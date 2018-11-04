@@ -1,4 +1,4 @@
-is![Shu](https://raw.github.com/codesinger/shu/master/doc/shu-2011-l.png)
+![Shu](https://raw.github.com/codesinger/shu/master/doc/shu-2011-l.png)
 *Shu Swamp, Charles T. Church Nature Preserve, Mill Neck, NY*
 # Shu #
 My personal Emacs configuration and useful lisp functions.
