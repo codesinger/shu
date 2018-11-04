@@ -73,8 +73,8 @@ of the variable \"org-stuck-projects\"."
 
     ;; Day of month 01 - 31
     (day-match (regexp-opt
-        (list "01" "02" "03" "04" "05" "06" "07" "08" "09" "10" 
-              "11" "12" "13" "14" "15" "16" "17" "18" "19" "20" 
+        (list "01" "02" "03" "04" "05" "06" "07" "08" "09" "10"
+              "11" "12" "13" "14" "15" "16" "17" "18" "19" "20"
               "21" "22" "23" "24" "25" "26" "27" "28" "29" "30" "31") nil ))
 
     ;; Must be twentieth or twenty-first centuray
@@ -119,9 +119,9 @@ of the variable \"org-stuck-projects\"."
 
   (setq year-match (concat year-start-match year-end-match))
   (setq date-match (concat
-                         year-match  "-" 
-                         month-match "-" 
-                         day-match 
+                         year-match  "-"
+                         month-match "-"
+                         day-match
                          day-name-match
                          hour-match  ":"
                          minute-match))
@@ -143,7 +143,7 @@ of the variable \"org-stuck-projects\"."
     (todo-state-regexp (regexp-opt todo-states))
     (done-match))
 
-  (setq done-match (concat "\\s-*- State\\s-+" "\"" done-word "\"" "\\s-+" 
+  (setq done-match (concat "\\s-*- State\\s-+" "\"" done-word "\"" "\\s-+"
                            "from" "\\s-+" "\"" todo-state-regexp "\""
                            "\\s-+" "\\[" "\\(" (shu-org-date-match-regexp) "\\)" "\\]"))
   done-match
@@ -172,7 +172,7 @@ than shu-org-archive-expiry-days days ago."
      (done-days )
      (done-regexp
             (concat "\\* \\(" (regexp-opt shu-org-done-keywords) "\\) "))
-     (todo-regexp 
+     (todo-regexp
             (concat "\\* " (regexp-opt (append shu-org-todo-keywords shu-org-done-keywords)) " "))
      (start-time (current-time))
      (cfile (buffer-file-name))
@@ -192,8 +192,8 @@ than shu-org-archive-expiry-days days ago."
   (when shu-debug
      (setq  gbuf (get-buffer-create "*shu debug*")))
   (setq time-string (format-time-string "%Y-%m-%d %a %H:%M" start-time))
-  (setq header (concat "\n\n******* Start TODO archive of " cfile 
-                " on " time-string 
+  (setq header (concat "\n\n******* Start TODO archive of " cfile
+                " on " time-string
                           " *******\n\n"))
   (save-excursion
     (save-restriction
@@ -203,13 +203,13 @@ than shu-org-archive-expiry-days days ago."
       (while (re-search-forward done-regexp nil t)
         (when shu-debug
           (princ (concat "string " (match-string 1) "\n") gbuf)
-          (princ (format "At line %d\n" (the-line-at (point))) gbuf))
+          (princ (format "At line %d\n" (shu-the-line-at (point))) gbuf))
         ;; The word that indicates DONE (something like DONE or CANCELLED)
         (setq done-word (match-string 1))
         (setq start-of-item (line-beginning-position))
         (setq end-of-item (line-end-position))
         ;; Build a regexp to search for the state transition record with a timestamp
-        (setq rex (concat "- State\\s-+" "\"" done-word "\"" "\\s-+" 
+        (setq rex (concat "- State\\s-+" "\"" done-word "\"" "\\s-+"
                           "from" "\\s-+" "\"" "[A-Z]*" "\"" "\\s-+"
                            "\\[\\([0-9A-Za-z\-\:\s]+\\)\\]*"))
         (when shu-debug
@@ -221,7 +221,7 @@ than shu-org-archive-expiry-days days ago."
             (setq sbound (line-beginning-position))))
 
         (when shu-debug
-          (princ (format "sbound = %d (line %d)\n" sbound (the-line-at sbound)) gbuf))
+          (princ (format "sbound = %d (line %d)\n" sbound (shu-the-line-at sbound)) gbuf))
         (if (re-search-forward rex sbound t)
           (progn
           (when shu-debug
@@ -255,8 +255,8 @@ than shu-org-archive-expiry-days days ago."
               (setq done-header t))
 
             (setq error-count (1+ error-count))
-            (append-to-file (format "\n***error*** The following entry at line %d has no close time:\n" 
-                            (the-line-at start-of-item)) nil ofile)
+            (append-to-file (format "\n***error*** The following entry at line %d has no close time:\n"
+                            (shu-the-line-at start-of-item)) nil ofile)
             (append-to-file (concat (buffer-substring start-of-item end-of-item) "\n\n")
                                    nil ofile)))
 
@@ -272,7 +272,7 @@ than shu-org-archive-expiry-days days ago."
               (if (= error-count 1)
                 (setq end-msg (format "Encountered %d error in attempting to archive completed items." error-count))
                 (setq end-msg (format "Encountered %d errors in attempting to archive completed items." error-count))))
-            (t 
+            (t
               (if (= archive-count 1)
                 (setq end-msg-a (format "Archived %d completed item " archive-count))
                 (setq end-msg-a (format "Archived %d completed items " archive-count)))

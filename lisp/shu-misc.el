@@ -150,7 +150,7 @@ file into the kill ring in the form of \"line 1234 of foo.cpp\"."
     (if (not name)
         (ding)
     ;;
-        (setq fline (format "line %d of %s" (current-line) name))
+        (setq fline (format "line %d of %s" (shu-current-line) name))
         (shu-kill-new fline))))
 
 
@@ -170,7 +170,7 @@ in the form of \"foo.cpp:123:2\"."
     (if (not name)
         (ding)
     ;;
-        (setq fline (format "%s:%d:%d" name (current-line) curpos))
+        (setq fline (format "%s:%d:%d" name (shu-current-line) curpos))
         (shu-kill-new fline))))
 
 
@@ -332,9 +332,9 @@ too short will be expanded as necessary."
 (defun shu-forward-line ()
   "Move forward by one line.  If there is a next line, point it moved into
 it.  If there are no more lines, a new one is created."
-  (let ((sline (current-line)))         ; Starting line
+  (let ((sline (shu-current-line)))     ; Starting line
     (forward-line)                      ; Try to move down one
-    (when (= sline (current-line))      ; Did not actually move
+    (when (= sline (shu-current-line))  ; Did not actually move
          (end-of-line)                  ; Add a new line to end
          (newline))))                   ;  of the file
 
@@ -347,7 +347,7 @@ it.  If there are no more lines, a new one is created."
 from the top of the current window."
   (interactive)
   (let ((targ-point (point))            ; Point to reposition
-        (targ-line (current-line))      ; Line to reposition
+        (targ-line (shu-current-line))  ; Line to reposition
         (wh (1- (window-height)))       ; Displayable window height
         (midp 0)                        ; Mid-point of window height
         (addp 0)                        ; Lines to add

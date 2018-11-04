@@ -37,7 +37,7 @@
 ;; defun). Such definitions do not conflict.
 ;;
 ;; emacs lisp does this by having a value cell and a function cell associated
-;; with each name.  See Section 8.1 (Symbol Components).  We might consider two 
+;; with each name.  See Section 8.1 (Symbol Components).  We might consider two
 ;; different lists of names?
 
 ;;
@@ -52,7 +52,7 @@
 ;;
 ;;  file-funs-list is a list of file-funs
 ;;
-;;  
+;;
 ;;  file-funs
 ;;
 ;;   -------------------
@@ -69,7 +69,7 @@
 ;;
 ;;  def-list is a list of file-item.
 ;;
-;;  
+;;
 ;;  file-item:
 ;;
 ;;   -------------------
@@ -85,7 +85,7 @@
 ;;
 ;;
 ;;
-;;  
+;;
 ;;  Name-lengths:
 ;;
 ;;   -------------------
@@ -100,7 +100,7 @@
 ;;
 ;;
 ;;
-;;  
+;;
 ;;  Item:
 ;;
 ;;   -------------------
@@ -115,7 +115,7 @@
 ;;
 ;;
 ;;  Info:
-;;  
+;;
 ;;   -------------------
 ;;   |        |        |
 ;;   |    o   |   o    |
@@ -143,7 +143,7 @@
 ;;   | File   | Line # |
 ;;   |        |        |
 ;;   -------------------
-;;                      
+;;
 ;;
 ;;  Ref: Is a list of all of the functions that call this one
 
@@ -160,7 +160,18 @@
               "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
               "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
               "_" "-" "$") nil)
+
 "A regular expression to match a varaiable name in emacs lisp.")
+(defconst shu-xref-var-types
+  '(("un"     . 1)
+    ("macro"  . 2)
+    ("subst"  . 3)
+    ("alias"  . 4)
+    ("var"    . 5)
+    ("const"  . 6)
+    ("custom" . 7)
+    ("group"  . 8))
+  "Associate a number with each type of variable")
 
 
 ;;
@@ -216,7 +227,7 @@ Then invoke shu-make-xref.  It will do a cross reference of all of those files."
         (find-file file-name)
         (setq fun-defs (shu-get-all-definitions fun-defs))
         (kill-buffer (current-buffer))
-        (setq tlist (cdr tlist)))    
+        (setq tlist (cdr tlist)))
   fun-defs
 ))
 
@@ -236,7 +247,7 @@ FILE-LIST is the list that is also the return value of this function."
        )
   (save-excursion
     (goto-char start)               ; Move to region start
-                                    ; While we have not reached last line and  
+                                    ; While we have not reached last line and
     (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
       (setq eol (save-excursion (end-of-line) (point)))
       (when (> eol (point))
@@ -256,7 +267,7 @@ FILE-LIST is the list that is also the return value of this function."
 name in T1 comes before the type name in T2.  If the type names are the same,
 then compare the variable names so that variables are in alphabetical order
 within type."
-  (let 
+  (let
    ((fun-name1)
     (info1)
     (def1)
@@ -294,7 +305,7 @@ within type."
 name in T1 comes before the type name in T2.  If the file names are the same,
 then compare the variable names so that variables are in alphabetical order
 within file."
-  (let 
+  (let
      ((def1)
       (file-name1)
       (fun-name1)
@@ -367,7 +378,7 @@ type name in the CAR and the longest variable name in the CDR."
       (when (> (length type-name) max-type-name-length)
           (setq max-type-name-length (length type-name)))
       (setq tlist (cdr tlist)))
-  (setq retval (cons max-type-name-length max-var-name-length))     
+  (setq retval (cons max-type-name-length max-var-name-length))
   retval
 ))
 
@@ -416,7 +427,7 @@ type name in the CAR and the longest variable name in the CDR."
 ;;  shu-get-all-definitions
 ;;
 ;; This returns a list with the following information in it for each function
-;;  
+;;
 ;;  Item:
 ;;
 ;;   -------------------
@@ -431,14 +442,14 @@ type name in the CAR and the longest variable name in the CDR."
 ;;
 ;;
 ;;  Info:
-;;  
+;;
 ;;   -------------------
 ;;   |        |        |
 ;;   |    o   |  nil   |
 ;;   |    |   |        |
 ;;   -----|-------------
-;;        |        
-;;        |                   
+;;        |
+;;        |
 ;;        |
 ;;        +-------------> Def
 ;;
@@ -459,7 +470,7 @@ type name in the CAR and the longest variable name in the CDR."
 ;;   | File   | Line # |
 ;;   |        |        |
 ;;   -------------------
-;;                      
+;;
 (defun shu-get-all-definitions (fun-defs)
   "Find all of the emacs lisp function definitions in the current buffer."
   (let
@@ -498,7 +509,7 @@ type name in the CAR and the longest variable name in the CDR."
 ;;
 ;;  shu-xref-get-next-definition
 ;;
-;;  
+;;
 ;;  Retval:
 ;;
 ;;   -------------------
@@ -513,7 +524,7 @@ type name in the CAR and the longest variable name in the CDR."
 ;;
 ;;
 ;;  Info:
-;;  
+;;
 ;;   -------------------
 ;;   |        |        |
 ;;   |    o   |   o    |
@@ -524,16 +535,6 @@ type name in the CAR and the longest variable name in the CDR."
 ;;        |
 ;;        +-------------> Type number
 ;;
-(defconst shu-xref-var-types
-  '(("un"     . 1)
-    ("macro"  . 2)
-    ("subst"  . 3)
-    ("alias"  . 4)
-    ("var"    . 5)
-    ("const"  . 6)
-    ("custom" . 7)
-    ("group"  . 8))
-  "Associate a number with each type of variable")
 ;;
 (defun shu-xref-get-next-definition (retval)
   "Find and return the next definition of an emacs lisp function of variable.
@@ -541,7 +542,7 @@ type name in the CAR and the longest variable name in the CDR."
 as nil if there are no more function definitions after point.  If a definition
 is found, RETVAL is returned as a cons cell with the name of the function
 in the CAR and the information about the function in the CDR.  The information in the
-CDR is a cons cell with the numeric variable type in the CAR and the line number in 
+CDR is a cons cell with the numeric variable type in the CAR and the line number in
 which the definition started in the CDR."
   (let*
    ((name "def\\(un\\|macro\\|subst\\|alias\\|var\\|const\\|custom\\|group\\)")
