@@ -17,6 +17,28 @@ it without having to drag along everything else.
 This is an incomplete work in progress.
 
 
+**Table Of Contents**
+
+* [Overview](#overview)
+* [Detailed description](#detailed description)
+  * [shu-project](#shu-project)
+  * [Generate skeleton class and component files](#Generate skeleton class and component files)
+  * [shu-keyring](#shu-keyring)
+* [References](#references)
+
+
+## Overview ##
+
+Most of the code in this repository helps me to read and write C and C++ code
+because that is what my day job, and occasionally my hobby, reauires.
+
+There is also a set of functions that allow one to use emacs as a key ring or
+password manager.  Information about user IDs, passwords, URLs, and other things is
+kept in an ASCII text file, which may be encrypted.  emacs commands are used to find
+entries and to place their values into the kill ring, from which they can be pasted
+into the appropriate place.
+
+
 ## References ##
 
 
