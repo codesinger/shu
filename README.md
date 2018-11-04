@@ -20,6 +20,7 @@ This is an incomplete work in progress.
 **Table Of Contents**
 
 * [Overview](#overview)
+* [Directories](#directories)
 * [Detailed description](#detailed description)
   * [shu-project](#shu-project)
   * [Generate skeleton class and component files](#Generate skeleton class and component files)
@@ -37,6 +38,34 @@ password manager.  Information about user IDs, passwords, URLs, and other things
 kept in an ASCII text file, which may be encrypted.  emacs commands are used to find
 entries and to place their values into the kill ring, from which they can be pasted
 into the appropriate place.
+
+## Directories ##
+
+THis repository contains three subdirectories.
+
+ 1. **lisp** contains the source code of the package
+
+ 2. **test** contains a set of unit tests for some, but not all, of the code in the
+   `lisp` directory.
+
+ 3. **usr** conatains files that are normally modified or replaced by users of this
+   package.
+
+
+
+## Detailed description ##
+
+
+### shu-project ###
+
+
+
+### Generate skeleton class and component files ###
+
+
+
+### shu-keyring ###
+
 
 
 ## References ##
