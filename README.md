@@ -21,9 +21,9 @@ This is an incomplete work in progress.
 
 * [Overview](#overview)
 * [Directories](#directories)
-* [Detailed description](#detailed description)
+* [Detailed description](#detaileddescription)
   * [shu-project](#shu-project)
-  * [Generate skeleton class and component files](#Generate skeleton class and component files)
+  * [Generate skeleton class and component files](#generatedcode)
   * [shu-keyring](#shu-keyring)
 * [References](#references)
 
@@ -53,14 +53,14 @@ THis repository contains three subdirectories.
 
 
 
-## Detailed description ##
+## Detailed description <a name=detaileddescription></a>
 
 
 ### shu-project ###
 
 
 
-### Generate skeleton class and component files ###
+### Generate skeleton class and component files <a name=generatecode></a>
 
 
 
