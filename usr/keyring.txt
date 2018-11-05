@@ -1,0 +1,11 @@
+This is a sample keyring file.  Text not enclosed in angle brackets is
+completeloy ignored
+
+< name="Fred email" url=mail.google.com  id=freddy@gmail.com  pw=secret />
+
+< url=ww.facebook.com  id=freddy@gmail.com  pw=facebook_secret />
+
+  What was your mother's maiden name?  "Wogus"
+
+< url=www.frednationalback.com  id=freddy@gmail.com  pw=bank_secret
+      acct=987654321  pin=1234 />
