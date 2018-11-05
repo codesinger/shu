@@ -101,6 +101,18 @@
 ;;  shu-test-shu-internal-doc-to-md-6
 ;;
 (ert-deftest shu-test-shu-internal-doc-to-md-6 ()
+  (let ((x  "ARG-NAME")
+        (expected "arg-name")
+        (actual))
+    (setq actual (downcase x))
+    (should (string= expected actual))
+      ))
+
+
+;;
+;;  shu-test-shu-internal-doc-to-md-7
+;;
+(ert-deftest shu-test-shu-internal-doc-to-md-7 ()
   (let ((x  "This is an ARG name.")
         (expected "This is an `arg` name.")
         (actual))

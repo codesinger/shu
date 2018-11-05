@@ -294,17 +294,15 @@
   "The current buffer contains a doc string from a function definition (with leading
 and trailing quotes removed).  This function turns escaped quotes into regular
 (non-escaped) quotes and turns names with leading and trailing asterisks (e.g.,
-**project-count-buffer**) into short code blocks surrounded by back ticks."
-(let (
-      (esc-quote    "\\\\\"")
+**project-count-buffer**) into short code blocks surrounded by back ticks.  It also
+turns upper case names into lower case names surroiunded by mardown ticks."
+(let ((esc-quote    "\\\\\"")
       (plain-quote  "\"")
       (star-name "*[a-zA-Z0-9*-_]+")
       (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\)+")
       (nm)
       (ln)
-      (case-fold-search nil)
-
-      )
+      (case-fold-search nil))
   (goto-char (point-min))
   (while (re-search-forward esc-quote nil t)
     (replace-match plain-quote))
@@ -315,6 +313,5 @@ and trailing quotes removed).  This function turns escaped quotes into regular
   (while (re-search-forward arg-name nil t)
     (setq nm (match-string 1))
     (setq ln (downcase nm))
-    (replace-match (concat "`" ln "`") ))
-
+    (replace-match (concat "`" ln "`") t nil nil 1))
   ))
