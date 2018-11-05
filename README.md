@@ -66,6 +66,63 @@ THis repository contains three subdirectories.
 
 ### shu-keyring ###
 
+`shu-keyring.el` contains a set of functions for maintaining and querying a keyring of
+names, URLs, IDs and passwords that are maintained in a relatively free form text
+file.
+
+The keyring file may be encrypted with GPG.  As of emacs 23, the EasyPG package is
+included with the emacs distribution.  When you tell emacs to open a file that has
+been encrypted with GPG, you are prompted for the passphrase and the file is
+decrypted into memory.
+
+The file `keyring.txt` in the **usr** directory is am example of a small keyring
+file that has not been encruypted.  Each entry in the file consists of a set of name
+value pairs.  Each value may be enclosed in quotes if it contains embedded blanks.
+
+A single set of name value pairs starts with an opening `<` and is terminated by a
+closing `\>`.
+
+Here is an example of a set of name value pairs taken from that file:
+
+```
+< name="Fred email" url=mail.google.com  id=freddy@gmail.com  pw=secret />
+```
+
+The names may be arbitrary but there are six names that are recognized by the
+functons in `keyring.el`.  They are:
+
+ 1. **acct** represents an account number
+
+ 2. **id** represents a user ID
+
+ 3. **name** represents the name of the entry.  This is the key that is used to find
+    the entry.  If mo name is given, then the name of the URL is used.  If the URL
+    sarts with `www.`, the `www.` is removed to form the name.  An entry that has no
+    name and a URL of `www.facebook.com` would have an auto generated name of `facebook`.
+
+ 4. **pin** represents a pin number
+
+ 5. **pw** represents a password
+
+ 6. **url** represents a URL for a web site
+
+TO use a keying file, place the following line im your `.emacs` file:
+
+```
+(setq shu-keyring-file "~/shu/usr/keyring.txt")
+```
+
+replacing `~/shu/usr/keyring.txt` with the path to your keyring file.
+
+Fred can nos use this to log onto his gmail account as follows.
+
+Type <kbd>M-x krurl</kbd>.  This prompts for the name of the desired key.  Type
+`fred em` and hit <kbd>TAB</kbd> to complete.  This fills out the name as 'fred
+email` and puts the URL `mail.google.com` into the kill ring.  Open a browser and
+paste the URL into it to go to gmail.  At gmail, select login.  Type <kbd>M-x
+krid</kbd>.  When prompted for the key, use the up arrow to retrieve tha last key
+used, which will be `fred email`.  This puts `freddy@gmail.com` into the kill ring
+for convenientlyu pasting into the gmail widow.  To obtain the password, type
 
 
 ## References ##
