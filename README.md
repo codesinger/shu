@@ -67,8 +67,12 @@ THis repository contains three subdirectories.
 ### shu-keyring ###
 
 `shu-keyring.el` contains a set of functions for maintaining and querying a keyring of
-names, URLs, IDs and passwords that are maintained in a relatively free form text
-file.
+names, URLs, users IDs, passwords, and related information that are maintained in an
+external keyring file.
+
+Functions allow you to find a keyring entry by name and to put one piece of its
+information, such as user ID or password, in the clip board, from which it may be
+pasted into a browser or other application.
 
 The keyring file may be encrypted with GPG.  As of emacs 23, the EasyPG package is
 included with the emacs distribution.  When you tell emacs to open a file that has
@@ -104,9 +108,9 @@ functons in `keyring.el`.  They are:
 
  5. **pw** represents a password
 
- 6. **url** represents a URL for a web site
+ 6. **url** represents a URL
 
-TO use a keying file, place the following line im your `.emacs` file:
+To use a keying file, place the following line im your `.emacs` file:
 
 ```
 (setq shu-keyring-file "~/shu/usr/keyring.txt")
@@ -114,15 +118,18 @@ TO use a keying file, place the following line im your `.emacs` file:
 
 replacing `~/shu/usr/keyring.txt` with the path to your keyring file.
 
-Fred can nos use this to log onto his gmail account as follows.
+If using the sample keyrig file,
+Fred can now use this to log onto his gmail account as follows.
 
 Type <kbd>M-x krurl</kbd>.  This prompts for the name of the desired key.  Type
-`fred em` and hit <kbd>TAB</kbd> to complete.  This fills out the name as 'fred
-email` and puts the URL `mail.google.com` into the kill ring.  Open a browser and
-paste the URL into it to go to gmail.  At gmail, select login.  Type <kbd>M-x
+`Fred em` and hit <kbd>TAB</kbd> to complete.  This fills out the name as 'Fred
+email` and puts the URL `mail.google.com` into the clip board.  Open a browser and
+paste the URL into it to go to gmail.  At gmail, select login.  In emacs type <kbd>M-x
 krid</kbd>.  When prompted for the key, use the up arrow to retrieve tha last key
-used, which will be `fred email`.  This puts `freddy@gmail.com` into the kill ring
-for convenientlyu pasting into the gmail widow.  To obtain the password, type
+used, which will be `Fred email`.  This puts `freddy@gmail.com` into the clip board
+for conveniently pasting into the gmail widow.  To obtain the password, type <kbd>M-x
+krpw</kbd>.  This puts the pssword into the clip board from which it may be paste
+into the gmail widow.
 
 
 ## References ##
