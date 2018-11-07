@@ -27,10 +27,10 @@
 
 ;;
 ;; ```
-;;  nvplist:               
-;;                      
+;;  nvplist:
+;;
 ;;   is a list of nvpair, each of which contains:
-;; 
+;;
 ;;   -------------------
 ;;   |        |        |
 ;;   |    o   |   o    |
@@ -40,22 +40,22 @@
 ;;        |       +-----> Value
 ;;        |
 ;;        +-------------> Name
-;; 
-;; 
+;;
+;;
 ;;  item:
-;; 
+;;
 ;;   -------------------
 ;;   |        |        |
 ;;   | Item # |   o-------------->nvplist
 ;;   |        |        |
 ;;   -------------------
-;;                      
-;; 
+;;
+;;
 ;;  index:
-;; 
+;;
 ;;   is a list of key-item, each of which contains:
-;; 
-;; 
+;;
+;;
 ;;   -------------------
 ;;   |        |        |
 ;;   |    o   |   o    |
@@ -65,11 +65,11 @@
 ;;        |       +-----> item
 ;;        |
 ;;        +-------------> Key
-;; 
+;;
 ;;  Given a key value, one can use (assoc), (assq), (assoc-default), etc. to find
 ;;  the item associated with the key.
 ;; ```
-;; 
+;;
 
 
 (defgroup shu-keyring nil
@@ -86,7 +86,7 @@
   "The variable that points to the in-memory keyring index.")
 
 (defvar shu-keyring-history   nil
-  "The history list used by completing-read when asking the user for a key to an 
+  "The history list used by completing-read when asking the user for a key to an
 entry in the keyring file.")
 
 (defconst shu-keyring-url-name   "url"
@@ -164,16 +164,28 @@ requesting it."
     (shu-keyring-get-field shu-keyring-account-name)
     )
 
+
+;;
+;; shu-keyring-get-file
+;;
+(defun shu-keyring-get-file()
+"DIsplay the name of the keyring file, if any"
+(interactive)
+(if shu-keyring-file
+    (message "Shu keyring file is \"%s\"" shu-keyring-file)
+  (message "%s" "No keyring file is defined."))
+  )
+
 ;;
 ;;  shu-keyring-clear-index
 ;;
 (defun shu-keyring-clear-index()
   "This is called from after-save-hook to clear the keyring index if the keyring file is saved.
-The keyring index is built the first time it is needed and kept in memory thereafter.  But we 
+The keyring index is built the first time it is needed and kept in memory thereafter.  But we
 must refresh the index if the keyring file is modified.  The easiest way to do this is to clear
 the index when the keyring file is modified.  The next time the index is neeeded it will be
 recreated."
-  (let 
+  (let
       ((fn1 (buffer-file-name))
        (fn2 (abbreviate-file-name (buffer-file-name))))
 
@@ -203,8 +215,8 @@ key value pair within the item.  Put the value in the kill-ring and also return 
         (progn
           (message "Could not parse keyring.  See %s." shu-unit-test-buffer)
           (ding))
-      
-      (let 
+
+      (let
            ((completion-ignore-case t))
         (setq keyring-key
               (completing-read
@@ -360,7 +372,7 @@ order by key value before this function is called."
         (xitem-number )
         (got-it    nil))
     (when (not tindex)
-      (setq done t))  
+      (setq done t))
     (while (not done)
       (setq pair (car tindex))
       (setq xvalue (car pair))
@@ -413,9 +425,9 @@ placed in the clipboard, (PW, ID, etc.)"
       ;; Nothing to display
       (setq got-string nil))
      ((and names (not urls)) ;; names only
-      (setq mstring (shu-keyring-values-to-string names)))    
+      (setq mstring (shu-keyring-values-to-string names)))
      ((and urls (not names)) ;; urls only
-      (setq mstring  (shu-keyring-values-to-string urls)))    
+      (setq mstring  (shu-keyring-values-to-string urls)))
      (t                       ;; Both names and urls
       (setq mstring (concat (shu-keyring-values-to-string urls) " (" (shu-keyring-values-to-string names) ")"))))
     (when got-string
@@ -452,4 +464,5 @@ shu- prefix removed."
   (defalias 'krpin 'shu-keyring-get-pin)
   (defalias 'krid 'shu-keyring-get-id)
   (defalias 'kracct 'shu-keyring-get-acct)
+  (defalias 'krfn 'shu-keyring-get-file)
   )
