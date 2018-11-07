@@ -128,8 +128,24 @@ paste the URL into it to go to gmail.  At gmail, select login.  In emacs type <k
 krid</kbd>.  When prompted for the key, use the up arrow to retrieve tha last key
 used, which will be `Fred email`.  This puts `freddy@gmail.com` into the clip board
 for conveniently pasting into the gmail widow.  To obtain the password, type <kbd>M-x
-krpw</kbd>.  This puts the pssword into the clip board from which it may be paste
+krpw</kbd>.  This puts the password into the clip board from which it may be paste
 into the gmail widow.
+
+
+### List of short keyring commands ###
+
+**kracct** Put the account number in the clip board.
+
+**krfn** Display the name of the keyring file, if any.
+
+**krid** Put the user ID in the clip board.
+
+**krpin** Put the pin number in the clip board.
+
+**krpw** Put the password in the clip board.
+
+**krurl** Put the URK in the clip board.
+
 
 
 ## References ##
