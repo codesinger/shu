@@ -200,7 +200,7 @@ recreated."
 
 
 ;;
-;;
+;;  shu-keyring-verify-file
 ;;
 (defun shu-keyring-verify-file ()
   "Parse and verify the keyring file, displaying the result of the operation in the
@@ -308,14 +308,18 @@ contains no duplicate keys."
         (key     )
         (item    )
         (item-number )
+        (item-number-string )
         (count   0))
+    (princ "     Line\n" gbuf)
+    (princ "    Number   Key ...\n" gbuf)
     (while tindex
       (setq count (1+ count))
       (setq key-item (car tindex))
       (setq key  (car key-item))
       (setq item (cdr key-item))
       (setq item-number (shu-nvplist-get-item-number item))
-      (princ (format "%3d: %s\n" item-number key) gbuf)
+      (setq item-number-string (shu-fixed-format-num item-number 10))
+      (princ (format "%s:  %s\n" item-number-string key) gbuf)
       (setq tindex (cdr tindex)))
     (princ (format "Index contains %d entries.\n" count)  gbuf)
     ))
