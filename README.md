@@ -51,6 +51,11 @@ THis repository contains three subdirectories.
  3. **usr** conatains files that are normally modified or replaced by users of this
    package.
 
+### External names ###
+
+All of the externally visible names in these packages (functions macros, constants, etc.) begin with the
+prefix `shu-`.  This keeps them kfrom interfering with names that are part of emacs or part of other
+packages.  But it also makes them a bit ciumersome to type.  Each lisp file has
 
 
 ## Detailed description <a name=detaileddescription></a>
@@ -145,6 +150,8 @@ into the gmail widow.
 **krpw** Put the password in the clip board.
 
 **krurl** Put the URK in the clip board.
+
+**krvf** Validate the keyring file by parsing it and displaying the results in a buffer.
 
 
 

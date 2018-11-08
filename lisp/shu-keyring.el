@@ -107,6 +107,10 @@ entry in the keyring file.")
 (defconst shu-keyring-pin-name   "pin"
   "Key word that denotes a PIN.")
 
+(defconst shu-keyring-buffer-name  "**shu-keyring**"
+  "The name of the buffer into which keyring diagnostics and messages
+are reorded.")
+
 
 
 ;;
@@ -169,7 +173,7 @@ requesting it."
 ;; shu-keyring-get-file
 ;;
 (defun shu-keyring-get-file()
-"DIsplay the name of the keyring file, if any"
+"Display the name of the keyring file, if any"
 (interactive)
 (if shu-keyring-file
     (message "Shu keyring file is \"%s\"" shu-keyring-file)
@@ -194,6 +198,24 @@ recreated."
       (setq shu-keyring-index nil))
     ))
 
+
+;;
+;;
+;;
+(defun shu-keyring-verify-file ()
+  "Parse and verify the keyring file, displaying the result of the operation in the
+keyring buffer."
+  (interactive)
+    (setq shu-keyring-index nil)
+    (when (bufferp shu-keyring-buffer-name)
+      (kill-buffer shu-keyring-buffer-name))
+    (shu-keyring-parse-keyring-file)
+    (switch-to-buffer shu-keyring-buffer-name)
+    (goto-char (point-min))
+    )
+
+
+
 ;;
 ;;  shu-keyring-get-field
 ;;
@@ -202,7 +224,7 @@ recreated."
 for the field that identifies the key.  Use the key to find the item.  Find the value of the named
 key value pair within the item.  Put the value in the kill-ring and also return it to the caller."
   (let
-       ((gbuf      (get-buffer-create shu-unit-test-buffer))
+       ((gbuf      (get-buffer-create shu-keyring-buffer-name))
         (invitation   "Key? ")
         (keyring-key   )
         (keyring-entry )
@@ -213,7 +235,7 @@ key value pair within the item.  Put the value in the kill-ring and also return 
       (shu-keyring-parse-keyring-file))
     (if (not shu-keyring-index)
         (progn
-          (message "Could not parse keyring.  See %s." shu-unit-test-buffer)
+          (message "Could not parse keyring.  See %s." shu-keyring-buffer-name)
           (ding))
 
       (let
@@ -245,9 +267,12 @@ key value pair within the item.  Put the value in the kill-ring and also return 
 ;; shu-keyring-parse-keyring-file
 ;;
 (defun shu-keyring-parse-keyring-file ()
+  "Parse the keyring file and create the in-memory index if the keyring file
+contains no duplicate keys."
   (interactive)
   (let
-      ((gbuf      (get-buffer-create shu-unit-test-buffer))
+      ((gbuf      (get-buffer-create shu-keyring-buffer-name))
+       (count        )
        (file-type   "Keyring")
        (item-list    )
        (ilist        )
@@ -261,19 +286,23 @@ key value pair within the item.  Put the value in the kill-ring and also return 
       (setq index (shu-keyring-update-index index item))
       (setq ilist (cdr ilist)))
     (setq index (sort index (lambda(t1 t2) (string< (upcase (car t1)) (upcase (car t2))))))
-    (shu-keyring-show-index index)
     (if (shu-keyring-find-index-duplicates index)
         (princ "Index has duplicates\n" gbuf)
       (princ "Index has no duplicates\n" gbuf)
-      (setq shu-keyring-index index))
+      (setq count (length index))
+      (setq shu-keyring-index index)
+      (princ (format "Index contains %d entries.\n" count)  gbuf))
+    (shu-keyring-show-index index)
     ))
+
+
 ;;
 ;;  shu-keyring-show-index
 ;;
 (defun shu-keyring-show-index (index)
   "Print the keyring index"
   (let
-       ((gbuf      (get-buffer-create shu-unit-test-buffer))
+       ((gbuf      (get-buffer-create shu-keyring-buffer-name))
         (tindex  index)
         (key-item )
         (key     )
@@ -300,7 +329,7 @@ keys for the same item.  But there could be two different items with the same ke
 function returns TRUE if two or more items have the same key.  The index must be in sorted
 order by key value before this function is called."
   (let
-       ((gbuf      (get-buffer-create shu-unit-test-buffer))
+       ((gbuf      (get-buffer-create shu-keyring-buffer-name))
         (tindex  index)
         (key-item )
         (key     )
@@ -391,7 +420,7 @@ order by key value before this function is called."
 ;;  shu-keyring-add-values-to-index
 ;;
 (defun shu-keyring-add-values-to-index (index vlist item)
-  "Add a set of keys (VLIST) to INDEX for ITEM.  Keys within the item are filtered for
+  "Add a set of keys VLIST to INDEX for ITEM.  Keys within the item are filtered for
 duplicates.  But this does not prevent two different items from sharing the same key,
 although it would be unusual in a keyring."
   (let
@@ -438,6 +467,9 @@ placed in the clipboard, (PW, ID, etc.)"
     (message "%s" mstring)
     ))
 
+;;
+;;  shu-keyring-values-to-string
+;;
 (defun shu-keyring-values-to-string (values)
   "Turn a list of values into a single string of values separated by slashes."
   (let
@@ -458,11 +490,13 @@ placed in the clipboard, (PW, ID, etc.)"
 (defun shu-keyring-set-alias ()
   "Set the common alias names for the functions in shu-keyring.
 These are generally the same as the function names with the leading
-shu- prefix removed."
+shu- prefix removed.  But in this case the names a drastically shorrtened
+to make them easier to type. "
   (defalias 'krpw 'shu-keyring-get-pw)
   (defalias 'krurl 'shu-keyring-get-url)
   (defalias 'krpin 'shu-keyring-get-pin)
   (defalias 'krid 'shu-keyring-get-id)
   (defalias 'kracct 'shu-keyring-get-acct)
   (defalias 'krfn 'shu-keyring-get-file)
+  (defalias 'krvf 'shu-keyring-verify-file)
   )
