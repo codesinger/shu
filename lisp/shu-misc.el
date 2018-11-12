@@ -77,6 +77,27 @@
       (while (re-search-forward "[ \t][ \t]*$" nil t)
           (delete-region (match-beginning 0) (point)))))
 
+;;
+;;  shu-quit - Exit emacs
+;;
+(defun shu-quit ()
+  "Invoke save-buffers-kill-emacs.  This is the function normally
+invoked by C-x C-c"
+  (interactive)
+  (save-buffers-kill-emacs))
+
+
+;;
+;;  shu-disabled-quit - Explain that C-x C-c does not do anything
+;;
+(defun shu-disabled-quit ()
+  "Explain that C-x C-c no longer kills emacs.  Must M-x quit instead.
+Far too often, I hit C-x C-c by mistake and emacs vanishes.  So I map
+C-x C-c to this function and use an explicit M-x quit to exit emacs."
+  (interactive)
+  (beep)
+  (message "C-x C-c has been disabled.  To exit emacs use M-x quit."))
+
 
 ;;
 ;;  shu-winpath

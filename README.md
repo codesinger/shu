@@ -34,10 +34,10 @@ Most of the code in this repository helps me to read and write C and C++ code
 because that is what my day job, and occasionally my hobby, reauires.
 
 There is also a set of functions that allow one to use emacs as a key ring or
-password manager.  Information about user IDs, passwords, URLs, and other things is
-kept in an ASCII text file, which may be encrypted.  emacs commands are used to find
-entries and to place their values into the kill ring, from which they can be pasted
-into the appropriate place.
+password manager.  Information about user IDs, passwords, URLs, and other items of
+interest is kept in an ASCII text file, which may be encrypted.  emacs commands are
+used to find entries and to place their values into the kill ring (clip board), from
+which they can be pasted into the appropriate place.
 
 ## Directories ##
 
@@ -53,9 +53,12 @@ THis repository contains three subdirectories.
 
 ### External names ###
 
-All of the externally visible names in these packages (functions macros, constants, etc.) begin with the
-prefix `shu-`.  This keeps them kfrom interfering with names that are part of emacs or part of other
-packages.  But it also makes them a bit ciumersome to type.  Each lisp file has
+All of the externally visible names in these packages (functions macros, constants,
+etc.) begin with the prefix `shu-`.  This keeps them from interfering with names
+that are part of emacs or part of other packages.  But it also makes them a bit
+ciumersome to type.  Each lisp file contains a function that will create a short
+alias for each function name.  THis is usually the original function name with the
+`shu-` prefix removed.
 
 
 ## Detailed description <a name=detaileddescription></a>
@@ -115,13 +118,19 @@ functons in `keyring.el`.  They are:
 
  6. **url** represents a URL
 
-To use a keying file, place the following line im your `.emacs` file:
+To use a keying file, place the following lines in your `.emacs` file:
 
 ```
+(load-file "~/.emacs.d/shu-base.elc")
+(load-file "~/.emacs.d/shu-nvplist.elc")
+(load-file "~/.emacs.d/shu-keyring.elc")
+(shu-keyring-set-alias)
 (setq shu-keyring-file "~/shu/usr/keyring.txt")
 ```
 
 replacing `~/shu/usr/keyring.txt` with the path to your keyring file.
+
+All of the `shu` functions require `shu-base`.
 
 If using the sample keyrig file,
 Fred can now use this to log onto his gmail account as follows.
