@@ -100,6 +100,19 @@ C-x C-c to this function and use an explicit M-x quit to exit emacs."
 
 
 ;;
+;;  Save the current file and load it as a .el file
+;;
+(defun shu-save-and-load ()
+  "Save and load the current file as a .el file."
+  (interactive)
+  (if (not (buffer-file-name))
+    (message "Current buffer has no file.")
+    (save-buffer)
+    (load-file (buffer-file-name))
+  ))
+
+
+;;
 ;;  shu-winpath
 ;;
 (defun shu-winpath (start end)
@@ -524,6 +537,7 @@ shu- prefix removed."
   (defalias 'set-dos-eol 'shu-set-dos-eol)
   (defalias 'trim-trailing-blanks 'shu-trim-trailing-blanks)
   (defalias 'winpath 'shu-winpath)
+  (defalias 'eld 'shu-save-and-load)
   (defalias 'gf 'shu-gf)
   (defalias 'of 'shu-of)
   (defalias 'gd 'shu-gd)
