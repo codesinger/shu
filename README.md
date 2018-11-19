@@ -41,14 +41,17 @@ which they can be pasted into the appropriate place.
 
 ## Directories ##
 
-THis repository contains three subdirectories.
+This repository contains four subdirectories.
 
  1. **lisp** contains the source code of the package
 
  2. **test** contains a set of unit tests for some, but not all, of the code in the
    `lisp` directory.
 
- 3. **usr** conatains files that are normally modified or replaced by users of this
+ 3. **personal** contains personal files that I use with emacs.  These are not part
+    of the `shu` package.
+
+ 4. **usr** conatains files that are normally modified or replaced by users of this
    package.
 
 ### External names ###
