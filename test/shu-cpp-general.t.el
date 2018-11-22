@@ -877,36 +877,22 @@ of a variable name with characters at the end."
 ))
 
 
-(defun zzz ()
-  (interactive)
-  (let (
-        (gb (get-buffer-create "**slp**"))
-        (class)
-        (qual)
-        (minibuffer-allow-text-properties nil)
-        )
-    (setq class (read-from-minibuffer "Class name? "))
-    (princ (concat "\"" class "\"\n") gb)
-    (setq qual (read-from-minibuffer "namespace? "))
-    (princ (concat "\"" qual "\"\n") gb)
-    (princ "\n" gb)
-    (message "%s::%s" qual class)
-    ))
-
-(defun yyy ()
-  (interactive)
-  (let (
-        (gb (get-buffer-create "**slp**"))
-        (class "")
-        (qual "")
-        (count 0)
-        (minibuffer-allow-text-properties nil)
-        )
-    (while (= 0 (length class))
-      (setq class (read-from-minibuffer "Class name? ")))
-    (while (= 0 (length qual))
-      (setq qual (read-from-minibuffer "Namespace? ")))
-    (goto-char (point-min))
-    (setq count (shu-qualify-class-name class qual))
-    (message "Replaced %d occurrences" count)
-    ))
+;;
+;;  shu-test-shu-qualify-class-name-12
+;;
+(ert-deftest shu-test-shu-qualify-class-name-12 ()
+  "Do not add namespace to lower case name."
+  (let* ((class "Mumble")
+        (data "mumble")
+        (namespace "abcdef")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))

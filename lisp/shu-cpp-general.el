@@ -1784,16 +1784,26 @@ names remain unchanged."
 ;;
 (defun shu-interactive-qualify-class-name ()
   "Interactively call SHU-QUALIFY-CLASS-NAME to find all instances of a class name and
-add a namespade qualifier to it."
+add a namespace qualifier to it.  First prompt is for the class name.  If a fully qualified
+class name is supplied, then the given namespace is applied to the class name.  If the name
+supplied is not a namespace qualified class name, then a second prompt is given to read the
+namespace."
   (interactive)
   (let ((class "")
+        (qclass "")
         (qual "")
+        (sqr (concat "\\(" shu-cpp-name "+\\)\\s-*::\\s-*\\(" shu-cpp-name "+\\)"))
         (count 0)
+        (case-fold-search nil)
         (minibuffer-allow-text-properties nil))
-    (while (= 0 (length class))
-      (setq class (read-from-minibuffer "Class name? ")))
+    (while (= 0 (length qclass))
+      (setq qclass (read-from-minibuffer "Class name? ")))
+    (setq class qclass)
+    (when (string-match sqr qclass)
+      (setq qual (match-string 1 qclass))
+      (setq class (match-string 2 qclass)))
     (while (= 0 (length qual))
-      (setq qual (read-from-minibuffer "Namespace? ")))
+      (setq qual (read-from-minibuffer "namespace? ")))
     (setq count (shu-qualify-class-name class qual))
     (message "Replaced %d occurrences" count)
     ))
