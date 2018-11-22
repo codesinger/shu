@@ -37,6 +37,11 @@
                               "_" "$") nil)
   "A regular expression to match a varaiable name in a C or C++ program.")
 
+(defconst shu-non-cpp-name
+  (concat "[^" (substring shu-cpp-name 1))
+  "A regular expression to match a character not valid in a varaiable name
+in a C or C++ program.")
+
 (defconst shu-cpp-file-name (regexp-opt
                              (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
                                    "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
@@ -117,6 +122,15 @@ the left and right brackets in the class of characters to be skipped.")
 the enclosing left and right square brackets removed.  skip-chars-forward does
 not expect character alternatives to be enclosed in square brackets and thus
 will include the brackets as characters to be skipped.")
+
+(defconst shu-not-all-whitespace-regexp
+  (concat "[^" (substring shu-all-whitespace-regexp 1))
+  "Regular expression to search for non-whitespace.  Since the syntax table considers
+newline to be (among other things) a comment terminator, the usual \\s- won't work
+for whitespace that includes newlines.  Note that this regular expression is a
+character alternative enclosed in left and right brackets.  skip-chars-forward does
+not expect character alternatives to be enclosed in square brackets and will include
+the left and right brackets in the class of characters to be skipped.")
 
 (defconst shu-comment-start-pattern "/[/\\*]"
   "*The regular expression that defines the delimeter used to start

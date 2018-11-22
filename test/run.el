@@ -13,8 +13,8 @@
       ((test-files
         (list
 ;;;         "find.t.el"
-         "macros.t.el"
-         "s-mode.t.el"
+;;;         "macros.t.el"
+;;;         "s-mode.t.el"
          "shu-base.t.el"
          "shu-capture-doc.t.el"
          "shu-cpp-general.t.el"

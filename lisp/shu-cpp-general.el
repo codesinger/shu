@@ -1729,6 +1729,77 @@ are not << represent a missing << operator."
 
 
 
+;;
+;;  shu-qualify-class-name
+;;
+(defun shu-qualify-class-name (target-name namespace)
+  "Find all instances of the class name TARGET-NAME and add an explicit namespace
+qualifier NAMESPACE.  If the TARGET-NAME is \"Mumble\" and the NAMESPACE is
+\"abcd\", then \"Mumble\" becomes \"abcd::Mumble\".  But variable names such
+as \"d_Mumble\" or \"MumbleIn\" remain unchanged and already qualified class
+names remain unchanged."
+  (interactive)
+  (let ((name-target (concat shu-cpp-name "+"))
+        (bol)
+        (eol)
+        (mbeg)
+        (mend)
+        (have-match)
+        (name)
+        (rename)
+        (count 0)
+        (case-fold-search nil))
+    (while (search-forward target-name nil t)
+      (setq bol (save-excursion (beginning-of-line) (point)))
+      (setq eol (save-excursion (end-of-line) (point)))
+      (setq name (match-string 0))
+      (setq mbeg (match-beginning 0))
+      (setq mend (match-end 0))
+      (setq have-match t)
+      (when (> mbeg bol)
+        (save-excursion
+          (goto-char (1- mbeg))
+          (if (looking-at shu-cpp-name)
+              (setq have-match nil)
+            (save-match-data
+              (when (re-search-backward shu-not-all-whitespace-regexp nil t)
+                (when (looking-at ":")
+                  (setq have-match nil)))))))
+      (when have-match
+        (when (< mend eol)
+          (save-excursion
+            (goto-char mend)
+            (when (looking-at shu-cpp-name)
+              (setq have-match nil)))))
+      (when have-match
+        (setq rename (concat namespace "::" name))
+        (replace-match rename t t)
+        (setq count (1+ count))))
+    count
+    ))
+
+
+;;
+;;  shu-interactive-qualify-class-name
+;;
+(defun shu-interactive-qualify-class-name ()
+  "Interactively call SHU-QUALIFY-CLASS-NAME to find all instances of a class name and
+add a namespade qualifier to it."
+  (interactive)
+  (let ((class "")
+        (qual "")
+        (count 0)
+        (minibuffer-allow-text-properties nil))
+    (while (= 0 (length class))
+      (setq class (read-from-minibuffer "Class name? ")))
+    (while (= 0 (length qual))
+      (setq qual (read-from-minibuffer "Namespace? ")))
+    (setq count (shu-qualify-class-name class qual))
+    (message "Replaced %d occurrences" count)
+    ))
+
+
+
 
 ;;
 ;;  shu-cpp-general-set-alias
@@ -1770,4 +1841,5 @@ shu- prefix removed."
   (defalias 'cdo 'shu-cdo)
   (defalias 'ck 'shu-cpp-check-streaming-op)
   (defalias 'set-default-namespace 'shu-set-default-namespace)
+  (defalias 'qualify-class 'shu-interactive-qualify-class-name)
 )

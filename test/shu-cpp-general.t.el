@@ -629,3 +629,284 @@
       (should (string= expected-do2 actual-do))
   )
 ))
+
+
+
+;;
+;;  shu-test-shu-qualify-class-name-1
+;;
+(ert-deftest shu-test-shu-qualify-class-name-1 ()
+  "Add a namespace to a class name when it is the only thing in the buffer"
+  (let* ((class "Mumble")
+        (namespace "abcdef")
+        (expected (concat namespace "::" class))
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert class)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 1 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-2
+;;
+(ert-deftest shu-test-shu-qualify-class-name-2 ()
+  "Add a namespace to a class name when it is the only thing in the buffer and it has
+something in front of it."
+  (let* ((class "Mumble")
+        (namespace "abcdef")
+        (prefix "  <")
+        (suffix "")
+        (expected (concat prefix namespace "::" class suffix))
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert (concat prefix class suffix))
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 1 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-3
+;;
+(ert-deftest shu-test-shu-qualify-class-name-3 ()
+  "Add a namespace to a class name when it is the only thing in the buffer and it has
+something in front of it and following it."
+  (let* ((class "Mumble")
+        (namespace "abcdef")
+        (prefix "  <")
+        (suffix ">")
+        (expected (concat prefix namespace "::" class suffix))
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert (concat prefix class suffix))
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 1 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-4
+;;
+(ert-deftest shu-test-shu-qualify-class-name-4 ()
+  "Do not add a namespace to something that might look like a class name but has the
+wrong case."
+  (let* ((class "Mumble")
+        (data "mumble")
+        (namespace "abcdef")
+        (prefix "  <")
+        (suffix ">")
+        (expected (concat prefix data suffix))
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert (concat prefix data suffix))
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-5
+;;
+(ert-deftest shu-test-shu-qualify-class-name-5 ()
+  "Do not add a namespace to something that might look like a class name but is part
+of a variable name with characters in front and with something also surrounding it."
+  (let* ((class "Mumble")
+        (data "d_Mumble")
+        (namespace "abcdef")
+        (prefix "  <")
+        (suffix ">")
+        (expected (concat prefix data suffix))
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert (concat prefix data suffix))
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-6
+;;
+(ert-deftest shu-test-shu-qualify-class-name-6 ()
+  "Do not add a namespace to something that might look like a class name but is part
+of a variable name with characters at the end and with something also surrounding it."
+  (let* ((class "Mumble")
+        (data "MumbleIn")
+        (namespace "abcdef")
+        (prefix "  <")
+        (suffix ">")
+        (expected (concat prefix data suffix))
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert (concat prefix data suffix))
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-7
+;;
+(ert-deftest shu-test-shu-qualify-class-name-7 ()
+  "Do not add a namespace to something that might look like a class name but is part
+of a variable name with characters in front."
+  (let* ((class "Mumble")
+        (data "d_Mumble")
+        (namespace "abcdef")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-8
+;;
+(ert-deftest shu-test-shu-qualify-class-name-8 ()
+  "Do not add a namespace to something that might look like a class name but is part
+of a variable name with characters at the end."
+  (let* ((class "Mumble")
+        (data "MumbleIn")
+        (namespace "abcdef")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-9
+;;
+(ert-deftest shu-test-shu-qualify-class-name-9 ()
+  "Add a namespace to multiple class names."
+  (let* ((class "Mumble")
+        (data "Mumble Mumble    Mumble")
+        (namespace "abcdef")
+        (expected "abcdef::Mumble abcdef::Mumble    abcdef::Mumble")
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 3 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-10
+;;
+(ert-deftest shu-test-shu-qualify-class-name-10 ()
+  "Do not add namespace to qualified class name."
+  (let* ((class "Mumble")
+        (data "abcdef::Mumble")
+        (namespace "abcdef")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-11
+;;
+(ert-deftest shu-test-shu-qualify-class-name-11 ()
+  "Do not add namespace to qualified class name."
+  (let* ((class "Mumble")
+        (data "abcdef  ::  Mumble")
+        (namespace "abcdef")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+(defun zzz ()
+  (interactive)
+  (let (
+        (gb (get-buffer-create "**slp**"))
+        (class)
+        (qual)
+        (minibuffer-allow-text-properties nil)
+        )
+    (setq class (read-from-minibuffer "Class name? "))
+    (princ (concat "\"" class "\"\n") gb)
+    (setq qual (read-from-minibuffer "namespace? "))
+    (princ (concat "\"" qual "\"\n") gb)
+    (princ "\n" gb)
+    (message "%s::%s" qual class)
+    ))
+
+(defun yyy ()
+  (interactive)
+  (let (
+        (gb (get-buffer-create "**slp**"))
+        (class "")
+        (qual "")
+        (count 0)
+        (minibuffer-allow-text-properties nil)
+        )
+    (while (= 0 (length class))
+      (setq class (read-from-minibuffer "Class name? ")))
+    (while (= 0 (length qual))
+      (setq qual (read-from-minibuffer "Namespace? ")))
+    (goto-char (point-min))
+    (setq count (shu-qualify-class-name class qual))
+    (message "Replaced %d occurrences" count)
+    ))
