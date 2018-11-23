@@ -1836,7 +1836,8 @@ qualifier."
 ;;  shu-qualify-namespace-std
 ;;
 (defun shu-qualify-namespace-std ()
-  "Add \"std\" namespace qualifier to some of the classes in \"std\"."
+  "Add \"std\" namespace qualifier to some of the classes in \"std\".  Return the
+count of class names changed."
   (interactive)
   (let ((gb (get-buffer-create "**chgs**"))
         (ls (list "std" "std"    "std"    "std"  "std"      "std"))
@@ -1862,6 +1863,7 @@ qualifier."
       (setq lcl (cdr lcl)))
     (goto-char (point-min))
     (message "Replaced %d occurrences.  See buffer **chgs**" count)
+    count
     ))
 
 
@@ -1870,7 +1872,8 @@ qualifier."
 ;;  shu-qualify-namespace-bsl
 ;;
 (defun shu-qualify-namespace-bsl ()
-  "Add \"bsl\" namespace qualifier to some of the classes in \"bsl\"."
+  "Add \"bsl\" namespace qualifier to some of the classes in \"bsl\".  Return the
+count of class names changed."
   (interactive)
   (let ((gb (get-buffer-create "**chgs**"))
         (ls (list "bsl" "bsl"    "bsl"    "bsl"  "bsl"        "bsl"))
@@ -1896,6 +1899,7 @@ qualifier."
       (setq lcl (cdr lcl)))
     (goto-char (point-min))
     (message "Replaced %d occurrences.  See buffer **chgs**" count)
+    count
     ))
 
 
