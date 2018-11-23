@@ -1737,7 +1737,16 @@ are not << represent a missing << operator."
 qualifier NAMESPACE.  If the TARGET-NAME is \"Mumble\" and the NAMESPACE is
 \"abcd\", then \"Mumble\" becomes \"abcd::Mumble\".  But variable names such
 as \"d_Mumble\" or \"MumbleIn\" remain unchanged and already qualified class
-names remain unchanged."
+names remain unchanged.
+This is intended to help rescue code that has one or more \"using namespace\"
+directives in it.  The problem with \"using namespace\" is that you now have
+class names from other namespaces with no easy way to identify the namespace
+to which they belong.  The best thing to do is get rid of the \"using
+namespace\" statements and explicitly qualify the class names.  But if you
+use a simple replace to do that, you will qualify variable names that resemble
+class names as well as class names that are already qualified.  This function
+only adds a namespace to a class name that does not already have a namespace
+qualifier."
   (interactive)
   (let ((name-target (concat shu-cpp-name "+"))
         (bol)
@@ -1787,7 +1796,16 @@ names remain unchanged."
 add a namespace qualifier to it.  First prompt is for the class name.  If a fully qualified
 class name is supplied, then the given namespace is applied to the class name.  If the name
 supplied is not a namespace qualified class name, then a second prompt is given to read the
-namespace."
+namespace.
+This is intended to help rescue code that has one or more \"using namespace\"
+directives in it.  The problem with \"using namespace\" is that you now have
+class names from other namespaces with no easy way to identify the namespace
+to which they belong.  The best thing to do is get rid of the \"using
+namespace\" statements and explicitly qualify the class names.  But if you
+use a simple replace to do that, you will qualify variable names that resemble
+class names as well as class names that are already qualified.  This function
+only adds a namespace to a class name that does not already have a namespace
+qualifier."
   (interactive)
   (let ((class "")
         (qclass "")
