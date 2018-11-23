@@ -1747,8 +1747,7 @@ use a simple replace to do that, you will qualify variable names that resemble
 class names as well as class names that are already qualified.  This function
 only adds a namespace to a class name that does not already have a namespace
 qualifier."
-  (let ((gb (get-buffer-create "**slp**"))
-        (name-target (concat shu-cpp-name "+"))
+  (let ((name-target (concat shu-cpp-name "+"))
         (bol)
         (eol)
         (mbeg)
@@ -1759,16 +1758,11 @@ qualifier."
         (count 0)
         (case-fold-search nil))
     (while (search-forward target-name nil t)
-      (princ "Start\n" gb)
       (setq bol (save-excursion (beginning-of-line) (point)))
       (setq eol (save-excursion (end-of-line) (point)))
       (setq name (match-string 0))
       (setq mbeg (match-beginning 0))
       (setq mend (match-end 0))
-      (princ (format "mbeg: %d, mend: %d, point: %d\n" mbeg mend (point)) gb)
-      (princ (format "name: \"%s\"\n" name) gb)
-      (princ (format "buffer: \"%s\"\n" (buffer-substring-no-properties mbeg mend)) gb)
-      (princ (format "whole buffer: \"%s\"\n" (buffer-substring-no-properties (point-min) (point-max))) gb)
       (setq have-match t)
       (when (> mbeg bol)
         (save-excursion
@@ -1776,25 +1770,13 @@ qualifier."
           (if (looking-at shu-cpp-name)
               (setq have-match nil)
             (save-match-data
-              (princ (format "Point 1: %d\n" (point)) gb)
               (if (looking-at shu-not-all-whitespace-regexp)
                   (progn
                     (when (or (looking-at ":") (looking-at ">"))
-                      (setq have-match nil)
-                      )
-                    )
+                      (setq have-match nil)))
                 (when (re-search-backward shu-not-all-whitespace-regexp nil t)
-                  (princ (format "Point 2: %d\n" (point)) gb)
-                  (princ (format "char: \"%s\"\n" (buffer-substring-no-properties (point) (1+ (point)))) gb)
                   (when (or (looking-at ":") (looking-at ">"))
-                    (setq have-match nil)
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
+                    (setq have-match nil))))))))
       (when have-match
         (when (< mend eol)
           (save-excursion

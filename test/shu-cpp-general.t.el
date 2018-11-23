@@ -881,9 +881,74 @@ of a variable name with characters at the end."
 ;;  shu-test-shu-qualify-class-name-12
 ;;
 (ert-deftest shu-test-shu-qualify-class-name-12 ()
+  "Do not add namespace to qualified class name."
+  (let* ((class "Mumble")
+        (data "abcdef::Mumble")
+        (namespace "abcdef")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-13
+;;
+(ert-deftest shu-test-shu-qualify-class-name-13 ()
   "Do not add namespace to lower case name."
   (let* ((class "Mumble")
         (data "mumble")
+        (namespace "abcdef")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-14
+;;
+(ert-deftest shu-test-shu-qualify-class-name-14 ()
+  "Do not add namespace to class name preceeded by \">\".  THis is most likely
+an arrow operator preceeding a function call."
+  (let* ((class "Mumble")
+        (data "boo -> Mumble")
+        (namespace "abcdef")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-15
+;;
+(ert-deftest shu-test-shu-qualify-class-name-15 ()
+  "Do not add namespace to class name preceeded by \">\".  THis is most likely
+an arrow operator preceeding a function call."
+  (let* ((class "Mumble")
+        (data "boo->Mumble")
         (namespace "abcdef")
         (expected data)
         (actual)
