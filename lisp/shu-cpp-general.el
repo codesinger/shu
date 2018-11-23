@@ -1747,7 +1747,6 @@ use a simple replace to do that, you will qualify variable names that resemble
 class names as well as class names that are already qualified.  This function
 only adds a namespace to a class name that does not already have a namespace
 qualifier."
-  (interactive)
   (let ((name-target (concat shu-cpp-name "+"))
         (bol)
         (eol)
