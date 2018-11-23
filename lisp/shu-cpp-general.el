@@ -1785,6 +1785,12 @@ qualifier."
             (when (looking-at shu-cpp-name)
               (setq have-match nil)))))
       (when have-match
+        (save-excursion
+          (save-match-data
+            (goto-char bol)
+            (when (re-search-forward "#\\s-*include" mbeg t)
+              (setq have-match nil)))))
+      (when have-match
         (setq rename (concat namespace "::" name))
         (replace-match rename t t)
         (setq count (1+ count))))

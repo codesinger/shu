@@ -1005,3 +1005,47 @@ a reference doing a function call."
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
 ))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-18
+;;
+(ert-deftest shu-test-shu-qualify-class-name-18 ()
+  "Do not add namespace to class name preceeded by \"#include\" on the same line.
+This is most likely the name of an include file and not the name of a class."
+  (let* ((class "string")
+        (data "#include <string>")
+        (namespace "std")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-19
+;;
+(ert-deftest shu-test-shu-qualify-class-name-19 ()
+  "Do not add namespace to class name preceeded by \"#include\" on the same line.
+This is most likely the name of an include file and not the name of a class."
+  (let* ((class "string")
+        (data " # include <string>")
+        (namespace "std")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
