@@ -1011,6 +1011,28 @@ a reference doing a function call."
 ;;  shu-test-shu-qualify-class-name-18
 ;;
 (ert-deftest shu-test-shu-qualify-class-name-18 ()
+  "Do not reject a class name that is preceeded by a dot, arrow, or colon on
+a previous line."
+  (let* ((class "Mumble")
+        (data "boo . \n  Mumble")
+        (namespace "abcdef")
+        (expected "abcdef::Mumble")
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 1 count))
+      (setq actual (buffer-substring-no-properties 10 (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-19
+;;
+(ert-deftest shu-test-shu-qualify-class-name-19 ()
   "Do not add namespace to class name preceeded by \"#include\" on the same line.
 This is most likely the name of an include file and not the name of a class."
   (let* ((class "string")
@@ -1030,9 +1052,9 @@ This is most likely the name of an include file and not the name of a class."
 
 
 ;;
-;;  shu-test-shu-qualify-class-name-19
+;;  shu-test-shu-qualify-class-name-20
 ;;
-(ert-deftest shu-test-shu-qualify-class-name-19 ()
+(ert-deftest shu-test-shu-qualify-class-name-20 ()
   "Do not add namespace to class name preceeded by \"#include\" on the same line.
 This is most likely the name of an include file and not the name of a class."
   (let* ((class "string")

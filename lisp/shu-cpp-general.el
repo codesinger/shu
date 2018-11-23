@@ -1775,7 +1775,7 @@ qualifier."
                   (progn
                     (when (looking-at prefix-rx)
                       (setq have-match nil)))
-                (when (re-search-backward shu-not-all-whitespace-regexp nil t)
+                (when (re-search-backward shu-not-all-whitespace-regexp bol t)
                   (when (looking-at prefix-rx)
                     (setq have-match nil))))))))
       (when have-match
