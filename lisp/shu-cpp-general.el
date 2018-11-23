@@ -1756,6 +1756,7 @@ qualifier."
         (name)
         (rename)
         (count 0)
+        (prefix-rx "[:>.]")
         (case-fold-search nil))
     (while (search-forward target-name nil t)
       (setq bol (save-excursion (beginning-of-line) (point)))
@@ -1772,10 +1773,10 @@ qualifier."
             (save-match-data
               (if (looking-at shu-not-all-whitespace-regexp)
                   (progn
-                    (when (or (looking-at ":") (looking-at ">"))
+                    (when (looking-at prefix-rx)
                       (setq have-match nil)))
                 (when (re-search-backward shu-not-all-whitespace-regexp nil t)
-                  (when (or (looking-at ":") (looking-at ">"))
+                  (when (looking-at prefix-rx)
                     (setq have-match nil))))))))
       (when have-match
         (when (< mend eol)

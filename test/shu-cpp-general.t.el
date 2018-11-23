@@ -923,7 +923,7 @@ of a variable name with characters at the end."
 ;;  shu-test-shu-qualify-class-name-14
 ;;
 (ert-deftest shu-test-shu-qualify-class-name-14 ()
-  "Do not add namespace to class name preceeded by \">\".  THis is most likely
+  "Do not add namespace to class name preceeded by \">\".  This is most likely
 an arrow operator preceeding a function call."
   (let* ((class "Mumble")
         (data "boo -> Mumble")
@@ -945,10 +945,54 @@ an arrow operator preceeding a function call."
 ;;  shu-test-shu-qualify-class-name-15
 ;;
 (ert-deftest shu-test-shu-qualify-class-name-15 ()
-  "Do not add namespace to class name preceeded by \">\".  THis is most likely
+  "Do not add namespace to class name preceeded by \">\".  This is most likely
 an arrow operator preceeding a function call."
   (let* ((class "Mumble")
         (data "boo->Mumble")
+        (namespace "abcdef")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-16
+;;
+(ert-deftest shu-test-shu-qualify-class-name-16 ()
+  "Do not add namespace to class name preceeded by \".\".  This is most likely
+a reference doing a function call."
+  (let* ((class "Mumble")
+        (data "boo.Mumble")
+        (namespace "abcdef")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-17
+;;
+(ert-deftest shu-test-shu-qualify-class-name-17 ()
+  "Do not add namespace to class name preceeded by \".\".  This is most likely
+a reference doing a function call."
+  (let* ((class "Mumble")
+        (data "boo . Mumble")
         (namespace "abcdef")
         (expected data)
         (actual)
