@@ -1834,8 +1834,8 @@ qualifier."
   "Add \"std\" namespace qualifier to some of the classes in \"std\"."
   (interactive)
   (let ((gb (get-buffer-create "**chgs**"))
-        (ls (list "std" "std"    "std"    "std"  "std"))
-        (cl (list "set" "map" "vector" "string" "pair"))
+        (ls (list "std" "std"    "std"    "std"  "std"      "std"))
+        (cl (list "set" "map" "vector" "string" "pair" "ifstream"))
         (lls)
         (lcl)
         (count 0)
@@ -1868,8 +1868,8 @@ qualifier."
   "Add \"bsl\" namespace qualifier to some of the classes in \"bsl\"."
   (interactive)
   (let ((gb (get-buffer-create "**chgs**"))
-        (ls (list "bsl" "bsl"    "bsl"    "bsl"  "bsl"))
-        (cl (list "set" "map" "vector" "string" "pair"))
+        (ls (list "bsl" "bsl"    "bsl"    "bsl"  "bsl"        "bsl"))
+        (cl (list "set" "map" "vector" "string" "pair"   "ifstream"))
         (lls)
         (lcl)
         (count 0)
