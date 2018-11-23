@@ -1840,8 +1840,8 @@ qualifier."
 count of class names changed."
   (interactive)
   (let ((gb (get-buffer-create "**chgs**"))
-        (ls (list "std" "std"    "std"    "std"  "std"      "std"))
-        (cl (list "set" "map" "vector" "string" "pair" "ifstream"))
+        (ls (list "std" "std"    "std"    "std"  "std"      "std"  "std"      "std"))
+        (cl (list "set" "map" "vector" "string" "pair" "ifstream" "endl" "ios_base"))
         (lls)
         (lcl)
         (count 0)
@@ -1876,8 +1876,8 @@ count of class names changed."
 count of class names changed."
   (interactive)
   (let ((gb (get-buffer-create "**chgs**"))
-        (ls (list "bsl" "bsl"    "bsl"    "bsl"  "bsl"        "bsl"))
-        (cl (list "set" "map" "vector" "string" "pair"   "ifstream"))
+        (ls (list "bsl" "bsl"    "bsl"    "bsl"  "bsl"      "bsl"  "bsl"      "bsl"))
+        (cl (list "set" "map" "vector" "string" "pair" "ifstream" "endl" "ios_base"))
         (lls)
         (lcl)
         (count 0)
