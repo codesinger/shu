@@ -1828,6 +1828,74 @@ qualifier."
 
 
 
+;;
+;;  shu-qualify-namespace-std
+;;
+(defun shu-qualify-namespace-std ()
+  "Add \"std\" namespace qualifier to some of the classes in \"std\"."
+  (interactive)
+  (let ((gb (get-buffer-create "**chgs**"))
+        (ls (list "std" "std"    "std"    "std"  "std"))
+        (cl (list "set" "map" "vector" "string" "pair"))
+        (lls)
+        (lcl)
+        (count 0)
+        (ct 0)
+        (cnt)
+        (class-name)
+        (namespace))
+    (setq lls ls)
+    (setq lcl cl)
+    (while lls
+      (setq class-name (car lcl))
+      (setq namespace (car lls))
+      (goto-char (point-min))
+      (setq ct (shu-qualify-class-name class-name namespace))
+      (setq count (+ count ct))
+      (setq cnt (shu-fixed-format-num ct 8))
+      (princ (format "%s: %s::%s\n" cnt namespace class-name) gb)
+      (setq lls (cdr lls))
+      (setq lcl (cdr lcl)))
+    (goto-char (point-min))
+    (message "Replaced %d occurrences.  See buffer **chgs**" count)
+    ))
+
+
+
+;;
+;;  shu-qualify-namespace-bsl
+;;
+(defun shu-qualify-namespace-bsl ()
+  "Add \"bsl\" namespace qualifier to some of the classes in \"bsl\"."
+  (interactive)
+  (let ((gb (get-buffer-create "**chgs**"))
+        (ls (list "bsl" "bsl"    "bsl"    "bsl"  "bsl"))
+        (cl (list "set" "map" "vector" "string" "pair"))
+        (lls)
+        (lcl)
+        (count 0)
+        (ct 0)
+        (cnt)
+        (class-name)
+        (namespace))
+    (setq lls ls)
+    (setq lcl cl)
+    (while lls
+      (setq class-name (car lcl))
+      (setq namespace (car lls))
+      (goto-char (point-min))
+      (setq ct (shu-qualify-class-name class-name namespace))
+      (setq count (+ count ct))
+      (setq cnt (shu-fixed-format-num ct 8))
+      (princ (format "%s: %s::%s\n" cnt namespace class-name) gb)
+      (setq lls (cdr lls))
+      (setq lcl (cdr lcl)))
+    (goto-char (point-min))
+    (message "Replaced %d occurrences.  See buffer **chgs**" count)
+    ))
+
+
+
 
 ;;
 ;;  shu-cpp-general-set-alias
@@ -1870,4 +1938,6 @@ shu- prefix removed."
   (defalias 'ck 'shu-cpp-check-streaming-op)
   (defalias 'set-default-namespace 'shu-set-default-namespace)
   (defalias 'qualify-class 'shu-interactive-qualify-class-name)
+  (defalias 'qualify-std 'shu-qualify-namespace-std)
+  (defalias 'qualify-bsl 'shu-qualify-namespace-bsl)
 )
