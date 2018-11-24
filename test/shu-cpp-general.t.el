@@ -1071,3 +1071,93 @@ This is most likely the name of an include file and not the name of a class."
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
 ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-qualify-classes-1
+;;
+(ert-deftest shu-test-shu-cpp-qualify-classes-1 ()
+  "Call with a list of classes and a single namespace, no buffer."
+  (let* ((classes (list "map" "set" "string" "vector"))
+         (namespace "std")
+         (data "map set")
+         (expected "std::map std::set")
+         (actual)
+         (count))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-qualify-classes classes namespace))
+      (should (= 2 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-qualify-classes-2
+;;
+(ert-deftest shu-test-shu-cpp-qualify-classes-2 ()
+  "Call with a list of classes and a list of namespaces, no buffer."
+  (let* ((classes   (list "map" "set" "string" "vector"))
+         (namespace (list "std" "std"    "std"    "std"))
+         (data "map set")
+         (expected "std::map std::set")
+         (actual)
+         (count))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-qualify-classes classes namespace))
+      (should (= 2 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-qualify-classes-3
+;;
+(ert-deftest shu-test-shu-cpp-qualify-classes-3 ()
+  "Call with a list of classes and a single namespace and a buffer."
+  (let* ((buf (get-buffer-create shu-unit-test-buffer))
+         (classes (list "map" "set" "string" "vector"))
+         (namespace "std")
+         (data "map set")
+         (expected "std::map std::set")
+         (actual)
+         (count))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-qualify-classes classes namespace buf))
+      (should (= 2 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-qualify-classes-4
+;;
+(ert-deftest shu-test-shu-cpp-qualify-classes-4 ()
+  "Call with a list of classes and a list of namespaces, no buffer."
+  (let* ((buf (get-buffer-create shu-unit-test-buffer))
+         (classes   (list "map" "set" "string" "vector"))
+         (namespace (list "std" "std"    "std"    "std"))
+         (data "map set")
+         (expected "std::map std::set")
+         (actual)
+         (count))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-qualify-classes classes namespace buf))
+      (should (= 2 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))

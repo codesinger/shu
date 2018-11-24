@@ -1839,6 +1839,65 @@ qualifier."
 
 
 ;;
+;;  shu-cpp-qualify-classes
+;;
+(defun shu-cpp-qualify-classes (class-list namespace &optional buffer)
+  "Repeatedcly call SHU-QUALIFY-CLASS-NAME for all class names in CLASS-LIST.
+NAMESPACE is either the name of a single namespace to apply to all classes
+in CLASS-LIST or is a list of namespaces each of which has a one to one
+correspondence with a class name in CLASS-LIST.  The optional BUFFER
+argument may be a buffer in which the actions are recorded.  Return the
+number of names changed."
+  (let ((classes class-list)
+        (names namespace)
+        (buf-msg "")
+        (class-name)
+        (cnt)
+        (count 0)
+        (ct)
+        (ns))
+    (when buffer
+      (when (not (bufferp buffer))
+        (error "Supplied BUFFER argument is not a buffer")))
+    (cond
+     ((stringp names)
+      (setq ns names)
+      (while classes
+        (setq class-name (car classes))
+        (goto-char (point-min))
+        (setq ct (shu-qualify-class-name class-name ns))
+        (setq count (+ count ct))
+        (setq cnt (shu-fixed-format-num ct 8))
+        (when buffer
+          (princ (format "%s: %s::%s\n" cnt ns class-name) buffer))
+        (setq classes (cdr classes))))
+     ((listp names)
+      (when (not (= (length classes) (length names)))
+        (error "Length of CLASS-LIST list (%d) not same as length of NAMESPACE list (%d)"
+               (length classes) (length names)))
+      (while classes
+        (setq class-name (car classes))
+        (setq ns (car names))
+        (goto-char (point-min))
+        (setq ct (shu-qualify-class-name class-name ns))
+        (setq count (+ count ct))
+        (setq cnt (shu-fixed-format-num ct 8))
+        (when buffer
+          (princ (format "%s: %s::%s\n" cnt ns class-name) buffer)
+          (setq names (cdr names)))
+        (setq classes (cdr classes))))
+     (t
+      (error "NAMES argument is neither a string nor a list")))
+    (goto-char (point-min))
+    (when buffer
+      (setq buf-msg (concat "  See buffer " (buffer-name buffer))))
+    (message "Replaced %d occurrences.%s" count buf-msg)
+    count
+    ))
+
+
+
+;;
 ;;  shu-qualify-namespace-std
 ;;
 (defun shu-qualify-namespace-std ()
@@ -1846,19 +1905,8 @@ qualifier."
 count of class names changed."
   (interactive)
   (let ((gb (get-buffer-create "**chgs**"))
-        (ls (list
-             "std"
-             "std"
-             "std"
-             "std"
-             "std"
-             "std"
-             "std"
-             "std"
-             "std"
-             "std"
-             "std"))
-        (cl (list
+        (namespace "std")
+        (classes (list
              "endl"
              "ifstream"
              "ios_base"
@@ -1870,27 +1918,8 @@ count of class names changed."
              "setw"
              "string"
              "vector"))
-        (lls)
-        (lcl)
-        (count 0)
-        (ct 0)
-        (cnt)
-        (class-name)
-        (namespace))
-    (setq lls ls)
-    (setq lcl cl)
-    (while lls
-      (setq class-name (car lcl))
-      (setq namespace (car lls))
-      (goto-char (point-min))
-      (setq ct (shu-qualify-class-name class-name namespace))
-      (setq count (+ count ct))
-      (setq cnt (shu-fixed-format-num ct 8))
-      (princ (format "%s: %s::%s\n" cnt namespace class-name) gb)
-      (setq lls (cdr lls))
-      (setq lcl (cdr lcl)))
-    (goto-char (point-min))
-    (message "Replaced %d occurrences.  See buffer **chgs**" count)
+        (count 0))
+    (setq count (shu-cpp-qualify-classes classes namespace gb))
     count
     ))
 
@@ -1904,19 +1933,8 @@ count of class names changed."
 count of class names changed."
   (interactive)
   (let ((gb (get-buffer-create "**chgs**"))
-        (ls (list
-             "bsl"
-             "bsl"
-             "bsl"
-             "bsl"
-             "bsl"
-             "bsl"
-             "bsl"
-             "bsl"
-             "bsl"
-             "bsl"
-             "bsl"))
-        (cl (list
+        (namespace "bsl")
+        (classes (list
              "endl"
              "ifstream"
              "ios_base"
@@ -1928,27 +1946,8 @@ count of class names changed."
              "setw"
              "string"
              "vector"))
-        (lls)
-        (lcl)
-        (count 0)
-        (ct 0)
-        (cnt)
-        (class-name)
-        (namespace))
-    (setq lls ls)
-    (setq lcl cl)
-    (while lls
-      (setq class-name (car lcl))
-      (setq namespace (car lls))
-      (goto-char (point-min))
-      (setq ct (shu-qualify-class-name class-name namespace))
-      (setq count (+ count ct))
-      (setq cnt (shu-fixed-format-num ct 8))
-      (princ (format "%s: %s::%s\n" cnt namespace class-name) gb)
-      (setq lls (cdr lls))
-      (setq lcl (cdr lcl)))
-    (goto-char (point-min))
-    (message "Replaced %d occurrences.  See buffer **chgs**" count)
+        (count 0))
+    (setq count (shu-cpp-qualify-classes classes namespace gb))
     count
     ))
 
