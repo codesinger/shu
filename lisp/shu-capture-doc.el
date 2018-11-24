@@ -88,6 +88,21 @@
 
 
 ;;
+;;  shu-capture-set-func-def-alias
+;;
+(defmacro shu-capture-set-func-def-alias (func-def signature attributes description alias)
+  "Create a func-def to describe the function"
+  `(let (
+         (func-alias)
+         (func-info)
+         )
+     (setq func-info (cons ,attributes ,description))
+     (setq func-alias (cons ,alias func-info))
+     (setq ,func-def (cons ,signature func-alias))
+     ))
+
+
+;;
 ;;  shu-capture-get-func-def
 ;;
 (defmacro shu-capture-get-func-def (func-def signature attributes description alias)
@@ -156,8 +171,10 @@
         (func-list)
         (xx)
         (alias)
+        (al)
         (xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
         (al)
+        (debug-on-error t)
         )
 ;;;    (setq al (shu-capture-aliases))
     (shu-capture-aliases)
@@ -179,7 +196,7 @@
         (setq fn (match-string 1))
         (setq args (match-string 2))
         (setq func-sig (concat fn " (" args ")"))
-        (princ (concat func-sig "\n") gb)
+        (princ (concat "Looking: " func-sig "\n") gb)
         (when (re-search-forward xquote eof t)
           (setq sdesc (point))
           (when (re-search-forward xquote eof t)
@@ -192,28 +209,62 @@
               (setq desc (buffer-substring-no-properties (point-min) (point-max)))
               )
             )
-          (shu-capture-set-func-def func-def func-sig interact desc)
+          (princ "\n\nshu-capture-alias-list\n\n" gb)
+          (princ shu-capture-alias-list gb)
+          (princ "\n\n" gb)
+          (princ "FN: " gb)
+          (princ fn gb)
+          (princ "\n" gb)
+          (setq alias nil)
+          (setq al nil)
+          (setq alias (assoc fn shu-capture-alias-list))
+          (when alias
+            (setq al (cdr alias)))
+          (shu-capture-set-func-def-alias func-def func-sig interact desc al)
           (setq func-list (cons func-def func-list))
           (princ (concat desc "\n\n") gb)
           )
         )
       )
     (princ "\n\n" gb)
+    (princ "End while\n" gb)
     (princ func-list gb )
+    (princ "\n\nBefore sort:\n\n" gb)
+    (setq xx func-list)
+    (while xx
+      (setq func-def (car xx))
+      (shu-capture-get-func-def func-def func-sig interact desc alias)
+      (princ (concat "\n**" func-sig "**") gb)
+      (when alias
+        (princ (format " (alias: %s)" alias) gb)
+        )
+      (princ "\n" gb)
+      (setq xx (cdr xx))
+      )
     (princ "\n\nSorted:\n\n" gb)
-    (sort func-list 'shu-doc-sort-compare)
+    (setq func-list (sort func-list 'shu-doc-sort-compare))
+    (setq xx func-list)
+    (while xx
+      (setq func-def (car xx))
+      (shu-capture-get-func-def func-def func-sig interact desc alias)
+      (princ (concat "\n**" func-sig "**") gb)
+      (when alias
+        (princ (format " (alias: %s)" alias) gb)
+        )
+      (princ "\n" gb)
+      (setq xx (cdr xx))
+      )
     (princ func-list gb )
-    (princ "\nFINAL LIST\n" gb)
+    (princ "\n\nFINAL LIST\n" gb)
 
     (setq xx func-list)
     (while xx
       (setq func-def (car xx))
       (shu-capture-get-func-def func-def func-sig interact desc alias)
-;;      (setq func-sig (car func-def))
-;;      (setq func-info (cdr func-def))
-;;      (setq interact (car func-info))
-;;      (setq desc (cdr func-info))
       (princ (concat "\n**" func-sig "**") gb)
+      (when alias
+        (princ (format " (alias: %s)" alias) gb)
+        )
       (when (string= interact "I")
         (princ "<br/>\nInteractive" gb))
 ;;;      (princ (concat "\n" interact) gb)
@@ -280,7 +331,6 @@
         (edesc)
         (desc)
         (func-sig)
-        (func-info)
         (func-def)
         (func-list)
         (xx)
@@ -314,13 +364,13 @@
               (setq desc (buffer-substring-no-properties (point-min) (point-max)))
               )
             )
-          (setq func-info (cons interact desc))
-          (setq func-def (cons func-sig func-info))
+          (shu-capture-set-func-def func-def func-sig interact desc)
           (setq func-list (cons func-def func-list))
           (princ (concat desc "\n\n") gb)
           )
         )
       )
+    (princ "End while\n" gb)
     (princ "\n\n" gb)
     (princ func-list gb )
     (princ "\n\nSorted:\n\n" gb)
@@ -339,7 +389,6 @@
     ))
 
 (defun shu-capture-aliases ()
-  (interactive)
   (let (
         (gb (get-buffer-create "**shu-capture-doc**"))
         (alias-rx "(\\s-*defalias\\s-*'\\([a-zA-Z0-9-_]+\\)\\s-*'\\([a-zA-Z0-9-_]+\\)\\s-*)")
@@ -347,6 +396,7 @@
         (name)
         (cell)
         )
+    (setq shu-capture-alias-list nil)
     (goto-char (point-min))
     (while (re-search-forward alias-rx nil t)
       (setq alias (match-string 1))
