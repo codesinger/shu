@@ -41,9 +41,22 @@
 ;;   |    |   |   |    |
 ;;   -----|-------|-----
 ;;        |       |
-;;        |       +-----> func-info
+;;        |       +-----> func-alias
 ;;        |
 ;;        +-------------> signature
+;;
+;;
+;;  func-alias
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> func-info
+;;        |
+;;        +-------------> alias
 ;;
 ;;
 ;;  func-info:
@@ -65,23 +78,28 @@
 (defmacro shu-capture-set-func-def (func-def signature attributes description)
   "Create a func-def to describe the function"
   `(let (
+         (func-alias)
          (func-info)
          )
      (setq func-info (cons ,attributes ,description))
-     (setq ,func-def (cons ,signature func-info))
+     (setq func-alias (cons nil func-info))
+     (setq ,func-def (cons ,signature func-alias))
      ))
 
 
 ;;
 ;;  shu-capture-get-func-def
 ;;
-(defmacro shu-capture-get-func-def (func-def signature attributes description)
+(defmacro shu-capture-get-func-def (func-def signature attributes description alias)
   "Extract the information from the func-def"
   `(let (
+         (func-alias)
          (func-info)
          )
      (setq ,signature (car ,func-def))
-     (setq func-info (cdr ,func-def))
+     (setq func-alias (cdr ,func-def))
+     (setq ,alias (car func-alias))
+     (setq func-info (cdr func-alias))
      (setq ,attributes (car func-info))
      (setq ,description (cdr func-info))
      ))
@@ -97,6 +115,25 @@
          )
      (setq ,signature (car ,func-def))
      ))
+
+
+;;
+;;  shu-capture-get-func-def-alias
+;;
+(defmacro shu-capture-get-func-def-alias (func-def alias)
+  "Extract the function alias from the func-def"
+  `(let (
+         (func-alias)
+         )
+     (setq func-alias (car ,func-def))
+     (setq ,alias (car func-alias))
+     ))
+
+;;
+;;  shu-capture-alias-list
+;;
+(defvar shu-capture-alias-list
+  "The alist that holds all of the alias names.")
 
 (defun shu-capture-doc ()
   (interactive)
@@ -118,8 +155,15 @@
         (func-def)
         (func-list)
         (xx)
+        (alias)
         (xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
+        (al)
         )
+;;;    (setq al (shu-capture-aliases))
+    (shu-capture-aliases)
+    (princ "Captured start:\n" gb)
+    (princ shu-capture-alias-list gb)
+    (princ "\nCaptured end:\n" gb)
     (goto-char (point-min))
     (while (re-search-forward ss nil t)
       (beginning-of-line)
@@ -164,10 +208,11 @@
     (setq xx func-list)
     (while xx
       (setq func-def (car xx))
-      (setq func-sig (car func-def))
-      (setq func-info (cdr func-def))
-      (setq interact (car func-info))
-      (setq desc (cdr func-info))
+      (shu-capture-get-func-def func-def func-sig interact desc alias)
+;;      (setq func-sig (car func-def))
+;;      (setq func-info (cdr func-def))
+;;      (setq interact (car func-info))
+;;      (setq desc (cdr func-info))
       (princ (concat "\n**" func-sig "**") gb)
       (when (string= interact "I")
         (princ "<br/>\nInteractive" gb))
@@ -189,9 +234,22 @@
 ;;   |    |   |   |    |
 ;;   -----|-------|-----
 ;;        |       |
+;;        |       +-----> func-alias
+;;        |
+;;        +-------------> signature
+;;
+;;
+;;  func-alias
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
 ;;        |       +-----> func-info
 ;;        |
-;;        +-------------> Name
+;;        +-------------> alias
 ;;
 ;;
 ;;  func-info:
@@ -202,9 +260,9 @@
 ;;   |    |   |   |    |
 ;;   -----|-------|-----
 ;;        |       |
-;;        |       +-----> func-desc
+;;        |       +-----> description
 ;;        |
-;;        +-------------> func-attrs
+;;        +-------------> attributes
 ;;
 (defun shu-internal-capture-doc ()
   (interactive)
@@ -278,6 +336,27 @@
         (func-list (shu-internal-capture-doc))
         )
 
+    ))
+
+(defun shu-capture-aliases ()
+  (interactive)
+  (let (
+        (gb (get-buffer-create "**shu-capture-doc**"))
+        (alias-rx "(\\s-*defalias\\s-*'\\([a-zA-Z0-9-_]+\\)\\s-*'\\([a-zA-Z0-9-_]+\\)\\s-*)")
+        (alias)
+        (name)
+        (cell)
+        )
+    (goto-char (point-min))
+    (while (re-search-forward alias-rx nil t)
+      (setq alias (match-string 1))
+      (setq name (match-string 2))
+      (princ (format "name: \"%s\", alias: \"%s\"\n" name alias) gb)
+      (setq cell (cons name alias))
+      (setq shu-capture-alias-list (cons cell shu-capture-alias-list))
+      )
+    (princ shu-capture-alias-list gb)
+    (princ "\n\n" gb)
     ))
 
 
