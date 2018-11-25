@@ -70,7 +70,10 @@
 ;;
 (ert-deftest shu-test-shu-internal-doc-to-md-4 ()
   (let ((x  "This is a **buffer-name**")
-        (expected "This is a `**buffer-name**`")
+        (expected (concat "This is a "
+                         shu-capture-md-buf-delimiter
+                         "**buffer-name**"
+                         shu-capture-md-buf-delimiter))
         (actual))
 
     (with-temp-buffer
@@ -86,7 +89,10 @@
 ;;
 (ert-deftest shu-test-shu-internal-doc-to-md-5 ()
   (let ((x  "**buffer-name**")
-        (expected "`**buffer-name**`")
+        (expected (concat
+                   shu-capture-md-buf-delimiter
+                   "**buffer-name**"
+                   shu-capture-md-buf-delimiter))
         (actual))
 
     (with-temp-buffer
@@ -114,7 +120,42 @@
 ;;
 (ert-deftest shu-test-shu-internal-doc-to-md-7 ()
   (let ((x  "This is an ARG name.")
-        (expected "This is an `arg` name.")
+        (expected (concat "This is an "
+                          shu-capture-md-arg-delimiter
+                          "arg" shu-capture-md-arg-delimiter
+                          " name."))
+        (actual))
+
+    (with-temp-buffer
+      (insert x)
+      (shu-internal-doc-to-md)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual))
+      )))
+
+
+;;
+;;  shu-test-shu-internal-doc-to-md-8
+;;
+(ert-deftest shu-test-shu-internal-doc-to-md-8 ()
+  (let ((x  "This is an ARG.")
+        (expected "This is an `arg`.")
+        (actual))
+
+    (with-temp-buffer
+      (insert x)
+      (shu-internal-doc-to-md)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual))
+      )))
+
+
+;;
+;;  shu-test-shu-internal-doc-to-md-9
+;;
+(ert-deftest shu-test-shu-internal-doc-to-md-9 ()
+  (let ((x  "This is an ARG, with")
+        (expected "This is an `arg`, with")
         (actual))
 
     (with-temp-buffer
@@ -130,13 +171,16 @@
 ;;
 (ert-deftest shu-test-shu-capture-set-func-def ()
   (let ((func-def)
+        (falias)
         (finfo)
         (signature    "some-function (arg1 arg2)")
         (attributes   "I")
         (description  "This is a putative dpc string."))
     (shu-capture-set-func-def func-def signature attributes description)
     (should (string= signature (car-safe func-def)))
-    (setq finfo (cdr-safe func-def))
+    (setq falias (cdr-safe func-def))
+    (should falias)
+    (setq finfo (cdr-safe falias))
     (should finfo)
     (should (string= attributes (car-safe finfo)))
     (should (string= description (cdr-safe finfo)))
@@ -154,12 +198,36 @@
         (description  "This is a putative dpc string.")
         (sig)
         (attrs)
+        (alias)
         (desc))
     (shu-capture-set-func-def func-def signature attributes description)
-    (shu-capture-get-func-def func-def sig attrs desc)
+    (shu-capture-get-func-def func-def sig attrs desc alias)
     (should (string= signature sig))
     (should (string= attributes attrs))
     (should (string= description desc))
+))
+
+
+;;
+;;  shu-test-shu-capture-set-func-def-alias
+;;
+(ert-deftest shu-test-shu-capture-set-func-def-alias ()
+  (let ((func-def)
+        (finfo)
+        (signature    "some-function (arg1 arg2)")
+        (attributes   "I")
+        (description  "This is a putative dpc string.")
+        (alias "some-alias")
+        (sig)
+        (attrs)
+        (als)
+        (desc))
+    (shu-capture-set-func-def-alias func-def signature attributes description alias)
+    (shu-capture-get-func-def func-def sig attrs desc als)
+    (should (string= signature sig))
+    (should (string= attributes attrs))
+    (should (string= description desc))
+    (should (string= alias als))
 ))
 
 
