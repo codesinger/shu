@@ -166,6 +166,20 @@
 
 
 ;;
+;;  shu-capture-attr-inter
+;;
+(defconst shu-capture-attr-inter (lsh 1 0)
+  "Bit that indicates that a function is interactive")
+
+
+;;
+;;  shu-capture-attr-alias
+;;
+(defconst shu-capture-attr-alias (lsh 1 1)
+  "Bit that indicates that a function is interactive")
+
+
+;;
 ;;  shu-capture-md-buf-delimiter
 ;;
 (defconst shu-capture-md-buf-delimiter "`"
@@ -183,7 +197,7 @@ any other name that has leading and trailing asterisks")
         (ss   "(defun\\s-+")
         (fs   "(defun\\s-*\\([a-zA-Z-]+\\)\\s-*(\\s-*\\([ a-zA-Z-,&\n]*\\))")
         (inter  "(interactive")
-        (interact  "I")
+        (attributes 0)
         (sof 0)
         (eof 0)
         (fn)
@@ -212,14 +226,14 @@ any other name that has leading and trailing asterisks")
     (princ "\nCaptured end:\n" gb)
     (goto-char (point-min))
     (while (re-search-forward ss nil t)
+      (setq attributes 0)
       (beginning-of-line)
       (setq sof (point))
       (setq eof (save-excursion
                   (forward-sexp)
                   (point)))
-      (if (search-forward inter eof t)
-          (setq interact "I")
-        (setq interact "."))
+      (when (search-forward inter eof t)
+        (setq attributes (logior attributes shu-capture-attr-inter)))
       (goto-char sof)
       (when (re-search-forward fs eof t)
         (setq fn (match-string 1))
@@ -250,10 +264,10 @@ any other name that has leading and trailing asterisks")
           (when alias
             (setq al (cdr alias))
             (setq sig (concat al " (" args ")"))
-            (shu-capture-set-func-def-alias alias-def sig interact desc fn)
+            (shu-capture-set-func-def-alias alias-def sig attributes desc fn)
             (setq alias-list (cons alias-def alias-list))
             )
-          (shu-capture-set-func-def-alias func-def func-sig interact desc al)
+          (shu-capture-set-func-def-alias func-def func-sig attributes desc al)
           (setq func-list (cons func-def func-list))
           (princ (concat desc "\n\n") gb)
           )
@@ -266,7 +280,7 @@ any other name that has leading and trailing asterisks")
     (setq xx func-list)
     (while xx
       (setq func-def (car xx))
-      (shu-capture-get-func-def func-def func-sig interact desc alias)
+      (shu-capture-get-func-def func-def func-sig attributes desc alias)
       (princ (concat "\n**" func-sig "**") gb)
       (when alias
         (princ (format " (alias: %s)" alias) gb)
@@ -279,7 +293,7 @@ any other name that has leading and trailing asterisks")
     (setq xx func-list)
     (while xx
       (setq func-def (car xx))
-      (shu-capture-get-func-def func-def func-sig interact desc alias)
+      (shu-capture-get-func-def func-def func-sig attributes desc alias)
       (princ (concat "\n**" func-sig "**") gb)
       (when alias
         (princ (format " (alias: %s)" alias) gb)
@@ -292,12 +306,12 @@ any other name that has leading and trailing asterisks")
     (setq xx func-list)
     (while xx
       (setq func-def (car xx))
-      (shu-capture-get-func-def func-def func-sig interact desc alias)
+      (shu-capture-get-func-def func-def func-sig attributes desc alias)
       (princ (concat "\n**" func-sig "**") gb)
       (when alias
         (princ (format " (alias: %s)" alias) gb)
         )
-      (when (string= interact "I")
+      (when (not (= 0 (logand attributes shu-capture-attr-inter)))
         (princ "<br/>\nInteractive" gb))
       (princ (concat "\n\n" desc "\n") gb)
       (setq xx (cdr xx))
@@ -307,12 +321,13 @@ any other name that has leading and trailing asterisks")
     (setq xx alias-list)
     (while xx
       (setq alias-def (car xx))
-      (shu-capture-get-func-def alias-def func-sig interact desc alias)
+      (setq attributes (logior attributes shu-capture-attr-alias))
+      (shu-capture-get-func-def alias-def func-sig attributes desc alias)
       (princ (concat "\n**" func-sig "**") gb)
       (when alias
         (princ (format " (function: %s)" alias) gb)
         )
-      (when (string= interact "I")
+      (when (not (= 0 (logand attributes shu-capture-attr-inter)))
         (princ "<br/>\nInteractive" gb))
       (princ (concat "\n\n" desc "\n") gb)
       (setq xx (cdr xx))
