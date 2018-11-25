@@ -28,9 +28,15 @@
 
 (provide 'shu-capture-doc)
 
-;; Information about a function and its doc string is contained in the folllwing two
-;; cons cells.  The macros immmediately below can create the cons cells from the information
-;; and extract the information from the cons cells.
+;; Information about a function and its doc string is contained in the folllwing
+;; three cons cells.  The macros immmediately below can create the cons cells from
+;; the information and extract the information from the cons cells.
+;;
+;; TODO: Use the same structure to capture an alias.  But in the case of the alias,
+;;       the signature in func-def is the signature of the alias and the alias name
+;;       in func-alias is the name of the actual function.
+;;
+;;
 ;;
 ;;
 ;;  func-def:
