@@ -450,7 +450,7 @@ turns upper case names into lower case names surroiunded by mardown ticks."
         (esc-quote    "\\\\\"")
       (plain-quote  "\"")
       (star-name "*[a-zA-Z0-9*-_]+")
-      (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\)+")
+      (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\)+")
       (nm)
       (ln)
       (case-fold-search nil))
