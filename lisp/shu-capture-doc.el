@@ -445,33 +445,28 @@ and trailing quotes removed).  This function turns escaped quotes into regular
 (non-escaped) quotes and turns names with leading and trailing asterisks (e.g.,
 **project-count-buffer**) into short code blocks surrounded by back ticks.  It also
 turns upper case names into lower case names surroiunded by mardown ticks."
-  (let (
-        (gb (get-buffer-create "**slp**"))
-        (esc-quote    "\\\\\"")
-      (plain-quote  "\"")
-      (star-name "*[a-zA-Z0-9*-_]+")
-      (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
-      (nm)
-      (ln)
-      (case-fold-search nil))
-  (goto-char (point-min))
-  (while (re-search-forward esc-quote nil t)
-    (princ (format "Matched quote: \"%s\"\n" (match-string 0)) gb)
-    (replace-match plain-quote))
-  (goto-char (point-min))
-  (while (re-search-forward star-name nil t)
-    (princ (format "Matched star: \"%s\"\n" (match-string 0)) gb )
-    (replace-match (concat
-                    shu-capture-md-buf-delimiter
-                    (match-string 0)
-                    shu-capture-md-buf-delimiter)))
-  (goto-char (point-min))
-  (while (re-search-forward arg-name nil t)
-    (setq nm (match-string 1))
-    (setq ln (downcase nm))
-    (princ (format "Matched arg: \"%s\"\n" nm) gb )
-    (replace-match (concat
-                    shu-capture-md-arg-delimiter
-                    ln
-                    shu-capture-md-arg-delimiter) t nil nil 1))
-  ))
+  (let ((esc-quote    "\\\\\"")
+        (plain-quote  "\"")
+        (star-name "*[a-zA-Z0-9*-_]+")
+        (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
+        (nm)
+        (ln)
+        (case-fold-search nil))
+    (goto-char (point-min))
+    (while (re-search-forward esc-quote nil t)
+      (replace-match plain-quote))
+    (goto-char (point-min))
+    (while (re-search-forward star-name nil t)
+      (replace-match (concat
+                      shu-capture-md-buf-delimiter
+                      (match-string 0)
+                      shu-capture-md-buf-delimiter)))
+    (goto-char (point-min))
+    (while (re-search-forward arg-name nil t)
+      (setq nm (match-string 1))
+      (setq ln (downcase nm))
+      (replace-match (concat
+                      shu-capture-md-arg-delimiter
+                      ln
+                      shu-capture-md-arg-delimiter) t nil nil 1))
+    ))
