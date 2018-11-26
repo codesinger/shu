@@ -247,7 +247,7 @@ any other name that has leading and trailing asterisks")
             (setq desc (buffer-substring-no-properties sdesc edesc))
             (with-temp-buffer
               (insert desc)
-              (shu-internal-doc-to-md)
+              (shu-doc-internal-to-md)
               (fill-region (point-min) (point-max))
               (setq desc (buffer-substring-no-properties (point-min) (point-max)))
               )
@@ -302,7 +302,9 @@ any other name that has leading and trailing asterisks")
       (setq xx (cdr xx))
       )
     (princ func-list gb )
-    (princ "\n\nFINAL FUNCTION LIST\n" gb)
+    (princ "\n\nFINAL FUNCTION LIST 1\n" gb)
+    (shu-capture-show-list-md func-list gb)
+    (princ "\n\nFINAL FUNCTION LIST 2\n" gb)
     (setq xx func-list)
     (while xx
       (setq func-def (car xx))
@@ -420,7 +422,7 @@ any other name that has leading and trailing asterisks")
             (setq desc (buffer-substring-no-properties sdesc edesc))
             (with-temp-buffer
               (insert desc)
-              (shu-internal-doc-to-md)
+              (shu-doc-internal-to-md)
               (fill-region (point-min) (point-max))
               (setq desc (buffer-substring-no-properties (point-min) (point-max)))
               )
@@ -471,16 +473,19 @@ any other name that has leading and trailing asterisks")
     ))
 
 
-
+;;
+;;  shu-doc-sort-compare
+;;
 (defun shu-doc-sort-compare (lhs rhs)
+  "Compare two function names in a sort."
   (string< (car lhs) (car rhs))
   )
 
 
 ;;
-;;  shu-internal-doc-to-md
+;;  shu-doc-internal-to-md
 ;;
-(defun shu-internal-doc-to-md ()
+(defun shu-doc-internal-to-md ()
   "The current buffer contains a doc string from a function definition (with leading
 and trailing quotes removed).  This function turns escaped quotes into regular
 (non-escaped) quotes and turns names with leading and trailing asterisks (e.g.,
@@ -510,4 +515,63 @@ turns upper case names into lower case names surroiunded by mardown ticks."
                       shu-capture-md-arg-delimiter
                       ln
                       shu-capture-md-arg-delimiter) t nil nil 1))
+    ))
+
+
+;;
+;;  shu-capture-show-list-md
+;;
+(defun shu-capture-show-list-md (func-list buffer)
+  "Show a list"
+  (let (
+        (xx func-list)
+        (func-def)
+        (func-string)
+        )
+    (while xx
+      (setq func-def (car xx))
+      (setq func-string (shu-doc-internal-func-to-md func-def))
+      (princ func-string buffer)
+      (setq xx (cdr xx))
+      )
+    ))
+
+;;
+;;  shu-doc-internal-func-to-md
+;;
+(defun shu-doc-internal-func-to-md (func-def)
+  "Take a function definition and turn it into a string of markdown text."
+  (let (
+        (signature)
+        (attributes)
+        (description)
+        (alias)
+        (title
+         (if (not (= 0 (logand attributes shu-capture-attr-alias)))
+             "Function"
+           "Alias"))
+        (alias-line "")
+        (interact-line "")
+        (result "")
+        )
+    (shu-capture-get-func-def func-def signature attributes description alias)
+    (with-temp-buffer
+      (insert description)
+      (shu-doc-internal-to-md)
+      (setq description (buffer-substring-no-properties (point-min) (point-max)))
+      )
+    (when alias
+      (setq alias-line (concat " (" title ": " alias ")"))
+      )
+      (when (and (not (= 0 (logand attributes shu-capture-attr-inter)))
+                 (= 0 (logand attributes shu-capture-attr-alias)))
+        (setq interact-line "<br/>\nInteractive"))
+
+    (setq result
+          (concat
+           "\n**" signature "**"
+           alias-line
+           interact-line
+           "\n\n" description "\n"))
+    result
     ))
