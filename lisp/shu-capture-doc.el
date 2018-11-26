@@ -193,11 +193,13 @@ any other name that has leading and trailing asterisks")
 (defun shu-capture-doc ()
   (interactive)
   (let (
+        (ggb (get-buffer-create "**slp**"))
         (gb (get-buffer-create "**shu-capture-doc**"))
         (ss   "(defun\\s-+")
         (fs   "(defun\\s-*\\([a-zA-Z-]+\\)\\s-*(\\s-*\\([ a-zA-Z-,&\n]*\\))")
         (inter  "(interactive")
         (attributes 0)
+        (attribs 0)
         (sof 0)
         (eof 0)
         (fn)
@@ -264,7 +266,8 @@ any other name that has leading and trailing asterisks")
           (when alias
             (setq al (cdr alias))
             (setq sig (concat al " (" args ")"))
-            (shu-capture-set-func-def-alias alias-def sig attributes desc fn)
+            (setq attribs (logior attributes shu-capture-attr-alias))
+            (shu-capture-set-func-def-alias alias-def sig attribs desc fn)
             (setq alias-list (cons alias-def alias-list))
             )
           (shu-capture-set-func-def-alias func-def func-sig attributes desc al)
@@ -318,13 +321,15 @@ any other name that has leading and trailing asterisks")
       (princ (concat "\n\n" desc "\n") gb)
       (setq xx (cdr xx))
       )
-    (princ "\n\nFINAL ALIAS LIST\n" gb)
     (setq alias-list (sort alias-list 'shu-doc-sort-compare))
+    (princ "\n\nFINAL ALIAS LIST 1\n" gb)
+    (shu-capture-show-list-md alias-list gb)
+    (princ "\n\nFINAL ALIAS LIST 2\n" gb)
     (setq xx alias-list)
     (while xx
       (setq alias-def (car xx))
-      (setq attributes (logior attributes shu-capture-attr-alias))
-      (shu-capture-get-func-def alias-def func-sig attributes desc alias)
+      (setq attribs (logior attributes shu-capture-attr-alias))
+      (shu-capture-get-func-def alias-def func-sig attribs desc alias)
       (princ (concat "\n**" func-sig "**") gb)
       (when alias
         (princ (format " (function: %s)" alias) gb)
@@ -542,30 +547,33 @@ turns upper case names into lower case names surroiunded by mardown ticks."
 (defun shu-doc-internal-func-to-md (func-def)
   "Take a function definition and turn it into a string of markdown text."
   (let (
+        (ggb  (get-buffer-create "**slp**"))
         (signature)
         (attributes)
         (description)
         (alias)
-        (title
-         (if (not (= 0 (logand attributes shu-capture-attr-alias)))
-             "Function"
-           "Alias"))
+        (title "")
         (alias-line "")
         (interact-line "")
         (result "")
         )
     (shu-capture-get-func-def func-def signature attributes description alias)
+    (setq title
+          (if (not (= 0 (logand attributes shu-capture-attr-alias)))
+              "Function"
+            "Alias"))
     (with-temp-buffer
       (insert description)
       (shu-doc-internal-to-md)
       (setq description (buffer-substring-no-properties (point-min) (point-max)))
       )
+    (princ (format "SIG: %s, attrs: %d\n" signature attributes) ggb)
     (when alias
       (setq alias-line (concat " (" title ": " alias ")"))
       )
-      (when (and (not (= 0 (logand attributes shu-capture-attr-inter)))
-                 (= 0 (logand attributes shu-capture-attr-alias)))
-        (setq interact-line "<br/>\nInteractive"))
+    (when (and (not (= 0 (logand attributes shu-capture-attr-inter)))
+               (= 0 (logand attributes shu-capture-attr-alias)))
+      (setq interact-line "<br/>\nInteractive"))
 
     (setq result
           (concat
