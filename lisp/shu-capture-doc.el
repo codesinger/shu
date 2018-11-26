@@ -546,17 +546,14 @@ turns upper case names into lower case names surroiunded by mardown ticks."
 ;;
 (defun shu-doc-internal-func-to-md (func-def)
   "Take a function definition and turn it into a string of markdown text."
-  (let (
-        (ggb  (get-buffer-create "**slp**"))
-        (signature)
+  (let (        (signature)
         (attributes)
         (description)
         (alias)
         (title "")
         (alias-line "")
         (interact-line "")
-        (result "")
-        )
+        (result ""))
     (shu-capture-get-func-def func-def signature attributes description alias)
     (setq title
           (if (not (= 0 (logand attributes shu-capture-attr-alias)))
@@ -565,16 +562,12 @@ turns upper case names into lower case names surroiunded by mardown ticks."
     (with-temp-buffer
       (insert description)
       (shu-doc-internal-to-md)
-      (setq description (buffer-substring-no-properties (point-min) (point-max)))
-      )
-    (princ (format "SIG: %s, attrs: %d\n" signature attributes) ggb)
+      (setq description (buffer-substring-no-properties (point-min) (point-max))))
     (when alias
-      (setq alias-line (concat " (" title ": " alias ")"))
-      )
+      (setq alias-line (concat " (" title ": " alias ")")))
     (when (and (not (= 0 (logand attributes shu-capture-attr-inter)))
                (= 0 (logand attributes shu-capture-attr-alias)))
       (setq interact-line "<br/>\nInteractive"))
-
     (setq result
           (concat
            "\n**" signature "**"
