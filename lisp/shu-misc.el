@@ -525,6 +525,40 @@ eliminates whitespace.  If there is a non-whitespace character in column
 
 
 
+;;
+;;  shu-git-number-commits
+;;
+(defun shu-git-number-commits ()
+  "In a git log buffer, number all of the commits with zero being the most
+recent.
+In git, the most recent commit may be referenced as HEAD.  The one before the
+most recent is HEAD~1.  The one before that is HEAD~2, and so on.  This
+notation is simple enough for the last small number of commits.  But if you
+are going back farther than that, you either have to copy and past each SHA-1
+hash or you have to count the commits by hand, which is tedious and error
+prone.
+This function numbers all of the commits in a log buffer, which allows you to
+do things like git diff between HEAD~33 anbs HEAD~35.  This function counts as
+a commit any instance of \"commit\" that starts at the beginning of a line and
+is followed by some white space and a forty character hexadecimal number.
+Returns the count of the number of commits found."
+  (interactive)
+  (let ((ss "^\\(commit\\)\\s-+[0-9a-f]\\{40\\}")
+        (count 0)
+        (cn))
+    (goto-char (point-min))
+    (while (re-search-forward ss nil t)
+      (setq cn (shu-fixed-format-num count 6))
+      (replace-match (concat cn ". " (match-string 0)))
+      (setq count (1+ count)))
+    (goto-char (point-min))
+    (message "Numnbered %d commits" count)
+    count
+    ))
+
+
+
+
 
 ;;
 ;;  shu-misc-set-alias
@@ -550,4 +584,5 @@ shu- prefix removed."
   (defalias 'reverse-comma-names 'shu-reverse-comma-names)
   (defalias 'comma-names-to-letter 'shu-comma-names-to-letter)
   (defalias 'remove-test-names 'shu-remove-test-names)
+  (defalias 'number-commits 'shu-git-number-commits)
 )
