@@ -48,15 +48,15 @@
           "commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"))
         (expected
          (concat
-          "     1. commit 545267aaca37b309196cd6aeacf4a0d0c17af17c\n"
+          "     0. commit 545267aaca37b309196cd6aeacf4a0d0c17af17c\n"
           "Some text here\n"
-          "     2. commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
+          "     1. commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
           "This is a short commit\n"
           "commit 03fd2e4f90676e7b91f156de9986d6b08e4591\n\n"
           "The following does not start at bol:\n"
           " commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
           "Another commit:\n"
-          "     3. commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"))
+          "     2. commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"))
         (actual)
         (count 0))
     (with-temp-buffer

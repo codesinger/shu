@@ -20,6 +20,7 @@
          "shu-cpp-general.t.el"
          "shu-cpp-project.t.el"
          "shu-cpp-token.t.el"
+         "shu-misc.t.el"
          "shu-nvplist.t.el"
          "shu-xref.t.el"))
        (file-name)
