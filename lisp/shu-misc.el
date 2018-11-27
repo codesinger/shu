@@ -571,12 +571,13 @@ second number added to the first.  If minus, then the end is the second number
 subtracted from the first.  If period, then the end is the second number.
 
 Return the two numbers as a cons cell (start . end).  If there is no end then the
-cdr of the cons cell is nil.
+cdr of the cons cell is nil.  If range string is not numeric, then both the car
+and the cdr of the cons cell are nil.
 
 For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end 97.
 \"99.103\" has start 99, end 103.  \"98\" has starrt 98 and end is nil."
   (let ((s-one "[0-9]+")
-        (s-two "\\([0-9]+\\)\\(+\\|-\\|.\\)\\([0-9]+\\)")
+        (s-two "\\([0-9]+\\)\\(\\+\\|\\-\\|\\.\\)\\([0-9]+\\)")
         (start)
         (end)
         (op)
@@ -597,9 +598,11 @@ For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end 9
            ((string= "." op)
             (setq end second)))
           (setq range (cons start end)))
-      (when (string-match s-one range-string)
+      (if (string-match s-one range-string)
+        (progn
             (setq start (string-to-number (match-string 0 range-string)))
-            (setq range (cons start nil))))
+            (setq range (cons start nil)))
+        (setq range (cons nil nil))))
       range
     ))
 

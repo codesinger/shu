@@ -66,3 +66,108 @@
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual))
       )))
+
+
+
+;;
+;;  shu-test-shu-split-range-string-1
+;;
+(ert-deftest shu-test-shu-split-range-string-1 ()
+  (let ((range-string "99+4")
+        (actual-start)
+        (actual-end)
+        (expected-start 99)
+        (expected-end 103)
+        (range))
+    (setq range (shu-split-range-string range-string))
+    (should (consp range))
+    (setq actual-start (car-safe range))
+    (setq actual-end (cdr-safe range))
+    (should (numberp actual-start))
+    (should (numberp actual-end))
+    (should (= expected-start actual-start))
+    (should (= expected-end actual-end))
+    ))
+
+
+;;
+;;  shu-test-shu-split-range-string-2
+;;
+(ert-deftest shu-test-shu-split-range-string-2 ()
+  (let ((range-string "99-4")
+        (actual-start)
+        (actual-end)
+        (expected-start 99)
+        (expected-end 95)
+        (range))
+    (setq range (shu-split-range-string range-string))
+    (should (consp range))
+    (setq actual-start (car-safe range))
+    (setq actual-end (cdr-safe range))
+    (should (numberp actual-start))
+    (should (numberp actual-end))
+    (should (= expected-start actual-start))
+    (should (= expected-end actual-end))
+    ))
+
+
+;;
+;;  shu-test-shu-split-range-string-3
+;;
+(ert-deftest shu-test-shu-split-range-string-3 ()
+  (let ((range-string "99.107")
+        (actual-start)
+        (actual-end)
+        (expected-start 99)
+        (expected-end 107)
+        (range))
+    (setq range (shu-split-range-string range-string))
+    (should (consp range))
+    (setq actual-start (car-safe range))
+    (setq actual-end (cdr-safe range))
+    (should (numberp actual-start))
+    (should (numberp actual-end))
+    (should (= expected-start actual-start))
+    (should (= expected-end actual-end))
+    ))
+
+
+;;
+;;  shu-test-shu-split-range-string-4
+;;
+(ert-deftest shu-test-shu-split-range-string-4 ()
+  (let ((range-string "107")
+        (actual-start)
+        (actual-end)
+        (expected-start 107)
+        (expected-end)
+        (debug-on-error t)
+        (range))
+    (setq range (shu-split-range-string range-string))
+    (should (consp range))
+    (setq actual-start (car-safe range))
+    (setq actual-end (cdr-safe range))
+    (should (numberp actual-start))
+    (should (not actual-end))
+    (should (= expected-start actual-start))
+    ))
+
+
+;;
+;;  shu-test-shu-split-range-string-5
+;;
+(ert-deftest shu-test-shu-split-range-string-5 ()
+  (let ((range-string "hello")
+        (actual-start)
+        (actual-end)
+        (expected-start)
+        (expected-end)
+        (debug-on-error t)
+        (range))
+    (setq range (shu-split-range-string range-string))
+    (should (consp range))
+    (setq actual-start (car-safe range))
+    (setq actual-end (cdr-safe range))
+    (should (not actual-start))
+    (should (not actual-end))
+    ))
