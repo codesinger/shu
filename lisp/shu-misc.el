@@ -610,6 +610,36 @@ For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end 9
 
 
 ;;
+;;  shu-find-numbered-commit
+;;
+(defun shu-find-numbered-commit (commit-number)
+  "Search through a numbered git commit log looking for the commit whose number is
+COMMIT-NUMBER.  Return the SHA-1 hash of the commit if the commit number is found.
+Return nil if no commit with the given number is found.
+The commit log is assume to have been numbered by shu-git-number-commits."
+  (let (
+        (gb (get-buffer-create "**slp**"))
+        (ss-1 "\\s-*")
+        (ss-2 "\\.\\s-*commit\\s-+\\([0-9a-f]\\{40\\}\\)")
+        (sss)
+        (commit-hash)
+        )
+    (save-excursion
+      (goto-char (point-min))
+      (setq sss (concat ss-1 (number-to-string commit-number) ss-2))
+      (princ (format "\nsss: \"%s\"\n" sss) gb)
+      (when (re-search-forward sss nil t)
+        (setq commit-hash (match-string 1))
+        )
+      )
+    (princ commit-hash gb)
+    (princ "\n" gb)
+    commit-hash
+    ))
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()

@@ -171,3 +171,61 @@
     (should (not actual-start))
     (should (not actual-end))
     ))
+
+
+
+;;
+;;  shu-test-shu-find-numbered-commit-1
+;;
+(ert-deftest shu-test-shu-find-numbered-commit-1 ()
+  (let ((data
+         (concat
+         " 501. commit 6469db55adb3e05d68b88b087fabe892e3874321\n\n"
+         " 304. commit 7469db55adb3e05d68b88b087fabe892e3874321\n\n"))
+        (commit-number 304)
+        (expected "7469db55adb3e05d68b88b087fabe892e3874321")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+    (setq actual (shu-find-numbered-commit commit-number))
+    (should (stringp actual))
+    (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-find-numbered-commit-2
+;;
+(ert-deftest shu-test-shu-find-numbered-commit-2 ()
+  (let ((data
+         (concat
+         " 501. commit 6469db55adb3e05d68b88b087fabe892e3874321\n\n"
+         " 304. commit 7469db55adb3e05d68b88b087fabe892e3874321\n\n"))
+        (commit-number 501)
+        (expected "6469db55adb3e05d68b88b087fabe892e3874321")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+    (setq actual (shu-find-numbered-commit commit-number))
+    (should (stringp actual))
+    (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-find-numbered-commit-3
+;;
+(ert-deftest shu-test-shu-find-numbered-commit-3 ()
+  (let ((data
+         (concat
+         " 501. commit 6469db55adb3e05d68b88b087fabe892e3874321\n\n"
+         " 304. commit 7469db55adb3e05d68b88b087fabe892e3874321\n\n"))
+        (commit-number 329)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+    (setq actual (shu-find-numbered-commit commit-number))
+    (should (not actual)))
+    ))
