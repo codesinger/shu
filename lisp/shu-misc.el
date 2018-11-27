@@ -661,6 +661,8 @@ is put into the kill ring:
         (end)
         (commit-1)
         (commit-2)
+        (scommit-1)
+        (scommit-2)
         (diff))
     (setq range (shu-split-range-string commit-range))
     (setq start (car range))
@@ -672,10 +674,33 @@ is put into the kill ring:
           (ding))
       (setq commit-1 (shu-find-numbered-commit start))
       (setq commit-2 (shu-find-numbered-commit end))
+      (setq scommit-1 (shu-git-find-short-hash commit-1))
+      (when scommit-1
+        (setq commit-1 scommit-1))
+      (setq scommit-2 (shu-git-find-short-hash commit-2))
+      (when scommit-2
+        (setq commit-2 scommit-2))
       (setq diff (concat "git diff -b " commit-1 ".." commit-2 " "))
       (shu-kill-new diff))
     ))
 
+
+
+;;
+;;  shu-git-find-short-hash
+;;
+(defun shu-git-find-short-hash (hash)
+  "Return the git short hash for the HASH supplied as an argument.  Return nil
+if the given HASH is not a valid git revision."
+  (let ((short-hash)
+        (ss "^[a-fA-F0-9]\\{2,40\\}"))
+    (with-temp-buffer
+      (call-process "git" nil (current-buffer) nil "rev-parse" "--short" hash)
+      (goto-char (point-min))
+      (when (re-search-forward ss nil t)
+        (setq short-hash (match-string 0))))
+    short-hash
+  ))
 
 
 ;;
