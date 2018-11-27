@@ -640,6 +640,45 @@ The commit log is assume to have been numbered by shu-git-number-commits."
 
 
 ;;
+;;  shu-git-diff-commits
+;;
+(defun shu-git-diff-commits (commit-range)
+  "In a buffer that is a numbered git log, query for a range string, find the two
+commits, and put into the kill ring a git diff command specifying the two commits.
+
+For example, given the following two numbered commits:
+
+    31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
+    33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
+
+if the commit range specified is either \"31.33\" or \"31+2\", then the following
+is put into the kill ring:
+
+    \"git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 \""
+  (interactive "sCommits?: ")
+  (let ((range)
+        (start)
+        (end)
+        (commit-1)
+        (commit-2)
+        (diff))
+    (setq range (shu-split-range-string commit-range))
+    (setq start (car range))
+    (setq end (cdr range))
+    (if (or (not start)
+            (not end))
+        (progn
+          (message "%s" "Invalid range specified")
+          (ding))
+      (setq commit-1 (shu-find-numbered-commit start))
+      (setq commit-2 (shu-find-numbered-commit end))
+      (setq diff (concat "git diff -b " commit-1 ".." commit-2 " "))
+      (shu-kill-new diff))
+    ))
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -664,4 +703,5 @@ shu- prefix removed."
   (defalias 'comma-names-to-letter 'shu-comma-names-to-letter)
   (defalias 'remove-test-names 'shu-remove-test-names)
   (defalias 'number-commits 'shu-git-number-commits)
+  (defalias 'diff-commits 'shu-git-diff-commits)
 )
