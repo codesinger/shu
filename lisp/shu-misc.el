@@ -548,7 +548,7 @@ Returns the count of the number of commits found."
         (cn))
     (goto-char (point-min))
     (while (re-search-forward ss nil t)
-      (setq cn (shu-fixed-format-num count 6))
+      (setq cn (shu-format-num count 6))
       (replace-match (concat cn ". " (match-string 0)))
       (setq count (1+ count)))
     (goto-char (point-min))
@@ -556,6 +556,52 @@ Returns the count of the number of commits found."
     count
     ))
 
+
+
+
+;;
+;;  shu-split-range-string
+;;
+(defun shu-split-range-string (range-string)
+  "RANGE-STRING is a string that contains either one or two numbers, possibly
+separated by plus, minus, or period.  If one number then it is the starting number
+and there is no ending number.  If two numbers then the first number is the start.
+The operator in the middle determines the end.  If plus, then the end is the
+second number added to the first.  If minus, then the end is the second number
+subtracted from the first.  If period, then the end is the second number.
+
+Return the two numbers as a cons cell (start . end).  If there is no end then the
+cdr of the cons cell is nil.
+
+For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end 97.
+\"99.103\" has start 99, end 103.  \"98\" has starrt 98 and end is nil."
+  (let ((s-one "[0-9]+")
+        (s-two "\\([0-9]+\\)\\(+\\|-\\|.\\)\\([0-9]+\\)")
+        (start)
+        (end)
+        (op)
+        (second)
+        (range))
+    (if (string-match s-two range-string)
+        (progn
+          (setq start (string-to-number (match-string 1 range-string)))
+          (setq op (match-string 2 range-string))
+          (setq second (string-to-number (match-string 3 range-string)))
+          (cond
+           ((string= "+" op)
+            (setq end (+ start second))
+            )
+           ((string= "-" op)
+            (setq end (- start second))
+            )
+           ((string= "." op)
+            (setq end second)))
+          (setq range (cons start end)))
+      (when (string-match s-one range-string)
+            (setq start (string-to-number (match-string 0 range-string)))
+            (setq range (cons start nil))))
+      range
+    ))
 
 
 
