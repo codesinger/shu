@@ -23,52 +23,52 @@
 
 
 ;;
-;;  shu-test-shu-internal-doc-to-md-1
+;;  shu-test-shu-doc-internal-to-md-1
 ;;
-(ert-deftest shu-test-shu-internal-doc-to-md-1 ()
+(ert-deftest shu-test-shu-doc-internal-to-md-1 ()
   (let ((x))
     (with-temp-buffer
-      (shu-internal-doc-to-md)
+      (shu-doc-internal-to-md)
       (setq x (buffer-substring-no-properties (point-min) (point-max)))
       (should (= 0 (length x)))
       )))
 
 
 ;;
-;;  shu-test-shu-internal-doc-to-md-2
+;;  shu-test-shu-doc-internal-to-md-2
 ;;
-(ert-deftest shu-test-shu-internal-doc-to-md-2 ()
+(ert-deftest shu-test-shu-doc-internal-to-md-2 ()
   (let ((x  "This is a doc-string")
         (y))
 
     (with-temp-buffer
       (insert x)
-      (shu-internal-doc-to-md)
+      (shu-doc-internal-to-md)
       (setq y (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= x y))
       )))
 
 
 ;;
-;;  shu-test-shu-internal-doc-to-md-3
+;;  shu-test-shu-doc-internal-to-md-3
 ;;
-(ert-deftest shu-test-shu-internal-doc-to-md-3 ()
+(ert-deftest shu-test-shu-doc-internal-to-md-3 ()
   (let ((x  "This is a \\\"doc\\\" string")
         (expected "This is a \"doc\" string")
         (actual))
 
     (with-temp-buffer
       (insert x)
-      (shu-internal-doc-to-md)
+      (shu-doc-internal-to-md)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual))
       )))
 
 
 ;;
-;;  shu-test-shu-internal-doc-to-md-4
+;;  shu-test-shu-doc-internal-to-md-4
 ;;
-(ert-deftest shu-test-shu-internal-doc-to-md-4 ()
+(ert-deftest shu-test-shu-doc-internal-to-md-4 ()
   (let ((x  "This is a **buffer-name**")
         (expected (concat "This is a "
                          shu-capture-md-buf-delimiter
@@ -78,16 +78,16 @@
 
     (with-temp-buffer
       (insert x)
-      (shu-internal-doc-to-md)
+      (shu-doc-internal-to-md)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual))
       )))
 
 
 ;;
-;;  shu-test-shu-internal-doc-to-md-5
+;;  shu-test-shu-doc-internal-to-md-5
 ;;
-(ert-deftest shu-test-shu-internal-doc-to-md-5 ()
+(ert-deftest shu-test-shu-doc-internal-to-md-5 ()
   (let ((x  "**buffer-name**")
         (expected (concat
                    shu-capture-md-buf-delimiter
@@ -97,16 +97,16 @@
 
     (with-temp-buffer
       (insert x)
-      (shu-internal-doc-to-md)
+      (shu-doc-internal-to-md)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual))
       )))
 
 
 ;;
-;;  shu-test-shu-internal-doc-to-md-6
+;;  shu-test-shu-doc-internal-to-md-6
 ;;
-(ert-deftest shu-test-shu-internal-doc-to-md-6 ()
+(ert-deftest shu-test-shu-doc-internal-to-md-6 ()
   (let ((x  "ARG-NAME")
         (expected "arg-name")
         (actual))
@@ -116,9 +116,9 @@
 
 
 ;;
-;;  shu-test-shu-internal-doc-to-md-7
+;;  shu-test-shu-doc-internal-to-md-7
 ;;
-(ert-deftest shu-test-shu-internal-doc-to-md-7 ()
+(ert-deftest shu-test-shu-doc-internal-to-md-7 ()
   (let ((x  "This is an ARG name.")
         (expected (concat "This is an "
                           shu-capture-md-arg-delimiter
@@ -128,39 +128,39 @@
 
     (with-temp-buffer
       (insert x)
-      (shu-internal-doc-to-md)
+      (shu-doc-internal-to-md)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual))
       )))
 
 
 ;;
-;;  shu-test-shu-internal-doc-to-md-8
+;;  shu-test-shu-doc-internal-to-md-8
 ;;
-(ert-deftest shu-test-shu-internal-doc-to-md-8 ()
+(ert-deftest shu-test-shu-doc-internal-to-md-8 ()
   (let ((x  "This is an ARG.")
         (expected "This is an `arg`.")
         (actual))
 
     (with-temp-buffer
       (insert x)
-      (shu-internal-doc-to-md)
+      (shu-doc-internal-to-md)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual))
       )))
 
 
 ;;
-;;  shu-test-shu-internal-doc-to-md-9
+;;  shu-test-shu-doc-internal-to-md-9
 ;;
-(ert-deftest shu-test-shu-internal-doc-to-md-9 ()
+(ert-deftest shu-test-shu-doc-internal-to-md-9 ()
   (let ((x  "This is an ARG, with")
         (expected "This is an `arg`, with")
         (actual))
 
     (with-temp-buffer
       (insert x)
-      (shu-internal-doc-to-md)
+      (shu-doc-internal-to-md)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual))
       )))
@@ -247,3 +247,166 @@
     (shu-capture-get-func-def-sig func-def sig)
     (should (string= signature sig))
 ))
+
+
+
+
+;;
+;;  shu-test-shu-capture-code-in-md-1
+;;
+(ert-deftest shu-test-shu-capture-code-in-md-1 ()
+  (let* ((pad (make-string shu-capture-doc-code-indent ? ))
+         (line "This is some text to test things.\n")
+         (delim-line "```\n")
+         (data (concat
+                line
+                line
+                pad line
+                pad line
+                line))
+         (expected (concat
+                    line
+                    line
+                    delim-line
+                    pad line
+                    pad line
+                    delim-line
+                    line))
+         (actual "")
+         (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-code-in-md))
+      (should (= 1 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+;;
+;;  shu-test-shu-capture-code-in-md-2
+;;
+(ert-deftest shu-test-shu-capture-code-in-md-2 ()
+  (let* ((pad (make-string (1- shu-capture-doc-code-indent) ? ))
+         (line "This is some text to test things.\n")
+         (delim-line "```\n")
+         (data (concat
+                line
+                line
+                pad line
+                pad line
+                line))
+         (expected data)
+         (actual "")
+         (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-code-in-md))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-code-in-md-3
+;;
+(ert-deftest shu-test-shu-capture-code-in-md-3 ()
+  (let* ((pad (make-string shu-capture-doc-code-indent ? ))
+         (line "This is some text to test things.\n")
+         (delim-line "```\n")
+         (data (concat
+                pad line
+                pad line
+                line))
+         (expected (concat
+                    delim-line
+                    pad line
+                    pad line
+                    delim-line
+                    line))
+         (actual "")
+         (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-code-in-md))
+      (should (= 1 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-code-in-md-4
+;;
+(ert-deftest shu-test-shu-capture-code-in-md-4 ()
+  (let* ((pad (make-string shu-capture-doc-code-indent ? ))
+         (line "This is some text to test things.\n")
+         (delim-line "```\n")
+         (data (concat
+                pad line
+                pad line))
+         (expected (concat
+                    delim-line
+                    pad line
+                    pad line
+                    delim-line))
+         (actual "")
+         (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-code-in-md))
+      (should (= 1 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-code-in-md-5
+;;
+(ert-deftest shu-test-shu-capture-code-in-md-5 ()
+  (let* ((pad (make-string shu-capture-doc-code-indent ? ))
+         (line "This is some text to test things.\n")
+         (delim-line "```\n")
+         (data (concat
+                line            ;;;  1
+                line            ;;;  2
+                pad line        ;;;  3
+                pad line        ;;;  4
+                line            ;;;  5
+                line            ;;;  6
+                pad line        ;;;  7
+                line            ;;;  8
+                pad line        ;;;  9
+                line))          ;;; 10
+         (expected (concat
+                    line        ;;;  1
+                    line        ;;;  2
+                    delim-line
+                    pad line    ;;;  3
+                    pad line    ;;;  4
+                    delim-line
+                    line        ;;;  5
+                    line        ;;;  6
+                    delim-line
+                    pad line    ;;;  7
+                    delim-line
+                    line        ;;;  8
+                    delim-line
+                    pad line    ;;;  9
+                    delim-line
+                    line        ;;; 10
+                    ))
+         (actual "")
+         (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-code-in-md))
+      (should (= 3 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))

@@ -187,6 +187,15 @@
 any other name that has leading and trailing asterisks")
 
 
+
+;;
+;;  shu-capture-doc-code-indent
+;;
+(defconst shu-capture-doc-code-indent 4
+  "Any line indented by this much in a doc stringis assumed to be a sample
+code snippet.")
+
+
 ;;
 ;;  shu-capture-doc
 ;;
@@ -422,7 +431,7 @@ any other name that has leading and trailing asterisks")
 and trailing quotes removed).  This function turns escaped quotes into regular
 (non-escaped) quotes and turns names with leading and trailing asterisks (e.g.,
 **project-count-buffer**) into short code blocks surrounded by back ticks.  It also
-turns upper case names into lower case names surroiunded by mardown ticks."
+turns upper case names into lower case names surrounded by mardown ticks."
   (let ((esc-quote    "\\\\\"")
         (plain-quote  "\"")
         (star-name "*[a-zA-Z0-9*-_]+")
@@ -447,6 +456,49 @@ turns upper case names into lower case names surroiunded by mardown ticks."
                       shu-capture-md-arg-delimiter
                       ln
                       shu-capture-md-arg-delimiter) t nil nil 1))
+    ))
+
+
+
+;;
+;;  shu-capture-code-in-md
+;;
+(defun shu-capture-code-in-md ()
+  "The current buffer is assumed to hold a doc string that is being converted to
+markdown.  Any line that is indented to column SHU-CAPTURE-DOC-CODE-INDENT or
+gteater is assumed to be a code snippet and will be surrounded by \"```\" to make
+it a code snippet in markdown.  Return the number of code snippets marked."
+  (interactive)
+  (let ((line-diff 0)
+        (in-code)
+        (count 0))
+    (goto-char (point-min))
+    (while (= line-diff 0)
+      (beginning-of-line)
+      (when (re-search-forward shu-not-all-whitespace-regexp (line-end-position) t)
+        (if (not in-code)
+            (progn
+              (when (> (current-column) shu-capture-doc-code-indent)
+                (setq in-code t)
+                (setq count (1+ count))
+                (if (= 1 (line-number-at-pos))
+                    (progn
+                      (beginning-of-line)
+                      (insert "```\n"))
+                  (forward-line -1)
+                  (end-of-line)
+                  (insert "\n```"))
+                (forward-line 1)))
+          (when (< (current-column) shu-capture-doc-code-indent)
+            (setq in-code nil)
+            (forward-line -1)
+            (end-of-line)
+            (insert "\n```")
+            (beginning-of-line))))
+      (setq line-diff (forward-line 1)))
+    (when in-code
+      (insert "```\n"))
+    count
     ))
 
 
