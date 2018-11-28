@@ -230,11 +230,9 @@ in the form of \"foo.cpp:123:2\"."
 (defun shu-new-latex()
   "Build a skeleton, empty LaTeX file."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (p               )
-       )
-  (save-excursion (save-restriction (widen)
+  (let ((p))
+    (save-excursion
+      (save-restriction (widen)
     (goto-char (point-min))
 
     (insert (concat
@@ -247,11 +245,64 @@ in the form of \"foo.cpp:123:2\"."
       "\n"
       "\n"
       "\n"
-      "\\end{document}\n"))
-   ))
+      "\\end{document}\n"))))
   (goto-char p)
+  ))
+
+
+;;
+;;  shu-new-lisp
+;;
+(defun shu-new-lisp (func-name)
+  "Insert at point a skeleton lisp function.  Prompt is issued for the function
+name."
+  (interactive "*sFunction name?: ")
+  (shu-internal-new-lisp "defun" func-name t)
   )
-)
+
+
+;;
+;;  shu-new-ert
+;;
+(defun shu-new-ert (func-name)
+  "Insert at point a skeleton lisp ert unit test.  Prompt is issued for the
+function name."
+  (interactive "*sFunction name?: ")
+  (shu-internal-new-lisp "ert-deftest" func-name)
+  )
+
+
+;;
+;;  shu-internal-new-lisp
+;;
+(defun shu-internal-new-lisp (func-type func-name &optional interactive)
+  "Insert at point a skeleton lisp function of type FUNC-TYPE whose name is
+FUNC-NAME.  FUNC-TYPE is not examined in any way but is only useful if its
+value is \"defun\", \"defmacro\", \"ert-deftest\", etc.  If INTERACTIVE is
+true, the function is interactive."
+  (let (
+        (p)
+        )
+    (insert
+     (concat
+      "\n"
+      ";;\n"
+      ";;  " func-name "\n"
+      ";;\n"
+      "(" func-type " " func-name " ()\n"
+      "  \"Doc string.\"\n"))
+    (when interactive
+      (insert "  (interactive)\n"))
+    (insert
+     (concat
+      "  (let (\n"
+      "        )\n"
+      "    "))
+    (setq p (point))
+    (insert  "\n    ))\n")
+    (goto-char p)
+    ))
+
 
 ;;
 ;;  shu-dup - Insert a duplicate of the current line following it.
@@ -724,6 +775,8 @@ shu- prefix removed."
   (defalias 'gquote 'shu-gquote)
   (defalias 'new-latex 'shu-new-latex)
   (defalias 'dup 'shu-dup)
+  (defalias 'new-lisp 'shu-new-lisp)
+  (defalias 'new-ert 'shu-new-ert)
   (defalias 'reverse-comma-names 'shu-reverse-comma-names)
   (defalias 'comma-names-to-letter 'shu-comma-names-to-letter)
   (defalias 'remove-test-names 'shu-remove-test-names)
