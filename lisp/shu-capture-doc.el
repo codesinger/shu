@@ -456,6 +456,7 @@ turns upper case names into lower case names surrounded by mardown ticks."
                       shu-capture-md-arg-delimiter
                       ln
                       shu-capture-md-arg-delimiter) t nil nil 1))
+    (shu-capture-code-in-md)
     ))
 
 
@@ -472,8 +473,9 @@ it a code snippet in markdown.  Return the number of code snippets marked."
   (let ((line-diff 0)
         (in-code)
         (count 0))
-    (goto-char (point-min))
-    (while (= line-diff 0)
+  (goto-char (point-min))
+  (while (and (= line-diff 0)
+              (not (= (point) (point-max))))
       (beginning-of-line)
       (when (re-search-forward shu-not-all-whitespace-regexp (line-end-position) t)
         (if (not in-code)

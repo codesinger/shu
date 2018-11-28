@@ -410,3 +410,23 @@
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     ))
+
+
+
+;;
+;;  shu-test-shu-capture-code-in-md-6
+;;
+(ert-deftest shu-test-shu-capture-code-in-md-6 ()
+  (let* ((pad (make-string shu-capture-doc-code-indent ? ))
+         (line "This is some text to test things.")
+         (data line)
+         (expected data)
+         (actual "")
+         (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-code-in-md))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
