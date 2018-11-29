@@ -83,10 +83,8 @@
 ;;
 (defmacro shu-capture-set-func-def (func-def signature attributes description)
   "Create a func-def to describe the function"
-  `(let (
-         (func-alias)
-         (func-info)
-         )
+  `(let ((func-alias)
+         (func-info))
      (setq func-info (cons ,attributes ,description))
      (setq func-alias (cons nil func-info))
      (setq ,func-def (cons ,signature func-alias))
@@ -98,10 +96,8 @@
 ;;
 (defmacro shu-capture-set-func-def-alias (func-def signature attributes description alias)
   "Create a func-def to describe the function"
-  `(let (
-         (func-alias)
-         (func-info)
-         )
+  `(let ((func-alias)
+         (func-info))
      (setq func-info (cons ,attributes ,description))
      (setq func-alias (cons ,alias func-info))
      (setq ,func-def (cons ,signature func-alias))
@@ -113,10 +109,8 @@
 ;;
 (defmacro shu-capture-get-func-def (func-def signature attributes description alias)
   "Extract the information from the func-def"
-  `(let (
-         (func-alias)
-         (func-info)
-         )
+  `(let ((func-alias)
+         (func-info))
      (setq ,signature (car ,func-def))
      (setq func-alias (cdr ,func-def))
      (setq ,alias (car func-alias))
@@ -131,9 +125,7 @@
 ;;
 (defmacro shu-capture-get-func-def-sig (func-def signature)
   "Extract the function signature from the func-def"
-  `(let (
-         (func-info)
-         )
+  `(let ((func-info))
      (setq ,signature (car ,func-def))
      ))
 
@@ -229,7 +221,6 @@ code snippet.")
         (al)
         (debug-on-error t)
         )
-;;;    (setq al (shu-capture-aliases))
     (shu-capture-aliases)
     (goto-char (point-min))
     (while (re-search-forward ss nil t)
@@ -469,7 +460,6 @@ turns upper case names into lower case names surrounded by mardown ticks."
 markdown.  Any line that is indented to column SHU-CAPTURE-DOC-CODE-INDENT or
 gteater is assumed to be a code snippet and will be surrounded by \"```\" to make
 it a code snippet in markdown.  Return the number of code snippets marked."
-  (interactive)
   (let ((line-diff 0)
         (in-code)
         (count 0))
