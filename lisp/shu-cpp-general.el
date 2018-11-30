@@ -2043,6 +2043,7 @@ is placed in a separate buffer called **shu-aix-malloc**."
     (setq nbuf-count (shu-group-number buf-count))
     (princ (format "\nbuf-count: %s buffers allocated\n" nbuf-count) gb)
     (princ (format "total: %s bytes allocated\n" ntotal) gb)
+    (princ (format "%s distinct buffer sizes found\n" (shu-group-number (length mlist))) gb)
     (cons total buf-count)
     ))
 
