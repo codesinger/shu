@@ -591,3 +591,37 @@ it a code snippet in markdown.  Return the number of code snippets marked."
            "\n\n" description "\n"))
     result
     ))
+
+
+
+;;
+;;  shu-capture-get-args-as-alist
+;;
+(defun shu-capture-get-args-as-alist (signature)
+  "SIGNATURE contains the function signature (both function name and arguments).
+This function returns the arguments as an a-list in which all of the argument names
+are the keys.  The special argument names \"&optional\" and \"&rest\" are not
+copied into the a-list if present."
+  (interactive)
+  (let ((fs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))")
+        (arg-string)
+        (arg-list)
+        (arg-assoc)
+        (arg)
+        (x))
+    (when (string-match fs signature)
+      (setq arg-string (match-string 2 signature))
+      (setq arg-list (split-string arg-string))
+      (when (not (= 0 (length arg-string)))
+        (while arg-list
+          (setq arg (car arg-list))
+          (when (and (not (string= arg "&optional"))
+                     (not (string= arg "&rest")))
+            (setq x (cons arg 1))
+            (if (not arg-assoc)
+                (setq arg-assoc (list x))
+              (when (not (assoc arg arg-assoc))
+                (setq arg-assoc (cons x arg-assoc)))))
+          (setq arg-list (cdr arg-list)))))
+    arg-assoc
+    ))

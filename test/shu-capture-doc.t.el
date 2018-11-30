@@ -430,3 +430,62 @@
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     ))
+
+
+
+
+;;
+;;  shu-test-shu-capture-get-args-as-alist-1
+;;
+(ert-deftest shu-test-shu-capture-get-args-as-alist-1 ()
+  "Doc string."
+  (let ((signature "func-name (arg1 arg2 arg3)")
+        (arg-assoc)
+        (x))
+    (setq arg-assoc (shu-capture-get-args-as-alist signature))
+    (should (listp arg-assoc))
+    (should (= 3 (length arg-assoc)))
+    (setq x arg-assoc)
+    (should (string= "arg3" (caar x)))
+    (setq x (cdr x))
+    (should (string= "arg2" (caar x)))
+    (setq x (cdr x))
+    (should (string= "arg1" (caar x)))
+    (setq x (cdr x))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-capture-get-args-as-alist-2
+;;
+(ert-deftest shu-test-shu-capture-get-args-as-alist-2 ()
+  "Doc string."
+  (let ((signature "func-name (arg1 &optional arg2 &rest arg3)")
+        (arg-assoc)
+        (x))
+    (setq arg-assoc (shu-capture-get-args-as-alist signature))
+    (should (listp arg-assoc))
+    (should (= 3 (length arg-assoc)))
+    (setq x arg-assoc)
+    (should (string= "arg3" (caar x)))
+    (setq x (cdr x))
+    (should (string= "arg2" (caar x)))
+    (setq x (cdr x))
+    (should (string= "arg1" (caar x)))
+    (setq x (cdr x))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-get-args-as-alist-3
+;;
+(ert-deftest shu-test-shu-capture-get-args-as-alist-3 ()
+  "Doc string."
+  (let ((signature "func-name ()")
+        (arg-assoc))
+    (setq arg-assoc (shu-capture-get-args-as-alist signature))
+    (should (not arg-assoc))
+    ))
