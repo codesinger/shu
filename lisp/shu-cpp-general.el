@@ -1953,6 +1953,101 @@ count of class names changed."
 
 
 
+;;
+;;  shu-dbx-summarize-malloc
+;;
+(defun shu-dbx-summarize-malloc ()
+  "Go through the output of a dbx malloc dump and generate a summary.  dbx is
+the AIX debugger.  It has a malloc comand that goes through the heap and prints
+one line for every allocated buffer.  Here is a sample of some of its output:
+
+         ADDRESS         SIZE HEAP    ALLOCATOR
+      0x30635678          680    0     YORKTOWN
+      0x30635928          680    0     YORKTOWN
+      0x30635bd8          680    0     YORKTOWN
+
+YORKTOWN is the name of the default allocator on AIX.  This function goes
+through the malloc output and gets the number and sizes of all buffers
+allocated.  This tells you how many buffers were allocated, the total number of
+bytes allocated, and the total number of buffers allocated by size.  The output
+is placed in a separate buffer called **shu-aix-malloc**."
+  (interactive)
+  (let ((gb (get-buffer-create "**shu-aix-malloc**"))
+        (rs   "0x\\([a-f0-9]+\\)\\s-+\\([0-9]+\\)\\s-+[0-9]+\\s-+YORKTOWN")
+        (address 0)
+        (size 0)
+        (sizes)
+        (count 0)
+        (x)
+        (z)
+        (buf-count 0))
+    (goto-char (point-min))
+    (while (re-search-forward rs nil t)
+      (setq address (match-string 1))
+      (setq size (match-string 2))
+      (setq size (string-to-number size))
+      (if (not sizes)
+          (setq sizes (list (cons size 1)))
+        (setq x (assoc size sizes))
+        (if x
+            (progn
+              (setq count (cdr x))
+          (setq count (1+ count))
+          (setcdr x count))
+          (setq count 1)
+          (setq x (cons size count))
+          (setq sizes (cons x sizes)))))
+    (setq sizes (sort sizes (lambda(lhs rhs) (< (car lhs) (car rhs)))))
+    (shu-aix-show-malloc-list sizes gb)
+    (setq sizes (sort sizes (lambda(lhs rhs) (< (cdr lhs) (cdr rhs)))))
+    (shu-aix-show-malloc-list sizes gb)
+    (setq sizes (sort sizes (lambda(lhs rhs) (< (* (car lhs) (cdr lhs))(* (car rhs) (cdr rhs))))))
+    (shu-aix-show-malloc-list sizes gb)
+    ))
+
+
+
+;;
+;;  shu-aix-show-malloc-list
+;;
+(defun shu-aix-show-malloc-list (mlist gb)
+  "Print the number of buffers allocated by size from an AIX dbx malloc command."
+  (let ((x mlist)
+        (z)
+        (size)
+        (count 0)
+        (total 0)
+        (this 0)
+        (nthis)
+        (nsize)
+        (ncount)
+        (buf-count 0)
+        (ntotal)
+        (nbuf-count))
+    (princ "\n\n" gb)
+    (princ "      buffer    buffer\n" gb)
+    (princ "        size     count\n" gb)
+    (while x
+      (setq z (car x))
+      (setq size (car z))
+      (setq count (cdr z))
+      (setq this (* size count))
+      (setq total (+ total this))
+      (setq nsize (shu-fixed-format-num size 12))
+      (setq nthis (shu-fixed-format-num this 12))
+      (setq ncount (shu-fixed-format-num count 8))
+      (princ (concat nsize ": " ncount "   (" nthis ")" "\n") gb)
+      (setq buf-count (+ count buf-count))
+      (setq x (cdr x)))
+    (setq ntotal (shu-group-number total))
+    (setq nbuf-count (shu-group-number buf-count))
+    (princ (format "\nbuf-count: %s buffers allocated\n" nbuf-count) gb)
+    (princ (format "total: %s bytes allocated\n" ntotal) gb)
+    (cons total buf-count)
+    ))
+
+
+
 
 ;;
 ;;  shu-cpp-general-set-alias
@@ -1997,4 +2092,5 @@ shu- prefix removed."
   (defalias 'qualify-class 'shu-interactive-qualify-class-name)
   (defalias 'qualify-std 'shu-qualify-namespace-std)
   (defalias 'qualify-bsl 'shu-qualify-namespace-bsl)
+  (defalias 'dbx-malloc 'shu-dbx-summarize-malloc)
 )
