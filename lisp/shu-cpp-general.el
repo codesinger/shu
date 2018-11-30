@@ -80,7 +80,7 @@ This is used by shu-internal-get-set when generating getters and setters for a c
 (defun shu-add-cpp-base-types (ntypes)
   "Add one or more data types to the list of C++ native data types defined in shu-cpp-base-types
 in shu-cpp-general.el.  Argument may be a single type in a string or a list of strings.
-This moifies shu-cpp-base-types."
+This mogifies shu-cpp-base-types."
   (let (
     (nt ntypes)
        )

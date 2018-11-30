@@ -117,8 +117,9 @@ are reorded.")
 ;; shu-keyring-get-pw
 ;;
 (defun shu-keyring-get-pw()
-  "Find the password for an entry in the keyring file.  This displays the entry in the message
-area and puts the password into the kill ring so that it can be yanked or pasted into the application
+  "Find the password for an entry in the keyring file.  This displays the entry
+(without the password) in the message area and puts the password into the kill
+ring so that it can be yanked into a buffer or pasted into the application
 requesting it."
   (interactive)
     (shu-keyring-get-field shu-keyring-pw-name)
@@ -128,9 +129,9 @@ requesting it."
 ;; shu-keyring-get-pin
 ;;
 (defun shu-keyring-get-pin()
-  "Find the pin for an entry in the keyring file.  This displays the entry in the message
-area and puts the password into the kill ring so that it can be yanked or pasted into the application
-requesting it."
+  "Find the pin for an entry in the keyring file.  This displays the entry in
+the message area and puts the pin into the kill ring so that it can be yanked
+into a buffer or pasted into the application requesting it."
   (interactive)
     (shu-keyring-get-field shu-keyring-pin-name)
     )
@@ -139,9 +140,9 @@ requesting it."
 ;; shu-keyring-get-id
 ;;
 (defun shu-keyring-get-id()
-  "Find the User ID for an entry in the keyring file.  This displays the entry in the message
-area and puts the password into the kill ring so that it can be yanked or pasted into the application
-requesting it."
+  "Find the User Id for an entry in the keyring file.  This displays the entry
+in the message area and puts the user Id into the kill ring so that it can be
+yanked into a buffer or pasted into the application requesting it."
   (interactive)
     (shu-keyring-get-field shu-keyring-id-name)
     )
@@ -150,9 +151,9 @@ requesting it."
 ;; shu-keyring-get-url
 ;;
 (defun shu-keyring-get-url()
-  "Find the User ID for an entry in the keyring file.  This displays the entry in the message
-area and puts the password into the kill ring so that it can be yanked or pasted into the application
-requesting it."
+  "Find the url for an entry in the keyring file.  This displays the entry in
+the message area and puts the url into the kill ring so that it can be yanked
+into a buffer or pasted into the application requesting it."
   (interactive)
     (shu-keyring-get-field shu-keyring-url-name)
     )
@@ -173,7 +174,10 @@ requesting it."
 ;; shu-keyring-get-file
 ;;
 (defun shu-keyring-get-file()
-"Display the name of the keyring file, if any"
+"Display the name of the keyring file, if any.  This is useful if you are
+getting unexpected results from some of the query functions that look up keyring
+information.  Perhaps the uexpected results come from the fact that you are
+using the wrong keyring file."
 (interactive)
 (if shu-keyring-file
     (message "Shu keyring file is \"%s\"" shu-keyring-file)
@@ -204,7 +208,13 @@ recreated."
 ;;
 (defun shu-keyring-verify-file ()
   "Parse and verify the keyring file, displaying the result of the operation in the
-keyring buffer."
+keyring buffer (**shu-keyring**).  If one of the queries for a url or other
+piece of information is unable to find the requested information, it could be
+that you have the wrong keyring file or that there is a syntax error in the
+ketring file.  shu-keyring-get-file (alias krfn) displays the name of the
+keyring file.  This function parses the keyring file.  AFter the operation. look
+into the keyring buffer (**shu-keyring**) to see if there are any complaints
+about syntax errors in the file."
   (interactive)
     (setq shu-keyring-index nil)
     (when (bufferp shu-keyring-buffer-name)
@@ -223,8 +233,7 @@ keyring buffer."
   "Fetch the value of a named field from the keyring.  Prompt the user with a completing-read
 for the field that identifies the key.  Use the key to find the item.  Find the value of the named
 key value pair within the item.  Put the value in the kill-ring and also return it to the caller."
-  (let
-       ((gbuf      (get-buffer-create shu-keyring-buffer-name))
+  (let ((gbuf      (get-buffer-create shu-keyring-buffer-name))
         (invitation   "Key? ")
         (keyring-key   )
         (keyring-entry )
@@ -324,6 +333,8 @@ contains no duplicate keys."
     (princ (format "Index contains %d entries.\n" count)  gbuf)
     ))
 
+
+
 ;;
 ;;  shu-keyring-find-index-duplicates
 ;;
@@ -390,6 +401,7 @@ order by key value before this function is called."
     index
     ))
 
+
 ;;
 ;;  shu-keyring-in-index
 ;;
@@ -420,6 +432,7 @@ order by key value before this function is called."
     got-it
     ))
 
+
 ;;
 ;;  shu-keyring-add-values-to-index
 ;;
@@ -440,6 +453,7 @@ although it would be unusual in a keyring."
     index
     ))
 
+
 ;;
 ;;  shu-keyring-show-name-url
 ;;
@@ -447,8 +461,7 @@ although it would be unusual in a keyring."
   "Show in the message area the name, url, or both of a keyring entry.  Also prefix
 the message with the upper case type, which is the type of the entry that has been
 placed in the clipboard, (PW, ID, etc.)"
-  (let
-       ((names   (shu-nvplist-get-item-value shu-keyring-name-name item))
+  (let ((names   (shu-nvplist-get-item-value shu-keyring-name-name item))
         (urls    (shu-nvplist-get-item-value shu-keyring-url-name item))
         (ids     (shu-nvplist-get-item-value shu-keyring-id-name item))
         (mstring    "")
@@ -471,13 +484,13 @@ placed in the clipboard, (PW, ID, etc.)"
     (message "%s" mstring)
     ))
 
+
 ;;
 ;;  shu-keyring-values-to-string
 ;;
 (defun shu-keyring-values-to-string (values)
   "Turn a list of values into a single string of values separated by slashes."
-  (let
-       ((retval "")
+  (let ((retval "")
         (x       0))
     (while values
       (setq x (1+ x))
@@ -488,13 +501,14 @@ placed in the clipboard, (PW, ID, etc.)"
     retval
     ))
 
+
 ;;
 ;;  shu-keyring-set-alias
 ;;
 (defun shu-keyring-set-alias ()
   "Set the common alias names for the functions in shu-keyring.
 These are generally the same as the function names with the leading
-shu- prefix removed.  But in this case the names a drastically shorrtened
+shu- prefix removed.  But in this case the names are drastically shorrtened
 to make them easier to type. "
   (defalias 'krpw 'shu-keyring-get-pw)
   (defalias 'krurl 'shu-keyring-get-url)

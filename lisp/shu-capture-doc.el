@@ -197,7 +197,7 @@ code snippet.")
         (ggb (get-buffer-create "**slp**"))
         (gb (get-buffer-create "**shu-capture-doc**"))
         (ss   "(defun\\s-+")
-        (fs   "(defun\\s-*\\([a-zA-Z-]+\\)\\s-*(\\s-*\\([ a-zA-Z-,&\n]*\\))")
+        (fs   "(defun\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))")
         (inter  "(interactive")
         (attributes 0)
         (attribs 0)
@@ -205,8 +205,6 @@ code snippet.")
         (eof 0)
         (fn)
         (args)
-        (sdesc)
-        (edesc)
         (desc)
         (func-sig)
         (sig)
@@ -224,52 +222,90 @@ code snippet.")
     (shu-capture-aliases)
     (goto-char (point-min))
     (while (re-search-forward ss nil t)
+      (princ (format "Found defun: %s\n" (match-string 0)) ggb)
       (setq attributes 0)
       (beginning-of-line)
       (setq sof (point))
+      (princ (format "sof: %d\n" sof ) ggb)
       (setq eof (save-excursion
                   (forward-sexp)
                   (point)))
       (when (search-forward inter eof t)
         (setq attributes (logior attributes shu-capture-attr-inter)))
       (goto-char sof)
-      (when (re-search-forward fs eof t)
-        (setq fn (match-string 1))
-        (setq args (match-string 2))
-        (setq func-sig (concat fn " (" args ")"))
-        (when (re-search-forward xquote eof t)
-          (setq sdesc (point))
-          (when (re-search-forward xquote eof t)
-            (setq edesc (1- (point)))
-            (setq desc (buffer-substring-no-properties sdesc edesc))
-            (with-temp-buffer
-              (insert desc)
-              (shu-doc-internal-to-md)
-              (fill-region (point-min) (point-max))
-              (setq desc (buffer-substring-no-properties (point-min) (point-max)))
+      (if (re-search-forward fs eof t)
+          (progn
+            (setq fn (match-string 1))
+            (setq args (match-string 2))
+            (setq func-sig (concat fn " (" args ")"))
+            (princ (format "FUNC: %s\n" func-sig) ggb)
+            (setq desc (shu-capture-get-doc-string eof))
+            (setq alias nil)
+            (setq al nil)
+            (setq alias (assoc fn shu-capture-alias-list))
+            (when alias
+              (setq al (cdr alias))
+              (setq sig (concat al " (" args ")"))
+              (setq attribs (logior attributes shu-capture-attr-alias))
+              (shu-capture-set-func-def-alias alias-def sig attribs desc fn)
+              (setq alias-list (cons alias-def alias-list))
               )
+            (shu-capture-set-func-def-alias func-def func-sig attributes desc al)
+            (setq func-list (cons func-def func-list))
             )
-          (setq alias nil)
-          (setq al nil)
-          (setq alias (assoc fn shu-capture-alias-list))
-          (when alias
-            (setq al (cdr alias))
-            (setq sig (concat al " (" args ")"))
-            (setq attribs (logior attributes shu-capture-attr-alias))
-            (shu-capture-set-func-def-alias alias-def sig attribs desc fn)
-            (setq alias-list (cons alias-def alias-list))
-            )
-          (shu-capture-set-func-def-alias func-def func-sig attributes desc al)
-          (setq func-list (cons func-def func-list))
-          )
+        (princ (format "\nERROR: At point %d, found \"defun\" but no function name\n\n" sof) gb)
+        (goto-char eof)
         )
       )
-    (setq func-list (sort func-list 'shu-doc-sort-compare))
-    (princ "\n\nFINAL FUNCTION LIST 1\n" gb)
-    (shu-capture-show-list-md func-list gb)
     (setq alias-list (sort alias-list 'shu-doc-sort-compare))
-    (princ "\n\nFINAL ALIAS LIST 1\n" gb)
+    (princ "\n\n## List of functions by alias name ##\n\n" gb)
     (shu-capture-show-list-md alias-list gb)
+    (setq func-list (sort func-list 'shu-doc-sort-compare))
+    (princ "\n\n## Full list of functions ##\n" gb)
+    (shu-capture-show-list-md func-list gb)
+    ))
+
+
+
+;;
+;;  shu-capture-get-doc-string
+;;
+(defun shu-capture-get-doc-string (eof)
+  "Enter with point positioned immediately after a function declaration.  Try to
+fetch the associatd doc string as follows:  1. Look for the first open or close
+[arenthesis.  2. Look for the first quote.  If the first parenthesis comes before
+the first quote, then there is no doc string.  In the following function, there is
+no doc string:
+
+     (defun foo (name)
+       (interactive \"sName?: \"))
+
+but if we do not notice that the firt parenthesis comes before the first quote, then
+we might think that there is a doc string that contains \"sName?: \".
+
+Return the doc string if there is one, nil otherwie."
+  (let ((xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
+        (fp "[()]+")
+        (first-quote 0)
+        (first-paren 0)
+        (sdesc 0)
+        (edesc 0)
+        (desc))
+    (save-excursion
+      (when (re-search-forward fp eof t)
+        (setq first-paren (point)))
+      )
+    (save-excursion
+      (when (re-search-forward xquote eof t)
+        (setq first-quote (point)))
+      )
+    (when (< first-quote first-paren)
+      (when (re-search-forward xquote eof t)
+        (setq sdesc (point))
+        (when (re-search-forward xquote eof t)
+          (setq edesc (1- (point)))
+          (setq desc (buffer-substring-no-properties sdesc edesc)))))
+    desc
     ))
 
 
@@ -517,7 +553,9 @@ it a code snippet in markdown.  Return the number of code snippets marked."
 ;;
 (defun shu-doc-internal-func-to-md (func-def)
   "Take a function definition and turn it into a string of markdown text."
-  (let (        (signature)
+  (let (
+        (gb (get-buffer-create "**shu-capture-doc**"))
+        (signature)
         (attributes)
         (description)
         (alias)
@@ -530,10 +568,16 @@ it a code snippet in markdown.  Return the number of code snippets marked."
           (if (not (= 0 (logand attributes shu-capture-attr-alias)))
               "Function"
             "Alias"))
-    (with-temp-buffer
-      (insert description)
-      (shu-doc-internal-to-md)
-      (setq description (buffer-substring-no-properties (point-min) (point-max))))
+    (if description
+        (progn
+          (with-temp-buffer
+            (insert description)
+            (shu-doc-internal-to-md)
+            (setq description (buffer-substring-no-properties (point-min) (point-max))))
+          )
+      ;;      (princ (format "\nERROR: %s has no doc string.\n\n" signature) gb)
+      (setq description "Undocumented")
+      )
     (when alias
       (setq alias-line (concat " (" title ": " alias ")")))
     (when (and (not (= 0 (logand attributes shu-capture-attr-inter)))
