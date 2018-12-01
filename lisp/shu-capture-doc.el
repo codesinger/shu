@@ -595,18 +595,72 @@ it a code snippet in markdown.  Return the number of code snippets marked."
 
 
 ;;
+;;  shu-capture-arg-to-md
+;;
+(defun shu-capture-arg-to-md (arg-name)
+  "Convert a function argument in a doc-string to markdown."
+  (concat shu-capture-md-arg-delimiter arg-name shu-capture-md-arg-delimiter)
+  )
+
+
+
+;;
+;;  shu-capture-arg-to-latex
+;;
+(defun shu-capture-arg-to-latex (arg-name)
+  "Convert a function argument in a doc-string to LaTex."
+  (concat "\emph{" arg-name "}")
+    )
+
+
+
+;;
+;;  shu-capture-doc-convert-args-to-md
+;;
+(defun shu-capture-doc-convert-args-to-md (signature)
+  (shu-capture-doc-convert-args signature 'shu-capture-arg-to-md))
+
+
+
+;;
+;;  shu-capture-doc-convert-args-to-latex
+;;
+(defun shu-capture-doc-convert-args-to-latex (signature)
+  (shu-capture-doc-convert-args signature 'shu-capture-arg-to-latex))
+
+
+
+;;
 ;;  shu-capture-doc-convert-args
 ;;
-(defun shu-capture-doc-convert-args (signature)
-  "Doc string."
-  (interactive)
+(defun shu-capture-doc-convert-args (signature converter)
+  "The current buffer contains a doc string from a function.  The argument to this
+function is the SIGNATURE of the function for which the doc string was written.
+This function goes through the doc string buffer looking for any word that is all
+upper case.  If the upper case word matches the name of an argument to the function,
+it is passed to the CONVERTER function for conversion into a markup language, which
+is probably markdown or LaTex, and it is then replaced in the doc string buffer.
+
+For example, if the function has the following signature:
+
+     do-something (hat cat)
+
+with the following doc string:
+
+  \"The Linux HAT is converted to an IBM CAT.\"
+
+would be converted to:
+
+  \"The Linux \emph{hat} is converted to an IBM \emph{cat}.\""
   (let ((arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
         (args (shu-capture-get-args-as-alist signature))
         (pname)
+        (new-name)
         (count 0))
     (goto-char (point-min))
     (while (re-search-forward arg-name nil t)
       (setq pname (downcase (match-string 1)))
+      (setq new-name (funcall converter pname))
       (when (assoc pname args)
         (replace-match (concat
                         shu-capture-md-arg-delimiter

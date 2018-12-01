@@ -437,7 +437,6 @@
 ;;  shu-test-shu-capture-doc-convert-args-1
 ;;
 (ert-deftest shu-test-shu-capture-doc-convert-args-1 ()
-  "Doc string."
   (let ((signature "do-somerhing (with these things &optional and &rest others)")
         (data
          (concat
@@ -483,7 +482,7 @@
         (actual))
     (with-temp-buffer
       (insert data)
-      (setq count (shu-capture-doc-convert-args signature))
+      (setq count (shu-capture-doc-convert-args-to-md signature))
       (setq actual (buffer-substring-no-properties (point-min) (point-max))))
     (should (= 8 count))
     (should (string= expected actual))
