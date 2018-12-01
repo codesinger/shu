@@ -433,6 +433,64 @@
 
 
 
+;;
+;;  shu-test-shu-capture-doc-convert-args-1
+;;
+(ert-deftest shu-test-shu-capture-doc-convert-args-1 ()
+  "Doc string."
+  (let ((signature "do-somerhing (with these things &optional and &rest others)")
+        (data
+         (concat
+          "This is a description of SOME THINGS that are arguments\n"
+          "and SOME that are and WITH are AND sort of NOT.  And perhaps\n"
+          "THESE, or WITH.  A test."))
+        (expected
+         (concat
+          "This is a description of SOME "
+          shu-capture-md-arg-delimiter
+          "things"
+          shu-capture-md-arg-delimiter
+          " that are arguments\n"
+          shu-capture-md-arg-delimiter
+          "and"
+          shu-capture-md-arg-delimiter
+          " SOME that are "
+          shu-capture-md-arg-delimiter
+          "and"
+          shu-capture-md-arg-delimiter
+          " "
+          shu-capture-md-arg-delimiter
+          "with"
+          shu-capture-md-arg-delimiter
+          " are "
+          shu-capture-md-arg-delimiter
+          "and"
+          shu-capture-md-arg-delimiter
+          " sort of NOT.  "
+          shu-capture-md-arg-delimiter
+          "and"
+          shu-capture-md-arg-delimiter
+          " perhaps\n"
+          shu-capture-md-arg-delimiter
+          "these"
+          shu-capture-md-arg-delimiter
+          ", or "
+          shu-capture-md-arg-delimiter
+          "with"
+          shu-capture-md-arg-delimiter
+          ".  A test."))
+        (count 0)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-doc-convert-args signature))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (= 8 count))
+    (should (string= expected actual))
+    ))
+
+
+
 
 ;;
 ;;  shu-test-shu-capture-get-args-as-alist-1

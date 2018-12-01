@@ -595,13 +595,44 @@ it a code snippet in markdown.  Return the number of code snippets marked."
 
 
 ;;
+;;  shu-capture-doc-convert-args
+;;
+(defun shu-capture-doc-convert-args (signature)
+  "Doc string."
+  (interactive)
+  (let ((arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
+        (args (shu-capture-get-args-as-alist signature))
+        (pname)
+        (count 0))
+    (goto-char (point-min))
+    (while (re-search-forward arg-name nil t)
+      (setq pname (downcase (match-string 1)))
+      (when (assoc pname args)
+        (replace-match (concat
+                        shu-capture-md-arg-delimiter
+                        pname
+                        shu-capture-md-arg-delimiter) t nil nil 1)
+        (setq count (1+ count))))
+    count
+    ))
+
+
+
+;;
 ;;  shu-capture-get-args-as-alist
 ;;
 (defun shu-capture-get-args-as-alist (signature)
   "SIGNATURE contains the function signature (both function name and arguments).
-This function returns the arguments as an a-list in which all of the argument names
-are the keys.  The special argument names \"&optional\" and \"&rest\" are not
-copied into the a-list if present."
+This function returns the arguments as an a-list in which all of the argument
+names are the keys.  The special argument names \"&optional\" and \"&rest\", if
+present, are not copied into the a-list.
+
+For example, if SIGNATURE holds the following:
+
+     do-somerhing (with these things &optional and &rest others)
+
+an a-list is returned with the keys \"others,\" \"and,\" \"things,\" \"these,\" and
+\"with.\""
   (interactive)
   (let ((fs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))")
         (arg-string)
