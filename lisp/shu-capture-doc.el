@@ -153,8 +153,46 @@
 ;;
 ;;  shu-capture-md-arg-delimiter
 ;;
-(defconst shu-capture-md-arg-delimiter "`"
-  "Define the delimiter that is used to surround an argument name.")
+(defconst shu-capture-md-arg-delimiter "**"
+  "Define the markdown delimiter that is used to surround an argument name.")
+
+
+;;
+;;  shu-capture-latex-arg-start
+;;
+(defconst shu-capture-latex-arg-start "\textbf{"
+  "Define the latex string that is used to prepended to an arguument name.")
+
+
+;;
+;;  shu-capture-latex-arg-end
+;;
+(defconst shu-capture-latex-arg-end "}"
+  "Define the latex string that is used to terminate an arguument name.")
+
+
+;;
+;;  shu-capture-md-buf-delimiter
+;;
+(defconst shu-capture-md-buf-delimiter "`"
+  "Define the markdown delimiter that is used to surround a buffer name or
+any other name that has leading and trailing asterisks")
+
+
+;;
+;;  shu-capture-latex-buf-start
+;;
+(defconst shu-capture-latex-buf-start "\emph{"
+  "Define the LaTex string that is used in front of a buffer name or
+any other name that has leading and trailing asterisks")
+
+
+;;
+;;  shu-capture-latex-buf-end
+;;
+(defconst shu-capture-latex-buf-end "}"
+  "Define the LaTex string that is used at the end of a buffer name or
+any other name that has leading and trailing asterisks")
 
 
 ;;
@@ -168,15 +206,14 @@
 ;;  shu-capture-attr-alias
 ;;
 (defconst shu-capture-attr-alias (lsh 1 1)
-  "Bit that indicates that a function is interactive")
+  "Bit that indicates that a function is identified by its alias name")
 
 
 ;;
-;;  shu-capture-md-buf-delimiter
+;;  shu-capture-attr-macro
 ;;
-(defconst shu-capture-md-buf-delimiter "`"
-  "Define the delimiter that is used to surround a buffer name or
-any other name that has leading and trailing asterisks")
+(defconst shu-capture-attr-macro (lsh 1 2)
+  "Bit that indicates that a function is a macro")
 
 
 
@@ -495,8 +532,30 @@ it a code snippet in markdown.  Return the number of code snippets marked."
 ;;
 (defun shu-capture-arg-to-latex (arg-name)
   "Convert a function argument in a doc-string to LaTex."
-  (concat "\emph{" arg-name "}")
+  (concat shu-capture-latex-arg-start arg-name shu-capture-latex-arg-end)
     )
+
+
+
+;;
+;;  shu-capture-buf-to-md
+;;
+(defun shu-capture-buf-to-md (arg-name)
+  "Convert a buffer name or other name that starts and ends with asterisks
+ in a doc-string to markdown."
+  (concat shu-capture-md-buf-delimiter arg-name shu-capture-md-buf-delimiter)
+  )
+
+
+
+;;
+;;  shu-capture-buf-to-latex
+;;
+(defun shu-capture-buf-to-latex (arg-name)
+  "Convert a buffer name or other name that starts and ends with asterisks
+ in a doc-string to markdown."
+  (concat shu-capture-latex-buf-start arg-name shu-capture-latex-buf-end)
+  )
 
 
 
@@ -573,7 +632,6 @@ For example, if SIGNATURE holds the following:
 
 an a-list is returned with the keys \"others,\" \"and,\" \"things,\" \"these,\" and
 \"with.\""
-  (interactive)
   (let ((fs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))")
         (arg-string)
         (arg-list)
