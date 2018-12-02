@@ -196,6 +196,29 @@ any other name that has leading and trailing asterisks")
 
 
 ;;
+;;  shu-capture-md-code-delimiter
+;;
+(defconst shu-capture-md-code-delimiter "```"
+  "Define the markdown delimiter that is used to surround a code snippet.")
+
+
+;;
+;;  shu-capture-latex-code-start
+;;
+(defconst shu-capture-latex-code-start "\begin{verbatim}"
+  "Define the LaTex string that is at the beginning of a verbatim
+code snippet.")
+
+
+;;
+;;  shu-capture-latex-code-end
+;;
+(defconst shu-capture-latex-code-end "\end{verbatim}"
+  "Define the LaTex string that is at the end of a verbatim
+code snippet.")
+
+
+;;
 ;;  shu-capture-attr-inter
 ;;
 (defconst shu-capture-attr-inter (lsh 1 0)
@@ -451,20 +474,20 @@ it a code snippet in markdown.  Return the number of code snippets marked."
                 (if (= 1 (line-number-at-pos))
                     (progn
                       (beginning-of-line)
-                      (insert "```\n"))
+                      (insert (concat shu-capture-md-code-delimiter "\n")))
                   (forward-line -1)
                   (end-of-line)
-                  (insert "\n```"))
+                  (insert (concat "\n" shu-capture-md-code-delimiter)))
                 (forward-line 1)))
           (when (< (current-column) shu-capture-doc-code-indent)
             (setq in-code nil)
             (forward-line -1)
             (end-of-line)
-            (insert "\n```")
+            (insert (concat "\n" shu-capture-md-code-delimiter))
             (beginning-of-line))))
       (setq line-diff (forward-line 1)))
     (when in-code
-      (insert "```\n"))
+      (insert (concat shu-capture-md-code-delimiter "\n")))
     count
     ))
 
