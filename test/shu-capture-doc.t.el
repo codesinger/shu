@@ -27,11 +27,9 @@
 ;;
 (ert-deftest shu-test-shu-doc-internal-to-md-1 ()
   (let ((x))
-    (with-temp-buffer
-      (shu-doc-internal-to-md)
-      (setq x (buffer-substring-no-properties (point-min) (point-max)))
+      (setq x (shu-doc-internal-to-md ""))
       (should (= 0 (length x)))
-      )))
+      ))
 
 
 ;;
@@ -40,13 +38,8 @@
 (ert-deftest shu-test-shu-doc-internal-to-md-2 ()
   (let ((x  "This is a doc-string")
         (y))
-
-    (with-temp-buffer
-      (insert x)
-      (shu-doc-internal-to-md)
-      (setq y (buffer-substring-no-properties (point-min) (point-max)))
-      (should (string= x y))
-      )))
+      (setq y (shu-doc-internal-to-md x))
+      ))
 
 
 ;;
@@ -56,13 +49,9 @@
   (let ((x  "This is a \\\"doc\\\" string")
         (expected "This is a \"doc\" string")
         (actual))
-
-    (with-temp-buffer
-      (insert x)
-      (shu-doc-internal-to-md)
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq actual (shu-doc-internal-to-md x))
       (should (string= expected actual))
-      )))
+      ))
 
 
 ;;
@@ -75,13 +64,9 @@
                          "**buffer-name**"
                          shu-capture-md-buf-delimiter))
         (actual))
-
-    (with-temp-buffer
-      (insert x)
-      (shu-doc-internal-to-md)
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq actual (shu-doc-internal-to-md x))
       (should (string= expected actual))
-      )))
+      ))
 
 
 ;;
@@ -94,13 +79,9 @@
                    "**buffer-name**"
                    shu-capture-md-buf-delimiter))
         (actual))
-
-    (with-temp-buffer
-      (insert x)
-      (shu-doc-internal-to-md)
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq actual (shu-doc-internal-to-md x))
       (should (string= expected actual))
-      )))
+      ))
 
 
 ;;
@@ -125,13 +106,9 @@
                           "arg" shu-capture-md-arg-delimiter
                           " name."))
         (actual))
-
-    (with-temp-buffer
-      (insert x)
-      (shu-doc-internal-to-md)
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq actual (shu-doc-internal-to-md x))
       (should (string= expected actual))
-      )))
+      ))
 
 
 ;;
@@ -139,15 +116,17 @@
 ;;
 (ert-deftest shu-test-shu-doc-internal-to-md-8 ()
   (let ((x  "This is an ARG.")
-        (expected "This is an `arg`.")
+        (expected
+         (concat
+          "This is an "
+          shu-capture-md-arg-delimiter
+          "arg"
+          shu-capture-md-arg-delimiter
+          "."))
         (actual))
-
-    (with-temp-buffer
-      (insert x)
-      (shu-doc-internal-to-md)
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq actual (shu-doc-internal-to-md x))
       (should (string= expected actual))
-      )))
+      ))
 
 
 ;;
@@ -155,15 +134,17 @@
 ;;
 (ert-deftest shu-test-shu-doc-internal-to-md-9 ()
   (let ((x  "This is an ARG, with")
-        (expected "This is an `arg`, with")
+        (expected
+         (concat
+          "This is an "
+          shu-capture-md-arg-delimiter
+          "arg"
+          shu-capture-md-arg-delimiter
+          ", with"))
         (actual))
-
-    (with-temp-buffer
-      (insert x)
-      (shu-doc-internal-to-md)
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq actual (shu-doc-internal-to-md x))
       (should (string= expected actual))
-      )))
+      ))
 
 
 ;;

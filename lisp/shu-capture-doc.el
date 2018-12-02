@@ -417,8 +417,8 @@ Return the doc string if there is one, nil otherwie."
 ;;
 ;;  shu-doc-internal-to-md
 ;;
-(defun shu-doc-internal-to-md ()
-  "The current buffer contains a doc string from a function definition (with leading
+(defun shu-doc-internal-to-md (description)
+  "DESCRIPTION contains a doc string from a function definition (with leading
 and trailing quotes removed).  This function turns escaped quotes into regular
 (non-escaped) quotes and turns names with leading and trailing asterisks (e.g.,
 **project-count-buffer**) into short code blocks surrounded by back ticks.  It also
@@ -429,25 +429,30 @@ turns upper case names into lower case names surrounded by mardown ticks."
         (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
         (nm)
         (ln)
+        (result)
         (case-fold-search nil))
-    (goto-char (point-min))
-    (while (re-search-forward esc-quote nil t)
-      (replace-match plain-quote))
-    (goto-char (point-min))
-    (while (re-search-forward star-name nil t)
-      (replace-match (concat
-                      shu-capture-md-buf-delimiter
-                      (match-string 0)
-                      shu-capture-md-buf-delimiter)))
-    (goto-char (point-min))
-    (while (re-search-forward arg-name nil t)
-      (setq nm (match-string 1))
-      (setq ln (downcase nm))
-      (replace-match (concat
-                      shu-capture-md-arg-delimiter
-                      ln
-                      shu-capture-md-arg-delimiter) t nil nil 1))
-    (shu-capture-code-in-md)
+    (with-temp-buffer
+      (insert description)
+      (goto-char (point-min))
+      (while (re-search-forward esc-quote nil t)
+        (replace-match plain-quote))
+      (goto-char (point-min))
+      (while (re-search-forward star-name nil t)
+        (replace-match (concat
+                        shu-capture-md-buf-delimiter
+                        (match-string 0)
+                        shu-capture-md-buf-delimiter)))
+      (goto-char (point-min))
+      (while (re-search-forward arg-name nil t)
+        (setq nm (match-string 1))
+        (setq ln (downcase nm))
+        (replace-match (concat
+                        shu-capture-md-arg-delimiter
+                        ln
+                        shu-capture-md-arg-delimiter) t nil nil 1))
+      (shu-capture-code-in-md)
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
+    result
     ))
 
 
@@ -533,15 +538,9 @@ it a code snippet in markdown.  Return the number of code snippets marked."
               "Function"
             "Alias"))
     (if description
-        (progn
-          (with-temp-buffer
-            (insert description)
-            (shu-doc-internal-to-md)
-            (setq description (buffer-substring-no-properties (point-min) (point-max))))
-          )
+            (setq description (shu-doc-internal-to-md description))
       ;;      (princ (format "\nERROR: %s has no doc string.\n\n" signature) gb)
-      (setq description "Undocumented")
-      )
+      (setq description "Undocumented"))
     (when alias
       (setq alias-line (concat " (" title ": " alias ")")))
     (when (and (not (= 0 (logand attributes shu-capture-attr-inter)))
