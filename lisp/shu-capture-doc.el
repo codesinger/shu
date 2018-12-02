@@ -233,8 +233,24 @@ code snippet.")
   (let (
         (ggb (get-buffer-create "**slp**"))
         (gb (get-buffer-create "**shu-capture-doc**"))
-        (ss   "(\\s-*\\(defun\\|defmacro\\)\\s-+")
-        (fs   "(\\s-*\\(defun\\|defmacro\\)\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))")
+        (ss
+         (concat
+          "("
+          "\\s-*"
+          "\\(defun\\|defmacro\\)\\"
+          "s-+"))
+        (fs
+         (concat
+          "("
+          "\\s-*"
+          "\\(defun\\|defmacro\\)"
+          "\\s-*"
+          "\\([0-9a-zA-Z-]+\\)"
+          "\\s-*"
+          "("
+          "\\s-*"
+          "\\([ 0-9a-zA-Z-,&\n]*\\)"
+          ")"))
         (inter  "(interactive")
         (attributes 0)
         (attribs 0)
