@@ -302,6 +302,27 @@ code snippet.")
 
 
 ;;
+;;  shu-capture-md-quote-delimiter
+;;
+(defconst shu-capture-md-quote-delimiter "\""
+  "Define the markdown delimiter that is used for open and close quote.")
+
+
+;;
+;;  shu-capture-latex-open-quote
+;;
+(defconst shu-capture-latex-open-quote "``"
+  "Define the LaTex string that is an open quote.")
+
+
+;;
+;;  shu-capture-latex-close-quote
+;;
+(defconst shu-capture-latex-close-quote "''"
+  "Define the LaTex string that is a close quote.")
+
+
+;;
 ;;  shu-capture-attr-inter
 ;;
 (defconst shu-capture-attr-inter (lsh 1 0)
@@ -712,6 +733,147 @@ it a code snippet in markdown.  Return the number of code snippets marked."
            interact-line
            "\n\n" description "\n"))
     result
+    ))
+
+
+
+;;
+;;  shu-capture-convert-doc-string
+;;
+(defun shu-capture-convert-doc-string (description converters)
+"DESCRIPTION contains a doc string from a function definition (with leading
+and trailing quotes removed).  CONVERTERS is an a-list of functions and strings as
+follows:
+
+      Key                              Value
+      ---                              -----
+      shu-capture-a-type-hdr           Function to format a section header
+      shu-capture-a-type-func          Function to format a function signature
+      shu-capture-a-type-buf           Function to format a buffer name
+      shu-capture-a-type-arg           Function to format an argument name
+      shu-capture-a-type-before        String that starts a block of verbatim code
+      shu-capture-a-type-after         String that ends a block of verbstim code
+      shu-capture-a-type-open-quote    String that is an open quote
+      shu-capture-a-type-close-quote   String that is a close quote
+
+This function turns escaped quotes into open and close quote strings, turns names
+with leading and trailing asterisks (e.g., **project-buffer**) into formatted buffer
+names, turns upper case names that match any argument names into lower case,
+formatted argument names."
+  (let ((star-name "*[a-zA-Z0-9*-_]+")
+        (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
+        (buf-converter (cdr-safe (assoc shu-capture-a-type-buf)))
+        (arg-converter (cdr-safe (assoc shu-capture-a-type-arg)))
+        (before-code (cdr-safe (assoc shu-capture-a-type-before)))
+        (after-code (cdr-safe (assoc shu-capture-a-type-after)))
+        (open-quote  (cdr-safe (assoc shu-capture-a-type-open-quote)))
+        (close-quote  (cdr-safe (assoc shu-capture-a-type-close-quote)))
+        (nm)
+        (ln)
+        (result)
+        (case-fold-search nil))
+    (with-temp-buffer
+      (insert description)
+      (goto-char (point-min))
+      (shu-capture-convert-quotes open-quote close-quote)
+      (goto-char (point-min))
+      (while (re-search-forward star-name nil t)
+        (replace-match (funcall buf-converter (match-string 0))))
+      (goto-char (point-min))
+      (while (re-search-forward arg-name nil t)
+        (setq nm (match-string 1))
+        (setq ln (downcase nm))
+        (replace-match (funcall arg-converter ln) t nil nil 1))
+      (shu-capture-code-in-doc before-code after-code)
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
+    result
+    ))
+
+
+
+;;
+;;  shu-capture-code-in-doc
+;;
+(defun shu-capture-code-in-doc (before-code after-code)
+  "The current buffer is assumed to hold a doc string that is being converted to
+markdown.  Any line that is indented to column SHU-CAPTURE-DOC-CODE-INDENT or
+gteater is assumed to be a code snippet.  To format this as a code snippet,
+BEFORE-CODE is placed one line above the code snippet and AFTER-CODE is placed
+one line below the code snippet.  Return the number of code snippets marked."
+  (let ((line-diff 0)
+        (in-code)
+        (count 0))
+  (goto-char (point-min))
+  (while (and (= line-diff 0)
+              (not (= (point) (point-max))))
+      (beginning-of-line)
+      (when (re-search-forward shu-not-all-whitespace-regexp (line-end-position) t)
+        (if (not in-code)
+            (progn
+              (when (> (current-column) shu-capture-doc-code-indent)
+                (setq in-code t)
+                (setq count (1+ count))
+                (if (= 1 (line-number-at-pos))
+                    (progn
+                      (beginning-of-line)
+                      (insert (concat before-code "\n")))
+                  (forward-line -1)
+                  (end-of-line)
+                  (insert (concat "\n" before-code)))
+                (forward-line 1)))
+          (when (< (current-column) shu-capture-doc-code-indent)
+            (setq in-code nil)
+            (forward-line -1)
+            (end-of-line)
+            (insert (concat "\n" after-code))
+            (beginning-of-line))))
+      (setq line-diff (forward-line 1)))
+    (when in-code
+      (insert (concat after-code "\n")))
+    count
+    ))
+
+
+
+;;
+;;  shu-capture-convert-quotes
+;;
+(defun shu-capture-convert-quotes (open-quote close-quote)
+  "Go through the current buffer converting any escaped quote to either an open or
+close quote.  If an escaped quote is preceded by whitespace, \"(\", \"{\", \"<\", or \">\",
+or by a close quote, then we replace it with an open quote.  Otherwise we replace it
+with a close quote."
+  (let* ((diff-quotes (not (string= open-quote close-quote)))
+         (esc-quote    "\\\\\"")
+         (is-open-chars (append shu-all-whitespace-chars (list "(" "[" "<" ">")))a
+         (is-open-rx (regexp-opt is-open-chars))
+         (is-open)
+         (move-len 0)
+         (count 0))
+    (goto-char (point-min))
+    (while (re-search-forward esc-quote nil t)
+      (setq is-open nil)
+      (when diff-quotes
+        (when (> (current-column) (1+ (length open-quote)))
+          (setq move-len (- (+ 2 (length open-quote))))
+          (save-excursion
+            (save-match-data
+              (forward-char move-len)
+              (when (looking-at close-quote)
+                (setq is-open t))))))
+      (when (not is-open)
+        (if (not (> (current-column) 2))
+            (setq is-open t)
+          (save-excursion
+            (save-match-data
+              (forward-char -3)
+              (when (looking-at is-open-rx)
+                (setq is-open t))))))
+      (if is-open
+          (replace-match open-quote)
+        (replace-match close-quote))
+      (setq count (1+ count)))
+    count
     ))
 
 

@@ -527,3 +527,199 @@
     (setq arg-assoc (shu-capture-get-args-as-alist signature))
     (should (not arg-assoc))
     ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-quotes-1
+;;
+(ert-deftest shu-test-shu-capture-convert-quotes-1 ()
+  "Doc string."
+  (let* ((open-quote "``")
+        (close-quote "''")
+        (esc "\\")
+        (quote    "\"")
+        (data (concat esc quote "Hello." esc quote))
+        (expected (concat open-quote "Hello." close-quote))
+        (count)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-convert-quotes open-quote close-quote))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (= 2 count))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-quotes-2
+;;
+(ert-deftest shu-test-shu-capture-convert-quotes-2 ()
+  "Doc string."
+  (let* ((open-quote "``")
+        (close-quote "''")
+        (esc "\\")
+        (quote    "\"")
+        (data (concat " " esc quote "Hello." esc quote))
+        (expected (concat " " open-quote "Hello." close-quote))
+        (count)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-convert-quotes open-quote close-quote))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (= 2 count))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-quotes-3
+;;
+(ert-deftest shu-test-shu-capture-convert-quotes-3 ()
+  "Doc string."
+  (let* ((open-quote "``")
+        (close-quote "''")
+        (esc "\\")
+        (quote    "\"")
+        (data (concat "(" esc quote "Hello." esc quote))
+        (expected (concat "(" open-quote "Hello." close-quote))
+        (count)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-convert-quotes open-quote close-quote))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (= 2 count))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-quotes-4
+;;
+(ert-deftest shu-test-shu-capture-convert-quotes-4 ()
+  "Doc string."
+  (let* ((open-quote "``")
+        (close-quote "''")
+        (esc "\\")
+        (quote    "\"")
+        (data (concat "[" esc quote "Hello." esc quote))
+        (expected (concat "[" open-quote "Hello." close-quote))
+        (count)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-convert-quotes open-quote close-quote))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (= 2 count))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-quotes-5
+;;
+(ert-deftest shu-test-shu-capture-convert-quotes-5 ()
+  "Doc string."
+  (let* ((open-quote "``")
+        (close-quote "''")
+        (esc "\\")
+        (quote    "\"")
+        (data (concat "<" esc quote "Hello." esc quote))
+        (expected (concat "<" open-quote "Hello." close-quote))
+        (count)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-convert-quotes open-quote close-quote))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (= 2 count))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-quotes-6
+;;
+(ert-deftest shu-test-shu-capture-convert-quotes-6 ()
+  "Doc string."
+  (let* ((open-quote "``")
+        (close-quote "''")
+        (esc "\\")
+        (quote    "\"")
+        (data (concat ">" esc quote "Hello." esc quote))
+        (expected (concat ">" open-quote "Hello." close-quote))
+        (count)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-convert-quotes open-quote close-quote))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (= 2 count))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-quotes-7
+;;
+(ert-deftest shu-test-shu-capture-convert-quotes-7 ()
+  "Doc string."
+  (let* ((open-quote "``")
+        (close-quote "''")
+        (esc "\\")
+        (quote    "\"")
+        (data
+         (concat
+          esc quote "Now is the" esc quote " "
+          esc quote "time" esc quote
+          " for all good\n"
+          esc quote "men" esc quote
+          " to come to the aid of the party."))
+        (expected
+         (concat
+          open-quote "Now is the" close-quote " "
+          open-quote "time" close-quote
+          " for all good\n"
+          open-quote "men" close-quote
+          " to come to the aid of the party."))
+        (count)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-convert-quotes open-quote close-quote))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (= 6 count))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-quotes-8
+;;
+(ert-deftest shu-test-shu-capture-convert-quotes-8 ()
+  "Doc string."
+  (let* ((open-quote "``")
+        (close-quote "''")
+        (esc "\\")
+        (quote    "\"")
+        (data (concat " " esc quote "Hello." esc quote esc quote "there" esc quote))
+        (expected (concat " " open-quote "Hello." close-quote open-quote "there" close-quote))
+        (count)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-capture-convert-quotes open-quote close-quote))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (= 4 count))
+    (should (string= expected actual))
+    ))
