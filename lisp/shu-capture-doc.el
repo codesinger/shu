@@ -151,6 +151,52 @@
 
 
 ;;
+;;  shu-capture-a-type-hdr
+;;
+(defconst shu-capture-a-type-hdr 1
+  "The a-list key value that identifies the function that emits section headers")
+
+
+;;
+;;  shu-capture-a-type-func
+;;
+(defconst shu-capture-a-type-func 2
+  "The a-list key value that identifies the function that formats a fundtion signature'")
+
+
+;;
+;;  shu-capture-a-type-buf
+;;
+(defconst shu-capture-a-type-buf 3
+  "The a-list key value that identifies the function that converts a buffer name or
+other name that begins and ends with asterisks to markup.")
+
+
+;;
+;;  shu-capture-a-type-arg
+;;
+(defconst shu-capture-a-type-arg 4
+  "The a-list key value that identifies the function that converts an argument name
+to markup.")
+
+
+;;
+;;  shu-capture-a-type-before
+;;
+(defconst shu-capture-a-type-before 5
+  "The a-list key value that identifies the string that is placed before a verbatim
+code snippet.")
+
+
+;;
+;;  shu-capture-a-type-after
+;;
+(defconst shu-capture-a-type-after 6
+  "The a-list key value that identifies the string that is placed after a verbatim
+code snippet.")
+
+
+;;
 ;;  shu-capture-md-arg-delimiter
 ;;
 (defconst shu-capture-md-arg-delimiter "**"
@@ -246,6 +292,11 @@ code snippet.")
 (defconst shu-capture-doc-code-indent 4
   "Any line indented by this much in a doc stringis assumed to be a sample
 code snippet.")
+
+
+;;
+;;  shu-capture-latex-section-hdr
+;;
 
 
 ;;
