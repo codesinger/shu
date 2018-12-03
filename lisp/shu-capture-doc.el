@@ -347,6 +347,48 @@ code snippet.")
 
 
 
+;;
+;;  shu-capture-arg-to-md
+;;
+(defun shu-capture-arg-to-md (arg-name)
+  "Convert a function argument in a doc-string to markdown."
+  (concat shu-capture-md-arg-delimiter arg-name shu-capture-md-arg-delimiter)
+  )
+
+
+
+;;
+;;  shu-capture-arg-to-latex
+;;
+(defun shu-capture-arg-to-latex (arg-name)
+  "Convert a function argument in a doc-string to LaTex."
+  (concat shu-capture-latex-arg-start arg-name shu-capture-latex-arg-end)
+    )
+
+
+
+;;
+;;  shu-capture-buf-to-md
+;;
+(defun shu-capture-buf-to-md (buf-name)
+  "Convert a buffer name or other name that starts and ends with asterisks
+ in a doc-string to markdown."
+  (concat shu-capture-md-buf-delimiter buf-name shu-capture-md-buf-delimiter)
+  )
+
+
+
+;;
+;;  shu-capture-buf-to-latex
+;;
+(defun shu-capture-buf-to-latex (buf-name)
+  "Convert a buffer name or other name that starts and ends with asterisks
+ in a doc-string to markdown."
+  (concat shu-capture-latex-buf-start buf-name shu-capture-latex-buf-end)
+  )
+
+
+
 
 ;;
 ;;  shu-capture-doc
@@ -656,48 +698,6 @@ it a code snippet in markdown.  Return the number of code snippets marked."
            "\n\n" description "\n"))
     result
     ))
-
-
-
-;;
-;;  shu-capture-arg-to-md
-;;
-(defun shu-capture-arg-to-md (arg-name)
-  "Convert a function argument in a doc-string to markdown."
-  (concat shu-capture-md-arg-delimiter arg-name shu-capture-md-arg-delimiter)
-  )
-
-
-
-;;
-;;  shu-capture-arg-to-latex
-;;
-(defun shu-capture-arg-to-latex (arg-name)
-  "Convert a function argument in a doc-string to LaTex."
-  (concat shu-capture-latex-arg-start arg-name shu-capture-latex-arg-end)
-    )
-
-
-
-;;
-;;  shu-capture-buf-to-md
-;;
-(defun shu-capture-buf-to-md (arg-name)
-  "Convert a buffer name or other name that starts and ends with asterisks
- in a doc-string to markdown."
-  (concat shu-capture-md-buf-delimiter arg-name shu-capture-md-buf-delimiter)
-  )
-
-
-
-;;
-;;  shu-capture-buf-to-latex
-;;
-(defun shu-capture-buf-to-latex (arg-name)
-  "Convert a buffer name or other name that starts and ends with asterisks
- in a doc-string to markdown."
-  (concat shu-capture-latex-buf-start arg-name shu-capture-latex-buf-end)
-  )
 
 
 
