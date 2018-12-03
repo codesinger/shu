@@ -197,6 +197,28 @@ code snippet.")
 
 
 ;;
+;;  shu-capture-md-section-delimiter
+;;
+(defconst shu-capture-md-section-delimiter "##"
+  "Define the markdown delimiter that is used to identfy a section.  This is se[arated
+from the section name by a space.")
+
+
+;;
+;;  shu-capture-latex-section-start
+;;
+(defconst shu-capture-latex-section-start "\subsection{"
+  "Define the LaTex tag that is used to identfy the start of a section headig.")
+
+
+;;
+;;  shu-capture-latex-section-end
+;;
+(defconst shu-capture-latex-section-end "}"
+  "Define the LaTex tag that is used to identfy the start of a section headig.")
+
+
+;;
 ;;  shu-capture-md-arg-delimiter
 ;;
 (defconst shu-capture-md-arg-delimiter "**"
@@ -294,9 +316,36 @@ code snippet.")
 code snippet.")
 
 
+
 ;;
-;;  shu-capture-latex-section-hdr
+;;  shu-capture-make-md-section
 ;;
+(defun shu-capture-make-md-section (hdr)
+  "Turn HDR into a markdown section header.  Return the markdown string."
+  (let ((header
+         (concat shu-capture-md-section-delimiter
+                 " "
+                 hdr
+                 " "
+                 shu-capture-md-section-delimiter)))
+    header
+    ))
+
+
+
+;;
+;;  shu-capture-make-latex-section
+;;
+(defun shu-capture-make-latex-section (hdr)
+  "Turn HDR into a LaTex section header.  Return the LaTex string."
+  (let ((header
+         (concat shu-capture-latex-section-start
+                 hdr
+                 shu-capture-latex-section-end)))
+    header
+    ))
+
+
 
 
 ;;
