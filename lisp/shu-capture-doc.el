@@ -197,6 +197,21 @@ code snippet.")
 
 
 ;;
+;;  shu-capture-a-type-open-quote
+;;
+(defconst shu-capture-a-type-open-quote 7
+  "The a-list key value that identifies the string that is an open quote.")
+
+
+;;
+;;  shu-capture-a-type-close-quote
+;;
+(defconst shu-capture-a-type-close-quote 8
+  "The a-list key value that identifies the string that is a close quote.")
+
+
+
+;;
 ;;  shu-capture-md-section-delimiter
 ;;
 (defconst shu-capture-md-section-delimiter "##"
