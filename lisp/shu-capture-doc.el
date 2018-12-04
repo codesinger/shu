@@ -354,6 +354,42 @@ code snippet.")
 
 
 ;;
+;;  shu-capture-md-converters
+;;
+(defconst shu-capture-md-converters
+  (list
+   (cons shu-capture-a-type-hdr          'shu-capture-make-md-section)
+   (cons shu-capture-a-type-func         'shu-capture-convert-func-md)
+   (cons shu-capture-a-type-buf          'shu-capture-buf-to-md)
+   (cons shu-capture-a-type-arg          'shu-capture-arg-to-md)
+   (cons shu-capture-a-type-before       shu-capture-md-code-delimiter)
+   (cons shu-capture-a-type-after        shu-capture-md-code-delimiter)
+   (cons shu-capture-a-type-open-quote   shu-capture-md-quote-delimiter)
+   (cons shu-capture-a-type-close-quote  shu-capture-md-quote-delimiter))
+  "This is the association list of functions and strings that is used to take an elisp
+function and its associated doc string and convert it to markdown.")
+
+
+
+;;
+;;  shu-capture-latex-converters
+;;
+(defconst shu-capture-latex-converters
+  (list
+    (cons shu-capture-a-type-hdr          'shu-capture-make-latex-section)
+    (cons shu-capture-a-type-func         'shu-capture-convert-func-latex)
+    (cons shu-capture-a-type-buf          'shu-capture-buf-to-latex)
+    (cons shu-capture-a-type-arg          'shu-capture-arg-to-latex)
+    (cons shu-capture-a-type-before       shu-capture-latex-code-start)
+    (cons shu-capture-a-type-after        shu-capture-latex-code-end)
+    (cons shu-capture-a-type-open-quote   shu-capture-latex-open-quote)
+    (cons shu-capture-a-type-close-quote  shu-capture-latex-close-quote))
+  "This is the association list of functions and strings that is used to take an elisp
+function and its associated doc string and convert it to LaTex.")
+
+
+
+;;
 ;;  shu-capture-make-md-section
 ;;
 (defun shu-capture-make-md-section (hdr)
@@ -738,6 +774,82 @@ it a code snippet in markdown.  Return the number of code snippets marked."
 
 
 ;;
+;;  shu-capture-convert-func-md
+;;
+(defun shu-capture-convert-func-md (func-def)
+  "Take a function definition and turn it into a string of markdown text."
+  (let (
+        (gb (get-buffer-create "**shu-capture-doc**"))
+        (signature)
+        (attributes)
+        (description)
+        (alias)
+        (title "")
+        (alias-line "")
+        (interact-line "")
+        (result ""))
+    (shu-capture-get-func-def func-def signature attributes description alias)
+    (setq title
+          (if (not (= 0 (logand attributes shu-capture-attr-alias)))
+              "Function"
+            "Alias"))
+    (when alias
+      (setq alias-line (concat " (" title ": " alias ")")))
+    (when (and (not (= 0 (logand attributes shu-capture-attr-inter)))
+               (= 0 (logand attributes shu-capture-attr-alias)))
+      (setq interact-line "<br/>\nInteractive"))
+    (when (not (= 0 (logand attributes shu-capture-attr-macro)))
+      (setq interact-line "<br/>\nMacro"))
+    (setq result
+          (concat
+           "\n**" signature "**"
+           alias-line
+           interact-line
+           "<br/>\n"))
+    result
+    ))
+
+
+
+;;
+;;  shu-capture-convert-func-latex
+;;
+(defun shu-capture-convert-func-latex (func-def)
+  "Take a function definition and turn it into a string of LaTex."
+  (let (
+        (gb (get-buffer-create "**shu-capture-doc**"))
+        (signature)
+        (attributes)
+        (description)
+        (alias)
+        (title "")
+        (alias-line "")
+        (interact-line "")
+        (result ""))
+    (shu-capture-get-func-def func-def signature attributes description alias)
+    (setq title
+          (if (not (= 0 (logand attributes shu-capture-attr-alias)))
+              "Function"
+            "Alias"))
+    (when alias
+      (setq alias-line (concat " (" title ": " alias ")")))
+    (when (and (not (= 0 (logand attributes shu-capture-attr-inter)))
+               (= 0 (logand attributes shu-capture-attr-alias)))
+      (setq interact-line "\%\nInteractive"))
+    (when (not (= 0 (logand attributes shu-capture-attr-macro)))
+      (setq interact-line "\%\nMacro"))
+    (setq result
+          (concat
+           "\n\textbf{" signature "}"
+           alias-line
+           interact-line
+           "\n"))
+    result
+    ))
+
+
+
+;;
 ;;  shu-capture-convert-doc-string
 ;;
 (defun shu-capture-convert-doc-string (description converters)
@@ -759,18 +871,20 @@ follows:
 This function turns escaped quotes into open and close quote strings, turns names
 with leading and trailing asterisks (e.g., **project-buffer**) into formatted buffer
 names, turns upper case names that match any argument names into lower case,
-formatted argument names."
+formatted argument names.  This is an internal function of shu-capture-doc and
+will likely crash if called with an invalid a-list."
   (let ((star-name "*[a-zA-Z0-9*-_]+")
         (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
-        (buf-converter (cdr-safe (assoc shu-capture-a-type-buf)))
-        (arg-converter (cdr-safe (assoc shu-capture-a-type-arg)))
-        (before-code (cdr-safe (assoc shu-capture-a-type-before)))
-        (after-code (cdr-safe (assoc shu-capture-a-type-after)))
-        (open-quote  (cdr-safe (assoc shu-capture-a-type-open-quote)))
-        (close-quote  (cdr-safe (assoc shu-capture-a-type-close-quote)))
+        (buf-converter (cdr (assoc shu-capture-a-type-buf converters)))
+        (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
+        (before-code (cdr (assoc shu-capture-a-type-before converters)))
+        (after-code (cdr (assoc shu-capture-a-type-after converters)))
+        (open-quote  (cdr (assoc shu-capture-a-type-open-quote converters)))
+        (close-quote  (cdr (assoc shu-capture-a-type-close-quote converters)))
         (nm)
         (ln)
         (result)
+        (debug-on-error t)
         (case-fold-search nil))
     (with-temp-buffer
       (insert description)

@@ -231,6 +231,132 @@
 
 
 
+;;
+;;  shu-test-shu-capture-convert-doc-string-1
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-1 ()
+  (let ((x))
+      (setq x (shu-capture-convert-doc-string "" shu-capture-md-converters))
+      (should (= 0 (length x)))
+      ))
+
+
+;;
+;;  shu-test-shu-capture-convert-doc-string-2
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-2 ()
+  (let ((x  "This is a doc-string")
+        (y))
+      (setq y (shu-capture-convert-doc-string x shu-capture-md-converters))
+      ))
+
+
+;;
+;;  shu-test-shu-capture-convert-doc-string-3
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-3 ()
+  (let ((x  "This is a \\\"doc\\\" string")
+        (expected "This is a \"doc\" string")
+        (actual))
+      (setq actual (shu-capture-convert-doc-string x shu-capture-md-converters))
+      (should (string= expected actual))
+      ))
+
+
+;;
+;;  shu-test-shu-capture-convert-doc-string-4
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-4 ()
+  (let ((x  "This is a **buffer-name**")
+        (expected (concat "This is a "
+                         shu-capture-md-buf-delimiter
+                         "**buffer-name**"
+                         shu-capture-md-buf-delimiter))
+        (actual))
+      (setq actual (shu-capture-convert-doc-string x shu-capture-md-converters))
+      (should (string= expected actual))
+      ))
+
+
+;;
+;;  shu-test-shu-capture-convert-doc-string-5
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-5 ()
+  (let ((x  "**buffer-name**")
+        (expected (concat
+                   shu-capture-md-buf-delimiter
+                   "**buffer-name**"
+                   shu-capture-md-buf-delimiter))
+        (actual))
+      (setq actual (shu-capture-convert-doc-string x shu-capture-md-converters))
+      (should (string= expected actual))
+      ))
+
+
+;;
+;;  shu-test-shu-capture-convert-doc-string-6
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-6 ()
+  (let ((x  "ARG-NAME")
+        (expected "arg-name")
+        (actual))
+    (setq actual (downcase x))
+    (should (string= expected actual))
+      ))
+
+
+;;
+;;  shu-test-shu-capture-convert-doc-string-7
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-7 ()
+  (let ((x  "This is an ARG name.")
+        (expected (concat "This is an "
+                          shu-capture-md-arg-delimiter
+                          "arg" shu-capture-md-arg-delimiter
+                          " name."))
+        (actual))
+      (setq actual (shu-capture-convert-doc-string x shu-capture-md-converters))
+      (should (string= expected actual))
+      ))
+
+
+;;
+;;  shu-test-shu-capture-convert-doc-string-8
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-8 ()
+  (let ((x  "This is an ARG.")
+        (expected
+         (concat
+          "This is an "
+          shu-capture-md-arg-delimiter
+          "arg"
+          shu-capture-md-arg-delimiter
+          "."))
+        (actual))
+      (setq actual (shu-capture-convert-doc-string x shu-capture-md-converters))
+      (should (string= expected actual))
+      ))
+
+
+;;
+;;  shu-test-shu-capture-convert-doc-string-9
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-9 ()
+  (let ((x  "This is an ARG, with")
+        (expected
+         (concat
+          "This is an "
+          shu-capture-md-arg-delimiter
+          "arg"
+          shu-capture-md-arg-delimiter
+          ", with"))
+        (actual))
+      (setq actual (shu-capture-convert-doc-string x shu-capture-md-converters))
+      (should (string= expected actual))
+      ))
+
+
+
 
 ;;
 ;;  shu-test-shu-capture-code-in-md-1
