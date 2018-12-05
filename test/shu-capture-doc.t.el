@@ -586,6 +586,7 @@
           shu-capture-md-arg-delimiter
           ".  A test."))
         (count 0)
+        (debug-on-error t)
         (actual))
     (with-temp-buffer
       (insert data)
@@ -847,5 +848,36 @@
       (setq count (shu-capture-convert-quotes open-quote close-quote))
       (setq actual (buffer-substring-no-properties (point-min) (point-max))))
     (should (= 4 count))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-make-md-section
+;;
+(ert-deftest shu-test-shu-capture-make-md-section ()
+  "Doc string."
+  (let* ((level 2)
+         (delim (make-string level ?#))
+         (hdr "This is a header")
+         (expected  (concat delim " " hdr " " delim))
+         (actual))
+    (setq actual (shu-capture-make-md-section level hdr))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-make-latex-section
+;;
+(ert-deftest shu-test-shu-capture-make-latex-section ()
+  "Doc string."
+  (let* ((level 2)
+         (hdr "This is a header")
+         (expected  (concat "\\subsection{" hdr shu-capture-latex-section-end))
+         (actual))
+    (setq actual (shu-capture-make-latex-section level hdr))
     (should (string= expected actual))
     ))

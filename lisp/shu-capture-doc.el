@@ -20,6 +20,8 @@
 ;; see <http://www.gnu.org/licenses/>.
 ;;
 
+;; NB: (intern-soft string) will return non-nil if string holds a symbol name
+
 ;;
 ;;  shu-capture-doc.el
 ;;
@@ -32,50 +34,46 @@
 ;; three cons cells.  The macros immmediately below can create the cons cells from
 ;; the information and extract the information from the cons cells.
 ;;
-;; TODO: Use the same structure to capture an alias.  But in the case of the alias,
-;;       the signature in func-def is the signature of the alias and the alias name
-;;       in func-alias is the name of the actual function.
 ;;
 ;;
 ;;
+;;      func-def:
 ;;
-;;  func-def:
-;;
-;;   -------------------
-;;   |        |        |
-;;   |    o   |   o    |
-;;   |    |   |   |    |
-;;   -----|-------|-----
-;;        |       |
-;;        |       +-----> func-alias
-;;        |
-;;        +-------------> signature
-;;
-;;
-;;  func-alias
-;;
-;;   -------------------
-;;   |        |        |
-;;   |    o   |   o    |
-;;   |    |   |   |    |
-;;   -----|-------|-----
-;;        |       |
-;;        |       +-----> func-info
-;;        |
-;;        +-------------> alias
+;;       -------------------
+;;       |        |        |
+;;       |    o   |   o    |
+;;       |    |   |   |    |
+;;       -----|-------|-----
+;;            |       |
+;;            |       +-----> func-alias
+;;            |
+;;            +-------------> signature
 ;;
 ;;
-;;  func-info:
+;;      func-alias
 ;;
-;;   -------------------
-;;   |        |        |
-;;   |    o   |   o    |
-;;   |    |   |   |    |
-;;   -----|-------|-----
-;;        |       |
-;;        |       +-----> description
-;;        |
-;;        +-------------> attributes
+;;       -------------------
+;;       |        |        |
+;;       |    o   |   o    |
+;;       |    |   |   |    |
+;;       -----|-------|-----
+;;            |       |
+;;            |       +-----> func-info
+;;            |
+;;            +-------------> alias
+;;
+;;
+;;      func-info:
+;;
+;;       -------------------
+;;       |        |        |
+;;       |    o   |   o    |
+;;       |    |   |   |    |
+;;       -----|-------|-----
+;;            |       |
+;;            |       +-----> description
+;;            |
+;;            +-------------> attributes
 ;;
 
 ;;
@@ -243,7 +241,7 @@ from the section name by a space.")
 ;;
 ;;  shu-capture-latex-arg-start
 ;;
-(defconst shu-capture-latex-arg-start "\textbf{"
+(defconst shu-capture-latex-arg-start "\\textbf{"
   "Define the latex string that is used to prepended to an arguument name.")
 
 
@@ -392,14 +390,16 @@ function and its associated doc string and convert it to LaTex.")
 ;;
 ;;  shu-capture-make-md-section
 ;;
-(defun shu-capture-make-md-section (hdr)
-  "Turn HDR into a markdown section header.  Return the markdown string."
-  (let ((header
-         (concat shu-capture-md-section-delimiter
-                 " "
-                 hdr
-                 " "
-                 shu-capture-md-section-delimiter)))
+(defun shu-capture-make-md-section (level hdr)
+  "Turn HDR into a markdown section header of level LEVEL, where 1 is a section,
+2 a subsection, etc.  Return the markdown string."
+  (let* ((delim (make-string level ?#))
+         (header
+          (concat delim
+                  " "
+                  hdr
+                  " "
+                  delim)))
     header
     ))
 
@@ -408,12 +408,22 @@ function and its associated doc string and convert it to LaTex.")
 ;;
 ;;  shu-capture-make-latex-section
 ;;
-(defun shu-capture-make-latex-section (hdr)
-  "Turn HDR into a LaTex section header.  Return the LaTex string."
-  (let ((header
-         (concat shu-capture-latex-section-start
-                 hdr
-                 shu-capture-latex-section-end)))
+(defun shu-capture-make-latex-section (level hdr)
+  "Turn HDR into a LaTex section header of level LEVEL, where 1 is a section,
+2 a subsection, etc.  Return the LaTex string."
+  (let (
+        (x (1- level))
+        (base "section{")
+        (prefix "")
+        (header)
+        (start)
+    )
+    (while (> x 0)
+      (setq prefix (concat "sub" prefix))
+      (setq x (1- x))
+      )
+    (setq start (concat "\\" prefix base))
+    (setq header (concat start hdr shu-capture-latex-section-end))
     header
     ))
 
@@ -462,11 +472,35 @@ function and its associated doc string and convert it to LaTex.")
 
 
 
+
+;;
+;;  shu-capture-md
+;;
+(defun shu-capture-md ()
+  "Capture all of the function and macro definitions in a .el source file and tuem
+them into markdown text that documents the functions and their doc strings."
+  (interactive)
+    (shu-capture-doc shu-capture-md-converters)
+    )
+
+
+
+;;
+;;  shu-capture-latex
+;;
+(defun shu-capture-latex ()
+  "Capture all of the function and macro definitions in a .el source file and tuem
+them into a LaTex text that documents the functions and their doc strings."
+  (interactive)
+    (shu-capture-doc shu-capture-latex-converters)
+    )
+
+
+
 ;;
 ;;  shu-capture-doc
 ;;
-(defun shu-capture-doc ()
-  (interactive)
+(defun shu-capture-doc (converters)
   (let (
         (ggb (get-buffer-create "**slp**"))
         (gb (get-buffer-create "**shu-capture-doc**"))
@@ -551,10 +585,10 @@ function and its associated doc string and convert it to LaTex.")
       )
     (setq alias-list (sort alias-list 'shu-doc-sort-compare))
     (princ "\n\n## List of functions by alias name ##\n\n" gb)
-    (shu-capture-show-list-md alias-list gb)
+    (shu-capture-show-list alias-list converters gb)
     (setq func-list (sort func-list 'shu-doc-sort-compare))
     (princ "\n\n## Full list of functions ##\n" gb)
-    (shu-capture-show-list-md func-list gb)
+    (shu-capture-show-list func-list converters gb)
     ))
 
 
@@ -713,6 +747,55 @@ it a code snippet in markdown.  Return the number of code snippets marked."
     ))
 
 
+
+
+;;
+;;  shu-capture-show-list
+;;
+(defun shu-capture-show-list (func-list converters buffer)
+  "FUNC-LIST is a list of function and macro defintions.  CONVERTERS
+is an a-list of functions and strings as
+follows:
+
+      Key                              Value
+      ---                              -----
+      shu-capture-a-type-hdr           Function to format a section header
+      shu-capture-a-type-func          Function to format a function signature
+      shu-capture-a-type-buf           Function to format a buffer name
+      shu-capture-a-type-arg           Function to format an argument name
+      shu-capture-a-type-before        String that starts a block of verbatim code
+      shu-capture-a-type-after         String that ends a block of verbstim code
+      shu-capture-a-type-open-quote    String that is an open quote
+      shu-capture-a-type-close-quote   String that is a close quote
+
+This function goes through the list and uses the CONVERTERS to turn the set of
+function definitions into either markdown or LaTex."
+  (let (
+        (func-converter (cdr (assoc shu-capture-a-type-func converters)))
+        (xx func-list)
+        (func-def)
+        (func-string)
+        (signature)
+        (attributes)
+        (description)
+        (description)
+        (alias)
+        )
+    (while xx
+      (setq func-def (car xx))
+      (shu-capture-get-func-def func-def signature attributes description alias)
+      (setq func-string (funcall func-converter func-def))
+      (if (not description)
+          (setq description "Undocumented")
+        (setq description (shu-capture-convert-doc-string-new func-def converters))
+        )
+      (princ (concat "\n\n" func-string) buffer)
+      (princ (concat "\n\n" description) buffer)
+      (setq xx (cdr xx))
+      )
+    ))
+
+
 ;;
 ;;  shu-capture-show-list-md
 ;;
@@ -840,12 +923,13 @@ it a code snippet in markdown.  Return the number of code snippets marked."
       (setq interact-line "\%\nMacro"))
     (setq result
           (concat
-           "\n\textbf{" signature "}"
+           "\n\\textbf{" signature "}"
            alias-line
            interact-line
            "\n"))
     result
     ))
+
 
 
 
@@ -894,6 +978,73 @@ will likely crash if called with an invalid a-list."
       (while (re-search-forward star-name nil t)
         (replace-match (funcall buf-converter (match-string 0))))
       (goto-char (point-min))
+      (while (re-search-forward arg-name nil t)
+        (setq nm (match-string 1))
+        (setq ln (downcase nm))
+        (replace-match (funcall arg-converter ln) t nil nil 1))
+      (shu-capture-code-in-doc before-code after-code)
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
+    result
+    ))
+
+
+
+;;
+;;  shu-capture-convert-doc-string-new
+;;
+(defun shu-capture-convert-doc-string-new (func-def converters)
+"DESCRIPTION contains a doc string from a function definition (with leading
+and trailing quotes removed).  CONVERTERS is an a-list of functions and strings as
+follows:
+
+      Key                              Value
+      ---                              -----
+      shu-capture-a-type-hdr           Function to format a section header
+      shu-capture-a-type-func          Function to format a function signature
+      shu-capture-a-type-buf           Function to format a buffer name
+      shu-capture-a-type-arg           Function to format an argument name
+      shu-capture-a-type-before        String that starts a block of verbatim code
+      shu-capture-a-type-after         String that ends a block of verbstim code
+      shu-capture-a-type-open-quote    String that is an open quote
+      shu-capture-a-type-close-quote   String that is a close quote
+
+This function turns escaped quotes into open and close quote strings, turns names
+with leading and trailing asterisks (e.g., **project-buffer**) into formatted buffer
+names, turns upper case names that match any argument names into lower case,
+formatted argument names.  This is an internal function of shu-capture-doc and
+will likely crash if called with an invalid a-list."
+(let (
+      (gb (get-buffer-create "**slp**"))
+      (star-name "*[a-zA-Z0-9*-_]+")
+        (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
+        (buf-converter (cdr (assoc shu-capture-a-type-buf converters)))
+        (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
+        (before-code (cdr (assoc shu-capture-a-type-before converters)))
+        (after-code (cdr (assoc shu-capture-a-type-after converters)))
+        (open-quote  (cdr (assoc shu-capture-a-type-open-quote converters)))
+        (close-quote  (cdr (assoc shu-capture-a-type-close-quote converters)))
+        (nm)
+        (ln)
+        (result)
+        (debug-on-error t)
+        (signature)
+        (attributes)
+        (description)
+        (alias)
+        (case-fold-search nil))
+  (princ "shu-capture-convert-doc-string-new\n" gb)
+  (princ func-def gb)
+  (princ "\n" gb)
+    (shu-capture-get-func-def func-def signature attributes description alias)
+    (with-temp-buffer
+      (insert description)
+      (goto-char (point-min))
+      (shu-capture-convert-quotes open-quote close-quote)
+      (goto-char (point-min))
+      (while (re-search-forward star-name nil t)
+        (replace-match (funcall buf-converter (match-string 0))))
+      (goto-char (point-min))
+      (shu-capture-doc-convert-args signature converters)
       (while (re-search-forward arg-name nil t)
         (setq nm (match-string 1))
         (setq ln (downcase nm))
@@ -996,7 +1147,7 @@ with a close quote."
 ;;  shu-capture-doc-convert-args-to-md
 ;;
 (defun shu-capture-doc-convert-args-to-md (signature)
-  (shu-capture-doc-convert-args signature 'shu-capture-arg-to-md))
+  (shu-capture-doc-convert-args signature shu-capture-md-converters))
 
 
 
@@ -1004,14 +1155,14 @@ with a close quote."
 ;;  shu-capture-doc-convert-args-to-latex
 ;;
 (defun shu-capture-doc-convert-args-to-latex (signature)
-  (shu-capture-doc-convert-args signature 'shu-capture-arg-to-latex))
+  (shu-capture-doc-convert-args signature shu-capture-latex-converters))
 
 
 
 ;;
 ;;  shu-capture-doc-convert-args
 ;;
-(defun shu-capture-doc-convert-args (signature converter)
+(defun shu-capture-doc-convert-args (signature converters)
   "The current buffer contains a doc string from a function.  The argument to this
 function is the SIGNATURE of the function for which the doc string was written.
 This function goes through the doc string buffer looking for any word that is all
@@ -1032,13 +1183,14 @@ would be converted to:
   \"The Linux \emph{hat} is converted to an IBM \emph{cat}.\""
   (let ((arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
         (args (shu-capture-get-args-as-alist signature))
+        (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
         (pname)
         (new-name)
         (count 0))
     (goto-char (point-min))
     (while (re-search-forward arg-name nil t)
       (setq pname (downcase (match-string 1)))
-      (setq new-name (funcall converter pname))
+      (setq new-name (funcall arg-converter pname))
       (when (assoc pname args)
         (replace-match (concat
                         shu-capture-md-arg-delimiter
