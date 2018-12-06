@@ -786,7 +786,7 @@ function definitions into either markdown or LaTex."
       (setq func-string (funcall func-converter func-def))
       (if (not description)
           (setq description "Undocumented")
-        (setq description (shu-capture-convert-doc-string-new signature description converters))
+        (setq description (shu-capture-convert-doc-string signature description converters))
         )
       (princ (concat "\n\n" func-string) buffer)
       (princ (concat "\n\n" description) buffer)
@@ -931,67 +931,10 @@ function definitions into either markdown or LaTex."
 
 
 
-
 ;;
 ;;  shu-capture-convert-doc-string
 ;;
-(defun shu-capture-convert-doc-string (description converters)
-"DESCRIPTION contains a doc string from a function definition (with leading
-and trailing quotes removed).  CONVERTERS is an a-list of functions and strings as
-follows:
-
-      Key                              Value
-      ---                              -----
-      shu-capture-a-type-hdr           Function to format a section header
-      shu-capture-a-type-func          Function to format a function signature
-      shu-capture-a-type-buf           Function to format a buffer name
-      shu-capture-a-type-arg           Function to format an argument name
-      shu-capture-a-type-before        String that starts a block of verbatim code
-      shu-capture-a-type-after         String that ends a block of verbstim code
-      shu-capture-a-type-open-quote    String that is an open quote
-      shu-capture-a-type-close-quote   String that is a close quote
-
-This function turns escaped quotes into open and close quote strings, turns names
-with leading and trailing asterisks (e.g., **project-buffer**) into formatted buffer
-names, turns upper case names that match any argument names into lower case,
-formatted argument names.  This is an internal function of shu-capture-doc and
-will likely crash if called with an invalid a-list."
-  (let ((star-name "*[a-zA-Z0-9*-_]+")
-        (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
-        (buf-converter (cdr (assoc shu-capture-a-type-buf converters)))
-        (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
-        (before-code (cdr (assoc shu-capture-a-type-before converters)))
-        (after-code (cdr (assoc shu-capture-a-type-after converters)))
-        (open-quote  (cdr (assoc shu-capture-a-type-open-quote converters)))
-        (close-quote  (cdr (assoc shu-capture-a-type-close-quote converters)))
-        (nm)
-        (ln)
-        (result)
-        (debug-on-error t)
-        (case-fold-search nil))
-    (with-temp-buffer
-      (insert description)
-      (goto-char (point-min))
-      (shu-capture-convert-quotes open-quote close-quote)
-      (goto-char (point-min))
-      (while (re-search-forward star-name nil t)
-        (replace-match (funcall buf-converter (match-string 0))))
-      (goto-char (point-min))
-      (while (re-search-forward arg-name nil t)
-        (setq nm (match-string 1))
-        (setq ln (downcase nm))
-        (replace-match (funcall arg-converter ln) t nil nil 1))
-      (shu-capture-code-in-doc before-code after-code)
-      (setq result (buffer-substring-no-properties (point-min) (point-max))))
-    result
-    ))
-
-
-
-;;
-;;  shu-capture-convert-doc-string-new
-;;
-(defun shu-capture-convert-doc-string-new (signature description converters)
+(defun shu-capture-convert-doc-string (signature description converters)
 "DESCRIPTION contains a doc string from a function definition (with leading
 and trailing quotes removed).  CONVERTERS is an a-list of functions and strings as
 follows:
