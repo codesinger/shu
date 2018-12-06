@@ -778,7 +778,6 @@ function definitions into either markdown or LaTex."
         (signature)
         (attributes)
         (description)
-        (description)
         (alias)
         )
     (while xx
@@ -787,7 +786,7 @@ function definitions into either markdown or LaTex."
       (setq func-string (funcall func-converter func-def))
       (if (not description)
           (setq description "Undocumented")
-        (setq description (shu-capture-convert-doc-string-new func-def converters))
+        (setq description (shu-capture-convert-doc-string-new signature description converters))
         )
       (princ (concat "\n\n" func-string) buffer)
       (princ (concat "\n\n" description) buffer)
@@ -992,7 +991,7 @@ will likely crash if called with an invalid a-list."
 ;;
 ;;  shu-capture-convert-doc-string-new
 ;;
-(defun shu-capture-convert-doc-string-new (func-def converters)
+(defun shu-capture-convert-doc-string-new (signature description converters)
 "DESCRIPTION contains a doc string from a function definition (with leading
 and trailing quotes removed).  CONVERTERS is an a-list of functions and strings as
 follows:
@@ -1027,15 +1026,7 @@ will likely crash if called with an invalid a-list."
         (ln)
         (result)
         (debug-on-error t)
-        (signature)
-        (attributes)
-        (description)
-        (alias)
         (case-fold-search nil))
-  (princ "shu-capture-convert-doc-string-new\n" gb)
-  (princ func-def gb)
-  (princ "\n" gb)
-    (shu-capture-get-func-def func-def signature attributes description alias)
     (with-temp-buffer
       (insert description)
       (goto-char (point-min))
