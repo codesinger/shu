@@ -2,6 +2,8 @@
 ;;
 ;; Copyright (C) 2018 Stewart L. Palmer
 ;;
+;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;;
 ;; This file is NOT part of GNU Emacs.
 ;;
 ;; This is free software: you can redistribute it and/or modify it
@@ -26,7 +28,6 @@
 ;;  shu-capture-doc.el
 ;;
 ;;  Collection of functions used to capture doc strings in elisp functions
-;;
 
 (provide 'shu-capture-doc)
 

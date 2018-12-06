@@ -2,6 +2,8 @@
 ;;
 ;; Copyright (C) 2013 Stewart L. Palmer
 ;;
+;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;;
 ;; This file is NOT part of GNU Emacs.
 ;;
 ;; This is free software: you can redistribute it and/or modify it
@@ -60,7 +62,7 @@ of the returned item list."
               (when we-opened-file
                 (shu-kill-current-buffer))
               )
-            )))) 
+            ))))
     (switch-to-buffer cbuf))
   item-list
   )
@@ -110,7 +112,7 @@ of the returned item list."
               (princ (format "Token at line %d (%d)  = <%s>\n" (car line-col) (cdr line-col) (cdr nvpair))  gbuf)
               (setq zlist (cdr zlist))))
           ;; Now turn the token list into a list of name value pairs.  Each item in the list is
-          ;; an nvpair whose CAR is the name and whose CDR is the value. 
+          ;; an nvpair whose CAR is the name and whose CDR is the value.
           (setq nvplist (shu-nvplist-make-nvpair-list tlist))
           ;; An item is a CONS cell whose CAR is the item number and whose CDR is the nvpair list.
           (setq item (shu-nvplist-make-item item-number nvplist))
@@ -219,7 +221,7 @@ all of the values whose name matches NAME."
       (setq vname (car nvpair))
       (when (string= (upcase name) (upcase vname))
         (setq value (cdr nvpair))
-        (setq vlist (cons value vlist)))  
+        (setq vlist (cons value vlist)))
       (setq nvplist (cdr nvplist)))
     (setq vlist (nreverse vlist))
     vlist
@@ -257,7 +259,7 @@ errors are found in the token list, then an empty list is returned."
             (setq equal-point (car token-holder))
             (setq equal (cdr token-holder))
             (if (string= equal "=")
-                (progn        
+                (progn
                   (setq token-holder (pop zlist))
                   (if token-holder
                       (progn
@@ -267,22 +269,22 @@ errors are found in the token list, then an empty list is returned."
                         (setq nvplist (cons nvpair nvplist)))
                     ;; Value that should follow equal sign is missing
                     (setq line-col (shu-line-and-column-at name-point))
-                    (princ 
-                     (format "The name (%s) at line %d column %d has no value.\n" 
+                    (princ
+                     (format "The name (%s) at line %d column %d has no value.\n"
                              name (car line-col) (cdr line-col))  gbuf)
                     (setq zlist nil)
                     (setq nvplist nil)))
               ;; Token following name is not an equal sign
               (setq line-col (shu-line-and-column-at name-point))
-              (princ 
-               (format "The token (%s) following the name (%s) at line %d column %d is not \"=\".\n" 
+              (princ
+               (format "The token (%s) following the name (%s) at line %d column %d is not \"=\".\n"
                        equal name (car line-col) (cdr line-col))  gbuf)
               (setq zlist nil)
               (setq nvplist nil)))
         ;; Token that should follow name ("=") is not there at all
         (setq line-col (shu-line-and-column-at name-point))
-        (princ 
-         (format "The name (%s) at line %d column %d is the last item in the entry.\n" 
+        (princ
+         (format "The name (%s) at line %d column %d is the last item in the entry.\n"
                  name (car line-col) (cdr line-col))  gbuf)
         (setq zlist nil)
         (setq nvplist nil)))
@@ -326,10 +328,10 @@ is positioned immediately after the end delimeter (\"/>\")."
         (setq string-term (buffer-substring (point) (1+ (point))))
         (setq epoint (shu-end-of-string string-term))
         (setq token (buffer-substring (1+ spoint) (1- epoint))))
-       
+
        ((looking-at closer)
         (setq done t))
-       
+
        ((looking-at "=")
         (setq token "=")
         (setq spoint (point))
@@ -356,4 +358,3 @@ is positioned immediately after the end delimeter (\"/>\")."
         (setq tlist (cdr tlist))))
     tlist
     ))
-
