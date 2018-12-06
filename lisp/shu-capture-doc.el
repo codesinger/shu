@@ -77,6 +77,9 @@
 ;;            +-------------> attributes
 ;;
 
+;;; Code
+
+
 ;;
 ;;  shu-capture-set-func-def
 ;;
@@ -1174,3 +1177,5 @@ an a-list is returned with the keys \"others,\" \"and,\" \"things,\" \"these,\" 
           (setq arg-list (cdr arg-list)))))
     arg-assoc
     ))
+
+;;; shu-capture-doc.el ends here

@@ -22,6 +22,9 @@
 
 (require 'ert)
 
+;;; Code
+
+
 (defvar shu-test-point-list
   "List of points to go to")
 (defvar shu-test-line-list
@@ -370,3 +373,5 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
        (result))
     (setq result (shu-group-number x 2 ";"))
     (should (string= gx result))))
+
+;;; shu-base.t.el ends here

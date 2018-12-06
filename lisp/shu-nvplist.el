@@ -29,6 +29,7 @@
 ;; shu-nvplist.el
 ;;
 
+;;; Code
 
 
 ;;
@@ -358,3 +359,5 @@ is positioned immediately after the end delimeter (\"/>\")."
         (setq tlist (cdr tlist))))
     tlist
     ))
+
+;;; shu-nvplist.el ends here

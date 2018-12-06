@@ -28,6 +28,9 @@
 ;; ago and moves it to an archive file by invoking org-archive-subtree
 ;; on it.
 
+;;; Code
+
+
 (defvar shu-org-home "~/data/org"
   "Home directory of the org data files.")
 
@@ -285,3 +288,5 @@ than shu-org-archive-expiry-days days ago."
 
           (message "%s" end-msg))))))
 ))
+
+;;; shu-org-extensions.el ends here

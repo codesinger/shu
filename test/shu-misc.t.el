@@ -32,6 +32,9 @@
 (require 'ert)
 (require 'shu-misc)
 
+;;; Code
+
+
 
 ;;
 ;;  shu-test-shu-git-number-commits
@@ -231,3 +234,5 @@
     (setq actual (shu-find-numbered-commit commit-number))
     (should (not actual)))
     ))
+
+;;; shu-misc.t.el ends here

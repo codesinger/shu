@@ -23,6 +23,9 @@
 (require 'ert)
 (require 'shu-capture-doc)
 
+;;; Code
+
+
 
 ;;
 ;;  shu-test-shu-doc-internal-to-md-1
@@ -926,3 +929,5 @@
     (setq actual (shu-capture-make-latex-section level hdr))
     (should (string= expected actual))
     ))
+
+;;; shu-capture-doc.t.el ends here

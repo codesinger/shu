@@ -152,6 +152,8 @@
 (require 'shu-base)
 (provide 'shu-xref)
 
+;;; Code
+
 (defconst shu-xref-buffer "**shu-xref**"
 "The name of the buffer into which the cross reference is placed.")
 
@@ -617,3 +619,5 @@ in the CAR and the line number in which the function definition starts in the CD
                       (setq retval (cons fun-name fun-start-line)))))))
   retval
 ))
+
+;;; shu-xref.el ends here

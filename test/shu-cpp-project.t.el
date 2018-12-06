@@ -23,6 +23,9 @@
 (require 'ert)
 (require 'shu-cpp-project)
 
+;;; Code
+
+
 
 ;;
 ;;  shu-test-possible-cpp-file-name-1
@@ -140,3 +143,5 @@
       (should (string= file (car result)))
       (should (= line (cadr result))))
 ))
+
+;;; shu-cpp-project.t.el ends here

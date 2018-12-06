@@ -110,6 +110,8 @@
 ;;
 
 
+;;; Code
+
 
 (defconst shu-cpp-operators-three
   (regexp-opt (list "->*" "<<=" ">>=") nil)
@@ -1103,3 +1105,5 @@ shu- prefix removed."
   (defalias 'parse-region 'shu-cpp-parse-region)
   (defalias 'reverse-parse-region 'shu-cpp-reverse-parse-region)
   )
+
+;;; shu-cpp-token.el ends here

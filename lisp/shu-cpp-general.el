@@ -30,6 +30,8 @@
 (provide 'shu-cpp-general)
 (require 'shu-base)
 
+;;; Code
+
 
 (defconst shu-cpp-base-types
         (list
@@ -2097,3 +2099,5 @@ shu- prefix removed."
   (defalias 'qualify-bsl 'shu-qualify-namespace-bsl)
   (defalias 'dbx-malloc 'shu-dbx-summarize-malloc)
 )
+
+;;; shu-cpp-general.el ends here

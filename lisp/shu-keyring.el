@@ -73,6 +73,9 @@
 ;; ```
 ;;
 
+;;; Code
+
+
 
 (defgroup shu-keyring nil
   "Maintain a keyring file of user IDs, URLs and passwords."
@@ -520,3 +523,5 @@ to make them easier to type. "
   (defalias 'krfn 'shu-keyring-get-file)
   (defalias 'krvf 'shu-keyring-verify-file)
   )
+
+;;; shu-keyring.el ends here

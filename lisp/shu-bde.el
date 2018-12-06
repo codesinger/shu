@@ -28,6 +28,7 @@
 (provide 'shu-bde)
 (require 'shu-base)
 
+;;; Code
 
 
 (defcustom shu-bde-gen-file-identifier-hook nil
@@ -787,3 +788,5 @@ shu- prefix removed."
   (defalias 'bde-sgen 'shu-bde-sgen)
   (defalias 'gen-bde-component 'shu-gen-bde-component)
 )
+
+;;; shu-bde.el ends here

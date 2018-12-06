@@ -23,10 +23,11 @@
 (require 'ert)
 (require 'shu-nvplist)
 
+;;; Code
 
 
 ;;
-;;  shu-test-shu-csplit
+;;  shu-test-shu-nvplist-parse
 ;;
 (ert-deftest shu-test-shu-nvplist-parse1 ()
   (let (
@@ -39,3 +40,5 @@
       (setq item-list (shu-nvplist-parse-buffer item-list))
       (shu-nvplist-show-item-list item-list))
     ))
+
+;;; shu-nvplist.t.el ends here

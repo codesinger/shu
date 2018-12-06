@@ -30,6 +30,8 @@
 
 (provide 'shu-base)
 
+;;; Code
+
 (defconst shu-cpp-name-list
                         (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
                               "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
@@ -372,3 +374,5 @@ by white space.  The default definition is blanks and tabs."
       (setq wspace (- (point) bos))     ; White space count at front of line
       (setq ccount (min wspace arg)))    ; Shift count is min of avail & wanted
     ))
+
+;;; shu-base.el ends here

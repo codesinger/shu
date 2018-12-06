@@ -34,7 +34,8 @@
 ;; A collection of useful functions for writing C++ code in Bloomberg, L.P.
 ;; BDE style
 ;;
-;; Author: Stewart Palmer (spalmer62@bloomberg.net)
+
+;;; Code
 
 
 ;;; shu-cpp-completion-prefix
@@ -371,3 +372,5 @@ These are generally the same as the function names with the leading
 shu- prefix removed."
   (defalias 'gen-bb-component 'shu-gen-bb-component)
 )
+
+;;; shu-bde-cpp.el ends here

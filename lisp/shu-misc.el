@@ -29,6 +29,8 @@
 
 (provide 'shu-misc)
 
+;;; Code
+
 
 ;;
 ;;  Control the EOL terminator
@@ -785,3 +787,5 @@ shu- prefix removed."
   (defalias 'number-commits 'shu-git-number-commits)
   (defalias 'diff-commits 'shu-git-diff-commits)
 )
+
+;;; shu-misc.el ends here

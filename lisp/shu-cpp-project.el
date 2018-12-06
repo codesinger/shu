@@ -31,6 +31,8 @@
 (provide 'shu-cpp-project)
 (require 'shu-base)
 
+;;; Code
+
 (defconst shu-cpp-c-extensions (list "c" "cc" "cpp" "Cc" "C")
   "A list of file extensions for all of the C file types we want to find.  This is defined
 as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions.")
@@ -1312,3 +1314,5 @@ shu- prefix removed."
   (defalias 'list-c-directories 'shu-list-c-directories)
   (defalias 'which-c-project 'shu-which-c-project)
   )
+
+;;; shu-cpp-project.el ends here

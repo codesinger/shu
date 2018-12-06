@@ -23,6 +23,9 @@
 (require 'ert)
 (require 'shu-cpp-general)
 
+;;; Code
+
+
 
 (defconst shu-test-cpp-general-base-string
   (concat
@@ -1163,3 +1166,5 @@ This is most likely the name of an include file and not the name of a class."
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     ))
+
+;;; shu-cpp-general.t.el ends here

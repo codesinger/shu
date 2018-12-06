@@ -23,6 +23,9 @@
 (require 'ert)
 (require 'shu-cpp-token)
 
+;;; Code
+
+
 ;;
 ;;  shu-test-shu-cpp-token-token-type-name
 ;;
@@ -1838,3 +1841,5 @@ me anything.  It is printed on test failure to identify the test that failed."
       (setq tlist (cdr tlist))
       )
     ))
+
+;;; shu-cpp-token.t.el ends here

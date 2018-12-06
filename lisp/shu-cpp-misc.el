@@ -30,6 +30,7 @@
 (provide 'shu-cpp-misc)
 (require 'shu-base)
 
+;;; Code
 
 
 ;;
@@ -865,3 +866,5 @@ shu- prefix removed."
   (defalias 'fline 'shu-fline)
   (defalias 'dox-file 'shu-dox-file)
 )
+
+;;; shu-cpp-misc.el ends here

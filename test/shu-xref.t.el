@@ -32,6 +32,9 @@
 (require 'ert)
 (require 'shu-xref)
 
+;;; Code
+
+
 ;;
 ;;  shu-test-shu-xref-get-next-funcall
 ;;
@@ -126,3 +129,5 @@
       (setq k (shu-xref-get-next-funcall name k))
       (should (not k))))
 ))
+
+;;; shu-xref.t.el ends here
