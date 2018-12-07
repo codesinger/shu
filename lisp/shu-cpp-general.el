@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
+;; Package: shu-org-extensions
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -21,16 +22,15 @@
 ;; of the GNU General Public License along with GNU Emacs.  If not,
 ;; see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
 
-;;
-;; shu-cpp-general.el
-;;
 ;; A collection of useful functions for dealing with C++ code
+
+;;; Code
+
 
 (provide 'shu-cpp-general)
 (require 'shu-base)
-
-;;; Code
 
 
 (defconst shu-cpp-base-types

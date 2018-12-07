@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
+;; Package: shu-cpp-project
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -21,17 +22,16 @@
 ;; of the GNU General Public License along with GNU Emacs.  If not,
 ;; see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
 
-;;
-;; shu-cpp-project.el
-;;
 ;; A collection of useful functions for dealing with project files and treating
 ;; a set of source files in multiple directories as a single project
+
+;;; Code
 
 (provide 'shu-cpp-project)
 (require 'shu-base)
 
-;;; Code
 
 (defconst shu-cpp-c-extensions (list "c" "cc" "cpp" "Cc" "C")
   "A list of file extensions for all of the C file types we want to find.  This is defined

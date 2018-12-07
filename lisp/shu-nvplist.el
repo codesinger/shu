@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2013 Stewart L. Palmer
 ;;
+;; Package: shu-org-extensions
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -22,15 +23,19 @@
 ;; see <http://www.gnu.org/licenses/>.
 ;;
 
+;;; Commentary:
+
+;; elisp code for maintaining directories of name / value pairs.
+
+;;; Code
+
+
 (provide 'shu-nvplist)
 (require 'shu-base)
 
 ;;
 ;; shu-nvplist.el
 ;;
-
-;;; Code
-
 
 ;;
 ;; shu-nvplist-parse-file

@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
+;; Package: shu-misc
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -21,16 +22,14 @@
 ;; of the GNU General Public License along with GNU Emacs.  If not,
 ;; see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
 
-;;
-;; shu-misc.el
 ;;
 ;; A miscellaneous collection of useful functions
 
-(provide 'shu-misc)
-
 ;;; Code
 
+(provide 'shu-misc)
 
 ;;
 ;;  Control the EOL terminator

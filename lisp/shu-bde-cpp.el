@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
+;; Package: shu-bde-cp
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -22,20 +23,15 @@
 ;; see <http://www.gnu.org/licenses/>.
 ;;
 
-;; shu-bde.el
-;;
+;;; Commentary:
+
+;; A collection of useful functions for writing C++ code in Bloomberg, L.P.
+;; BDE style
+
+;;; Code
 
 (provide 'shu-bde-cpp)
 (require 'shu-base)
-
-;;
-;; shu-bb-cpp.el
-;;
-;; A collection of useful functions for writing C++ code in Bloomberg, L.P.
-;; BDE style
-;;
-
-;;; Code
 
 
 ;;; shu-cpp-completion-prefix

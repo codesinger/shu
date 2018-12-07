@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
+;; Package: shu-cpp-misc
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -21,17 +22,15 @@
 ;; of the GNU General Public License along with GNU Emacs.  If not,
 ;; see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
 
-;;
-;; shu-cpp-misc.el
-;;
 ;; A collection of useful functions for dealing with C++ code
-
-(provide 'shu-cpp-misc)
-(require 'shu-base)
 
 ;;; Code
 
+
+(provide 'shu-cpp-misc)
+(require 'shu-base)
 
 ;;
 ;;  shu-gen-component

@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2018 Stewart L. Palmer
 ;;
+;; Package: shu-capture-doc
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -22,12 +23,14 @@
 ;; see <http://www.gnu.org/licenses/>.
 ;;
 
+;;; Commentary:
+
+;;  Collection of functions used to capture doc strings in elisp functions
+
+;;; Code
+
 ;; NB: (intern-soft string) will return non-nil if string holds a symbol name
 
-;;
-;;  shu-capture-doc.el
-;;
-;;  Collection of functions used to capture doc strings in elisp functions
 
 (provide 'shu-capture-doc)
 
@@ -76,9 +79,6 @@
 ;;            |
 ;;            +-------------> attributes
 ;;
-
-;;; Code
-
 
 ;;
 ;;  shu-capture-set-func-def

@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
+;; Package: shu-bde
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -22,14 +23,15 @@
 ;; see <http://www.gnu.org/licenses/>.
 ;;
 
-;; shu-bde.el
-;;
+;;; Commentary:
 
-(provide 'shu-bde)
-(require 'shu-base)
+;; A set of functions useful for Bloomberg, L.P. BDE style programming
 
 ;;; Code
 
+
+(provide 'shu-bde)
+(require 'shu-base)
 
 (defcustom shu-bde-gen-file-identifier-hook nil
   "Generate the text that constitiutes a source file identifier, if any."

@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2013 Stewart L. Palmer
 ;;
+;; Package: shu-org-extensions
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -22,15 +23,13 @@
 ;; see <http://www.gnu.org/licenses/>.
 ;;
 
-;;
-;;  shu-base.el
-;;
-;;  Collection of miscellaneous functions used by other packages
-;;
+;;; Commentary:
 
-(provide 'shu-base)
+;;  Collection of miscellaneous functions used by other packages
 
 ;;; Code
+
+(provide 'shu-base)
 
 (defconst shu-cpp-name-list
                         (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"

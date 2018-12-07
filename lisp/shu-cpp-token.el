@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
+;; Package: shu-cpp-token
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -21,10 +22,8 @@
 ;; of the GNU General Public License along with GNU Emacs.  If not,
 ;; see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
 
-;;
-;; shu-cpp-token.el
-;;
 ;; Functions to parse a region of C++ code and return a list of tokens
 ;; found therein.  The returned list is a list of token-info, whose structure
 ;; is shown below.
@@ -34,8 +33,7 @@
 ;; first token in the list being the first token found.  The latter function
 ;; returns the reverse of the former.
 
-;;
-;;
+;;; Code
 
 (provide 'shu-cpp-token)
 (require 'shu-base)
@@ -108,9 +106,6 @@
 ;;        +-------------> Start point
 ;;
 ;;
-
-
-;;; Code
 
 
 (defconst shu-cpp-operators-three

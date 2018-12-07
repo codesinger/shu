@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2013 Stewart L. Palmer
 ;;
+;; Package: shu-keyring
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -22,10 +23,14 @@
 ;; see <http://www.gnu.org/licenses/>.
 ;;
 
+;;; Commentary:
+
+;; A set of functions to allow one to use emacs as a keyring or password manager
+
+;;; Code
+
+
 (require 'shu-nvplist)
-;;
-;; shu-keyring.el
-;;
 
 ;;
 ;; ```

@@ -2,9 +2,11 @@
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
+;; Package: shu-xref
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
+
 ;;
 ;; This is free software: you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by
@@ -22,11 +24,14 @@
 ;; see <http://www.gnu.org/licenses/>.
 ;;
 
-;;
-;;  shu-xref.el
+;;; Commentary:
+
 ;;
 ;;  Collection of ...
 ;;
+
+;;; Code
+
 
 ;; NOTES: Look at variable "obarray"
 
@@ -151,9 +156,6 @@
 
 (require 'shu-base)
 (provide 'shu-xref)
-
-;;; Code
-
 (defconst shu-xref-buffer "**shu-xref**"
 "The name of the buffer into which the cross reference is placed.")
 

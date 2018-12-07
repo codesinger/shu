@@ -2,6 +2,7 @@
 ;;
 ;; Copyright (C) 2014 Stewart L. Palmer
 ;;
+;; Package: shu-org-extensions
 ;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -21,6 +22,8 @@
 ;; of the GNU General Public License along with GNU Emacs.  If not,
 ;; see <http://www.gnu.org/licenses/>.
 ;;
+
+;;; Commentary:
 
 ;; The major function of this file is the function shu-org-archive-done-tasks,
 ;; which can be used as an after-save-hook for org files.  It finds each
