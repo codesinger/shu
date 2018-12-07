@@ -1,0 +1,48 @@
+%%% test-doc.tex --- Shu project documentation
+%%
+%% Copyright (C) 2018 Stewart L. Palmer
+%%
+%% Package: shu-org-extensions
+%% Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+%%
+%% This file is NOT part of GNU Emacs.
+%%
+%% This is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% (at your option) any later version.
+%%
+%% This software is distributed in the hope that it will be useful,
+%% but WITHOUT ANY WARRANTY% without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%% General Public License for more details.
+%%
+%% There is a copy of the Gnu General Public license in the file
+%% LICENSE in this repository.  You should also have received a copy
+%% of the GNU General Public License along with GNU Emacs.  If not,
+%% see <http://www.gnu.org/licenses/>.
+%%
+
+\documentclass[12pt,onecolumn]{article}
+\usepackage[english]{babel}
+\usepackage{blindtext}
+
+\input{prologue}
+\newenvironment{king}
+{ \rule{1ex}{1ex}\hspace{\stretch{1}} }
+{ \hspace{\stretch{1}}\rule{1ex}{1ex} }
+
+\begin{document}
+\blindtext
+
+\noindent
+  \texttt{read-directory-name} \emph{prompt} \textbf {\&optional} \emph{directory}
+  \hfill [Function]
+\begin{doc-string}
+\blindtext
+
+\blindtext
+\end{doc-string}
+
+\blindtext
+\end{document}
