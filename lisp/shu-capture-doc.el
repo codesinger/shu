@@ -183,9 +183,17 @@ to markup.")
 
 
 ;;
+;;  shu-capture-a-type-keywd
+;;
+(defconst shu-capture-a-type-keywd 5
+  "The a-list key value that identifies the function that converts an key word, such
+as \"&optional\" or \"&rest\" to markup.")
+
+
+;;
 ;;  shu-capture-a-type-before
 ;;
-(defconst shu-capture-a-type-before 5
+(defconst shu-capture-a-type-before 6
   "The a-list key value that identifies the string that is placed before a verbatim
 code snippet.")
 
@@ -193,7 +201,7 @@ code snippet.")
 ;;
 ;;  shu-capture-a-type-after
 ;;
-(defconst shu-capture-a-type-after 6
+(defconst shu-capture-a-type-after 7
   "The a-list key value that identifies the string that is placed after a verbatim
 code snippet.")
 
@@ -201,14 +209,14 @@ code snippet.")
 ;;
 ;;  shu-capture-a-type-open-quote
 ;;
-(defconst shu-capture-a-type-open-quote 7
+(defconst shu-capture-a-type-open-quote 8
   "The a-list key value that identifies the string that is an open quote.")
 
 
 ;;
 ;;  shu-capture-a-type-close-quote
 ;;
-(defconst shu-capture-a-type-close-quote 8
+(defconst shu-capture-a-type-close-quote 9
   "The a-list key value that identifies the string that is a close quote.")
 
 
@@ -238,14 +246,22 @@ from the section name by a space.")
 ;;
 ;;  shu-capture-md-arg-delimiter
 ;;
-(defconst shu-capture-md-arg-delimiter "**"
+(defconst shu-capture-md-arg-delimiter "*"
   "Define the markdown delimiter that is used to surround an argument name.")
+
+
+;;
+;;  shu-capture-md-keywd-delimiter
+;;
+(defconst shu-capture-md-keywd-delimiter "**"
+  "Define the markdown delimiter that is used to surround an key word such as
+\"&optional\" or \"&rest\".")
 
 
 ;;
 ;;  shu-capture-latex-arg-start
 ;;
-(defconst shu-capture-latex-arg-start "\\textbf{"
+(defconst shu-capture-latex-arg-start "\\emph{"
   "Define the latex string that is used to prepended to an arguument name.")
 
 
@@ -253,6 +269,20 @@ from the section name by a space.")
 ;;  shu-capture-latex-arg-end
 ;;
 (defconst shu-capture-latex-arg-end "}"
+  "Define the latex string that is used to terminate an arguument name.")
+
+
+;;
+;;  shu-capture-latex-keywd-start
+;;
+(defconst shu-capture-latex-keywd-start "\\textbf{"
+  "Define the latex string that is used to prepended to an arguument name.")
+
+
+;;
+;;  shu-capture-latex-keywd-end
+;;
+(defconst shu-capture-latex-keywd-end "}"
   "Define the latex string that is used to terminate an arguument name.")
 
 
@@ -364,6 +394,7 @@ code snippet.")
    (cons shu-capture-a-type-func         'shu-capture-convert-func-md)
    (cons shu-capture-a-type-buf          'shu-capture-buf-to-md)
    (cons shu-capture-a-type-arg          'shu-capture-arg-to-md)
+   (cons shu-capture-a-type-keywd        'shu-capture-keywd-to-md)
    (cons shu-capture-a-type-before       shu-capture-md-code-delimiter)
    (cons shu-capture-a-type-after        shu-capture-md-code-delimiter)
    (cons shu-capture-a-type-open-quote   shu-capture-md-quote-delimiter)
@@ -382,6 +413,7 @@ function and its associated doc string and convert it to markdown.")
     (cons shu-capture-a-type-func         'shu-capture-convert-func-latex)
     (cons shu-capture-a-type-buf          'shu-capture-buf-to-latex)
     (cons shu-capture-a-type-arg          'shu-capture-arg-to-latex)
+    (cons shu-capture-a-type-keywd        'shu-capture-keywd-to-latex)
     (cons shu-capture-a-type-before       shu-capture-latex-code-start)
     (cons shu-capture-a-type-after        shu-capture-latex-code-end)
     (cons shu-capture-a-type-open-quote   shu-capture-latex-open-quote)
@@ -437,7 +469,7 @@ function and its associated doc string and convert it to LaTex.")
 ;;  shu-capture-arg-to-md
 ;;
 (defun shu-capture-arg-to-md (arg-name)
-  "Convert a function argument in a doc-string to markdown."
+  "Convert a function argument in a doc-string or argument list to markdown."
   (concat shu-capture-md-arg-delimiter arg-name shu-capture-md-arg-delimiter)
   )
 
@@ -447,8 +479,30 @@ function and its associated doc string and convert it to LaTex.")
 ;;  shu-capture-arg-to-latex
 ;;
 (defun shu-capture-arg-to-latex (arg-name)
-  "Convert a function argument in a doc-string to LaTex."
+  "Convert a function argument in a doc-string or argument list to LaTex."
   (concat shu-capture-latex-arg-start arg-name shu-capture-latex-arg-end)
+    )
+
+
+
+;;
+;;  shu-capture-keywd-to-md
+;;
+(defun shu-capture-keywd-to-md (arg-name)
+  "Convert a function argument key word in a doc-string or argument list
+to markdown."
+  (concat shu-capture-md-keywd-delimiter arg-name shu-capture-md-keywd-delimiter)
+  )
+
+
+
+;;
+;;  shu-capture-keywd-to-latex
+;;
+(defun shu-capture-keywd-to-latex (arg-name)
+  "Convert a function argument key word in a doc-string or argument list
+to LaTex."
+  (concat shu-capture-latex-keywd-start arg-name shu-capture-latex-keywd-end)
     )
 
 
@@ -767,6 +821,7 @@ follows:
       shu-capture-a-type-func          Function to format a function signature
       shu-capture-a-type-buf           Function to format a buffer name
       shu-capture-a-type-arg           Function to format an argument name
+      shu-capture-a-type-keywd         Function to format a key word
       shu-capture-a-type-before        String that starts a block of verbatim code
       shu-capture-a-type-after         String that ends a block of verbstim code
       shu-capture-a-type-open-quote    String that is an open quote
@@ -949,6 +1004,7 @@ follows:
       shu-capture-a-type-func          Function to format a function signature
       shu-capture-a-type-buf           Function to format a buffer name
       shu-capture-a-type-arg           Function to format an argument name
+      shu-capture-a-type-keywd         Function to format a key word
       shu-capture-a-type-before        String that starts a block of verbatim code
       shu-capture-a-type-after         String that ends a block of verbstim code
       shu-capture-a-type-open-quote    String that is an open quote
