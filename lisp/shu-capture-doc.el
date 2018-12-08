@@ -87,11 +87,13 @@
 ;;
 (defmacro shu-capture-set-func-def (func-def signature attributes description)
   "Create a func-def to describe the function"
-  `(let ((func-alias)
-         (func-info))
-     (setq func-info (cons ,attributes ,description))
-     (setq func-alias (cons nil func-info))
-     (setq ,func-def (cons ,signature func-alias))
+  (let ((tfunc-alias (make-symbol "func-alias"))
+        (tfunc-info (make-symbol "func-info")))
+  `(let ((,tfunc-alias)
+         (,tfunc-info))
+     (setq ,tfunc-info (cons ,attributes ,description))
+     (setq ,tfunc-alias (cons nil ,tfunc-info))
+     (setq ,func-def (cons ,signature ,tfunc-alias)))
      ))
 
 
@@ -113,15 +115,17 @@
 ;;
 (defmacro shu-capture-get-func-def (func-def signature attributes description alias)
   "Extract the information from the func-def"
-  `(let ((func-alias)
-         (func-info))
-     (setq ,signature (car ,func-def))
-     (setq func-alias (cdr ,func-def))
-     (setq ,alias (car func-alias))
-     (setq func-info (cdr func-alias))
-     (setq ,attributes (car func-info))
-     (setq ,description (cdr func-info))
-     ))
+  (let ((tfunc-alias (make-symbol "func-alias"))
+        (tfunc-info (make-symbol "func-info")))
+    `(let ((,tfunc-alias)
+           (,tfunc-info))
+       (setq ,signature (car ,func-def))
+       (setq ,tfunc-alias (cdr ,func-def))
+       (setq ,alias (car ,tfunc-alias))
+       (setq ,tfunc-info (cdr ,tfunc-alias))
+       (setq ,attributes (car ,tfunc-info))
+       (setq ,description (cdr ,tfunc-info)))
+    ))
 
 
 ;;
@@ -139,11 +143,10 @@
 ;;
 (defmacro shu-capture-get-func-def-alias (func-def alias)
   "Extract the function alias from the func-def"
-  `(let (
-         (func-alias)
-         )
-     (setq func-alias (car ,func-def))
-     (setq ,alias (car func-alias))
+  (let ((tfunc-alias (make-symbol "func-alias")))
+  `(let ((,tfunc-alias))
+     (setq ,tfunc-alias (car ,func-def))
+     (setq ,alias (car ,tfunc-alias)))
      ))
 
 
@@ -161,13 +164,14 @@ The on return FUNC-NAME will hold \"do-something\" and ARGS will contain the
 string \"to something)\".  If there are no arguments, ARGS will contain a string
 of length zero.  If there is no function name, FUNC-NAME will contain a string
 of length zero"
-  `(let ((fs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))"))
-     (if (string-match fs ,signature)
+  (let ((tfs (make-symbol "fs")))
+  `(let ((,tfs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))"))
+     (if (string-match ,tfs ,signature)
          (progn
            (setq ,func-name (match-string 1 ,signature))
            (setq ,args (string-trim (match-string 2 ,signature))))
        (setq ,func-name "")
-       (setq ,args ""))
+       (setq ,args "")))
      ))
 
 
