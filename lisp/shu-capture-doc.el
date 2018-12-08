@@ -1255,26 +1255,25 @@ For example, if SIGNATURE holds the following:
 
 an a-list is returned with the keys \"others,\" \"and,\" \"things,\" \"these,\" and
 \"with.\""
-  (let ((fs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))")
+  (let ((func-name)
         (arg-string)
         (arg-list)
         (arg-assoc)
         (arg)
         (x))
-    (when (string-match fs signature)
-      (setq arg-string (match-string 2 signature))
+    (shu-capture-get-name-and-args signature func-name arg-string)
+    (when (not (= 0 (length arg-string)))
       (setq arg-list (split-string arg-string))
-      (when (not (= 0 (length arg-string)))
-        (while arg-list
-          (setq arg (car arg-list))
-          (when (and (not (string= arg shu-capture-keywd-optional))
-                     (not (string= arg shu-capture-keywd-rest)))
-            (setq x (cons arg 1))
-            (if (not arg-assoc)
-                (setq arg-assoc (list x))
-              (when (not (assoc arg arg-assoc))
-                (setq arg-assoc (cons x arg-assoc)))))
-          (setq arg-list (cdr arg-list)))))
+      (while arg-list
+        (setq arg (car arg-list))
+        (when (and (not (string= arg shu-capture-keywd-optional))
+                   (not (string= arg shu-capture-keywd-rest)))
+          (setq x (cons arg 1))
+          (if (not arg-assoc)
+              (setq arg-assoc (list x))
+            (when (not (assoc arg arg-assoc))
+              (setq arg-assoc (cons x arg-assoc)))))
+        (setq arg-list (cdr arg-list))))
     arg-assoc
     ))
 
@@ -1305,7 +1304,7 @@ markdown will contain (\"*with*\", \"*these*\", \"*things*\", \"**&optional**\",
 
 If the function signature contains no arguments, then nil is returned instead of the
 above described cons cell."
-  (let ((fs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))")
+  (let ((func-name)
         (arg-string)
         (arg-list)
         (arg)
@@ -1313,22 +1312,21 @@ above described cons cell."
         (markup-args)
         (result)
         (x))
-    (when (string-match fs signature)
-      (setq arg-string (match-string 2 signature))
+    (shu-capture-get-name-and-args signature func-name arg-string)
+    (unless (= 0 (length arg-string))
       (setq arg-list (split-string arg-string))
-      (unless (= 0 (length arg-string))
-        (setq arg-list (nreverse arg-list))
-        (setq x arg-list)
-        (while x
-          (setq arg (car x))
-          (setq lengths (cons (length arg) lengths))
-          (if (or (string= arg shu-capture-keywd-optional)
-                  (string= arg shu-capture-keywd-rest))
-              (setq arg (funcall keywd-converter arg))
-            (setq arg (funcall arg-converter arg)))
-          (setq markup-args (cons arg markup-args))
-          (setq x (cdr x)))
-        (setq result (cons lengths markup-args))))
+      (setq arg-list (nreverse arg-list))
+      (setq x arg-list)
+      (while x
+        (setq arg (car x))
+        (setq lengths (cons (length arg) lengths))
+        (if (or (string= arg shu-capture-keywd-optional)
+                (string= arg shu-capture-keywd-rest))
+            (setq arg (funcall keywd-converter arg))
+          (setq arg (funcall arg-converter arg)))
+        (setq markup-args (cons arg markup-args))
+        (setq x (cdr x)))
+      (setq result (cons lengths markup-args)))
     result
     ))
 
