@@ -237,6 +237,90 @@
 
 
 ;;
+;;  shu-test-shu-capture-get-name-and-args-1
+;;
+(ert-deftest shu-test-shu-capture-get-name-and-args-1 ()
+  "Doc string."
+  (let (
+        (signature "do-something (to something)")
+        (expected-func-name "do-something")
+        (expected-args "to something")
+        (func-name)
+        (args)
+        )
+    (shu-capture-get-name-and-args signature func-name args)
+    (should func-name)
+    (should args)
+    (should (string= expected-func-name func-name))
+    (should (string= expected-args args))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-get-name-and-args-2
+;;
+(ert-deftest shu-test-shu-capture-get-name-and-args-2 ()
+  "Doc string."
+  (let (
+        (signature "do-something (  to something  )  ")
+        (expected-func-name "do-something")
+        (expected-args "to something")
+        (func-name)
+        (args)
+        )
+    (shu-capture-get-name-and-args signature func-name args)
+    (should func-name)
+    (should args)
+    (should (string= expected-func-name func-name))
+    (should (string= expected-args args))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-get-name-and-args-3
+;;
+(ert-deftest shu-test-shu-capture-get-name-and-args-3 ()
+  "Doc string."
+  (let (
+        (signature "do-something ()  ")
+        (expected-func-name "do-something")
+        (expected-args "")
+        (func-name)
+        (args)
+        )
+    (shu-capture-get-name-and-args signature func-name args)
+    (should func-name)
+    (should args)
+    (should (string= expected-func-name func-name))
+    (should (string= expected-args args))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-get-name-and-args-4
+;;
+(ert-deftest shu-test-shu-capture-get-name-and-args-4 ()
+  "Doc string."
+  (let (
+        (signature "Happy birthday")
+        (expected-func-name "")
+        (expected-args "")
+        (func-name)
+        (args)
+        )
+    (shu-capture-get-name-and-args signature func-name args)
+    (should func-name)
+    (should args)
+    (should (string= expected-func-name func-name))
+    (should (string= expected-args args))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-capture-convert-doc-string-1
 ;;
 (ert-deftest shu-test-shu-capture-convert-doc-string-1 ()

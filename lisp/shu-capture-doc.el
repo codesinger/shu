@@ -33,6 +33,8 @@
 
 
 (provide 'shu-capture-doc)
+(require 'subr-x)
+
 
 ;; Information about a function and its doc string is contained in the folllwing
 ;; three cons cells.  The macros immmediately below can create the cons cells from
@@ -142,6 +144,30 @@
          )
      (setq func-alias (car ,func-def))
      (setq ,alias (car func-alias))
+     ))
+
+
+
+;;
+;;  shu-capture-get-name-and-args
+;;
+(defmacro shu-capture-get-name-and-args (signature func-name args)
+  "Extract the function and the string of arguments from a whole signature that
+includes both the function name and the arguments.  If SIGNATURE contains:
+
+     \"do-something (to something)\"
+
+The on return FUNC-NAME will hold \"do-something\" and ARGS will contain the
+string \"to something)\".  If there are no arguments, ARGS will contain a string
+of length zero.  If there is no function name, FUNC-NAME will contain a string
+of length zero"
+  `(let ((fs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))"))
+     (if (string-match fs ,signature)
+         (progn
+           (setq ,func-name (match-string 1 ,signature))
+           (setq ,args (string-trim (match-string 2 ,signature))))
+       (setq ,func-name "")
+       (setq ,args ""))
      ))
 
 
