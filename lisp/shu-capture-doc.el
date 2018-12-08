@@ -220,6 +220,19 @@ code snippet.")
   "The a-list key value that identifies the string that is a close quote.")
 
 
+;;
+;;  shu-capture-keywd-optional
+;;
+(defconst shu-capture-keywd-optional "&optional"
+  "The argument list keyword for an optional argument.")
+
+
+;;
+;;  shu-capture-keywd-rest
+;;
+(defconst shu-capture-keywd-rest "&rest"
+  "The argument list keyword for a multiple optional arguments.")
+
 
 ;;
 ;;  shu-capture-md-section-delimiter
@@ -1223,8 +1236,8 @@ an a-list is returned with the keys \"others,\" \"and,\" \"things,\" \"these,\" 
       (when (not (= 0 (length arg-string)))
         (while arg-list
           (setq arg (car arg-list))
-          (when (and (not (string= arg "&optional"))
-                     (not (string= arg "&rest")))
+          (when (and (not (string= arg shu-capture-keywd-optional))
+                     (not (string= arg shu-capture-keywd-rest)))
             (setq x (cons arg 1))
             (if (not arg-assoc)
                 (setq arg-assoc (list x))
@@ -1232,6 +1245,60 @@ an a-list is returned with the keys \"others,\" \"and,\" \"things,\" \"these,\" 
                 (setq arg-assoc (cons x arg-assoc)))))
           (setq arg-list (cdr arg-list)))))
     arg-assoc
+    ))
+
+
+
+;;
+;;  shu-capture-convert-args-to-markup
+;;
+(defun shu-capture-convert-args-to-markup (signature arg-converter keywd-converter)
+  "SIGNATURE contains the function signature (both function name and arguments).
+ARG-CONVERTER is the function used to convert an argument to markup.  KEYWD-CONVERTER
+is the function used to convert an argument list keyword, such as \&optional\" or \"&rest\"
+to markup.
+
+This function returns a cons cell pointing to two lists.  The first list contains the length
+of each argument name prior to conversion to markup.  This is because the amount of space
+on a line is largely determied by the length of the unconverted argument.  \"arg\" will
+take much less space on a line than will \"\emph{arg}\".  The second list contains each
+of the argument names converted to the appropriate markup.
+
+Given the following function signature:
+
+     do-somerhing (with these things &optional and &rest others)
+
+the length list will contain (4, 5, 6, 9, 3, 5, 6).  The converted arguments list for
+markdown will contain (\"*with*\", \"*these*\", \"*things*\", \"**&optional**\", \"*and*\",
+\"**&rest**\", \"*others*\").
+
+If the function signature contains no arguments, then nil is returned instead of the
+above described cons cell."
+  (let ((fs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))")
+        (arg-string)
+        (arg-list)
+        (arg)
+        (lengths)
+        (markup-args)
+        (result)
+        (x))
+    (when (string-match fs signature)
+      (setq arg-string (match-string 2 signature))
+      (setq arg-list (split-string arg-string))
+      (unless (= 0 (length arg-string))
+        (setq arg-list (nreverse arg-list))
+        (setq x arg-list)
+        (while x
+          (setq arg (car x))
+          (setq lengths (cons (length arg) lengths))
+          (if (or (string= arg shu-capture-keywd-optional)
+                  (string= arg shu-capture-keywd-rest))
+              (setq arg (funcall keywd-converter arg))
+            (setq arg (funcall arg-converter arg)))
+          (setq markup-args (cons arg markup-args))
+          (setq x (cdr x)))
+        (setq result (cons lengths markup-args))))
+    result
     ))
 
 ;;; shu-capture-doc.el ends here

@@ -1,4 +1,4 @@
-;;; shu-capture-doc.t.el --- Shu project code unit tests
+;;; shu-capture-doc.t.el --- Shu project code unit tests for shu-capture-doc
 ;;
 ;; Copyright (C) 2018 Stewart L. Palmer
 ;;
@@ -20,11 +20,11 @@
 ;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
 ;;
 
-(require 'ert)
-(require 'shu-capture-doc)
-
 ;;; Code
 
+
+(require 'ert)
+(require 'shu-capture-doc)
 
 
 ;;
@@ -928,6 +928,112 @@
          (actual))
     (setq actual (shu-capture-make-latex-section level hdr))
     (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-args-to-markup-1
+;;
+(ert-deftest shu-test-shu-capture-convert-args-to-markup-1 ()
+  (let ((arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-md-converters)))
+        (keywd-converter (cdr (assoc shu-capture-a-type-keywd shu-capture-md-converters)))
+        (signature "convert (arg1 arg-convert)")
+        (expected-lengths (list 4 11))
+        (expected-arg1
+         (concat
+          shu-capture-md-arg-delimiter "arg1" shu-capture-md-arg-delimiter))
+        (expected-arg2
+         (concat
+          shu-capture-md-arg-delimiter "arg-convert" shu-capture-md-arg-delimiter))
+        (result)
+        (lengths)
+        (markup-args)
+        (actual-arg1)
+        (actual-arg2))
+    (setq result (shu-capture-convert-args-to-markup signature arg-converter keywd-converter))
+    (should (consp result))
+    (setq lengths (car result))
+    (should (listp lengths))
+    (setq markup-args (cdr result))
+    (should (listp markup-args))
+    (should (equal expected-lengths lengths))
+    (setq actual-arg1 (car markup-args))
+    (should (string= expected-arg1 actual-arg1))
+    (should (cdr markup-args))
+    (setq markup-args (cdr markup-args))
+    (setq actual-arg2 (car markup-args))
+    (should (string= expected-arg2 actual-arg2))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-args-to-markup-2
+;;
+(ert-deftest shu-test-shu-capture-convert-args-to-markup-2 ()
+  (let ((arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-md-converters)))
+        (keywd-converter (cdr (assoc shu-capture-a-type-keywd shu-capture-md-converters)))
+        (signature "convert (arg1 arg-convert &optional other)")
+        (expected-lengths (list 4 11 9 5))
+        (expected-arg1
+         (concat
+          shu-capture-md-arg-delimiter "arg1" shu-capture-md-arg-delimiter))
+        (expected-arg2
+         (concat
+          shu-capture-md-arg-delimiter "arg-convert" shu-capture-md-arg-delimiter))
+        (expected-arg3
+         (concat
+          shu-capture-md-keywd-delimiter "&optional" shu-capture-md-keywd-delimiter))
+        (expected-arg4
+         (concat
+          shu-capture-md-arg-delimiter "other" shu-capture-md-arg-delimiter))
+        (result)
+        (lengths)
+        (markup-args)
+        (actual-arg1)
+        (actual-arg2)
+        (actual-arg3)
+        (actual-arg4))
+    (setq result (shu-capture-convert-args-to-markup signature arg-converter keywd-converter))
+    (should (consp result))
+    (setq lengths (car result))
+    (should (listp lengths))
+    (setq markup-args (cdr result))
+    (should (listp markup-args))
+    (should (equal expected-lengths lengths))
+    (should (car markup-args))
+    (setq actual-arg1 (car markup-args))
+    (should (string= expected-arg1 actual-arg1))
+    (should (cdr markup-args))
+    (setq markup-args (cdr markup-args))
+    (should (car markup-args))
+    (setq actual-arg2 (car markup-args))
+    (should (string= expected-arg2 actual-arg2))
+    (should (cdr markup-args))
+    (setq markup-args (cdr markup-args))
+    (should (car markup-args))
+    (setq actual-arg3 (car markup-args))
+    (should (string= expected-arg3 actual-arg3))
+    (should (cdr markup-args))
+    (setq markup-args (cdr markup-args))
+    (should (car markup-args))
+    (setq actual-arg4 (car markup-args))
+    (should (string= expected-arg4 actual-arg4))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-convert-args-to-markup-3
+;;
+(ert-deftest shu-test-shu-capture-convert-args-to-markup-3 ()
+  (let ((arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-md-converters)))
+        (keywd-converter (cdr (assoc shu-capture-a-type-keywd shu-capture-md-converters)))
+        (signature "convert ()")
+        (result))
+    (setq result (shu-capture-convert-args-to-markup signature arg-converter keywd-converter))
+    (should (not result))
     ))
 
 ;;; shu-capture-doc.t.el ends here
