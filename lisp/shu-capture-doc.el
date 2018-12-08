@@ -512,11 +512,16 @@ to markdown."
 ;;
 ;;  shu-capture-keywd-to-latex
 ;;
-(defun shu-capture-keywd-to-latex (arg-name)
+(defun shu-capture-keywd-to-latex (keywd-name)
   "Convert a function argument key word in a doc-string or argument list
 to LaTex."
-  (concat shu-capture-latex-keywd-start arg-name shu-capture-latex-keywd-end)
-    )
+  (let ((prefix "")
+        (name))
+    (when (string= "&" (substring keywd-name 0 1))
+      (setq prefix "\\"))
+    (setq name (concat prefix keywd-name))
+    (concat shu-capture-latex-keywd-start name shu-capture-latex-keywd-end)
+    ))
 
 
 

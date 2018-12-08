@@ -1036,4 +1036,60 @@
     (should (not result))
     ))
 
+
+
+;;
+;;  shu-test-shu-capture-convert-args-to-markup-4
+;;
+(ert-deftest shu-test-shu-capture-convert-args-to-markup-4 ()
+  (let ((arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-latex-converters)))
+        (keywd-converter (cdr (assoc shu-capture-a-type-keywd shu-capture-latex-converters)))
+        (signature "convert (arg1 arg-convert &optional other)")
+        (expected-lengths (list 4 11 9 5))
+        (expected-arg1
+         (concat
+          shu-capture-latex-arg-start "arg1" shu-capture-latex-arg-end))
+        (expected-arg2
+         (concat
+          shu-capture-latex-arg-start "arg-convert" shu-capture-latex-arg-end))
+        (expected-arg3
+         (concat
+          shu-capture-latex-keywd-start "\\&optional" shu-capture-latex-keywd-end))
+        (expected-arg4
+         (concat
+          shu-capture-latex-arg-start "other" shu-capture-latex-arg-end))
+        (result)
+        (lengths)
+        (markup-args)
+        (actual-arg1)
+        (actual-arg2)
+        (actual-arg3)
+        (actual-arg4))
+    (setq result (shu-capture-convert-args-to-markup signature arg-converter keywd-converter))
+    (should (consp result))
+    (setq lengths (car result))
+    (should (listp lengths))
+    (setq markup-args (cdr result))
+    (should (listp markup-args))
+    (should (equal expected-lengths lengths))
+    (should (car markup-args))
+    (setq actual-arg1 (car markup-args))
+    (should (string= expected-arg1 actual-arg1))
+    (should (cdr markup-args))
+    (setq markup-args (cdr markup-args))
+    (should (car markup-args))
+    (setq actual-arg2 (car markup-args))
+    (should (string= expected-arg2 actual-arg2))
+    (should (cdr markup-args))
+    (setq markup-args (cdr markup-args))
+    (should (car markup-args))
+    (setq actual-arg3 (car markup-args))
+    (should (string= expected-arg3 actual-arg3))
+    (should (cdr markup-args))
+    (setq markup-args (cdr markup-args))
+    (should (car markup-args))
+    (setq actual-arg4 (car markup-args))
+    (should (string= expected-arg4 actual-arg4))
+    ))
+
 ;;; shu-capture-doc.t.el ends here
