@@ -133,7 +133,7 @@
 ;;
 (defmacro shu-capture-get-func-def-sig (func-def signature)
   "Extract the function signature from the func-def"
-  `(let ((func-info))
+  `(let ()
      (setq ,signature (car ,func-def))
      ))
 
