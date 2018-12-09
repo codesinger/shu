@@ -27,6 +27,7 @@
 \usepackage[english]{babel}
 \usepackage{blindtext}
 
+\newsavebox{\funcname}
 \usepackage{makeidx}
 
 \input{prologue}
@@ -47,10 +48,12 @@
 
 
 \noindent
-  \texttt{read-directory-name} \emph{prompt} \textbf {\&optional} \emph{directory}
+\savebox{\funcname}{\noindent\texttt{read-directory-name }}
+%%\showthe\wd\funcname
+  \usebox{\funcname}\emph{prompt} \textbf {\&optional} \emph{directory}
   \hfill [Function]
   \index{read-directory-name2}
-\hspace*{22ex} \emph{and} \emph{others} \emph{too}
+\hspace*{\wd\funcname} \emph{and} \emph{others} \emph{too}
 \begin{doc-string}
 \blindtext
 \end{doc-string}
