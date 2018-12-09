@@ -27,22 +27,35 @@
 \usepackage[english]{babel}
 \usepackage{blindtext}
 
-\input{prologue}
-\newenvironment{king}
-{ \rule{1ex}{1ex}\hspace{\stretch{1}} }
-{ \hspace{\stretch{1}}\rule{1ex}{1ex} }
+\usepackage{makeidx}
 
+\input{prologue}
+\makeindex
 \begin{document}
 \blindtext
 
 \noindent
   \texttt{read-directory-name} \emph{prompt} \textbf {\&optional} \emph{directory}
   \hfill [Function]
+  \index{read-directory-name}
+\hspace*{19ex} \emph{and} \emph{others} \emph{too}
 \begin{doc-string}
 \blindtext
 
 \blindtext
 \end{doc-string}
 
+
+\noindent
+  \texttt{read-directory-name} \emph{prompt} \textbf {\&optional} \emph{directory}
+  \hfill [Function]
+  \index{read-directory-name2}
+\hspace*{22ex} \emph{and} \emph{others} \emph{too}
+\begin{doc-string}
 \blindtext
+\end{doc-string}
+
+\blindtext
+
+\printindex
 \end{document}
