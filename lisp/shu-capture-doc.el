@@ -614,13 +614,13 @@ them into a LaTex text that documents the functions and their doc strings."
          (concat
           "("
           "\\s-*"
-          "\\(defun\\|defmacro\\)\\"
+          "\\(defun\\|defsubst\\|defmacro\\)\\"
           "s-+"))
         (fs
          (concat
           "("
           "\\s-*"
-          "\\(defun\\|defmacro\\)"
+          "\\(defun\\|defsubst\\|defmacro\\)"
           "\\s-*"
           "\\([0-9a-zA-Z-]+\\)"
           "\\s-*"
@@ -1332,6 +1332,25 @@ above described cons cell."
         (setq x (cdr x)))
       (setq result (cons lengths markup-args)))
     result
+    ))
+
+
+
+;;
+;;  shu-capture-func-type-name
+;;
+(defun shu-capture-func-type-name (attributes)
+  "Return the type of function that is represented by the bits in ATTRIBUTES.  This
+could be \"Command,\" \"Function,\" etc."
+  (let ((name))
+    (cond
+     ((not (= 0 (logand attributes shu-capture-attr-macro)))
+      (setq name "Macro"))
+     ((not (= 0 (logand attributes shu-capture-attr-inter)))
+      (setq name "Command"))
+     (t
+      (setq name "Function")))
+    name
     ))
 
 ;;; shu-capture-doc.el ends here

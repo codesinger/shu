@@ -1176,4 +1176,27 @@
     (should (string= expected-arg4 actual-arg4))
     ))
 
+
+
+;;
+;;  shu-test-shu-capture-func-type-name-1
+;;
+(ert-deftest shu-test-shu-capture-func-type-name-1 ()
+  (let (
+        (macro-attributes1 shu-capture-attr-macro)
+        (macro-attributes2 (logior shu-capture-attr-macro shu-capture-attr-alias))
+        (interactive-attributes1 shu-capture-attr-inter)
+        (interactive-attributes2 (logior shu-capture-attr-inter shu-capture-attr-alias))
+        (function-attributes shu-capture-attr-alias)
+        (macro-name "Macro")
+        (function-name "Function")
+        (interactive-name "Command")
+        )
+    (should (string= macro-name (shu-capture-func-type-name macro-attributes1)))
+    (should (string= macro-name (shu-capture-func-type-name macro-attributes2)))
+    (should (string= function-name (shu-capture-func-type-name function-attributes)))
+    (should (string= interactive-name (shu-capture-func-type-name interactive-attributes1)))
+    (should (string= interactive-name (shu-capture-func-type-name interactive-attributes2)))
+    ))
+
 ;;; shu-capture-doc.t.el ends here
