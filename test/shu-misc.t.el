@@ -179,6 +179,31 @@
 
 
 
+
+;;
+;;  shu-test-shu-fix-times
+;;
+(ert-deftest shu-test-shu-fix-times ()
+  "Doc string."
+  (let ((data
+         (concat
+          "2017-11-21T130344.568\n"
+          "2018-07-08T030344.768"))
+        (expected
+         (concat
+          "2017-11-21 13:03:44.568\n"
+          "2018-07-08 03:03:44.768"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (shu-fix-times)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
 ;;
 ;;  shu-test-shu-find-numbered-commit-1
 ;;

@@ -612,6 +612,40 @@ Returns the count of the number of commits found."
 
 
 
+;;
+;;  shu-fix-tmeimes
+;;
+(defun shu-fix-times ()
+  "Go through a buffer that contains timestamps of the form
+     YYYY-MM-DDTHHMMSS.DDD
+converting them to the form
+     YYYY-MM-DD HH:MM:SS.DDD
+The latter is a format that Microsoft Excel can import."
+  (interactive)
+  (let ((rdate "\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\)T")
+        (rtime "\\([0-9]\\{6\\}.[0-9]\\{3\\}\\)")
+        (date)
+        (hh)
+        (mm)
+        (ss)
+        (ddd)
+        (ftime)
+        (ttime))
+    (while (re-search-forward rdate nil t)
+      (setq date (concat (match-string 1) " "))
+      (replace-match date t t)
+      (re-search-forward rtime nil t)
+      (setq ftime (match-string 1))
+      (setq hh (substring ftime 0 2))
+      (setq mm (substring ftime 2 4))
+      (setq ss (substring ftime 4 6))
+      (setq ddd (substring ftime 7))
+      (setq ttime (concat hh ":" mm ":" ss "." ddd))
+      (replace-match ttime t t))
+    ))
+
+
+
 
 ;;
 ;;  shu-split-range-string
