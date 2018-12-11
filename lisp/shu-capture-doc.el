@@ -1004,9 +1004,11 @@ function definitions into either markdown or LaTex."
 ;;  shu-capture-convert-func-latex
 ;;
 (defun shu-capture-convert-func-latex (func-def)
-  "Take a function definition and turn it into a string of LaTex."
+  "Take a function definition and turn it into a string of LaTex.  Return said string."
   (let (
         (gb (get-buffer-create "**shu-capture-doc**"))
+        (arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-latex-converters)))
+        (keywd-converter (cdr (assoc shu-capture-a-type-keywd shu-capture-latex-converters)))
         (signature)
         (attributes)
         (description)
@@ -1014,6 +1016,10 @@ function definitions into either markdown or LaTex."
         (title "")
         (alias-line "")
         (interact-line "")
+        (func-name)
+        (func-type)
+        (markups)
+        (args)
         (result ""))
     (shu-capture-get-func-def func-def signature attributes description alias)
     (setq title
@@ -1022,17 +1028,81 @@ function definitions into either markdown or LaTex."
             "Alias"))
     (when alias
       (setq alias-line (concat " (" title ": " alias ")")))
-    (when (and (not (= 0 (logand attributes shu-capture-attr-inter)))
-               (= 0 (logand attributes shu-capture-attr-alias)))
-      (setq interact-line "\%\nInteractive"))
-    (when (not (= 0 (logand attributes shu-capture-attr-macro)))
-      (setq interact-line "\%\nMacro"))
-    (setq result
-          (concat
-           "\n\\textbf{" signature "}"
-           alias-line
-           interact-line
-           "\n"))
+    (setq func-type (shu-capture-func-type-name attributes))
+    (shu-capture-get-name-and-args signature func-name args)
+    (setq markups (shu-capture-convert-args-to-markup signature arg-converter keywd-converter))
+    (setq result (shu-capture-make-args-latex func-name markups func-type))
+    result
+    ))
+
+
+
+
+;;
+;;  shu-capture-make-args-latex
+;;
+(defun shu-capture-make-args-latex (func-name markups func-type)
+  "FUNC-NAME is the name of the function, macro, alias, ect.  FUNC-TYPE is a
+string that represents the function type.  This will be part of the argument
+display.  MARKUPS is either nil or is a cons cell that points to two lists.  If
+MARKUPS is nil, the function has no arguments.  If MARKUPS is non-nil, it is a
+cons cell that points to two lists.  The car of MARKUPS is a list of the lengths
+of each argument before any markup was added to the argument.  If an argument
+name is \"arg1,\" its length is 4 even though the length of the argument name
+after markup is applied mDaye be longer.  The cdr of MARKUPS is a list of the
+arguments with markup applied to them."
+  (let ((fill-string (concat
+                      "\\index{" func-name "} "
+                      "\\hfill [" func-type "]"))
+        (filled)
+        (size)
+        (sizes)
+        (arg)
+        (args)
+        (pad)
+        (acount)
+        (ccount)
+        (ncount)
+        (result))
+    (with-temp-buffer
+      (insert
+       (concat
+        "\\savebox{\\funcname}{\\noindent\\texttt{"
+        func-name " }}\n"
+        "\\usebox{\\funcname}"))
+      (if (not markups)
+          (progn
+            (insert (concat "\n" fill-string))
+            (setq filled t))
+        (setq sizes (car markups))
+        (setq args (cdr markups))
+        (setq pad "")
+        (setq acount 0)
+        (setq ccount (1+ (length func-name)))
+        (while (and sizes args)
+          (setq arg (car args))
+          (setq size (car sizes))
+          (setq ncount (+ ccount size (length pad)))
+          (if (and (> acount 0)
+                   (> ncount 64))
+              (progn
+                (when (not filled)
+                  (insert (concat "\n" fill-string))
+                  (setq filled t))
+                (insert "\n\\hspace*{\\wd\\funcname}")
+                (setq pad "")
+                (setq acount 0)
+                (setq ccount (1+ (length func-name))))
+            (insert (concat pad arg))
+            (setq acount (1+ acount))
+            (setq pad " ")
+            (setq ccount ncount))
+          (setq sizes (cdr sizes))
+          (setq args (cdr args)))
+        (when (not filled)
+          (insert (concat "\n" fill-string))
+          (setq filled t)))
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
     result
     ))
 

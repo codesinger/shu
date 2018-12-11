@@ -1199,4 +1199,30 @@
     (should (string= interactive-name (shu-capture-func-type-name interactive-attributes2)))
     ))
 
+
+
+
+
+;;
+;;  shu-test-shu-capture-convert-func-latex
+;;
+(ert-deftest shu-test-shu-capture-convert-func-latex ()
+  (let* (
+         (gb (get-buffer-create "**slp**"))
+         (signature
+          "some-function-name (arg1 something &optional or-other and more1 and more2 and more3 and more4)")
+         (func-type "Function")
+         (func-name)
+         (args)
+         (arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-latex-converters)))
+         (keywd-converter (cdr (assoc shu-capture-a-type-keywd shu-capture-latex-converters)))
+         (markups)
+         (result)
+        )
+    (setq markups (shu-capture-convert-args-to-markup signature arg-converter keywd-converter))
+    (shu-capture-get-name-and-args signature func-name args)
+    (setq result (shu-capture-make-args-latex func-name markups func-type))
+    (princ (concat result "\n") gb)
+    ))
+
 ;;; shu-capture-doc.t.el ends here
