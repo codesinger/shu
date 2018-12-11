@@ -630,7 +630,9 @@ The latter is a format that Microsoft Excel can import."
         (ss)
         (ddd)
         (ftime)
-        (ttime))
+        (ttime)
+        (count 0)
+        (ncount))
     (while (re-search-forward rdate nil t)
       (setq date (concat (match-string 1) " "))
       (replace-match date t t)
@@ -641,7 +643,11 @@ The latter is a format that Microsoft Excel can import."
       (setq ss (substring ftime 4 6))
       (setq ddd (substring ftime 7))
       (setq ttime (concat hh ":" mm ":" ss "." ddd))
-      (replace-match ttime t t))
+      (replace-match ttime t t)
+      (setq count (1+ count))
+      )
+    (setq ncount (shu-group-number count))
+    (message "Replaced %s occurrences" ncount)
     ))
 
 
