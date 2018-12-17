@@ -216,14 +216,22 @@ to markup.")
 ;;  shu-capture-a-type-keywd
 ;;
 (defconst shu-capture-a-type-keywd 5
-  "The a-list key value that identifies the function that converts an key word, such
+  "The a-list key value that identifies the function that converts a key word, such
+as \"&optional\" or \"&rest\" to markup.")
+
+
+;;
+;;  shu-capture-a-type-doc-string
+;;
+(defconst shu-capture-a-type-doc-string 6
+  "The a-list key value that identifies the function that converts a key word, such
 as \"&optional\" or \"&rest\" to markup.")
 
 
 ;;
 ;;  shu-capture-a-type-before
 ;;
-(defconst shu-capture-a-type-before 6
+(defconst shu-capture-a-type-before 7
   "The a-list key value that identifies the string that is placed before a verbatim
 code snippet.")
 
@@ -231,7 +239,7 @@ code snippet.")
 ;;
 ;;  shu-capture-a-type-after
 ;;
-(defconst shu-capture-a-type-after 7
+(defconst shu-capture-a-type-after 8
   "The a-list key value that identifies the string that is placed after a verbatim
 code snippet.")
 
@@ -239,14 +247,14 @@ code snippet.")
 ;;
 ;;  shu-capture-a-type-open-quote
 ;;
-(defconst shu-capture-a-type-open-quote 8
+(defconst shu-capture-a-type-open-quote 9
   "The a-list key value that identifies the string that is an open quote.")
 
 
 ;;
 ;;  shu-capture-a-type-close-quote
 ;;
-(defconst shu-capture-a-type-close-quote 9
+(defconst shu-capture-a-type-close-quote 10
   "The a-list key value that identifies the string that is a close quote.")
 
 
@@ -275,7 +283,7 @@ from the section name by a space.")
 ;;
 ;;  shu-capture-latex-section-start
 ;;
-(defconst shu-capture-latex-section-start "\subsection{"
+(defconst shu-capture-latex-section-start "\\subsection{"
   "Define the LaTex tag that is used to identfy the start of a section headig.")
 
 
@@ -340,7 +348,7 @@ any other name that has leading and trailing asterisks")
 ;;
 ;;  shu-capture-latex-buf-start
 ;;
-(defconst shu-capture-latex-buf-start "\emph{"
+(defconst shu-capture-latex-buf-start "\\emph{"
   "Define the LaTex string that is used in front of a buffer name or
 any other name that has leading and trailing asterisks")
 
@@ -363,7 +371,7 @@ any other name that has leading and trailing asterisks")
 ;;
 ;;  shu-capture-latex-code-start
 ;;
-(defconst shu-capture-latex-code-start "\begin{verbatim}"
+(defconst shu-capture-latex-code-start "\\begin{verbatim}"
   "Define the LaTex string that is at the beginning of a verbatim
 code snippet.")
 
@@ -371,7 +379,7 @@ code snippet.")
 ;;
 ;;  shu-capture-latex-code-end
 ;;
-(defconst shu-capture-latex-code-end "\end{verbatim}"
+(defconst shu-capture-latex-code-end "\\end{verbatim}"
   "Define the LaTex string that is at the end of a verbatim
 code snippet.")
 
@@ -438,6 +446,7 @@ code snippet.")
    (cons shu-capture-a-type-buf          'shu-capture-buf-to-md)
    (cons shu-capture-a-type-arg          'shu-capture-arg-to-md)
    (cons shu-capture-a-type-keywd        'shu-capture-keywd-to-md)
+   (cons shu-capture-a-type-doc-string   'shu-capture-finish-doc-string-md)
    (cons shu-capture-a-type-before       shu-capture-md-code-delimiter)
    (cons shu-capture-a-type-after        shu-capture-md-code-delimiter)
    (cons shu-capture-a-type-open-quote   shu-capture-md-quote-delimiter)
@@ -457,6 +466,7 @@ function and its associated doc string and convert it to markdown.")
     (cons shu-capture-a-type-buf          'shu-capture-buf-to-latex)
     (cons shu-capture-a-type-arg          'shu-capture-arg-to-latex)
     (cons shu-capture-a-type-keywd        'shu-capture-keywd-to-latex)
+    (cons shu-capture-a-type-doc-string   'shu-capture-finish-doc-string-latex)
     (cons shu-capture-a-type-before       shu-capture-latex-code-start)
     (cons shu-capture-a-type-after        shu-capture-latex-code-end)
     (cons shu-capture-a-type-open-quote   shu-capture-latex-open-quote)
@@ -523,8 +533,9 @@ function and its associated doc string and convert it to LaTex.")
 ;;
 (defun shu-capture-arg-to-latex (arg-name)
   "Convert a function argument in a doc-string or argument list to LaTex."
-  (concat shu-capture-latex-arg-start arg-name shu-capture-latex-arg-end)
-    )
+  (let ((result (concat shu-capture-latex-arg-start arg-name shu-capture-latex-arg-end)))
+  result
+    ))
 
 
 
@@ -575,6 +586,33 @@ to LaTex."
   (concat shu-capture-latex-buf-start buf-name shu-capture-latex-buf-end)
   )
 
+
+
+;;
+;;  shu-capture-finish-doc-string-md
+;;
+(defun shu-capture-finish-doc-string-md ()
+  "Function that exeacutes last step in the conversion of a doc-string to
+markdown."
+    )
+
+
+
+;;
+;;  shu-capture-finish-doc-string-latex
+;;
+(defun shu-capture-finish-doc-string-latex ()
+  "Function that exeacutes last step in the conversion of a doc-string to
+markdown."
+  (interactive)
+  (let ((start "\\begin{doc-string}\n")
+        (end "\n\\end{doc-string}"))
+    (goto-char (point-min))
+    (insert start)
+    (goto-char (point-max))
+    (insert end)
+
+    ))
 
 
 
@@ -870,6 +908,7 @@ follows:
       shu-capture-a-type-buf           Function to format a buffer name
       shu-capture-a-type-arg           Function to format an argument name
       shu-capture-a-type-keywd         Function to format a key word
+      shu-capture-a-type-doc-string    Function to finish formatting the doc string
       shu-capture-a-type-before        String that starts a block of verbatim code
       shu-capture-a-type-after         String that ends a block of verbstim code
       shu-capture-a-type-open-quote    String that is an open quote
@@ -1112,7 +1151,7 @@ arguments with markup applied to them."
 ;;  shu-capture-convert-doc-string
 ;;
 (defun shu-capture-convert-doc-string (signature description converters)
-"DESCRIPTION contains a doc string from a function definition (with leading
+  "DESCRIPTION contains a doc string from a function definition (with leading
 and trailing quotes removed).  CONVERTERS is an a-list of functions and strings as
 follows:
 
@@ -1123,6 +1162,7 @@ follows:
       shu-capture-a-type-buf           Function to format a buffer name
       shu-capture-a-type-arg           Function to format an argument name
       shu-capture-a-type-keywd         Function to format a key word
+      shu-capture-a-type-doc-string    Function to finish formatting the doc string
       shu-capture-a-type-before        String that starts a block of verbatim code
       shu-capture-a-type-after         String that ends a block of verbstim code
       shu-capture-a-type-open-quote    String that is an open quote
@@ -1133,12 +1173,13 @@ with leading and trailing asterisks (e.g., **project-buffer**) into formatted bu
 names, turns upper case names that match any argument names into lower case,
 formatted argument names.  This is an internal function of shu-capture-doc and
 will likely crash if called with an invalid a-list."
-(let (
-      (gb (get-buffer-create "**slp**"))
-      (star-name "*[a-zA-Z0-9*-_]+")
+  (let (
+        (gb (get-buffer-create "**slp**"))
+        (star-name "*[a-zA-Z0-9*-_]+")
         (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
         (buf-converter (cdr (assoc shu-capture-a-type-buf converters)))
         (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
+        (all-converter (cdr (assoc shu-capture-a-type-doc-string converters)))
         (before-code (cdr (assoc shu-capture-a-type-before converters)))
         (after-code (cdr (assoc shu-capture-a-type-after converters)))
         (open-quote  (cdr (assoc shu-capture-a-type-open-quote converters)))
@@ -1149,20 +1190,25 @@ will likely crash if called with an invalid a-list."
         (debug-on-error t)
         (case-fold-search nil))
     (with-temp-buffer
+      (princ (concat "\n\nBEFORE:\n" description) gb)
       (insert description)
       (goto-char (point-min))
       (shu-capture-convert-quotes open-quote close-quote)
+      (princ (concat "\nAFTER shu-capture-convert-quotes:\n"
+                     (buffer-substring-no-properties (point-min) (point-max))) gb)
       (goto-char (point-min))
       (while (re-search-forward star-name nil t)
-        (replace-match (funcall buf-converter (match-string 0))))
+        (replace-match (funcall buf-converter (match-string 0)) t t))
+      (princ (concat "\nAFTER converting buffer names:\n"
+                     (buffer-substring-no-properties (point-min) (point-max))) gb)
       (goto-char (point-min))
       (shu-capture-doc-convert-args signature converters)
-      (while (re-search-forward arg-name nil t)
-        (setq nm (match-string 1))
-        (setq ln (downcase nm))
-        (replace-match (funcall arg-converter ln) t nil nil 1))
+      (princ (concat "\nAFTER converting arg names:\n"
+                     (buffer-substring-no-properties (point-min) (point-max))) gb)
       (shu-capture-code-in-doc before-code after-code)
+      (funcall all-converter)
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
+      (princ (concat "\n\nAFTER:\n" result) gb)
     result
     ))
 
@@ -1293,21 +1339,24 @@ with the following doc string:
 would be converted to:
 
   \"The Linux \emph{hat} is converted to an IBM \emph{cat}.\""
-  (let ((arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
+  (let (
+        (gb (get-buffer-create "**slp**"))
+        (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
         (args (shu-capture-get-args-as-alist signature))
         (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
         (pname)
         (new-name)
         (count 0))
+
     (goto-char (point-min))
+    (princ "\narg-converter " gb)
+    (print arg-converter gb)
+    (princ "\n" gb)
     (while (re-search-forward arg-name nil t)
       (setq pname (downcase (match-string 1)))
       (setq new-name (funcall arg-converter pname))
       (when (assoc pname args)
-        (replace-match (concat
-                        shu-capture-md-arg-delimiter
-                        pname
-                        shu-capture-md-arg-delimiter) t nil nil 1)
+        (replace-match new-name t t nil 1)
         (setq count (1+ count))))
     count
     ))
