@@ -393,11 +393,15 @@
 ;;  shu-test-shu-capture-convert-doc-string-6
 ;;
 (ert-deftest shu-test-shu-capture-convert-doc-string-6 ()
-  (let ((signature "foo (a arg-name)")
+  (let (
+        (gb (get-buffer-create "**slp**"))
+        (signature "foo (a arg-name)")
         (description  "ARG-NAME")
-        (expected "arg-name")
+        (expected (concat shu-capture-md-arg-delimiter "arg-name" shu-capture-md-arg-delimiter))
         (actual))
-    (setq actual (downcase description))
+    (setq actual (shu-capture-convert-doc-string signature description shu-capture-md-converters))
+    (princ (concat "\n6 expected: \"" expected "\"\n"
+                   "    actual: \"" actual "\"\n") gb)
     (should (string= expected actual))
       ))
 
@@ -484,6 +488,56 @@
           ", and NAME with"))
         (actual))
       (setq actual (shu-capture-convert-doc-string signature description shu-capture-md-converters))
+      (should (string= expected actual))
+      ))
+
+
+;;
+;;  shu-test-shu-capture-convert-doc-string-12
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-12 ()
+  (let (
+        (gb (get-buffer-create "**slp**"))
+        (signature "foo (arg b)")
+        (description  "This is an ARG, and NAME with")
+        (expected
+         (concat
+          shu-capture-latex-doc-start "\n"
+          "This is an "
+          shu-capture-latex-arg-start
+          "arg"
+          shu-capture-latex-arg-end
+          ", and NAME with"
+          "\n" shu-capture-latex-doc-end))
+        (actual))
+      (setq actual (shu-capture-convert-doc-string signature description shu-capture-latex-converters))
+      (princ (concat "\n12 expected: \"" expected "\"\n"
+                     "     actual: \"" actual "\"\n") gb)
+      (should (string= expected actual))
+      ))
+
+
+;;
+;;  shu-test-shu-capture-convert-doc-string-13
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-13 ()
+  (let (
+        (gb (get-buffer-create "**slp**"))
+        (signature "foo (arg b)")
+        (description  "This is an ARG, and NAME with")
+        (expected
+         (concat
+          shu-capture-latex-doc-start "\n"
+          "This is an "
+          shu-capture-latex-arg-start
+          "arg"
+          shu-capture-latex-arg-end
+          ", and NAME with"
+          "\n" shu-capture-latex-doc-end))
+        (actual))
+      (setq actual (shu-capture-convert-doc-string signature description shu-capture-latex-converters))
+      (princ (concat "\n13 expected: \"" expected "\"\n"
+                     "     actual: \"" actual "\"\n") gb)
       (should (string= expected actual))
       ))
 

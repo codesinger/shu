@@ -406,6 +406,20 @@ code snippet.")
 
 
 ;;
+;;  shu-capture-latex-doc-start
+;;
+(defconst shu-capture-latex-doc-start "\\begin{doc-string}"
+  "Define the LaTex string that starts a doc string.")
+
+
+;;
+;;  shu-capture-latex-doc-end
+;;
+(defconst shu-capture-latex-doc-end "\\end{doc-string}"
+  "Define the LaTex string that ends a doc string.")
+
+
+;;
 ;;  shu-capture-attr-inter
 ;;
 (defconst shu-capture-attr-inter (lsh 1 0)
@@ -605,13 +619,12 @@ markdown."
   "Function that exeacutes last step in the conversion of a doc-string to
 markdown."
   (interactive)
-  (let ((start "\\begin{doc-string}\n")
-        (end "\n\\end{doc-string}"))
+  (let ((start (concat shu-capture-latex-doc-start "\n"))
+        (end (concat "\n" shu-capture-latex-doc-end)))
     (goto-char (point-min))
     (insert start)
     (goto-char (point-max))
     (insert end)
-
     ))
 
 
