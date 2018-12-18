@@ -542,6 +542,31 @@
       ))
 
 
+;;
+;;  shu-test-shu-capture-convert-doc-string-14
+;;
+(ert-deftest shu-test-shu-capture-convert-doc-string-14 ()
+  (let (
+        (gb (get-buffer-create "**slp**"))
+        (signature "foo (arg b)")
+        (description  "This is an ARG, and NAME with &optional")
+        (expected
+         (concat
+          shu-capture-latex-doc-start "\n"
+          "This is an "
+          shu-capture-latex-arg-start
+          "arg"
+          shu-capture-latex-arg-end
+          ", and NAME with \\&optional"
+          "\n" shu-capture-latex-doc-end))
+        (actual))
+      (setq actual (shu-capture-convert-doc-string signature description shu-capture-latex-converters))
+      (princ (concat "\n14 expected: \"" expected "\"\n"
+                     "     actual: \"" actual "\"\n") gb)
+      (should (string= expected actual))
+      ))
+
+
 
 
 ;;

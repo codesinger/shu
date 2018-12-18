@@ -221,9 +221,16 @@ as \"&optional\" or \"&rest\" to markup.")
 
 
 ;;
+;;  shu-capture-pre-code-in-doc
+;;
+(defconst shu-capture-pre-code-in-doc 6
+  "The a-list key value that identifies the function that converts characters in a
+doc string right before the code snippets are captured.")
+
+;;
 ;;  shu-capture-a-type-doc-string
 ;;
-(defconst shu-capture-a-type-doc-string 6
+(defconst shu-capture-a-type-doc-string 7
   "The a-list key value that identifies the function that converts a key word, such
 as \"&optional\" or \"&rest\" to markup.")
 
@@ -231,7 +238,7 @@ as \"&optional\" or \"&rest\" to markup.")
 ;;
 ;;  shu-capture-a-type-before
 ;;
-(defconst shu-capture-a-type-before 7
+(defconst shu-capture-a-type-before 8
   "The a-list key value that identifies the string that is placed before a verbatim
 code snippet.")
 
@@ -239,7 +246,7 @@ code snippet.")
 ;;
 ;;  shu-capture-a-type-after
 ;;
-(defconst shu-capture-a-type-after 8
+(defconst shu-capture-a-type-after 9
   "The a-list key value that identifies the string that is placed after a verbatim
 code snippet.")
 
@@ -247,14 +254,14 @@ code snippet.")
 ;;
 ;;  shu-capture-a-type-open-quote
 ;;
-(defconst shu-capture-a-type-open-quote 9
+(defconst shu-capture-a-type-open-quote 10
   "The a-list key value that identifies the string that is an open quote.")
 
 
 ;;
 ;;  shu-capture-a-type-close-quote
 ;;
-(defconst shu-capture-a-type-close-quote 10
+(defconst shu-capture-a-type-close-quote 11
   "The a-list key value that identifies the string that is a close quote.")
 
 
@@ -460,6 +467,7 @@ code snippet.")
    (cons shu-capture-a-type-buf          'shu-capture-buf-to-md)
    (cons shu-capture-a-type-arg          'shu-capture-arg-to-md)
    (cons shu-capture-a-type-keywd        'shu-capture-keywd-to-md)
+   (cons shu-capture-pre-code-in-doc     'shu-capture-pre-code-md)
    (cons shu-capture-a-type-doc-string   'shu-capture-finish-doc-string-md)
    (cons shu-capture-a-type-before       shu-capture-md-code-delimiter)
    (cons shu-capture-a-type-after        shu-capture-md-code-delimiter)
@@ -480,6 +488,7 @@ function and its associated doc string and convert it to markdown.")
     (cons shu-capture-a-type-buf          'shu-capture-buf-to-latex)
     (cons shu-capture-a-type-arg          'shu-capture-arg-to-latex)
     (cons shu-capture-a-type-keywd        'shu-capture-keywd-to-latex)
+    (cons shu-capture-pre-code-in-doc     'shu-capture-pre-code-latex)
     (cons shu-capture-a-type-doc-string   'shu-capture-finish-doc-string-latex)
     (cons shu-capture-a-type-before       shu-capture-latex-code-start)
     (cons shu-capture-a-type-after        shu-capture-latex-code-end)
@@ -603,6 +612,30 @@ to LaTex."
 
 
 ;;
+;;  shu-capture-pre-code-md
+;;
+(defun shu-capture-pre-code-md ()
+  "Function that prepares a doc string to capture code snippets in markdown."
+    )
+
+
+
+;;
+;;  shu-capture-pre-code-latex
+;;
+(defun shu-capture-pre-code-latex ()
+  "Function that prepares a doc string to capture code snippets in LaTex."
+    (goto-char (point-min))
+    (while (search-forward "{" nil t)
+      (replace-match "\\{" t t))
+    (goto-char (point-min))
+    (while (search-forward "}" nil t)
+      (replace-match "\\}" t t))
+    )
+
+
+
+;;
 ;;  shu-capture-finish-doc-string-md
 ;;
 (defun shu-capture-finish-doc-string-md ()
@@ -621,6 +654,9 @@ markdown."
   (interactive)
   (let ((start (concat shu-capture-latex-doc-start "\n"))
         (end (concat "\n" shu-capture-latex-doc-end)))
+    (goto-char (point-min))
+    (while (search-forward "&" nil t)
+      (replace-match "\\&" t t))
     (goto-char (point-min))
     (insert start)
     (goto-char (point-max))
@@ -1136,7 +1172,7 @@ arguments with markup applied to them."
           (setq size (car sizes))
           (setq ncount (+ ccount size (length pad)))
           (if (and (> acount 0)
-                   (> ncount 64))
+                   (> ncount 58))
               (progn
                 (when (not filled)
                   (insert (concat "\n" fill-string))
@@ -1193,6 +1229,7 @@ will likely crash if called with an invalid a-list."
         (buf-converter (cdr (assoc shu-capture-a-type-buf converters)))
         (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
         (all-converter (cdr (assoc shu-capture-a-type-doc-string converters)))
+        (pre-code (cdr (assoc shu-capture-pre-code-in-doc converters)))
         (before-code (cdr (assoc shu-capture-a-type-before converters)))
         (after-code (cdr (assoc shu-capture-a-type-after converters)))
         (open-quote  (cdr (assoc shu-capture-a-type-open-quote converters)))
@@ -1218,6 +1255,7 @@ will likely crash if called with an invalid a-list."
       (shu-capture-doc-convert-args signature converters)
       (princ (concat "\nAFTER converting arg names:\n"
                      (buffer-substring-no-properties (point-min) (point-max))) gb)
+      (funcall pre-code)
       (shu-capture-code-in-doc before-code after-code)
       (funcall all-converter)
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
@@ -1421,7 +1459,7 @@ an a-list is returned with the keys \"others,\" \"and,\" \"things,\" \"these,\" 
 (defun shu-capture-convert-args-to-markup (signature arg-converter keywd-converter)
   "SIGNATURE contains the function signature (both function name and arguments).
 ARG-CONVERTER is the function used to convert an argument to markup.  KEYWD-CONVERTER
-is the function used to convert an argument list keyword, such as \&optional\" or \"&rest\"
+is the function used to convert an argument list keyword, such as \"&optional\" or \"&rest\"
 to markup.
 
 This function returns a cons cell pointing to two lists.  The first list contains the length
