@@ -782,11 +782,13 @@ them into a LaTex text that documents the functions and their doc strings."
     (when (/= 0 (length alias-list))
       (setq sec-hdr (funcall section-converter 2 "List of functions by alias name"))
       (princ (concat "\n\n" sec-hdr "\n\n") gb)
+      (princ "A list of aliases and associted function names.\n\n" gb)
       (shu-capture-show-list alias-list converters gb))
     (setq func-list (sort func-list 'shu-doc-sort-compare))
     (when (/= 0 (length func-list))
       (setq sec-hdr (funcall section-converter 2 "List of functions by alias name"))
       (princ (concat "\n\n" sec-hdr "\n\n") gb)
+      (princ "A list of functions in this package.\n\n" gb)
       (shu-capture-show-list func-list converters gb))
     ))
 
@@ -1163,6 +1165,7 @@ arguments with markup applied to them."
        (concat
         "\\savebox{\\funcname}{\\noindent\\texttt{"
         func-name " }}\n"
+        "\\vspace{1em}\n"
         "\\usebox{\\funcname}"))
       (if (not markups)
           (progn
@@ -1178,7 +1181,7 @@ arguments with markup applied to them."
           (setq size (car sizes))
           (setq ncount (+ ccount size (length pad)))
           (if (and (> acount 0)
-                   (> ncount 58))
+                   (> ncount 50))
               (progn
                 (when (not filled)
                   (insert (concat "\n" fill-string))
@@ -1248,6 +1251,7 @@ will likely crash if called with an invalid a-list."
     (with-temp-buffer
       (princ (concat "\n\nBEFORE:\n" description) gb)
       (insert description)
+      (funcall pre-code)
       (goto-char (point-min))
       (shu-capture-convert-quotes open-quote close-quote)
       (princ (concat "\nAFTER shu-capture-convert-quotes:\n"
@@ -1261,7 +1265,6 @@ will likely crash if called with an invalid a-list."
       (shu-capture-doc-convert-args signature converters)
       (princ (concat "\nAFTER converting arg names:\n"
                      (buffer-substring-no-properties (point-min) (point-max))) gb)
-      (funcall pre-code)
       (shu-capture-code-in-doc before-code after-code)
       (funcall all-converter)
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
