@@ -697,6 +697,7 @@ them into a LaTex text that documents the functions and their doc strings."
   (let (
         (ggb (get-buffer-create "**slp**"))
         (gb (get-buffer-create "**shu-capture-doc**"))
+        (section-converter (cdr (assoc shu-capture-a-type-hdr converters)))
         (ss
          (concat
           "("
@@ -734,6 +735,7 @@ them into a LaTex text that documents the functions and their doc strings."
         (al)
         (xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
         (al)
+        (sec-hdr)
         )
     (shu-capture-aliases)
     (goto-char (point-min))
@@ -777,11 +779,15 @@ them into a LaTex text that documents the functions and their doc strings."
         )
       )
     (setq alias-list (sort alias-list 'shu-doc-sort-compare))
-    (princ "\n\n## List of functions by alias name ##\n\n" gb)
-    (shu-capture-show-list alias-list converters gb)
+    (when (/= 0 (length alias-list))
+      (setq sec-hdr (funcall section-converter 2 "List of functions by alias name"))
+      (princ (concat "\n\n" sec-hdr "\n\n") gb)
+      (shu-capture-show-list alias-list converters gb))
     (setq func-list (sort func-list 'shu-doc-sort-compare))
-    (princ "\n\n## Full list of functions ##\n" gb)
-    (shu-capture-show-list func-list converters gb)
+    (when (/= 0 (length func-list))
+      (setq sec-hdr (funcall section-converter 2 "List of functions by alias name"))
+      (princ (concat "\n\n" sec-hdr "\n\n") gb)
+      (shu-capture-show-list func-list converters gb))
     ))
 
 
@@ -1389,7 +1395,7 @@ with the following doc string:
 
 would be converted to:
 
-  \"The Linux \emph{hat} is converted to an IBM \emph{cat}.\""
+  \"The Linux *hat* is converted to an IBM *cat*.\""
   (let (
         (gb (get-buffer-create "**slp**"))
         (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
@@ -1465,8 +1471,8 @@ to markup.
 This function returns a cons cell pointing to two lists.  The first list contains the length
 of each argument name prior to conversion to markup.  This is because the amount of space
 on a line is largely determied by the length of the unconverted argument.  \"arg\" will
-take much less space on a line than will \"\emph{arg}\".  The second list contains each
-of the argument names converted to the appropriate markup.
+take much less space on a line than will the same word with markup added.  The second list
+contains each of the argument names converted to the appropriate markup.
 
 Given the following function signature:
 
