@@ -631,6 +631,9 @@ to LaTex."
     (goto-char (point-min))
     (while (search-forward "}" nil t)
       (replace-match "\\}" t t))
+    (goto-char (point-min))
+    (while (search-forward "_" nil t)
+      (replace-match "\\_" t t))
     )
 
 
@@ -786,7 +789,7 @@ them into a LaTex text that documents the functions and their doc strings."
       (shu-capture-show-list alias-list converters gb))
     (setq func-list (sort func-list 'shu-doc-sort-compare))
     (when (/= 0 (length func-list))
-      (setq sec-hdr (funcall section-converter 2 "List of functions by alias name"))
+      (setq sec-hdr (funcall section-converter 2 "List of functions"))
       (princ (concat "\n\n" sec-hdr "\n\n") gb)
       (princ "A list of functions in this package.\n\n" gb)
       (shu-capture-show-list func-list converters gb))
@@ -986,7 +989,7 @@ function definitions into either markdown or LaTex."
     (while xx
       (setq func-def (car xx))
       (shu-capture-get-func-def func-def signature attributes description alias)
-      (setq func-string (funcall func-converter func-def))
+      (setq func-string (funcall func-converter func-def converters))
       (if (not description)
           (setq description "Undocumented")
         (setq description (shu-capture-convert-doc-string signature description converters))
@@ -1061,7 +1064,7 @@ function definitions into either markdown or LaTex."
 ;;
 ;;  shu-capture-convert-func-md
 ;;
-(defun shu-capture-convert-func-md (func-def)
+(defun shu-capture-convert-func-md (func-def converters)
   "Take a function definition and turn it into a string of markdown text."
   (let (
         (gb (get-buffer-create "**shu-capture-doc**"))
@@ -1099,7 +1102,7 @@ function definitions into either markdown or LaTex."
 ;;
 ;;  shu-capture-convert-func-latex
 ;;
-(defun shu-capture-convert-func-latex (func-def)
+(defun shu-capture-convert-func-latex (func-def converters)
   "Take a function definition and turn it into a string of LaTex.  Return said string."
   (let (
         (gb (get-buffer-create "**shu-capture-doc**"))
@@ -1163,9 +1166,10 @@ arguments with markup applied to them."
     (with-temp-buffer
       (insert
        (concat
+        "\\vspace{1em}\n"
+        "\\noindent\n"`
         "\\savebox{\\funcname}{\\noindent\\texttt{"
         func-name " }}\n"
-        "\\vspace{1em}\n"
         "\\usebox{\\funcname}"))
       (if (not markups)
           (progn
