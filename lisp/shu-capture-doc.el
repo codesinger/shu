@@ -1065,9 +1065,12 @@ function definitions into either markdown or LaTex."
 ;;  shu-capture-convert-func-md
 ;;
 (defun shu-capture-convert-func-md (func-def converters)
-  "Take a function definition and turn it into a string of markdown text."
+  "Take a function definition and turn it into a string of markdown.  Return said string."
   (let (
         (gb (get-buffer-create "**shu-capture-doc**"))
+        (arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-md-converters)))
+        (keywd-converter (cdr (assoc shu-capture-a-type-keywd shu-capture-md-converters)))
+        (section-converter (cdr (assoc shu-capture-a-type-hdr converters)))
         (signature)
         (attributes)
         (description)
@@ -1075,6 +1078,10 @@ function definitions into either markdown or LaTex."
         (title "")
         (alias-line "")
         (interact-line "")
+        (func-name)
+        (func-type)
+        (markups)
+        (args)
         (result ""))
     (shu-capture-get-func-def func-def signature attributes description alias)
     (setq title
@@ -1083,17 +1090,54 @@ function definitions into either markdown or LaTex."
             "Alias"))
     (when alias
       (setq alias-line (concat " (" title ": " alias ")")))
-    (when (and (not (= 0 (logand attributes shu-capture-attr-inter)))
-               (= 0 (logand attributes shu-capture-attr-alias)))
-      (setq interact-line "<br/>\nInteractive"))
-    (when (not (= 0 (logand attributes shu-capture-attr-macro)))
-      (setq interact-line "<br/>\nMacro"))
-    (setq result
-          (concat
-           "\n**" signature "**"
-           alias-line
-           interact-line
-           "<br/>\n"))
+    (setq func-type (shu-capture-func-type-name attributes))
+    (shu-capture-get-name-and-args signature func-name args)
+    (setq markups (shu-capture-convert-args-to-markup signature arg-converter keywd-converter))
+    (setq result (shu-capture-make-args-md func-name markups func-type section-converter))
+    result
+    ))
+
+
+
+
+;;
+;;  shu-capture-make-args-md
+;;
+(defun shu-capture-make-args-md (func-name markups func-type section-converter)
+  "FUNC-NAME is the name of the function, macro, alias, ect.  FUNC-TYPE is a
+string that represents the function type.  This will be part of the argument
+display.  MARKUPS is either nil or is a cons cell that points to two lists.  If
+MARKUPS is nil, the function has no arguments.  If MARKUPS is non-nil, it is a
+cons cell that points to two lists.  The car of MARKUPS is a list of the lengths
+of each argument before any markup was added to the argument.  If an argument
+name is \"arg1,\" its length is 4 even though the length of the argument name
+after markup is applied mDaye be longer.  The cdr of MARKUPS is a list of the
+arguments with markup applied to them.  SECTION-CONVERTER is the function that
+will turn a sring into a section heading."
+  (let (
+        (arg)
+        (args)
+        (pad)
+        (result)
+        (sec-hdr (funcall section-converter 4 func-name))
+        )
+    (with-temp-buffer
+      (insert
+       (concat
+        "\n\n" sec-hdr "\n"
+        ))
+      (insert func-name)
+      (when markups
+        (setq args (cdr markups))
+        (setq pad " ")
+        (while args
+          (setq arg (car args))
+          (insert (concat pad arg))
+          (setq args (cdr args))
+          )
+        )
+      (setq result (buffer-substring-no-properties (point-min) (point-max)))
+      )
     result
     ))
 

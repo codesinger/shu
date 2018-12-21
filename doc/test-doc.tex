@@ -35,16 +35,18 @@
 \begin{document}
 \blindtext
 
+
 \noindent
-  \texttt{read-directory-name} \emph{prompt} \textbf {\&optional} \emph{directory}
+\savebox{\funcname}{\noindent\texttt{read-directory-name }}
+%%\showthe\wd\funcname
+  \usebox{\funcname}\emph{prompt} \textbf {\&optional} \emph{directory}
   \hfill [Function]
-  \index{read-directory-name}
-\hspace*{19ex} \emph{and} \emph{others} \emph{too}
+  \index{read-directory-name2}
+\hspace*{\wd\funcname} \emph{and} \emph{others} \emph{too}
 \begin{doc-string}
 \blindtext
-
-\blindtext
 \end{doc-string}
+
 
 
 \noindent
