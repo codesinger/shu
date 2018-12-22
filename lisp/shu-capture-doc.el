@@ -672,6 +672,8 @@ to LaTex."
     (goto-char (point-min))
     (while (search-forward "_" nil t)
       (replace-match "\\_" t t))
+    (while (search-forward "#" nil t)
+      (replace-match "\\#" t t))
     )
 
 
@@ -745,7 +747,24 @@ either markdown or LaTex."
         (alias-list)
         (func-list)
         (sec-hdr)
+        (cresult)
+        (pkg-name)
+        (commentary)
+        (dummy-signature "dummy ()")
         )
+    (setq cresult (shu-capture-commentary))
+    (setq pkg-name (car cresult))
+    (setq commentary (cdr cresult))
+    (when commentary
+      (setq commentary (shu-capture-convert-doc-string dummy-signature commentary converters))
+      )
+    (when pkg-name
+      (setq sec-hdr (funcall section-converter 1 pkg-name))
+      (princ (concat "\n\n" sec-hdr "\n\n") gb)
+      )
+    (when commentary
+      (princ (concat "\n" commentary "\n") gb)
+      )
     (setq af-lists (shu-capture-internal-doc))
     (setq alias-list (car af-lists))
     (setq func-list (cdr af-lists))
@@ -760,7 +779,7 @@ either markdown or LaTex."
     (when (/= 0 (length func-list))
       (setq sec-hdr (funcall section-converter 2 "List of functions"))
       (princ (concat "\n\n" sec-hdr "\n\n") gb)
-      (princ "A list of functions in this package.\n\n" gb)
+      (princ "List of functions and variable definitions in this package.\n\n" gb)
       (shu-capture-show-list func-list converters gb))
     ))
 
@@ -772,27 +791,24 @@ either markdown or LaTex."
 (defun shu-capture-internal-doc ()
   "Function that captures documentation for all instances of \"defun,\" \"defsubst,\"
 and \"defmacro.\""
-  (let (
-        (ggb (get-buffer-create "**slp**"))
+  (let ((ggb (get-buffer-create "**slp**"))
         (gb (get-buffer-create shu-capture-buffer-name))
-        (ss
-         (concat
-          "("
-          "\\s-*"
-          "\\(defun\\|defsubst\\|defmacro\\)\\"
-          "s-+"))
-        (fs
-         (concat
-          "("
-          "\\s-*"
-          "\\(defun\\|defsubst\\|defmacro\\)"
-          "\\s-*"
-          "\\([0-9a-zA-Z-]+\\)"
-          "\\s-*"
-          "("
-          "\\s-*"
-          "\\([ 0-9a-zA-Z-,&\n]*\\)"
-          ")"))
+        (ss (concat
+             "("
+             "\\s-*"
+             "\\(defun\\|defsubst\\|defmacro\\)\\"
+             "s-+"))
+        (fs (concat
+             "("
+             "\\s-*"
+             "\\(defun\\|defsubst\\|defmacro\\)"
+             "\\s-*"
+             "\\([0-9a-zA-Z-]+\\)"
+             "\\s-*"
+             "("
+             "\\s-*"
+             "\\([ 0-9a-zA-Z-,&\n]*\\)"
+             ")"))
         (inter  "(interactive")
         (attributes 0)
         (sof 0)
@@ -812,8 +828,7 @@ and \"defmacro.\""
         (al)
         (xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
         (al)
-        (sec-hdr)
-        )
+        (sec-hdr))
     (shu-capture-aliases)
     (goto-char (point-min))
     (while (re-search-forward ss nil t)
@@ -846,15 +861,11 @@ and \"defmacro.\""
               (setq sig (concat al " (" args ")"))
               (setq attributes (logior attributes shu-capture-attr-alias))
               (shu-capture-set-func-def-alias alias-def sig attributes desc fn)
-              (setq alias-list (cons alias-def alias-list))
-              )
+              (setq alias-list (cons alias-def alias-list)))
             (shu-capture-set-func-def-alias func-def func-sig attributes desc al)
-            (setq func-list (cons func-def func-list))
-            )
+            (setq func-list (cons func-def func-list)))
         (princ (format "\nERROR: At point %d, found \"defun\" but no function name\n\n" sof) gb)
-        (goto-char eof)
-        )
-      )
+        (goto-char eof)))
     (cons alias-list func-list)
     ))
 

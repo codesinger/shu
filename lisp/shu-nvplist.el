@@ -2,7 +2,7 @@
 ;;
 ;; Copyright (C) 2013 Stewart L. Palmer
 ;;
-;; Package: shu-org-extensions
+;; Package: shu-nvplist
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
