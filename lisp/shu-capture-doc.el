@@ -447,6 +447,20 @@ code snippet.")
   "Bit that indicates that a function is a macro")
 
 
+;;
+;;  shu-capture-attr-const
+;;
+(defconst shu-capture-attr-const (lsh 1 3)
+  "Bit that indicates that a definition is a defconst")
+
+
+;;
+;;  shu-capture-attr-var
+;;
+(defvar shu-capture-attr-var (lsh 1 4)
+  "Bit that indicates that a definition is a defvar")
+
+
 
 ;;
 ;;  shu-capture-doc-code-indent
