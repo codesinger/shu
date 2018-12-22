@@ -1049,10 +1049,7 @@ function definitions into either markdown or LaTex."
         (interact-line "")
         (result ""))
     (shu-capture-get-func-def func-def signature attributes description alias)
-    (setq title
-          (if (not (= 0 (logand attributes shu-capture-attr-alias)))
-              "Function"
-            "Alias"))
+    (setq title (shu-capture-func-type-name attributes))
     (if description
             (setq description (shu-doc-internal-to-md description))
       ;;      (princ (format "\nERROR: %s has no doc string.\n\n" signature) gb)
@@ -1098,10 +1095,7 @@ function definitions into either markdown or LaTex."
         (args)
         (result ""))
     (shu-capture-get-func-def func-def signature attributes description alias)
-    (setq title
-          (if (not (= 0 (logand attributes shu-capture-attr-alias)))
-              "Function"
-            "Alias"))
+    (setq title (shu-capture-func-type-name attributes))
     (when alias
       (setq alias-line (concat " (" title ": " alias ")")))
     (setq func-type (shu-capture-func-type-name attributes))
@@ -1179,10 +1173,7 @@ will turn a sring into a section heading."
         (args)
         (result ""))
     (shu-capture-get-func-def func-def signature attributes description alias)
-    (setq title
-          (if (not (= 0 (logand attributes shu-capture-attr-alias)))
-              "Function"
-            "Alias"))
+    (setq title (shu-capture-func-type-name attributes))
     (when alias
       (setq alias-line (concat " (" title ": " alias ")")))
     (setq func-type (shu-capture-func-type-name attributes))
@@ -1581,14 +1572,18 @@ above described cons cell."
 ;;  shu-capture-func-type-name
 ;;
 (defun shu-capture-func-type-name (attributes)
-  "Return the type of function that is represented by the bits in ATTRIBUTES.  This
-could be \"Command,\" \"Function,\" etc."
+  "Return the name of the type \"Alias,\" \"Macro,\" \"Constant,\" \"Variable,\" or
+\"Function\" based on the ATTRIBUTES passed in."
   (let ((name))
     (cond
-     ((not (= 0 (logand attributes shu-capture-attr-macro)))
+     ((/= 0 (logand attributes shu-capture-attr-alias))
+      (setq name "Alias"))
+     ((/= 0 (logand attributes shu-capture-attr-macro))
       (setq name "Macro"))
-     ((not (= 0 (logand attributes shu-capture-attr-inter)))
-      (setq name "Command"))
+     ((/= 0 (logand attributes shu-capture-attr-const))
+      (setq name "Constant"))
+     ((/= 0 (logand attributes shu-capture-attr-var))
+      (setq name "Variable"))
      (t
       (setq name "Function")))
     name
