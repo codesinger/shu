@@ -711,10 +711,46 @@ them into a LaTex text that documents the functions and their doc strings."
 ;;  shu-capture-doc
 ;;
 (defun shu-capture-doc (converters)
+  "Top level function that captures all definitions and doc strings in a language
+neutral manner and then uses the supplied CONVERTERS to convert the documentation to
+either markdown or LaTex."
+  (let (
+        (gb (get-buffer-create "**shu-capture-doc**"))
+        (section-converter (cdr (assoc shu-capture-a-type-hdr converters)))
+        (af-lists)
+        (alias-list)
+        (func-list)
+        (sec-hdr)
+        )
+    (setq af-lists (shu-capture-internal-doc))
+    (setq alias-list (car af-lists))
+    (setq func-list (cdr af-lists))
+    (setq func-list (shu-capture-vars func-list))
+    (setq alias-list (sort alias-list 'shu-doc-sort-compare))
+    (when (/= 0 (length alias-list))
+      (setq sec-hdr (funcall section-converter 2 "List of functions by alias name"))
+      (princ (concat "\n\n" sec-hdr "\n\n") gb)
+      (princ "A list of aliases and associted function names.\n\n" gb)
+      (shu-capture-show-list alias-list converters gb))
+    (setq func-list (sort func-list 'shu-doc-sort-compare))
+    (when (/= 0 (length func-list))
+      (setq sec-hdr (funcall section-converter 2 "List of functions"))
+      (princ (concat "\n\n" sec-hdr "\n\n") gb)
+      (princ "A list of functions in this package.\n\n" gb)
+      (shu-capture-show-list func-list converters gb))
+    ))
+
+
+
+;;
+;;  shu-capture-internal-doc
+;;
+(defun shu-capture-internal-doc ()
+  "Function that captures documentation for all instances of \"defun,\" \"defsubst,\"
+and \"defmacro.\""
   (let (
         (ggb (get-buffer-create "**slp**"))
         (gb (get-buffer-create "**shu-capture-doc**"))
-        (section-converter (cdr (assoc shu-capture-a-type-hdr converters)))
         (ss
          (concat
           "("
@@ -795,18 +831,73 @@ them into a LaTex text that documents the functions and their doc strings."
         (goto-char eof)
         )
       )
-    (setq alias-list (sort alias-list 'shu-doc-sort-compare))
-    (when (/= 0 (length alias-list))
-      (setq sec-hdr (funcall section-converter 2 "List of functions by alias name"))
-      (princ (concat "\n\n" sec-hdr "\n\n") gb)
-      (princ "A list of aliases and associted function names.\n\n" gb)
-      (shu-capture-show-list alias-list converters gb))
-    (setq func-list (sort func-list 'shu-doc-sort-compare))
-    (when (/= 0 (length func-list))
-      (setq sec-hdr (funcall section-converter 2 "List of functions"))
-      (princ (concat "\n\n" sec-hdr "\n\n") gb)
-      (princ "A list of functions in this package.\n\n" gb)
-      (shu-capture-show-list func-list converters gb))
+    (cons alias-list func-list)
+    ))
+
+
+
+
+;;
+;;  shu-capture-vars
+;;
+(defun shu-capture-vars (func-list)
+  "Find the name and doc-string for instances of \"defvar\" or \"defconst.\""
+  (let (
+        (ss
+         (concat
+          "("
+          "\\s-*"
+          "\\(defvar\\|defconst\\)"
+          "\\s-*"
+          "\\([0-9a-zA-Z-]+\\)"
+          ))
+        (eov)
+        (name)
+        (type)
+        (bod)
+        (eod)
+        (pc)
+        (zzz)
+        (desc)
+        (attributes)
+        (signature)
+        (func-def)
+        )
+    (goto-char (point-min))
+    (while (re-search-forward ss nil t)
+      (setq zzz t)
+      (setq desc nil)
+      (setq type (match-string 1))
+      (setq attributes shu-capture-attr-const)
+      (if (string= type "defvar")
+          (setq attributes shu-capture-attr-var)
+        (when (string= type "defconst")
+          (setq attributes shu-capture-attr-const)
+          ))
+      (setq name (match-string 2))
+      (setq eov (point))
+      (goto-char (match-beginning 0))
+      (forward-sexp)
+      (when (search-backward "\"" eov t)
+        (forward-char -1)
+        (setq eod (1+ (point)))
+        (while zzz
+          (when (search-backward "\"" eov t)
+            (setq bod (1+ (point)))
+            (setq pc (buffer-substring-no-properties (1- (point)) (point)))
+            (when (not (string= pc "\\"))
+              (setq zzz nil)
+              (setq bod (1+ (point)))
+              )
+            )
+          (setq desc (buffer-substring-no-properties bod eod))
+          )
+        )
+      (setq signature (concat name " ()"))
+      (shu-capture-set-func-def func-def signature attributes desc)
+      (setq func-list (cons func-def func-list))
+      )
+    func-list
     ))
 
 
@@ -852,6 +943,10 @@ Return the doc string if there is one, nil otherwie."
     desc
     ))
 
+
+;;
+;;  shu-capture-aliases
+;;
 (defun shu-capture-aliases ()
   (let (
         (gb (get-buffer-create "**shu-capture-doc**"))
@@ -1574,18 +1669,31 @@ above described cons cell."
 (defun shu-capture-func-type-name (attributes)
   "Return the name of the type \"Alias,\" \"Macro,\" \"Constant,\" \"Variable,\" or
 \"Function\" based on the ATTRIBUTES passed in."
-  (let ((name))
+  (let ((macro-name "Macro")
+        (function-name "Function")
+        (interactive-name "Command")
+        (constant-name "Constant")
+        (variable-name "Variable")
+        (name))
     (cond
+     ((and (/= 0 (logand attributes shu-capture-attr-alias))
+           (/= 0 (logand attributes shu-capture-attr-macro)))
+      (setq name macro-name))
+     ((and (/= 0 (logand attributes shu-capture-attr-alias))
+           (/= 0 (logand attributes shu-capture-attr-inter)))
+      (setq name interactive-name))
      ((/= 0 (logand attributes shu-capture-attr-alias))
-      (setq name "Alias"))
+      (setq name function-name))
      ((/= 0 (logand attributes shu-capture-attr-macro))
-      (setq name "Macro"))
+      (setq name macro-name))
      ((/= 0 (logand attributes shu-capture-attr-const))
-      (setq name "Constant"))
+      (setq name constant-name))
      ((/= 0 (logand attributes shu-capture-attr-var))
-      (setq name "Variable"))
+      (setq name variable-name))
      (t
-      (setq name "Function")))
+      (if (/= 0 (logand attributes shu-capture-attr-inter))
+          (setq name interactive-name)
+        (setq name function-name))))
     name
     ))
 

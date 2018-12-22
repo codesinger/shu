@@ -1257,29 +1257,6 @@
 
 
 
-;;
-;;  shu-test-shu-capture-func-type-name-1
-;;
-(ert-deftest shu-test-shu-capture-func-type-name-1 ()
-  (let (
-        (macro-attributes1 shu-capture-attr-macro)
-        (macro-attributes2 (logior shu-capture-attr-macro shu-capture-attr-alias))
-        (interactive-attributes1 shu-capture-attr-inter)
-        (interactive-attributes2 (logior shu-capture-attr-inter shu-capture-attr-alias))
-        (function-attributes shu-capture-attr-alias)
-        (macro-name "Macro")
-        (function-name "Function")
-        (interactive-name "Command")
-        )
-    (should (string= macro-name (shu-capture-func-type-name macro-attributes1)))
-    (should (string= macro-name (shu-capture-func-type-name macro-attributes2)))
-    (should (string= function-name (shu-capture-func-type-name function-attributes)))
-    (should (string= interactive-name (shu-capture-func-type-name interactive-attributes1)))
-    (should (string= interactive-name (shu-capture-func-type-name interactive-attributes2)))
-    ))
-
-
-
 
 
 ;;
@@ -1302,6 +1279,58 @@
     (shu-capture-get-name-and-args signature func-name args)
     (setq result (shu-capture-make-args-latex func-name markups func-type))
     (princ (concat result "\n") gb)
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-capture-func-type-name-1
+;;
+(ert-deftest shu-test-shu-capture-func-type-name-1 ()
+  (let (
+        (macro-attributes1 shu-capture-attr-macro)
+        (macro-attributes2 (logior shu-capture-attr-macro shu-capture-attr-alias))
+        (interactive-attributes1 shu-capture-attr-inter)
+        (interactive-attributes2 (logior shu-capture-attr-inter shu-capture-attr-alias))
+        (function-attributes shu-capture-attr-alias)
+        (macro-name "Macro")
+        (function-name "Function")
+        (interactive-name "Command")
+        )
+    (should (string= macro-name (shu-capture-func-type-name macro-attributes1)))
+    (should (string= macro-name (shu-capture-func-type-name macro-attributes2)))
+    (should (string= function-name (shu-capture-func-type-name function-attributes)))
+    (should (string= interactive-name (shu-capture-func-type-name interactive-attributes1)))
+    (should (string= interactive-name (shu-capture-func-type-name interactive-attributes2)))
+    ))
+
+
+;;
+;;  shu-test-shu-capture-func-type-name-2
+;;
+(ert-deftest shu-test-shu-capture-func-type-name-2 ()
+  (let (
+        (macro-attributes1 shu-capture-attr-macro)
+        (macro-attributes2 (logior shu-capture-attr-macro shu-capture-attr-alias))
+        (interactive-attributes1 shu-capture-attr-inter)
+        (interactive-attributes2 (logior shu-capture-attr-inter shu-capture-attr-alias))
+        (function-attributes shu-capture-attr-alias)
+        (macro-name "Macro")
+        (function-name "Function")
+        (interactive-name "Command")
+        (constant-name "Constant")
+        (variable-name "Variable")
+        )
+    (should (string= macro-name (shu-capture-func-type-name macro-attributes1)))
+    (should (string= macro-name (shu-capture-func-type-name macro-attributes2)))
+    (should (string= function-name (shu-capture-func-type-name function-attributes)))
+    (should (string= interactive-name (shu-capture-func-type-name interactive-attributes1)))
+    (should (string= interactive-name (shu-capture-func-type-name interactive-attributes2)))
+    (should (string= function-name (shu-capture-func-type-name 0)))
+    (should (string= macro-name (shu-capture-func-type-name shu-capture-attr-macro)))
+    (should (string= constant-name (shu-capture-func-type-name shu-capture-attr-const)))
+    (should (string= variable-name (shu-capture-func-type-name shu-capture-attr-var)))
     ))
 
 ;;; shu-capture-doc.t.el ends here
