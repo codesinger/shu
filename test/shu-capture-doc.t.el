@@ -1338,9 +1338,9 @@
 
 
 ;;
-;;  shu-test-shu-capture-commentary
+;;  shu-test-shu-capture-commentary-1
 ;;
-(ert-deftest shu-test-shu-capture-commentary ()
+(ert-deftest shu-test-shu-capture-commentary-1 ()
   (let ((expected-pkg-name "shu-capture-doc")
         (expected-doc
          (concat
@@ -1363,6 +1363,48 @@
         "\n"
         ";; Collection of functions used to capture function and variable definitions\n"
         ";; subsequent publication.\n"
+        "\n"
+        ";;; Code:\n"
+        "        \n"))
+      (setq result (shu-capture-commentary))
+      (should result)
+      (should (consp result))
+      (setq actual-pkg-name (car result))
+      (should actual-pkg-name)
+      (should (stringp actual-pkg-name))
+      (setq actual-doc (cdr result))
+      (should actual-doc)
+      (should (stringp actual-doc))
+      (should (string= expected-pkg-name actual-pkg-name))
+      (should (string= expected-doc actual-doc)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-commentary-2
+;;
+(ert-deftest shu-test-shu-capture-commentary-2 ()
+  (let ((expected-pkg-name "shu-cpp-general")
+        (expected-doc
+         (concat
+        "A collection of useful functions for dealing with C++ code"
+        ))
+        (result)
+        (actual-pkg-name)
+        (actual-doc))
+    (with-temp-buffer
+      (insert
+       (concat
+        ";;\n"
+        ";; Package: shu-cpp-general\n"
+        ";; Author: Stewart L. Palmer <stewart@stewartpalmer.com>\n"
+        ";; see <http://www.gnu.org/licenses/>.\n"
+        ";;\n"
+        "\n"
+        ";;; Commentary:\n"
+        "\n"
+        ";; A collection of useful functions for dealing with C++ code\n"
         "\n"
         ";;; Code:\n"
         "        \n"))

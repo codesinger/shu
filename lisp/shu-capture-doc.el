@@ -228,6 +228,7 @@ as \"&optional\" or \"&rest\" to markup.")
   "The a-list key value that identifies the function that converts characters in a
 doc string right before the code snippets are captured.")
 
+
 ;;
 ;;  shu-capture-a-type-doc-string
 ;;
@@ -237,9 +238,17 @@ as \"&optional\" or \"&rest\" to markup.")
 
 
 ;;
+;;  shu-capture-a-type-enclose-doc
+;;
+(defconst shu-capture-a-type-enclose-doc 8
+  "The a-list key value that identifies the function that converts a key word, such
+as \"&optional\" or \"&rest\" to markup.")
+
+
+;;
 ;;  shu-capture-a-type-before
 ;;
-(defconst shu-capture-a-type-before 8
+(defconst shu-capture-a-type-before 9
   "The a-list key value that identifies the string that is placed before a verbatim
 code snippet.")
 
@@ -247,7 +256,7 @@ code snippet.")
 ;;
 ;;  shu-capture-a-type-after
 ;;
-(defconst shu-capture-a-type-after 9
+(defconst shu-capture-a-type-after 10
   "The a-list key value that identifies the string that is placed after a verbatim
 code snippet.")
 
@@ -255,14 +264,14 @@ code snippet.")
 ;;
 ;;  shu-capture-a-type-open-quote
 ;;
-(defconst shu-capture-a-type-open-quote 10
+(defconst shu-capture-a-type-open-quote 11
   "The a-list key value that identifies the string that is an open quote.")
 
 
 ;;
 ;;  shu-capture-a-type-close-quote
 ;;
-(defconst shu-capture-a-type-close-quote 11
+(defconst shu-capture-a-type-close-quote 12
   "The a-list key value that identifies the string that is a close quote.")
 
 
@@ -507,6 +516,7 @@ code snippet.")
    (cons shu-capture-a-type-keywd        'shu-capture-keywd-to-md)
    (cons shu-capture-pre-code-in-doc     'shu-capture-pre-code-md)
    (cons shu-capture-a-type-doc-string   'shu-capture-finish-doc-string-md)
+   (cons shu-capture-a-type-enclose-doc  'shu-capture-enclose-doc-md)
    (cons shu-capture-a-type-before       shu-capture-md-code-delimiter)
    (cons shu-capture-a-type-after        shu-capture-md-code-delimiter)
    (cons shu-capture-a-type-open-quote   shu-capture-md-quote-delimiter)
@@ -528,6 +538,7 @@ function and its associated doc string and convert it to markdown.")
     (cons shu-capture-a-type-keywd        'shu-capture-keywd-to-latex)
     (cons shu-capture-pre-code-in-doc     'shu-capture-pre-code-latex)
     (cons shu-capture-a-type-doc-string   'shu-capture-finish-doc-string-latex)
+    (cons shu-capture-a-type-enclose-doc  'shu-capture-enclose-doc-latex)
     (cons shu-capture-a-type-before       shu-capture-latex-code-start)
     (cons shu-capture-a-type-after        shu-capture-latex-code-end)
     (cons shu-capture-a-type-open-quote   shu-capture-latex-open-quote)
@@ -672,6 +683,7 @@ to LaTex."
     (goto-char (point-min))
     (while (search-forward "_" nil t)
       (replace-match "\\_" t t))
+    (goto-char (point-min))
     (while (search-forward "#" nil t)
       (replace-match "\\#" t t))
     )
@@ -695,16 +707,36 @@ markdown."
   "Function that exeacutes last step in the conversion of a doc-string to
 markdown."
   (interactive)
-  (let ((start (concat shu-capture-latex-doc-start "\n"))
-        (end (concat "\n" shu-capture-latex-doc-end)))
     (goto-char (point-min))
     (while (search-forward "&" nil t)
       (replace-match "\\&" t t))
+    )
+
+
+
+;;
+;;  shu-capture-enclose-doc-latex
+;;
+(defun shu-capture-enclose-doc-latex ()
+  "Enclose the doc-string with the appropriate begin / end pair for LaTex."
+  (let (
+        (start (concat shu-capture-latex-doc-start "\n"))
+        (end (concat "\n" shu-capture-latex-doc-end)))
     (goto-char (point-min))
     (insert start)
     (goto-char (point-max))
     (insert end)
     ))
+
+
+
+
+;;
+;;  shu-capture-enclose-doc-md
+;;
+(defun shu-capture-enclose-doc-md ()
+  "Enclose the doc-string with the appropriate begin / end pair for markdown."
+    )
 
 
 
@@ -756,7 +788,7 @@ either markdown or LaTex."
     (setq pkg-name (car cresult))
     (setq commentary (cdr cresult))
     (when commentary
-      (setq commentary (shu-capture-convert-doc-string dummy-signature commentary converters))
+      (setq commentary (shu-capture-internal-convert-doc-string dummy-signature commentary converters))
       )
     (when pkg-name
       (setq sec-hdr (funcall section-converter 1 pkg-name))
@@ -1142,6 +1174,7 @@ follows:
       shu-capture-a-type-arg           Function to format an argument name
       shu-capture-a-type-keywd         Function to format a key word
       shu-capture-a-type-doc-string    Function to finish formatting the doc string
+      shu-capture-a-type-enclose-doc   Function to enclose doc string in begin / end
       shu-capture-a-type-before        String that starts a block of verbatim code
       shu-capture-a-type-after         String that ends a block of verbstim code
       shu-capture-a-type-open-quote    String that is an open quote
@@ -1163,10 +1196,10 @@ function definitions into either markdown or LaTex."
       (setq func-def (car xx))
       (shu-capture-get-func-def func-def signature attributes description alias)
       (setq func-string (funcall func-converter func-def converters))
-      (if (not description)
+      (when (not description)
           (setq description "Undocumented")
-        (setq description (shu-capture-convert-doc-string signature description converters))
         )
+        (setq description (shu-capture-convert-doc-string signature description converters))
       (princ (concat "\n\n" func-string) buffer)
       (princ (concat "\n\n" description) buffer)
       (setq xx (cdr xx))
@@ -1436,6 +1469,49 @@ follows:
       shu-capture-a-type-arg           Function to format an argument name
       shu-capture-a-type-keywd         Function to format a key word
       shu-capture-a-type-doc-string    Function to finish formatting the doc string
+      shu-capture-a-type-enclose-doc   Function to enclose doc string in begin / end
+      shu-capture-a-type-before        String that starts a block of verbatim code
+      shu-capture-a-type-after         String that ends a block of verbstim code
+      shu-capture-a-type-open-quote    String that is an open quote
+      shu-capture-a-type-close-quote   String that is a close quote
+
+This function turns escaped quotes into open and close quote strings, turns names
+with leading and trailing asterisks (e.g., **project-buffer**) into formatted buffer
+names, turns upper case names that match any argument names into lower case,
+formatted argument names.  This is an internal function of shu-capture-doc and
+will likely crash if called with an invalid a-list."
+  (let (
+        (encloser (cdr (assoc shu-capture-a-type-enclose-doc converters)))
+        (result)
+        (result2)
+        )
+    (setq result (shu-capture-internal-convert-doc-string signature description converters))
+    (with-temp-buffer
+      (insert result)
+      (funcall encloser)
+      (setq result2 (buffer-substring-no-properties (point-min) (point-max)))
+      )
+    result2
+    ))
+
+
+;;
+;;  shu-capture-internal-convert-doc-string
+;;
+(defun shu-capture-internal-convert-doc-string (signature description converters)
+  "DESCRIPTION contains a doc string from a function definition (with leading
+and trailing quotes removed).  CONVERTERS is an a-list of functions and strings as
+follows:
+
+      Key                              Value
+      ---                              -----
+      shu-capture-a-type-hdr           Function to format a section header
+      shu-capture-a-type-func          Function to format a function signature
+      shu-capture-a-type-buf           Function to format a buffer name
+      shu-capture-a-type-arg           Function to format an argument name
+      shu-capture-a-type-keywd         Function to format a key word
+      shu-capture-a-type-doc-string    Function to finish formatting the doc string
+      shu-capture-a-type-enclose-doc   Function to enclose doc string in begin / end
       shu-capture-a-type-before        String that starts a block of verbatim code
       shu-capture-a-type-after         String that ends a block of verbstim code
       shu-capture-a-type-open-quote    String that is an open quote

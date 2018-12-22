@@ -26,7 +26,7 @@
 
 ;; A collection of useful functions for dealing with C++ code
 
-;;; Code
+;;; Code:
 
 
 (provide 'shu-cpp-general)
