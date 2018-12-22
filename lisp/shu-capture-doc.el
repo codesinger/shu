@@ -472,6 +472,22 @@ code snippet.")
 
 
 ;;
+;;  shu-capture-buffer-name
+;;
+(defconst shu-capture-buffer-name "**shu-capture-doc**"
+  "Name of the buffer into which the converted documentation is written")
+
+
+
+;;
+;;  shu-capture-index-buffer
+;;
+(defconst shu-capture-index-buffer "**shu-capture-index**"
+  "Name of the buffer into which the markdown index is written")
+
+
+
+;;
 ;;  shu-capture-md-converters
 ;;
 (defconst shu-capture-md-converters
@@ -715,7 +731,7 @@ them into a LaTex text that documents the functions and their doc strings."
 neutral manner and then uses the supplied CONVERTERS to convert the documentation to
 either markdown or LaTex."
   (let (
-        (gb (get-buffer-create "**shu-capture-doc**"))
+        (gb (get-buffer-create shu-capture-buffer-name))
         (section-converter (cdr (assoc shu-capture-a-type-hdr converters)))
         (af-lists)
         (alias-list)
@@ -750,7 +766,7 @@ either markdown or LaTex."
 and \"defmacro.\""
   (let (
         (ggb (get-buffer-create "**slp**"))
-        (gb (get-buffer-create "**shu-capture-doc**"))
+        (gb (get-buffer-create shu-capture-buffer-name))
         (ss
          (concat
           "("
@@ -949,7 +965,7 @@ Return the doc string if there is one, nil otherwie."
 ;;
 (defun shu-capture-aliases ()
   (let (
-        (gb (get-buffer-create "**shu-capture-doc**"))
+        (gb (get-buffer-create shu-capture-buffer-name))
         (alias-rx "(\\s-*defalias\\s-*'\\([a-zA-Z0-9-_]+\\)\\s-*'\\([a-zA-Z0-9-_]+\\)\\s-*)")
         (alias)
         (name)
@@ -1024,7 +1040,7 @@ turns upper case names into lower case names surrounded by mardown ticks."
 (defun shu-capture-code-in-md ()
   "The current buffer is assumed to hold a doc string that is being converted to
 markdown.  Any line that is indented to column SHU-CAPTURE-DOC-CODE-INDENT or
-gteater is assumed to be a code snippet and will be surrounded by \"```\" to make
+greater is assumed to be a code snippet and will be surrounded by \"```\" to make
 it a code snippet in markdown.  Return the number of code snippets marked."
   (let ((line-diff 0)
         (in-code)
@@ -1134,7 +1150,7 @@ function definitions into either markdown or LaTex."
 (defun shu-doc-internal-func-to-md (func-def)
   "Take a function definition and turn it into a string of markdown text."
   (let (
-        (gb (get-buffer-create "**shu-capture-doc**"))
+        (gb (get-buffer-create shu-capture-buffer-name))
         (signature)
         (attributes)
         (description)
@@ -1173,7 +1189,7 @@ function definitions into either markdown or LaTex."
 (defun shu-capture-convert-func-md (func-def converters)
   "Take a function definition and turn it into a string of markdown.  Return said string."
   (let (
-        (gb (get-buffer-create "**shu-capture-doc**"))
+        (gb (get-buffer-create shu-capture-buffer-name))
         (arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-md-converters)))
         (keywd-converter (cdr (assoc shu-capture-a-type-keywd shu-capture-md-converters)))
         (section-converter (cdr (assoc shu-capture-a-type-hdr converters)))
@@ -1227,10 +1243,9 @@ will turn a sring into a section heading."
     (with-temp-buffer
       (insert
        (concat
-        "\n\n" sec-hdr "\n"
-        ))
-      (insert func-name)
+        "\n\n" sec-hdr "\n"))
       (when markups
+        (insert func-name)
         (setq args (cdr markups))
         (setq pad " ")
         (while args
@@ -1238,7 +1253,9 @@ will turn a sring into a section heading."
           (insert (concat pad arg))
           (setq args (cdr args))
           )
+        (insert "\n")
         )
+      (insert (concat "[" func-type "]"))
       (setq result (buffer-substring-no-properties (point-min) (point-max)))
       )
     result
@@ -1252,7 +1269,7 @@ will turn a sring into a section heading."
 (defun shu-capture-convert-func-latex (func-def converters)
   "Take a function definition and turn it into a string of LaTex.  Return said string."
   (let (
-        (gb (get-buffer-create "**shu-capture-doc**"))
+        (gb (get-buffer-create shu-capture-buffer-name))
         (arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-latex-converters)))
         (keywd-converter (cdr (assoc shu-capture-a-type-keywd shu-capture-latex-converters)))
         (signature)
@@ -1428,7 +1445,7 @@ will likely crash if called with an invalid a-list."
 (defun shu-capture-code-in-doc (before-code after-code)
   "The current buffer is assumed to hold a doc string that is being converted to
 markdown.  Any line that is indented to column SHU-CAPTURE-DOC-CODE-INDENT or
-gteater is assumed to be a code snippet.  To format this as a code snippet,
+greater is assumed to be a code snippet.  To format this as a code snippet,
 BEFORE-CODE is placed one line above the code snippet and AFTER-CODE is placed
 one line below the code snippet.  Return the number of code snippets marked."
   (let ((line-diff 0)
@@ -1554,8 +1571,8 @@ would be converted to:
         (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
         (pname)
         (new-name)
+        (name-prefix)
         (count 0))
-
     (goto-char (point-min))
     (princ "\narg-converter " gb)
     (print arg-converter gb)
@@ -1563,9 +1580,17 @@ would be converted to:
     (while (re-search-forward arg-name nil t)
       (setq pname (downcase (match-string 1)))
       (setq new-name (funcall arg-converter pname))
-      (when (assoc pname args)
-        (replace-match new-name t t nil 1)
-        (setq count (1+ count))))
+      (setq name-prefix "")
+      (when (> (length pname) 11)
+        (setq name-prefix (substring pname 0 11)))
+      (if (assoc pname args)
+          (progn
+            (replace-match new-name t t nil 1)
+            (setq count (1+ count)))
+        (when (and (intern-soft pname)
+                   (string= "shu-capture" name-prefix))
+          (replace-match new-name t t nil 1)
+          (setq count (1+ count)))))
     count
     ))
 
