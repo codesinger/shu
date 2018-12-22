@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
 ;; Package: shu-cpp-project
-;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -27,7 +27,7 @@
 ;; A collection of useful functions for dealing with project files and treating
 ;; a set of source files in multiple directories as a single project
 
-;;; Code
+;;; Code:
 
 (provide 'shu-cpp-project)
 (require 'shu-base)

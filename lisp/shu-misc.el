@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
 ;; Package: shu-misc
-;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -27,7 +27,7 @@
 ;;
 ;; A miscellaneous collection of useful functions
 
-;;; Code
+;;; Code:
 
 (provide 'shu-misc)
 

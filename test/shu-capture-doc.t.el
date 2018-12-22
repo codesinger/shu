@@ -1321,6 +1321,7 @@
         (interactive-name "Command")
         (constant-name "Constant")
         (variable-name "Variable")
+        (custom-name "Custom")
         )
     (should (string= macro-name (shu-capture-func-type-name macro-attributes1)))
     (should (string= macro-name (shu-capture-func-type-name macro-attributes2)))
@@ -1331,6 +1332,51 @@
     (should (string= macro-name (shu-capture-func-type-name shu-capture-attr-macro)))
     (should (string= constant-name (shu-capture-func-type-name shu-capture-attr-const)))
     (should (string= variable-name (shu-capture-func-type-name shu-capture-attr-var)))
+    (should (string= custom-name (shu-capture-func-type-name shu-capture-attr-custom)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-commentary
+;;
+(ert-deftest shu-test-shu-capture-commentary ()
+  (let ((expected-pkg-name "shu-capture-doc")
+        (expected-doc
+         (concat
+        "Collection of functions used to capture function and variable definitions\n"
+        "subsequent publication."
+        ))
+        (result)
+        (actual-pkg-name)
+        (actual-doc))
+    (with-temp-buffer
+      (insert
+       (concat
+        ";;\n"
+        ";; Package: shu-capture-doc\n"
+        ";; Author: Stewart L. Palmer <stewart@stewartpalmer.com>\n"
+        ";; see <http://www.gnu.org/licenses/>.\n"
+        ";;\n"
+        "\n"
+        ";;; Commentary:\n"
+        "\n"
+        ";; Collection of functions used to capture function and variable definitions\n"
+        ";; subsequent publication.\n"
+        "\n"
+        ";;; Code:\n"
+        "        \n"))
+      (setq result (shu-capture-commentary))
+      (should result)
+      (should (consp result))
+      (setq actual-pkg-name (car result))
+      (should actual-pkg-name)
+      (should (stringp actual-pkg-name))
+      (setq actual-doc (cdr result))
+      (should actual-doc)
+      (should (stringp actual-doc))
+      (should (string= expected-pkg-name actual-pkg-name))
+      (should (string= expected-doc actual-doc)))
     ))
 
 ;;; shu-capture-doc.t.el ends here

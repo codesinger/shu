@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
 ;; Package: shu-cpp-token
-;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -33,7 +33,7 @@
 ;; first token in the list being the first token found.  The latter function
 ;; returns the reverse of the former.
 
-;;; Code
+;;; Code:
 
 (provide 'shu-cpp-token)
 (require 'shu-base)

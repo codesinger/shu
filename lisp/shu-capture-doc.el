@@ -3,7 +3,7 @@
 ;; Copyright (C) 2018 Stewart L. Palmer
 ;;
 ;; Package: shu-capture-doc
-;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -25,11 +25,12 @@
 
 ;;; Commentary:
 
-;;  Collection of functions used to capture doc strings in elisp functions
+;; Collection of functions used to capture function and variable definitions
+;; along with their associated doc strings in elisp code.  It can then write
+;; this information into a buffer in either markdown or LaTex format for
+;; subsequent publication.
 
-;;; Code
-
-;; NB: (intern-soft string) will return non-nil if string holds a symbol name
+;;; Code:
 
 
 (provide 'shu-capture-doc)
@@ -461,6 +462,13 @@ code snippet.")
   "Bit that indicates that a definition is a defvar")
 
 
+;;
+;;  shu-capture-attr-custom
+;;
+(defvar shu-capture-attr-custom (lsh 1 5)
+  "Bit that indicates that a definition is a defcustom")
+
+
 
 ;;
 ;;  shu-capture-doc-code-indent
@@ -854,16 +862,55 @@ and \"defmacro.\""
 
 
 ;;
+;;  shu-capture-commentary
+;;
+(defun shu-capture-commentary ()
+  "Search through an elisp file for a package name and a commentary section.
+Return a cons cell whose car is the package name and whose cdr is the prose
+found in the commentary section."
+  (let ((pkss "[;]+\\s-*Package:\\s-+\\([a-zA-Z0-9-_]+\\)")
+        (ctss "[;]+\\s-*Commentary:")
+        (ssss "^[;]+\\s-*")
+        (cdss "[;]+\\s-*Code:")
+        (pkg-name)
+        (bod)
+        (eod)
+        (doc))
+    (goto-char (point-min))
+    (when (re-search-forward pkss nil t)
+      (setq pkg-name (match-string 1)))
+    (when (re-search-forward ctss nil t)
+      (when (re-search-forward ssss nil t)
+        (beginning-of-line)
+        (setq bod (point))
+        (when (re-search-forward cdss nil t)
+          (beginning-of-line)
+          (when (re-search-backward ssss nil t)
+            (end-of-line)
+            (setq eod (point))))))
+    (when (and bod eod)
+      (setq doc (buffer-substring-no-properties bod eod))
+      (with-temp-buffer
+        (insert doc)
+        (goto-char (point-min))
+        (while (re-search-forward ssss nil t)
+          (replace-match ""))
+        (setq doc (buffer-substring-no-properties (point-min) (point-max)))))
+    (cons pkg-name doc)
+    ))
+
+
+
+;;
 ;;  shu-capture-vars
 ;;
 (defun shu-capture-vars (func-list)
   "Find the name and doc-string for instances of \"defvar\" or \"defconst.\""
-  (let (
-        (ss
+  (let ((ss
          (concat
           "("
           "\\s-*"
-          "\\(defvar\\|defconst\\)"
+          "\\(defvar\\|defconst\\|defcustom\\)"
           "\\s-*"
           "\\([0-9a-zA-Z-]+\\)"
           ))
@@ -877,8 +924,7 @@ and \"defmacro.\""
         (desc)
         (attributes)
         (signature)
-        (func-def)
-        )
+        (func-def))
     (goto-char (point-min))
     (while (re-search-forward ss nil t)
       (setq zzz t)
@@ -887,9 +933,10 @@ and \"defmacro.\""
       (setq attributes shu-capture-attr-const)
       (if (string= type "defvar")
           (setq attributes shu-capture-attr-var)
-        (when (string= type "defconst")
-          (setq attributes shu-capture-attr-const)
-          ))
+        (if (string= type "defconst")
+            (setq attributes shu-capture-attr-const)
+          (when (string= type "defcustom")
+            (setq attributes shu-capture-attr-custom))))
       (setq name (match-string 2))
       (setq eov (point))
       (goto-char (match-beginning 0))
@@ -903,16 +950,11 @@ and \"defmacro.\""
             (setq pc (buffer-substring-no-properties (1- (point)) (point)))
             (when (not (string= pc "\\"))
               (setq zzz nil)
-              (setq bod (1+ (point)))
-              )
-            )
-          (setq desc (buffer-substring-no-properties bod eod))
-          )
-        )
+              (setq bod (1+ (point)))))
+          (setq desc (buffer-substring-no-properties bod eod))))
       (setq signature (concat name " ()"))
       (shu-capture-set-func-def func-def signature attributes desc)
-      (setq func-list (cons func-def func-list))
-      )
+      (setq func-list (cons func-def func-list)))
     func-list
     ))
 
@@ -944,12 +986,10 @@ Return the doc string if there is one, nil otherwie."
         (desc))
     (save-excursion
       (when (re-search-forward fp eof t)
-        (setq first-paren (point)))
-      )
+        (setq first-paren (point))))
     (save-excursion
       (when (re-search-forward xquote eof t)
-        (setq first-quote (point)))
-      )
+        (setq first-quote (point))))
     (when (< first-quote first-paren)
       (when (re-search-forward xquote eof t)
         (setq sdesc (point))
@@ -964,21 +1004,18 @@ Return the doc string if there is one, nil otherwie."
 ;;  shu-capture-aliases
 ;;
 (defun shu-capture-aliases ()
-  (let (
-        (gb (get-buffer-create shu-capture-buffer-name))
+  (let ((gb (get-buffer-create shu-capture-buffer-name))
         (alias-rx "(\\s-*defalias\\s-*'\\([a-zA-Z0-9-_]+\\)\\s-*'\\([a-zA-Z0-9-_]+\\)\\s-*)")
         (alias)
         (name)
-        (cell)
-        )
+        (cell))
     (setq shu-capture-alias-list nil)
     (goto-char (point-min))
     (while (re-search-forward alias-rx nil t)
       (setq alias (match-string 1))
       (setq name (match-string 2))
       (setq cell (cons name alias))
-      (setq shu-capture-alias-list (cons cell shu-capture-alias-list))
-      )
+      (setq shu-capture-alias-list (cons cell shu-capture-alias-list)))
     ))
 
 
@@ -1701,6 +1738,7 @@ above described cons cell."
         (interactive-name "Command")
         (constant-name "Constant")
         (variable-name "Variable")
+        (custom-name "Custom")
         (name))
     (cond
      ((and (/= 0 (logand attributes shu-capture-attr-alias))
@@ -1717,6 +1755,8 @@ above described cons cell."
       (setq name constant-name))
      ((/= 0 (logand attributes shu-capture-attr-var))
       (setq name variable-name))
+     ((/= 0 (logand attributes shu-capture-attr-custom))
+      (setq name custom-name))
      (t
       (if (/= 0 (logand attributes shu-capture-attr-inter))
           (setq name interactive-name)

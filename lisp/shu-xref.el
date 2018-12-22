@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
 ;; Package: shu-xref
-;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
 
@@ -30,7 +30,7 @@
 ;;  Collection of ...
 ;;
 
-;;; Code
+;;; Code:
 
 
 ;; NOTES: Look at variable "obarray"

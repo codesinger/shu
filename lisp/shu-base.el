@@ -3,7 +3,7 @@
 ;; Copyright (C) 2013 Stewart L. Palmer
 ;;
 ;; Package: shu-org-extensions
-;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -25,9 +25,10 @@
 
 ;;; Commentary:
 
-;;  Collection of miscellaneous functions used by other packages
+;; Collection of miscellaneous functions  and constants used by other
+;; packages
 
-;;; Code
+;;; Code:
 
 (provide 'shu-base)
 
@@ -140,7 +141,7 @@ not expect character alternatives to be enclosed in square brackets and will inc
 the left and right brackets in the class of characters to be skipped.")
 
 (defconst shu-comment-start-pattern "/[/\\*]"
-  "*The regular expression that defines the delimeter used to start
+  "The regular expression that defines the delimeter used to start
 a comment.")
 
 (defconst shu-unit-test-buffer "**shu-unit-tests**"

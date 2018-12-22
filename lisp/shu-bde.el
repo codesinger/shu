@@ -27,7 +27,7 @@
 
 ;; A set of functions useful for Bloomberg, L.P. BDE style programming
 
-;;; Code
+;;; Code:
 
 
 (provide 'shu-bde)

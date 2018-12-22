@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
 ;; Package: shu-cpp-misc
-;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -26,7 +26,7 @@
 
 ;; A collection of useful functions for dealing with C++ code
 
-;;; Code
+;;; Code:
 
 
 (provide 'shu-cpp-misc)

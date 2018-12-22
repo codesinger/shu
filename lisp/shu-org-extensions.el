@@ -3,7 +3,7 @@
 ;; Copyright (C) 2014 Stewart L. Palmer
 ;;
 ;; Package: shu-org-extensions
-;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -31,7 +31,7 @@
 ;; ago and moves it to an archive file by invoking org-archive-subtree
 ;; on it.
 
-;;; Code
+;;; Code:
 
 
 (defvar shu-org-home "~/data/org"

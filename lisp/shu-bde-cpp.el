@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
 ;; Package: shu-bde-cp
-;; Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -28,7 +28,7 @@
 ;; A collection of useful functions for writing C++ code in Bloomberg, L.P.
 ;; BDE style
 
-;;; Code
+;;; Code:
 
 (provide 'shu-bde-cpp)
 (require 'shu-base)
