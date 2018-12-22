@@ -1234,12 +1234,14 @@ after markup is applied mDaye be longer.  The cdr of MARKUPS is a list of the
 arguments with markup applied to them.  SECTION-CONVERTER is the function that
 will turn a sring into a section heading."
   (let (
+        (ixb (get-buffer-create shu-capture-index-buffer))
         (arg)
         (args)
         (pad)
         (result)
         (sec-hdr (funcall section-converter 4 func-name))
         )
+    (princ (concat "* [" func-name "](#" func-name ")\n") ixb)
     (with-temp-buffer
       (insert
        (concat
@@ -1581,14 +1583,14 @@ would be converted to:
       (setq pname (downcase (match-string 1)))
       (setq new-name (funcall arg-converter pname))
       (setq name-prefix "")
-      (when (> (length pname) 11)
-        (setq name-prefix (substring pname 0 11)))
+      (when (> (length pname) 4)
+        (setq name-prefix (substring pname 0 4)))
       (if (assoc pname args)
           (progn
             (replace-match new-name t t nil 1)
             (setq count (1+ count)))
         (when (and (intern-soft pname)
-                   (string= "shu-capture" name-prefix))
+                   (string= "shu-" name-prefix))
           (replace-match new-name t t nil 1)
           (setq count (1+ count)))))
     count
