@@ -663,30 +663,66 @@ to LaTex."
 ;;
 ;;  shu-capture-pre-code-md
 ;;
-(defun shu-capture-pre-code-md ()
+(defun shu-capture-pre-code-md (min-point max-point)
   "Function that prepares a doc string to capture code snippets in markdown."
+  max-point
     )
+
 
 
 
 ;;
 ;;  shu-capture-pre-code-latex
 ;;
-(defun shu-capture-pre-code-latex ()
-  "Function that prepares a doc string to capture code snippets in LaTex."
-    (goto-char (point-min))
-    (while (search-forward "{" nil t)
-      (replace-match "\\{" t t))
-    (goto-char (point-min))
-    (while (search-forward "}" nil t)
-      (replace-match "\\}" t t))
-    (goto-char (point-min))
-    (while (search-forward "_" nil t)
-      (replace-match "\\_" t t))
-    (goto-char (point-min))
-    (while (search-forward "#" nil t)
-      (replace-match "\\#" t t))
-    )
+(defun shu-capture-pre-code-latex (min-point max-point)
+  "Function that prepares a doc string to capture code snippets in LaTex.
+Enter with MIN-POINT and MAX-POINT defining the region to be changed.
+MIN-POINT cannot change because all changes are made after it.  But
+MAX-POINT will change if replacments add extra characters.  Return the
+new value of MAX-POINT which takes into account the number of characters
+added to the text."
+  (let (
+        (xpoint max-point)
+        (xx)
+        )
+    (goto-char xpoint)
+    (while (search-backward "{" min-point t)
+      (replace-match "\\{" t t)
+      (forward-char -1)
+      (setq xpoint (1+ xpoint))
+      )
+    (goto-char xpoint)
+    (while (search-backward "}" min-point t)
+      (replace-match "\\}" t t)
+      (forward-char -1)
+      (setq xpoint (1+ xpoint))
+      )
+    (goto-char xpoint)
+    (while (search-backward "_" min-point t)
+      (replace-match "\\_" t t)
+      (forward-char -1)
+      (setq xpoint (1+ xpoint))
+      )
+    (goto-char xpoint)
+    (while (search-backward "#" min-point t)
+      (replace-match "\\#" t t)
+      (forward-char -1)
+      (setq xpoint (1+ xpoint))
+      )
+    (goto-char xpoint)
+    (while (search-backward "<" min-point t)
+      (replace-match "$<$" t t)
+      (forward-char -2)
+      (setq xpoint (+ 2 xpoint))
+      )
+    (goto-char xpoint)
+    (while (search-backward ">" min-point t)
+      (replace-match "$>$" t t)
+      (forward-char -2)
+      (setq xpoint (+ 2 xpoint))
+      )
+    xpoint
+    ))
 
 
 
@@ -1542,7 +1578,7 @@ will likely crash if called with an invalid a-list."
         (buf-converter (cdr (assoc shu-capture-a-type-buf converters)))
         (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
         (all-converter (cdr (assoc shu-capture-a-type-doc-string converters)))
-        (pre-code (cdr (assoc shu-capture-pre-code-in-doc converters)))
+        (text-converter (cdr (assoc shu-capture-pre-code-in-doc converters)))
         (before-code (cdr (assoc shu-capture-a-type-before converters)))
         (after-code (cdr (assoc shu-capture-a-type-after converters)))
         (open-quote  (cdr (assoc shu-capture-a-type-open-quote converters)))
@@ -1555,7 +1591,6 @@ will likely crash if called with an invalid a-list."
     (with-temp-buffer
       (princ (concat "\n\nBEFORE:\n" description) gb)
       (insert description)
-      (funcall pre-code)
       (goto-char (point-min))
       (shu-capture-convert-quotes open-quote close-quote)
       (princ (concat "\nAFTER shu-capture-convert-quotes:\n"
@@ -1569,7 +1604,7 @@ will likely crash if called with an invalid a-list."
       (shu-capture-doc-convert-args signature converters)
       (princ (concat "\nAFTER converting arg names:\n"
                      (buffer-substring-no-properties (point-min) (point-max))) gb)
-      (shu-capture-code-in-doc before-code after-code)
+      (shu-capture-code-in-doc before-code after-code text-converter)
       (funcall all-converter)
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
       (princ (concat "\n\nAFTER:\n" result) gb)
@@ -1581,7 +1616,7 @@ will likely crash if called with an invalid a-list."
 ;;
 ;;  shu-capture-code-in-doc
 ;;
-(defun shu-capture-code-in-doc (before-code after-code)
+(defun shu-capture-code-in-doc (before-code after-code text-converter)
   "The current buffer is assumed to hold a doc string that is being converted to
 markdown.  Any line that is indented to column SHU-CAPTURE-DOC-CODE-INDENT or
 greater is assumed to be a code snippet.  To format this as a code snippet,
@@ -1608,6 +1643,8 @@ one line below the code snippet.  Return the number of code snippets marked."
             (progn
               (when (> (current-column) shu-capture-doc-code-indent)
                 (setq plain-text-end (line-beginning-position))
+                (setq plain-text-end (funcall text-converter plain-text-start plain-text-end))
+                (goto-char plain-text-end)
                 (setq in-code t)
                 (setq count (1+ count))
                 (if (= 1 (line-number-at-pos))
@@ -1624,7 +1661,6 @@ one line below the code snippet.  Return the number of code snippets marked."
               )
           (when (< (current-column) shu-capture-doc-code-indent)
             (setq in-code nil)
-            (setq plain-text-start (line-beginning-position))
             (if last-code-pos
                 (progn
                   (goto-char last-code-pos)
@@ -1633,12 +1669,14 @@ one line below the code snippet.  Return the number of code snippets marked."
               )
             (end-of-line)
             (insert (concat "\n" after-code))
+            (setq plain-text-start (point))
             (setq last-code-pos nil)
             (beginning-of-line))))
       (setq line-diff (forward-line 1)))
     (if in-code
         (insert (concat after-code "\n"))
       (setq plain-text-end (point))
+      (setq plain-text-end (funcall text-converter plain-text-start plain-text-end))
       )
     count
     ))
