@@ -681,46 +681,37 @@ MIN-POINT cannot change because all changes are made after it.  But
 MAX-POINT will change if replacments add extra characters.  Return the
 new value of MAX-POINT which takes into account the number of characters
 added to the text."
-  (let (
-        (xpoint max-point)
-        (xx)
-        )
+  (let ((xpoint max-point))
     (goto-char xpoint)
     (while (search-backward "{" min-point t)
       (replace-match "\\{" t t)
       (forward-char -1)
-      (setq xpoint (1+ xpoint))
-      )
+      (setq xpoint (1+ xpoint)))
     (goto-char xpoint)
     (while (search-backward "}" min-point t)
       (replace-match "\\}" t t)
       (forward-char -1)
-      (setq xpoint (1+ xpoint))
-      )
+      (setq xpoint (1+ xpoint)))
     (goto-char xpoint)
     (while (search-backward "_" min-point t)
       (replace-match "\\_" t t)
       (forward-char -1)
-      (setq xpoint (1+ xpoint))
-      )
+      (setq xpoint (1+ xpoint)))
     (goto-char xpoint)
     (while (search-backward "#" min-point t)
       (replace-match "\\#" t t)
       (forward-char -1)
-      (setq xpoint (1+ xpoint))
-      )
+      (setq xpoint (1+ xpoint)))
     (goto-char xpoint)
     (while (search-backward "<" min-point t)
       (replace-match "$<$" t t)
       (forward-char -2)
-      (setq xpoint (+ 2 xpoint))
-      )
+      (setq xpoint (+ 2 xpoint)))
     (goto-char xpoint)
     (while (search-backward ">" min-point t)
       (replace-match "$>$" t t)
       (forward-char -2)
-      (setq xpoint (+ 2 xpoint))
-      )
+      (setq xpoint (+ 2 xpoint)))
     xpoint
     ))
 
@@ -1621,24 +1612,26 @@ will likely crash if called with an invalid a-list."
 markdown.  Any line that is indented to column SHU-CAPTURE-DOC-CODE-INDENT or
 greater is assumed to be a code snippet.  To format this as a code snippet,
 BEFORE-CODE is placed one line above the code snippet and AFTER-CODE is placed
-one line below the code snippet.  Return the number of code snippets marked."
-  (let (
-        (gb (get-buffer-create "**doc**"))
-        (line-diff 0)
+one line below the code snippet.  Return the number of code snippets marked.
+Because we only want to replace special characters in text that does not include
+a code snippet, then each time we find the end of regular text, we call the
+TEXT-CONVERTER function passing it the beginning and end point of the regular
+text.  The TEXT-CONVERTER function may expand the amount of text present if it
+adds characters to the text.  It is the responsibility of the TEXT-CONVERTER
+function to return the new text end point to this function."
+  (let ((line-diff 0)
         (in-code)
         (count 0)
         (last-code-pos)
         (plain-text-start 0)
-        (plain-text-end 0)
-        )
+        (plain-text-end 0))
     (goto-char (point-min))
     (while (and (= line-diff 0)
                 (not (= (point) (point-max))))
       (beginning-of-line)
       (when (re-search-forward shu-not-all-whitespace-regexp (line-end-position) t)
         (when (> (current-column) shu-capture-doc-code-indent)
-          (setq last-code-pos (point))
-          )
+          (setq last-code-pos (point)))
         (if (not in-code)
             (progn
               (when (> (current-column) shu-capture-doc-code-indent)
@@ -1653,20 +1646,14 @@ one line below the code snippet.  Return the number of code snippets marked."
                       (insert (concat before-code "\n")))
                   (forward-line -1)
                   (end-of-line)
-                  (insert (concat "\n" before-code))
-                  )
+                  (insert (concat "\n" before-code)))
                 (setq last-code-pos (+ 1 last-code-pos (length before-code)))
-                (forward-line 1)
-                )
-              )
+                (forward-line 1)))
           (when (< (current-column) shu-capture-doc-code-indent)
             (setq in-code nil)
             (if last-code-pos
-                (progn
-                  (goto-char last-code-pos)
-                  )
-              (forward-line -1)
-              )
+                (goto-char last-code-pos)
+              (forward-line -1))
             (end-of-line)
             (insert (concat "\n" after-code))
             (setq plain-text-start (point))
@@ -1676,8 +1663,7 @@ one line below the code snippet.  Return the number of code snippets marked."
     (if in-code
         (insert (concat after-code "\n"))
       (setq plain-text-end (point))
-      (setq plain-text-end (funcall text-converter plain-text-start plain-text-end))
-      )
+      (setq plain-text-end (funcall text-converter plain-text-start plain-text-end)))
     count
     ))
 
