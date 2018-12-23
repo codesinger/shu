@@ -806,13 +806,13 @@ either markdown or LaTex."
       (setq sec-hdr (funcall section-converter 2 "List of functions by alias name"))
       (princ (concat "\n\n" sec-hdr "\n\n") gb)
       (princ "A list of aliases and associted function names.\n\n" gb)
-      (shu-capture-show-list alias-list converters gb))
+      (shu-capture-show-list alias-list converters gb t))
     (setq func-list (sort func-list 'shu-doc-sort-compare))
     (when (/= 0 (length func-list))
-      (setq sec-hdr (funcall section-converter 2 "List of functions"))
+      (setq sec-hdr (funcall section-converter 2 "List of functions and variables"))
       (princ (concat "\n\n" sec-hdr "\n\n") gb)
       (princ "List of functions and variable definitions in this package.\n\n" gb)
-      (shu-capture-show-list func-list converters gb))
+      (shu-capture-show-list func-list converters gb nil))
     ))
 
 
@@ -915,6 +915,8 @@ found in the commentary section."
         (ctss "[;]+\\s-*Commentary:")
         (ssss "^[;]+\\s-*")
         (cdss "[;]+\\s-*Code:")
+        (cmsa ";; ")
+        (cmsb ";;")
         (pkg-name)
         (bod)
         (eod)
@@ -936,7 +938,10 @@ found in the commentary section."
       (with-temp-buffer
         (insert doc)
         (goto-char (point-min))
-        (while (re-search-forward ssss nil t)
+        (while (search-forward cmsa nil t)
+          (replace-match ""))
+        (goto-char (point-min))
+        (while (search-forward cmsb nil t)
           (replace-match ""))
         (setq doc (buffer-substring-no-properties (point-min) (point-max)))))
     (cons pkg-name doc)
@@ -1161,7 +1166,7 @@ it a code snippet in markdown.  Return the number of code snippets marked."
 ;;
 ;;  shu-capture-show-list
 ;;
-(defun shu-capture-show-list (func-list converters buffer)
+(defun shu-capture-show-list (func-list converters buffer is-alias-list)
   "FUNC-LIST is a list of function and macro defintions.  CONVERTERS
 is an a-list of functions and strings as
 follows:
@@ -1195,7 +1200,7 @@ function definitions into either markdown or LaTex."
     (while xx
       (setq func-def (car xx))
       (shu-capture-get-func-def func-def signature attributes description alias)
-      (setq func-string (funcall func-converter func-def converters))
+      (setq func-string (funcall func-converter func-def converters  is-alias-list))
       (when (not description)
           (setq description "Undocumented")
         )
@@ -1267,7 +1272,7 @@ function definitions into either markdown or LaTex."
 ;;
 ;;  shu-capture-convert-func-md
 ;;
-(defun shu-capture-convert-func-md (func-def converters)
+(defun shu-capture-convert-func-md (func-def converters is-alias-list)
   "Take a function definition and turn it into a string of markdown.  Return said string."
   (let (
         (gb (get-buffer-create shu-capture-buffer-name))
@@ -1287,13 +1292,17 @@ function definitions into either markdown or LaTex."
         (args)
         (result ""))
     (shu-capture-get-func-def func-def signature attributes description alias)
-    (setq title (shu-capture-func-type-name attributes))
     (when alias
+      (if is-alias-list
+          (setq title "Function")
+        (setq title "Alias"))
       (setq alias-line (concat " (" title ": " alias ")")))
     (setq func-type (shu-capture-func-type-name attributes))
     (shu-capture-get-name-and-args signature func-name args)
     (setq markups (shu-capture-convert-args-to-markup signature arg-converter keywd-converter))
     (setq result (shu-capture-make-args-md func-name markups func-type section-converter))
+    (when alias
+      (setq result (concat result "\n" alias-line)))
     result
     ))
 
@@ -1349,7 +1358,7 @@ will turn a sring into a section heading."
 ;;
 ;;  shu-capture-convert-func-latex
 ;;
-(defun shu-capture-convert-func-latex (func-def converters)
+(defun shu-capture-convert-func-latex (func-def converters is-alias-list)
   "Take a function definition and turn it into a string of LaTex.  Return said string."
   (let (
         (gb (get-buffer-create shu-capture-buffer-name))
@@ -1368,13 +1377,17 @@ will turn a sring into a section heading."
         (args)
         (result ""))
     (shu-capture-get-func-def func-def signature attributes description alias)
-    (setq title (shu-capture-func-type-name attributes))
     (when alias
+      (if is-alias-list
+          (setq title "Function")
+        (setq title "Alias"))
       (setq alias-line (concat " (" title ": " alias ")")))
     (setq func-type (shu-capture-func-type-name attributes))
     (shu-capture-get-name-and-args signature func-name args)
     (setq markups (shu-capture-convert-args-to-markup signature arg-converter keywd-converter))
     (setq result (shu-capture-make-args-latex func-name markups func-type))
+    (when alias
+      (setq result (concat result "\\" "\\%" "\n" alias-line)))
     result
     ))
 
