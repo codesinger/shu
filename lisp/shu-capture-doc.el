@@ -1587,17 +1587,27 @@ markdown.  Any line that is indented to column SHU-CAPTURE-DOC-CODE-INDENT or
 greater is assumed to be a code snippet.  To format this as a code snippet,
 BEFORE-CODE is placed one line above the code snippet and AFTER-CODE is placed
 one line below the code snippet.  Return the number of code snippets marked."
-  (let ((line-diff 0)
+  (let (
+        (gb (get-buffer-create "**doc**"))
+        (line-diff 0)
         (in-code)
-        (count 0))
-  (goto-char (point-min))
-  (while (and (= line-diff 0)
-              (not (= (point) (point-max))))
+        (count 0)
+        (last-code-pos)
+        (plain-text-start 0)
+        (plain-text-end 0)
+        )
+    (goto-char (point-min))
+    (while (and (= line-diff 0)
+                (not (= (point) (point-max))))
       (beginning-of-line)
       (when (re-search-forward shu-not-all-whitespace-regexp (line-end-position) t)
+        (when (> (current-column) shu-capture-doc-code-indent)
+          (setq last-code-pos (point))
+          )
         (if (not in-code)
             (progn
               (when (> (current-column) shu-capture-doc-code-indent)
+                (setq plain-text-end (line-beginning-position))
                 (setq in-code t)
                 (setq count (1+ count))
                 (if (= 1 (line-number-at-pos))
@@ -1606,17 +1616,30 @@ one line below the code snippet.  Return the number of code snippets marked."
                       (insert (concat before-code "\n")))
                   (forward-line -1)
                   (end-of-line)
-                  (insert (concat "\n" before-code)))
-                (forward-line 1)))
+                  (insert (concat "\n" before-code))
+                  )
+                (setq last-code-pos (+ 1 last-code-pos (length before-code)))
+                (forward-line 1)
+                )
+              )
           (when (< (current-column) shu-capture-doc-code-indent)
             (setq in-code nil)
-            (forward-line -1)
+            (setq plain-text-start (line-beginning-position))
+            (if last-code-pos
+                (progn
+                  (goto-char last-code-pos)
+                  )
+              (forward-line -1)
+              )
             (end-of-line)
             (insert (concat "\n" after-code))
+            (setq last-code-pos nil)
             (beginning-of-line))))
       (setq line-diff (forward-line 1)))
-    (when in-code
-      (insert (concat after-code "\n")))
+    (if in-code
+        (insert (concat after-code "\n"))
+      (setq plain-text-end (point))
+      )
     count
     ))
 
