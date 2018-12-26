@@ -423,7 +423,7 @@ first token that is beyond the point specified by LIMIT, we stop the scan."
 (defun shu-cpp-reverse-tokenize-region (start end &optional limit)
   "Scan the region between START and AND to build a list of tokens that represent the C++
 code in the region.  Return a cons cell with two items in it.  The car of the cons cell
-is a token-info that represnts a parse error.  The cdr of the cons cell is the list of
+is a token-info that represents a parse error.  The cdr of the cons cell is the list of
 tokens.  This list is incomplete if the car of the cons sell is not nil.  The optional
 LIMIT argument is used to bound the scan as follows.  When we have added to the list the
 first token that is beyond the point specified by LIMIT, we stop the scan."

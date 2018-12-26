@@ -258,7 +258,7 @@ source code."
 ;;  shu-set-c-project
 ;;
 (defun shu-set-c-project (start end)
-  "Mark a region in a file that contains one subdirecdory name per line.
+  "Mark a region in a file that contains one subdirectory name per line.
 Then invoke set-c-project and it will find and remember all of the c and h
 files in those subdirectories.  You may then subsequently visit any of
 those files by invoking M-x vh which will allow you to type in the file
