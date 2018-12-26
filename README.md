@@ -31,7 +31,7 @@ This is an incomplete work in progress.
 ## Overview ##
 
 Most of the code in this repository helps me to read and write C and C++ code
-because that is what my day job, and occasionally my hobby, reauires.
+because that is what my day job, and occasionally my hobby, requires.
 
 There is also a set of functions that allow one to use emacs as a key ring or
 password manager.  Information about user IDs, passwords, URLs, and other items of
@@ -54,12 +54,12 @@ This repository contains four subdirectories.
  4. **usr** conatains files that are normally modified or replaced by users of this
    package.
 
-### External names ###
+## External names ##
 
 All of the externally visible names in these packages (functions macros, constants,
 etc.) begin with the prefix `shu-`.  This keeps them from interfering with names
 that are part of emacs or part of other packages.  But it also makes them a bit
-ciumersome to type.  Each lisp file contains a function that will create a short
+cumbersome to type.  Each lisp file contains a function that will create a short
 alias for each function name.  THis is usually the original function name with the
 `shu-` prefix removed.
 

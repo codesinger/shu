@@ -29,6 +29,9 @@
 ;; along with their associated doc strings in elisp code.  It can then write
 ;; this information into a buffer in either markdown or LaTex format for
 ;; subsequent publication.
+;;
+;; This mechanism was used to create most of the documentation for the elisp
+;; functions in this repository.
 
 ;;; Code:
 
@@ -505,6 +508,14 @@ code snippet.")
 
 
 ;;
+;;  shu-capture-toc-buffer
+;;
+(defconst shu-capture-toc-buffer "**shu-capture-toc**"
+  "Name of the buffer into which the markdown yable of contents is written")
+
+
+
+;;
 ;;  shu-capture-md-converters
 ;;
 (defconst shu-capture-md-converters
@@ -553,14 +564,22 @@ function and its associated doc string and convert it to LaTex.")
 ;;
 (defun shu-capture-make-md-section (level hdr)
   "Turn HDR into a markdown section header of level LEVEL, where 1 is a section,
-2 a subsection, etc.  Return the markdown string."
-  (let* ((delim (make-string level ?#))
+2 a subsection, etc.  Return the markdown string.  If level is one (major heading),
+write a corresponding entry into the markdown table of contents buffer."
+  (let* ((tocb (get-buffer-create shu-capture-toc-buffer))
+         (delim (make-string level ?#))
+         (toc-entry)
          (header
           (concat delim
                   " "
                   hdr
                   " "
                   delim)))
+    (when (= 1 level)
+      (setq toc-entry
+            (concat
+             "* [" hdr "](#" hdr ")"))
+      (princ (concat toc-entry "\n") tocb))
     header
     ))
 
@@ -850,8 +869,7 @@ either markdown or LaTex."
 (defun shu-capture-internal-doc ()
   "Function that captures documentation for all instances of \"defun,\" \"defsubst,\"
 and \"defmacro.\""
-  (let ((ggb (get-buffer-create "**slp**"))
-        (gb (get-buffer-create shu-capture-buffer-name))
+  (let ((gb (get-buffer-create shu-capture-buffer-name))
         (ss (concat
              "("
              "\\s-*"
@@ -891,11 +909,9 @@ and \"defmacro.\""
     (shu-capture-aliases)
     (goto-char (point-min))
     (while (re-search-forward ss nil t)
-      (princ (format "Found defun: %s\n" (match-string 0)) ggb)
       (setq attributes 0)
       (beginning-of-line)
       (setq sof (point))
-      (princ (format "sof: %d\n" sof ) ggb)
       (setq eof (save-excursion
                   (forward-sexp)
                   (point)))
@@ -908,7 +924,6 @@ and \"defmacro.\""
             (setq fn (match-string 2))
             (setq args (match-string 3))
             (setq func-sig (concat fn " (" args ")"))
-            (princ (format "FUNC: %s\n" func-sig) ggb)
             (setq desc (shu-capture-get-doc-string eof))
             (when (string= ftype "defmacro")
               (setq attributes (logior attributes shu-capture-attr-macro)))
@@ -1562,9 +1577,7 @@ with leading and trailing asterisks (e.g., **project-buffer**) into formatted bu
 names, turns upper case names that match any argument names into lower case,
 formatted argument names.  This is an internal function of shu-capture-doc and
 will likely crash if called with an invalid a-list."
-  (let (
-        (gb (get-buffer-create "**slp**"))
-        (star-name "*[a-zA-Z0-9*-_]+")
+  (let ((star-name "*[a-zA-Z0-9*-_]+")
         (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
         (buf-converter (cdr (assoc shu-capture-a-type-buf converters)))
         (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
@@ -1580,25 +1593,17 @@ will likely crash if called with an invalid a-list."
         (debug-on-error t)
         (case-fold-search nil))
     (with-temp-buffer
-      (princ (concat "\n\nBEFORE:\n" description) gb)
       (insert description)
       (goto-char (point-min))
       (shu-capture-convert-quotes open-quote close-quote)
-      (princ (concat "\nAFTER shu-capture-convert-quotes:\n"
-                     (buffer-substring-no-properties (point-min) (point-max))) gb)
       (goto-char (point-min))
       (while (re-search-forward star-name nil t)
         (replace-match (funcall buf-converter (match-string 0)) t t))
-      (princ (concat "\nAFTER converting buffer names:\n"
-                     (buffer-substring-no-properties (point-min) (point-max))) gb)
       (shu-capture-code-in-doc before-code after-code text-converter)
       (goto-char (point-min))
       (shu-capture-doc-convert-args signature converters)
-      (princ (concat "\nAFTER converting arg names:\n"
-                     (buffer-substring-no-properties (point-min) (point-max))) gb)
       (funcall all-converter)
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
-      (princ (concat "\n\nAFTER:\n" result) gb)
     result
     ))
 
@@ -1750,9 +1755,7 @@ with the following doc string:
 would be converted to:
 
   \"The Linux *hat* is converted to an IBM *cat*.\""
-  (let (
-        (gb (get-buffer-create "**slp**"))
-        (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
+  (let ((arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
         (args (shu-capture-get-args-as-alist signature))
         (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
         (pname)
@@ -1760,9 +1763,6 @@ would be converted to:
         (name-prefix)
         (count 0))
     (goto-char (point-min))
-    (princ "\narg-converter " gb)
-    (print arg-converter gb)
-    (princ "\n" gb)
     (while (re-search-forward arg-name nil t)
       (setq pname (downcase (match-string 1)))
       (setq new-name (funcall arg-converter pname))

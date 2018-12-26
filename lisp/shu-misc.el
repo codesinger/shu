@@ -585,17 +585,17 @@ eliminates whitespace.  If there is a non-whitespace character in column
 (defun shu-git-number-commits ()
   "In a git log buffer, number all of the commits with zero being the most
 recent.
-In git, the most recent commit may be referenced as HEAD.  The one before the
-most recent is HEAD~1.  The one before that is HEAD~2, and so on.  This
-notation is simple enough for the last small number of commits.  But if you
-are going back farther than that, you either have to copy and past each SHA-1
-hash or you have to count the commits by hand, which is tedious and error
-prone.
-This function numbers all of the commits in a log buffer, which allows you to
-do things like git diff between HEAD~33 and HEAD~35.  This function counts as
-a commit any instance of \"commit\" that starts at the beginning of a line and
-is followed by some white space and a forty character hexadecimal number.
-Returns the count of the number of commits found."
+
+It is possible to refer to commits by their SHA-1 hash.  If you want to see the
+difference between two commits you can ask git to show you the difference by
+specifying the commit hash of each one.  But this is cumbersome.  It involves
+copying and pasting two SHA-1 hashes.  Once the commits are numbered, then
+SHU-GIT-DIFF-COMMITS may be used to diff two commits by number.  See the
+documentation for SHU-GIT-DIFF-COMMITS for further information.
+
+This function counts as a commit any instance of \"commit\" that starts at the
+beginning of a line and is followed by some white space and a forty character
+hexadecimal number.  Returns the count of the number of commits found."
   (interactive)
   (let ((ss "^\\(commit\\)\\s-+[0-9a-f]\\{40\\}")
         (count 0)

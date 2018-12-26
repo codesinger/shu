@@ -27,8 +27,9 @@
 ;;; Commentary:
 
 ;;
-;;  Collection of ...
-;;
+;; A set of functions that scan a set of elisp files and create a cross reference
+;; of all of the definitions (functions, macros, constants, variables, etc.).
+;; See the doc string for SHU-MAKE-XREF for further details.
 
 ;;; Code:
 
@@ -156,6 +157,8 @@
 
 (require 'shu-base)
 (provide 'shu-xref)
+
+
 (defconst shu-xref-buffer "**shu-xref**"
 "The name of the buffer into which the cross reference is placed.")
 
@@ -184,17 +187,14 @@
 ;;  shu-make-xref
 ;;
 (defun shu-make-xref (start end)
-"Mark a region in a file that contains one name per line of an emacs lisp file
+  "Mark a region in a file that contains one name per line of an emacs lisp file
 Then invoke shu-make-xref.  It will do a cross reference of all of those files."
   (interactive "r")                 ; bounds of marked region (start end)
-  (let (
-    (file-list)
-    (fun-defs)
-    (max-type-name-length)
-    (max-var-name-length)
-    (retval)
-(debug-on-error t)
-       )
+  (let ((file-list)
+        (fun-defs)
+        (max-type-name-length)
+        (max-var-name-length)
+        (retval))
     (setq file-list (shu-xref-get-file-list start end file-list))
 
     (setq fun-defs (shu-xref-get-defs file-list fun-defs))
@@ -216,7 +216,8 @@ Then invoke shu-make-xref.  It will do a cross reference of all of those files."
     (shu-xref-dump fun-defs max-var-name-length max-type-name-length)
     (switch-to-buffer shu-xref-buffer)
     (goto-char (point-min))
-))
+    ))
+
 
 ;;
 ;;  shu-xref-get-defs

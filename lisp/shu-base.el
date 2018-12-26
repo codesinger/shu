@@ -26,7 +26,8 @@
 ;;; Commentary:
 
 ;; Collection of miscellaneous functions  and constants used by other
-;; packages
+;; packages in this repository.  Most of the elisp files in this repository
+;; depend on this file.
 
 ;;; Code:
 

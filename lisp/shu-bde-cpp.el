@@ -25,8 +25,8 @@
 
 ;;; Commentary:
 
-;; A collection of useful functions for writing C++ code in Bloomberg, L.P.
-;; BDE style
+;; A collection of useful functions for generating C++ skeleton code files
+;; and classes for code written in Bloomberg, L.P. BDE style.
 
 ;;; Code:
 

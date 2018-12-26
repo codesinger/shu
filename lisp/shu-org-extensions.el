@@ -25,9 +25,9 @@
 
 ;;; Commentary:
 
-;; The major function of this file is the function shu-org-archive-done-tasks,
+;; The major function of this file is the function SHU-ORG-ARCHIVE-DONE-TASKS,
 ;; which can be used as an after-save-hook for org files.  It finds each
-;; TODO item that was marked DONE more than shu-org-archive-expiry days
+;; TODO item that was marked DONE more than SHU-ORG-ARCHIVE-EXPIRY days
 ;; ago and moves it to an archive file by invoking org-archive-subtree
 ;; on it.
 
