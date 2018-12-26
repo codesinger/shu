@@ -1591,11 +1591,11 @@ will likely crash if called with an invalid a-list."
         (replace-match (funcall buf-converter (match-string 0)) t t))
       (princ (concat "\nAFTER converting buffer names:\n"
                      (buffer-substring-no-properties (point-min) (point-max))) gb)
+      (shu-capture-code-in-doc before-code after-code text-converter)
       (goto-char (point-min))
       (shu-capture-doc-convert-args signature converters)
       (princ (concat "\nAFTER converting arg names:\n"
                      (buffer-substring-no-properties (point-min) (point-max))) gb)
-      (shu-capture-code-in-doc before-code after-code text-converter)
       (funcall all-converter)
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
       (princ (concat "\n\nAFTER:\n" result) gb)
