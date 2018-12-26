@@ -249,7 +249,7 @@ tokens contained therein, displaying the result in the Shu unit test buffer."
 ;;  shu-cpp-token-internal-parse-region
 ;;
 (defun shu-cpp-token-internal-parse-region (func start end)
-    "Internal function to do a forward or reverse parse of the region betwen START
+    "Internal function to do a forward or reverse parse of the region between START
 and END.  FUNC holds the function to be invoked to do the parse.  This would be
 either shu-cpp-tokenize-region or shu-cpp-reverse-tokenize-region.  Once the
 parse is complete, the token list is shown in the Shu unit test buffer.  If any
@@ -356,11 +356,11 @@ error, return the token list, else return nil"
 ;;  shu-cpp-token-internal-tokenize-region-for-command
 ;;
 (defun shu-cpp-token-internal-tokenize-region-for-command (func start end &optional limit)
-    "Internal function to do a forward or reverse parse of the region betwen START
+    "Internal function to do a forward or reverse parse of the region between START
 and END.  FUNC holds the function to be invoked to do the parse.  This would be
 either shu-cpp-tokenize-region or shu-cpp-reverse-tokenize-region.  Once the
 parse is complete, we check to see if an error was detected.  If an error was
-detected wo go to the error point and show the error.  Then we return nil to the
+detected we go to the error point and show the error.  Then we return nil to the
 caller.  If no error was detected, we return the token-list to the caller.  This
 is a convenient way for a command to get the token-list and not have to do anything
 to display an error message if an error is encountered.  The command calls this
@@ -401,7 +401,7 @@ already been displayed."
 (defun shu-cpp-tokenize-region (start end &optional limit)
   "Scan the region between START and AND to build a list of tokens that represent the C++
 code in the region.  Return a cons cell with two items in it.  The car of the cons cell
-is a token-info that represnts a parse error.  The cdr of the cons cell is the list of
+is a token-info that represents a parse error.  The cdr of the cons cell is the list of
 tokens.  This list is incomplete if the car of the cons cell is not nil.  The optional
 LIMIT argument is used to bound the scan as follows.  When we have added to the list the
 first token that is beyond the point specified by LIMIT, we stop the scan."
@@ -508,7 +508,7 @@ in the operator, which is either 1, 2, or 3."
 ;;  shu-cpp-get-unquoted-token
 ;;
 (defun shu-cpp-get-unquoted-token (start end)
-  "Find the unquoted token in the buffer that starts ar point.  The token is
+  "Find the unquoted token in the buffer that starts at point.  The token is
 terminated either by the position of END or by the regular expression that
 defines the end of an unquoted token."
   (let
@@ -536,7 +536,7 @@ defines the end of an unquoted token."
 ;;
 (defun shu-cpp-get-quoted-token (start end)
   "Find the token in the buffer between START and END that is terminated by an
-un-escaped quote.  On entry, point must be positioned on the quote that starts
+unescaped quote.  On entry, point must be positioned on the quote that starts
 the string.  The appropriate error message is returned if there is no unescaped
 quote before the end of the current line.  If the character under point is not a
 quote start character, nil is returned."
@@ -615,7 +615,7 @@ line.  If it starts with /*, skip to terminating */.  If there is no terminating
 ;;  shu-cpp-make-token-info
 ;;
 (defun shu-cpp-make-token-info (token token-type spoint epoint &optional error-message)
-  "Pack the supplied aguments into a TOKEN-INFO and return the TOKEN-INFO."
+  "Pack the supplied arguments into a TOKEN-INFO and return the TOKEN-INFO."
   (let
       ((token-info)
        (info)
@@ -832,7 +832,7 @@ then we change the token that contains the type name by copying the template
 parameters into it.  If the type name token was \"Mumble\", then the token
 itself is changed to \"Mumble<int, double>\".  The tokens that represent the
 template parameters are removed from the token list in either case.
-This eliminates any comma that does not immeditately follow a parameter name.
+This eliminates any comma that does not immediately follow a parameter name.
 As we scan the reverse ordered token list, any comma that we find immediately
 precedes a variable name in the parameter list.  There may be intervening
 operators and comments.  But once we find a comma, the next unquoted token is
@@ -1095,7 +1095,7 @@ of reverse parsed code have the same suffix."
 ;;
 (defun shu-cpp-token-set-alias ()
   "Set the common alias names for the functions in shu-cpp-token.
-These are tokenly the same as the function names with the leading
+These are usually the same as the function names with the leading
 shu- prefix removed."
   (defalias 'parse-region 'shu-cpp-parse-region)
   (defalias 'reverse-parse-region 'shu-cpp-reverse-parse-region)

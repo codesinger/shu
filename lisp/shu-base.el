@@ -43,11 +43,11 @@
 
 (defconst shu-cpp-name (regexp-opt
                         shu-cpp-name-list  nil)
-  "A regular expression to match a varaiable name in a C or C++ program.")
+  "A regular expression to match a variable name in a C or C++ program.")
 
 (defconst shu-non-cpp-name
   (concat "[^" (substring shu-cpp-name 1))
-  "A regular expression to match a character not valid in a varaiable name
+  "A regular expression to match a character not valid in a variable name
 in a C or C++ program.")
 
 (defconst shu-cpp-file-name (regexp-opt
@@ -99,7 +99,7 @@ angle brackets instead of quotes."
 (defcustom shu-cpp-default-global-namespace nil
   "The string that defines the default global C++ namepace, if any.
 If this has a value, then C++ classes are declared with a two level
-namespace with the global namespace encompassig the local one"
+namespace with the global namespace encompassing the local one"
   :type '(string)
   :group 'shu-base)
 
@@ -141,7 +141,7 @@ not expect character alternatives to be enclosed in square brackets and will inc
 the left and right brackets in the class of characters to be skipped.")
 
 (defconst shu-comment-start-pattern "/[/\\*]"
-  "The regular expression that defines the delimeter used to start
+  "The regular expression that defines the delimiter used to start
 a comment.")
 
 (defconst shu-unit-test-buffer "**shu-unit-tests**"
@@ -243,7 +243,7 @@ and pad filled to length WIDTH."
 ;;
 (defun shu-fixed-format-num (num width)
   "Return a printable representation of NUM in a string right justified
-and pad filled to length WIDTH.  The number is formatted as comma saparated
+and pad filled to length WIDTH.  The number is formatted as comma separated
 as defined by shu-group-number."
   (let ((num  (shu-group-number num 3)))
     (when (<= width (length num))

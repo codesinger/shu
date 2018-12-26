@@ -35,7 +35,7 @@
 ;;  Control the EOL terminator
 ;;
 (defun shu-set-buffer-eol-type (eol-type)
-  "Define what the end of line delimeter is in a text file."
+  "Define what the end of line delimiter is in a text file."
   (setq buffer-file-coding-system (coding-system-change-eol-conversion
                                    buffer-file-coding-system eol-type))
   (set-buffer-modified-p t)
@@ -592,7 +592,7 @@ are going back farther than that, you either have to copy and past each SHA-1
 hash or you have to count the commits by hand, which is tedious and error
 prone.
 This function numbers all of the commits in a log buffer, which allows you to
-do things like git diff between HEAD~33 anbs HEAD~35.  This function counts as
+do things like git diff between HEAD~33 and HEAD~35.  This function counts as
 a commit any instance of \"commit\" that starts at the beginning of a line and
 is followed by some white space and a forty character hexadecimal number.
 Returns the count of the number of commits found."
@@ -669,7 +669,7 @@ cdr of the cons cell is nil.  If range string is not numeric, then both the car
 and the cdr of the cons cell are nil.
 
 For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end 97.
-\"99.103\" has start 99, end 103.  \"98\" has starrt 98 and end is nil."
+\"99.103\" has start 99, end 103.  \"98\" has start 98 and end is nil."
   (let ((s-one "[0-9]+")
         (s-two "\\([0-9]+\\)\\(\\+\\|\\-\\|\\.\\)\\([0-9]+\\)")
         (start)

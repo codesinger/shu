@@ -161,7 +161,7 @@ a project file and point is not sitting on something that resembles a file name.
 ;;  shu-add-cpp-c-extensions
 ;;
 (defun shu-add-cpp-c-extensions (xtns)
-  "Add one or more file extensions to the list of C and C++ extensions recognizd by the
+  "Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
 This modifies both shu-cpp-c-extensions and shu-cpp-extensions."
   (let (
@@ -177,7 +177,7 @@ This modifies both shu-cpp-c-extensions and shu-cpp-extensions."
 ;;  shu-add-cpp-h-extensions
 ;;
 (defun shu-add-cpp-h-extensions (xtns)
-  "Add one or more file extensions to the list of C and C++ extensions recognizd by the
+  "Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
 This modifies both shu-cpp-h-extensions and shu-cpp-extensions."
   (let (
@@ -258,7 +258,7 @@ source code."
 ;;  shu-set-c-project
 ;;
 (defun shu-set-c-project (start end)
-  "Mark a region in a file that contains one subdirecdtory name per line.
+  "Mark a region in a file that contains one subdirecdory name per line.
 Then invoke set-c-project and it will find and remember all of the c and h
 files in those subdirectories.  You may then subsequently visit any of
 those files by invoking M-x vh which will allow you to type in the file
@@ -472,7 +472,7 @@ name \"/u/foo/bar/thing.c\"."
 (defun shu-vh ()
   "Visit a c or h file in a project.  If point is on something that resembles a file
 name, then visit that file.  If the file name is followed by a colon and a number
-then go to that line in the file.  zif the line number is followed by a colon and
+then go to that line in the file.  If the line number is followed by a colon and
 a number then use the second number as the column number within the line."
   (interactive)
   (shu-internal-visit-project-file t)
@@ -485,8 +485,8 @@ a number then use the second number as the column number within the line."
 ;;
 ;;
 (defun shu-vj ()
-  "Visit a c or h file in a project.  Ignore tny text that point is on and visit the
-file typed in the ompletion buffer."
+  "Visit a c or h file in a project.  Ignore any text that point is on and visit the
+file typed in the completion buffer."
   (interactive)
   (shu-internal-visit-project-file nil)
   )
@@ -650,8 +650,8 @@ name, line number, and column number, a list with three entries."
 ;;  shu-on-the-word-line
 ;;
 (defun shu-on-the-word-line()
-  "Return the character position of the start of the curent word if point is sitting
-anywhre on the word \"line\".  This is used pick up file positions of the form:
+  "Return the character position of the start of the current word if point is sitting
+anywhere on the word \"line\".  This is used pick up file positions of the form:
 \"line 628 of frobnitz.cpp\""
   (let
       ((case-fold-search t)           ;; Searches ignore case
@@ -822,7 +822,7 @@ visit that file."
   "Choose from a number of possible file names.
 We have found an unqualified file name of interest but it resolves to multiple
 fully qualified file names.  Display all of the possibilities in a completion
-buffer and ask the user to choose the desired one.  The string contaning the
+buffer and ask the user to choose the desired one.  The string containing the
 chosen fully qualified file name will then be passed to the function pointed
 to by target."
   (ad-enable-advice 'choose-completion
@@ -868,7 +868,7 @@ choice out of the buffer in which mouse-choose-completion inserts it."
 ;;
 (defun shu-cpp-common-completion ()
   "Called when the user hits enter or clicks mouse button 2 on completion window.
-At this point the users selected choice is in the current bufffer.  We get the
+At this point the users selected choice is in the current buffer.  We get the
 answer from the current buffer and call the function that is currently
 pointed to by shu-cpp-completion-target."
   (let
@@ -926,7 +926,7 @@ by a completing read from a completion buffer."
 ;;
 (defun shu-count-c-project ()
   "Count the number of lines of code in a project.  The final count is shown in
-the minibuffer.  The counts of indivitial subdirectories are stored in the
+the minibuffer.  The counts of individual subdirectories are stored in the
 temporary buffer *shu-project-count*"
   (interactive)
   (let

@@ -38,28 +38,28 @@
 ;; a file that has been encrypted with GPG, you are prompted for the passphrase
 ;; and the file is decrypted into memory.
 ;;
-;; The file `keyring.txt` in the **usr** directory is am example of a small
-;; keyring file that has not been encruypted.  Each entry in the file consists of
-;; a set of name value pairs.  Each value may be enclosed in quotes if it
-;; contains embedded blanks.
+;; The file keyring.txt in the usr directory is am example of a small
+;; keyring file that has not been encrypted.  Each entry in the file consists of
+;; a set of name value pairs.  Each value may be enclosed in quotes and must be
+;; enclosed in quotes if it contains embedded blanks.
 ;;
 ;; A single set of name value pairs starts with an opening "<" and is terminated
-;; by a closing "\>".
+;; by a closing "/>".
 ;;
 ;; Here is an example of a set of name value pairs:
 ;;
 ;;      < name="Fred email" url=mail.google.com  id=freddy@gmail.com  pw=secret />
 ;;
 ;; The names may be arbitrary but there are six names that are recognized by the
-;; functons in `keyring.el`.  They are:
+;; functions in this package.  They are:
 ;;
 ;; acct represents an account number
 ;;
 ;; id represents a user ID
 ;;
 ;; name represents the name of the entry.  This is the key that is used to find
-;; the entry.  If mo name is given, then the name of the URL is used.  If the URL
-;; sarts with "www.", the "www." is removed to form the name.  An entry that has
+;; the entry.  If no name is given, then the name of the URL is used.  If the URL
+;; starts with "www.", the "www." is removed to form the name.  An entry that has
 ;; no name and a URL of "www.facebook.com" would have an auto generated name of
 ;; "facebook.com".
 ;;
@@ -71,13 +71,13 @@
 ;;
 ;; To use a keying file, place the following lines in your .emacs file:
 ;;
-;;      (load-file "~/.emacs.d/shu-base.elc")
-;;      (load-file "~/.emacs.d/shu-nvplist.elc")
-;;      (load-file "~/.emacs.d/shu-keyring.elc")
+;;      (load-file "/Users/fred/.emacs.d/shu-base.elc")
+;;      (load-file "/Users/fred/.emacs.d/shu-nvplist.elc")
+;;      (load-file "/Users/fred/.emacs.d/shu-keyring.elc")
 ;;      (shu-keyring-set-alias)
-;;      (setq shu-keyring-file "~/shu/usr/keyring.txt")
+;;      (setq shu-keyring-file "/Users/fred/shu/usr/keyring.txt")
 ;;
-;; replacing "~/shu/usr/keyring.txt" with the path to your keyring file.
+;; replacing "/Users/fred/shu/usr/keyring.txt" with the path to your keyring file.
 ;;
 ;; All of the shu functions require shu-base.
 ;;
@@ -88,7 +88,7 @@
 ;; and hit TAB to complete.  This fills out the name as "Fred email" and puts the
 ;; URL "mail.google.com" into the clip board.  Open a browser and paste the URL
 ;; into it to go to gmail.  At gmail, select login.  In emacs type M-x krid.
-;; When prompted for the key, use the up arrow to retrieve tha last key used,
+;; When prompted for the key, use the up arrow to retrieve the last key used,
 ;; which will be "Fred email".  This puts "freddy@gmail.com" into the clip board
 ;; for conveniently pasting into the gmail widow.  To obtain the password, type
 ;; M-x krpw.  This puts the password into the clip board from which it may be
@@ -184,7 +184,7 @@ entry in the keyring file.")
 
 (defconst shu-keyring-buffer-name  "**shu-keyring**"
   "The name of the buffer into which keyring diagnostics and messages
-are reorded.")
+are recorded.")
 
 
 
@@ -251,7 +251,7 @@ requesting it."
 (defun shu-keyring-get-file()
 "Display the name of the keyring file, if any.  This is useful if you are
 getting unexpected results from some of the query functions that look up keyring
-information.  Perhaps the uexpected results come from the fact that you are
+information.  Perhaps the unexpected results come from the fact that you are
 using the wrong keyring file."
 (interactive)
 (if shu-keyring-file
@@ -266,7 +266,7 @@ using the wrong keyring file."
   "This is called from after-save-hook to clear the keyring index if the keyring file is saved.
 The keyring index is built the first time it is needed and kept in memory thereafter.  But we
 must refresh the index if the keyring file is modified.  The easiest way to do this is to clear
-the index when the keyring file is modified.  The next time the index is neeeded it will be
+the index when the keyring file is modified.  The next time the index is needed it will be
 recreated."
   (let
       ((fn1 (buffer-file-name))
@@ -286,8 +286,8 @@ recreated."
 keyring buffer (**shu-keyring**).  If one of the queries for a url or other
 piece of information is unable to find the requested information, it could be
 that you have the wrong keyring file or that there is a syntax error in the
-ketring file.  shu-keyring-get-file (alias krfn) displays the name of the
-keyring file.  This function parses the keyring file.  AFter the operation. look
+keyring file.  shu-keyring-get-file (alias krfn) displays the name of the
+keyring file.  This function parses the keyring file.  After the operation. look
 into the keyring buffer (**shu-keyring**) to see if there are any complaints
 about syntax errors in the file."
   (interactive)
@@ -583,7 +583,7 @@ placed in the clipboard, (PW, ID, etc.)"
 (defun shu-keyring-set-alias ()
   "Set the common alias names for the functions in shu-keyring.
 These are generally the same as the function names with the leading
-shu- prefix removed.  But in this case the names are drastically shorrtened
+shu- prefix removed.  But in this case the names are drastically shortened
 to make them easier to type. "
   (defalias 'krpw 'shu-keyring-get-pw)
   (defalias 'krurl 'shu-keyring-get-url)

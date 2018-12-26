@@ -304,8 +304,8 @@ errors are found in the token list, then an empty list is returned."
 (defun shu-nvplist-make-token-list (tlist)
   "Turn an entry in a name / value file into a list of tokens.  The CAR of each entry is the point
 at which the token starts.  the CDR of each entry in the list is the token itself.  On entry
-to this function, point is immediately after the start delimeter (\"<\").  On return, point
-is positioned immediately after the end delimeter (\"/>\")."
+to this function, point is immediately after the start delimiter (\"<\").  On return, point
+is positioned immediately after the end delimiter (\"/>\")."
   (let
       ((gbuf      (get-buffer-create shu-unit-test-buffer))
        (debug-on-error   t)

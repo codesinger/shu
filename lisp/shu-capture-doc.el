@@ -194,7 +194,7 @@ of length zero"
 ;;  shu-capture-a-type-func
 ;;
 (defconst shu-capture-a-type-func 2
-  "The a-list key value that identifies the function that formats a fundtion signature'")
+  "The a-list key value that identifies the function that formats a function signature'")
 
 
 ;;
@@ -293,7 +293,7 @@ code snippet.")
 ;;  shu-capture-md-section-delimiter
 ;;
 (defconst shu-capture-md-section-delimiter "##"
-  "Define the markdown delimiter that is used to identfy a section.  This is se[arated
+  "Define the markdown delimiter that is used to identify a section.  This is separated
 from the section name by a space.")
 
 
@@ -301,14 +301,14 @@ from the section name by a space.")
 ;;  shu-capture-latex-section-start
 ;;
 (defconst shu-capture-latex-section-start "\\subsection{"
-  "Define the LaTex tag that is used to identfy the start of a section headig.")
+  "Define the LaTex tag that is used to identify the start of a section heading.")
 
 
 ;;
 ;;  shu-capture-latex-section-end
 ;;
 (defconst shu-capture-latex-section-end "}"
-  "Define the LaTex tag that is used to identfy the start of a section headig.")
+  "Define the LaTex tag that is used to identify the start of a section heading.")
 
 
 ;;
@@ -330,28 +330,28 @@ from the section name by a space.")
 ;;  shu-capture-latex-arg-start
 ;;
 (defconst shu-capture-latex-arg-start "\\emph{"
-  "Define the latex string that is used to prepended to an arguument name.")
+  "Define the latex string that is used to prepended to an argument name.")
 
 
 ;;
 ;;  shu-capture-latex-arg-end
 ;;
 (defconst shu-capture-latex-arg-end "}"
-  "Define the latex string that is used to terminate an arguument name.")
+  "Define the latex string that is used to terminate an argument name.")
 
 
 ;;
 ;;  shu-capture-latex-keywd-start
 ;;
 (defconst shu-capture-latex-keywd-start "\\textbf{"
-  "Define the latex string that is used to prepended to an arguument name.")
+  "Define the latex string that is used to prepended to an argument name.")
 
 
 ;;
 ;;  shu-capture-latex-keywd-end
 ;;
 (defconst shu-capture-latex-keywd-end "}"
-  "Define the latex string that is used to terminate an arguument name.")
+  "Define the latex string that is used to terminate an argument name.")
 
 
 ;;
@@ -483,7 +483,7 @@ code snippet.")
 ;;  shu-capture-doc-code-indent
 ;;
 (defconst shu-capture-doc-code-indent 4
-  "Any line indented by this much in a doc stringis assumed to be a sample
+  "Any line indented by this much in a doc string is assumed to be a sample
 code snippet.")
 
 
@@ -678,7 +678,7 @@ to LaTex."
   "Function that prepares a doc string to capture code snippets in LaTex.
 Enter with MIN-POINT and MAX-POINT defining the region to be changed.
 MIN-POINT cannot change because all changes are made after it.  But
-MAX-POINT will change if replacments add extra characters.  Return the
+MAX-POINT will change if replacements add extra characters.  Return the
 new value of MAX-POINT which takes into account the number of characters
 added to the text."
   (let ((xpoint max-point))
@@ -721,7 +721,7 @@ added to the text."
 ;;  shu-capture-finish-doc-string-md
 ;;
 (defun shu-capture-finish-doc-string-md ()
-  "Function that exeacutes last step in the conversion of a doc-string to
+  "Function that executes last step in the conversion of a doc-string to
 markdown."
     )
 
@@ -731,7 +731,7 @@ markdown."
 ;;  shu-capture-finish-doc-string-latex
 ;;
 (defun shu-capture-finish-doc-string-latex ()
-  "Function that exeacutes last step in the conversion of a doc-string to
+  "Function that executes last step in the conversion of a doc-string to
 markdown."
   (interactive)
     (goto-char (point-min))
@@ -772,7 +772,7 @@ markdown."
 ;;  shu-capture-md
 ;;
 (defun shu-capture-md ()
-  "Capture all of the function and macro definitions in a .el source file and tuem
+  "Capture all of the function and macro definitions in a .el source file and turn
 them into markdown text that documents the functions and their doc strings."
   (interactive)
     (shu-capture-doc shu-capture-md-converters)
@@ -784,7 +784,7 @@ them into markdown text that documents the functions and their doc strings."
 ;;  shu-capture-latex
 ;;
 (defun shu-capture-latex ()
-  "Capture all of the function and macro definitions in a .el source file and tuem
+  "Capture all of the function and macro definitions in a .el source file and turn
 them into a LaTex text that documents the functions and their doc strings."
   (interactive)
     (shu-capture-doc shu-capture-latex-converters)
@@ -832,7 +832,7 @@ either markdown or LaTex."
     (when (/= 0 (length alias-list))
       (setq sec-hdr (funcall section-converter 2 "List of functions by alias name"))
       (princ (concat "\n\n" sec-hdr "\n\n") gb)
-      (princ "A list of aliases and associted function names.\n\n" gb)
+      (princ "A list of aliases and associated function names.\n\n" gb)
       (shu-capture-show-list alias-list converters gb t))
     (setq func-list (sort func-list 'shu-doc-sort-compare))
     (when (/= 0 (length func-list))
@@ -1040,18 +1040,18 @@ found in the commentary section."
 ;;
 (defun shu-capture-get-doc-string (eof)
   "Enter with point positioned immediately after a function declaration.  Try to
-fetch the associatd doc string as follows:  1. Look for the first open or close
-[arenthesis.  2. Look for the first quote.  If the first parenthesis comes before
+fetch the associated doc string as follows:  1. Look for the first open or close
+parenthesis.  2. Look for the first quote.  If the first parenthesis comes before
 the first quote, then there is no doc string.  In the following function, there is
 no doc string:
 
      (defun foo (name)
        (interactive \"sName?: \"))
 
-but if we do not notice that the firt parenthesis comes before the first quote, then
+but if we do not notice that the first parenthesis comes before the first quote, then
 we might think that there is a doc string that contains \"sName?: \".
 
-Return the doc string if there is one, nil otherwie."
+Return the doc string if there is one, nil otherwise."
   (let ((xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
         (fp "[()]+")
         (first-quote 0)
@@ -1111,7 +1111,7 @@ Return the doc string if there is one, nil otherwie."
 and trailing quotes removed).  This function turns escaped quotes into regular
 (non-escaped) quotes and turns names with leading and trailing asterisks (e.g.,
 **project-count-buffer**) into short code blocks surrounded by back ticks.  It also
-turns upper case names into lower case names surrounded by mardown ticks."
+turns upper case names into lower case names surrounded by markdown ticks."
   (let ((esc-quote    "\\\\\"")
         (plain-quote  "\"")
         (star-name "*[a-zA-Z0-9*-_]+")
@@ -1194,7 +1194,7 @@ it a code snippet in markdown.  Return the number of code snippets marked."
 ;;  shu-capture-show-list
 ;;
 (defun shu-capture-show-list (func-list converters buffer is-alias-list)
-  "FUNC-LIST is a list of function and macro defintions.  CONVERTERS
+  "FUNC-LIST is a list of function and macro definitions.  CONVERTERS
 is an a-list of functions and strings as
 follows:
 
@@ -1208,7 +1208,7 @@ follows:
       shu-capture-a-type-doc-string    Function to finish formatting the doc string
       shu-capture-a-type-enclose-doc   Function to enclose doc string in begin / end
       shu-capture-a-type-before        String that starts a block of verbatim code
-      shu-capture-a-type-after         String that ends a block of verbstim code
+      shu-capture-a-type-after         String that ends a block of verbatim code
       shu-capture-a-type-open-quote    String that is an open quote
       shu-capture-a-type-close-quote   String that is a close quote
 
@@ -1340,16 +1340,16 @@ function definitions into either markdown or LaTex."
 ;;  shu-capture-make-args-md
 ;;
 (defun shu-capture-make-args-md (func-name markups func-type section-converter)
-  "FUNC-NAME is the name of the function, macro, alias, ect.  FUNC-TYPE is a
+  "FUNC-NAME is the name of the function, macro, alias, etc.  FUNC-TYPE is a
 string that represents the function type.  This will be part of the argument
 display.  MARKUPS is either nil or is a cons cell that points to two lists.  If
 MARKUPS is nil, the function has no arguments.  If MARKUPS is non-nil, it is a
 cons cell that points to two lists.  The car of MARKUPS is a list of the lengths
 of each argument before any markup was added to the argument.  If an argument
 name is \"arg1,\" its length is 4 even though the length of the argument name
-after markup is applied mDaye be longer.  The cdr of MARKUPS is a list of the
+after markup is applied may be longer.  The cdr of MARKUPS is a list of the
 arguments with markup applied to them.  SECTION-CONVERTER is the function that
-will turn a sring into a section heading."
+will turn a string into a section heading."
   (let (
         (ixb (get-buffer-create shu-capture-index-buffer))
         (arg)
@@ -1425,14 +1425,14 @@ will turn a sring into a section heading."
 ;;  shu-capture-make-args-latex
 ;;
 (defun shu-capture-make-args-latex (func-name markups func-type)
-  "FUNC-NAME is the name of the function, macro, alias, ect.  FUNC-TYPE is a
+  "FUNC-NAME is the name of the function, macro, alias, etc.  FUNC-TYPE is a
 string that represents the function type.  This will be part of the argument
 display.  MARKUPS is either nil or is a cons cell that points to two lists.  If
 MARKUPS is nil, the function has no arguments.  If MARKUPS is non-nil, it is a
 cons cell that points to two lists.  The car of MARKUPS is a list of the lengths
 of each argument before any markup was added to the argument.  If an argument
 name is \"arg1,\" its length is 4 even though the length of the argument name
-after markup is applied mDaye be longer.  The cdr of MARKUPS is a list of the
+after markup is applied may be longer.  The cdr of MARKUPS is a list of the
 arguments with markup applied to them."
   (let ((fill-string (concat
                       "\\index{" func-name "} "
@@ -1511,7 +1511,7 @@ follows:
       shu-capture-a-type-doc-string    Function to finish formatting the doc string
       shu-capture-a-type-enclose-doc   Function to enclose doc string in begin / end
       shu-capture-a-type-before        String that starts a block of verbatim code
-      shu-capture-a-type-after         String that ends a block of verbstim code
+      shu-capture-a-type-after         String that ends a block of verbatim code
       shu-capture-a-type-open-quote    String that is an open quote
       shu-capture-a-type-close-quote   String that is a close quote
 
@@ -1553,7 +1553,7 @@ follows:
       shu-capture-a-type-doc-string    Function to finish formatting the doc string
       shu-capture-a-type-enclose-doc   Function to enclose doc string in begin / end
       shu-capture-a-type-before        String that starts a block of verbatim code
-      shu-capture-a-type-after         String that ends a block of verbstim code
+      shu-capture-a-type-after         String that ends a block of verbatim code
       shu-capture-a-type-open-quote    String that is an open quote
       shu-capture-a-type-close-quote   String that is a close quote
 
@@ -1793,7 +1793,7 @@ present, are not copied into the a-list.
 
 For example, if SIGNATURE holds the following:
 
-     do-somerhing (with these things &optional and &rest others)
+     do-something (with these things &optional and &rest others)
 
 an a-list is returned with the keys \"others,\" \"and,\" \"things,\" \"these,\" and
 \"with.\""
@@ -1832,13 +1832,13 @@ to markup.
 
 This function returns a cons cell pointing to two lists.  The first list contains the length
 of each argument name prior to conversion to markup.  This is because the amount of space
-on a line is largely determied by the length of the unconverted argument.  \"arg\" will
+on a line is largely determined by the length of the unconverted argument.  \"arg\" will
 take much less space on a line than will the same word with markup added.  The second list
 contains each of the argument names converted to the appropriate markup.
 
 Given the following function signature:
 
-     do-somerhing (with these things &optional and &rest others)
+     do-something (with these things &optional and &rest others)
 
 the length list will contain (4, 5, 6, 9, 3, 5, 6).  The converted arguments list for
 markdown will contain (\"*with*\", \"*these*\", \"*things*\", \"**&optional**\", \"*and*\",

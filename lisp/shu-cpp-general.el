@@ -52,7 +52,7 @@
                 "uint32_t"
                 "uint64_t"
                 "unsigned")
-"A list of all of tbe base types in C and C++.  This may be modified by shu-add-cpp-base-types")
+"A list of all of the base types in C and C++.  This may be modified by shu-add-cpp-base-types")
 
 (defvar shu-cpp-member-prefix "_"
 "The character string that is used as the prefix to member variables of a C++ class.
@@ -84,7 +84,7 @@ This is used by shu-internal-get-set when generating getters and setters for a c
 (defun shu-add-cpp-base-types (ntypes)
   "Add one or more data types to the list of C++ native data types defined in shu-cpp-base-types
 in shu-cpp-general.el.  Argument may be a single type in a string or a list of strings.
-This mogifies shu-cpp-base-types."
+This modifies shu-cpp-base-types."
   (let (
     (nt ntypes)
        )
@@ -1846,7 +1846,7 @@ qualifier."
 ;;  shu-cpp-qualify-classes
 ;;
 (defun shu-cpp-qualify-classes (class-list namespace &optional buffer)
-  "Repeatedcly call SHU-QUALIFY-CLASS-NAME for all class names in CLASS-LIST.
+  "Repeatedly call SHU-QUALIFY-CLASS-NAME for all class names in CLASS-LIST.
 NAMESPACE is either the name of a single namespace to apply to all classes
 in CLASS-LIST or is a list of namespaces each of which has a one to one
 correspondence with a class name in CLASS-LIST.  The optional BUFFER
@@ -1962,7 +1962,7 @@ count of class names changed."
 ;;
 (defun shu-dbx-summarize-malloc ()
   "Go through the output of a dbx malloc dump and generate a summary.  dbx is
-the AIX debugger.  It has a malloc comand that goes through the heap and prints
+the AIX debugger.  It has a malloc command that goes through the heap and prints
 one line for every allocated buffer.  Here is a sample of some of its output:
 
          ADDRESS         SIZE HEAP    ALLOCATOR

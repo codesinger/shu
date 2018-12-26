@@ -34,7 +34,7 @@
 (require 'shu-base)
 
 (defcustom shu-bde-gen-file-identifier-hook nil
-  "Generate the text that constitiutes a source file identifier, if any."
+  "Generate the text that constitutes a source file identifier, if any."
   :type 'hook
   :group 'shu-bde)
 

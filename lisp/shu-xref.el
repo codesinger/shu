@@ -167,7 +167,7 @@
               "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
               "_" "-" "$") nil)
 
-"A regular expression to match a varaiable name in emacs lisp.")
+"A regular expression to match a variable name in emacs lisp.")
 (defconst shu-xref-var-types
   '(("un"     . 1)
     ("macro"  . 2)
@@ -242,7 +242,7 @@ Then invoke shu-make-xref.  It will do a cross reference of all of those files."
 ;;
 (defun shu-xref-get-file-list (start end file-list)
   "Return a list of file names from a region of a buffer.  START and END
-define the region.  Each line in the region is aasumed to be a file name.
+define the region.  Each line in the region is assumed to be a file name.
 FILE-LIST is the list that is also the return value of this function."
   (interactive "r")                 ; bounds of marked region (start end)
   (let (
