@@ -1666,7 +1666,7 @@ function to return the new text end point to this function."
             (beginning-of-line))))
       (setq line-diff (forward-line 1)))
     (if in-code
-        (insert (concat after-code "\n"))
+        (insert (concat "\n" after-code))
       (setq plain-text-end (point))
       (setq plain-text-end (funcall text-converter plain-text-start plain-text-end)))
     count
