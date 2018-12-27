@@ -28,8 +28,6 @@
 
 **Table Of Contents**
 
-
-
 * [shu-base](#shu-base)
 * [shu-bde-cp](#shu-bde-cp)
 * [shu-bde](#shu-bde)
@@ -4381,8 +4379,8 @@ if the commit range specified is either "31.33" or "31+2", then the following
 is put into the kill ring:
 
 ```
-    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "```
-
+    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "
+```
 
 
 
@@ -4705,8 +4703,8 @@ if the commit range specified is either "31.33" or "31+2", then the following
 is put into the kill ring:
 
 ```
-    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "```
-
+    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "
+```
 
 
 
@@ -5291,6 +5289,7 @@ within type.
 
 Associate a number with each type of variable
 
+
 # Index #
 
 * [acgen](#acgen)
@@ -5818,7 +5817,6 @@ Associate a number with each type of variable
 * [trim-trailing-blanks](#trim-trailing-blanks)
 * [which-c-project](#which-c-project)
 * [winpath](#winpath)
-
 
 
 <!--
