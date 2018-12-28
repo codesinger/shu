@@ -93,7 +93,20 @@ this point is assumed to be a block comment."
 
 (defcustom shu-cpp-include-user-brackets nil
   "Set non-nil if user written include files are to be delimited by
-angle brackets instead of quotes."
+angle brackets instead of quotes.
+In many C anc C++ environments, system include files such as stdio.h are delimited
+by angle brackets, for example:
+
+      #include <stdio.h>
+
+while user written include files are delimited by quotes, for example:
+
+      #include \"myclass.h\"
+
+If this variable is non-nil, then user written include files are delimited
+by angle brackets and an include of \"myclass.h\" would be written as
+
+      #include <myclass.h>"
   :type '(number)
   :group 'shu-base)
 
