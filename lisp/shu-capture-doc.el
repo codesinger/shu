@@ -558,6 +558,71 @@ function and its associated doc string and convert it to markdown.")
 function and its associated doc string and convert it to LaTex.")
 
 
+;;
+;;  shu-capture-file-list
+;;
+(defconst shu-capture-file-list
+  (list
+   "shu-overview.el"
+   "shu-base.el"
+   "shu-bde-cpp.el"
+   "shu-bde.el"
+   "shu-capture-doc.el"
+   "shu-cpp-general.el"
+   "shu-cpp-misc.el"
+   "shu-cpp-project.el"
+   "shu-cpp-token.el"
+   "shu-keyring.el"
+   "shu-misc.el"
+   "shu-nvplist.el"
+   "shu-org-extensions.el"
+   "shu-xref.el")
+  "This is a list of all of the files in this repository from which documentation
+should be extracted.")
+
+
+
+;;
+;;  shu-capture-all-md
+;;
+(defun shu-capture-all-md ()
+  "Visit all of the files in SHU-CAPTURE-FILE-LIST, invoking SHU-CAPTURE-MD on each
+file to capture its documentation and turn it into markdown source."
+  (interactive)
+  (let ((xx shu-capture-file-list)
+        (fn)
+         (fbuf))
+    (while xx
+      (setq fn (car xx))
+      (setq fbuf (shu-conditional-find-file fn))
+      (shu-capture-md)
+      (when (not fbuf)
+        (kill-buffer (current-buffer)))
+      (setq xx (cdr xx)))
+    ))
+
+
+
+;;
+;;  shu-capture-all-latex
+;;
+(defun shu-capture-all-latex ()
+  "Visit all of the files in SHU-CAPTURE-FILE-LIST, invoking SHU-CAPTURE-LATEX on
+each file to capture its documentation and turn it into LaTex source."
+  (interactive)
+  (let ((xx shu-capture-file-list)
+        (fn)
+         (fbuf))
+    (while xx
+      (setq fn (car xx))
+      (setq fbuf (shu-conditional-find-file fn))
+      (shu-capture-latex)
+      (when (not fbuf)
+        (kill-buffer (current-buffer)))
+      (setq xx (cdr xx)))
+    ))
+
+
 
 ;;
 ;;  shu-capture-make-md-section

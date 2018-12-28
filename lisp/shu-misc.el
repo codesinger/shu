@@ -797,6 +797,36 @@ if the given HASH is not a valid git revision."
   ))
 
 
+
+
+;;
+;;  shu-conditional-find-file
+;;
+(defun shu-conditional-find-file (file-name)
+  "Make the buffer for FILE-NAME the current buffer.  If FILE-NAME is already
+loaded into a buffer, then make that the current buffer.  If FILE-NAME is not
+loaded into a buffer, load the file into a buffer and make that the current
+buffer.  Return true if this function created the buffer, nil otherwise.
+
+This function is intended to handle the situation in which a function wants
+to visit the contents of several files but does not want to leave behind a
+lot of file buffers that it created.
+
+If this function returns true, then the calling function should kill the
+buffer when it is finished with it."
+  (interactive)
+  (let (
+        (fbuf (get-buffer file-name))
+        (file-buf)
+        )
+    (if fbuf
+        (setq file-buf fbuf)
+      (setq file-buf (find-file-noselect file-name)))
+    (set-buffer file-buf)
+    fbuf
+    ))
+
+
 ;;
 ;;  shu-misc-set-alias
 ;;
