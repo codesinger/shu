@@ -2,7 +2,7 @@
 ;;
 ;; Copyright (C) 2018 Stewart L. Palmer
 ;;
-;; Package: overview
+;; Package: Overview
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -28,9 +28,12 @@
 ;; This manual contains detailed information on all of the function, macro,
 ;; variable, and constant definitions in this repository.
 ;;
-;; What is lacks are detailed scenarios and work flows.  The reader might well
-;; say that this is an interesting collection of parts, and then go on to ask
-;; how to use it.  How does one use all of these things in a coherent manner?
+;; This is Version 1.0 of the shu elisp repository.
+;;
+;; What this document lacks lacks are detailed scenarios and work flows.  The
+;; reader might well say that this is an interesting collection of parts, and
+;; then go on to ask how to use it.  How does one use all of these things in a
+;; coherent manner?
 ;;
 ;; I hope to address that in the near future.
 ;;
@@ -41,5 +44,5 @@
 
 ;;; Code:
 
-;; This file contains no code.  It is here for the content of the Commentary
+;; This file contains no code.  It is here only for the content of the Commentary
 ;; above
