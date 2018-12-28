@@ -2,7 +2,7 @@
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
-;; Package: shu-bde-cp
+;; Package: shu-bde-cpp
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.

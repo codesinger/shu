@@ -391,7 +391,7 @@ any other name that has leading and trailing asterisks")
 ;;
 ;;  shu-capture-latex-code-start
 ;;
-(defconst shu-capture-latex-code-start "\\begin{verbatim}"
+(defconst shu-capture-latex-code-start "\\small{\\begin{verbatim}"
   "Define the LaTex string that is at the beginning of a verbatim
 code snippet.")
 
@@ -399,7 +399,7 @@ code snippet.")
 ;;
 ;;  shu-capture-latex-code-end
 ;;
-(defconst shu-capture-latex-code-end "\\end{verbatim}"
+(defconst shu-capture-latex-code-end "\\end{verbatim}}"
   "Define the LaTex string that is at the end of a verbatim
 code snippet.")
 
@@ -511,7 +511,7 @@ code snippet.")
 ;;  shu-capture-toc-buffer
 ;;
 (defconst shu-capture-toc-buffer "**shu-capture-toc**"
-  "Name of the buffer into which the markdown yable of contents is written")
+  "Name of the buffer into which the markdown table of contents is written")
 
 
 
@@ -670,13 +670,16 @@ write a corresponding entry into the markdown table of contents buffer."
         (prefix "")
         (header)
         (start)
+        (newp "")
     )
+    (when (= 1 level)
+      (setq newp (concat "\\" "eject" "\n")))
     (while (> x 0)
       (setq prefix (concat "sub" prefix))
       (setq x (1- x))
       )
     (setq start (concat "\\" prefix base))
-    (setq header (concat start hdr shu-capture-latex-section-end))
+    (setq header (concat newp start hdr shu-capture-latex-section-end))
     header
     ))
 

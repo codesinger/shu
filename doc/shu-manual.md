@@ -4,7 +4,7 @@
 
  Copyright (C) 2018 Stewart L. Palmer
 
- Author: Stewart L. Pslmer <stewart@stewartpalmer.com>
+ Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 
  This file is NOT part of GNU Emacs.
 
@@ -30,7 +30,7 @@
 
 * [Overview](#Overview)
 * [shu-base](#shu-base)
-* [shu-bde-cp](#shu-bde-cp)
+* [shu-bde-cpp](#shu-bde-cpp)
 * [shu-bde](#shu-bde)
 * [shu-capture-doc](#shu-capture-doc)
 * [shu-cpp-general](#shu-cpp-general)
@@ -52,13 +52,13 @@
 This manual contains detailed information on all of the function, macro,
 variable, and constant definitions in this repository.
 
-What is lacks are detailed senarios and work flows.  The reader might well
+What is lacks are detailed scenarios and work flows.  The reader might well
 say that this is an interesting collection of parts, and then go on to ask
 how to use it.  How does one use all of these things in a coherent manner?
 
 I hope to address that in the near future.
 
-One thing I will mention is that the function *shu-capture-all-latex* ceated
+One thing I will mention is that the function *shu-capture-all-latex* created
 the entire LaTex users manual (shu-manual.tex) and the function
 *shu-capture-all-md* created the entire markdown version of the users manual
 (shu-manual.md).
@@ -170,7 +170,7 @@ A regular expression to match the name of a C or C++ file in the file system.
 
 Set non-nil if user written include files are to be delimited by
 angle brackets instead of quotes.
-In many C anc C++ environments, system include files such as stdio.h are delimited
+In many C and C++ environments, system include files such as stdio.h are delimited
 by angle brackets, for example:
 
 ```
@@ -376,7 +376,7 @@ relative to the start of the buffer, whether or not narrowing is in effect.
 
 The name of the buffer into which unit tests place their output and debug trace.
 
-# shu-bde-cp #
+# shu-bde-cpp #
 
 
 A collection of useful functions for generating C++ skeleton code files
@@ -1667,7 +1667,7 @@ Show a list
 #### shu-capture-toc-buffer ####
 [Constant]
 
-Name of the buffer into which the markdown yable of contents is written
+Name of the buffer into which the markdown table of contents is written
 
 
 
@@ -5929,6 +5929,6 @@ LocalWords:  cc ct qt uq keyring IDs GPG EasyPG passphrase usr url pw acct www c
 LocalWords:  facebook setq gmail krurl em krid krpw kracct krfn krpin krvf vlist cb
 LocalWords:  urls Lastname Firstname diff dbc ee da ec dup eld gd dired gf gfc gfl
 LocalWords:  gfn gquote ert SHA dos eol CRLF unix LF winpath eob YYYY DDTHHMMSS DDD
-LocalWords:  DD mac CR nvplist org TODO expiry CANCELLED todo xref defs retval
-LocalWords:  funcall
+LocalWords:  DD mac CR nvplist org TODO expiry CANCELLED todo xref defs retval tex
+LocalWords:  funcall myclass toc unescaped nvpair
 -->

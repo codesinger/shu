@@ -94,7 +94,7 @@ this point is assumed to be a block comment."
 (defcustom shu-cpp-include-user-brackets nil
   "Set non-nil if user written include files are to be delimited by
 angle brackets instead of quotes.
-In many C anc C++ environments, system include files such as stdio.h are delimited
+In many C and C++ environments, system include files such as stdio.h are delimited
 by angle brackets, for example:
 
       #include <stdio.h>

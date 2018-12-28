@@ -24,25 +24,25 @@
 
 
 
-
 \section{Overview}
 
 
 This manual contains detailed information on all of the function, macro,
 variable, and constant definitions in this repository.
 
-What is lacks are detailed senarios and work flows.  The reader might well
+What is lacks are detailed scenarios and work flows.  The reader might well
 say that this is an interesting collection of parts, and then go on to ask
 how to use it.  How does one use all of these things in a coherent manner?
 
 I hope to address that in the near future.
 
-One thing I will mention is that the function \emph{shu-capture-all-latex} ceated
+One thing I will mention is that the function \emph{shu-capture-all-latex} created
 the entire LaTex users manual (shu-manual.tex) and the function
 \emph{shu-capture-all-md} created the entire markdown version of the users manual
 (shu-manual.md).
 
 
+\eject
 \section{shu-base}
 
 
@@ -181,25 +181,25 @@ A regular expression to match the name of a C or C++ file in the file system.
 \begin{doc-string}
 Set non-nil if user written include files are to be delimited by
 angle brackets instead of quotes.
-In many C anc C++ environments, system include files such as stdio.h are delimited
+In many C and C++ environments, system include files such as stdio.h are delimited
 by angle brackets, for example:
 
-\begin{verbatim}
+\small{\begin{verbatim}
       #include <stdio.h>
-\end{verbatim}
+\end{verbatim}}
 
 while user written include files are delimited by quotes, for example:
 
-\begin{verbatim}
+\small{\begin{verbatim}
       #include ``myclass.h''
-\end{verbatim}
+\end{verbatim}}
 
 If this variable is non-nil, then user written include files are delimited
 by angle brackets and an include of ``myclass.h'' would be written as
 
-\begin{verbatim}
+\small{\begin{verbatim}
       #include <myclass.h>
-\end{verbatim}
+\end{verbatim}}
 \end{doc-string}
 
 \vspace{1em}
@@ -441,7 +441,8 @@ relative to the start of the buffer, whether or not narrowing is in effect.
 The name of the buffer into which unit tests place their output and debug trace.
 \end{doc-string}
 
-\section{shu-bde-cp}
+\eject
+\section{shu-bde-cpp}
 
 
 A collection of useful functions for generating C++ skeleton code files
@@ -524,6 +525,7 @@ Generate a skeleton header file
 Generate a skeleton t.cpp file
 \end{doc-string}
 
+\eject
 \section{shu-bde}
 
 
@@ -871,6 +873,7 @@ Generate a skeleton header file
 Generate a skeleton t.cpp file
 \end{doc-string}
 
+\eject
 \section{shu-capture-doc}
 
 
@@ -1227,9 +1230,9 @@ contains each of the argument names converted to the appropriate markup.
 
 Given the following function signature:
 
-\begin{verbatim}
+\small{\begin{verbatim}
      do-something (with these things \&optional and \&rest others)
-\end{verbatim}
+\end{verbatim}}
 
 the length list will contain (4, 5, 6, 9, 3, 5, 6).  The converted arguments list for
 markdown will contain (``\emph\{*with*\}'', ``\emph\{*these*\}'', ``\emph\{*things*\}'', ``\emph\{**\}\&optional\emph\{**\}'', ``\emph\{*and*\}'',
@@ -1251,7 +1254,7 @@ above described cons cell.
 and trailing quotes removed).  \emph{converters} is an a-list of functions and strings as
 follows:
 
-\begin{verbatim}
+\small{\begin{verbatim}
       Key                              Value
       ---                              -----
       shu-capture-a-type-hdr           Function to format a section header
@@ -1265,7 +1268,7 @@ follows:
       shu-capture-a-type-after         String that ends a block of verbatim code
       shu-capture-a-type-open-quote    String that is an open quote
       shu-capture-a-type-close-quote   String that is a close quote
-\end{verbatim}
+\end{verbatim}}
 
 This function turns escaped quotes into open and close quote strings, turns names
 with leading and trailing asterisks (e.g., \emph\{**project-buffer**\}) into formatted buffer
@@ -1348,9 +1351,9 @@ is probably markdown or LaTex, and it is then replaced in the doc string buffer.
 
 For example, if the function has the following signature:
 
-\begin{verbatim}
+\small{\begin{verbatim}
      do-something (hat cat)
-\end{verbatim}
+\end{verbatim}}
 
 with the following doc string:
 
@@ -1459,9 +1462,9 @@ present, are not copied into the a-list.
 
 For example, if \emph{signature} holds the following:
 
-\begin{verbatim}
+\small{\begin{verbatim}
      do-something (with these things \&optional and \&rest others)
-\end{verbatim}
+\end{verbatim}}
 
 an a-list is returned with the keys ``others,'' ``and,'' ``things,'' ``these,'' and
 ``with.''
@@ -1480,10 +1483,10 @@ parenthesis.  2. Look for the first quote.  If the first parenthesis comes befor
 the first quote, then there is no doc string.  In the following function, there is
 no doc string:
 
-\begin{verbatim}
+\small{\begin{verbatim}
      (defun foo (name)
        (interactive ``sName?: ``))
-\end{verbatim}
+\end{verbatim}}
 
 but if we do not notice that the first parenthesis comes before the first quote, then
 we might think that there is a doc string that contains ``sName?: ``.
@@ -1533,9 +1536,9 @@ Extract the function signature from the func-def
 Extract the function and the string of arguments from a whole signature that
 includes both the function name and the arguments.  If \emph{signature} contains:
 
-\begin{verbatim}
+\small{\begin{verbatim}
      ``do-something (to something)''
-\end{verbatim}
+\end{verbatim}}
 
 The on return \emph{func-name} will hold ``do-something'' and \emph{args} will contain the
 string ``to something)''.  If there are no arguments, \emph{args} will contain a string
@@ -1577,7 +1580,7 @@ markdown.
 and trailing quotes removed).  \emph{converters} is an a-list of functions and strings as
 follows:
 
-\begin{verbatim}
+\small{\begin{verbatim}
       Key                              Value
       ---                              -----
       shu-capture-a-type-hdr           Function to format a section header
@@ -1591,7 +1594,7 @@ follows:
       shu-capture-a-type-after         String that ends a block of verbatim code
       shu-capture-a-type-open-quote    String that is an open quote
       shu-capture-a-type-close-quote   String that is a close quote
-\end{verbatim}
+\end{verbatim}}
 
 This function turns escaped quotes into open and close quote strings, turns names
 with leading and trailing asterisks (e.g., \emph\{**project-buffer**\}) into formatted buffer
@@ -2036,7 +2039,7 @@ Create a func-def to describe the function
 is an a-list of functions and strings as
 follows:
 
-\begin{verbatim}
+\small{\begin{verbatim}
       Key                              Value
       ---                              -----
       shu-capture-a-type-hdr           Function to format a section header
@@ -2050,7 +2053,7 @@ follows:
       shu-capture-a-type-after         String that ends a block of verbatim code
       shu-capture-a-type-open-quote    String that is an open quote
       shu-capture-a-type-close-quote   String that is a close quote
-\end{verbatim}
+\end{verbatim}}
 
 This function goes through the list and uses the \emph{converters} to turn the set of
 function definitions into either markdown or LaTex.
@@ -2073,7 +2076,7 @@ Show a list
 \index{shu-capture-toc-buffer} \hfill [Constant]
 
 \begin{doc-string}
-Name of the buffer into which the markdown yable of contents is written
+Name of the buffer into which the markdown table of contents is written
 \end{doc-string}
 
 \vspace{1em}
@@ -2120,6 +2123,7 @@ turns upper case names into lower case names surrounded by markdown ticks.
 Compare two function names in a sort.
 \end{doc-string}
 
+\eject
 \section{shu-cpp-general}
 
 
@@ -2305,12 +2309,12 @@ Go through the output of a dbx malloc dump and generate a summary.  dbx is
 the AIX debugger.  It has a malloc command that goes through the heap and prints
 one line for every allocated buffer.  Here is a sample of some of its output:
 
-\begin{verbatim}
+\small{\begin{verbatim}
          ADDRESS         SIZE HEAP    ALLOCATOR
       0x30635678          680    0     YORKTOWN
       0x30635928          680    0     YORKTOWN
       0x30635bd8          680    0     YORKTOWN
-\end{verbatim}
+\end{verbatim}}
 
 YORKTOWN is the name of the default allocator on AIX.  This function goes
 through the malloc output and gets the number and sizes of all buffers
@@ -2858,12 +2862,12 @@ Go through the output of a dbx malloc dump and generate a summary.  dbx is
 the AIX debugger.  It has a malloc command that goes through the heap and prints
 one line for every allocated buffer.  Here is a sample of some of its output:
 
-\begin{verbatim}
+\small{\begin{verbatim}
          ADDRESS         SIZE HEAP    ALLOCATOR
       0x30635678          680    0     YORKTOWN
       0x30635928          680    0     YORKTOWN
       0x30635bd8          680    0     YORKTOWN
-\end{verbatim}
+\end{verbatim}}
 
 YORKTOWN is the name of the default allocator on AIX.  This function goes
 through the malloc output and gets the number and sizes of all buffers
@@ -3333,6 +3337,7 @@ file.
 The variable name that corresponds to an attribute name.
 \end{doc-string}
 
+\eject
 \section{shu-cpp-misc}
 
 
@@ -3602,6 +3607,7 @@ Generate a skeleton header file
 Generate a skeleton t.cpp file
 \end{doc-string}
 
+\eject
 \section{shu-cpp-project}
 
 
@@ -4094,10 +4100,10 @@ of all of the c and h files in the subdirectory, and as values the the
 fully qualified name and path of the c or h file.  So if the directory
 ``/u/foo/bar'' contains thing.c and what.h the returned alist would be
 
-\begin{verbatim}
+\small{\begin{verbatim}
       ( (``thing.c'' ``/u/foo/bar/thing.c'')
         (``what.h''  ``/u/foo/bar/what.h'' ) )
-\end{verbatim}
+\end{verbatim}}
 
 This allows us to associate the key ``thing.c'' with the fully qualified
 name ``/u/foo/bar/thing.c''.
@@ -4473,6 +4479,7 @@ project.  Then switch to that buffer.  The idea is to invoke this function, look
 results in that buffer, and then quit out of the buffer.
 \end{doc-string}
 
+\eject
 \section{shu-cpp-token}
 
 
@@ -4732,9 +4739,9 @@ and its matching ``$>$``).  In addition, adjust the end point of the token
 immediately prior to the template parameter to be that of the endpoint of the
 template parameter.
 Thus something like the following:
-\begin{verbatim}
+\small{\begin{verbatim}
     Mumble<int, double>
-\end{verbatim}
+\end{verbatim}}
 becomes the token ``Mumble'' with a length of 19.  If \emph{preserve-template} is true,
 then we change the token that contains the type name by copying the template
 parameters into it.  If the type name token was ``Mumble'', then the token
@@ -5042,6 +5049,7 @@ error, return the token list, else return nil
 Undocumented
 \end{doc-string}
 
+\eject
 \section{shu-keyring}
 
 
@@ -5068,9 +5076,9 @@ by a closing "/$>$".
 
 Here is an example of a set of name value pairs:
 
-\begin{verbatim}
+\small{\begin{verbatim}
      < name="Fred email" url=mail.google.com  id=freddy@gmail.com  pw=secret />
-\end{verbatim}
+\end{verbatim}}
 
 The names may be arbitrary but there are six names that are recognized by the
 functions in this package.  They are:
@@ -5093,13 +5101,13 @@ url represents a URL
 
 To use a keying file, place the following lines in your .emacs file:
 
-\begin{verbatim}
+\small{\begin{verbatim}
      (load-file "/Users/fred/.emacs.d/shu-base.elc")
      (load-file "/Users/fred/.emacs.d/shu-nvplist.elc")
      (load-file "/Users/fred/.emacs.d/shu-keyring.elc")
      (shu-keyring-set-alias)
      (setq shu-keyring-file "/Users/fred/shu/usr/keyring.txt")
-\end{verbatim}
+\end{verbatim}}
 
 replacing "/Users/fred/shu/usr/keyring.txt" with the path to your keyring file.
 
@@ -5556,6 +5564,7 @@ into the keyring buffer (\emph\{**shu-keyring**\}) to see if there are any compl
 about syntax errors in the file.
 \end{doc-string}
 
+\eject
 \section{shu-misc}
 
 
@@ -5595,17 +5604,17 @@ commits, and put into the kill ring a git diff command specifying the two commit
 
 For example, given the following two numbered commits:
 
-\begin{verbatim}
+\small{\begin{verbatim}
     31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
     33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
-\end{verbatim}
+\end{verbatim}}
 
 if the commit range specified is either ``31.33'' or ``31+2'', then the following
 is put into the kill ring:
 
-\begin{verbatim}
+\small{\begin{verbatim}
     ``git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 ``
-\end{verbatim}
+\end{verbatim}}
 \end{doc-string}
 
 \vspace{1em}
@@ -5931,13 +5940,13 @@ The commit log is assume to have been numbered by shu-git-number-commits.
 
 \begin{doc-string}
 Go through a buffer that contains timestamps of the form
-\begin{verbatim}
+\small{\begin{verbatim}
      YYYY-MM-DDTHHMMSS.DDD
-\end{verbatim}
+\end{verbatim}}
 converting them to the form
-\begin{verbatim}
+\small{\begin{verbatim}
      YYYY-MM-DD HH:MM:SS.DDD
-\end{verbatim}
+\end{verbatim}}
 The latter is a format that Microsoft Excel can import.
 \end{doc-string}
 
@@ -6033,17 +6042,17 @@ commits, and put into the kill ring a git diff command specifying the two commit
 
 For example, given the following two numbered commits:
 
-\begin{verbatim}
+\small{\begin{verbatim}
     31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
     33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
-\end{verbatim}
+\end{verbatim}}
 
 if the commit range specified is either ``31.33'' or ``31+2'', then the following
 is put into the kill ring:
 
-\begin{verbatim}
+\small{\begin{verbatim}
     ``git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 ``
-\end{verbatim}
+\end{verbatim}}
 \end{doc-string}
 
 \vspace{1em}
@@ -6380,6 +6389,7 @@ Take marked region, put in kill ring, changing / to \.
 This makes it a valid path on windows machines.
 \end{doc-string}
 
+\eject
 \section{shu-nvplist}
 
 
@@ -6504,6 +6514,7 @@ Undocumented
 Undocumented
 \end{doc-string}
 
+\eject
 \section{shu-org-extensions}
 
 
@@ -6607,6 +6618,7 @@ Return a regular expression that will match a particular TODO state record of th
 Key words that represent the not DONE state.
 \end{doc-string}
 
+\eject
 \section{shu-xref}
 
 
