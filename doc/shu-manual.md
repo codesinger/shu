@@ -28,6 +28,7 @@
 
 **Table Of Contents**
 
+* [Overview](#Overview)
 * [shu-base](#shu-base)
 * [shu-bde-cp](#shu-bde-cp)
 * [shu-bde](#shu-bde)
@@ -43,6 +44,24 @@
 * [shu-xref](#shu-xref)
 * [Index](#Index)
 
+
+
+# Overview #
+
+
+This manual contains detailed information on all of the function, macro,
+variable, and constant definitions in this repository.
+
+What is lacks are detailed senarios and work flows.  The reader might well
+say that this is an interesting collection of parts, and then go on to ask
+how to use it.  How does one use all of these things in a coherent manner?
+
+I hope to address that in the near future.
+
+One thing I will mention is that the function *shu-capture-all-latex* ceated
+the entire LaTex users manual (shu-manual.tex) and the function
+*shu-capture-all-md* created the entire markdown version of the users manual
+(shu-manual.md).
 
 
 # shu-base #
@@ -151,6 +170,25 @@ A regular expression to match the name of a C or C++ file in the file system.
 
 Set non-nil if user written include files are to be delimited by
 angle brackets instead of quotes.
+In many C anc C++ environments, system include files such as stdio.h are delimited
+by angle brackets, for example:
+
+```
+      #include <stdio.h>
+```
+
+while user written include files are delimited by quotes, for example:
+
+```
+      #include "myclass.h"
+```
+
+If this variable is non-nil, then user written include files are delimited
+by angle brackets and an include of "myclass.h" would be written as
+
+```
+      #include <myclass.h>
+```
 
 
 
@@ -807,6 +845,22 @@ Undocumented
 
 
 
+#### shu-capture-all-latex ####
+[Command]
+
+Visit all of the files in *shu-capture-file-list*, invoking *shu-capture-latex* on
+each file to capture its documentation and turn it into LaTex source.
+
+
+
+#### shu-capture-all-md ####
+[Command]
+
+Visit all of the files in *shu-capture-file-list*, invoking *shu-capture-md* on each
+file to capture its documentation and turn it into markdown source.
+
+
+
 #### shu-capture-arg-to-latex ####
 shu-capture-arg-to-latex *arg-name*
 [Function]
@@ -1091,6 +1145,14 @@ Enclose the doc-string with the appropriate begin / end pair for markdown.
 
 
 
+#### shu-capture-file-list ####
+[Constant]
+
+This is a list of all of the files in this repository from which documentation
+should be extracted.
+
+
+
 #### shu-capture-finish-doc-string-latex ####
 [Command]
 
@@ -1204,6 +1266,16 @@ of length zero
 [Constant]
 
 Name of the buffer into which the markdown index is written
+
+
+
+#### shu-capture-internal-all ####
+shu-capture-internal-all *file-list* *capture-func*
+[Function]
+
+Visit all of the files in *file-list*, invoking *capture-func* on each
+file to capture its documentation and turn it into either LaTex or
+markdown.
 
 
 
@@ -4575,6 +4647,24 @@ Position to the start of the file and invoke once.
 
 
 
+#### shu-conditional-find-file ####
+shu-conditional-find-file *file-name*
+[Command]
+
+Make the buffer for *file-name* the current buffer.  If *file-name* is already
+loaded into a buffer, then make that the current buffer.  If *file-name* is not
+loaded into a buffer, load the file into a buffer and make that the current
+buffer.  Return true if this function created the buffer, nil otherwise.
+
+This function is intended to handle the situation in which a function wants
+to visit the contents of several files but does not want to leave behind a
+lot of file buffers that it created.
+
+If this function returns true, then the calling function should kill the
+buffer when it is finished with it.
+
+
+
 #### shu-disabled-quit ####
 [Command]
 
@@ -5422,6 +5512,8 @@ Associate a number with each type of variable
 * [shu-capture-a-type-open-quote](#shu-capture-a-type-open-quote)
 * [shu-capture-alias-list](#shu-capture-alias-list)
 * [shu-capture-aliases](#shu-capture-aliases)
+* [shu-capture-all-latex](#shu-capture-all-latex)
+* [shu-capture-all-md](#shu-capture-all-md)
 * [shu-capture-arg-to-latex](#shu-capture-arg-to-latex)
 * [shu-capture-arg-to-md](#shu-capture-arg-to-md)
 * [shu-capture-attr-alias](#shu-capture-attr-alias)
@@ -5448,6 +5540,7 @@ Associate a number with each type of variable
 * [shu-capture-doc](#shu-capture-doc)
 * [shu-capture-enclose-doc-latex](#shu-capture-enclose-doc-latex)
 * [shu-capture-enclose-doc-md](#shu-capture-enclose-doc-md)
+* [shu-capture-file-list](#shu-capture-file-list)
 * [shu-capture-finish-doc-string-latex](#shu-capture-finish-doc-string-latex)
 * [shu-capture-finish-doc-string-md](#shu-capture-finish-doc-string-md)
 * [shu-capture-func-type-name](#shu-capture-func-type-name)
@@ -5458,6 +5551,7 @@ Associate a number with each type of variable
 * [shu-capture-get-func-def](#shu-capture-get-func-def)
 * [shu-capture-get-name-and-args](#shu-capture-get-name-and-args)
 * [shu-capture-index-buffer](#shu-capture-index-buffer)
+* [shu-capture-internal-all](#shu-capture-internal-all)
 * [shu-capture-internal-convert-doc-string](#shu-capture-internal-convert-doc-string)
 * [shu-capture-internal-doc](#shu-capture-internal-doc)
 * [shu-capture-keywd-optional](#shu-capture-keywd-optional)
@@ -5510,6 +5604,7 @@ Associate a number with each type of variable
 * [shu-comma-names-to-letter](#shu-comma-names-to-letter)
 * [shu-comment-start-pattern](#shu-comment-start-pattern)
 * [shu-completion-is-directory](#shu-completion-is-directory)
+* [shu-conditional-find-file](#shu-conditional-find-file)
 * [shu-cother](#shu-cother)
 * [shu-count-c-project](#shu-count-c-project)
 * [shu-count-in-cpp-directory](#shu-count-in-cpp-directory)
