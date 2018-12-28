@@ -589,17 +589,8 @@ should be extracted.")
   "Visit all of the files in SHU-CAPTURE-FILE-LIST, invoking SHU-CAPTURE-MD on each
 file to capture its documentation and turn it into markdown source."
   (interactive)
-  (let ((xx shu-capture-file-list)
-        (fn)
-         (fbuf))
-    (while xx
-      (setq fn (car xx))
-      (setq fbuf (shu-conditional-find-file fn))
-      (shu-capture-md)
-      (when (not fbuf)
-        (kill-buffer (current-buffer)))
-      (setq xx (cdr xx)))
-    ))
+  (shu-capture-internal-all shu-capture-file-list 'shu-capture-md)
+    )
 
 
 
@@ -610,16 +601,33 @@ file to capture its documentation and turn it into markdown source."
   "Visit all of the files in SHU-CAPTURE-FILE-LIST, invoking SHU-CAPTURE-LATEX on
 each file to capture its documentation and turn it into LaTex source."
   (interactive)
-  (let ((xx shu-capture-file-list)
+  (shu-capture-internal-all shu-capture-file-list 'shu-capture-latex)
+    )
+
+
+
+;;
+;;  shu-capture-internal-all
+;;
+(defun shu-capture-internal-all (file-list capture-func)
+  "Visit all of the files in FILE-LIST, invoking CAPTURE-FUNC on each
+file to capture its documentation and turn it into either LaTex or
+markdown."
+  (let ((xx file-list)
         (fn)
-         (fbuf))
+        (nbuf 0)
+        (cbuf 0)
+        (fbuf))
     (while xx
       (setq fn (car xx))
       (setq fbuf (shu-conditional-find-file fn))
-      (shu-capture-latex)
+      (funcall capture-func)
+      (setq nbuf (1+ nbuf))
       (when (not fbuf)
+        (setq cbuf (1+ cbuf))
         (kill-buffer (current-buffer)))
       (setq xx (cdr xx)))
+    (message "Documented %d files, created/killed %d buffers" nbuf cbuf)
     ))
 
 
