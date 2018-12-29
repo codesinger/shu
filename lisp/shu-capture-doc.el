@@ -1676,8 +1676,7 @@ will likely crash if called with an invalid a-list."
       (goto-char (point-min))
       (while (re-search-forward star-name nil t)
         (replace-match (funcall buf-converter (match-string 0)) t t))
-      (shu-capture-code-in-doc before-code after-code text-converter)
-      (shu-capture-headers-in-doc section-converter)
+      (shu-capture-code-in-doc before-code after-code text-converter section-converter)
       (goto-char (point-min))
       (shu-capture-doc-convert-args signature converters)
       (funcall all-converter)
@@ -1723,24 +1722,44 @@ considered to be a heading and is translated to either markdown or LaTex."
 ;;
 ;;  shu-capture-code-in-doc
 ;;
-(defun shu-capture-code-in-doc (before-code after-code text-converter)
+(defun shu-capture-code-in-doc (before-code after-code text-converter section-converter)
   "The current buffer is assumed to hold a doc string that is being converted to
-markdown.  Any line that is indented to column SHU-CAPTURE-DOC-CODE-INDENT or
-greater is assumed to be a code snippet.  To format this as a code snippet,
-BEFORE-CODE is placed one line above the code snippet and AFTER-CODE is placed
-one line below the code snippet.  Return the number of code snippets marked.
-Because we only want to replace special characters in text that does not include
-a code snippet, then each time we find the end of regular text, we call the
-TEXT-CONVERTER function passing it the beginning and end point of the regular
-text.  The TEXT-CONVERTER function may expand the amount of text present if it
-adds characters to the text.  It is the responsibility of the TEXT-CONVERTER
-function to return the new text end point to this function."
-  (let ((line-diff 0)
+either markdown or LaTex.  We divide the text into two categories.  The first
+category is plain text that should be scanned for characters to escape, such as
+pound signs if we are converting to LaTex.  The second category is text that
+should not be scanned for characters to escape, either because it is to be
+treated as a verbatim code snippet or because it is a pseudo markdown section
+heading that will be converted either to a markdown section headng or to a LaTex
+section heading.
+
+When we come to the end of plain text (either because we have found a code
+snippet or becuase we have found a pseuo markdown section heading), we call the
+TEXT-CONVERTER function on the bounds of the plain text whose end we have just
+found.
+
+A pseudo markdown section heading is identified as follows.  It must start in
+column 1.  It must start with two to four pound signs.  It must have some text.
+It must end at the end of the line with the same number of pund signs with which
+it started.
+
+A code snippet to be shown in verbatim mode is any one whose first column occurs
+on or after SHU-CAPTURE-DOC-CODE-INDENT.
+
+When the TEXT-CONVERTER function is called.  It may expand the size of the text
+area if it adds charaters to the text.  It is the responsibility of the
+TEXT-CONVERTER function to return the new text end point to this function."
+  (let ((ss  "\\([#]\\{2,4\\}\\) \\([a-zA-Z0-9 -_]+\\) \\1$")
+        (line-diff 0)
         (in-code)
         (count 0)
         (last-code-pos)
         (plain-text-start 0)
-        (plain-text-end 0))
+        (plain-text-end 0)
+        (prefix)
+        (hdr)
+        (level)
+        (sec-hdr)
+        (pos))
     (goto-char (point-min))
     (while (and (= line-diff 0)
                 (not (= (point) (point-max))))
@@ -1748,33 +1767,50 @@ function to return the new text end point to this function."
       (when (re-search-forward shu-not-all-whitespace-regexp (line-end-position) t)
         (when (> (current-column) shu-capture-doc-code-indent)
           (setq last-code-pos (point)))
-        (if (not in-code)
-            (progn
-              (when (> (current-column) shu-capture-doc-code-indent)
-                (setq plain-text-end (line-beginning-position))
-                (setq plain-text-end (funcall text-converter plain-text-start plain-text-end))
-                (goto-char plain-text-end)
-                (setq in-code t)
-                (setq count (1+ count))
-                (if (= 1 (line-number-at-pos))
-                    (progn
-                      (beginning-of-line)
-                      (insert (concat before-code "\n")))
-                  (forward-line -1)
-                  (end-of-line)
-                  (insert (concat "\n" before-code)))
-                (setq last-code-pos (+ 1 last-code-pos (length before-code)))
-                (forward-line 1)))
-          (when (< (current-column) shu-capture-doc-code-indent)
-            (setq in-code nil)
-            (if last-code-pos
-                (goto-char last-code-pos)
-              (forward-line -1))
-            (end-of-line)
-            (insert (concat "\n" after-code))
-            (setq plain-text-start (point))
-            (setq last-code-pos nil)
-            (beginning-of-line))))
+        (setq pos (point))
+        (beginning-of-line)
+        (if (looking-at ss)
+            (progn ;; Replace pseudo section header
+              (setq plain-text-end (line-beginning-position))
+              (setq prefix (match-string 1))
+              (setq hdr (match-string 2))
+              (setq level (length prefix))
+              (setq sec-hdr (funcall section-converter level hdr))
+              (beginning-of-line)
+              (kill-line)
+              (insert sec-hdr)
+              (setq plain-text-end (funcall text-converter plain-text-start plain-text-end))
+              (goto-char plain-text-end)
+              (end-of-line)
+              (setq plain-text-start (1+ (point))))
+          (goto-char pos)
+          (if (not in-code)
+              (progn ;; Look for start of code snippet
+                (when (> (current-column) shu-capture-doc-code-indent)
+                  (setq plain-text-end (line-beginning-position))
+                  (setq plain-text-end (funcall text-converter plain-text-start plain-text-end))
+                  (goto-char plain-text-end)
+                  (setq in-code t)
+                  (setq count (1+ count))
+                  (if (= 1 (line-number-at-pos))
+                      (progn
+                        (beginning-of-line)
+                        (insert (concat before-code "\n")))
+                    (forward-line -1)
+                    (end-of-line)
+                    (insert (concat "\n" before-code)))
+                  (setq last-code-pos (+ 1 last-code-pos (length before-code)))
+                  (forward-line 1)))
+            (when (< (current-column) shu-capture-doc-code-indent)
+              (setq in-code nil)
+              (if last-code-pos
+                  (goto-char last-code-pos)
+                (forward-line -1))
+              (end-of-line)
+              (insert (concat "\n" after-code))
+              (setq plain-text-start (point))
+              (setq last-code-pos nil)
+              (beginning-of-line)))))
       (setq line-diff (forward-line 1)))
     (if in-code
         (insert (concat "\n" after-code))
