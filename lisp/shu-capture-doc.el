@@ -1655,6 +1655,7 @@ formatted argument names.  This is an internal function of shu-capture-doc and
 will likely crash if called with an invalid a-list."
   (let ((star-name "*[a-zA-Z0-9*-_]+")
         (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
+        (section-converter (cdr (assoc shu-capture-a-type-hdr converters)))
         (buf-converter (cdr (assoc shu-capture-a-type-buf converters)))
         (arg-converter (cdr (assoc shu-capture-a-type-arg converters)))
         (all-converter (cdr (assoc shu-capture-a-type-doc-string converters)))
@@ -1676,11 +1677,45 @@ will likely crash if called with an invalid a-list."
       (while (re-search-forward star-name nil t)
         (replace-match (funcall buf-converter (match-string 0)) t t))
       (shu-capture-code-in-doc before-code after-code text-converter)
+      (shu-capture-headers-in-doc section-converter)
       (goto-char (point-min))
       (shu-capture-doc-convert-args signature converters)
       (funcall all-converter)
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
     result
+    ))
+
+
+
+;;
+;;  shu-capture-headers-in-doc
+;;
+(defun shu-capture-headers-in-doc (section-converter)
+  "Convert markdown section headers to either markdown or LaTex.
+This allows the author of some Commentary at the beginning of a file to add section
+headers.  If the heading level is 2 through 4 and the heading begins in column 1 and
+the number of pound signs at the end is the same as the number of pound signs at
+the beginning and the pound signs at the end are at the end of a line, then this is
+considered to be a heading and is translated to either markdown or LaTex."
+  (let ((ss  "\\([#]\\{2,4\\}\\) \\([a-zA-Z0-9 -_]+\\) \\1$")
+        (line-diff 0)
+        (prefix)
+        (hdr)
+        (level)
+        (sec-hdr))
+    (goto-char (point-min))
+    (while (and (= line-diff 0)
+                (not (= (point) (point-max))))
+      (beginning-of-line)
+      (when (looking-at ss)
+        (setq prefix (match-string 1))
+        (setq hdr (match-string 2))
+        (setq level (length prefix))
+        (setq sec-hdr (funcall section-converter level hdr))
+        (beginning-of-line)
+        (kill-line)
+        (insert sec-hdr))
+      (setq line-diff (forward-line 1)))
     ))
 
 

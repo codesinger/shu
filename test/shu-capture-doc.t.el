@@ -1421,4 +1421,73 @@
       (should (string= expected-doc actual-doc)))
     ))
 
+
+
+;;
+;;  shu-test-shu-capture-headers-in-doc-1
+;;
+(ert-deftest shu-test-shu-capture-headers-in-doc-1 ()
+  "Test convert header to LaTex."
+  (let* ((section-converter (cdr (assoc shu-capture-a-type-hdr shu-capture-latex-converters)))
+         (hdr "This is a heading")
+         (prefix "###")
+         (sec-hdr (concat prefix " " hdr " " prefix))
+         (expected-hdr (concat "\\subsubsection{" hdr "}"))
+         (text "Some text and some text\n")
+         (data (concat text sec-hdr "\n" text))
+         (actual)
+         (expected (concat text expected-hdr "\n" text)))
+    (with-temp-buffer
+      (insert data)
+      (shu-capture-headers-in-doc section-converter)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-headers-in-doc-2
+;;
+(ert-deftest shu-test-shu-capture-headers-in-doc-2 ()
+  "Test convert header to markdown."
+  (let* ((section-converter (cdr (assoc shu-capture-a-type-hdr shu-capture-md-converters)))
+         (hdr "This is a heading")
+         (prefix "###")
+         (sec-hdr (concat prefix " " hdr " " prefix))
+         (expected-hdr sec-hdr)
+         (text "Some text and some text\n")
+         (data (concat text sec-hdr "\n" text))
+         (actual)
+         (expected (concat text expected-hdr "\n" text)))
+    (with-temp-buffer
+      (insert data)
+      (shu-capture-headers-in-doc section-converter)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-capture-headers-in-doc-3
+;;
+(ert-deftest shu-test-shu-capture-headers-in-doc-3 ()
+  "Do not convert header if it does not start in column 1."
+  (let* ((section-converter (cdr (assoc shu-capture-a-type-hdr shu-capture-latex-converters)))
+         (hdr "This is a heading")
+         (prefix "###")
+         (sec-hdr (concat prefix " " hdr " " prefix))
+         (expected-hdr (concat "\\subsubsection{" hdr "}"))
+         (text "Some text and some text\n")
+         (data (concat text " " sec-hdr "\n" text))
+         (actual)
+         (expected data))
+    (with-temp-buffer
+      (insert data)
+      (shu-capture-headers-in-doc section-converter)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
 ;;; shu-capture-doc.t.el ends here
