@@ -1729,24 +1729,24 @@ category is plain text that should be scanned for characters to escape, such as
 pound signs if we are converting to LaTex.  The second category is text that
 should not be scanned for characters to escape, either because it is to be
 treated as a verbatim code snippet or because it is a pseudo markdown section
-heading that will be converted either to a markdown section headng or to a LaTex
+heading that will be converted either to a markdown section heading or to a LaTex
 section heading.
 
 When we come to the end of plain text (either because we have found a code
-snippet or becuase we have found a pseuo markdown section heading), we call the
+snippet or because we have found a pseudo markdown section heading), we call the
 TEXT-CONVERTER function on the bounds of the plain text whose end we have just
 found.
 
 A pseudo markdown section heading is identified as follows.  It must start in
 column 1.  It must start with two to four pound signs.  It must have some text.
-It must end at the end of the line with the same number of pund signs with which
+It must end at the end of the line with the same number of pound signs with which
 it started.
 
 A code snippet to be shown in verbatim mode is any one whose first column occurs
 on or after SHU-CAPTURE-DOC-CODE-INDENT.
 
 When the TEXT-CONVERTER function is called.  It may expand the size of the text
-area if it adds charaters to the text.  It is the responsibility of the
+area if it adds characters to the text.  It is the responsibility of the
 TEXT-CONVERTER function to return the new text end point to this function."
   (let ((ss  "\\([#]\\{2,4\\}\\) \\([a-zA-Z0-9 -_]+\\) \\1$")
         (line-diff 0)
