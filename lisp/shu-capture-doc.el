@@ -93,12 +93,12 @@
   "Create a func-def to describe the function"
   (let ((tfunc-alias (make-symbol "func-alias"))
         (tfunc-info (make-symbol "func-info")))
-  `(let ((,tfunc-alias)
-         (,tfunc-info))
-     (setq ,tfunc-info (cons ,attributes ,description))
-     (setq ,tfunc-alias (cons nil ,tfunc-info))
-     (setq ,func-def (cons ,signature ,tfunc-alias)))
-     ))
+    `(let ((,tfunc-alias)
+           (,tfunc-info))
+       (setq ,tfunc-info (cons ,attributes ,description))
+       (setq ,tfunc-alias (cons nil ,tfunc-info))
+       (setq ,func-def (cons ,signature ,tfunc-alias)))
+    ))
 
 
 ;;
@@ -148,10 +148,10 @@
 (defmacro shu-capture-get-func-def-alias (func-def alias)
   "Extract the function alias from the func-def"
   (let ((tfunc-alias (make-symbol "func-alias")))
-  `(let ((,tfunc-alias))
-     (setq ,tfunc-alias (car ,func-def))
-     (setq ,alias (car ,tfunc-alias)))
-     ))
+    `(let ((,tfunc-alias))
+       (setq ,tfunc-alias (car ,func-def))
+       (setq ,alias (car ,tfunc-alias)))
+    ))
 
 
 
@@ -169,14 +169,14 @@ string \"to something)\".  If there are no arguments, ARGS will contain a string
 of length zero.  If there is no function name, FUNC-NAME will contain a string
 of length zero"
   (let ((tfs (make-symbol "fs")))
-  `(let ((,tfs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))"))
-     (if (string-match ,tfs ,signature)
-         (progn
-           (setq ,func-name (match-string 1 ,signature))
-           (setq ,args (string-trim (match-string 2 ,signature))))
-       (setq ,func-name "")
-       (setq ,args "")))
-     ))
+    `(let ((,tfs   "\\s-*\\([0-9a-zA-Z-]+\\)\\s-*(\\s-*\\([ 0-9a-zA-Z-,&\n]*\\))"))
+       (if (string-match ,tfs ,signature)
+           (progn
+             (setq ,func-name (match-string 1 ,signature))
+             (setq ,args (string-trim (match-string 2 ,signature))))
+         (setq ,func-name "")
+         (setq ,args "")))
+    ))
 
 
 ;;
@@ -542,18 +542,18 @@ function and its associated doc string and convert it to markdown.")
 ;;
 (defconst shu-capture-latex-converters
   (list
-    (cons shu-capture-a-type-hdr          'shu-capture-make-latex-section)
-    (cons shu-capture-a-type-func         'shu-capture-convert-func-latex)
-    (cons shu-capture-a-type-buf          'shu-capture-buf-to-latex)
-    (cons shu-capture-a-type-arg          'shu-capture-arg-to-latex)
-    (cons shu-capture-a-type-keywd        'shu-capture-keywd-to-latex)
-    (cons shu-capture-pre-code-in-doc     'shu-capture-pre-code-latex)
-    (cons shu-capture-a-type-doc-string   'shu-capture-finish-doc-string-latex)
-    (cons shu-capture-a-type-enclose-doc  'shu-capture-enclose-doc-latex)
-    (cons shu-capture-a-type-before       shu-capture-latex-code-start)
-    (cons shu-capture-a-type-after        shu-capture-latex-code-end)
-    (cons shu-capture-a-type-open-quote   shu-capture-latex-open-quote)
-    (cons shu-capture-a-type-close-quote  shu-capture-latex-close-quote))
+   (cons shu-capture-a-type-hdr          'shu-capture-make-latex-section)
+   (cons shu-capture-a-type-func         'shu-capture-convert-func-latex)
+   (cons shu-capture-a-type-buf          'shu-capture-buf-to-latex)
+   (cons shu-capture-a-type-arg          'shu-capture-arg-to-latex)
+   (cons shu-capture-a-type-keywd        'shu-capture-keywd-to-latex)
+   (cons shu-capture-pre-code-in-doc     'shu-capture-pre-code-latex)
+   (cons shu-capture-a-type-doc-string   'shu-capture-finish-doc-string-latex)
+   (cons shu-capture-a-type-enclose-doc  'shu-capture-enclose-doc-latex)
+   (cons shu-capture-a-type-before       shu-capture-latex-code-start)
+   (cons shu-capture-a-type-after        shu-capture-latex-code-end)
+   (cons shu-capture-a-type-open-quote   shu-capture-latex-open-quote)
+   (cons shu-capture-a-type-close-quote  shu-capture-latex-close-quote))
   "This is the association list of functions and strings that is used to take an elisp
 function and its associated doc string and convert it to LaTex.")
 
@@ -590,7 +590,7 @@ should be extracted.")
 file to capture its documentation and turn it into markdown source."
   (interactive)
   (shu-capture-internal-all shu-capture-file-list 'shu-capture-md)
-    )
+  )
 
 
 
@@ -602,7 +602,7 @@ file to capture its documentation and turn it into markdown source."
 each file to capture its documentation and turn it into LaTex source."
   (interactive)
   (shu-capture-internal-all shu-capture-file-list 'shu-capture-latex)
-    )
+  )
 
 
 
@@ -671,7 +671,7 @@ write a corresponding entry into the markdown table of contents buffer."
         (header)
         (start)
         (newp "")
-    )
+        )
     (when (= 1 level)
       (setq newp (concat "\\" "eject" "\n")))
     (while (> x 0)
@@ -701,7 +701,7 @@ write a corresponding entry into the markdown table of contents buffer."
 (defun shu-capture-arg-to-latex (arg-name)
   "Convert a function argument in a doc-string or argument list to LaTex."
   (let ((result (concat shu-capture-latex-arg-start arg-name shu-capture-latex-arg-end)))
-  result
+    result
     ))
 
 
@@ -761,7 +761,7 @@ to LaTex."
 (defun shu-capture-pre-code-md (min-point max-point)
   "Function that prepares a doc string to capture code snippets in markdown."
   max-point
-    )
+  )
 
 
 
@@ -818,7 +818,7 @@ added to the text."
 (defun shu-capture-finish-doc-string-md ()
   "Function that executes last step in the conversion of a doc-string to
 markdown."
-    )
+  )
 
 
 
@@ -829,10 +829,10 @@ markdown."
   "Function that executes last step in the conversion of a doc-string to
 markdown."
   (interactive)
-    (goto-char (point-min))
-    (while (search-forward "&" nil t)
-      (replace-match "\\&" t t))
-    )
+  (goto-char (point-min))
+  (while (search-forward "&" nil t)
+    (replace-match "\\&" t t))
+  )
 
 
 
@@ -858,7 +858,7 @@ markdown."
 ;;
 (defun shu-capture-enclose-doc-md ()
   "Enclose the doc-string with the appropriate begin / end pair for markdown."
-    )
+  )
 
 
 
@@ -870,8 +870,8 @@ markdown."
   "Capture all of the function and macro definitions in a .el source file and turn
 them into markdown text that documents the functions and their doc strings."
   (interactive)
-    (shu-capture-doc shu-capture-md-converters)
-    )
+  (shu-capture-doc shu-capture-md-converters)
+  )
 
 
 
@@ -882,8 +882,8 @@ them into markdown text that documents the functions and their doc strings."
   "Capture all of the function and macro definitions in a .el source file and turn
 them into a LaTex text that documents the functions and their doc strings."
   (interactive)
-    (shu-capture-doc shu-capture-latex-converters)
-    )
+  (shu-capture-doc shu-capture-latex-converters)
+  )
 
 
 
@@ -1248,9 +1248,9 @@ it a code snippet in markdown.  Return the number of code snippets marked."
   (let ((line-diff 0)
         (in-code)
         (count 0))
-  (goto-char (point-min))
-  (while (and (= line-diff 0)
-              (not (= (point) (point-max))))
+    (goto-char (point-min))
+    (while (and (= line-diff 0)
+                (not (= (point) (point-max))))
       (beginning-of-line)
       (when (re-search-forward shu-not-all-whitespace-regexp (line-end-position) t)
         (if (not in-code)
@@ -1320,9 +1320,9 @@ function definitions into either markdown or LaTex."
       (shu-capture-get-func-def func-def signature attributes description alias)
       (setq func-string (funcall func-converter func-def converters  is-alias-list))
       (when (not description)
-          (setq description "Undocumented")
+        (setq description "Undocumented")
         )
-        (setq description (shu-capture-convert-doc-string signature description converters))
+      (setq description (shu-capture-convert-doc-string signature description converters))
       (princ (concat "\n\n" func-string) buffer)
       (princ (concat "\n\n" description) buffer)
       (setq xx (cdr xx))
@@ -1366,7 +1366,7 @@ function definitions into either markdown or LaTex."
     (shu-capture-get-func-def func-def signature attributes description alias)
     (setq title (shu-capture-func-type-name attributes))
     (if description
-            (setq description (shu-doc-internal-to-md description))
+        (setq description (shu-doc-internal-to-md description))
       ;;      (princ (format "\nERROR: %s has no doc string.\n\n" signature) gb)
       (setq description "Undocumented"))
     (when alias

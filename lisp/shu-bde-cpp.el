@@ -143,7 +143,7 @@
       " * \\author " author "\n"
       " */\n"
       "\n"))
-     (run-hooks 'shu-bde-gen-file-identifier-hook)
+    (run-hooks 'shu-bde-gen-file-identifier-hook)
     (insert
      (concat
       "\n"
@@ -228,7 +228,7 @@
       "\n"
       "#include <" hfile-name ">\n"
       "\n"))
-     (run-hooks 'shu-bde-gen-file-identifier-hook)
+    (run-hooks 'shu-bde-gen-file-identifier-hook)
     (insert
      (concat
       "\n"
@@ -245,7 +245,7 @@
       "\n"
       "\n"
       "\n"
-     inner-close-namespace
+      inner-close-namespace
       "}  // close enterprise namespace\n"
       "\n"
       "\n"
@@ -367,6 +367,6 @@
 These are generally the same as the function names with the leading
 shu- prefix removed."
   (defalias 'gen-bb-component 'shu-gen-bb-component)
-)
+  )
 
 ;;; shu-bde-cpp.el ends here

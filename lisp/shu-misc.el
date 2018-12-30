@@ -47,7 +47,7 @@
 ;;
 (defun shu-set-unix-eol ()
   "Set the end of line delimiter to be the Unix standard (LF)."
-(interactive)
+  (interactive)
   (shu-set-buffer-eol-type 'unix))
 
 
@@ -56,7 +56,7 @@
 ;;
 (defun shu-set-dos-eol ()
   "Set the end of line delimiter to be the DOS standard (CRLF)."
-(interactive)
+  (interactive)
   (shu-set-buffer-eol-type 'dos))
 
 
@@ -65,7 +65,7 @@
 ;;
 (defun shu-set-mac-eol ()
   "Set the end of line delimiter to be the Mac standard (CR)."
-(interactive)
+  (interactive)
   (shu-set-buffer-eol-type 'mac))
 
 
@@ -76,9 +76,9 @@
   "Eliminate whitespace at ends of all lines in the current buffer."
   (interactive)
   (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward "[ \t][ \t]*$" nil t)
-          (delete-region (match-beginning 0) (point)))))
+    (goto-char (point-min))
+    (while (re-search-forward "[ \t][ \t]*$" nil t)
+      (delete-region (match-beginning 0) (point)))))
 
 ;;
 ;;  shu-quit - Exit emacs
@@ -109,10 +109,10 @@ C-x C-c to this function and use an explicit M-x quit to exit emacs."
   "Save and load the current file as a .el file."
   (interactive)
   (if (not (buffer-file-name))
-    (message "Current buffer has no file.")
+      (message "Current buffer has no file.")
     (save-buffer)
     (load-file (buffer-file-name))
-  ))
+    ))
 
 
 ;;
@@ -139,7 +139,7 @@ This makes it a valid path on windows machines."
   "While in dired, put the full path to the current file in the kill ring"
   (interactive)
   (let ((name   (dired-get-filename)))
-  (shu-kill-new name)))
+    (shu-kill-new name)))
 
 ;;
 ;;  shu-of
@@ -158,7 +158,7 @@ This makes it a valid path on windows machines."
   "While in dired, put the full path to the current directory in the kill ring"
   (interactive)
   (let ((name   (dired-current-directory)))
-  (shu-kill-new name)))
+    (shu-kill-new name)))
 
 
 ;;
@@ -170,8 +170,8 @@ This makes it a valid path on windows machines."
   (let ((name  (file-name-nondirectory (buffer-file-name))))
     (if name
         (shu-kill-new name)
-    ;;
-        (ding))))
+      ;;
+      (ding))))
 
 
 ;;
@@ -182,13 +182,13 @@ This makes it a valid path on windows machines."
 file into the kill ring in the form of \"line 1234 of foo.cpp\"."
   (interactive)
   (let
-   ((name  (file-name-nondirectory (buffer-file-name)))
-    (fline))
+      ((name  (file-name-nondirectory (buffer-file-name)))
+       (fline))
     (if (not name)
         (ding)
-    ;;
-        (setq fline (format "line %d of %s" (shu-current-line) name))
-        (shu-kill-new fline))))
+      ;;
+      (setq fline (format "line %d of %s" (shu-current-line) name))
+      (shu-kill-new fline))))
 
 
 ;;
@@ -200,15 +200,15 @@ column number and the name of the current file into the kill ring
 in the form of \"foo.cpp:123:2\"."
   (interactive)
   (let
-   ((debug-on-error t)
-    (name  (file-name-nondirectory (buffer-file-name)))
-    (curpos (1+ (current-column)))
-    (fline))
+      ((debug-on-error t)
+       (name  (file-name-nondirectory (buffer-file-name)))
+       (curpos (1+ (current-column)))
+       (fline))
     (if (not name)
         (ding)
-    ;;
-        (setq fline (format "%s:%d:%d" name (shu-current-line) curpos))
-        (shu-kill-new fline))))
+      ;;
+      (setq fline (format "%s:%d:%d" name (shu-current-line) curpos))
+      (shu-kill-new fline))))
 
 
 ;;
@@ -218,13 +218,13 @@ in the form of \"foo.cpp:123:2\"."
   "Insert a LaTeX quote environment and position the cursor for typing the quote."
   (interactive)
   (let (
-    (ip     )
-       )
-  (insert "\\begin{quote}\n\n")
-  (setq ip (point))
-  (insert "\n\n\\end{quote}\n")
-  (goto-char ip)
-))
+        (ip     )
+        )
+    (insert "\\begin{quote}\n\n")
+    (setq ip (point))
+    (insert "\n\n\\end{quote}\n")
+    (goto-char ip)
+    ))
 
 
 ;;
@@ -235,22 +235,25 @@ in the form of \"foo.cpp:123:2\"."
   (interactive)
   (let ((p))
     (save-excursion
-      (save-restriction (widen)
-    (goto-char (point-min))
+      (save-restriction
+        (widen)
+        (goto-char (point-min))
 
-    (insert (concat
-      "\\documentclass[12pt,onecolumn]{article}\n"
-      "\\begin{document}\n"
-      "\n"))
-    (setq p (point))
-    (insert (concat
-      "\n"
-      "\n"
-      "\n"
-      "\n"
-      "\\end{document}\n"))))
-  (goto-char p)
-  ))
+        (insert
+         (concat
+          "\\documentclass[12pt,onecolumn]{article}\n"
+          "\\begin{document}\n"
+          "\n"))
+        (setq p (point))
+        (insert
+         (concat
+          "\n"
+          "\n"
+          "\n"
+          "\n"
+          "\\end{document}\n"))))
+    (goto-char p)
+    ))
 
 
 ;;
@@ -314,15 +317,15 @@ true, the function is interactive."
   "Insert a duplicate of the current line, following it."
   (interactive)
   (save-excursion
-   (let* ((xline                        ; Get copy of current line
-	   (buffer-substring
-	    (progn (beginning-of-line) (point))
-	    (progn (end-of-line) (point))))
-          (len (length xline))          ; Get length of current line
-          (fill-column (max fill-column (1+ len)))) ; Keep fill from truncating
-     (end-of-line)
-     (newline)
-     (insert xline))))
+    (let* ((xline                        ; Get copy of current line
+	    (buffer-substring
+	     (progn (beginning-of-line) (point))
+	     (progn (end-of-line) (point))))
+           (len (length xline))          ; Get length of current line
+           (fill-column (max fill-column (1+ len)))) ; Keep fill from truncating
+      (end-of-line)
+      (newline)
+      (insert xline))))
 
 
 ;;
@@ -334,19 +337,19 @@ of Lastname, Firstname to Firstname Lastname.
 Position to the start of the file and invoke once."
   (interactive)
   (let
-   ((ss "\\s-*\\([a-zA-Z\\s-]*\\),\\s-*\\([a-z0-9A-Z\\.\\,\\ ]*\\)\n")
-    (last-name "")
-    (first-name "")
-    (ostring    nil)
-    (ccount 0))
-   (while (re-search-forward ss (buffer-size) t)
-       (progn
-         (setq last-name (match-string 1))
-         (setq first-name (match-string 2))
-         (setq ostring (concat first-name " " last-name "\n"))
-         (replace-match ostring t t nil)
-         (setq ccount (1+ ccount))))
-   (message (concat "Converted " ccount " occurrences."))))
+      ((ss "\\s-*\\([a-zA-Z\\s-]*\\),\\s-*\\([a-z0-9A-Z\\.\\,\\ ]*\\)\n")
+       (last-name "")
+       (first-name "")
+       (ostring    nil)
+       (ccount 0))
+    (while (re-search-forward ss (buffer-size) t)
+      (progn
+        (setq last-name (match-string 1))
+        (setq first-name (match-string 2))
+        (setq ostring (concat first-name " " last-name "\n"))
+        (replace-match ostring t t nil)
+        (setq ccount (1+ ccount))))
+    (message (concat "Converted " ccount " occurrences."))))
 
 ;;
 ;;
@@ -382,24 +385,25 @@ of Lastname, Firstname to an empty Latex letter.
 Position to the start of the file and invoke once."
   (interactive)
   (let
-   ((ss "\\s-*\\([a-zA-Z\\s-]*\\),\\s-*\\([a-z0-9A-Z\\.\\,\\ ]*\\)\n")
-    (last-name "")
-    (first-name "")
-    (ostring nil)
-    (ccount 0))
-   (while (re-search-forward ss (buffer-size) t)
-       (setq last-name (match-string 1))
-       (setq first-name (match-string 2))
-       (setq ostring (concat
-           "\n%---------------------------------------------------------------\n"
-           "\\begin{letter}{%\n"
-            first-name " " last-name "\\\\}\n\n"
-           "\\opening{Dear " first-name ",}\n\n\n"
-           "\\closing{All the best,}\n\n"
-           "\\end{letter}\n"))
-         (replace-match ostring t t nil)
-         (setq ccount (1+ ccount)))
-   (message (concat "Converted " ccount " occurrences."))))
+      ((ss "\\s-*\\([a-zA-Z\\s-]*\\),\\s-*\\([a-z0-9A-Z\\.\\,\\ ]*\\)\n")
+       (last-name "")
+       (first-name "")
+       (ostring nil)
+       (ccount 0))
+    (while (re-search-forward ss (buffer-size) t)
+      (setq last-name (match-string 1))
+      (setq first-name (match-string 2))
+      (setq ostring
+            (concat
+             "\n%---------------------------------------------------------------\n"
+             "\\begin{letter}{%\n"
+             first-name " " last-name "\\\\}\n\n"
+             "\\opening{Dear " first-name ",}\n\n\n"
+             "\\closing{All the best,}\n\n"
+             "\\end{letter}\n"))
+      (replace-match ostring t t nil)
+      (setq ccount (1+ ccount)))
+    (message (concat "Converted " ccount " occurrences."))))
 
 
 ;;
@@ -412,8 +416,8 @@ too short will be expanded as necessary."
   (interactive "p")
   (let ((scol (current-column)))        ; Remember current column
     (while (> arg 0)                    ; Loop through the line count
-        (shu-forward-line)              ; Move down, adding a line if needed
-        (setq arg (1- arg)))            ; Decrement the loop count
+      (shu-forward-line)              ; Move down, adding a line if needed
+      (setq arg (1- arg)))            ; Decrement the loop count
     (move-to-column scol t)))           ; Move to the original column
 
 
@@ -423,15 +427,15 @@ it.  If there are no more lines, a new one is created."
   (let ((sline (shu-current-line)))     ; Starting line
     (forward-line)                      ; Try to move down one
     (when (= sline (shu-current-line))  ; Did not actually move
-         (end-of-line)                  ; Add a new line to end
-         (newline))))                   ;  of the file
+      (end-of-line)                  ; Add a new line to end
+      (newline))))                   ;  of the file
 
 
 ;;
 ;;  shu-put-line-near-top
 ;;
 (defun shu-put-line-near-top ()
-"Take the line containing point and position it approximately five lines
+  "Take the line containing point and position it approximately five lines
 from the top of the current window."
   (interactive)
   (let ((targ-point (point))            ; Point to reposition
@@ -444,8 +448,8 @@ from the top of the current window."
     (setq midp (/ wh 2))                ; Midpoint of window
     (setq addp (- midp 4))              ; Lines to add to target
     (if (< addp 0)                      ; Do not add
-      (setq addp 0)                     ;  a negative count
-    )
+        (setq addp 0)                     ;  a negative count
+      )
     (setq add-line (+ targ-line addp))
     (goto-char (point-min))
     (forward-line (1- add-line))
@@ -493,10 +497,10 @@ case-fold-search.  The user should set it before calling this function."
 (defun shu-get-current-line()
   "Return the current line in the buffer as a string"
   (let*
-   ((bol (save-excursion (beginning-of-line) (point)))
-    (eol (save-excursion (end-of-line) (point)))
-    (the-line (buffer-substring bol eol)))
-  the-line))
+      ((bol (save-excursion (beginning-of-line) (point)))
+       (eol (save-excursion (end-of-line) (point)))
+       (the-line (buffer-substring bol eol)))
+    the-line))
 
 
 ;;
@@ -693,11 +697,11 @@ For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end 9
             (setq end second)))
           (setq range (cons start end)))
       (if (string-match s-one range-string)
-        (progn
+          (progn
             (setq start (string-to-number (match-string 0 range-string)))
             (setq range (cons start nil)))
         (setq range (cons nil nil))))
-      range
+    range
     ))
 
 
@@ -794,7 +798,7 @@ if the given HASH is not a valid git revision."
       (when (re-search-forward ss nil t)
         (setq short-hash (match-string 0))))
     short-hash
-  ))
+    ))
 
 
 
@@ -855,6 +859,6 @@ shu- prefix removed."
   (defalias 'remove-test-names 'shu-remove-test-names)
   (defalias 'number-commits 'shu-git-number-commits)
   (defalias 'diff-commits 'shu-git-diff-commits)
-)
+  )
 
 ;;; shu-misc.el ends here

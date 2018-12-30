@@ -78,35 +78,35 @@ run bde-all-guard on a file that contains some guarded #includes and some unguar
 #includes.  Only the unguarded ones will have the guard added."
   (interactive)
   (let
-   ((gg (concat "#include\s*<\\(" shu-cpp-file-name "+\\)>"))
-    (eol (save-excursion (end-of-line) (point)))
-    (eol2 )
-    (guard )
-    (fn )
-    (gmatch )
-    (bol ))
-  (beginning-of-line)
-  (if (re-search-forward gg eol t)
-      (progn  ;; Found an include directive that we might guard
-        (setq fn (match-string 1))  ;; Remember the file name
-        (setq guard (shu-bde-include-guard fn))
-        (setq gmatch (concat "#ifndef\s+" guard))
-        (setq bol (save-excursion (beginning-of-line) (point)))
-        (forward-line -1)
-        (if (= bol (point)) ;; We are already at top of file
-            (shu-bde-insert-guard fn t)
-        ;;  We were able to go up one line
+      ((gg (concat "#include\s*<\\(" shu-cpp-file-name "+\\)>"))
+       (eol (save-excursion (end-of-line) (point)))
+       (eol2 )
+       (guard )
+       (fn )
+       (gmatch )
+       (bol ))
+    (beginning-of-line)
+    (if (re-search-forward gg eol t)
+        (progn  ;; Found an include directive that we might guard
+          (setq fn (match-string 1))  ;; Remember the file name
+          (setq guard (shu-bde-include-guard fn))
+          (setq gmatch (concat "#ifndef\s+" guard))
+          (setq bol (save-excursion (beginning-of-line) (point)))
+          (forward-line -1)
+          (if (= bol (point)) ;; We are already at top of file
+              (shu-bde-insert-guard fn t)
+            ;;  We were able to go up one line
             (beginning-of-line)
             (setq eol2 (save-excursion (end-of-line) (point)))
             (if (re-search-forward gmatch eol2 t)
-              (progn
+                (progn
                   (message "Include is already guarded")
                   (forward-line 2))
-            ;;
+              ;;
               (end-of-line)
               (insert "\n")
               (shu-bde-insert-guard fn nil))))
-  ;;
+      ;;
       (message "%s" "No #include on this line")
       (ding))))
 
@@ -119,18 +119,18 @@ run bde-all-guard on a file that contains some guarded #includes and some unguar
 the included file.  AT-TOP is true if the #include directive is located on the first
 line of the file so there is no line above it."
   (let*
-   ((guard-name (shu-bde-include-guard fn))
-    (guard-string (concat "#ifndef " guard-name)))
+      ((guard-name (shu-bde-include-guard fn))
+       (guard-string (concat "#ifndef " guard-name)))
     (when at-top
-        (setq guard-string (concat guard-string "\n")))
+      (setq guard-string (concat guard-string "\n")))
     (beginning-of-line)
     (insert guard-string)
     (forward-line 1)
     (end-of-line)
     (if at-top
         (insert "#endif")
-    ;;
-        (insert "\n#endif"))
+      ;;
+      (insert "\n#endif"))
     (forward-line 1)))
 
 
@@ -142,10 +142,10 @@ line of the file so there is no line above it."
 or narrowed region."
   (interactive)
   (let
-   ((gg (concat "#include\s*<\\(" shu-cpp-file-name "+\\)>"))
-    (eoln (save-excursion (end-of-line) (point))))
-  (while (re-search-forward gg nil t)
-    (shu-bde-add-guard))))
+      ((gg (concat "#include\s*<\\(" shu-cpp-file-name "+\\)>"))
+       (eoln (save-excursion (end-of-line) (point))))
+    (while (re-search-forward gg nil t)
+      (shu-bde-add-guard))))
 
 
 ;;
@@ -173,12 +173,10 @@ the only optional argument.  This is only the file name part of the include guar
 If the name of the file is foo_something.h, then this function returns
 FOO_SOMETHING.  The full name of the macro variable would be
 INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard"
-  (let (
-    (file-name (or fn (file-name-nondirectory (buffer-file-name))))
-    (guard )
-       )
-  (setq guard (upcase (file-name-sans-extension file-name)))
-))
+  (let ((file-name (or fn (file-name-nondirectory (buffer-file-name))))
+        (guard ))
+    (setq guard (upcase (file-name-sans-extension file-name)))
+    ))
 
 ;;
 ;;  shu-bde-include-guard
@@ -190,7 +188,7 @@ only optional argument.  This is the name of the macro variable that is used in 
 include guard.  If the name of the file is foo_something.h, then this function
 returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
   (let
-   ((guard (concat "INCLUDED_" (shu-bde-include-guard-fn fn))))
+      ((guard (concat "INCLUDED_" (shu-bde-include-guard-fn fn))))
     guard))
 
 
@@ -218,87 +216,89 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
        (start-pos ))
     (when shu-cpp-use-bde-library
       (setq std-name "bsl"))
-  (setq class-name-pad (make-string (length class-name) ? ))
-  (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
-  (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
-  (setq blank24 (make-string 24 ? ))
-  (setq ostream-class-length (+ (length "const ") (length class-name) 2))
-  (if (> ostream-length ostream-class-length)
-      (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
+    (setq class-name-pad (make-string (length class-name) ? ))
+    (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
+    (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
+    (setq blank24 (make-string 24 ? ))
+    (setq ostream-class-length (+ (length "const ") (length class-name) 2))
+    (if (> ostream-length ostream-class-length)
+        (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
       (when (> ostream-class-length ostream-length)
-          (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
-  (setq starts-with-vowel (string-match (substring class-name 0 1) "aeioAEIO"))
-  (setq creator-a "a")
-  (when starts-with-vowel (setq creator-a "an"))
+        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
+    (setq starts-with-vowel (string-match (substring class-name 0 1) "aeioAEIO"))
+    (setq creator-a "a")
+    (when starts-with-vowel (setq creator-a "an"))
 
-  (setq copy-ctor (concat
-    "    explicit " class-name "(const " class-name " &original);\n"))
-  (when (> (length copy-ctor) 79)
-          (setq copy-ctor (concat
-            "    explicit " class-name "(\n"
-            "        const " class-name " &original);\n")))
+    (setq copy-ctor (concat
+                     "    explicit " class-name "(const " class-name " &original);\n"))
+    (when (> (length copy-ctor) 79)
+      (setq copy-ctor (concat
+                       "    explicit " class-name "(\n"
+                       "        const " class-name " &original);\n")))
 
-  (setq op-equal (concat
-    "    " class-name " &operator=(const " class-name " &rhs);\n"))
-  (when (> (length op-equal) 79)
-          (setq op-equal (concat
-            "    " class-name " &operator=(\n"
-            "        const " class-name " &rhs);\n")))
+    (setq op-equal (concat
+                    "    " class-name " &operator=(const " class-name " &rhs);\n"))
+    (when (> (length op-equal) 79)
+      (setq op-equal (concat
+                      "    " class-name " &operator=(\n"
+                      "        const " class-name " &rhs);\n")))
 
-  (insert (concat
-    "\n"
-    "\n"
-    blank24 "// " equal-pad "\n"
-    blank24 "// class " class-name "\n"
-    blank24 "// " equal-pad "\n"
-    "\n"
-    "class " class-name " {\n"
-    "    // This class ...\n"))
-  (setq start-pos (save-excursion (forward-line -1) (forward-char 18) (point)))
-  (insert (concat
-    "\n"
-    "    // DATA\n"
-    "    // SomeType          d_someName;\n"
-    "        // Description of 'd_someName'\n"
-    "\n"
-    "  public:\n"
-    "\n"
-    "    //CREATORS\n"
-    "    explicit " class-name "();\n"
-    "        // Create " creator-a " '" class-name "' object ...\n"
-    "\n"
-    "    // ~" class-name "();\n"
-    "        // Destroy this object.\n"
-    "\n"
-    "    // MANIPULATORS\n"
-    "\n"
-    "    // ACCESSORS\n"
-    "\n"
-    "    " std-name "::ostream &printSelf(" std-name "::ostream    &os) const;\n"
-    "        // Stream the object to the given stream.  Intended for use by\n"
-    "        // 'operator<<()'.\n"
-    "\n"
-    "  private:\n"
-    "\n"
-    "    // NOT IMPLEMENTED\n"
-    copy-ctor
-    "        // Copy constructor is explicit, private, and unimplememted.\n"
-    "\n"
-    op-equal
-    "        // operator=() is private and unimplemented.\n"
-    "\n"
-    "    // MANIPULATORS\n"
-    "\n"
-    "    // ACCESSORS\n"
-    "\n"
-    "};\n"
-    "\n"
-    "// FREE OPERATORS\n"
-    "inline\n"
-    std-name "::ostream &operator<<(" std-name "::ostream" ostream-pad "  &os,\n"
-    "                         const " class-name ostream-class-pad "  &cn);\n"
-    "    // Stream an instance of '" class-name "' to the stream 'os'.\n"))
-  (goto-char start-pos)))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      blank24 "// " equal-pad "\n"
+      blank24 "// class " class-name "\n"
+      blank24 "// " equal-pad "\n"
+      "\n"
+      "class " class-name " {\n"
+      "    // This class ...\n"))
+    (setq start-pos (save-excursion (forward-line -1) (forward-char 18) (point)))
+    (insert
+     (concat
+      "\n"
+      "    // DATA\n"
+      "    // SomeType          d_someName;\n"
+      "        // Description of 'd_someName'\n"
+      "\n"
+      "  public:\n"
+      "\n"
+      "    //CREATORS\n"
+      "    explicit " class-name "();\n"
+      "        // Create " creator-a " '" class-name "' object ...\n"
+      "\n"
+      "    // ~" class-name "();\n"
+      "        // Destroy this object.\n"
+      "\n"
+      "    // MANIPULATORS\n"
+      "\n"
+      "    // ACCESSORS\n"
+      "\n"
+      "    " std-name "::ostream &printSelf(" std-name "::ostream    &os) const;\n"
+      "        // Stream the object to the given stream.  Intended for use by\n"
+      "        // 'operator<<()'.\n"
+      "\n"
+      "  private:\n"
+      "\n"
+      "    // NOT IMPLEMENTED\n"
+      copy-ctor
+      "        // Copy constructor is explicit, private, and unimplememted.\n"
+      "\n"
+      op-equal
+      "        // operator=() is private and unimplemented.\n"
+      "\n"
+      "    // MANIPULATORS\n"
+      "\n"
+      "    // ACCESSORS\n"
+      "\n"
+      "};\n"
+      "\n"
+      "// FREE OPERATORS\n"
+      "inline\n"
+      std-name "::ostream &operator<<(" std-name "::ostream" ostream-pad "  &os,\n"
+      "                         const " class-name ostream-class-pad "  &cn);\n"
+      "    // Stream an instance of '" class-name "' to the stream 'os'.\n"))
+    (goto-char start-pos)))
 
 
 ;;
@@ -307,72 +307,72 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 (defun shu-bde-gen (class-name)
   "Generate a skeleton BDE class code generation at point."
   (interactive "*sClass name?: ")
-  (let (
-      (std-name "std")
-    (ostream-length (length "std::ostream  "))
-    (ostream-class-length 0)
-    (ostream-pad "")
-    (ostream-class-pad "")
-    (equal-pad )
-    (dash-pad )
-    (blank24 )
-    (class-name-pad )
-    (start-pos )
-       )
+  (let ((std-name "std")
+        (ostream-length (length "std::ostream  "))
+        (ostream-class-length 0)
+        (ostream-pad "")
+        (ostream-class-pad "")
+        (equal-pad )
+        (dash-pad )
+        (blank24 )
+        (class-name-pad )
+        (start-pos ))
     (when shu-cpp-use-bde-library
       (setq std-name "bsl"))
-  (setq class-name-pad (make-string (length class-name) ? ))
-  (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
-  (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
-  (setq blank24 (make-string 24 ? ))
-  (setq ostream-class-length (+ (length "const ") (length class-name) 2))
-  (if (> ostream-length ostream-class-length)
-      (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
+    (setq class-name-pad (make-string (length class-name) ? ))
+    (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
+    (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
+    (setq blank24 (make-string 24 ? ))
+    (setq ostream-class-length (+ (length "const ") (length class-name) 2))
+    (if (> ostream-length ostream-class-length)
+        (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
       (when (> ostream-class-length ostream-length)
-          (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
+        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
 
 
-  (insert (concat
-    "\n"
-    "// ===========================================================================\n"
-    "//                  INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS\n"
-    "// ===========================================================================\n"
-    "\n"
-    "\n"
-    blank24 "// " dash-pad "\n"
-    blank24 "// class " class-name "\n"
-    blank24 "// " dash-pad "\n"
-    "\n"
-    "// CREATORS\n"
-    "inline\n"
-    class-name "::" class-name "()\n"))
-  (setq start-pos (save-excursion (forward-line -1) (end-of-line) (forward-char -1) (point)))
-  (insert (concat
-    "{\n"
-    "}\n"
-    "\n"
-    "    // MANIPULATORS\n"
-    "\n"
-    "    // ACCESSORS\n"
-    "\n"
-    "inline\n"
-    std-name "::ostream &" class-name "::printSelf(" std-name "::ostream    &os) const\n"
-    "{\n"
-    "    os << \"Instance of '" class-name "'\";\n"
-    "\n"
-    "    return os;\n"
-    "}\n"
-    "\n"
-    "// FREE OPERATORS\n"
-    "inline\n"
-    std-name "::ostream &operator<<(" std-name "::ostream" ostream-pad "  &os,\n"
-    "                         const " class-name ostream-class-pad "  &cn)\n"
-    "{\n"
-    "    return cn.printSelf(os);\n"
-    "}\n"
+    (insert
+     (concat
+      "\n"
+      "// ===========================================================================\n"
+      "//                  INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS\n"
+      "// ===========================================================================\n"
+      "\n"
+      "\n"
+      blank24 "// " dash-pad "\n"
+      blank24 "// class " class-name "\n"
+      blank24 "// " dash-pad "\n"
+      "\n"
+      "// CREATORS\n"
+      "inline\n"
+      class-name "::" class-name "()\n"))
+    (setq start-pos (save-excursion (forward-line -1) (end-of-line) (forward-char -1) (point)))
+    (insert
+     (concat
+      "{\n"
+      "}\n"
+      "\n"
+      "    // MANIPULATORS\n"
+      "\n"
+      "    // ACCESSORS\n"
+      "\n"
+      "inline\n"
+      std-name "::ostream &" class-name "::printSelf(" std-name "::ostream    &os) const\n"
+      "{\n"
+      "    os << \"Instance of '" class-name "'\";\n"
+      "\n"
+      "    return os;\n"
+      "}\n"
+      "\n"
+      "// FREE OPERATORS\n"
+      "inline\n"
+      std-name "::ostream &operator<<(" std-name "::ostream" ostream-pad "  &os,\n"
+      "                         const " class-name ostream-class-pad "  &cn)\n"
+      "{\n"
+      "    return cn.printSelf(os);\n"
+      "}\n"
+      ))
+    (goto-char start-pos)
     ))
-  (goto-char start-pos)
-))
 
 ;;
 ;;  shu-bde-sdecl
@@ -380,38 +380,38 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 (defun shu-bde-sdecl (class-name)
   "Generate a skeleton BDE struct definition at point."
   (interactive "*sStruct name?: ")
-  (let (
-    (equal-pad )
-    (blank24 )
-    (class-name-pad )
-    (start-pos )
-       )
-  (setq class-name-pad (make-string (length class-name) ? ))
-  (setq equal-pad (make-string (+ 7 (length class-name)) ?=))
-  (setq blank24 (make-string 24 ? ))
+  (let ((equal-pad )
+        (blank24 )
+        (class-name-pad )
+        (start-pos ))
+    (setq class-name-pad (make-string (length class-name) ? ))
+    (setq equal-pad (make-string (+ 7 (length class-name)) ?=))
+    (setq blank24 (make-string 24 ? ))
 
-  (insert (concat
-    "\n"
-    "\n"
-    blank24 "// " equal-pad "\n"
-    blank24 "// struct " class-name "\n"
-    blank24 "// " equal-pad "\n"
-    "\n"
-    "struct " class-name " {\n"
-    "    // This 'struct' provides a namespace for utility functions that\n"
-    "    // \n"))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      blank24 "// " equal-pad "\n"
+      blank24 "// struct " class-name "\n"
+      blank24 "// " equal-pad "\n"
+      "\n"
+      "struct " class-name " {\n"
+      "    // This 'struct' provides a namespace for utility functions that\n"
+      "    // \n"))
 
-  (setq start-pos (save-excursion (forward-line -1) (end-of-line) (point)))
+    (setq start-pos (save-excursion (forward-line -1) (end-of-line) (point)))
 
-  (insert (concat
-    "\n"
-    "    // CLASS METHODS\n"
-    "\n"
-    "\n"
-    "};\n"
-  ))
-  (goto-char start-pos)
-))
+    (insert
+     (concat
+      "\n"
+      "    // CLASS METHODS\n"
+      "\n"
+      "\n"
+      "};\n"
+      ))
+    (goto-char start-pos)
+    ))
 
 
 ;;
@@ -420,38 +420,38 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 (defun shu-bde-sgen (class-name)
   "Generate a skeleton BDE struct code generation at point."
   (interactive "*sStruct name?: ")
-  (let (
-    (dash-pad )
-    (blank24 )
-    (class-name-pad )
-    (start-pos )
-       )
-  (setq class-name-pad (make-string (length class-name) ? ))
-  (setq dash-pad (make-string (+ 7 (length class-name)) ?-))
-  (setq blank24 (make-string 24 ? ))
+  (let ((dash-pad )
+        (blank24 )
+        (class-name-pad )
+        (start-pos ))
+    (setq class-name-pad (make-string (length class-name) ? ))
+    (setq dash-pad (make-string (+ 7 (length class-name)) ?-))
+    (setq blank24 (make-string 24 ? ))
 
-  (insert (concat
-    "\n"
-    "// ===========================================================================\n"
-    "//                  INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS\n"
-    "// ===========================================================================\n"
-    "\n"
-    "\n"
-    blank24 "// " dash-pad "\n"
-    blank24 "// struct " class-name "\n"
-    blank24 "// " dash-pad "\n"
-    "\n"
-    "// CLASS METHODS\n"
-    "inline\n"
-    "void " class-name "::???()\n"))
-  (setq start-pos (save-excursion (forward-line -1) (end-of-line) (forward-char -5) (point)))
-  (insert (concat
-    "{\n"
-    "}\n"
-    "\n"
+    (insert
+     (concat
+      "\n"
+      "// ===========================================================================\n"
+      "//                  INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS\n"
+      "// ===========================================================================\n"
+      "\n"
+      "\n"
+      blank24 "// " dash-pad "\n"
+      blank24 "// struct " class-name "\n"
+      blank24 "// " dash-pad "\n"
+      "\n"
+      "// CLASS METHODS\n"
+      "inline\n"
+      "void " class-name "::???()\n"))
+    (setq start-pos (save-excursion (forward-line -1) (end-of-line) (forward-char -5) (point)))
+    (insert
+     (concat
+      "{\n"
+      "}\n"
+      "\n"
+      ))
+    (goto-char start-pos)
     ))
-  (goto-char start-pos)
-))
 
 
 
@@ -464,8 +464,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 (defun shu-gen-bde-component (class-name)
   "Generate the three files for a new component: .cpp, .h, and .t.cpp"
   (interactive "sClass name?: ")
-  (let* (
-         (gitbuf (get-buffer-create "**git-add**"))
+  (let* ((gitbuf (get-buffer-create "**git-add**"))
          (debug-on-error t)
          (author shu-cpp-author)
          (namespace shu-cpp-default-namespace)
@@ -479,8 +478,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
          (found-files "")
          (file-comma "")
          (got-count 0)
-         (file-file "File")
-         )
+         (file-file "File"))
     (when (not namespace)
       (setq base-name base-class-name)
       (setq hfile-name (concat base-name ".h"))
@@ -535,8 +533,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 ;;
 (defun shu-generate-bde-hfile (author namespace class-name)
   "Generate a skeleton header file"
-  (let* (
-         (hfile-name (file-name-nondirectory (buffer-file-name)))
+  (let* ((hfile-name (file-name-nondirectory (buffer-file-name)))
          (guard-name (shu-bde-include-guard hfile-name))
          (open-line (concat (shu-make-padded-line (concat "// " hfile-name) 70) "-*-C++-*-"))
          (namespace-name namespace)
@@ -545,8 +542,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
          (outer-namespace)
          (outer-close "}  // close enterprise namespace\n")
          (inner-namespace "")
-         (decl-point)
-         )
+         (decl-point))
 
     (if shu-cpp-default-global-namespace
         (setq outer-namespace (concat "namespace " shu-cpp-default-global-namespace " {\n"))
@@ -571,9 +567,9 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
       " * \\author " author "\n"
       " */\n"
       "\n"))
-     (run-hooks 'shu-bde-gen-file-identifier-hook)
-     (insert
-      (concat
+    (run-hooks 'shu-bde-gen-file-identifier-hook)
+    (insert
+     (concat
       "\n"
       "//@PURPOSE: Provide an  ...\n"
       "//         \n"
@@ -581,9 +577,9 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
       "//   " namespace-name  namespace-sep class-name "\n"
       "//\n"
       "//@AUTHOR: " author "\n"))
-     (run-hooks 'shu-bde-gen-h-includes-hook)
-     (insert
-      (concat
+    (run-hooks 'shu-bde-gen-h-includes-hook)
+    (insert
+     (concat
       "\n"
       "\n"
       outer-namespace
@@ -619,8 +615,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 ;;
 (defun shu-generate-bde-cfile (author namespace class-name)
   "Generate a skeleton cpp file"
-  (let* (
-         (cfile-name (file-name-nondirectory (buffer-file-name)))
+  (let* ((cfile-name (file-name-nondirectory (buffer-file-name)))
          (hfile-name (concat (file-name-sans-extension cfile-name) ".h"))
          (rcs-file-name (concat (file-name-sans-extension cfile-name) "_cpp"))
          (guard-name (shu-bde-include-guard cfile-name))
@@ -630,8 +625,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
          (outer-namespace)
          (outer-close "}  // close enterprise namespace\n")
          (left-include-delim "\"")
-         (right-include-delim "\"")
-         )
+         (right-include-delim "\""))
     (when shu-cpp-include-user-brackets
       (setq left-include-delim "<")
       (setq right-include-delim ">"))
@@ -656,7 +650,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
       "\n"
       "#include "left-include-delim hfile-name right-include-delim "\n"
       "\n"))
-     (run-hooks 'shu-bde-gen-file-identifier-hook)
+    (run-hooks 'shu-bde-gen-file-identifier-hook)
     (insert
      (concat
       "\n"
@@ -679,7 +673,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
       "\n"))
     (insert
      (concat
-     (run-hooks 'shu-bde-gen-cfile-copyright-hook)
+      (run-hooks 'shu-bde-gen-cfile-copyright-hook)
       "// ----------------------------- END-OF-FILE ---------------------------------\n"))
     ))
 
@@ -692,8 +686,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 (defun shu-generate-bde-tfile (author namespace class-name)
   "Generate a skeleton t.cpp file"
   (interactive)
-  (let* (
-         (tfile-name (file-name-nondirectory (buffer-file-name)))
+  (let* ((tfile-name (file-name-nondirectory (buffer-file-name)))
          (tbase-name (file-name-sans-extension tfile-name))
          (ext2 (file-name-extension tfile-name))
          (ext1 (file-name-extension tbase-name))
@@ -705,13 +698,12 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
          (outer-using "")
          (outer-qualifier)
          (left-include-delim "\"")
-         (right-include-delim "\"")
-         )
+         (right-include-delim "\""))
     (when shu-cpp-include-user-brackets
       (setq left-include-delim "<")
       (setq right-include-delim ">"))
     (when shu-cpp-default-global-namespace
-        (setq outer-using (concat "using namespace " shu-cpp-default-global-namespace ";\n")))
+      (setq outer-using (concat "using namespace " shu-cpp-default-global-namespace ";\n")))
     (when shu-cpp-default-global-namespace
       (setq outer-qualifier (concat shu-cpp-default-global-namespace "::")))
 
@@ -790,6 +782,6 @@ shu- prefix removed."
   (defalias 'bde-sdecl 'shu-bde-sdecl)
   (defalias 'bde-sgen 'shu-bde-sgen)
   (defalias 'gen-bde-component 'shu-gen-bde-component)
-)
+  )
 
 ;;; shu-bde.el ends here

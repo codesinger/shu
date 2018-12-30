@@ -66,9 +66,7 @@ of the returned item list."
               (set-buffer pwbuf)
               (setq item-list (shu-nvplist-parse-buffer item-list))
               (when we-opened-file
-                (shu-kill-current-buffer))
-              )
-            ))))
+                (shu-kill-current-buffer)))))))
     (switch-to-buffer cbuf))
   item-list
   )
@@ -99,9 +97,9 @@ of the returned item list."
         (while (re-search-forward opener nil t)
           (save-excursion
             (let*
-                  ((bol (save-excursion (beginning-of-line) (point)))
-                   (eol (save-excursion (end-of-line) (point)))
-                   (line-no (shu-the-line-at bol)))))
+                ((bol (save-excursion (beginning-of-line) (point)))
+                 (eol (save-excursion (end-of-line) (point)))
+                 (line-no (shu-the-line-at bol)))))
 
           (setq item-number (1+ item-number))
           ;;
@@ -130,8 +128,8 @@ of the returned item list."
           ;;
           ;;
           (setq item-list (cons item item-list)))))
-  item-list
-  ))
+    item-list
+    ))
 
 ;;
 ;;  shu-nvplist-make-item
@@ -172,8 +170,8 @@ name-value pair list in the CDR."
 ;;
 (defun shu-nvplist-show-item-list (item-list)
   (let
-       ((tlist item-list)
-        (item))
+      ((tlist item-list)
+       (item))
     (while tlist
       (setq item (car tlist))
       (shu-nvplist-show-item item)

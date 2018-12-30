@@ -160,17 +160,17 @@
 
 
 (defconst shu-xref-buffer "**shu-xref**"
-"The name of the buffer into which the cross reference is placed.")
+  "The name of the buffer into which the cross reference is placed.")
 
 (defconst shu-xref-lisp-name (regexp-opt
-        (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
-              "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
-              "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M"
-              "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
-              "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
-              "_" "-" "$") nil)
+                              (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
+                                    "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
+                                    "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M"
+                                    "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
+                                    "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+                                    "_" "-" "$") nil)
 
-"A regular expression to match a variable name in emacs lisp.")
+  "A regular expression to match a variable name in emacs lisp.")
 (defconst shu-xref-var-types
   '(("un"     . 1)
     ("macro"  . 2)
@@ -225,18 +225,18 @@ Then invoke shu-make-xref.  It will do a cross reference of all of those files."
 (defun shu-xref-get-defs (file-list fun-defs)
   "Extract the variable definitions from each file."
   (let (
-    (tlist file-list)
-    (file-name)
-    (fun-defs)
-       )
+        (tlist file-list)
+        (file-name)
+        (fun-defs)
+        )
     (while tlist
-        (setq file-name (car tlist))
-        (find-file file-name)
-        (setq fun-defs (shu-get-all-definitions fun-defs))
-        (kill-buffer (current-buffer))
-        (setq tlist (cdr tlist)))
-  fun-defs
-))
+      (setq file-name (car tlist))
+      (find-file file-name)
+      (setq fun-defs (shu-get-all-definitions fun-defs))
+      (kill-buffer (current-buffer))
+      (setq tlist (cdr tlist)))
+    fun-defs
+    ))
 
 ;;
 ;;  shu-xref-get-file-list
@@ -247,23 +247,23 @@ define the region.  Each line in the region is assumed to be a file name.
 FILE-LIST is the list that is also the return value of this function."
   (interactive "r")                 ; bounds of marked region (start end)
   (let (
-    (eline (shu-the-line-at end))
-    (eol)
-    (file-name)
-    (line-diff 0)
-       )
-  (save-excursion
-    (goto-char start)               ; Move to region start
-                                    ; While we have not reached last line and
-    (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
-      (setq eol (save-excursion (end-of-line) (point)))
-      (when (> eol (point))
+        (eline (shu-the-line-at end))
+        (eol)
+        (file-name)
+        (line-diff 0)
+        )
+    (save-excursion
+      (goto-char start)               ; Move to region start
+                                        ; While we have not reached last line and
+      (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
+        (setq eol (save-excursion (end-of-line) (point)))
+        (when (> eol (point))
           (setq file-name (buffer-substring (point) eol)))
-          (setq file-list (cons file-name file-list))
-      (setq line-diff (forward-line 1)))
-    (setq file-list (nreverse file-list)))
+        (setq file-list (cons file-name file-list))
+        (setq line-diff (forward-line 1)))
+      (setq file-list (nreverse file-list)))
     file-list
-))
+    ))
 
 
 ;;
@@ -275,34 +275,34 @@ name in T1 comes before the type name in T2.  If the type names are the same,
 then compare the variable names so that variables are in alphabetical order
 within type."
   (let
-   ((fun-name1)
-    (info1)
-    (def1)
-    (type1)
-    (type-name1)
-    (fun-name2)
-    (info2)
-    (def2)
-    (type2)
-    (type-name2)
-    (is-less))
-  (setq fun-name1 (car t1))
-  (setq info1 (cdr t1))
-  (setq def1 (car info1))
-  (setq type1 (car def1))
-  (setq type-name1 (concat "def" (car (rassoc type1 shu-xref-var-types))))
-  (setq fun-name2 (car t2))
-  (setq info2 (cdr t2))
-  (setq def2 (car info2))
-  (setq type2 (car def2))
-  (setq type-name2 (concat "def" (car (rassoc type2 shu-xref-var-types))))
-  (if (string< type-name1 type-name2)
-      (setq is-less t)
+      ((fun-name1)
+       (info1)
+       (def1)
+       (type1)
+       (type-name1)
+       (fun-name2)
+       (info2)
+       (def2)
+       (type2)
+       (type-name2)
+       (is-less))
+    (setq fun-name1 (car t1))
+    (setq info1 (cdr t1))
+    (setq def1 (car info1))
+    (setq type1 (car def1))
+    (setq type-name1 (concat "def" (car (rassoc type1 shu-xref-var-types))))
+    (setq fun-name2 (car t2))
+    (setq info2 (cdr t2))
+    (setq def2 (car info2))
+    (setq type2 (car def2))
+    (setq type-name2 (concat "def" (car (rassoc type2 shu-xref-var-types))))
+    (if (string< type-name1 type-name2)
+        (setq is-less t)
       (when (string= type-name1 type-name2)
-          (when (string< fun-name1 fun-name2)
-              (setq is-less t))))
-  is-less
-))
+        (when (string< fun-name1 fun-name2)
+          (setq is-less t))))
+    is-less
+    ))
 
 ;;
 ;;  shu-xref-file-compare
@@ -313,47 +313,47 @@ name in T1 comes before the type name in T2.  If the file names are the same,
 then compare the variable names so that variables are in alphabetical order
 within file."
   (let
-     ((def1)
-      (file-name1)
-      (fun-name1)
-      (info1)
-      (is-less)
-      (line-no1)
-      (type-name1)
-      (type1)
-      (where1)
-      (def2)
-      (file-name2)
-      (fun-name2)
-      (info2)
-      (is-less)
-      (line-no2)
-      (type-name2)
-      (type2)
-      (where2))
-  (setq fun-name1 (car t1))
-  (setq info1 (cdr t1))
-  (setq def1 (car info1))
-  (setq type1 (car def1))
-  (setq type-name1 (concat "def" (car (rassoc type1 shu-xref-var-types))))
-  (setq where1 (cdr def1))
-  (setq file-name1 (car where1))
-  (setq line-no1 (cdr where1))
-  (setq fun-name2 (car t2))
-  (setq info2 (cdr t2))
-  (setq def2 (car info2))
-  (setq type2 (car def2))
-  (setq type-name2 (concat "def" (car (rassoc type2 shu-xref-var-types))))
-  (setq where2 (cdr def2))
-  (setq file-name2 (car where2))
-  (setq line-no2 (cdr where2))
-  (if (string< file-name1 file-name2)
-      (setq is-less t)
+      ((def1)
+       (file-name1)
+       (fun-name1)
+       (info1)
+       (is-less)
+       (line-no1)
+       (type-name1)
+       (type1)
+       (where1)
+       (def2)
+       (file-name2)
+       (fun-name2)
+       (info2)
+       (is-less)
+       (line-no2)
+       (type-name2)
+       (type2)
+       (where2))
+    (setq fun-name1 (car t1))
+    (setq info1 (cdr t1))
+    (setq def1 (car info1))
+    (setq type1 (car def1))
+    (setq type-name1 (concat "def" (car (rassoc type1 shu-xref-var-types))))
+    (setq where1 (cdr def1))
+    (setq file-name1 (car where1))
+    (setq line-no1 (cdr where1))
+    (setq fun-name2 (car t2))
+    (setq info2 (cdr t2))
+    (setq def2 (car info2))
+    (setq type2 (car def2))
+    (setq type-name2 (concat "def" (car (rassoc type2 shu-xref-var-types))))
+    (setq where2 (cdr def2))
+    (setq file-name2 (car where2))
+    (setq line-no2 (cdr where2))
+    (if (string< file-name1 file-name2)
+        (setq is-less t)
       (when (string= file-name1 file-name2)
-          (when (string< fun-name1 fun-name2)
-              (setq is-less t))))
-  is-less
-))
+        (when (string< fun-name1 fun-name2)
+          (setq is-less t))))
+    is-less
+    ))
 
 ;;
 ;;  shu-xref-get-longest-name
@@ -363,17 +363,17 @@ within file."
 name in the list.  These are returned as a cons cell with the length of the longest
 type name in the CAR and the longest variable name in the CDR."
   (let
-   ((tlist fun-defs)
-    (max-var-name-length 0)
-    (max-type-name-length 0)
-    (item)
-    (fun-name)
-    (info)
-    (def)
-    (type)
-    (type-name)
-    (retval))
-  (while tlist
+      ((tlist fun-defs)
+       (max-var-name-length 0)
+       (max-type-name-length 0)
+       (item)
+       (fun-name)
+       (info)
+       (def)
+       (type)
+       (type-name)
+       (retval))
+    (while tlist
       (setq item (car tlist))
       (setq fun-name (car item))
       (setq info (cdr item))
@@ -381,34 +381,34 @@ type name in the CAR and the longest variable name in the CDR."
       (setq type (car def))
       (setq type-name (concat "def" (car (rassoc type shu-xref-var-types))))
       (when (> (length fun-name) max-var-name-length)
-          (setq max-var-name-length (length fun-name)))
+        (setq max-var-name-length (length fun-name)))
       (when (> (length type-name) max-type-name-length)
-          (setq max-type-name-length (length type-name)))
+        (setq max-type-name-length (length type-name)))
       (setq tlist (cdr tlist)))
-  (setq retval (cons max-type-name-length max-var-name-length))
-  retval
-))
+    (setq retval (cons max-type-name-length max-var-name-length))
+    retval
+    ))
 
 ;;
 ;;  shu-xref-dump
 ;;
 (defun shu-xref-dump (fun-defs max-var-name-length max-type-name-length)
   (let
-   ((tlist fun-defs)
-    (item)
-    (fun-name)
-    (type)
-    (type-name)
-    (info)
-    (def)
-    (where)
-    (file-name)
-    (line-no)
-    (pad-count)
-    (pad)
-    (gbuf (get-buffer-create shu-xref-buffer)))
-  (princ "\n================================================================\n" gbuf)
-  (while tlist
+      ((tlist fun-defs)
+       (item)
+       (fun-name)
+       (type)
+       (type-name)
+       (info)
+       (def)
+       (where)
+       (file-name)
+       (line-no)
+       (pad-count)
+       (pad)
+       (gbuf (get-buffer-create shu-xref-buffer)))
+    (princ "\n================================================================\n" gbuf)
+    (while tlist
       (setq item (car tlist))
       (setq fun-name (car item))
       (setq info (cdr item))
@@ -426,9 +426,9 @@ type name in the CAR and the longest variable name in the CDR."
       (setq type-name (concat type-name pad))
       (princ (format "%s %s: %s: %d\n" fun-name type-name file-name line-no) gbuf)
       (setq tlist (cdr tlist)))
-))
-; (setq pad (make-string pad-count ? ))
-;  (setq type (concat "def" (car (rassoc 2 shu-xref-var-types))))
+    ))
+                                        ; (setq pad (make-string pad-count ? ))
+                                        ;  (setq type (concat "def" (car (rassoc 2 shu-xref-var-types))))
 
 ;;
 ;;  shu-get-all-definitions
@@ -481,23 +481,24 @@ type name in the CAR and the longest variable name in the CDR."
 (defun shu-get-all-definitions (fun-defs)
   "Find all of the emacs lisp function definitions in the current buffer."
   (let
-   ((fun-extract)
-     (name "def\\(un\\|macro\\|subst\\|alias\\|var\\|const\\|custom\\|group\\)")
-;    (name "defun")
-    (fun-name)
-    (info)
-    (line-no)
-    (var-type-number)
-    (where)
-    (def)
-    (gbuf (get-buffer-create shu-xref-buffer))
-    (info)
-    (item))
-  (save-excursion (save-restriction
-      (widen)
-      (goto-char (point-min))
-      (setq fun-extract (shu-xref-get-next-definition fun-extract))
-      (while fun-extract
+      ((fun-extract)
+       (name "def\\(un\\|macro\\|subst\\|alias\\|var\\|const\\|custom\\|group\\)")
+                                        ;    (name "defun")
+       (fun-name)
+       (info)
+       (line-no)
+       (var-type-number)
+       (where)
+       (def)
+       (gbuf (get-buffer-create shu-xref-buffer))
+       (info)
+       (item))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (goto-char (point-min))
+        (setq fun-extract (shu-xref-get-next-definition fun-extract))
+        (while fun-extract
           (setq fun-name (car fun-extract))
           (setq info (cdr fun-extract))
           (setq line-no (cdr info))
@@ -508,9 +509,9 @@ type name in the CAR and the longest variable name in the CDR."
           (setq item (cons fun-name info))
           (setq fun-defs (cons item fun-defs))
           (setq fun-extract (shu-xref-get-next-definition fun-extract)))))
-  (setq fun-defs (nreverse fun-defs))
-  fun-defs
-))
+    (setq fun-defs (nreverse fun-defs))
+    fun-defs
+    ))
 
 
 ;;
@@ -552,38 +553,38 @@ in the CAR and the information about the function in the CDR.  The information i
 CDR is a cons cell with the numeric variable type in the CAR and the line number in
 which the definition started in the CDR."
   (let*
-   ((name "def\\(un\\|macro\\|subst\\|alias\\|var\\|const\\|custom\\|group\\)")
-   (sdefun (concat "\(" shu-all-whitespace-regexp "*" name shu-all-whitespace-regexp "*" "\\(" shu-xref-lisp-name "+\\)"))
-    (retval)
-    (x)
-    (something t)
-    (fun-name)
-    (fun-start-point)
-    (fun-start-line)
-    (fun-end-point)
-    (info)
-    (var-type-number)
-    (var-type-name))
-  (while something
+      ((name "def\\(un\\|macro\\|subst\\|alias\\|var\\|const\\|custom\\|group\\)")
+       (sdefun (concat "\(" shu-all-whitespace-regexp "*" name shu-all-whitespace-regexp "*" "\\(" shu-xref-lisp-name "+\\)"))
+       (retval)
+       (x)
+       (something t)
+       (fun-name)
+       (fun-start-point)
+       (fun-start-line)
+       (fun-end-point)
+       (info)
+       (var-type-number)
+       (var-type-name))
+    (while something
       (setq fun-end-point (re-search-forward sdefun nil t))
       (if (not (numberp fun-end-point))
           (setq something nil)
-      ;;
-          (setq var-type-name (match-string 1))
-          (setq fun-name (match-string 2))
-          (save-excursion
-              (re-search-backward sdefun nil t)
-              (setq fun-start-point (point))
-              (setq fun-start-line (shu-the-line-at (point)))
-              (when (not (shu-point-in-string))
-                  (beginning-of-line)
-                  (when (not (re-search-forward ";" fun-start-point t))
-                      (setq something nil)
-                      (setq var-type-number (cdr (assoc var-type-name shu-xref-var-types)))
-                      (setq info (cons var-type-number fun-start-line))
-                      (setq retval (cons fun-name info)))))))
-  retval
-))
+        ;;
+        (setq var-type-name (match-string 1))
+        (setq fun-name (match-string 2))
+        (save-excursion
+          (re-search-backward sdefun nil t)
+          (setq fun-start-point (point))
+          (setq fun-start-line (shu-the-line-at (point)))
+          (when (not (shu-point-in-string))
+            (beginning-of-line)
+            (when (not (re-search-forward ";" fun-start-point t))
+              (setq something nil)
+              (setq var-type-number (cdr (assoc var-type-name shu-xref-var-types)))
+              (setq info (cons var-type-number fun-start-line))
+              (setq retval (cons fun-name info)))))))
+    retval
+    ))
 
 
 
@@ -596,31 +597,31 @@ as nil if there are no more function invocations after point.  If a function
 invocation is found, RETVAL is returned as a cons cell with the name of the function
 in the CAR and the line number in which the function definition starts in the CDR."
   (let
-   ((sdefun (concat "\(" shu-all-whitespace-regexp "*" name shu-all-whitespace-regexp "*" "\\(" shu-xref-lisp-name "+\\)"))
-    (retval)
-    (x)
-    (something t)
-    (fun-name)
-    (fun-start-point)
- (gbuf (get-buffer-create "**zzlp**"))
-    (fun-start-line)
-    (fun-end-point))
-  (while something
+      ((sdefun (concat "\(" shu-all-whitespace-regexp "*" name shu-all-whitespace-regexp "*" "\\(" shu-xref-lisp-name "+\\)"))
+       (retval)
+       (x)
+       (something t)
+       (fun-name)
+       (fun-start-point)
+       (gbuf (get-buffer-create "**zzlp**"))
+       (fun-start-line)
+       (fun-end-point))
+    (while something
       (setq fun-end-point (re-search-forward sdefun nil t))
       (if (not (numberp fun-end-point))
           (setq something nil)
-      ;;
-          (setq fun-name (match-string 1))
-          (save-excursion
-              (re-search-backward sdefun nil t)
-              (setq fun-start-point (point))
-              (setq fun-start-line (shu-the-line-at (point)))
-              (when (not (shu-point-in-string))
-                  (beginning-of-line)
-                  (when (not (re-search-forward ";" fun-start-point t))
-                      (setq something nil)
-                      (setq retval (cons fun-name fun-start-line)))))))
-  retval
-))
+        ;;
+        (setq fun-name (match-string 1))
+        (save-excursion
+          (re-search-backward sdefun nil t)
+          (setq fun-start-point (point))
+          (setq fun-start-line (shu-the-line-at (point)))
+          (when (not (shu-point-in-string))
+            (beginning-of-line)
+            (when (not (re-search-forward ";" fun-start-point t))
+              (setq something nil)
+              (setq retval (cons fun-name fun-start-line)))))))
+    retval
+    ))
 
 ;;; shu-xref.el ends here

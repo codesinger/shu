@@ -309,7 +309,7 @@
   (let (
         (use-allocator shu-cpp-use-bde-library)
         )
-  (shu-cpp-inner-cdecl class-name nil use-allocator)))
+    (shu-cpp-inner-cdecl class-name nil use-allocator)))
 
 
 
@@ -403,10 +403,10 @@
       "\n"
       ipad "// DATA\n\n"))
     (when use-allocator
-    (insert
-     (concat
-      ipad "bslma::Allocator                 *d_allocator;\n"
-      )))
+      (insert
+       (concat
+        ipad "bslma::Allocator                 *d_allocator;\n"
+        )))
     (insert
      (concat
       "\n"
@@ -418,10 +418,10 @@
       ipad " */\n"
       "    explicit " class-name "("))
     (when use-allocator
-    (insert
-     (concat
-      "\n"
-      ipad "    bslma::Allocator    *allocator = 0")))
+      (insert
+       (concat
+        "\n"
+        ipad "    bslma::Allocator    *allocator = 0")))
     (insert
      (concat
       ");\n"
@@ -448,25 +448,25 @@
     (when (not copy-allowed)
       (insert
        (concat
-      "\n"
-      ipad "// NOT IMPLEMENTED\n"
-      ipad "/*!\n"
-      ipad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
-      ipad " *\n"
-      ipad " * \\param original the object from which we are to be constructed\n"
-      ipad " */\n"
-      copy-ctor
-      "\n"
-      ipad "/*!\n"
-      ipad " * \\brief operator=() is deliberately private and unimplemented.\n"
-      ipad " *\n"
-      ipad " * \\param rhs the object from which we are to be assigned\n"
-      ipad " *\n"
-      ipad " * \\return reference to self to allow for chained operators\n"
-      ipad " */\n"
-      op-equal)))
-      (insert
-       (concat
+        "\n"
+        ipad "// NOT IMPLEMENTED\n"
+        ipad "/*!\n"
+        ipad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
+        ipad " *\n"
+        ipad " * \\param original the object from which we are to be constructed\n"
+        ipad " */\n"
+        copy-ctor
+        "\n"
+        ipad "/*!\n"
+        ipad " * \\brief operator=() is deliberately private and unimplemented.\n"
+        ipad " *\n"
+        ipad " * \\param rhs the object from which we are to be assigned\n"
+        ipad " *\n"
+        ipad " * \\return reference to self to allow for chained operators\n"
+        ipad " */\n"
+        op-equal)))
+    (insert
+     (concat
       "\n"
       ipad "// MANIPULATORS\n"
       "\n"
@@ -482,22 +482,22 @@
       std-name "::ostream &operator<<(\n"
       "    " std-name "::ostream" ostream-pad "  &os,\n"
       "    const " class-name ostream-class-pad "  &cn);\n"))
-      (when use-allocator
-        (save-excursion
-          (save-restriction
-            (widen)
-            (goto-char (point-min))
-            (when (search-forward "INCLUDED_BSLMA_ALLOCATOR" nil t)
-              (setq have-include t))))
-        (when (not have-include)
-          (goto-char header-pos)
-          (beginning-of-line)
-          (insert
-           (concat
-            "\n"
-            "#ifndef INCLUDED_BSLMA_ALLOCATOR\n"
-            "#include <bslma_allocator.h>\n"
-            "#endif\n"))))
+    (when use-allocator
+      (save-excursion
+        (save-restriction
+          (widen)
+          (goto-char (point-min))
+          (when (search-forward "INCLUDED_BSLMA_ALLOCATOR" nil t)
+            (setq have-include t))))
+      (when (not have-include)
+        (goto-char header-pos)
+        (beginning-of-line)
+        (insert
+         (concat
+          "\n"
+          "#ifndef INCLUDED_BSLMA_ALLOCATOR\n"
+          "#include <bslma_allocator.h>\n"
+          "#endif\n"))))
     (goto-char start-pos)))
 
 
@@ -724,18 +724,18 @@
     (save-excursion
       (save-restriction
         (widen)
-         (goto-char (point-min))
-         (when (search-forward "INCLUDED_BSLMA_DEFAULT" nil t)
-           (setq have-include t))))
+        (goto-char (point-min))
+        (when (search-forward "INCLUDED_BSLMA_DEFAULT" nil t)
+          (setq have-include t))))
     (when (not have-include)
       (goto-char header-pos)
       (beginning-of-line)
       (setq include-line
             (concat
-        "\n"
-        "#ifndef INCLUDED_BSLMA_DEFAULT\n"
-        "#include <bslma_default.h>\n"
-        "#endif\n"))
+             "\n"
+             "#ifndef INCLUDED_BSLMA_DEFAULT\n"
+             "#include <bslma_default.h>\n"
+             "#endif\n"))
       (setq start-pos (+ start-pos (length include-line)))
       (insert include-line))
     (goto-char start-pos)
@@ -768,7 +768,7 @@
     (save-excursion
       (save-restriction
         (widen)
-         (setq have-header (search-backward header nil t))))
+        (setq have-header (search-backward header nil t))))
     (setq class-name-pad (make-string (length class-name) ? ))
     (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
     (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
@@ -820,7 +820,7 @@
   "Place a stream of __FILE__ and __LINE__ at point."
   (interactive)
   (insert " << __FILE__ << \":\" << __LINE__ << \": \" <<")
-)
+  )
 
 
 ;;
@@ -831,22 +831,22 @@
   (interactive)
   (let
       ((start-pos))
-  (beginning-of-line)
-  (insert
-   (concat
-    "\n"
-    "/*!\n"
-    " * \\file " (file-name-nondirectory (buffer-file-name))  "\n"
-    " * \n"
-    " * \\brief "))
-  (setq start-pos (point))
-  (insert
-   (concat
-    "\n"
-    " * \n"
-    " */\n"))
-  (goto-char start-pos)
-))
+    (beginning-of-line)
+    (insert
+     (concat
+      "\n"
+      "/*!\n"
+      " * \\file " (file-name-nondirectory (buffer-file-name))  "\n"
+      " * \n"
+      " * \\brief "))
+    (setq start-pos (point))
+    (insert
+     (concat
+      "\n"
+      " * \n"
+      " */\n"))
+    (goto-char start-pos)
+    ))
 
 ;;
 ;;  shu-shu-misc-set-alias
@@ -864,6 +864,6 @@ shu- prefix removed."
   (defalias 'hcgen 'shu-cpp-hcgen)
   (defalias 'fline 'shu-fline)
   (defalias 'dox-file 'shu-dox-file)
-)
+  )
 
 ;;; shu-cpp-misc.el ends here

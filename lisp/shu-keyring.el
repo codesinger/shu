@@ -197,8 +197,8 @@ are recorded.")
 ring so that it can be yanked into a buffer or pasted into the application
 requesting it."
   (interactive)
-    (shu-keyring-get-field shu-keyring-pw-name)
-    )
+  (shu-keyring-get-field shu-keyring-pw-name)
+  )
 
 ;;
 ;; shu-keyring-get-pin
@@ -208,8 +208,8 @@ requesting it."
 the message area and puts the pin into the kill ring so that it can be yanked
 into a buffer or pasted into the application requesting it."
   (interactive)
-    (shu-keyring-get-field shu-keyring-pin-name)
-    )
+  (shu-keyring-get-field shu-keyring-pin-name)
+  )
 
 ;;
 ;; shu-keyring-get-id
@@ -219,8 +219,8 @@ into a buffer or pasted into the application requesting it."
 in the message area and puts the user Id into the kill ring so that it can be
 yanked into a buffer or pasted into the application requesting it."
   (interactive)
-    (shu-keyring-get-field shu-keyring-id-name)
-    )
+  (shu-keyring-get-field shu-keyring-id-name)
+  )
 
 ;;
 ;; shu-keyring-get-url
@@ -230,8 +230,8 @@ yanked into a buffer or pasted into the application requesting it."
 the message area and puts the url into the kill ring so that it can be yanked
 into a buffer or pasted into the application requesting it."
   (interactive)
-    (shu-keyring-get-field shu-keyring-url-name)
-    )
+  (shu-keyring-get-field shu-keyring-url-name)
+  )
 
 ;;
 ;; shu-keyring-get-acct
@@ -241,22 +241,22 @@ into a buffer or pasted into the application requesting it."
 area and puts the password into the kill ring so that it can be yanked or pasted into the application
 requesting it."
   (interactive)
-    (shu-keyring-get-field shu-keyring-account-name)
-    )
+  (shu-keyring-get-field shu-keyring-account-name)
+  )
 
 
 ;;
 ;; shu-keyring-get-file
 ;;
 (defun shu-keyring-get-file()
-"Display the name of the keyring file, if any.  This is useful if you are
+  "Display the name of the keyring file, if any.  This is useful if you are
 getting unexpected results from some of the query functions that look up keyring
 information.  Perhaps the unexpected results come from the fact that you are
 using the wrong keyring file."
-(interactive)
-(if shu-keyring-file
-    (message "Shu keyring file is \"%s\"" shu-keyring-file)
-  (message "%s" "No keyring file is defined."))
+  (interactive)
+  (if shu-keyring-file
+      (message "Shu keyring file is \"%s\"" shu-keyring-file)
+    (message "%s" "No keyring file is defined."))
   )
 
 ;;
@@ -291,13 +291,13 @@ keyring file.  This function parses the keyring file.  After the operation. look
 into the keyring buffer (**shu-keyring**) to see if there are any complaints
 about syntax errors in the file."
   (interactive)
-    (setq shu-keyring-index nil)
-    (when (bufferp shu-keyring-buffer-name)
-      (kill-buffer shu-keyring-buffer-name))
-    (shu-keyring-parse-keyring-file)
-    (switch-to-buffer shu-keyring-buffer-name)
-    (goto-char (point-min))
-    )
+  (setq shu-keyring-index nil)
+  (when (bufferp shu-keyring-buffer-name)
+    (kill-buffer shu-keyring-buffer-name))
+  (shu-keyring-parse-keyring-file)
+  (switch-to-buffer shu-keyring-buffer-name)
+  (goto-char (point-min))
+  )
 
 
 
@@ -323,7 +323,7 @@ key value pair within the item.  Put the value in the kill-ring and also return 
           (ding))
 
       (let
-           ((completion-ignore-case t))
+          ((completion-ignore-case t))
         (setq keyring-key
               (completing-read
                invitation  ;; prompt
@@ -386,14 +386,14 @@ contains no duplicate keys."
 (defun shu-keyring-show-index (index)
   "Print the keyring index"
   (let
-       ((gbuf      (get-buffer-create shu-keyring-buffer-name))
-        (tindex  index)
-        (key-item )
-        (key     )
-        (item    )
-        (item-number )
-        (item-number-string )
-        (count   0))
+      ((gbuf      (get-buffer-create shu-keyring-buffer-name))
+       (tindex  index)
+       (key-item )
+       (key     )
+       (item    )
+       (item-number )
+       (item-number-string )
+       (count   0))
     (princ "     Line\n" gbuf)
     (princ "    Number   Key ...\n" gbuf)
     (while tindex
@@ -419,15 +419,15 @@ keys for the same item.  But there could be two different items with the same ke
 function returns TRUE if two or more items have the same key.  The index must be in sorted
 order by key value before this function is called."
   (let
-       ((gbuf      (get-buffer-create shu-keyring-buffer-name))
-        (tindex  index)
-        (key-item )
-        (key     )
-        (item    )
-        (item-number )
-        (last-key   nil)
-        (last-item-number  0)
-        (has-duplicate     nil))
+      ((gbuf      (get-buffer-create shu-keyring-buffer-name))
+       (tindex  index)
+       (key-item )
+       (key     )
+       (item    )
+       (item-number )
+       (last-key   nil)
+       (last-item-number  0)
+       (has-duplicate     nil))
     (while tindex
       (setq key-item (car tindex))
       (setq key  (car key-item))
@@ -451,10 +451,10 @@ order by key value before this function is called."
 (defun shu-keyring-update-index (index item)
   "Extract the keys from a keyring item and add them to the keyring index."
   (let
-       ((vlist   )
-        (tlist   )
-        (value   )
-        (new-value ))
+      ((vlist   )
+       (tlist   )
+       (value   )
+       (new-value ))
     ;; First add all the names for this item to the index
     (setq vlist (shu-nvplist-get-item-value "name" item))
     (setq index (shu-keyring-add-values-to-index index vlist item))
@@ -483,14 +483,14 @@ order by key value before this function is called."
 (defun shu-keyring-in-index (index item value)
   "Return true if the INDEX already contains the VALUE for this ITEM."
   (let
-       ((item-number (shu-nvplist-get-item-number item))
-        (tindex  index)
-        (done         )
-        (pair         )
-        (xvalue       )
-        (xitem        )
-        (xitem-number )
-        (got-it    nil))
+      ((item-number (shu-nvplist-get-item-number item))
+       (tindex  index)
+       (done         )
+       (pair         )
+       (xvalue       )
+       (xitem        )
+       (xitem-number )
+       (got-it    nil))
     (when (not tindex)
       (setq done t))
     (while (not done)
@@ -516,9 +516,9 @@ order by key value before this function is called."
 duplicates.  But this does not prevent two different items from sharing the same key,
 although it would be unusual in a keyring."
   (let
-       ((zlist   vlist)
-        (value   )
-        (pair    ))
+      ((zlist   vlist)
+       (value   )
+       (pair    ))
     (while zlist
       (setq value (car zlist))
       (when (not (shu-keyring-in-index index item value))

@@ -110,9 +110,11 @@ sitting on something that appears to be a file name.")
 by shu-make-c-project")
 
 (defvar shu-project-user-class-count)
-(defvar shu-project-class-count)
-(defvar shu-project-errors)
-(defvar shu-project-file-list)
+
+
+(defvar shu-project-file-list
+  "This is a list of the full path and name of every file in the project.
+It is used when a global change needs to visit every file in the project.")
 
 ;;
 ;;  Functions for customzing
@@ -200,8 +202,8 @@ any that contain c or h files.  It then inserts all of the directory names
 into the current file at point."
   (interactive "DRoot?: ")
   (let ((level     1)
-       (dtop      nil)
-       (tlist     nil))
+        (dtop      nil)
+        (tlist     nil))
     (setq shu-cpp-final-list nil)
     (shu-cpp-project-subdirs (expand-file-name proj-root) level)
     (setq shu-cpp-final-list (sort shu-cpp-final-list 'string<))
@@ -220,15 +222,15 @@ subdirectory that contains C, C++, or H files.  This is used by shu-make-c-proje
 and other functions that wish to discover all directories that might contain
 source code."
   (let ((gbuf      (get-buffer-create "*Project List*")) ;
-       (dlist )
-       (tlist )
-       (sname )
-       (dir-list )
-       (sub-list )
-       (cname )
-       (dname )
-       (got-interest )
-       (extension))
+        (dlist )
+        (tlist )
+        (sname )
+        (dir-list )
+        (sub-list )
+        (cname )
+        (dname )
+        (got-interest )
+        (extension))
     (setq dlist (directory-files dir-name t nil t))
     (setq tlist dlist)
     (while tlist
@@ -293,16 +295,14 @@ appropriate subdirectory."
   "Renew a previously established project to pick up any new files."
   (interactive)
   (let ((dir-name)
-       (ilist)
-       (key-list)
-       (c1)
-       (file-name)
-       (full-name)
-       (extension)
-       (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
-       (tlist))
-    (setq shu-project-errors 0)
-    (setq shu-project-class-count 0)
+        (ilist)
+        (key-list)
+        (c1)
+        (file-name)
+        (full-name)
+        (extension)
+        (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
+        (tlist))
     (setq shu-project-user-class-count 0)
     (setq shu-project-file-list nil)
     (setq tlist shu-cpp-project-list)
@@ -336,21 +336,21 @@ appropriate subdirectory."
 (defun shu-cpp-finish-project (&optional key-list)
   "Finish constructing a C project from a user file list."
   (let ((ilist)
-       (c1)
-       (file-name)
-       (full-name)
-       (full-name-list)
-       (item)
-       (limit)
-       (nname)
-       (extension)
-       (c-count         0)
-       (h-count         0)
-       (dup-count       0)
-       (name-name       "name")
-       (occur-name      "occurs")
-       (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
-       (plist))
+        (c1)
+        (file-name)
+        (full-name)
+        (full-name-list)
+        (item)
+        (limit)
+        (nname)
+        (extension)
+        (c-count         0)
+        (h-count         0)
+        (dup-count       0)
+        (name-name       "name")
+        (occur-name      "occurs")
+        (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
+        (plist))
     ;;
     ;; Now sort the list by name and construct a new list.  Any duplicate names
     ;; will contain entries for all of the files that contain the duplicate
@@ -1066,8 +1066,8 @@ the message in the minibuffer and passing the totals back to the caller."
   "Insert into the current buffer the names of all of the directories in a project."
   (interactive)
   (let (
-       (tlist    shu-cpp-project-list)
-       (dir-name))
+        (tlist    shu-cpp-project-list)
+        (dir-name))
     (if (not tlist)
         (progn
           (message "There is no project to list.")

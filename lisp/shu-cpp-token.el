@@ -163,8 +163,8 @@ But some of the other transform functions will turn this list of tokens into the
 template parameter \"int\"")
 
 (defconst shu-cpp-token-delimiter-end
-   (regexp-opt shu-cpp-token-delimiter-chars  nil)
-   "Regular expression to define that which terminates an unquoted token in C++")
+  (regexp-opt shu-cpp-token-delimiter-chars  nil)
+  "Regular expression to define that which terminates an unquoted token in C++")
 
 
 ;;
@@ -199,21 +199,21 @@ template parameter \"int\"")
     (when token-type
       (if (not (numberp token-type))
           (setq type-name "**unknown** (Not a number)")
-      (setq type-name (format "**unknown** (%d)" token-type))
-      (cond
-       ((= token-type shu-cpp-token-type-op)
-        (setq type-name "operator"))
-       ((= token-type shu-cpp-token-type-qt)
-        (setq type-name "quoted-string"))
-       ((= token-type shu-cpp-token-type-uq)
-        (setq type-name "unquoted token"))
-       ((= token-type shu-cpp-token-type-ct)
-        (setq type-name "comment"))
-       ((= token-type shu-cpp-token-type-cc)
-        (setq type-name "code comment"))
-       ((= token-type shu-cpp-token-type-tp)
-        (setq type-name "template parameter"))
-       )))
+        (setq type-name (format "**unknown** (%d)" token-type))
+        (cond
+         ((= token-type shu-cpp-token-type-op)
+          (setq type-name "operator"))
+         ((= token-type shu-cpp-token-type-qt)
+          (setq type-name "quoted-string"))
+         ((= token-type shu-cpp-token-type-uq)
+          (setq type-name "unquoted token"))
+         ((= token-type shu-cpp-token-type-ct)
+          (setq type-name "comment"))
+         ((= token-type shu-cpp-token-type-cc)
+          (setq type-name "code comment"))
+         ((= token-type shu-cpp-token-type-tp)
+          (setq type-name "template parameter"))
+         )))
     type-name
     ))
 
@@ -249,7 +249,7 @@ tokens contained therein, displaying the result in the Shu unit test buffer."
 ;;  shu-cpp-token-internal-parse-region
 ;;
 (defun shu-cpp-token-internal-parse-region (func start end)
-    "Internal function to do a forward or reverse parse of the region between START
+  "Internal function to do a forward or reverse parse of the region between START
 and END.  FUNC holds the function to be invoked to do the parse.  This would be
 either shu-cpp-tokenize-region or shu-cpp-reverse-tokenize-region.  Once the
 parse is complete, the token list is shown in the Shu unit test buffer.  If any
@@ -356,7 +356,7 @@ error, return the token list, else return nil"
 ;;  shu-cpp-token-internal-tokenize-region-for-command
 ;;
 (defun shu-cpp-token-internal-tokenize-region-for-command (func start end &optional limit)
-    "Internal function to do a forward or reverse parse of the region between START
+  "Internal function to do a forward or reverse parse of the region between START
 and END.  FUNC holds the function to be invoked to do the parse.  This would be
 either shu-cpp-tokenize-region or shu-cpp-reverse-tokenize-region.  Once the
 parse is complete, we check to see if an error was detected.  If an error was
@@ -546,7 +546,7 @@ quote start character, nil is returned."
        (spoint (point))
        (epoint (1+ start))
        (token)
-            (tbuf      (get-buffer-create shu-unit-test-buffer))
+       (tbuf      (get-buffer-create shu-unit-test-buffer))
        (token-type shu-cpp-token-type-qt)
        (token-info)
        (error-message)
@@ -737,9 +737,9 @@ are the same.  Do not include the start or end points in the comparison."
 (defun shu-cpp-token-info-replace-token (token-info new-token)
   "Replace the TOKEN of TOKEN-INFO with NEW-TOKEN, returning the
 modified TOKEN-INFO"
-    (setcdr token-info new-token)
-    new-token
-    )
+  (setcdr token-info new-token)
+  new-token
+  )
 
 
 
@@ -1016,10 +1016,10 @@ of reverse parsed code have the same suffix."
         (tlist token-list)
         (token-info)
         )
-        (while tlist
-          (setq token-info (car tlist))
-            (shu-cpp-token-show-token-info token-info)
-            (setq tlist (cdr tlist)))
+    (while tlist
+      (setq token-info (car tlist))
+      (shu-cpp-token-show-token-info token-info)
+      (setq tlist (cdr tlist)))
     ))
 
 

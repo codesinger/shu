@@ -36,12 +36,12 @@
 (provide 'shu-base)
 
 (defconst shu-cpp-name-list
-                        (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
-                              "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
-                              "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M"
-                              "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
-                              "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
-                              "_" "$")
+  (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
+        "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
+        "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M"
+        "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
+        "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+        "_" "$")
   "List of all characters that can be present in a C++ file name.")
 
 (defconst shu-cpp-name (regexp-opt
@@ -216,12 +216,10 @@ of non-escaped quotes (double quotes).  The left-hand quote (opening quote) must
 on the same line as point.  Does not take into account comments, #if 0, etc.  It is
 assumed that someone who wants to operate on a string will generally position point
 within a legitimate string."
-  (let (
-        (xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
+  (let ((xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
         ;; of a line or a quote not preceded by \
         (start-pos )
-        (bol (save-excursion (beginning-of-line) (point)))
-        )
+        (bol (save-excursion (beginning-of-line) (point))))
     (save-excursion
       ;; Search backwards for either a quote at beginning of line or a quote
       ;; not preceded by \.  If we find the quote not at the beginning of the
@@ -299,12 +297,10 @@ either a string or a number."
 The single argument STRING-TERM is a string containing the character that
 started the string (single or double quote).  Return nil if the current
 string is not terminated in the buffer."
-  (let (
-        (limit     t)
+  (let ((limit     t)
         (epoint    nil)
         (string-end    (regexp-quote string-term))
-        (back-slash-or-quote (regexp-opt (list "\\" string-term) nil))
-        )
+        (back-slash-or-quote (regexp-opt (list "\\" string-term) nil)))
     (forward-char 1)
     (while limit
       (setq epoint (re-search-forward back-slash-or-quote nil t))
@@ -315,8 +311,7 @@ string is not terminated in the buffer."
             (progn
               (forward-char 1)
               (setq limit nil))
-          (forward-char 2)))
-      )
+          (forward-char 2))))
     epoint
     ))
 
@@ -325,38 +320,34 @@ string is not terminated in the buffer."
 ;;  shu-line-and-column-at
 ;;
 (defun shu-line-and-column-at (arg)
-"Return the line number and column number of the point passed in as an argument."
-  (let (
-    (line-no    -1)
-    (col-no     -1)
-       )
-  (save-excursion
-    (save-restriction
-    (widen)
-      (goto-char arg)
-      (beginning-of-line)
-      (setq line-no (1+ (count-lines 1 (point))))
-      (setq col-no (1+ (- arg (point))))))
-  (cons line-no col-no)
-))
+  "Return the line number and column number of the point passed in as an argument."
+  (let ((line-no    -1)
+        (col-no     -1))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (goto-char arg)
+        (beginning-of-line)
+        (setq line-no (1+ (count-lines 1 (point))))
+        (setq col-no (1+ (- arg (point))))))
+    (cons line-no col-no)
+    ))
 
 
 ;;
 ;;  shu-the-column-at
 ;;
 (defun shu-the-column-at (arg)
-"Return the column number of the point passed in as an argument."
-  (let (
-    (col-no     -1)
-       )
-  (save-excursion
-    (save-restriction
-    (widen)
-      (goto-char arg)
-      (beginning-of-line)
-      (setq col-no (1+ (- arg (point))))))
-  col-no
-))
+  "Return the column number of the point passed in as an argument."
+  (let ((col-no     -1))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (goto-char arg)
+        (beginning-of-line)
+        (setq col-no (1+ (- arg (point))))))
+    col-no
+    ))
 
 
 ;;

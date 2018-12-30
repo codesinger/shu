@@ -56,17 +56,17 @@ words that represent a DONE item.  These are the words defined in org-done-keywo
 If the two keywords that mean finished item are DONE and CANCELLED, then this function will
 return the string: TODO={.+}/-CANCELLED-DONE.  This is intended to be used in the definition
 of the variable \"org-stuck-projects\"."
- (let
-  ((qq    shu-org-done-keywords)
-   (str   "TODO={.+}/")
-   (t1    nil))
+  (let
+      ((qq    shu-org-done-keywords)
+       (str   "TODO={.+}/")
+       (t1    nil))
 
-  (while qq
-    (setq t1 (car qq))
-    (setq str (concat str "-" t1))
-    (setq qq (cdr qq)))
- str
-))
+    (while qq
+      (setq t1 (car qq))
+      (setq str (concat str "-" t1))
+      (setq qq (cdr qq)))
+    str
+    ))
 
 ;;
 ;;  shu-org-date-match-regexp
@@ -75,67 +75,67 @@ of the variable \"org-stuck-projects\"."
   "Return a regexp string that matches an org date of the form 2012-04-01 Tue 13:18."
   (let (
 
-    ;; Months 01 - 12
-    (month-match (regexp-opt
-        (list "01" "02" "03" "04" "05" "06" "07" "08" "09" "10" "11" "12") nil))
+        ;; Months 01 - 12
+        (month-match (regexp-opt
+                      (list "01" "02" "03" "04" "05" "06" "07" "08" "09" "10" "11" "12") nil))
 
-    ;; Day of month 01 - 31
-    (day-match (regexp-opt
-        (list "01" "02" "03" "04" "05" "06" "07" "08" "09" "10"
-              "11" "12" "13" "14" "15" "16" "17" "18" "19" "20"
-              "21" "22" "23" "24" "25" "26" "27" "28" "29" "30" "31") nil ))
+        ;; Day of month 01 - 31
+        (day-match (regexp-opt
+                    (list "01" "02" "03" "04" "05" "06" "07" "08" "09" "10"
+                          "11" "12" "13" "14" "15" "16" "17" "18" "19" "20"
+                          "21" "22" "23" "24" "25" "26" "27" "28" "29" "30" "31") nil ))
 
-    ;; Must be twentieth or twenty-first centuray
-    (year-start-match (regexp-opt
-        (list "19" "20") nil ))
+        ;; Must be twentieth or twenty-first centuray
+        (year-start-match (regexp-opt
+                           (list "19" "20") nil ))
 
-    ;; But may be any year in those centuries
-    (year-end-match (regexp-opt
-        (list "00" "01" "02" "03" "04" "05" "06" "07" "08" "09"
-              "10" "11" "12" "13" "14" "15" "16" "17" "18" "19"
-              "20" "21" "22" "23" "24" "25" "26" "27" "28" "29"
-              "30" "31" "32" "33" "34" "35" "36" "37" "38" "39"
-              "40" "41" "42" "43" "44" "45" "46" "47" "48" "49"
-              "50" "51" "52" "53" "54" "55" "56" "57" "58" "59"
-              "60" "61" "62" "63" "64" "65" "66" "67" "68" "69"
-              "70" "71" "72" "73" "74" "75" "76" "77" "78" "79"
-              "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
-              "90" "91" "92" "93" "94" "95" "96" "97" "98" "99") nil ))
+        ;; But may be any year in those centuries
+        (year-end-match (regexp-opt
+                         (list "00" "01" "02" "03" "04" "05" "06" "07" "08" "09"
+                               "10" "11" "12" "13" "14" "15" "16" "17" "18" "19"
+                               "20" "21" "22" "23" "24" "25" "26" "27" "28" "29"
+                               "30" "31" "32" "33" "34" "35" "36" "37" "38" "39"
+                               "40" "41" "42" "43" "44" "45" "46" "47" "48" "49"
+                               "50" "51" "52" "53" "54" "55" "56" "57" "58" "59"
+                               "60" "61" "62" "63" "64" "65" "66" "67" "68" "69"
+                               "70" "71" "72" "73" "74" "75" "76" "77" "78" "79"
+                               "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
+                               "90" "91" "92" "93" "94" "95" "96" "97" "98" "99") nil ))
 
-    ;; Must be one of these day names
-    (day-name-match (regexp-opt
-        (list " Mon " " Tue " " Wed " " Thu " " Fri " " Sat " " Sun ") nil ))
+        ;; Must be one of these day names
+        (day-name-match (regexp-opt
+                         (list " Mon " " Tue " " Wed " " Thu " " Fri " " Sat " " Sun ") nil ))
 
-    ;; Twenty-four hour clock
-    (hour-match (regexp-opt
-        (list "00" "01" "02" "03" "04" "05" "06" "07" "08" "09"
-              "10" "11" "12" "13" "14" "15" "16" "17" "18" "19"
-              "20" "21" "22" "23" "24") nil ))
+        ;; Twenty-four hour clock
+        (hour-match (regexp-opt
+                     (list "00" "01" "02" "03" "04" "05" "06" "07" "08" "09"
+                           "10" "11" "12" "13" "14" "15" "16" "17" "18" "19"
+                           "20" "21" "22" "23" "24") nil ))
 
-    ;; May be any minute within the hour
-    (minute-match (regexp-opt
-        (list "00" "01" "02" "03" "04" "05" "06" "07" "08" "09"
-              "10" "11" "12" "13" "14" "15" "16" "17" "18" "19"
-              "20" "21" "22" "23" "24" "25" "26" "27" "28" "29"
-              "30" "31" "32" "33" "34" "35" "36" "37" "38" "39"
-              "40" "41" "42" "43" "44" "45" "46" "47" "48" "49"
-              "50" "51" "52" "53" "54" "55" "56" "57" "58" "59") nil ))
+        ;; May be any minute within the hour
+        (minute-match (regexp-opt
+                       (list "00" "01" "02" "03" "04" "05" "06" "07" "08" "09"
+                             "10" "11" "12" "13" "14" "15" "16" "17" "18" "19"
+                             "20" "21" "22" "23" "24" "25" "26" "27" "28" "29"
+                             "30" "31" "32" "33" "34" "35" "36" "37" "38" "39"
+                             "40" "41" "42" "43" "44" "45" "46" "47" "48" "49"
+                             "50" "51" "52" "53" "54" "55" "56" "57" "58" "59") nil ))
 
-    (year-match )
-    (date-match )
-       )
+        (year-match )
+        (date-match )
+        )
 
-  (setq year-match (concat year-start-match year-end-match))
-  (setq date-match (concat
-                         year-match  "-"
-                         month-match "-"
-                         day-match
-                         day-name-match
-                         hour-match  ":"
-                         minute-match))
+    (setq year-match (concat year-start-match year-end-match))
+    (setq date-match (concat
+                      year-match  "-"
+                      month-match "-"
+                      day-match
+                      day-name-match
+                      hour-match  ":"
+                      minute-match))
 
-  date-match
-))
+    date-match
+    ))
 
 ;;
 ;;  shu-org-state-regexp
@@ -145,17 +145,17 @@ of the variable \"org-stuck-projects\"."
    - State \"DONE\"       from \"CANCELLED\"  [2012-04-01 Tue 13:18]
   DONE-WORD is the desired state of the record."
   (let*
-   ((date-match (concat "\\[\\(" (shu-org-date-match-regexp) "\\)\\]"))
+      ((date-match (concat "\\[\\(" (shu-org-date-match-regexp) "\\)\\]"))
 
-    (todo-states (append (list "" ) shu-org-todo-keywords shu-org-done-keywords))
-    (todo-state-regexp (regexp-opt todo-states))
-    (done-match))
+       (todo-states (append (list "" ) shu-org-todo-keywords shu-org-done-keywords))
+       (todo-state-regexp (regexp-opt todo-states))
+       (done-match))
 
-  (setq done-match (concat "\\s-*- State\\s-+" "\"" done-word "\"" "\\s-+"
-                           "from" "\\s-+" "\"" todo-state-regexp "\""
-                           "\\s-+" "\\[" "\\(" (shu-org-date-match-regexp) "\\)" "\\]"))
-  done-match
-))
+    (setq done-match (concat "\\s-*- State\\s-+" "\"" done-word "\"" "\\s-+"
+                             "from" "\\s-+" "\"" todo-state-regexp "\""
+                             "\\s-+" "\\[" "\\(" (shu-org-date-match-regexp) "\\)" "\\]"))
+    done-match
+    ))
 
 ;;
 ;;  shu-org-archive-done-tasks
@@ -167,129 +167,129 @@ of the variable \"org-stuck-projects\"."
 than shu-org-archive-expiry-days days ago."
   (interactive)
   (let
-    ((ofile (concat shu-org-home "/auto-archive-log.txt"))
-     (shu-debug nil) ;; Set to to dump debug information into "*shu debug*"
-     (gbuf      nil)
-     (debug-on-error t)
-     (rex )
-     (start-of-item )
-     (end-of-item )
-     (done-word )
-     (when-done )
-     (done-time-string )
-     (done-days )
-     (done-regexp
-            (concat "\\* \\(" (regexp-opt shu-org-done-keywords) "\\) "))
-     (todo-regexp
-            (concat "\\* " (regexp-opt (append shu-org-todo-keywords shu-org-done-keywords)) " "))
-     (start-time (current-time))
-     (cfile (buffer-file-name))
-     (done-header )
-     (header )
-     (time-string )
-     (age )
-     (sbound )
-     (archive-count 0)
-     (error-count 0)
-     (end-msg )
-     (end-msg-a )
-     (end-msg-b )
-     (buffer-changed  nil))
+      ((ofile (concat shu-org-home "/auto-archive-log.txt"))
+       (shu-debug nil) ;; Set to to dump debug information into "*shu debug*"
+       (gbuf      nil)
+       (debug-on-error t)
+       (rex )
+       (start-of-item )
+       (end-of-item )
+       (done-word )
+       (when-done )
+       (done-time-string )
+       (done-days )
+       (done-regexp
+        (concat "\\* \\(" (regexp-opt shu-org-done-keywords) "\\) "))
+       (todo-regexp
+        (concat "\\* " (regexp-opt (append shu-org-todo-keywords shu-org-done-keywords)) " "))
+       (start-time (current-time))
+       (cfile (buffer-file-name))
+       (done-header )
+       (header )
+       (time-string )
+       (age )
+       (sbound )
+       (archive-count 0)
+       (error-count 0)
+       (end-msg )
+       (end-msg-a )
+       (end-msg-b )
+       (buffer-changed  nil))
 
-(when (eq major-mode 'org-mode)
-  (when shu-debug
-     (setq  gbuf (get-buffer-create "*shu debug*")))
-  (setq time-string (format-time-string "%Y-%m-%d %a %H:%M" start-time))
-  (setq header (concat "\n\n******* Start TODO archive of " cfile
-                " on " time-string
-                          " *******\n\n"))
-  (save-excursion
-    (save-restriction
-      (widen)
-      (goto-char (point-min))
-      ;; Look for a TODO item that is completed
-      (while (re-search-forward done-regexp nil t)
-        (when shu-debug
-          (princ (concat "string " (match-string 1) "\n") gbuf)
-          (princ (format "At line %d\n" (shu-the-line-at (point))) gbuf))
-        ;; The word that indicates DONE (something like DONE or CANCELLED)
-        (setq done-word (match-string 1))
-        (setq start-of-item (line-beginning-position))
-        (setq end-of-item (line-end-position))
-        ;; Build a regexp to search for the state transition record with a timestamp
-        (setq rex (concat "- State\\s-+" "\"" done-word "\"" "\\s-+"
-                          "from" "\\s-+" "\"" "[A-Z]*" "\"" "\\s-+"
-                           "\\[\\([0-9A-Za-z\-\:\s]+\\)\\]*"))
-        (when shu-debug
-          (princ (concat "rex = " rex "\n") gbuf))
-        (setq rex (shu-org-state-regexp done-word))
-        (setq sbound nil)
-        (save-excursion
-          (when (re-search-forward todo-regexp nil t)
-            (setq sbound (line-beginning-position))))
+    (when (eq major-mode 'org-mode)
+      (when shu-debug
+        (setq  gbuf (get-buffer-create "*shu debug*")))
+      (setq time-string (format-time-string "%Y-%m-%d %a %H:%M" start-time))
+      (setq header (concat "\n\n******* Start TODO archive of " cfile
+                           " on " time-string
+                           " *******\n\n"))
+      (save-excursion
+        (save-restriction
+          (widen)
+          (goto-char (point-min))
+          ;; Look for a TODO item that is completed
+          (while (re-search-forward done-regexp nil t)
+            (when shu-debug
+              (princ (concat "string " (match-string 1) "\n") gbuf)
+              (princ (format "At line %d\n" (shu-the-line-at (point))) gbuf))
+            ;; The word that indicates DONE (something like DONE or CANCELLED)
+            (setq done-word (match-string 1))
+            (setq start-of-item (line-beginning-position))
+            (setq end-of-item (line-end-position))
+            ;; Build a regexp to search for the state transition record with a timestamp
+            (setq rex (concat "- State\\s-+" "\"" done-word "\"" "\\s-+"
+                              "from" "\\s-+" "\"" "[A-Z]*" "\"" "\\s-+"
+                              "\\[\\([0-9A-Za-z\-\:\s]+\\)\\]*"))
+            (when shu-debug
+              (princ (concat "rex = " rex "\n") gbuf))
+            (setq rex (shu-org-state-regexp done-word))
+            (setq sbound nil)
+            (save-excursion
+              (when (re-search-forward todo-regexp nil t)
+                (setq sbound (line-beginning-position))))
 
-        (when shu-debug
-          (princ (format "sbound = %d (line %d)\n" sbound (shu-the-line-at sbound)) gbuf))
-        (if (re-search-forward rex sbound t)
-          (progn
-          (when shu-debug
-            (princ (concat "Found " rex "\n") gbuf))
-          (setq done-time-string (match-string 1))
-          (setq end-of-item (line-end-position))
-          (when shu-debug
-            (princ (concat "Time: " done-time-string "\n") gbuf))
-          (setq when-done (org-parse-time-string done-time-string))
-          (setq done-days  (time-to-number-of-days
-                             (time-subtract start-time
-                              (apply #'encode-time when-done))))
-          (when shu-debug
-            (princ (format "Done days = %d\n" done-days) gbuf))
-          (when  (>= done-days shu-org-archive-expiry-days)
-            (when (not done-header)
-              (append-to-file header nil ofile)
-              (setq done-header t))
+            (when shu-debug
+              (princ (format "sbound = %d (line %d)\n" sbound (shu-the-line-at sbound)) gbuf))
+            (if (re-search-forward rex sbound t)
+                (progn
+                  (when shu-debug
+                    (princ (concat "Found " rex "\n") gbuf))
+                  (setq done-time-string (match-string 1))
+                  (setq end-of-item (line-end-position))
+                  (when shu-debug
+                    (princ (concat "Time: " done-time-string "\n") gbuf))
+                  (setq when-done (org-parse-time-string done-time-string))
+                  (setq done-days  (time-to-number-of-days
+                                    (time-subtract start-time
+                                                   (apply #'encode-time when-done))))
+                  (when shu-debug
+                    (princ (format "Done days = %d\n" done-days) gbuf))
+                  (when  (>= done-days shu-org-archive-expiry-days)
+                    (when (not done-header)
+                      (append-to-file header nil ofile)
+                      (setq done-header t))
 
-            (setq age (format "%d" done-days))
-            (append-to-file (concat "Archiving (" age " days):\n") nil ofile)
-            (append-to-file (concat (buffer-substring start-of-item end-of-item) "\n")
-                                   nil ofile)
-            (goto-char start-of-item)
-            (org-archive-subtree)
-            (setq archive-count (1+ archive-count))
-            (setq buffer-changed t)))
+                    (setq age (format "%d" done-days))
+                    (append-to-file (concat "Archiving (" age " days):\n") nil ofile)
+                    (append-to-file (concat (buffer-substring start-of-item end-of-item) "\n")
+                                    nil ofile)
+                    (goto-char start-of-item)
+                    (org-archive-subtree)
+                    (setq archive-count (1+ archive-count))
+                    (setq buffer-changed t)))
 
-            (when (not done-header)
-              (append-to-file header nil ofile)
-              (setq done-header t))
+              (when (not done-header)
+                (append-to-file header nil ofile)
+                (setq done-header t))
 
-            (setq error-count (1+ error-count))
-            (append-to-file (format "\n***error*** The following entry at line %d has no close time:\n"
-                            (shu-the-line-at start-of-item)) nil ofile)
-            (append-to-file (concat (buffer-substring start-of-item end-of-item) "\n\n")
-                                   nil ofile)))
+              (setq error-count (1+ error-count))
+              (append-to-file (format "\n***error*** The following entry at line %d has no close time:\n"
+                                      (shu-the-line-at start-of-item)) nil ofile)
+              (append-to-file (concat (buffer-substring start-of-item end-of-item) "\n\n")
+                              nil ofile)))
 
-      (when buffer-changed
-        (save-buffer)
-        (when (or (> archive-count 0) (> error-count 0))
-          (cond
-            ((= error-count 0)
-              (if (= archive-count 1)
-                (setq end-msg (format "Archived %d completed item." archive-count))
-                (setq end-msg (format "Archived %d completed items." archive-count))))
-            ((= archive-count 0)
-              (if (= error-count 1)
-                (setq end-msg (format "Encountered %d error in attempting to archive completed items." error-count))
-                (setq end-msg (format "Encountered %d errors in attempting to archive completed items." error-count))))
-            (t
-              (if (= archive-count 1)
-                (setq end-msg-a (format "Archived %d completed item " archive-count))
-                (setq end-msg-a (format "Archived %d completed items " archive-count)))
-              (if (= error-count 1)
-                (setq end-msg-b (format "with %d error." error-count))
-                (setq end-msg-b (format "with %d errors." error-count)))
-              (setq end-msg (concat end-msg-a end-msg-b))))
+          (when buffer-changed
+            (save-buffer)
+            (when (or (> archive-count 0) (> error-count 0))
+              (cond
+               ((= error-count 0)
+                (if (= archive-count 1)
+                    (setq end-msg (format "Archived %d completed item." archive-count))
+                  (setq end-msg (format "Archived %d completed items." archive-count))))
+               ((= archive-count 0)
+                (if (= error-count 1)
+                    (setq end-msg (format "Encountered %d error in attempting to archive completed items." error-count))
+                  (setq end-msg (format "Encountered %d errors in attempting to archive completed items." error-count))))
+               (t
+                (if (= archive-count 1)
+                    (setq end-msg-a (format "Archived %d completed item " archive-count))
+                  (setq end-msg-a (format "Archived %d completed items " archive-count)))
+                (if (= error-count 1)
+                    (setq end-msg-b (format "with %d error." error-count))
+                  (setq end-msg-b (format "with %d errors." error-count)))
+                (setq end-msg (concat end-msg-a end-msg-b))))
 
-          (message "%s" end-msg))))))
-))
+              (message "%s" end-msg))))))
+    ))
 
 ;;; shu-org-extensions.el ends here
