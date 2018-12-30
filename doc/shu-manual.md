@@ -3567,13 +3567,6 @@ list of length three if there is a file name, line number, and column number.
 
 
 
-#### shu-project-class-count ####
-[Variable]
-
-Undocumented
-
-
-
 #### shu-project-cpp-buffer-name ####
 [Constant]
 
@@ -3582,17 +3575,11 @@ are being scanned.
 
 
 
-#### shu-project-errors ####
-[Variable]
-
-Undocumented
-
-
-
 #### shu-project-file-list ####
 [Variable]
 
-Undocumented
+This is a list of the full path and name of every file in the project.
+It is used when a global change needs to visit every file in the project.
 
 
 
@@ -5523,7 +5510,6 @@ within type.
 
 Associate a number with each type of variable
 
-
 # Index #
 
 * [acgen](#acgen)
@@ -5997,9 +5983,7 @@ Associate a number with each type of variable
 * [shu-other](#shu-other)
 * [shu-point-in-string](#shu-point-in-string)
 * [shu-possible-cpp-file-name](#shu-possible-cpp-file-name)
-* [shu-project-class-count](#shu-project-class-count)
 * [shu-project-cpp-buffer-name](#shu-project-cpp-buffer-name)
-* [shu-project-errors](#shu-project-errors)
 * [shu-project-file-list](#shu-project-file-list)
 * [shu-project-user-class-count](#shu-project-user-class-count)
 * [shu-put-line-near-top](#shu-put-line-near-top)
