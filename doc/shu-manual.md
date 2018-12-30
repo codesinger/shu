@@ -46,6 +46,7 @@
 
 
 
+
 # Overview #
 
 
@@ -948,20 +949,34 @@ Name of the buffer into which the converted documentation is written
 
 
 #### shu-capture-code-in-doc ####
-shu-capture-code-in-doc *before-code* *after-code* *text-converter*
+shu-capture-code-in-doc *before-code* *after-code* *text-converter* *section-converter*
 [Function]
 
 The current buffer is assumed to hold a doc string that is being converted to
-markdown.  Any line that is indented to column *shu-capture-doc-code-indent* or
-greater is assumed to be a code snippet.  To format this as a code snippet,
-*before-code* is placed one line above the code snippet and *after-code* is placed
-one line below the code snippet.  Return the number of code snippets marked.
-Because we only want to replace special characters in text that does not include
-a code snippet, then each time we find the end of regular text, we call the
-*text-converter* function passing it the beginning and end point of the regular
-text.  The *text-converter* function may expand the amount of text present if it
-adds characters to the text.  It is the responsibility of the *text-converter*
-function to return the new text end point to this function.
+either markdown or LaTex.  We divide the text into two categories.  The first
+category is plain text that should be scanned for characters to escape, such as
+pound signs if we are converting to LaTex.  The second category is text that
+should not be scanned for characters to escape, either because it is to be
+treated as a verbatim code snippet or because it is a pseudo markdown section
+heading that will be converted either to a markdown section heading or to a LaTex
+section heading.
+
+When we come to the end of plain text (either because we have found a code
+snippet or because we have found a pseudo markdown section heading), we call the
+*text-converter* function on the bounds of the plain text whose end we have just
+found.
+
+A pseudo markdown section heading is identified as follows.  It must start in
+column 1.  It must start with two to four pound signs.  It must have some text.
+It must end at the end of the line with the same number of pound signs with which
+it started.
+
+A code snippet to be shown in verbatim mode is any one whose first column occurs
+on or after *shu-capture-doc-code-indent*.
+
+When the *text-converter* function is called.  It may expand the size of the text
+area if it adds characters to the text.  It is the responsibility of the
+*text-converter* function to return the new text end point to this function.
 
 
 
@@ -1262,6 +1277,19 @@ The on return *func-name* will hold "do-something" and *args* will contain the
 string "to something)".  If there are no arguments, *args* will contain a string
 of length zero.  If there is no function name, *func-name* will contain a string
 of length zero
+
+
+
+#### shu-capture-headers-in-doc ####
+shu-capture-headers-in-doc *section-converter*
+[Function]
+
+Convert markdown section headers to either markdown or LaTex.
+This allows the author of some Commentary at the beginning of a file to add section
+headers.  If the heading level is 2 through 4 and the heading begins in column 1 and
+the number of pound signs at the end is the same as the number of pound signs at
+the beginning and the pound signs at the end are at the end of a line, then this is
+considered to be a heading and is translated to either markdown or LaTex.
 
 
 
@@ -1711,7 +1739,25 @@ Compare two function names in a sort.
 # shu-cpp-general #
 
 
-A collection of useful functions for dealing with C++ code
+A collection of useful functions for dealing with C++ code.
+
+## Selected highlights ##
+
+Here are some useful features of this package.
+
+### Dealing with long string constants ###
+
+If you copy strings of text into string constants in your program, you may end up
+with some very long lines.  *shu-csplit* can automatically split such a line
+for you.  *shu-cunsplit* can undo the split.  *shu-creplace* can in one
+operation, replace a split line with a different string constant.
+
+### Toggle back and forth between files ###
+
+If you are editing a C or C++ file and wish to switch to its associated
+header file, *shu-hother* will switch to the header file.  *shu-cother* will
+switch back to the original C or C++ file.  *shu-tother* will switch to the
+associated unit test file that ends in "1.cpp.""
 
 
 ## List of functions by alias name ##
@@ -1812,10 +1858,39 @@ Place a skeleton class definition in the current buffer at point.
 [Command]
  (Function: shu-creplace)
 
-This function will replace the C++ string in which point is placed with the C++ string
-in the kill ring.  The C++ string in the kill ring is expected to be a single string with
-or without quotes.  The C++ string in which point is placed may have been split into
-smaller substrings in order to avoid long lines.
+This function will replace the C++ string in which point is placed with the
+C++ string in the kill ring.  The C++ string in the kill ring is expected to be
+a single string with or without quotes.  The C++ string in which point is placed
+may have been split into smaller substrings in order to avoid long lines.
+
+Assume you have the sample string that is shown in *shu-csplit*
+
+```
+     static const std::string x("This is a very long line of text that look"
+                                "s as though it will go on forever.");
+```
+
+You with to replace it with a slightly different line of text, perhaps something
+that came from the output of a program.  Copy the new string into the kill ring.
+Then put the cursor into an part of the string to be replaced and invoke this
+function.  This function will remove the old string, replace it with the
+contents of the string in the kill ring, and then split it up into shorter lines
+as in the following example.  The string in the kill ring may have opening and
+closing quotes or not.
+
+```
+     static const std::string x("This is a very long line of text that look"
+                                "s as though it will go on forever and prob"
+                                "ably already has done so or is threatening"
+                                " to do so.");
+```
+
+This is especially useful if you have a constant in a unit if you have a string
+constant in a unit test and you have modified the code that creates the string.
+gtest will complain that the expected string did not match the actual string.
+If the actual string is correct, copy it into the kill ring, go into your unit
+test, find the old string, place the cursor in the old string, and replace it
+with the new.
 
 
 
@@ -1823,8 +1898,26 @@ smaller substrings in order to avoid long lines.
 [Command]
  (Function: shu-csplit)
 
-Split a C++ string into multiple strings in order to keep the line length below a
-certain minimum length, currently hard coded to column 76.
+Split a C++ string into multiple strings in order to keep the line length
+below a certain minimum length, currently hard coded to column 76.
+
+For example, you may copy a very long line of text into a section of code as
+follows:
+
+```
+     static const std::string x("This is a very long line of text that looks as though it will go on forever.");
+```
+
+To be polite to future code readers, you want to split this into multiple lines.
+This can be a bit cumbersome if the text is very long.  This function splits the
+text at a somewhat arbitrary boundary so that it can be read by others whose
+text editors do not show code much beyond column 80 or so.  This is an example
+of the above line after csplit was invoked:
+
+```
+     static const std::string x("This is a very long line of text that look"
+                                "s as though it will go on forever.");
+```
 
 
 
@@ -2049,7 +2142,7 @@ set-default-namespace *name*
 [Command]
  (Function: shu-set-default-namespace)
 
-Undocumented
+Set the local namespace for C++ classes.
 
 
 
@@ -2193,7 +2286,8 @@ are not << represent a missing << operator.
 shu-cpp-is-enclosing-op *op*
 [Function]
 
-Undocumented
+Return true if the single character in *op* is an enclosing character, a left
+or right parenthesis or a left or right square bracket.
 
 
 
@@ -2240,10 +2334,39 @@ Place a skeleton class definition in the current buffer at point.
 [Command]
  (Alias: creplace)
 
-This function will replace the C++ string in which point is placed with the C++ string
-in the kill ring.  The C++ string in the kill ring is expected to be a single string with
-or without quotes.  The C++ string in which point is placed may have been split into
-smaller substrings in order to avoid long lines.
+This function will replace the C++ string in which point is placed with the
+C++ string in the kill ring.  The C++ string in the kill ring is expected to be
+a single string with or without quotes.  The C++ string in which point is placed
+may have been split into smaller substrings in order to avoid long lines.
+
+Assume you have the sample string that is shown in *shu-csplit*
+
+```
+     static const std::string x("This is a very long line of text that look"
+                                "s as though it will go on forever.");
+```
+
+You with to replace it with a slightly different line of text, perhaps something
+that came from the output of a program.  Copy the new string into the kill ring.
+Then put the cursor into an part of the string to be replaced and invoke this
+function.  This function will remove the old string, replace it with the
+contents of the string in the kill ring, and then split it up into shorter lines
+as in the following example.  The string in the kill ring may have opening and
+closing quotes or not.
+
+```
+     static const std::string x("This is a very long line of text that look"
+                                "s as though it will go on forever and prob"
+                                "ably already has done so or is threatening"
+                                " to do so.");
+```
+
+This is especially useful if you have a constant in a unit if you have a string
+constant in a unit test and you have modified the code that creates the string.
+gtest will complain that the expected string did not match the actual string.
+If the actual string is correct, copy it into the kill ring, go into your unit
+test, find the old string, place the cursor in the old string, and replace it
+with the new.
 
 
 
@@ -2251,8 +2374,26 @@ smaller substrings in order to avoid long lines.
 [Command]
  (Alias: csplit)
 
-Split a C++ string into multiple strings in order to keep the line length below a
-certain minimum length, currently hard coded to column 76.
+Split a C++ string into multiple strings in order to keep the line length
+below a certain minimum length, currently hard coded to column 76.
+
+For example, you may copy a very long line of text into a section of code as
+follows:
+
+```
+     static const std::string x("This is a very long line of text that looks as though it will go on forever.");
+```
+
+To be polite to future code readers, you want to split this into multiple lines.
+This can be a bit cumbersome if the text is very long.  This function splits the
+text at a somewhat arbitrary boundary so that it can be read by others whose
+text editors do not show code much beyond column 80 or so.  This is an example
+of the above line after csplit was invoked:
+
+```
+     static const std::string x("This is a very long line of text that look"
+                                "s as though it will go on forever.");
+```
 
 
 
@@ -2594,7 +2735,7 @@ characters in length.
 shu-set-author *name*
 [Command]
 
-Undocumented
+Set the author name to be placed in generated C++ classes.
 
 
 
@@ -2602,7 +2743,7 @@ Undocumented
 shu-set-default-global-namespace *name*
 [Command]
 
-Undocumented
+Set the global namespace for C++ classes.
 
 
 
@@ -2611,7 +2752,7 @@ shu-set-default-namespace *name*
 [Command]
  (Alias: set-default-namespace)
 
-Undocumented
+Set the local namespace for C++ classes.
 
 
 
@@ -5382,6 +5523,7 @@ within type.
 
 Associate a number with each type of variable
 
+
 # Index #
 
 * [acgen](#acgen)
@@ -5552,6 +5694,7 @@ Associate a number with each type of variable
 * [shu-capture-get-func-def-sig](#shu-capture-get-func-def-sig)
 * [shu-capture-get-func-def](#shu-capture-get-func-def)
 * [shu-capture-get-name-and-args](#shu-capture-get-name-and-args)
+* [shu-capture-headers-in-doc](#shu-capture-headers-in-doc)
 * [shu-capture-index-buffer](#shu-capture-index-buffer)
 * [shu-capture-internal-all](#shu-capture-internal-all)
 * [shu-capture-internal-convert-doc-string](#shu-capture-internal-convert-doc-string)
@@ -5933,5 +6076,5 @@ LocalWords:  facebook setq gmail krurl em krid krpw kracct krfn krpin krvf vlist
 LocalWords:  urls Lastname Firstname diff dbc ee da ec dup eld gd dired gf gfc gfl
 LocalWords:  gfn gquote ert SHA dos eol CRLF unix LF winpath eob YYYY DDTHHMMSS DDD
 LocalWords:  DD mac CR nvplist org TODO expiry CANCELLED todo xref defs retval tex
-LocalWords:  funcall myclass toc unescaped nvpair
+LocalWords:  funcall myclass toc unescaped nvpair prob gtest
 -->
