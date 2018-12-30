@@ -1173,20 +1173,34 @@ Name of the buffer into which the converted documentation is written
 \savebox{\funcname}{\noindent\texttt{shu-capture-code-in-doc }}
 \usebox{\funcname}\emph{before-code} \emph{after-code}
 \index{shu-capture-code-in-doc} \hfill [Function]
-\hspace*{\wd\funcname}
+\hspace*{\wd\funcname}\emph{section-converter}
 
 \begin{doc-string}
 The current buffer is assumed to hold a doc string that is being converted to
-markdown.  Any line that is indented to column \emph{shu-capture-doc-code-indent} or
-greater is assumed to be a code snippet.  To format this as a code snippet,
-\emph{before-code} is placed one line above the code snippet and \emph{after-code} is placed
-one line below the code snippet.  Return the number of code snippets marked.
-Because we only want to replace special characters in text that does not include
-a code snippet, then each time we find the end of regular text, we call the
-\emph{text-converter} function passing it the beginning and end point of the regular
-text.  The \emph{text-converter} function may expand the amount of text present if it
-adds characters to the text.  It is the responsibility of the \emph{text-converter}
-function to return the new text end point to this function.
+either markdown or LaTex.  We divide the text into two categories.  The first
+category is plain text that should be scanned for characters to escape, such as
+pound signs if we are converting to LaTex.  The second category is text that
+should not be scanned for characters to escape, either because it is to be
+treated as a verbatim code snippet or because it is a pseudo markdown section
+heading that will be converted either to a markdown section heading or to a LaTex
+section heading.
+
+When we come to the end of plain text (either because we have found a code
+snippet or because we have found a pseudo markdown section heading), we call the
+\emph{text-converter} function on the bounds of the plain text whose end we have just
+found.
+
+A pseudo markdown section heading is identified as follows.  It must start in
+column 1.  It must start with two to four pound signs.  It must have some text.
+It must end at the end of the line with the same number of pound signs with which
+it started.
+
+A code snippet to be shown in verbatim mode is any one whose first column occurs
+on or after \emph{shu-capture-doc-code-indent}.
+
+When the \emph{text-converter} function is called.  It may expand the size of the text
+area if it adds characters to the text.  It is the responsibility of the
+\emph{text-converter} function to return the new text end point to this function.
 \end{doc-string}
 
 \vspace{1em}
@@ -1549,6 +1563,21 @@ The on return \emph{func-name} will hold ``do-something'' and \emph{args} will c
 string ``to something)''.  If there are no arguments, \emph{args} will contain a string
 of length zero.  If there is no function name, \emph{func-name} will contain a string
 of length zero
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-capture-headers-in-doc }}
+\usebox{\funcname}\emph{section-converter}
+\index{shu-capture-headers-in-doc} \hfill [Function]
+
+\begin{doc-string}
+Convert markdown section headers to either markdown or LaTex.
+This allows the author of some Commentary at the beginning of a file to add section
+headers.  If the heading level is 2 through 4 and the heading begins in column 1 and
+the number of pound signs at the end is the same as the number of pound signs at
+the beginning and the pound signs at the end are at the end of a line, then this is
+considered to be a heading and is translated to either markdown or LaTex.
 \end{doc-string}
 
 \vspace{1em}
@@ -2132,7 +2161,25 @@ Compare two function names in a sort.
 \section{shu-cpp-general}
 
 
-A collection of useful functions for dealing with C++ code
+A collection of useful functions for dealing with C++ code.
+
+\subsection{Selected highlights}
+
+Here are some useful features of this package.
+
+\subsubsection{Dealing with long string constants}
+
+If you copy strings of text into string constants in your program, you may end up
+with some very long lines.  \emph{shu-csplit} can automatically split such a line
+for you.  \emph{shu-cunsplit} can undo the split.  \emph{shu-creplace} can in one
+operation, replace a split line with a different string constant.
+
+\subsubsection{Toggle back and forth between files}
+
+If you are editing a C or C++ file and wish to switch to its associated
+header file, \emph{shu-hother} will switch to the header file.  \emph{shu-cother} will
+switch back to the original C or C++ file.  \emph{shu-tother} will switch to the
+associated unit test file that ends in ``1.cpp.""
 
 
 \subsection{List of functions by alias name}
@@ -2262,10 +2309,39 @@ Place a skeleton class definition in the current buffer at point.
  (Function: shu-creplace)
 
 \begin{doc-string}
-This function will replace the C++ string in which point is placed with the C++ string
-in the kill ring.  The C++ string in the kill ring is expected to be a single string with
-or without quotes.  The C++ string in which point is placed may have been split into
-smaller substrings in order to avoid long lines.
+This function will replace the C++ string in which point is placed with the
+C++ string in the kill ring.  The C++ string in the kill ring is expected to be
+a single string with or without quotes.  The C++ string in which point is placed
+may have been split into smaller substrings in order to avoid long lines.
+
+Assume you have the sample string that is shown in \emph{shu-csplit}
+
+\small{\begin{verbatim}
+     static const std::string x(``This is a very long line of text that look''
+                                ``s as though it will go on forever.'');
+\end{verbatim}}
+
+You with to replace it with a slightly different line of text, perhaps something
+that came from the output of a program.  Copy the new string into the kill ring.
+Then put the cursor into an part of the string to be replaced and invoke this
+function.  This function will remove the old string, replace it with the
+contents of the string in the kill ring, and then split it up into shorter lines
+as in the following example.  The string in the kill ring may have opening and
+closing quotes or not.
+
+\small{\begin{verbatim}
+     static const std::string x(``This is a very long line of text that look''
+                                ``s as though it will go on forever and prob''
+                                ``ably already has done so or is threatening''
+                                `` to do so.'');
+\end{verbatim}}
+
+This is especially useful if you have a constant in a unit if you have a string
+constant in a unit test and you have modified the code that creates the string.
+gtest will complain that the expected string did not match the actual string.
+If the actual string is correct, copy it into the kill ring, go into your unit
+test, find the old string, place the cursor in the old string, and replace it
+with the new.
 \end{doc-string}
 
 \vspace{1em}
@@ -2276,8 +2352,26 @@ smaller substrings in order to avoid long lines.
  (Function: shu-csplit)
 
 \begin{doc-string}
-Split a C++ string into multiple strings in order to keep the line length below a
-certain minimum length, currently hard coded to column 76.
+Split a C++ string into multiple strings in order to keep the line length
+below a certain minimum length, currently hard coded to column 76.
+
+For example, you may copy a very long line of text into a section of code as
+follows:
+
+\small{\begin{verbatim}
+     static const std::string x(``This is a very long line of text that looks as though it will go on forever.'');
+\end{verbatim}}
+
+To be polite to future code readers, you want to split this into multiple lines.
+This can be a bit cumbersome if the text is very long.  This function splits the
+text at a somewhat arbitrary boundary so that it can be read by others whose
+text editors do not show code much beyond column 80 or so.  This is an example
+of the above line after csplit was invoked:
+
+\small{\begin{verbatim}
+     static const std::string x(``This is a very long line of text that look''
+                                ``s as though it will go on forever.'');
+\end{verbatim}}
 \end{doc-string}
 
 \vspace{1em}
@@ -2755,7 +2849,8 @@ are not $<$$<$ represent a missing $<$$<$ operator.
 \index{shu-cpp-is-enclosing-op} \hfill [Function]
 
 \begin{doc-string}
-Undocumented
+Return true if the single character in \emph{op} is an enclosing character, a left
+or right parenthesis or a left or right square bracket.
 \end{doc-string}
 
 \vspace{1em}
@@ -2815,10 +2910,39 @@ Place a skeleton class definition in the current buffer at point.
  (Alias: creplace)
 
 \begin{doc-string}
-This function will replace the C++ string in which point is placed with the C++ string
-in the kill ring.  The C++ string in the kill ring is expected to be a single string with
-or without quotes.  The C++ string in which point is placed may have been split into
-smaller substrings in order to avoid long lines.
+This function will replace the C++ string in which point is placed with the
+C++ string in the kill ring.  The C++ string in the kill ring is expected to be
+a single string with or without quotes.  The C++ string in which point is placed
+may have been split into smaller substrings in order to avoid long lines.
+
+Assume you have the sample string that is shown in \emph{shu-csplit}
+
+\small{\begin{verbatim}
+     static const std::string x(``This is a very long line of text that look''
+                                ``s as though it will go on forever.'');
+\end{verbatim}}
+
+You with to replace it with a slightly different line of text, perhaps something
+that came from the output of a program.  Copy the new string into the kill ring.
+Then put the cursor into an part of the string to be replaced and invoke this
+function.  This function will remove the old string, replace it with the
+contents of the string in the kill ring, and then split it up into shorter lines
+as in the following example.  The string in the kill ring may have opening and
+closing quotes or not.
+
+\small{\begin{verbatim}
+     static const std::string x(``This is a very long line of text that look''
+                                ``s as though it will go on forever and prob''
+                                ``ably already has done so or is threatening''
+                                `` to do so.'');
+\end{verbatim}}
+
+This is especially useful if you have a constant in a unit if you have a string
+constant in a unit test and you have modified the code that creates the string.
+gtest will complain that the expected string did not match the actual string.
+If the actual string is correct, copy it into the kill ring, go into your unit
+test, find the old string, place the cursor in the old string, and replace it
+with the new.
 \end{doc-string}
 
 \vspace{1em}
@@ -2829,8 +2953,26 @@ smaller substrings in order to avoid long lines.
  (Alias: csplit)
 
 \begin{doc-string}
-Split a C++ string into multiple strings in order to keep the line length below a
-certain minimum length, currently hard coded to column 76.
+Split a C++ string into multiple strings in order to keep the line length
+below a certain minimum length, currently hard coded to column 76.
+
+For example, you may copy a very long line of text into a section of code as
+follows:
+
+\small{\begin{verbatim}
+     static const std::string x(``This is a very long line of text that looks as though it will go on forever.'');
+\end{verbatim}}
+
+To be polite to future code readers, you want to split this into multiple lines.
+This can be a bit cumbersome if the text is very long.  This function splits the
+text at a somewhat arbitrary boundary so that it can be read by others whose
+text editors do not show code much beyond column 80 or so.  This is an example
+of the above line after csplit was invoked:
+
+\small{\begin{verbatim}
+     static const std::string x(``This is a very long line of text that look''
+                                ``s as though it will go on forever.'');
+\end{verbatim}}
 \end{doc-string}
 
 \vspace{1em}

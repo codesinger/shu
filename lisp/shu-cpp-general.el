@@ -24,7 +24,25 @@
 
 ;;; Commentary:
 
-;; A collection of useful functions for dealing with C++ code
+;; A collection of useful functions for dealing with C++ code.
+;;
+;; ## Selected highlights ##
+;;
+;; Here are some useful features of this package.
+;;
+;; ### Dealing with long string constants ###
+;;
+;; If you copy strings of text into string constants in your program, you may end up
+;; with some very long lines.  SHU-CSPLIT can automatically split such a line
+;; for you.  SHU-CUNSPLIT can undo the split.  SHU-CREPLACE can in one
+;; operation, replace a split line with a different string constant.
+;;
+;; ### Toggle back and forth between files ###
+;;
+;; If you are editing a C or C++ file and wish to switch to its associated
+;; header file, SHU-HOTHER will switch to the header file.  SHU-COTHER will
+;; switch back to the original C or C++ file.  SHU-TOTHER will switch to the
+;; associated unit test file that ends in \"1.cpp.""
 
 ;;; Code:
 
@@ -1312,8 +1330,22 @@ and set functions will be placed in the buffer *get-set*."
 ;;  shu-csplit
 ;;
 (defun shu-csplit ()
-  "Split a C++ string into multiple strings in order to keep the line length below a
-certain minimum length, currently hard coded to column 76."
+  "Split a C++ string into multiple strings in order to keep the line length
+below a certain minimum length, currently hard coded to column 76.
+
+For example, you may copy a very long line of text into a section of code as
+follows:
+
+     static const std::string x(\"This is a very long line of text that looks as though it will go on forever.\");
+
+To be polite to future code readers, you want to split this into multiple lines.
+This can be a bit cumbersome if the text is very long.  This function splits the
+text at a somewhat arbitrary boundary so that it can be read by others whose
+text editors do not show code much beyond column 80 or so.  This is an example
+of the above line after csplit was invoked:
+
+     static const std::string x(\"This is a very long line of text that look\"
+                                \"s as though it will go on forever.\");"
   (interactive)
   (let (
     (xquote "[^\\]\"") ;; quote not preceded by escape
@@ -1389,10 +1421,35 @@ certain minimum length, currently hard coded to column 76."
 ;;  shu-creplace
 ;;
 (defun shu-creplace ()
-  "This function will replace the C++ string in which point is placed with the C++ string
-in the kill ring.  The C++ string in the kill ring is expected to be a single string with
-or without quotes.  The C++ string in which point is placed may have been split into
-smaller substrings in order to avoid long lines."
+  "This function will replace the C++ string in which point is placed with the
+C++ string in the kill ring.  The C++ string in the kill ring is expected to be
+a single string with or without quotes.  The C++ string in which point is placed
+may have been split into smaller substrings in order to avoid long lines.
+
+Assume you have the sample string that is shown in SHU-CSPLIT
+
+     static const std::string x(\"This is a very long line of text that look\"
+                                \"s as though it will go on forever.\");
+
+You with to replace it with a slightly different line of text, perhaps something
+that came from the output of a program.  Copy the new string into the kill ring.
+Then put the cursor into an part of the string to be replaced and invoke this
+function.  This function will remove the old string, replace it with the
+contents of the string in the kill ring, and then split it up into shorter lines
+as in the following example.  The string in the kill ring may have opening and
+closing quotes or not.
+
+     static const std::string x(\"This is a very long line of text that look\"
+                                \"s as though it will go on forever and prob\"
+                                \"ably already has done so or is threatening\"
+                                \" to do so.\");
+
+This is especially useful if you have a constant in a unit if you have a string
+constant in a unit test and you have modified the code that creates the string.
+gtest will complain that the expected string did not match the actual string.
+If the actual string is correct, copy it into the kill ring, go into your unit
+test, find the old string, place the cursor in the old string, and replace it
+with the new."
   (interactive)
   (let
       ((xquote "[^\\]\"") ;; quote not preceded by escape
@@ -1722,6 +1779,8 @@ are not << represent a missing << operator."
 
 
 (defun shu-cpp-is-enclosing-op (op)
+  "Return true if the single character in OP is an enclosing character, a left
+or right parenthesis or a left or right square bracket.""
   (let ((is-enc))
     (setq is-enc (or
                   (string= op ")")
