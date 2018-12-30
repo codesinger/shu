@@ -52,28 +52,28 @@
 
 
 (defconst shu-cpp-base-types
-        (list
-                "bool"
-                "char"
-                "double"
-                "enum"
-                "float"
-                "int"
-                "int16_t"
-                "int32_t"
-                "int64_t"
-                "long"
-                "short"
-                "signed"
-                "std::size_t"
-                "uint16_t"
-                "uint32_t"
-                "uint64_t"
-                "unsigned")
-"A list of all of the base types in C and C++.  This may be modified by shu-add-cpp-base-types")
+  (list
+   "bool"
+   "char"
+   "double"
+   "enum"
+   "float"
+   "int"
+   "int16_t"
+   "int32_t"
+   "int64_t"
+   "long"
+   "short"
+   "signed"
+   "std::size_t"
+   "uint16_t"
+   "uint32_t"
+   "uint64_t"
+   "unsigned")
+  "A list of all of the base types in C and C++.  This may be modified by shu-add-cpp-base-types")
 
 (defvar shu-cpp-member-prefix "_"
-"The character string that is used as the prefix to member variables of a C++ class.
+  "The character string that is used as the prefix to member variables of a C++ class.
 This is used by shu-internal-get-set when generating getters and setters for a class.")
 
 (defvar shu-is-const nil
@@ -103,13 +103,11 @@ This is used by shu-internal-get-set when generating getters and setters for a c
   "Add one or more data types to the list of C++ native data types defined in shu-cpp-base-types
 in shu-cpp-general.el.  Argument may be a single type in a string or a list of strings.
 This modifies shu-cpp-base-types."
-  (let (
-    (nt ntypes)
-       )
-  (when (not (listp nt))
-    (setq nt (list nt)))
-  (setq shu-cpp-base-types (append shu-cpp-base-types nt))
-))
+  (let ((nt ntypes))
+    (when (not (listp nt))
+      (setq nt (list nt)))
+    (setq shu-cpp-base-types (append shu-cpp-base-types nt))
+    ))
 
 
 
@@ -119,24 +117,22 @@ This modifies shu-cpp-base-types."
 (defun shu-cpp1-class (class-name)
   "Place a skeleton class definition in the current buffer at point."
   (interactive "*sClass name?: ")
-  (let (
-    (debug-on-error t)
-       )
-  (insert (concat
-    "class " class-name "\n"
-    "{\n"
-    "public:\n\n"
-    "  " class-name "()\n"
-    "   { }\n\n"
-    "private:\n\n"
-    "  " class-name "(\n"
-    "    const " class-name "   &rhs);\n\n"
-    "  " class-name " &operator=(\n"
-    "    const " class-name "   &rhs);\n\n"
-    "};"))
-  (search-backward "{" nil t)
-  (forward-char 2)
-))
+  (let ((debug-on-error t))
+    (insert (concat
+             "class " class-name "\n"
+             "{\n"
+             "public:\n\n"
+             "  " class-name "()\n"
+             "   { }\n\n"
+             "private:\n\n"
+             "  " class-name "(\n"
+             "    const " class-name "   &rhs);\n\n"
+             "  " class-name " &operator=(\n"
+             "    const " class-name "   &rhs);\n\n"
+             "};"))
+    (search-backward "{" nil t)
+    (forward-char 2)
+    ))
 
 
 ;;
@@ -146,7 +142,7 @@ This modifies shu-cpp-base-types."
   "Place a skeleton class definition in the current buffer at point."
   (interactive "*sClass name?: ")
   (shu-internal-cpp2-class class-name)
-)
+  )
 
 
 ;;
@@ -155,124 +151,120 @@ This modifies shu-cpp-base-types."
 (defun shu-new-c-class ()
   "Place a skeleton class definition in the current buffer at point."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (hfile (file-name-nondirectory (buffer-file-name)))
-    (hfile-base (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
-       )
-  (shu-internal-cpp2-class hfile-base)
-))
+  (let ((debug-on-error t)
+        (hfile (file-name-nondirectory (buffer-file-name)))
+        (hfile-base (file-name-sans-extension (file-name-nondirectory (buffer-file-name)))))
+    (shu-internal-cpp2-class hfile-base)
+    ))
 
 ;;
 ;;  shu-internal-cpp2-class
 ;;
 (defun shu-internal-cpp2-class (class-name)
   "Place a skeleton class definition in the current buffer at point."
-  (let (
-    (debug-on-error t)
-    (comment-start  36)
-    (comment-end    78)
-    (comment-length  0)
-    (ostream        "std::ostream")
-    (otry           nil)
-    (opt-length     22)
-    (class-arg      nil)
-    (arg-length      0)
-    (pad            "")
-    (pad-after      "  ")
-    (pad-count      0)
-    (comment1       "!< The stream into which we stream")
-    (comment2       "!< The object to be streamed")
-       )
+  (let ((debug-on-error t)
+        (comment-start  36)
+        (comment-end    78)
+        (comment-length  0)
+        (ostream        "std::ostream")
+        (otry           nil)
+        (opt-length     22)
+        (class-arg      nil)
+        (arg-length      0)
+        (pad            "")
+        (pad-after      "  ")
+        (pad-count      0)
+        (comment1       "!< The stream into which we stream")
+        (comment2       "!< The object to be streamed"))
 
-  (when (boundp 's-comment-start)
-    (setq comment-start s-comment-start))
-  (when (boundp 's-comment-end)
-    (setq comment-end s-comment-end))
-  (setq comment-length (- comment-end comment-start 3))
+    (when (boundp 's-comment-start)
+      (setq comment-start s-comment-start))
+    (when (boundp 's-comment-end)
+      (setq comment-end s-comment-end))
+    (setq comment-length (- comment-end comment-start 3))
 
-; std::ostream                &os
-; const required_item_thing   &cn
-; 123456789012345678901234567890
+                                        ; std::ostream                &os
+                                        ; const required_item_thing   &cn
+                                        ; 123456789012345678901234567890
 
-  (setq class-arg (concat "const " class-name))
-  (setq arg-length (max (length class-arg) (length ostream)))
-  (when (< arg-length opt-length)
-    (setq pad-after (concat pad-after " ")))
-  (setq class-arg (concat class-arg pad-after))
-  (setq ostream (concat ostream pad-after))
-  (setq arg-length (max (length class-arg) (length ostream)))
-  (setq class-arg (shu-make-padded-line class-arg arg-length))
-  (setq ostream (shu-make-padded-line ostream arg-length))
+    (setq class-arg (concat "const " class-name))
+    (setq arg-length (max (length class-arg) (length ostream)))
+    (when (< arg-length opt-length)
+      (setq pad-after (concat pad-after " ")))
+    (setq class-arg (concat class-arg pad-after))
+    (setq ostream (concat ostream pad-after))
+    (setq arg-length (max (length class-arg) (length ostream)))
+    (setq class-arg (shu-make-padded-line class-arg arg-length))
+    (setq ostream (shu-make-padded-line ostream arg-length))
 
-  (setq pad-count (- comment-start (length ostream) 9))
-  (if (> pad-count 0)
-    (setq pad (make-string pad-count ? ))
-  ;
-    (setq comment-length (+ comment-length pad-count)))
-  (setq comment1 (shu-make-padded-line comment1 comment-length))
-  (setq comment2 (shu-make-padded-line comment2 comment-length))
+    (setq pad-count (- comment-start (length ostream) 9))
+    (if (> pad-count 0)
+        (setq pad (make-string pad-count ? ))
+                                        ;
+      (setq comment-length (+ comment-length pad-count)))
+    (setq comment1 (shu-make-padded-line comment1 comment-length))
+    (setq comment2 (shu-make-padded-line comment2 comment-length))
 
-;  (when (< (length ostream) (length class-arg))
-;    (setq class-arg (shu-make-padded-line class-arg (length ostream))))
+                                        ;  (when (< (length ostream) (length class-arg))
+                                        ;    (setq class-arg (shu-make-padded-line class-arg (length ostream))))
 
-  (insert (concat
-    "/*!\n"
-    " * \\brief Description of " class-name "\n"
-    " */\n"
-    "class " class-name "\n"
-    "{\n"
-    "public:\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief Standard constructor\n"
-    "  " " */\n"
-    "  explicit " class-name "()\n"
-    "  { }\n\n\n"
-    "  " "/*!\n"
-    "  " " *  \\brief Stream object out to a stream\n"
-    "  " " *\n"
-    "  " " * \\return The same stream as the input to allow for chained operators.\n"
-    "  " " */\n"
-    "  friend std::ostream &operator<<(\n"
-    "    " ostream "&os," pad "/*" comment1 "*/\n"
-    "    " class-arg "&cn)" pad "/*" comment2 "*/\n"
-    "  {\n"
-    "    return cn.print_self(os);\n"
-    "  }\n\n\n"
-    "private:\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief The copy constructor is deliberately private and unimplemented.\n"
-    "  " " *\n"
-    "  " " * \\param rhs the object from which we are to be constructed\n"
-    "  " " */\n"
-    "  " class-name "(\n"
-    "    const " class-name "   &rhs);\n\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator=() is deliberately private and unimplemented.\n"
-    "  " " *\n"
-    "  " " * \\param rhs the object from which we are to be assigned\n"
-    "  " " *\n"
-    "  " " * \\return reference to self to allow for chained operators\n"
-    "  " " */\n"
-    "  " class-name " &operator=(\n"
-    "    const " class-name "   &rhs);\n\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief This is the implementation function for operator<<()\n"
-    "  " " *\n"
-    "  " " * \\return The same stream as the input to allow for chained operators.\n"
-    "  " " */\n"
-    "  std::ostream &print_self(\n"
-    "    std::ostream    &os)           /*!< The stream into which we stream     */\n"
-    "  const\n"
-    "  {\n"
-    "    os << \"" class-name "\";\n\n"
-    "    return os;\n"
-    "  }\n\n\n"
-    "};"))
-  (search-backward "class " nil t)
-  (search-backward "brief" nil t)
-  (end-of-line)
-))
+    (insert (concat
+             "/*!\n"
+             " * \\brief Description of " class-name "\n"
+             " */\n"
+             "class " class-name "\n"
+             "{\n"
+             "public:\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief Standard constructor\n"
+             "  " " */\n"
+             "  explicit " class-name "()\n"
+             "  { }\n\n\n"
+             "  " "/*!\n"
+             "  " " *  \\brief Stream object out to a stream\n"
+             "  " " *\n"
+             "  " " * \\return The same stream as the input to allow for chained operators.\n"
+             "  " " */\n"
+             "  friend std::ostream &operator<<(\n"
+             "    " ostream "&os," pad "/*" comment1 "*/\n"
+             "    " class-arg "&cn)" pad "/*" comment2 "*/\n"
+             "  {\n"
+             "    return cn.print_self(os);\n"
+             "  }\n\n\n"
+             "private:\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief The copy constructor is deliberately private and unimplemented.\n"
+             "  " " *\n"
+             "  " " * \\param rhs the object from which we are to be constructed\n"
+             "  " " */\n"
+             "  " class-name "(\n"
+             "    const " class-name "   &rhs);\n\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator=() is deliberately private and unimplemented.\n"
+             "  " " *\n"
+             "  " " * \\param rhs the object from which we are to be assigned\n"
+             "  " " *\n"
+             "  " " * \\return reference to self to allow for chained operators\n"
+             "  " " */\n"
+             "  " class-name " &operator=(\n"
+             "    const " class-name "   &rhs);\n\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief This is the implementation function for operator<<()\n"
+             "  " " *\n"
+             "  " " * \\return The same stream as the input to allow for chained operators.\n"
+             "  " " */\n"
+             "  std::ostream &print_self(\n"
+             "    std::ostream    &os)           /*!< The stream into which we stream     */\n"
+             "  const\n"
+             "  {\n"
+             "    os << \"" class-name "\";\n\n"
+             "    return os;\n"
+             "  }\n\n\n"
+             "};"))
+    (search-backward "class " nil t)
+    (search-backward "brief" nil t)
+    (end-of-line)
+    ))
 
 ;;
 ;;  shu-operators
@@ -282,197 +274,196 @@ This modifies shu-cpp-base-types."
 (defun shu-operators (class-name)
   "Place skeletons of all of the standard c++ operator functions at point."
   (interactive "*sClass name?: ")
-  (let (
-    (debug-on-error t)
-    (comment-start  36)
-    (comment-end    78)
-    (comment-length  0)
-    (ostream        "std::ostream")
-    (otry           nil)
-    (opt-length     22)
-    (class-arg      nil)
-    (arg-length      0)
-    (pad            "")
-    (pad-after      "  ")
-    (pad-count      0)
-    (str   )
-    (comment1       "!< The stream into which we stream")
-    (comment2       "!< The object to be streamed")
-       )
+  (let ((debug-on-error t)
+        (comment-start  36)
+        (comment-end    78)
+        (comment-length  0)
+        (ostream        "std::ostream")
+        (otry           nil)
+        (opt-length     22)
+        (class-arg      nil)
+        (arg-length      0)
+        (pad            "")
+        (pad-after      "  ")
+        (pad-count      0)
+        (str   )
+        (comment1       "!< The stream into which we stream")
+        (comment2       "!< The object to be streamed"))
 
-  (when (boundp 's-comment-start)
-    (setq comment-start s-comment-start))
-  (when (boundp 's-comment-end)
-    (setq comment-end s-comment-end))
-  (setq comment-length (- comment-end comment-start 3))
+    (when (boundp 's-comment-start)
+      (setq comment-start s-comment-start))
+    (when (boundp 's-comment-end)
+      (setq comment-end s-comment-end))
+    (setq comment-length (- comment-end comment-start 3))
 
-; std::ostream                &os
-; const required_item_thing   &cn
-; 123456789012345678901234567890
+                                        ; std::ostream                &os
+                                        ; const required_item_thing   &cn
+                                        ; 123456789012345678901234567890
 
-  (setq class-arg (concat "const " class-name))
-  (setq arg-length (max (length class-arg) (length ostream)))
-  (when (< arg-length opt-length)
-    (setq pad-after (concat pad-after " ")))
-  (setq class-arg (concat class-arg pad-after))
-  (setq ostream (concat ostream pad-after))
-  (setq arg-length (max (length class-arg) (length ostream)))
-  (setq class-arg (shu-make-padded-line class-arg arg-length))
-  (setq ostream (shu-make-padded-line ostream arg-length))
+    (setq class-arg (concat "const " class-name))
+    (setq arg-length (max (length class-arg) (length ostream)))
+    (when (< arg-length opt-length)
+      (setq pad-after (concat pad-after " ")))
+    (setq class-arg (concat class-arg pad-after))
+    (setq ostream (concat ostream pad-after))
+    (setq arg-length (max (length class-arg) (length ostream)))
+    (setq class-arg (shu-make-padded-line class-arg arg-length))
+    (setq ostream (shu-make-padded-line ostream arg-length))
 
-  (setq pad-count (- comment-start (length ostream) 9))
-  (if (> pad-count 0)
-    (setq pad (make-string pad-count ? ))
-  ;
-    (setq comment-length (+ comment-length pad-count)))
-  (setq comment1 (shu-make-padded-line comment1 comment-length))
-  (setq comment2 (shu-make-padded-line comment2 comment-length))
+    (setq pad-count (- comment-start (length ostream) 9))
+    (if (> pad-count 0)
+        (setq pad (make-string pad-count ? ))
+                                        ;
+      (setq comment-length (+ comment-length pad-count)))
+    (setq comment1 (shu-make-padded-line comment1 comment-length))
+    (setq comment2 (shu-make-padded-line comment2 comment-length))
 
-;  (when (< (length ostream) (length class-arg))
-;    (setq class-arg (shu-make-padded-line class-arg (length ostream))))
-  (setq str (concat "  " "  const " class-name "   &rhs"))
-  (setq pad-count (- comment-start (length str) 2 ))
-  (when (> pad-count 0)
-    (setq pad (make-string pad-count ? )))
-  (insert (concat
-    "\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator+()\n"
-    "  " " *\n"
-    "  " " * \\return a reference to ourself to allow chained operators\n"
-    "  " " */\n"
-    "  " class-name " &operator+(\n"
-    "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to add           */\n"
-    "  {\n"
-    "\n"
-    "    return *this;\n"
-    "  }\n"
-    "\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator+=()\n"
-    "  " " *\n"
-    "  " " * \\return a reference to ourself to allow chained operators\n"
-    "  " " */\n"
-    "  " class-name " &operator+=(\n"
-    "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to add           */\n"
-    "  {\n"
-    "\n"
-    "    return *this;\n"
-    "  }\n"
-    "\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator-()\n"
-    "  " " *\n"
-    "  " " * \\return a reference to ourself to allow chained operators\n"
-    "  " " */\n"
-    "  " class-name " &operator-(\n"
-    "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to subtract      */\n"
-    "  {\n"
-    "\n"
-    "    return *this;\n"
-    "  }\n"
-    "\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator-=()\n"
-    "  " " *\n"
-    "  " " * \\return a reference to ourself to allow chained operators\n"
-    "  " " */\n"
-    "  " class-name " &operator-=(\n"
-    "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to subtract      */\n"
-    "  {\n"
-    "\n"
-    "    return *this;\n"
-    "  }\n"
-    "\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator<()\n"
-    "  " " *\n"
-    "  " " * \\return true if this object is less than the right hand one\n"
-    "  " " */\n"
-    "  " " bool  operator<(\n"
-    "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
-    "  {\n"
-    "    const bool is_it = true;\n"
-    "\n"
-    "    return is_it;\n"
-    "  }\n"
-    "\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator<=()\n"
-    "  " " *\n"
-    "  " " * \\return true if this object is less than or equal to the right hand one\n"
-    "  " " */\n"
-    "  " " bool  operator<=(\n"
-    "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
-    "  {\n"
-    "    const bool is_it = true;\n"
-    "\n"
-    "    return is_it;\n"
-    "  }\n"
-    "\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator>()\n"
-    "  " " *\n"
-    "  " " * \\return true if this object is greater than the right hand one\n"
-    "  " " */\n"
-    "  " " bool  operator>(\n"
-    "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
-    "  {\n"
-    "    const bool is_it = true;\n"
-    "\n"
-    "    return is_it;\n"
-    "  }\n"
-    "\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator>=()\n"
-    "  " " *\n"
-    "  " " * \\return true if this object is greater than or equal to the right hand one\n"
-    "  " " */\n"
-    "  " " bool  operator>=(\n"
-    "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
-    "  {\n"
-    "    const bool is_it = true;\n"
-    "\n"
-    "    return is_it;\n"
-    "  }\n"
-    "\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator==()\n"
-    "  " " *\n"
-    "  " " * \\return true if this object is equal to the right hand one\n"
-    "  " " */\n"
-    "  " " bool  operator==(\n"
-    "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
-    "  {\n"
-    "    const bool is_it = true;\n"
-    "\n"
-    "    return is_it;\n"
-    "  }\n"
-    "\n\n"
-    "  " "/*!\n"
-    "  " " * \\brief operator!=()\n"
-    "  " " *\n"
-    "  " " * \\return true if this object is not equal to the right hand one\n"
-    "  " " */\n"
-    "  " " bool  operator!=(\n"
-    "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
-    "  {\n"
-    "    const bool is_it = !operator==(rhs);\n"
-    "\n"
-    "    return is_it;\n"
-    "  }\n"
+                                        ;  (when (< (length ostream) (length class-arg))
+                                        ;    (setq class-arg (shu-make-padded-line class-arg (length ostream))))
+    (setq str (concat "  " "  const " class-name "   &rhs"))
+    (setq pad-count (- comment-start (length str) 2 ))
+    (when (> pad-count 0)
+      (setq pad (make-string pad-count ? )))
+    (insert (concat
+             "\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator+()\n"
+             "  " " *\n"
+             "  " " * \\return a reference to ourself to allow chained operators\n"
+             "  " " */\n"
+             "  " class-name " &operator+(\n"
+             "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to add           */\n"
+             "  {\n"
+             "\n"
+             "    return *this;\n"
+             "  }\n"
+             "\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator+=()\n"
+             "  " " *\n"
+             "  " " * \\return a reference to ourself to allow chained operators\n"
+             "  " " */\n"
+             "  " class-name " &operator+=(\n"
+             "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to add           */\n"
+             "  {\n"
+             "\n"
+             "    return *this;\n"
+             "  }\n"
+             "\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator-()\n"
+             "  " " *\n"
+             "  " " * \\return a reference to ourself to allow chained operators\n"
+             "  " " */\n"
+             "  " class-name " &operator-(\n"
+             "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to subtract      */\n"
+             "  {\n"
+             "\n"
+             "    return *this;\n"
+             "  }\n"
+             "\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator-=()\n"
+             "  " " *\n"
+             "  " " * \\return a reference to ourself to allow chained operators\n"
+             "  " " */\n"
+             "  " class-name " &operator-=(\n"
+             "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to subtract      */\n"
+             "  {\n"
+             "\n"
+             "    return *this;\n"
+             "  }\n"
+             "\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator<()\n"
+             "  " " *\n"
+             "  " " * \\return true if this object is less than the right hand one\n"
+             "  " " */\n"
+             "  " " bool  operator<(\n"
+             "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
+             "  {\n"
+             "    const bool is_it = true;\n"
+             "\n"
+             "    return is_it;\n"
+             "  }\n"
+             "\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator<=()\n"
+             "  " " *\n"
+             "  " " * \\return true if this object is less than or equal to the right hand one\n"
+             "  " " */\n"
+             "  " " bool  operator<=(\n"
+             "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
+             "  {\n"
+             "    const bool is_it = true;\n"
+             "\n"
+             "    return is_it;\n"
+             "  }\n"
+             "\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator>()\n"
+             "  " " *\n"
+             "  " " * \\return true if this object is greater than the right hand one\n"
+             "  " " */\n"
+             "  " " bool  operator>(\n"
+             "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
+             "  {\n"
+             "    const bool is_it = true;\n"
+             "\n"
+             "    return is_it;\n"
+             "  }\n"
+             "\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator>=()\n"
+             "  " " *\n"
+             "  " " * \\return true if this object is greater than or equal to the right hand one\n"
+             "  " " */\n"
+             "  " " bool  operator>=(\n"
+             "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
+             "  {\n"
+             "    const bool is_it = true;\n"
+             "\n"
+             "    return is_it;\n"
+             "  }\n"
+             "\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator==()\n"
+             "  " " *\n"
+             "  " " * \\return true if this object is equal to the right hand one\n"
+             "  " " */\n"
+             "  " " bool  operator==(\n"
+             "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
+             "  {\n"
+             "    const bool is_it = true;\n"
+             "\n"
+             "    return is_it;\n"
+             "  }\n"
+             "\n\n"
+             "  " "/*!\n"
+             "  " " * \\brief operator!=()\n"
+             "  " " *\n"
+             "  " " * \\return true if this object is not equal to the right hand one\n"
+             "  " " */\n"
+             "  " " bool  operator!=(\n"
+             "  " "  const " class-name "   &rhs)" pad "/*!< Right hand operand to compare       */\n"
+             "  {\n"
+             "    const bool is_it = !operator==(rhs);\n"
+             "\n"
+             "    return is_it;\n"
+             "  }\n"
+             ))
+
+    (search-backward "class " nil t)
+    (search-backward "brief" nil t)
+    (end-of-line)
     ))
-
-  (search-backward "class " nil t)
-  (search-backward "brief" nil t)
-  (end-of-line)
-))
 
 
 ;;
 ;;  shu-set-author
 ;;
 (defun shu-set-author (name)
+  "Set the author name to be placed in generated C++ classes."
   (interactive)
   (setq shu-cpp-author name))
 
@@ -481,6 +472,7 @@ This modifies shu-cpp-base-types."
 ;;  shu-set-default-global-namespace
 ;;
 (defun shu-set-default-global-namespace (name)
+  "Set the global namespace for C++ classes."
   (interactive "sName?: ")
   (setq shu-cpp-default-global-namespace name))
 
@@ -489,6 +481,7 @@ This modifies shu-cpp-base-types."
 ;;  shu-set-default-namespace
 ;;
 (defun shu-set-default-namespace (name)
+  "Set the local namespace for C++ classes."
   (interactive "sName?: ")
   (setq shu-cpp-default-namespace name))
 
@@ -499,26 +492,24 @@ This modifies shu-cpp-base-types."
 (defun shu-dox-hdr ()
   "Place a skeleton Doxygen header definition at point."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (ccol           (current-column))
-    (pad-count      (current-column))
-    (pad            nil)
-       )
-;  (when (> ccol 1)
-;    (setq pad-count (- ccol 1)))
-  (setq pad (make-string pad-count ? ))
-  (beginning-of-line)
-  (insert (concat
-  pad "\n"
-  pad "/*!\n"
-  pad " * \n"
-  pad " */"
-))
-  (search-backward "*/")
-  (search-backward "*")
-  (forward-char 2)
-))
+  (let ((debug-on-error t)
+        (ccol           (current-column))
+        (pad-count      (current-column))
+        (pad            nil))
+                                        ;  (when (> ccol 1)
+                                        ;    (setq pad-count (- ccol 1)))
+    (setq pad (make-string pad-count ? ))
+    (beginning-of-line)
+    (insert (concat
+             pad "\n"
+             pad "/*!\n"
+             pad " * \n"
+             pad " */"
+             ))
+    (search-backward "*/")
+    (search-backward "*")
+    (forward-char 2)
+    ))
 
 ;;
 ;;  shu-dox-brief
@@ -526,27 +517,25 @@ This modifies shu-cpp-base-types."
 (defun shu-dox-brief ()
   "Place a skeleton Doxygen header definition at point."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (ccol           (current-column))
-    (pad-count      (current-column))
-    (pad            nil)
-       )
-;  (when (> ccol 1)
-;    (setq pad-count (- ccol 1)))
-  (setq pad (make-string pad-count ? ))
-  (beginning-of-line)
-  (insert (concat
-  pad "\n"
-  pad "/*!\n"
-  pad " * \\brief \n"
-  pad " */"
-))
-  (search-backward "*/")
-  (search-backward "*")
-  (search-forward "brief")
-  (forward-char 1)
-))
+  (let ((debug-on-error t)
+        (ccol           (current-column))
+        (pad-count      (current-column))
+        (pad            nil))
+                                        ;  (when (> ccol 1)
+                                        ;    (setq pad-count (- ccol 1)))
+    (setq pad (make-string pad-count ? ))
+    (beginning-of-line)
+    (insert (concat
+             pad "\n"
+             pad "/*!\n"
+             pad " * \\brief \n"
+             pad " */"
+             ))
+    (search-backward "*/")
+    (search-backward "*")
+    (search-forward "brief")
+    (forward-char 1)
+    ))
 
 ;;
 ;;  shu-dox2-hdr
@@ -554,26 +543,24 @@ This modifies shu-cpp-base-types."
 (defun shu-dox2-hdr ()
   "Place a skeleton Doxygen header definition at point."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (ccol           (current-column))
-    (pad-count      (current-column))
-    (pad            nil)
-       )
-;  (when (> ccol 1)
-;    (setq pad-count (- ccol 1)))
-  (setq pad (make-string pad-count ? ))
-  (beginning-of-line)
-  (insert (concat
-  pad "\n"
-  pad "/*!\n"
-  pad " * \\brief \n"
-  pad " * \n"
-  pad " */"
-))
-  (search-backward "brief")
-  (search-forward " ")
-))
+  (let ((debug-on-error t)
+        (ccol           (current-column))
+        (pad-count      (current-column))
+        (pad            nil))
+                                        ;  (when (> ccol 1)
+                                        ;    (setq pad-count (- ccol 1)))
+    (setq pad (make-string pad-count ? ))
+    (beginning-of-line)
+    (insert (concat
+             pad "\n"
+             pad "/*!\n"
+             pad " * \\brief \n"
+             pad " * \n"
+             pad " */"
+             ))
+    (search-backward "brief")
+    (search-forward " ")
+    ))
 
 ;;
 ;;  shu-dcc
@@ -581,23 +568,21 @@ This modifies shu-cpp-base-types."
 (defun shu-dcc ()
   "Place a skeleton Doxygen header definition at point."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (ccol           (current-column))
-    (pad-count      (current-column))
-    (pad            nil)
-       )
-;  (when (> ccol 1)
-;    (setq pad-count (- ccol 1)))
-  (setq pad (make-string pad-count ? ))
-  (beginning-of-line)
-  (insert (concat
-  pad "\n"
-  pad "/*!\n"
-  pad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
-  pad " */"
-))
-))
+  (let ((debug-on-error t)
+        (ccol           (current-column))
+        (pad-count      (current-column))
+        (pad            nil))
+                                        ;  (when (> ccol 1)
+                                        ;    (setq pad-count (- ccol 1)))
+    (setq pad (make-string pad-count ? ))
+    (beginning-of-line)
+    (insert (concat
+             pad "\n"
+             pad "/*!\n"
+             pad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
+             pad " */"
+             ))
+    ))
 
 ;;
 ;;  shu-dce
@@ -605,23 +590,21 @@ This modifies shu-cpp-base-types."
 (defun shu-dce ()
   "Place a skeleton Doxygen header definition at point."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (ccol           (current-column))
-    (pad-count      (current-column))
-    (pad            nil)
-       )
-;  (when (> ccol 1)
-;    (setq pad-count (- ccol 1)))
-  (setq pad (make-string pad-count ? ))
-  (beginning-of-line)
-  (insert (concat
-  pad "\n"
-  pad "/*!\n"
-  pad " * \\brief operator=() is deliberately private and unimplemented.\n"
-  pad " */"
-))
-))
+  (let ((debug-on-error t)
+        (ccol           (current-column))
+        (pad-count      (current-column))
+        (pad            nil))
+                                        ;  (when (> ccol 1)
+                                        ;    (setq pad-count (- ccol 1)))
+    (setq pad (make-string pad-count ? ))
+    (beginning-of-line)
+    (insert (concat
+             pad "\n"
+             pad "/*!\n"
+             pad " * \\brief operator=() is deliberately private and unimplemented.\n"
+             pad " */"
+             ))
+    ))
 
 ;;
 ;;  shu-clc
@@ -629,23 +612,21 @@ This modifies shu-cpp-base-types."
 (defun shu-clc ()
   "Place a skeleton Doxygen header definition at point."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (ccol           (current-column))
-    (pad-count      (current-column))
-    (pad            nil)
-       )
-;  (when (> ccol 1)
-;    (setq pad-count (- ccol 1)))
-  (setq pad (make-string pad-count ? ))
-  (beginning-of-line)
-  (insert (concat
-  pad "\n"
-  pad "/*!\n"
-  pad " * The constructor acquires the latch.\n"
-  pad " */"
-))
-))
+  (let ((debug-on-error t)
+        (ccol           (current-column))
+        (pad-count      (current-column))
+        (pad            nil))
+                                        ;  (when (> ccol 1)
+                                        ;    (setq pad-count (- ccol 1)))
+    (setq pad (make-string pad-count ? ))
+    (beginning-of-line)
+    (insert (concat
+             pad "\n"
+             pad "/*!\n"
+             pad " * The constructor acquires the latch.\n"
+             pad " */"
+             ))
+    ))
 
 ;;
 ;;  shu-drc
@@ -653,23 +634,21 @@ This modifies shu-cpp-base-types."
 (defun shu-drc ()
   "Place a skeleton Doxygen header definition at point."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (ccol           (current-column))
-    (pad-count      (current-column))
-    (pad            nil)
-       )
-;  (when (> ccol 1)
-;    (setq pad-count (- ccol 1)))
-  (setq pad (make-string pad-count ? ))
-  (beginning-of-line)
-  (insert (concat
-  pad "\n"
-  pad "/*!\n"
-  pad " * The destructor releases the latch.\n"
-  pad " */"
-))
-))
+  (let ((debug-on-error t)
+        (ccol           (current-column))
+        (pad-count      (current-column))
+        (pad            nil))
+                                        ;  (when (> ccol 1)
+                                        ;    (setq pad-count (- ccol 1)))
+    (setq pad (make-string pad-count ? ))
+    (beginning-of-line)
+    (insert (concat
+             pad "\n"
+             pad "/*!\n"
+             pad " * The destructor releases the latch.\n"
+             pad " */"
+             ))
+    ))
 
 
 ;;
@@ -681,35 +660,28 @@ If visiting a .h file, invoke SHU-OTHER and you will be taken to the
 .c or .cpp file.  If visiting a .c or .cpp file, invoke other and you
 will be taken to the corresponding .h file"
   (interactive)
-  (let (
-    (debug-on-error t)
-    (ext       (file-name-extension (buffer-file-name)))
-    (base-name (file-name-sans-extension (buffer-file-name)))
-    (newext    nil)
-    (tryc      nil)
-    (newfile   nil)
-       )
-  (when (string= ext "h")
-    (setq tryc t))
-
-  (if tryc
-    (progn
-      (setq newfile (concat base-name ".cpp"))
+  (let ((debug-on-error t)
+        (ext       (file-name-extension (buffer-file-name)))
+        (base-name (file-name-sans-extension (buffer-file-name)))
+        (newext    nil)
+        (tryc      nil)
+        (newfile   nil))
+    (when (string= ext "h")
+      (setq tryc t))
+    (if tryc
+        (progn
+          (setq newfile (concat base-name ".cpp"))
+          (if (file-readable-p newfile)
+              (find-file newfile)
+            (setq newfile (concat base-name ".c"))
+            (if (file-readable-p newfile)
+                (find-file newfile)
+              (message (concat "Cannot find other file for " base-name)))))
+      (setq newfile (concat base-name ".h"))
       (if (file-readable-p newfile)
-        (find-file newfile)
-      ;
-        (setq newfile (concat base-name ".c"))
-        (if (file-readable-p newfile)
           (find-file newfile)
         (message (concat "Cannot find other file for " base-name))))
-    )
-  ;
-    (setq newfile (concat base-name ".h"))
-    (if (file-readable-p newfile)
-      (find-file newfile)
-        (message (concat "Cannot find other file for " base-name))
     ))
-))
 
 
 ;;
@@ -778,39 +750,33 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
 (defun shu-dox-cvt ()
   "Convert a section of comments delimited by // into Doxygen format."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (pad            nil)
-    (eol            nil)
-    (spos           nil)
-    (slash-pos      nil)
-    (not-done       t)
-       )
-  (beginning-of-line)
-  (setq eol (save-excursion (forward-line 1) (end-of-line) (point)))
-  (setq spos (search-forward "//" eol t))
-  (if (not spos)
-    (error "Unable to find any // near here")
-  ;
-    (progn
-    (setq slash-pos (- (current-column) 2))
-    (when (< slash-pos 0)
-      (setq slash-pos 0))
-    (setq pad (make-string slash-pos ? ))
-    (forward-line -1)
-    (insert (concat "\n" pad "/*!"))
-    (while not-done
-      (forward-line 1)
-      (setq eol (save-excursion (end-of-line) (point)))
-      (if (search-forward "//" eol t)
-        (replace-match " *")
-      ;
-        (progn
-        (setq not-done nil)
-        (insert (concat pad " */\n"))))
-    )
-  ))
-))
+  (let ((debug-on-error t)
+        (pad            nil)
+        (eol            nil)
+        (spos           nil)
+        (slash-pos      nil)
+        (not-done       t))
+    (beginning-of-line)
+    (setq eol (save-excursion (forward-line 1) (end-of-line) (point)))
+    (setq spos (search-forward "//" eol t))
+    (if (not spos)
+        (error "Unable to find any // near here")
+      (progn
+        (setq slash-pos (- (current-column) 2))
+        (when (< slash-pos 0)
+          (setq slash-pos 0))
+        (setq pad (make-string slash-pos ? ))
+        (forward-line -1)
+        (insert (concat "\n" pad "/*!"))
+        (while not-done
+          (forward-line 1)
+          (setq eol (save-excursion (end-of-line) (point)))
+          (if (search-forward "//" eol t)
+              (replace-match " *")
+            (progn
+              (setq not-done nil)
+              (insert (concat pad " */\n")))))))
+    ))
 
 
 ;;
@@ -819,16 +785,13 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
 (defun shu-dox-cbt ()
   "Convert a section of comments delimited by //! into Doxygen brief format."
   (interactive)
-  (let (
-        (debug-on-error t)
-        (bol (save-excursion (beginning-of-line) (point)))
+  (let ((bol (save-excursion (beginning-of-line) (point)))
         (pad  )
         (eol  )
         (spos )
         (slash-pos )
         (not-done       t)
-        (j              0)
-        )
+        (j              0))
     (beginning-of-line)
     (setq eol (save-excursion (forward-line 1) (end-of-line) (point)))
     (setq spos (search-forward "//!" eol t))
@@ -844,9 +807,7 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
         (end-of-line)
         (insert (concat "\n" pad " */"))
         (forward-line -1)
-        (end-of-line)
-        )
-      )
+        (end-of-line)))
     ))
 
 
@@ -856,17 +817,15 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
 (defun shu-new-x-file ()
   "Generate a skeleton Doxygen \\file directive."
   (interactive)
-  (let (
-    (xfile (file-name-nondirectory (buffer-file-name)))
-       )
-  (insert (concat
-      "\n"
-      "/*!\n"
-      "  \\file " xfile "\n"
-      "\n"
-      "    \\brief Contains the implementation fuctions of BloombergLP::m_moalrt::\n"
-      "*/\n"))
-))
+  (let ((xfile (file-name-nondirectory (buffer-file-name))))
+    (insert (concat
+             "\n"
+             "/*!\n"
+             "  \\file " xfile "\n"
+             "\n"
+             "    \\brief Contains the implementation fuctions of BloombergLP::m_moalrt::\n"
+             "*/\n"))
+    ))
 
 
 ;;
@@ -875,59 +834,57 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
 (defun shu-new-h-file ()
   "Generate a skeleton header file for C or C++ file."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (comment-start  36)
-    (comment-end    78)
-    (comment-length nil)
-    (comment-length nil)
-    (pad-count      nil)
-    (pad            nil)
-    (ecomment       nil)
-    (tcomment       nil)
-    (hfile (file-name-nondirectory (buffer-file-name)))
-    (hfile-base (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
-    (file-line  "/*  FILE_NAME: ")
-    (slength        nil)
-    (incl-name      nil)
-       )
-  (when (boundp 's-comment-start)
-    (setq comment-start s-comment-start))
-  (when (boundp 's-comment-end)
-    (setq comment-end s-comment-end))
-  (setq comment-length (- comment-end comment-start 4))
+  (let ((debug-on-error t)
+        (comment-start  36)
+        (comment-end    78)
+        (comment-length nil)
+        (comment-length nil)
+        (pad-count      nil)
+        (pad            nil)
+        (ecomment       nil)
+        (tcomment       nil)
+        (hfile (file-name-nondirectory (buffer-file-name)))
+        (hfile-base (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+        (file-line  "/*  FILE_NAME: ")
+        (slength        nil)
+        (incl-name      nil))
+    (when (boundp 's-comment-start)
+      (setq comment-start s-comment-start))
+    (when (boundp 's-comment-end)
+      (setq comment-end s-comment-end))
+    (setq comment-length (- comment-end comment-start 4))
 
 
-  (setq pad-count (- comment-end 4))
-  (setq slength (- comment-end 2))
-  (setq pad (make-string pad-count ? ))
-  (setq ecomment (concat "/*" pad "*/\n"))
-  (setq pad (make-string pad-count ?*))
-  (setq tcomment (concat "/*" pad "*/\n"))
-  (setq file-line (concat file-line hfile))
-  (setq pad-count (- comment-end 2 (length file-line)))
-  (setq pad (make-string pad-count ? ))
-  (setq file-line (concat file-line pad "*/\n"))
-  (setq incl-name (concat hfile-base "_h_included"))
-  (insert (concat "#ifndef " incl-name "\n"))
-  (insert (concat "#define " incl-name " 1\n"))
-  (insert "\n")
-  (insert "/*!\n")
-  (insert (concat " * \\file " hfile "\n"))
-  (insert " *\n")
-  (insert (concat " * \\brief Contains the definition of " hfile-base "\n"))
-  (insert " *\n")
-  (insert " * \\author " shu-cpp-author " \n")
-  (insert " */\n")
-  (insert "\n")
-  (insert "#include <iostream>\n")
-  (insert "\n")
-  (insert "\n")
-  (insert "\n")
-  (insert (concat (shu-make-padded-line "#endif" (1- comment-start)) "/* "))
-  (insert (concat (shu-make-padded-line incl-name comment-length) "*/\n"))
-  (forward-line -3)
-))
+    (setq pad-count (- comment-end 4))
+    (setq slength (- comment-end 2))
+    (setq pad (make-string pad-count ? ))
+    (setq ecomment (concat "/*" pad "*/\n"))
+    (setq pad (make-string pad-count ?*))
+    (setq tcomment (concat "/*" pad "*/\n"))
+    (setq file-line (concat file-line hfile))
+    (setq pad-count (- comment-end 2 (length file-line)))
+    (setq pad (make-string pad-count ? ))
+    (setq file-line (concat file-line pad "*/\n"))
+    (setq incl-name (concat hfile-base "_h_included"))
+    (insert (concat "#ifndef " incl-name "\n"))
+    (insert (concat "#define " incl-name " 1\n"))
+    (insert "\n")
+    (insert "/*!\n")
+    (insert (concat " * \\file " hfile "\n"))
+    (insert " *\n")
+    (insert (concat " * \\brief Contains the definition of " hfile-base "\n"))
+    (insert " *\n")
+    (insert " * \\author " shu-cpp-author " \n")
+    (insert " */\n")
+    (insert "\n")
+    (insert "#include <iostream>\n")
+    (insert "\n")
+    (insert "\n")
+    (insert "\n")
+    (insert (concat (shu-make-padded-line "#endif" (1- comment-start)) "/* "))
+    (insert (concat (shu-make-padded-line incl-name comment-length) "*/\n"))
+    (forward-line -3)
+    ))
 
 ;;
 ;;  shu-new-c-file
@@ -935,55 +892,53 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
 (defun shu-new-c-file ()
   "Generate a skeleton code file for a C or C++ file."
   (interactive)
-  (let (
-    (debug-on-error t)
-    (comment-start  36)
-    (comment-end    78)
-    (comment-length nil)
-    (comment-length nil)
-    (pad-count      nil)
-    (pad            nil)
-    (ecomment       nil)
-    (tcomment       nil)
-    (hfile (file-name-nondirectory (buffer-file-name)))
-    (hfile-base (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
-    (file-line  "/*  FILE_NAME: ")
-    (slength        nil)
-    (incl-name      nil)
-    (base-name (file-name-sans-extension (buffer-file-name)))
-       )
-  (setq incl-name (concat hfile-base ".h"))
-  (when (boundp 's-comment-start)
-    (setq comment-start s-comment-start))
-  (when (boundp 's-comment-end)
-    (setq comment-end s-comment-end))
-  (setq comment-length (- comment-end comment-start 4))
+  (let ((debug-on-error t)
+        (comment-start  36)
+        (comment-end    78)
+        (comment-length nil)
+        (comment-length nil)
+        (pad-count      nil)
+        (pad            nil)
+        (ecomment       nil)
+        (tcomment       nil)
+        (hfile (file-name-nondirectory (buffer-file-name)))
+        (hfile-base (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))
+        (file-line  "/*  FILE_NAME: ")
+        (slength        nil)
+        (incl-name      nil)
+        (base-name (file-name-sans-extension (buffer-file-name))))
+    (setq incl-name (concat hfile-base ".h"))
+    (when (boundp 's-comment-start)
+      (setq comment-start s-comment-start))
+    (when (boundp 's-comment-end)
+      (setq comment-end s-comment-end))
+    (setq comment-length (- comment-end comment-start 4))
 
 
-  (setq pad-count (- comment-end 4))
-  (setq slength (- comment-end 2))
-  (setq pad (make-string pad-count ? ))
-  (setq ecomment (concat "/*" pad "*/\n"))
-  (setq pad (make-string pad-count ?*))
-  (setq tcomment (concat "/*" pad "*/\n"))
-  (setq file-line (concat file-line hfile))
-  (setq pad-count (- comment-end 2 (length file-line)))
-  (setq pad (make-string pad-count ? ))
-  (setq file-line (concat file-line pad "*/\n"))
-  (insert "\n")
-  (insert "/*!\n")
-  (insert (concat " * \\file " hfile "\n"))
-  (insert " *\n")
-  (insert (concat " * \\brief Contains the implementation of " hfile-base "\n"))
-  (insert " *\n")
-  (insert " * \\author " shu-cpp-author "\n")
-  (insert " */\n")
-  (insert "\n")
-  (insert (concat "#include \"" incl-name "\""))
-  (insert "\n")
-  (insert "\nusing namespace ::std;\n")
-;;  (forward-line -3)
-))
+    (setq pad-count (- comment-end 4))
+    (setq slength (- comment-end 2))
+    (setq pad (make-string pad-count ? ))
+    (setq ecomment (concat "/*" pad "*/\n"))
+    (setq pad (make-string pad-count ?*))
+    (setq tcomment (concat "/*" pad "*/\n"))
+    (setq file-line (concat file-line hfile))
+    (setq pad-count (- comment-end 2 (length file-line)))
+    (setq pad (make-string pad-count ? ))
+    (setq file-line (concat file-line pad "*/\n"))
+    (insert "\n")
+    (insert "/*!\n")
+    (insert (concat " * \\file " hfile "\n"))
+    (insert " *\n")
+    (insert (concat " * \\brief Contains the implementation of " hfile-base "\n"))
+    (insert " *\n")
+    (insert " * \\author " shu-cpp-author "\n")
+    (insert " */\n")
+    (insert "\n")
+    (insert (concat "#include \"" incl-name "\""))
+    (insert "\n")
+    (insert "\nusing namespace ::std;\n")
+    ;;  (forward-line -3)
+    ))
 
 ;;
 ;;  shu-author
@@ -995,55 +950,53 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
   (beginning-of-line)
   (insert " *\n")
   (insert " * \\author " shu-cpp-author "\n")
-)
+  )
 
 ;;
 ;;  shu-make-padded-line
 ;;
 (defun shu-make-padded-line (line tlen)
   "Add sufficient spaces to make LINE the length TLEN."
-  (let (
-    (clen       (length line))
-    (pad        "")
-    (pad-count  nil)
-       )
-  (setq pad-count (- tlen clen))
-  (when (> pad-count 0)
-    (setq pad (make-string pad-count ? ))  )
-  (concat line pad)
-))
+  (let ((clen       (length line))
+        (pad        "")
+        (pad-count  nil))
+    (setq pad-count (- tlen clen))
+    (when (> pad-count 0)
+      (setq pad (make-string pad-count ? ))  )
+    (concat line pad)
+    ))
 
 ;;
 ;;  shu-getters
 ;;
 (defun shu-getters (start end)
-"Mark a region in a file that contains C++ instance variable declarations.
+  "Mark a region in a file that contains C++ instance variable declarations.
 This function will create get and set functions for all of the instance
 variables."
   (interactive "r")                 ; bounds of marked region (start end)
   (save-excursion
-  (let ((sline (shu-the-line-at start)) ; Remember start line
-        (eline (shu-the-line-at end))   ; Remember end line
-        (line-diff 0)               ; The difference between the number of lines we
-                                    ;  tried to move and the number we actually moved
-        (eol       nil)
-        (dir-name  nil)
-;;        (shu-cpp-buffer (get-buffer-create shu-cpp-buffer-name))
-     (m (copy-marker 300 ) ) )
-    (setq debug-on-error t)
-    (setq shu-cpp-project-list nil)
-    (goto-char start)               ; Move to region start
-                                         ; While we have not reached last line and
-    (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
-      (setq eol (save-excursion (end-of-line) (point)))
-      (when (> eol (point))
-        (get-set)
+    (let ((sline (shu-the-line-at start)) ; Remember start line
+          (eline (shu-the-line-at end))   ; Remember end line
+          (line-diff 0)               ; The difference between the number of lines we
+                                        ;  tried to move and the number we actually moved
+          (eol       nil)
+          (dir-name  nil)
+          ;;        (shu-cpp-buffer (get-buffer-create shu-cpp-buffer-name))
+          (m (copy-marker 300 ) ) )
+      (setq debug-on-error t)
+      (setq shu-cpp-project-list nil)
+      (goto-char start)               ; Move to region start
+                                        ; While we have not reached last line and
+      (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
+        (setq eol (save-excursion (end-of-line) (point)))
+        (when (> eol (point))
+          (get-set)
+          )
+        (setq line-diff (forward-line 1))
+        )
       )
-      (setq line-diff (forward-line 1))
     )
   )
-  )
-)
 
 ;;
 ;;  shu-get-set - Emit getters and setters for an instance variable
@@ -1053,30 +1006,29 @@ variables."
 Position the cursor ahead of the Doxygen comment above the variable.  The get
 and set functions will be placed in the buffer *get-set*."
   (interactive)
-  (let (
-    (non-white1 "[^[:space:]\n\t\v\f]")
-    (non-white2 "[^[:space:]]")
-    (cstart )        ;; Comment start position
-    (cend )          ;; Comment end position
-    (comment "")     ;; Original comment
-    (shu-lc-comment "")  ;; Comment with first letter downcased
-       )
-  (when (re-search-forward non-white1 nil t)
-    (backward-char 1)
-    (when (looking-at "//!")
-      (forward-char 3)
-      (re-search-forward non-white2 nil t)
-      (setq cstart (1- (point)))
-      (setq cend (save-excursion (end-of-line) (point)))
-      (setq comment (buffer-substring cstart cend))
-      (setq cstart (substring comment 0 1))
-      (setq cstart (downcase cstart))
-      (setq shu-lc-comment (concat cstart (substring comment 1)))
-      (forward-line 1)
-    )
-    (shu-internal-get-set comment shu-lc-comment)
-  )
-))
+  (let ((non-white1 "[^[:space:]\n\t\v\f]")
+        (non-white2 "[^[:space:]]")
+        (cstart )        ;; Comment start position
+        (cend )          ;; Comment end position
+        (comment "")     ;; Original comment
+        (shu-lc-comment "")  ;; Comment with first letter downcased
+        )
+    (when (re-search-forward non-white1 nil t)
+      (backward-char 1)
+      (when (looking-at "//!")
+        (forward-char 3)
+        (re-search-forward non-white2 nil t)
+        (setq cstart (1- (point)))
+        (setq cend (save-excursion (end-of-line) (point)))
+        (setq comment (buffer-substring cstart cend))
+        (setq cstart (substring comment 0 1))
+        (setq cstart (downcase cstart))
+        (setq shu-lc-comment (concat cstart (substring comment 1)))
+        (forward-line 1)
+        )
+      (shu-internal-get-set comment shu-lc-comment)
+      )
+    ))
 
 
 ;;
@@ -1102,140 +1054,139 @@ and set functions will be placed in the buffer *get-set*."
   "Generate get and set functions for an instance variable in a C++ class."
   (interactive)
   (let (
-;;    (gbuf      (get-buffer-create shu-unit-test-buffer))
-    (gs-buf    (get-buffer-create "*get-set*"))
-    (cbuf (current-buffer))
-    (bol (save-excursion (beginning-of-line) (point)))
-    (eol (save-excursion (end-of-line) (point)))
-    (got-semi )   ; True if we found semi-colon at end of declaration
-    (name-exp (concat "\\s-*" shu-cpp-name))
-    (op (regexp-opt (list "*" "&") nil))
-    (op-or-space (regexp-opt (list " " "*" "&") nil))
-    (cnx "\\*+\\s-*const\\s-*")
-    (name-end )   ; Point at end of attribute name
-    (name-start ) ; Point at start of attribute name
-    (shu-attr-name )  ; Name of attribute
-    (shu-var-name )   ; Corresponding variable name
-    (found-op )   ; Set to "*" or "&" if this is a pointer or reference
-    (vtype )      ; Data type of attribute
-    (shu-nc-vtype )   ; Non-const data type
-    (non-blank "[^ \t]")
-    (vlist )
-    (tlist )
-    (tblank )
-    (nc-tblank )
-    (tword )
-    (is-base-type ) ; True if base type (int, long, double, etc)
-    (shu-is-const )     ; True if declared to be const
-    (shu-is-const-ptr ) ; True if a const pointer (*const x;)
-    (mpfx   shu-cpp-member-prefix)
-    (mpfx-len (length shu-cpp-member-prefix))
-    (debug-on-error t)
-       )
-  (save-excursion
-    (beginning-of-line)
-    (when (re-search-forward non-blank bol t)
-      (setq bol (point)))
-    (setq got-semi (search-forward ";" eol t))
-    (if (not got-semi)
-      (error "%s" "No terminating semi-colon found.")
-      (backward-char 1)
-      (re-search-backward name-exp bol t)
-      (setq name-end (1+ (point)))
-      (re-search-backward op-or-space bol t) ;; Look for beginning of name
-      (setq name-start (1+ (point)))
-      (setq shu-attr-name (buffer-substring name-start name-end))
-      (setq shu-var-name shu-attr-name)
-      (when (string= (substring shu-attr-name 0 mpfx-len) mpfx)
-        (setq shu-var-name (substring shu-attr-name mpfx-len)))
-      (if (looking-at op) ;; Name immediately preceded by "*" or "&"
-        (progn
-          (setq found-op (char-after (point)))
-          (re-search-backward non-blank bol t)
-          (setq eol (1+ (point)))
-        )
-        ;; Name immediately preceded by space
-        (if (re-search-backward cnx bol t)
-          (progn  ;; This is a const pointer (*const x;)
-            (setq found-op ?*)
-            (setq shu-is-const-ptr t)
-            (when (re-search-backward non-blank bol t)
-              (setq eol (1+ (point))))
-          )
-          (when (re-search-backward non-blank bol t)
-            (if (not (looking-at op))
-              (setq eol (1+ (point)))
+        ;;    (gbuf      (get-buffer-create shu-unit-test-buffer))
+        (gs-buf    (get-buffer-create "*get-set*"))
+        (cbuf (current-buffer))
+        (bol (save-excursion (beginning-of-line) (point)))
+        (eol (save-excursion (end-of-line) (point)))
+        (got-semi )   ; True if we found semi-colon at end of declaration
+        (name-exp (concat "\\s-*" shu-cpp-name))
+        (op (regexp-opt (list "*" "&") nil))
+        (op-or-space (regexp-opt (list " " "*" "&") nil))
+        (cnx "\\*+\\s-*const\\s-*")
+        (name-end )   ; Point at end of attribute name
+        (name-start ) ; Point at start of attribute name
+        (shu-attr-name )  ; Name of attribute
+        (shu-var-name )   ; Corresponding variable name
+        (found-op )   ; Set to "*" or "&" if this is a pointer or reference
+        (vtype )      ; Data type of attribute
+        (shu-nc-vtype )   ; Non-const data type
+        (non-blank "[^ \t]")
+        (vlist )
+        (tlist )
+        (tblank )
+        (nc-tblank )
+        (tword )
+        (is-base-type ) ; True if base type (int, long, double, etc)
+        (shu-is-const )     ; True if declared to be const
+        (shu-is-const-ptr ) ; True if a const pointer (*const x;)
+        (mpfx   shu-cpp-member-prefix)
+        (mpfx-len (length shu-cpp-member-prefix))
+        (debug-on-error t))
+    (save-excursion
+      (beginning-of-line)
+      (when (re-search-forward non-blank bol t)
+        (setq bol (point)))
+      (setq got-semi (search-forward ";" eol t))
+      (if (not got-semi)
+          (error "%s" "No terminating semi-colon found.")
+        (backward-char 1)
+        (re-search-backward name-exp bol t)
+        (setq name-end (1+ (point)))
+        (re-search-backward op-or-space bol t) ;; Look for beginning of name
+        (setq name-start (1+ (point)))
+        (setq shu-attr-name (buffer-substring name-start name-end))
+        (setq shu-var-name shu-attr-name)
+        (when (string= (substring shu-attr-name 0 mpfx-len) mpfx)
+          (setq shu-var-name (substring shu-attr-name mpfx-len)))
+        (if (looking-at op) ;; Name immediately preceded by "*" or "&"
+            (progn
               (setq found-op (char-after (point)))
-              (when (re-search-backward non-blank bol t)
-                (setq eol (1+ (point))))
+              (re-search-backward non-blank bol t)
+              (setq eol (1+ (point)))
+              )
+          ;; Name immediately preceded by space
+          (if (re-search-backward cnx bol t)
+              (progn  ;; This is a const pointer (*const x;)
+                (setq found-op ?*)
+                (setq shu-is-const-ptr t)
+                (when (re-search-backward non-blank bol t)
+                  (setq eol (1+ (point))))
+                )
+            (when (re-search-backward non-blank bol t)
+              (if (not (looking-at op))
+                  (setq eol (1+ (point)))
+                (setq found-op (char-after (point)))
+                (when (re-search-backward non-blank bol t)
+                  (setq eol (1+ (point))))
+                )
+              )
             )
           )
-        )
-      )
-      (when found-op
-        (setq found-op (char-to-string found-op)))
-    ;; Fetch the data type and split it into a list of words (eg const unsigned int)
-      (setq vtype (buffer-substring bol eol))
-      (setq vlist (split-string vtype "[ \t]+" t))
-;;      (princ vlist (get-buffer gbuf))
-      (setq vtype nil)
-      (setq tblank "")
-      (setq nc-tblank "")
-      (setq tlist vlist)
-    ;; Check to see if it is const and whether it is a base type (int, long, etc)
-      (while tlist
-        (setq tword (car tlist))
-        (when (string= tword "const")
-          (setq shu-is-const t))
-        (when (member tword shu-cpp-base-types)
-          (setq is-base-type t))
-        (setq tlist (cdr tlist))
-      )
-    ;; Turn the list of words back into a type declaration
-      (setq tlist vlist)
-      (while tlist
-        (setq tword (car tlist))
-        (when  (not (string= tword "const"))
-          (setq shu-nc-vtype (concat shu-nc-vtype nc-tblank tword))
-          (setq nc-tblank " "))
-        (setq vtype (concat vtype tblank tword))
-        (setq tblank " ")
-        (setq tlist (cdr tlist))
-      )
-;      (message "shu-attr-name = \"%s\", shu-var-name = \"%s\", found-op = %s, vtype = \"%s\", shu-nc-vtype = \"%s\"" shu-attr-name shu-var-name found-op vtype shu-nc-vtype)
-      (switch-to-buffer (get-buffer gs-buf))
-      (goto-char (point-max))
-      (cond
-        ((string= found-op "&")
-            (shu-return-ref)
-         )
-        ((string= found-op "*")
-            (shu-return-ptr)
-            (when (not shu-is-const-ptr)
-              (shu-set-ptr))
-         )
-        (t ;; No operator at all
+        (when found-op
+          (setq found-op (char-to-string found-op)))
+        ;; Fetch the data type and split it into a list of words (eg const unsigned int)
+        (setq vtype (buffer-substring bol eol))
+        (setq vlist (split-string vtype "[ \t]+" t))
+        ;;      (princ vlist (get-buffer gbuf))
+        (setq vtype nil)
+        (setq tblank "")
+        (setq nc-tblank "")
+        (setq tlist vlist)
+        ;; Check to see if it is const and whether it is a base type (int, long, etc)
+        (while tlist
+          (setq tword (car tlist))
+          (when (string= tword "const")
+            (setq shu-is-const t))
+          (when (member tword shu-cpp-base-types)
+            (setq is-base-type t))
+          (setq tlist (cdr tlist))
+          )
+        ;; Turn the list of words back into a type declaration
+        (setq tlist vlist)
+        (while tlist
+          (setq tword (car tlist))
+          (when  (not (string= tword "const"))
+            (setq shu-nc-vtype (concat shu-nc-vtype nc-tblank tword))
+            (setq nc-tblank " "))
+          (setq vtype (concat vtype tblank tword))
+          (setq tblank " ")
+          (setq tlist (cdr tlist))
+          )
+                                        ;      (message "shu-attr-name = \"%s\", shu-var-name = \"%s\", found-op = %s, vtype = \"%s\", shu-nc-vtype = \"%s\"" shu-attr-name shu-var-name found-op vtype shu-nc-vtype)
+        (switch-to-buffer (get-buffer gs-buf))
+        (goto-char (point-max))
+        (cond
+         ((string= found-op "&")
+          (shu-return-ref)
+          )
+         ((string= found-op "*")
+          (shu-return-ptr)
+          (when (not shu-is-const-ptr)
+            (shu-set-ptr))
+          )
+         (t ;; No operator at all
           (if is-base-type
-            (progn
-              (shu-emit-get)
-              (insert (concat "  " shu-nc-vtype  "  " shu-var-name "() const\n"
-                              "    {\n        return " shu-attr-name ";\n    }\n"))
-              (shu-emit-set shu-var-name)
-              (insert (concat
-                "  void set_" shu-var-name "(\n"
-                "    " vtype "   " shu-var-name ")\n"
-                "    {\n    "        shu-attr-name " = " shu-var-name ";\n    }\n"))
-            ) ;; is-base-type
+              (progn
+                (shu-emit-get)
+                (insert (concat "  " shu-nc-vtype  "  " shu-var-name "() const\n"
+                                "    {\n        return " shu-attr-name ";\n    }\n"))
+                (shu-emit-set shu-var-name)
+                (insert (concat
+                         "  void set_" shu-var-name "(\n"
+                         "    " vtype "   " shu-var-name ")\n"
+                         "    {\n    "        shu-attr-name " = " shu-var-name ";\n    }\n"))
+                ) ;; is-base-type
             ;; Not a base type, return a reference to it
             (shu-return-ref)
             (shu-set-obj)
+            )
           )
+         )
+        (switch-to-buffer (get-buffer cbuf))
         )
-      )
-      (switch-to-buffer (get-buffer cbuf))
-    )
-  ) ; save-excursion
-))
+      ) ; save-excursion
+    ))
 
 ;;
 ;;  shu-return-ref  -  Return a reference to an instance variable
@@ -1245,11 +1196,11 @@ and set functions will be placed in the buffer *get-set*."
     (shu-emit-get)
     (insert (concat "    " shu-nc-vtype "  &" shu-var-name "()\n"
                     "    {\n        return " shu-attr-name ";\n    }\n"))
-  )
+    )
   (shu-emit-get)
   (insert (concat "    const " shu-nc-vtype "  &" shu-var-name "() const\n"
                   "    {\n        return " shu-attr-name ";\n    }\n"))
-)
+  )
 
 ;;
 ;;  shu-set-obj
@@ -1257,11 +1208,11 @@ and set functions will be placed in the buffer *get-set*."
 (defun shu-set-obj ()
   (shu-emit-set shu-var-name)
   (insert (concat
-       "    void set_" shu-var-name "(\n"
-       "        const " shu-nc-vtype "   &" shu-var-name ")\n"
-       "    {\n    "        shu-attr-name " = " shu-var-name ";\n    }\n"))
+           "    void set_" shu-var-name "(\n"
+           "        const " shu-nc-vtype "   &" shu-var-name ")\n"
+           "    {\n    "        shu-attr-name " = " shu-var-name ";\n    }\n"))
 
-)
+  )
 
 ;;
 ;;  shu-return-ptr - Return a reference to something pointed to by an instance variable
@@ -1272,11 +1223,11 @@ and set functions will be placed in the buffer *get-set*."
     (shu-emit-get)
     (insert (concat "    " shu-nc-vtype "  &" shu-var-name "()\n"))
     (shu-gen-return-ptr)
-  )
+    )
   (shu-emit-get)
-    (insert (concat "    const " shu-nc-vtype "  &" shu-var-name "() const\n"))
-    (shu-gen-return-ptr)
-)
+  (insert (concat "    const " shu-nc-vtype "  &" shu-var-name "() const\n"))
+  (shu-gen-return-ptr)
+  )
 
 ;;
 ;;  shu-set-ptr
@@ -1284,11 +1235,11 @@ and set functions will be placed in the buffer *get-set*."
 (defun shu-set-ptr ()
   (shu-emit-set shu-var-name)
   (insert (concat
-       "    void set_" shu-var-name "(\n"
-       "        const " shu-nc-vtype "   &" shu-var-name ")\n"
-       "    {\n    "        shu-attr-name " = &" shu-var-name ";\n    }\n"))
+           "    void set_" shu-var-name "(\n"
+           "        const " shu-nc-vtype "   &" shu-var-name ")\n"
+           "    {\n    "        shu-attr-name " = &" shu-var-name ";\n    }\n"))
 
-)
+  )
 
 ;;
 ;;  shu-gen-return-ptr - Return a reference to something pointed to by an instance variable
@@ -1299,31 +1250,31 @@ and set functions will be placed in the buffer *get-set*."
                   "        assert(" shu-attr-name " != 0);\n"
                   "        return *" shu-attr-name ";\n"
                   "    }\n"))
-)
+  )
 
 ;;
 ;;  shu-emit-get
 ;;
 (defun shu-emit-get ()
   (insert (concat
-  "    \n\n"
-  "    /*!\n"
-  "     * \\brief Get " shu-lc-comment "\n"
-  "     *\n"
-  "     */\n"))
-)
+           "    \n\n"
+           "    /*!\n"
+           "     * \\brief Get " shu-lc-comment "\n"
+           "     *\n"
+           "     */\n"))
+  )
 
 ;;
 ;;  shu-emit-set
 ;;
 (defun shu-emit-set (arg)
   (insert (concat
-  "    \n\n"
-  "    /*!\n"
-  "     * \\brief Set " shu-lc-comment "\n"
-  "     *\n"
-  "     */\n"))
-)
+           "    \n\n"
+           "    /*!\n"
+           "     * \\brief Set " shu-lc-comment "\n"
+           "     *\n"
+           "     */\n"))
+  )
 
 
 ;;
@@ -1347,34 +1298,32 @@ of the above line after csplit was invoked:
      static const std::string x(\"This is a very long line of text that look\"
                                 \"s as though it will go on forever.\");"
   (interactive)
-  (let (
-    (xquote "[^\\]\"") ;; quote not preceded by escape
-    (pad-count )
-    (pad )
-    (tstart )
-    (previous-char )
-    (line-min 76)
-    (debug-on-error t)
-       )
-  ;; Ensure that we are positioned between two non-escaped quotes
-  (setq tstart (shu-point-in-string))
-  (if (not tstart)
-      (progn
+  (let ((xquote "[^\\]\"") ;; quote not preceded by escape
+        (pad-count )
+        (pad )
+        (tstart )
+        (previous-char )
+        (line-min 76)
+        (debug-on-error t))
+    ;; Ensure that we are positioned between two non-escaped quotes
+    (setq tstart (shu-point-in-string))
+    (if (not tstart)
+        (progn
           (ding)
           (message "%s" "Not in a string."))
-  ;; We appear to be inside a string
+      ;; We appear to be inside a string
       (goto-char tstart)
       (setq pad-count (1- (current-column))) ;; Build pad string
       (setq pad (concat "\"\n" (make-string pad-count ? ) "\""))
       (while (not (looking-at xquote))
-          (setq previous-char (buffer-substring-no-properties (point) (1+ (point))))
-          (forward-char 1)
-          (when (>= (1+ (current-column)) line-min)
-               (when (string= previous-char "\\")
-                   (forward-char -1))
-               (insert pad)))
+        (setq previous-char (buffer-substring-no-properties (point) (1+ (point))))
+        (forward-char 1)
+        (when (>= (1+ (current-column)) line-min)
+          (when (string= previous-char "\\")
+            (forward-char -1))
+          (insert pad)))
       (forward-char 2))
-))
+    ))
 
 
 ;;
@@ -1519,32 +1468,30 @@ with the new."
 No movement occurs if no lines, starting with the current position, exceed 79
 characters in length."
   (interactive)
-  (let (
-    (eol )        ;; point at end of current line
-    (last-col )   ;; last column in current line
-    (done )       ;; loop termination flag
-    (start (point)) ;; Remember our start position
-    (found1 )     ;; true if we find a long line
-    (max-length 79)
-       )
-  (while (not done)
+  (let ((eol )        ;; point at end of current line
+        (last-col )   ;; last column in current line
+        (done )       ;; loop termination flag
+        (start (point)) ;; Remember our start position
+        (found1 )     ;; true if we find a long line
+        (max-length 79))
+    (while (not done)
       (setq last-col (save-excursion (end-of-line) (current-column)))
       (when (> last-col max-length)
-          (setq found1 t)
-          (setq done t)
-          (beginning-of-line)
-          (goto-char (1- (+ (point) max-length)))
-      )
+        (setq found1 t)
+        (setq done t)
+        (beginning-of-line)
+        (goto-char (1- (+ (point) max-length)))
+        )
       (when (not done)
-          (forward-line 1)
-          (setq eol (save-excursion (end-of-line) (point)))
-          (when (>= eol (point-max))
-             (setq done t)))
-  )
-  (when (not found1)
+        (forward-line 1)
+        (setq eol (save-excursion (end-of-line) (point)))
+        (when (>= eol (point-max))
+          (setq done t)))
+      )
+    (when (not found1)
       (message "%s" "No long lines")
       (goto-char start))
-))
+    ))
 
 
 ;;
@@ -1553,18 +1500,16 @@ characters in length."
 (defun shu-cif ()
   "Insert an empty if statement."
   (interactive)
-  (let (
-    (pad )
-    (pad-count (current-column))
-    (start )
-       )
+  (let ((pad )
+        (pad-count (current-column))
+        (start ))
     (setq pad (make-string pad-count ? ))
     (setq start (save-excursion (beginning-of-line) (point)))
     (insert (concat     "if ()\n"
-                    pad "{\n"
-                    pad "}"))
+                        pad "{\n"
+                        pad "}"))
     (goto-char (+ start pad-count 4))
-))
+    ))
 
 
 ;;
@@ -1573,20 +1518,18 @@ characters in length."
 (defun shu-celse ()
   "Insert an empty else statement."
   (interactive)
-  (let (
-    (pad )
-    (pad-count (current-column))
-    (start )
-       )
+  (let ((pad )
+        (pad-count (current-column))
+        (start ))
     (setq pad (make-string pad-count ? ))
     (insert (concat     "else\n"
-                    pad "{\n"
-                    pad "    "))
+                        pad "{\n"
+                        pad "    "))
     (setq start (point))
     (insert "\n")
     (insert (concat pad "}\n"))
     (goto-char start)
-))
+    ))
 
 
 ;;
@@ -1595,18 +1538,16 @@ characters in length."
 (defun shu-cfor ()
   "Insert an empty for statement."
   (interactive)
-  (let (
-    (pad )
-    (pad-count (current-column))
-    (start )
-       )
+  (let ((pad )
+        (pad-count (current-column))
+        (start ))
     (setq pad (make-string pad-count ? ))
     (setq start (save-excursion (beginning-of-line) (point)))
     (insert (concat     "for ()\n"
-                    pad "{\n"
-                    pad "}"))
+                        pad "{\n"
+                        pad "}"))
     (goto-char (+ start pad-count 5))
-))
+    ))
 
 
 ;;
@@ -1615,18 +1556,16 @@ characters in length."
 (defun shu-cwhile ()
   "Insert an empty while statement."
   (interactive)
-  (let (
-    (pad )
-    (pad-count (current-column))
-    (start )
-       )
+  (let ((pad )
+        (pad-count (current-column))
+        (start ))
     (setq pad (make-string pad-count ? ))
     (setq start (save-excursion (beginning-of-line) (point)))
     (insert (concat     "while ()\n"
-                    pad "{\n"
-                    pad "}"))
+                        pad "{\n"
+                        pad "}"))
     (goto-char (+ start pad-count 7))
-))
+    ))
 
 
 ;;
@@ -1635,19 +1574,17 @@ characters in length."
 (defun shu-cdo ()
   "Insert an empty do statement."
   (interactive)
-  (let (
-    (pad )
-    (pad-count (current-column))
-    (start )
-       )
+  (let ((pad )
+        (pad-count (current-column))
+        (start ))
     (setq pad (make-string pad-count ? ))
     (setq start (save-excursion (beginning-of-line) (point)))
     (insert (concat     "do\n"
-                    pad "{\n"))
+                        pad "{\n"))
     (setq start (1- (point)))
     (insert (concat  pad "} while();"))
     (goto-char (+ start pad-count 9))
-))
+    ))
 
 
 ;;
@@ -1673,10 +1610,10 @@ strings and that you are not missing any occurrences of <<."
         (ext-info)
         (point-pair)
         (error-message)
-            (tbuf      (get-buffer-create shu-unit-test-buffer))
+        (tbuf      (get-buffer-create shu-unit-test-buffer))
         (emsg)
         (spoint)
-       (debug-on-error t)
+        (debug-on-error t)
         (epoint)
         )
     (setq ret-val (shu-cpp-tokenize-region start end))
@@ -1703,7 +1640,7 @@ strings and that you are not missing any occurrences of <<."
         (setq emsg "Uknown error at point"))
       (goto-char spoint)
       (message "%s" emsg)
-    )
+      )
     ))
 
 
@@ -1780,7 +1717,7 @@ are not << represent a missing << operator."
 
 (defun shu-cpp-is-enclosing-op (op)
   "Return true if the single character in OP is an enclosing character, a left
-or right parenthesis or a left or right square bracket.""
+or right parenthesis or a left or right square bracket."
   (let ((is-enc))
     (setq is-enc (or
                   (string= op ")")
@@ -1970,17 +1907,17 @@ count of class names changed."
   (let ((gb (get-buffer-create "**chgs**"))
         (namespace "std")
         (classes (list
-             "endl"
-             "ifstream"
-             "ios_base"
-             "map"
-             "ostringstream"
-             "pair"
-             "set"
-             "setfill"
-             "setw"
-             "string"
-             "vector"))
+                  "endl"
+                  "ifstream"
+                  "ios_base"
+                  "map"
+                  "ostringstream"
+                  "pair"
+                  "set"
+                  "setfill"
+                  "setw"
+                  "string"
+                  "vector"))
         (count 0))
     (setq count (shu-cpp-qualify-classes classes namespace gb))
     count
@@ -1998,17 +1935,17 @@ count of class names changed."
   (let ((gb (get-buffer-create "**chgs**"))
         (namespace "bsl")
         (classes (list
-             "endl"
-             "ifstream"
-             "ios_base"
-             "map"
-             "ostringstream"
-             "pair"
-             "set"
-             "setfill"
-             "setw"
-             "string"
-             "vector"))
+                  "endl"
+                  "ifstream"
+                  "ios_base"
+                  "map"
+                  "ostringstream"
+                  "pair"
+                  "set"
+                  "setfill"
+                  "setw"
+                  "string"
+                  "vector"))
         (count 0))
     (setq count (shu-cpp-qualify-classes classes namespace gb))
     count
@@ -2055,8 +1992,8 @@ is placed in a separate buffer called **shu-aix-malloc**."
         (if x
             (progn
               (setq count (cdr x))
-          (setq count (1+ count))
-          (setcdr x count))
+              (setq count (1+ count))
+              (setcdr x count))
           (setq count 1)
           (setq x (cons size count))
           (setq sizes (cons x sizes)))))
@@ -2157,6 +2094,6 @@ shu- prefix removed."
   (defalias 'qualify-std 'shu-qualify-namespace-std)
   (defalias 'qualify-bsl 'shu-qualify-namespace-bsl)
   (defalias 'dbx-malloc 'shu-dbx-summarize-malloc)
-)
+  )
 
 ;;; shu-cpp-general.el ends here
