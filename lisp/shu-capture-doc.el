@@ -37,7 +37,7 @@
 
 
 (provide 'shu-capture-doc)
-(require 'subr-x)
+;;; (require 'subr-x)
 
 
 ;; Information about a function and its doc string is contained in the folllwing
