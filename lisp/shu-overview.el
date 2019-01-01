@@ -28,7 +28,8 @@
 ;; This manual contains detailed information on all of the function, macro,
 ;; variable, and constant definitions in this repository.
 ;;
-;; This is Version 1.0 of the shu elisp repository.
+;; This is Version 1.0 of the shu elisp repository.  Version 1.0 was merged with
+;; the master branch on 31 December 2018.
 ;;
 ;; What this document lacks lacks are detailed scenarios and work flows.  The
 ;; reader might well say that this is an interesting collection of parts, and
