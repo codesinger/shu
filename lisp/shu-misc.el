@@ -753,7 +753,7 @@ if the commit range specified is either \"31.33\" or \"31+2\", then the followin
 is put into the kill ring:
 
     \"git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 \""
-  (interactive "sCommits?: ")
+  (interactive "sCommits in the form x.y or x+y or x-y?: ")
   (let ((range)
         (start)
         (end)

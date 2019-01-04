@@ -144,4 +144,110 @@
       (should (= line (cadr result))))
 ))
 
+
+
+;;
+;;  shu-test-shu-get-line-column-of-file-1
+;;
+(ert-deftest shu-test-shu-get-line-column-of-file-1 ()
+  (let ((data "thing.cpp:55:30: error:")
+        (expected-line   55)
+        (expected-col    30)
+        (actual)
+        (actual-line)
+        (actual-col))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (if (search-forward "cpp" nil t)
+          (progn
+            (setq actual (shu-get-line-column-of-file))
+            (should actual)
+            (should (listp actual))
+            (should (= 2 (length actual)))
+            (setq actual-line (car actual))
+            (should (= expected-line actual-line))
+            (setq actual (cdr actual))
+            (setq actual-col (car actual))
+            (should (= expected-col actual-col)))
+        (should nil)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-line-column-of-file-2
+;;
+(ert-deftest shu-test-shu-get-line-column-of-file-2 ()
+  (let ((data "[file=thing.cpp] [line=55] error:")
+        (expected-line   55)
+        (actual)
+        (actual-line))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (if (search-forward "cpp" nil t)
+          (progn
+            (setq actual (shu-get-line-column-of-file))
+            (should actual)
+            (should (listp actual))
+            (should (= 1 (length actual)))
+            (setq actual-line (car actual))
+            (should (= expected-line actual-line)))
+        (should nil)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-line-column-of-file-3
+;;
+(ert-deftest shu-test-shu-get-line-column-of-file-3 ()
+  (let ((data "\"thing.cpp\", line 55.30: 1540-0064 (S) Syntax error:")
+        (expected-line   55)
+        (expected-col    30)
+        (actual)
+        (actual-line)
+        (actual-col))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (if (search-forward "cpp" nil t)
+          (progn
+            (setq actual (shu-get-line-column-of-file))
+            (should actual)
+            (should (listp actual))
+            (should (= 2 (length actual)))
+            (setq actual-line (car actual))
+            (should (= expected-line actual-line))
+            (setq actual (cdr actual))
+            (setq actual-col (car actual))
+            (should (= expected-col actual-col)))
+        (should nil)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-line-column-of-file-4
+;;
+(ert-deftest shu-test-shu-get-line-column-of-file-4 ()
+  (let ((data " \"thing.cpp\", line 55: ")
+        (expected-line   55)
+        (actual)
+        (actual-line))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (if (search-forward "cpp" nil t)
+          (progn
+            (setq actual (shu-get-line-column-of-file))
+            (should actual)
+            (should (listp actual))
+            (should (= 1 (length actual)))
+            (setq actual-line (car actual))
+            (should (= expected-line actual-line)))
+        (should nil)))
+    ))
+
 ;;; shu-cpp-project.t.el ends here

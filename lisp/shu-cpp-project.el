@@ -744,7 +744,7 @@ list of length three if there is a file name, line number, and column number."
   "Fetch the potential line number and column number within a file.  On entry,
 point is positioned at the character following a file name.  This file name
 may be followed by a line number and the line number may be followed by a
-column number.  This function recognizes two forms of line and column
+column number.  This function recognizes four forms of line and column
 specifications.
 
   thing.cpp:1234:42
@@ -755,6 +755,14 @@ indicates the file thing.cpp line number 1234, column 42
 
 indicates the file thing.cpp line number 1234.
 
+  \"thing.cpp\", line 55.16:
+
+indicates the file thing.cpp line number 55, column 16.
+
+  \"thing.cpp\", line 55:
+
+indicates the file thing.cpp line number 55.
+
 The purpose of this function is only to gather the line and column
 specification following the file name.  The return value is a list, which is
 empty if no line or column number was found.  It has only one element, which
@@ -764,29 +772,29 @@ number were found.
 
 This should probably be turned into a hook at some point so that other line
 and column number indications may be used."
-  (let (
-        (numbers "[0-9]+")
-        (line-ss "\\[line\\s-*=\\s-*\\([0-9]+\\)\\]")
-        (eol (save-excursion (end-of-line) (point)))
+  (let ((numbers "[0-9]+")
+        (line1-ss "\\[line\\s-*=\\s-*\\([0-9]+\\)\\]")
+        (line2-ss ",\\s-*line\\s-*\\([0-9]+\\)")
+        (eol (line-end-position))
         (line-number )  ;; Line number or nil
         (column-number ) ;; Column number or nil
-        (ret-list )     ;; Returned list
-        (debug-on-error t)
-        )
+        (ret-list ))     ;; Returned list
     (cond
      ((looking-at ":")
       (when (re-search-forward numbers eol t)
         (setq line-number (string-to-number (match-string 0))) ;; Line number within file
         (when (looking-at ":")  ;; Colon following line number
           (when (re-search-forward numbers eol t)
-            (setq column-number (string-to-number (match-string 0))))))
-      )
+            (setq column-number (string-to-number (match-string 0)))))))
      ((looking-at "]")
-      (when (re-search-forward line-ss eol t)
+      (when (re-search-forward line1-ss eol t)
+        (setq line-number (string-to-number (match-string 1))))) ;; Line number within file
+     ((or (looking-at "\"") (looking-at ","))
+      (when (re-search-forward line2-ss eol t)
         (setq line-number (string-to-number (match-string 1))) ;; Line number within file
-        )
-      )
-     )
+        (when (looking-at "\\.")  ;; Dot following line number
+          (when (re-search-forward numbers eol t)
+            (setq column-number (string-to-number (match-string 0))))))))
     (when line-number
       (setq ret-list (list line-number))
       (when column-number
