@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.0
+;; Version: 1.1
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -356,7 +356,8 @@ string is not terminated in the buffer."
 (defun shu-remove-trailing-all-whitespace (input-string)
   "Return a copy of INPUT-STRING with all trailing whitespace removed.  All control
 characters are considered whitespace."
-  (replace-regexp-in-string (rx (* (any " \b\t\n\v\f\r")) eos) "" input-string))
+  (shu-trim-trailing input-string)
+  )
 
 
 
@@ -369,17 +370,54 @@ count or ARG, whichever is smaller.  Used by functions that wish to
 safely delete ARG characters of white space from the current position
 without deleting any characters that are not white space.
 An optional second argument is a string that defines what is meant
-by white space.  The default definition is blanks and tabs."
-  (let ((bos (point))                   ; Remember beginning point of space
-        (ccount 0)                      ; The count that can be deleted
-        (bspace " \t")                  ; The blank space string
-        (wspace 0))                     ; Amount of white space that exists
+by white space.  The default definition is SHU-ALL-WHITESPACE-REGEXP."
+  (let ((bos (point))
+        (bspace (or shu-all-whitespace-regexp-scf white-space))
+        (wspace 0))
     (save-excursion
-      (when white-space                 ; A white space definition was given
-        (setq bspace white-space))      ; Use the given definition
-      (skip-chars-forward bspace)       ; Skip to first non white space
-      (setq wspace (- (point) bos))     ; White space count at front of line
-      (setq ccount (min wspace arg)))    ; Shift count is min of avail & wanted
+      (skip-chars-forward bspace)
+      (setq wspace (- (point) bos))
+      (min wspace arg))
+    ))
+
+
+
+;;
+;;  shu-trim-leading
+;;
+(defun shu-trim-leading (string)
+  "Trim leading whitespace from a string.  Return the modified string.  String
+remains unmodified if it had no leading whitespace."
+  (let ((ss (concat "\\`\\(?:" shu-all-whitespace-regexp "+\\)")))
+    (when (string-match ss string)
+      (setq string (replace-match "" t t string)))
+    string
+    ))
+
+
+
+;;
+;;  shu-trim-trailing
+;;
+(defun shu-trim-trailing (string)
+  "Trim trailing whitespace from a string.  Return the modified string.  String
+remains unmodified if it had no trailing whitespace."
+  (let ((ss (concat "\\(?:" shu-all-whitespace-regexp "+\\)\\'")))
+    (when (string-match ss string)
+      (setq string (replace-match "" t t string)))
+    string
+    ))
+
+
+
+;;
+;;  shu-trim
+;;
+(defun shu-trim (string)
+  "Trim leading and trailing whitespace from a string.  Return the modified
+string.  String remains unmodified if it had no leading or trailing whitespace."
+  (let ((trimmed (shu-trim-trailing (shu-trim-leading string))))
+    trimmed
     ))
 
 ;;; shu-base.el ends here

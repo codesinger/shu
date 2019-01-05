@@ -374,4 +374,246 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     (setq result (shu-group-number x 2 ";"))
     (should (string= gx result))))
 
+
+
+;;
+;;  shu-test-shu-remove-trailing-all-whitespace-1
+;;
+(ert-deftest shu-test-shu-remove-trailing-all-whitespace-1 ()
+  (let* ((string  " \t Now is the time for all good men ...")
+         (expected string)
+         (actual))
+    (setq actual (shu-remove-trailing-all-whitespace string))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-remove-trailing-all-whitespace-2
+;;
+(ert-deftest shu-test-shu-remove-trailing-all-whitespace-2 ()
+  (let* ((data "  Now is the time for all good men ...")
+         (string  (concat data " \t "))
+         (expected data)
+         (actual))
+    (setq actual (shu-remove-trailing-all-whitespace string))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-remove-trailing-all-whitespace-3
+;;
+(ert-deftest shu-test-shu-remove-trailing-all-whitespace-3 ()
+  (let* ((data "  Now is the time for all good men ...")
+         (string  (concat data "    "))
+         (expected data)
+         (actual))
+    (setq actual (shu-remove-trailing-all-whitespace string))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-trim-leading-1
+;;
+(ert-deftest shu-test-shu-trim-leading-1 ()
+  (let* ((string  "Now is the time for all good men ...   ")
+         (expected string)
+         (actual))
+    (setq actual (shu-trim-leading string))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-leading-2
+;;
+(ert-deftest shu-test-shu-trim-leading-2 ()
+  (let* ((data "Now is the time for all good men ...    ")
+         (string  (concat " \t " data))
+         (expected data)
+         (actual))
+    (setq actual (shu-trim-leading string))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-leading-3
+;;
+(ert-deftest shu-test-shu-trim-leading-3 ()
+  (let* ((data "Now is the time for all good men ...    ")
+         (string  (concat "    " data))
+         (expected data)
+         (actual))
+    (setq actual (shu-trim-leading string))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-trailing-1
+;;
+(ert-deftest shu-test-shu-trim-trailing-1 ()
+  (let* ((string  " \t Now is the time for all good men ...")
+         (expected string)
+         (actual))
+    (setq actual (shu-trim-trailing string))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-trailing-2
+;;
+(ert-deftest shu-test-shu-trim-trailing-2 ()
+  (let* ((data "  Now is the time for all good men ...")
+         (string  (concat data " \t "))
+         (expected data)
+         (actual))
+    (setq actual (shu-trim-trailing string))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-trailing-3
+;;
+(ert-deftest shu-test-shu-trim-trailing-3 ()
+  (let* ((data "  Now is the time for all good men ...")
+         (string  (concat data "    "))
+         (expected data)
+         (actual))
+    (setq actual (shu-trim-trailing string))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-trim-1
+;;
+(ert-deftest shu-test-shu-trim-1 ()
+  (let* ((string  "Now is the time for all good men ...")
+         (expected string)
+         (actual))
+    (setq actual (shu-trim-trailing string))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-2
+;;
+(ert-deftest shu-test-shu-trim-2 ()
+  (let* ((data "Now is the time for all good men ...")
+         (string  (concat " \t " data))
+         (expected data)
+         (actual))
+    (setq actual (shu-trim string))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-3
+;;
+(ert-deftest shu-test-shu-trim-3 ()
+  (let* ((data "Now is the time for all good men ...")
+         (string  (concat data " \t "))
+         (expected data)
+         (actual))
+    (setq actual (shu-trim string))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-4
+;;
+(ert-deftest shu-test-shu-trim-4 ()
+  (let* ((data "Now is the time for all good men ...")
+         (string  (concat " \t " data " \t "))
+         (expected data)
+         (actual))
+    (setq actual (shu-trim string))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-minimum-leading-space-1
+;;
+(ert-deftest shu-test-shu-minimum-leading-space-1 ()
+  (let* ((data "    Now is the time ...")
+         (expected 2)
+         (actual)
+         (pos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq pos (point))
+      (setq actual (shu-minimum-leading-space expected))
+      (should (= expected actual))
+      (should (= pos (point))))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-minimum-leading-space-2
+;;
+(ert-deftest shu-test-shu-minimum-leading-space-2 ()
+  (let* ((data "    Now is the time ...")
+         (expected 4)
+         (want 8)
+         (actual)
+         (pos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq pos (point))
+      (setq actual (shu-minimum-leading-space want))
+      (should (= expected actual))
+      (should (= pos (point))))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-minimum-leading-space-3
+;;
+(ert-deftest shu-test-shu-minimum-leading-space-3 ()
+  (let* ((data " \t  Now is the time ...")
+         (expected 4)
+         (want 4)
+         (actual)
+         (pos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq pos (point))
+      (setq actual (shu-minimum-leading-space want))
+      (should (= expected actual))
+      (should (= pos (point))))
+    ))
+
 ;;; shu-base.t.el ends here

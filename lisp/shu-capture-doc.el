@@ -37,7 +37,7 @@
 
 
 (provide 'shu-capture-doc)
-;;; (require 'subr-x)
+(require 'shu-base)
 
 
 ;; Information about a function and its doc string is contained in the folllwing
@@ -173,7 +173,7 @@ of length zero"
        (if (string-match ,tfs ,signature)
            (progn
              (setq ,func-name (match-string 1 ,signature))
-             (setq ,args (string-trim (match-string 2 ,signature))))
+             (setq ,args (shu-trim (match-string 2 ,signature))))
          (setq ,func-name "")
          (setq ,args "")))
     ))
