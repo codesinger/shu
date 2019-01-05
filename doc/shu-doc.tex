@@ -25,14 +25,15 @@
 
 
 
-
 \section{Overview}
 
 
 This manual contains detailed information on all of the function, macro,
 variable, and constant definitions in this repository.
 
-This is Version 1.0 of the shu elisp repository.
+Version 1.0 was merged with the master branch on 31 December 2018.
+
+This is Version 1.1 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -361,7 +362,7 @@ count or \emph{arg}, whichever is smaller.  Used by functions that wish to
 safely delete \emph{arg} characters of white space from the current position
 without deleting any characters that are not white space.
 An optional second argument is a string that defines what is meant
-by white space.  The default definition is blanks and tabs.
+by white space.  The default definition is \emph{shu-all-whitespace-regexp}.
 \end{doc-string}
 
 \vspace{1em}
@@ -434,6 +435,39 @@ Return the column number of the point passed in as an argument.
 \begin{doc-string}
 Return the line number of the point passed in as an argument.  The line number is
 relative to the start of the buffer, whether or not narrowing is in effect.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-trim }}
+\usebox{\funcname}\emph{string}
+\index{shu-trim} \hfill [Function]
+
+\begin{doc-string}
+Trim leading and trailing whitespace from a string.  Return the modified
+string.  String remains unmodified if it had no leading or trailing whitespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-trim-leading }}
+\usebox{\funcname}\emph{string}
+\index{shu-trim-leading} \hfill [Function]
+
+\begin{doc-string}
+Trim leading whitespace from a string.  Return the modified string.  String
+remains unmodified if it had no leading whitespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-trim-trailing }}
+\usebox{\funcname}\emph{string}
+\index{shu-trim-trailing} \hfill [Function]
+
+\begin{doc-string}
+Trim trailing whitespace from a string.  Return the modified string.  String
+remains unmodified if it had no trailing whitespace.
 \end{doc-string}
 
 \vspace{1em}
@@ -2323,11 +2357,11 @@ Assume you have the sample string that is shown in \emph{shu-csplit}
 
 You with to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
-Then put the cursor into an part of the string to be replaced and invoke this
-function.  This function will remove the old string, replace it with the
-contents of the string in the kill ring, and then split it up into shorter lines
-as in the following example.  The string in the kill ring may have opening and
-closing quotes or not.
+Then put the cursor into any part of the first line of the string to be replaced
+and invoke this function.  This function will remove the old string, replace it
+with the contents of the string in the kill ring, and then split it up into
+shorter lines as in the following example.  The string in the kill ring may have
+opening and closing quotes or not.
 
 \small{\begin{verbatim}
      static const std::string x(``This is a very long line of text that look''
@@ -2336,12 +2370,11 @@ closing quotes or not.
                                 `` to do so.'');
 \end{verbatim}}
 
-This is especially useful if you have a constant in a unit if you have a string
-constant in a unit test and you have modified the code that creates the string.
-gtest will complain that the expected string did not match the actual string.
-If the actual string is correct, copy it into the kill ring, go into your unit
-test, find the old string, place the cursor in the old string, and replace it
-with the new.
+This is especially useful if you have a a string constant in a unit test and you
+have modified the code that creates the string.  gtest will complain that the
+expected string did not match the actual string.  If the actual string is
+correct, copy it into the kill ring, go into your unit test, find the old
+string, place the cursor in the old string, and replace it with the new.
 \end{doc-string}
 
 \vspace{1em}
@@ -2924,11 +2957,11 @@ Assume you have the sample string that is shown in \emph{shu-csplit}
 
 You with to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
-Then put the cursor into an part of the string to be replaced and invoke this
-function.  This function will remove the old string, replace it with the
-contents of the string in the kill ring, and then split it up into shorter lines
-as in the following example.  The string in the kill ring may have opening and
-closing quotes or not.
+Then put the cursor into any part of the first line of the string to be replaced
+and invoke this function.  This function will remove the old string, replace it
+with the contents of the string in the kill ring, and then split it up into
+shorter lines as in the following example.  The string in the kill ring may have
+opening and closing quotes or not.
 
 \small{\begin{verbatim}
      static const std::string x(``This is a very long line of text that look''
@@ -2937,12 +2970,11 @@ closing quotes or not.
                                 `` to do so.'');
 \end{verbatim}}
 
-This is especially useful if you have a constant in a unit if you have a string
-constant in a unit test and you have modified the code that creates the string.
-gtest will complain that the expected string did not match the actual string.
-If the actual string is correct, copy it into the kill ring, go into your unit
-test, find the old string, place the cursor in the old string, and replace it
-with the new.
+This is especially useful if you have a a string constant in a unit test and you
+have modified the code that creates the string.  gtest will complain that the
+expected string did not match the actual string.  If the actual string is
+correct, copy it into the kill ring, go into your unit test, find the old
+string, place the cursor in the old string, and replace it with the new.
 \end{doc-string}
 
 \vspace{1em}
@@ -4342,7 +4374,7 @@ name, line number, and column number, a list with three entries.
 Fetch the potential line number and column number within a file.  On entry,
 point is positioned at the character following a file name.  This file name
 may be followed by a line number and the line number may be followed by a
-column number.  This function recognizes two forms of line and column
+column number.  This function recognizes four forms of line and column
 specifications.
 
   thing.cpp:1234:42
@@ -4352,6 +4384,14 @@ indicates the file thing.cpp line number 1234, column 42
   [file=thing.cpp] [line=1234]
 
 indicates the file thing.cpp line number 1234.
+
+  ``thing.cpp'', line 55.16:
+
+indicates the file thing.cpp line number 55, column 16.
+
+  ``thing.cpp'', line 55:
+
+indicates the file thing.cpp line number 55.
 
 The purpose of this function is only to gather the line and column
 specification following the file name.  The return value is a list, which is

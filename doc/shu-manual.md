@@ -46,14 +46,15 @@
 
 
 
-
 # Overview #
 
 
 This manual contains detailed information on all of the function, macro,
 variable, and constant definitions in this repository.
 
-This is Version 1.0 of the shu elisp repository.
+Version 1.0 was merged with the master branch on 31 December 2018.
+
+This is Version 1.1 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -314,7 +315,7 @@ count or *arg*, whichever is smaller.  Used by functions that wish to
 safely delete *arg* characters of white space from the current position
 without deleting any characters that are not white space.
 An optional second argument is a string that defines what is meant
-by white space.  The default definition is blanks and tabs.
+by white space.  The default definition is *shu-all-whitespace-regexp*.
 
 
 
@@ -372,6 +373,33 @@ shu-the-line-at *arg*
 
 Return the line number of the point passed in as an argument.  The line number is
 relative to the start of the buffer, whether or not narrowing is in effect.
+
+
+
+#### shu-trim ####
+shu-trim *string*
+[Function]
+
+Trim leading and trailing whitespace from a string.  Return the modified
+string.  String remains unmodified if it had no leading or trailing whitespace.
+
+
+
+#### shu-trim-leading ####
+shu-trim-leading *string*
+[Function]
+
+Trim leading whitespace from a string.  Return the modified string.  String
+remains unmodified if it had no leading whitespace.
+
+
+
+#### shu-trim-trailing ####
+shu-trim-trailing *string*
+[Function]
+
+Trim trailing whitespace from a string.  Return the modified string.  String
+remains unmodified if it had no trailing whitespace.
 
 
 
@@ -1872,11 +1900,11 @@ Assume you have the sample string that is shown in *shu-csplit*
 
 You with to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
-Then put the cursor into an part of the string to be replaced and invoke this
-function.  This function will remove the old string, replace it with the
-contents of the string in the kill ring, and then split it up into shorter lines
-as in the following example.  The string in the kill ring may have opening and
-closing quotes or not.
+Then put the cursor into any part of the first line of the string to be replaced
+and invoke this function.  This function will remove the old string, replace it
+with the contents of the string in the kill ring, and then split it up into
+shorter lines as in the following example.  The string in the kill ring may have
+opening and closing quotes or not.
 
 ```
      static const std::string x("This is a very long line of text that look"
@@ -1885,12 +1913,11 @@ closing quotes or not.
                                 " to do so.");
 ```
 
-This is especially useful if you have a constant in a unit if you have a string
-constant in a unit test and you have modified the code that creates the string.
-gtest will complain that the expected string did not match the actual string.
-If the actual string is correct, copy it into the kill ring, go into your unit
-test, find the old string, place the cursor in the old string, and replace it
-with the new.
+This is especially useful if you have a a string constant in a unit test and you
+have modified the code that creates the string.  gtest will complain that the
+expected string did not match the actual string.  If the actual string is
+correct, copy it into the kill ring, go into your unit test, find the old
+string, place the cursor in the old string, and replace it with the new.
 
 
 
@@ -2348,11 +2375,11 @@ Assume you have the sample string that is shown in *shu-csplit*
 
 You with to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
-Then put the cursor into an part of the string to be replaced and invoke this
-function.  This function will remove the old string, replace it with the
-contents of the string in the kill ring, and then split it up into shorter lines
-as in the following example.  The string in the kill ring may have opening and
-closing quotes or not.
+Then put the cursor into any part of the first line of the string to be replaced
+and invoke this function.  This function will remove the old string, replace it
+with the contents of the string in the kill ring, and then split it up into
+shorter lines as in the following example.  The string in the kill ring may have
+opening and closing quotes or not.
 
 ```
      static const std::string x("This is a very long line of text that look"
@@ -2361,12 +2388,11 @@ closing quotes or not.
                                 " to do so.");
 ```
 
-This is especially useful if you have a constant in a unit if you have a string
-constant in a unit test and you have modified the code that creates the string.
-gtest will complain that the expected string did not match the actual string.
-If the actual string is correct, copy it into the kill ring, go into your unit
-test, find the old string, place the cursor in the old string, and replace it
-with the new.
+This is especially useful if you have a a string constant in a unit test and you
+have modified the code that creates the string.  gtest will complain that the
+expected string did not match the actual string.  If the actual string is
+correct, copy it into the kill ring, go into your unit test, find the old
+string, place the cursor in the old string, and replace it with the new.
 
 
 
@@ -3461,7 +3487,7 @@ name, line number, and column number, a list with three entries.
 Fetch the potential line number and column number within a file.  On entry,
 point is positioned at the character following a file name.  This file name
 may be followed by a line number and the line number may be followed by a
-column number.  This function recognizes two forms of line and column
+column number.  This function recognizes four forms of line and column
 specifications.
 
   thing.cpp:1234:42
@@ -3471,6 +3497,14 @@ indicates the file thing.cpp line number 1234, column 42
   [file=thing.cpp] [line=1234]
 
 indicates the file thing.cpp line number 1234.
+
+  "thing.cpp", line 55.16:
+
+indicates the file thing.cpp line number 55, column 16.
+
+  "thing.cpp", line 55:
+
+indicates the file thing.cpp line number 55.
 
 The purpose of this function is only to gather the line and column
 specification following the file name.  The return value is a list, which is
@@ -5510,6 +5544,7 @@ within type.
 
 Associate a number with each type of variable
 
+
 # Index #
 
 * [acgen](#acgen)
@@ -6019,7 +6054,10 @@ Associate a number with each type of variable
 * [shu-the-column-at](#shu-the-column-at)
 * [shu-the-line-at](#shu-the-line-at)
 * [shu-tother](#shu-tother)
+* [shu-trim-leading](#shu-trim-leading)
 * [shu-trim-trailing-blanks](#shu-trim-trailing-blanks)
+* [shu-trim-trailing](#shu-trim-trailing)
+* [shu-trim](#shu-trim)
 * [shu-unit-test-buffer](#shu-unit-test-buffer)
 * [shu-var-name](#shu-var-name)
 * [shu-vh](#shu-vh)
