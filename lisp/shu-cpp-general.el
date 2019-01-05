@@ -1382,23 +1382,22 @@ Assume you have the sample string that is shown in SHU-CSPLIT
 
 You with to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
-Then put the cursor into an part of the string to be replaced and invoke this
-function.  This function will remove the old string, replace it with the
-contents of the string in the kill ring, and then split it up into shorter lines
-as in the following example.  The string in the kill ring may have opening and
-closing quotes or not.
+Then put the cursor into any part of the first line of the string to be replaced
+and invoke this function.  This function will remove the old string, replace it
+with the contents of the string in the kill ring, and then split it up into
+shorter lines as in the following example.  The string in the kill ring may have
+opening and closing quotes or not.
 
      static const std::string x(\"This is a very long line of text that look\"
                                 \"s as though it will go on forever and prob\"
                                 \"ably already has done so or is threatening\"
                                 \" to do so.\");
 
-This is especially useful if you have a constant in a unit if you have a string
-constant in a unit test and you have modified the code that creates the string.
-gtest will complain that the expected string did not match the actual string.
-If the actual string is correct, copy it into the kill ring, go into your unit
-test, find the old string, place the cursor in the old string, and replace it
-with the new."
+This is especially useful if you have a a string constant in a unit test and you
+have modified the code that creates the string.  gtest will complain that the
+expected string did not match the actual string.  If the actual string is
+correct, copy it into the kill ring, go into your unit test, find the old
+string, place the cursor in the old string, and replace it with the new."
   (interactive)
   (let
       ((xquote "[^\\]\"") ;; quote not preceded by escape

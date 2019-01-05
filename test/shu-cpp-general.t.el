@@ -517,6 +517,69 @@
 
 
 ;;
+;;  shu-test-shu-creplace-5
+;;
+(ert-deftest shu-test-shu-creplace-5 ()
+  (let ((actual-split)
+        (actual-replace)
+        (original1
+         (concat
+          "\"Ut porta, quam eget tempor aliquet, lectus elit pulvinar dolor, sit amet d\"\n"
+          "\"ignissim est massa ut arcu. Donec est dolor, ultricies eu cursus id, imper\"\n"
+          "\"diet aliquam dui. Pellentesque ut blandit quam. Nunc dictum tempus enim no\"\n"
+          "\"n elementum. Phasellus scelerisque purus sapien, quis congue ipsum ultrice\"\n"
+          "\"s ut. Sed vel nibh ornare, sodales mi sed, pretium ex. Integer convallis, \"\n"
+          "\"quam vulputate tempus volutpat, dui odio tincidunt nisi, et tincidunt nunc\"\n"
+          "\" lectus id velit. Donec volutpat mi non laoreet scelerisque. Sed id leo si\"\n"
+          "\"t amet mauris hendrerit ullamcorper. Curabitur fermentum libero vel ullamc\"\n"
+          "\"orper feugiat. Nunc et hendrerit nulla, nec condimentum urna. Nullam et co\"\n"
+          "\"ndimentum nisl, id semper ante. Vivamus eu tempor erat, sed tincidunt mi. \"\n"
+          "\"Phasellus et massa viverra sapien bibendum tempor eget a enim. Duis varius\"\n"
+          "\", dolor in ultrices posuere, lorem enim tincidunt enim, at iaculis libero \"\n"
+          "\"eros id felis. Sed et justo mattis dolor porttitor fermentum id ut lorem.\""))
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (expected-replace1
+         (concat
+          "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lac\"\n"
+          "\"inia lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida\"\n"
+          "\" interdum et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor\"\n"
+          "\". Etiam eget enim pharetra,tristique ex at, porta dui. Fusce varius non or\"\n"
+          "\"ci ut semper. Nuncfinibus lorem at elit varius, volutpat semper arcuinterd\"\n"
+          "\"um. Quisque egestas tristique velit vel varius. In nisinulla, mollis quis \"\n"
+          "\"mauris sit amet, dictum molestiejusto. Curabitur feugiat eu mi at consecte\"\n"
+          "\"tur. Sed ultrices massavel turpis pulvinar tristique. Etiam aliquam vulput\"\n"
+          "\"ate magna,vitae commodo leo dictum at. Donec aliquam purus tortor, sit ame\"\n"
+          "\"tvulputate orci facilisis at.\"")))
+    ;; Do a shu-creplace of a split string with a long, unquoted string
+    (with-temp-buffer
+      (insert original1)
+      (goto-char (point-min))  ;; Sitting on top of open quote
+      (with-temp-buffer        ;; Put a different string in the kill ring
+        (insert replace1)
+        (copy-region-as-kill (point-min) (point-max)))
+      (goto-char 60)           ;; Go to first line of split string
+      (shu-creplace)           ;; Replace with contents of kill ring
+      ;; Buffer must hold the expected result
+      (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected-replace1 actual-replace)))
+    ))
+
+
+
+;;
 ;;  shu-test-cif
 ;;
 (ert-deftest shu-test-cif ()
