@@ -392,8 +392,7 @@ by white space.  The default definition is SHU-ALL-WHITESPACE-REGEXP."
   "Trim leading whitespace from STRING.  Return the modified string.  String
 remains unmodified if it had no leading whitespace."
   (let ((ss (concat "\\`\\(?:" shu-all-whitespace-regexp "+\\)")))
-    (when (string-match ss string)
-      (setq string (replace-match "" t t string)))
+    (setq string (replace-regexp-in-string ss "" string t t))
     string
     ))
 
@@ -406,8 +405,7 @@ remains unmodified if it had no leading whitespace."
   "Trim trailing whitespace from STRING.  Return the modified string.  String
 remains unmodified if it had no trailing whitespace."
   (let ((ss (concat "\\(?:" shu-all-whitespace-regexp "+\\)\\'")))
-    (when (string-match ss string)
-      (setq string (replace-match "" t t string)))
+    (setq string (replace-regexp-in-string ss "" string t t))
     string
     ))
 
