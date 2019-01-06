@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.1
+;; Version: 1.2
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -34,6 +34,9 @@
 ;;; Code:
 
 (provide 'shu-base)
+
+(defconst shu-version "1.2"
+  "The version number of the Shu elisp package.")
 
 (defconst shu-cpp-name-list
   (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
@@ -386,7 +389,7 @@ by white space.  The default definition is SHU-ALL-WHITESPACE-REGEXP."
 ;;  shu-trim-leading
 ;;
 (defun shu-trim-leading (string)
-  "Trim leading whitespace from a string.  Return the modified string.  String
+  "Trim leading whitespace from STRING.  Return the modified string.  String
 remains unmodified if it had no leading whitespace."
   (let ((ss (concat "\\`\\(?:" shu-all-whitespace-regexp "+\\)")))
     (when (string-match ss string)
@@ -400,7 +403,7 @@ remains unmodified if it had no leading whitespace."
 ;;  shu-trim-trailing
 ;;
 (defun shu-trim-trailing (string)
-  "Trim trailing whitespace from a string.  Return the modified string.  String
+  "Trim trailing whitespace from STRING.  Return the modified string.  String
 remains unmodified if it had no trailing whitespace."
   (let ((ss (concat "\\(?:" shu-all-whitespace-regexp "+\\)\\'")))
     (when (string-match ss string)
@@ -414,7 +417,7 @@ remains unmodified if it had no trailing whitespace."
 ;;  shu-trim
 ;;
 (defun shu-trim (string)
-  "Trim leading and trailing whitespace from a string.  Return the modified
+  "Trim leading and trailing whitespace from STRING.  Return the modified
 string.  String remains unmodified if it had no leading or trailing whitespace."
   (let ((trimmed (shu-trim-trailing (shu-trim-leading string))))
     trimmed
