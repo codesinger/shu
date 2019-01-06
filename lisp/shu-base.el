@@ -38,6 +38,14 @@
 (defconst shu-version "1.2"
   "The version number of the Shu elisp package.")
 
+(defconst shu-last-commit "1be0fcfaa19765a5649a95996082c5e2381edae2"
+  "The git SHA-1 of the most recent commit.  This cannot be the SHA-1 hash of
+the last commit because that is not known unti after the commit happens.  Just
+before the merge with master, a commit is done.  Its SHA-1 hash is copied into
+this constant.  Then one more commit is done to push this change out.  If you
+want to find this version in git, look for the commit after the one defined
+here.")
+
 (defconst shu-cpp-name-list
   (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
         "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
