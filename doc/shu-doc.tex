@@ -33,7 +33,9 @@ variable, and constant definitions in this repository.
 
 Version 1.0 was merged with the master branch on 31 December 2018.
 
-This is Version 1.1 of the Shu elisp repository.
+Version 1.1 was merged with the master branch on 5 January 2019.
+
+This is Version 1.2 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -341,6 +343,21 @@ do a paste.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-last-commit }}
+\usebox{\funcname}
+\index{shu-last-commit} \hfill [Constant]
+
+\begin{doc-string}
+The git SHA-1 of the most recent commit.  This cannot be the SHA-1 hash of
+the last commit because that is not known unti after the commit happens.  Just
+before the merge with master, a commit is done.  Its SHA-1 hash is copied into
+this constant.  Then one more commit is done to push this change out.  If you
+want to find this version in git, look for the commit after the one defined
+here.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-line-and-column-at }}
 \usebox{\funcname}\emph{arg}
 \index{shu-line-and-column-at} \hfill [Function]
@@ -444,7 +461,7 @@ relative to the start of the buffer, whether or not narrowing is in effect.
 \index{shu-trim} \hfill [Function]
 
 \begin{doc-string}
-Trim leading and trailing whitespace from a string.  Return the modified
+Trim leading and trailing whitespace from \emph{string}.  Return the modified
 string.  String remains unmodified if it had no leading or trailing whitespace.
 \end{doc-string}
 
@@ -455,7 +472,7 @@ string.  String remains unmodified if it had no leading or trailing whitespace.
 \index{shu-trim-leading} \hfill [Function]
 
 \begin{doc-string}
-Trim leading whitespace from a string.  Return the modified string.  String
+Trim leading whitespace from \emph{string}.  Return the modified string.  String
 remains unmodified if it had no leading whitespace.
 \end{doc-string}
 
@@ -466,7 +483,7 @@ remains unmodified if it had no leading whitespace.
 \index{shu-trim-trailing} \hfill [Function]
 
 \begin{doc-string}
-Trim trailing whitespace from a string.  Return the modified string.  String
+Trim trailing whitespace from \emph{string}.  Return the modified string.  String
 remains unmodified if it had no trailing whitespace.
 \end{doc-string}
 
@@ -478,6 +495,16 @@ remains unmodified if it had no trailing whitespace.
 
 \begin{doc-string}
 The name of the buffer into which unit tests place their output and debug trace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-version }}
+\usebox{\funcname}
+\index{shu-version} \hfill [Constant]
+
+\begin{doc-string}
+The version number of the Shu elisp package.
 \end{doc-string}
 
 \eject

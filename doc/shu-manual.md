@@ -46,6 +46,7 @@
 
 
 
+
 # Overview #
 
 
@@ -54,7 +55,9 @@ variable, and constant definitions in this repository.
 
 Version 1.0 was merged with the master branch on 31 December 2018.
 
-This is Version 1.1 of the Shu elisp repository.
+Version 1.1 was merged with the master branch on 5 January 2019.
+
+This is Version 1.2 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -298,6 +301,18 @@ do a paste.
 
 
 
+#### shu-last-commit ####
+[Constant]
+
+The git SHA-1 of the most recent commit.  This cannot be the SHA-1 hash of
+the last commit because that is not known unti after the commit happens.  Just
+before the merge with master, a commit is done.  Its SHA-1 hash is copied into
+this constant.  Then one more commit is done to push this change out.  If you
+want to find this version in git, look for the commit after the one defined
+here.
+
+
+
 #### shu-line-and-column-at ####
 shu-line-and-column-at *arg*
 [Function]
@@ -380,7 +395,7 @@ relative to the start of the buffer, whether or not narrowing is in effect.
 shu-trim *string*
 [Function]
 
-Trim leading and trailing whitespace from a string.  Return the modified
+Trim leading and trailing whitespace from *string*.  Return the modified
 string.  String remains unmodified if it had no leading or trailing whitespace.
 
 
@@ -389,7 +404,7 @@ string.  String remains unmodified if it had no leading or trailing whitespace.
 shu-trim-leading *string*
 [Function]
 
-Trim leading whitespace from a string.  Return the modified string.  String
+Trim leading whitespace from *string*.  Return the modified string.  String
 remains unmodified if it had no leading whitespace.
 
 
@@ -398,7 +413,7 @@ remains unmodified if it had no leading whitespace.
 shu-trim-trailing *string*
 [Function]
 
-Trim trailing whitespace from a string.  Return the modified string.  String
+Trim trailing whitespace from *string*.  Return the modified string.  String
 remains unmodified if it had no trailing whitespace.
 
 
@@ -407,6 +422,13 @@ remains unmodified if it had no trailing whitespace.
 [Constant]
 
 The name of the buffer into which unit tests place their output and debug trace.
+
+
+
+#### shu-version ####
+[Constant]
+
+The version number of the Shu elisp package.
 
 # shu-bde-cpp #
 
@@ -5973,6 +5995,7 @@ Associate a number with each type of variable
 * [shu-keyring-verify-file](#shu-keyring-verify-file)
 * [shu-kill-current-buffer](#shu-kill-current-buffer)
 * [shu-kill-new](#shu-kill-new)
+* [shu-last-commit](#shu-last-commit)
 * [shu-lc-comment](#shu-lc-comment)
 * [shu-line-and-column-at](#shu-line-and-column-at)
 * [shu-list-c-directories](#shu-list-c-directories)
@@ -6060,6 +6083,7 @@ Associate a number with each type of variable
 * [shu-trim](#shu-trim)
 * [shu-unit-test-buffer](#shu-unit-test-buffer)
 * [shu-var-name](#shu-var-name)
+* [shu-version](#shu-version)
 * [shu-vh](#shu-vh)
 * [shu-vj](#shu-vj)
 * [shu-which-c-project](#shu-which-c-project)
