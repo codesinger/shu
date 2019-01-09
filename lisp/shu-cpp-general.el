@@ -1380,8 +1380,8 @@ in any of the strings and invoke this function."
   (let ((white-quote (concat shu-all-whitespace-regexp "*" "[^\\]\""))
         (x (shu-point-in-string))
         (going)
-        (eos)       ;; End of last strig
-        (bos)       ;; Beginning of first styring
+        (eos)       ;; End of last string
+        (bos)       ;; Beginning of first string
         (cend)      ;; End of current string
         (del-count) ;; Number of characters to delete
         (pbegin))   ;; Beginning of previous string

@@ -697,42 +697,33 @@ shu-get-line-column-of-file to perhaps harvest a line number and column number
 within the file.  The return result is a list of length one if there is only
 a file name, a list of length two if there is a file name and line number, a
 list of length three if there is a file name, line number, and column number."
-  (let* (
-         (gbuf (get-buffer-create "*boo*"))
-         (target-extensions (regexp-opt shu-cpp-extensions t))
+  (let* ((target-extensions (regexp-opt shu-cpp-extensions t))
          (target-name (concat shu-cpp-file-name "*\\." target-extensions))
          (target-char shu-cpp-file-name)
          (numbers "[0-9]+")
          (bol (save-excursion (beginning-of-line) (point)))
          (eol (save-excursion (end-of-line) (point)))
-         (file-name )    ;; This will contain the name or nil
-         (line-number )  ;; Line number or nil
+         (file-name )     ;; This will contain the name or nil
+         (line-number )   ;; Line number or nil
          (column-number ) ;; Column number or nil
-         (ret-list )     ;; Returned list
-         (line-col)
-         )
-    (when (looking-at target-char) ;; Looking at a legal file name character
-      (while (and (looking-at target-char) ;; Still on a file name char
-                  (> (point) bol)) ;; And still on same line
-        (backward-char 1))            ;; Keep moving back until we aren't on a file name char
-      ;;  or we hit the beginning of the line
-      (when (not (looking-at target-char)) ;; Moved backward past beginning of name
-        (forward-char 1))             ;; Move forward to what might be the beginning
-      (when (re-search-forward target-name eol t)
-        (setq file-name (match-string 0)) ;; Have something that matches file name syntax
-        (when (not (= (point) eol))
-          (when (looking-at target-char)
-            (setq file-name nil)
-            )
-          )
-        )
-      )
-    (when file-name
-      (setq line-col (shu-get-line-column-of-file))
-      (setq ret-list (cons file-name line-col))
-      )
-    (princ ret-list gbuf)
-    (princ "\n" gbuf)
+         (ret-list )      ;; Returned list
+         (line-col))
+    (save-excursion
+      (when (looking-at target-char) ;; Looking at a legal file name character
+        (while (and (looking-at target-char) ;; Still on a file name char
+                    (> (point) bol)) ;; And still on same line
+          (backward-char 1))            ;; Keep moving back until we aren't on a file name char
+        ;;  or we hit the beginning of the line
+        (when (not (looking-at target-char)) ;; Moved backward past beginning of name
+          (forward-char 1))             ;; Move forward to what might be the beginning
+        (when (re-search-forward target-name eol t)
+          (setq file-name (match-string 0)) ;; Have something that matches file name syntax
+          (when (not (= (point) eol))
+            (when (looking-at target-char)
+              (setq file-name nil)))))
+      (when file-name
+        (setq line-col (shu-get-line-column-of-file))
+        (setq ret-list (cons file-name line-col))))
     ret-list
     ))
 
