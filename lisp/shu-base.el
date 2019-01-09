@@ -35,10 +35,16 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.2"
+(defconst shu-version "1.3"
   "The version number of the Shu elisp package.")
 
-(defconst shu-last-commit "8a0413fbc02d77f625ab0e54fc449ec159ea2f98"
+(defconst shu-all-commits
+  (list
+   (cons "1.2"   "8a0413fbc02d77f625ab0e54fc449ec159ea2f98")
+   (cons "1.3"   "UNKNOWN"))
+  "A list of all commits by version starting with version 1.2")
+
+(defconst shu-last-commit "UNKNOWN"
   "The git SHA-1 of the most recent commit.  This cannot be the SHA-1 hash of
 the last commit because that is not known unti after the commit happens.  Just
 before the merge with master, a commit is done.  Its SHA-1 hash is copied into
@@ -307,7 +313,11 @@ either a string or a number."
   "Return the point that terminates the current quoted string in the buffer.
 The single argument STRING-TERM is a string containing the character that
 started the string (single or double quote).  Return nil if the current
-string is not terminated in the buffer."
+string is not terminated in the buffer.
+
+This function actually returns the position after the terminating quote and
+also moves point to that position.  This cannot be changed because other
+functions depend on this frankly strange behavior."
   (let ((limit     t)
         (epoint    nil)
         (string-end    (regexp-quote string-term))

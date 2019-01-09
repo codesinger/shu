@@ -616,4 +616,71 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
       (should (= pos (point))))
     ))
 
+
+;;
+;;  shu-test-shu-end-of-string-1
+;;
+(ert-deftest shu-test-shu-end-of-string-1 ()
+  (let ((p1)
+        (expected 5)
+        (pos))
+    (with-temp-buffer
+      (insert "\"As\"")
+      (goto-char 2)
+      (setq pos (point))
+      (setq p1 (shu-end-of-string "\""))
+      (should (= expected (point)))
+      (should (= expected p1)))
+    ))
+
+
+;;
+;;  shu-test-shu-end-of-string-2
+;;
+(ert-deftest shu-test-shu-end-of-string-2 ()
+  (let ((p1)
+        (expected 5)
+        (pos))
+    (with-temp-buffer
+      (insert "'As'")
+      (goto-char 2)
+      (setq pos (point))
+      (setq p1 (shu-end-of-string "'"))
+      (should (= expected (point)))
+      (should (= expected p1)))
+    ))
+
+
+;;
+;;  shu-test-shu-end-of-string-3
+;;
+(ert-deftest shu-test-shu-end-of-string-3 ()
+  (let ((p1)
+        (expected 12)
+        (pos))
+    (with-temp-buffer
+      (insert "'Something'")
+      (goto-char 2)
+      (setq pos (point))
+      (setq p1 (shu-end-of-string "'"))
+      (should (= expected (point)))
+      (should (= expected p1)))
+    ))
+
+
+;;
+;;  shu-test-shu-end-of-string-4
+;;
+(ert-deftest shu-test-shu-end-of-string-4 ()
+  (let ((p1)
+        (pos))
+    (with-temp-buffer
+      (insert "'Something")
+      (goto-char 2)
+      (setq pos (point))
+      (setq p1 (shu-end-of-string "'"))
+      (should (= 3 (point)))
+      (should (not p1)))
+    ))
+
 ;;; shu-base.t.el ends here

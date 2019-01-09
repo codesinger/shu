@@ -1366,6 +1366,75 @@ of the above line after csplit was invoked:
     ))
 
 
+
+
+;;
+;;  shu-new-cunsplit
+;;
+(defun shu-new-cunsplit ()
+  "The beginnings of a re-write of SHU-CUNSPLIT.
+Needs more testing.
+Undo the split that was done by csplit.  Place the cursor anywhere
+in any of the strings and invoke this function."
+  (interactive)
+  (let ((white-quote (concat shu-all-whitespace-regexp "*" "[^\\]\""))
+        (x (shu-point-in-string))
+        (going)
+        (eos)       ;; End of last strig
+        (bos)       ;; Beginning of first styring
+        (cend)      ;; End of current string
+        (del-count) ;; Number of characters to delete
+        (pbegin))   ;; Beginning of previous string
+    (if (not x)
+        (progn
+          (ding)
+          (message "%s" "Not in a string."))
+      ;;; Search forward for last string in the group
+      (setq going t)
+      (while going
+        (setq x (shu-end-of-string "\""))
+        (if (not x)
+            (setq going nil)
+          (setq eos (- x 2))
+          (skip-chars-forward shu-all-whitespace-regexp-scf)
+          (if (not (looking-at "\""))
+              (setq going nil)
+            (forward-char 1)
+            (setq x (shu-point-in-string))
+            (when (not x)
+              (setq going nil)))))
+      ;;; End of last string
+      (goto-char eos)
+      (setq x (shu-point-in-string))
+      (setq going t)
+      ;;; Walk backwards deleting string separators
+      (while going
+        (setq bos x)
+        (if (not (>= (- x 2) (point-min)))
+            (setq going nil)
+          (goto-char (- x 2))
+          (setq pbegin (1- x))
+          (skip-chars-backward shu-all-whitespace-regexp-scf)
+          (if (not (> (point) (point-min)))
+              (setq going nil)
+            (backward-char 1)
+            (if (not (looking-at "\""))
+                (setq going nil)
+              (setq cend (point))
+              (backward-char 1)
+              (setq x (shu-point-in-string))
+              (when (and pbegin cend)
+                (setq del-count (- pbegin cend))
+                (save-excursion
+                  (goto-char cend)
+                  (delete-char (1+ del-count))
+                  (setq pbegin nil)
+                  (setq cend nil)))
+              (when (not x)
+                (setq going nil)))))))
+    ))
+
+
 ;;
 ;;  shu-creplace
 ;;
