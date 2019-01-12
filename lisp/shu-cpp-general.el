@@ -1796,26 +1796,22 @@ qualifier."
       (setq mbeg (match-beginning 0))
       (setq mend (match-end 0))
       (setq have-match t)
-      (when (> mbeg bol)
-        (save-excursion
-          (goto-char (1- mbeg))
-          (if (looking-at shu-cpp-name)
-              (setq have-match nil)
-            (save-match-data
-              (if (looking-at shu-not-all-whitespace-regexp)
-                  (progn
-                    (when (looking-at prefix-rx)
-                      (setq have-match nil)))
-                (when (re-search-backward shu-not-all-whitespace-regexp bol t)
-                  (when (looking-at prefix-rx)
-                    (setq have-match nil)
-                    )
-                  )
-                )
-              )
-            )
-          )
-        )
+      (save-match-data
+        (when (> mbeg bol)
+          (save-excursion
+            (if (shu-class-is-blocked mbeg)
+                (setq have-match nil)
+              (goto-char (1- mbeg))
+              (if (looking-at shu-cpp-name)
+                  (setq have-match nil)
+                (save-match-data
+                  (if (looking-at shu-not-all-whitespace-regexp)
+                      (progn
+                        (when (looking-at prefix-rx)
+                          (setq have-match nil)))
+                    (when (re-search-backward shu-not-all-whitespace-regexp bol t)
+                      (when (looking-at prefix-rx)
+                        (setq have-match nil))))))))))
       (when have-match
         (when (< mend eol)
           (save-excursion
@@ -1833,6 +1829,31 @@ qualifier."
         (replace-match rename t t)
         (setq count (1+ count))))
     count
+    ))
+
+
+
+;;
+;;  shu-class-is-blocked
+;;
+(defun shu-class-is-blocked (pos)
+  "Return true if a class name should be ignored because it is either in a
+string or a comment.
+
+We have found something at point POS that looks as though it might be a class
+name.  If it is in a string or is preceeded on the same line by \"//\" (also not
+in a string), then it is either in a string or is probably in a comment, so we
+want to ignore it.  Return true if the class name should be ignored."
+  (let ((bol (line-beginning-position))
+        (blocked))
+    (save-excursion
+      (if (shu-point-in-string pos)
+          (setq blocked t)
+        (goto-char bol)
+        (when (search-forward "//" pos t)
+          (when (not (shu-point-in-string))
+            (setq blocked t)))))
+    blocked
     ))
 
 

@@ -1279,6 +1279,94 @@ This is most likely the name of an include file and not the name of a class."
 ))
 
 
+;;
+;;  shu-test-shu-qualify-class-name-21
+;;
+(ert-deftest shu-test-shu-qualify-class-name-21 ()
+  "Do not add namespace to class name that is locaated inside a string."
+  (let* ((class "set")
+        (data "\"This is how we set the pointer.\"")
+        (namespace "std")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-22
+;;
+(ert-deftest shu-test-shu-qualify-class-name-22 ()
+  "Do not add namespace to class name that is locaated inside a comment."
+  (let* ((class "set")
+        (data " // This is how we set the pointer.")
+        (namespace "std")
+        (expected data)
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-23
+;;
+(ert-deftest shu-test-shu-qualify-class-name-23 ()
+  "Add a namespace to a class name that is followed by a comment."
+  (let* ((class "Mumble")
+        (namespace "abcdef")
+        (prefix "  ")
+        (suffix "  // A comment")
+        (expected (concat prefix namespace "::" class suffix))
+        (data (concat prefix class suffix))
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 1 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
+;;
+;;  shu-test-shu-qualify-class-name-24
+;;
+(ert-deftest shu-test-shu-qualify-class-name-24 ()
+  "Add a namespace to a class name that is preceeded by a comment in a string."
+  (let* ((class "Mumble")
+        (namespace "abcdef")
+        (prefix "  \" // cmt in string \" ")
+        (suffix "  ")
+        (expected (concat prefix namespace "::" class suffix))
+        (data (concat prefix class suffix))
+        (actual)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq count (shu-qualify-class-name class namespace))
+      (should (= 1 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+))
+
+
 
 
 ;;
