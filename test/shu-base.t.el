@@ -281,6 +281,36 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
       (should (not p1)))
 ))
 
+
+
+;;
+;;  shu-test-shu-point-in-string-4
+;;
+(ert-deftest shu-test-shu-point-in-string-4 ()
+  (let ((gbuf (get-buffer-create shu-unit-test-buffer))
+       (p1))
+    (with-temp-buffer
+      (insert "\"A\"\"B\"")
+      (setq p1 (shu-point-in-string 5))
+      (should (= 5 p1)))
+    (with-temp-buffer
+      (insert "\"A\"")
+      (setq p1 (shu-point-in-string 2))
+      (should (= 2 p1)))
+    (with-temp-buffer
+      (insert " \"A\"")
+      (setq p1 (shu-point-in-string 3))
+      (should (= 3 p1)))
+    (with-temp-buffer
+      (insert "  \"A\"")
+      (setq p1 (shu-point-in-string 4))
+      (should (= 4 p1)))
+    (with-temp-buffer
+      (insert "   \"A\"")
+      (setq p1 (shu-point-in-string 5))
+      (should (= 5 p1)))
+))
+
 ;;
 ;;  shu-test-shu-remove-trailing-whitespace-1
 ;;

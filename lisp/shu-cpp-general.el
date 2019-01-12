@@ -1787,6 +1787,7 @@ qualifier."
         (rename)
         (count 0)
         (prefix-rx "[:>.]")
+        (pis)
         (case-fold-search nil))
     (while (search-forward target-name nil t)
       (setq bol (line-beginning-position))
@@ -1807,7 +1808,14 @@ qualifier."
                       (setq have-match nil)))
                 (when (re-search-backward shu-not-all-whitespace-regexp bol t)
                   (when (looking-at prefix-rx)
-                    (setq have-match nil))))))))
+                    (setq have-match nil)
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
       (when have-match
         (when (< mend eol)
           (save-excursion

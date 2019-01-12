@@ -227,18 +227,21 @@ do a paste."
 ;;
 ;;  shu-point-in-string
 ;;
-(defun shu-point-in-string ()
+(defun shu-point-in-string (&optional pos)
   "Return the start position of the string text if point is sitting between a pair
 of non-escaped quotes (double quotes).  The left-hand quote (opening quote) must be
 on the same line as point.  The string must be on a single line.  If point is sitting
 on a quote, then it is not inside a string.  In order to be inside a string, point
-must lie bwetween two non-escaped quotes."
+must lie bwetween two non-escaped quotes.  The optional argument POS, if specified,
+is used in place of the position of point."
   (let ((xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
         ;; of a line or a quote not preceded by \
         (start-pos)
         (bol (line-beginning-position))
         (eol (line-end-position)))
     (save-excursion
+      (when pos
+        (goto-char pos))
       ;; Search backwards for either a quote at beginning of line or a quote
       ;; not preceded by \.  If we find the quote not at the beginning of the
       ;; line, we are positioned one character before it.  If we find the quote
