@@ -142,13 +142,8 @@
       "//\n"
       "//@AUTHOR: " author "\n"
       "\n"
-      "#ifndef INCLUDED_BSLALG_TYPETRAITS\n"
       "#include <bslalg_typetraits.h>\n"
-      "#endif\n"
-      "\n"
-      "#ifndef INCLUDED_BSL_IOSTREAM\n"
       "#include <bsl_iostream.h>\n"
-      "#endif\n"
       "\n"
       "\n"
       "namespace BloombergLP {\n"
@@ -487,7 +482,7 @@
         (save-restriction
           (widen)
           (goto-char (point-min))
-          (when (search-forward "INCLUDED_BSLMA_ALLOCATOR" nil t)
+          (when (search-forward "#include <bslma_allocator.h>" nil t)
             (setq have-include t))))
       (when (not have-include)
         (goto-char header-pos)
@@ -495,9 +490,7 @@
         (insert
          (concat
           "\n"
-          "#ifndef INCLUDED_BSLMA_ALLOCATOR\n"
-          "#include <bslma_allocator.h>\n"
-          "#endif\n"))))
+          "#include <bslma_allocator.h>\n"))))
     (goto-char start-pos)))
 
 
@@ -725,7 +718,7 @@
       (save-restriction
         (widen)
         (goto-char (point-min))
-        (when (search-forward "INCLUDED_BSLMA_DEFAULT" nil t)
+        (when (search-forward "#include <bslma_default.h>" nil t)
           (setq have-include t))))
     (when (not have-include)
       (goto-char header-pos)
@@ -733,9 +726,7 @@
       (setq include-line
             (concat
              "\n"
-             "#ifndef INCLUDED_BSLMA_DEFAULT\n"
-             "#include <bslma_default.h>\n"
-             "#endif\n"))
+             "#include <bslma_default.h>\n"))
       (setq start-pos (+ start-pos (length include-line)))
       (insert include-line))
     (goto-char start-pos)
