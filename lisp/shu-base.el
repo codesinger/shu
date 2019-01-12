@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.2
+;; Version: 1.4
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.3"
+(defconst shu-version "1.4"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Jan 12"
@@ -44,10 +44,11 @@
 (defconst shu-all-commits
   (list
    (cons "1.2"   "8a0413fbc02d77f625ab0e54fc449ec159ea2f98")
-   (cons "1.3"   "6b2f890394d200303b114f49aa3d1e9880b1feab"))
+   (cons "1.3"   "6b2f890394d200303b114f49aa3d1e9880b1feab")
+   (cons "1.4"   "UNKNOWN"))
   "A list of all commits by version starting with version 1.2")
 
-(defconst shu-last-commit "6b2f890394d200303b114f49aa3d1e9880b1feab"
+(defconst shu-last-commit "UNKNOWN"
   "The git SHA-1 of the most recent commit.  This cannot be the SHA-1 hash of
 the last commit because that is not known until after the commit happens.  Just
 before the merge with master, a commit is done.  Its SHA-1 hash is copied into
