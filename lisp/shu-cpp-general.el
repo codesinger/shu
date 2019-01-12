@@ -1326,52 +1326,11 @@ of the above line after csplit was invoked:
     ))
 
 
+
 ;;
 ;;  shu-cunsplit
 ;;
 (defun shu-cunsplit ()
-  "Undo the split that was done by csplit."
-  (interactive)
-  (let (
-        (xquote "[^\\]\"") ;; quote not preceded by escape
-        (white-quote "\\s-*[^\\]\"") ;; Optional whitespace, followed by non-escaped quote
-        (eol )   ;; End of current line
-        (eop )   ;; End of previous string
-        (bon )   ;; Beginning of next string
-        (neol )  ;; Next end of line
-        (del-count ) ;; Number of intervening chars to delete betwen strings
-        (done )
-        )
-    (if (not (shu-point-in-string))
-        (progn
-          (ding)
-          (message "%s" "Not in a string."))
-      ;; We appear to be inside a string
-      (while (not done)
-        (setq eol (save-excursion (end-of-line) (point)))
-        (if (not (re-search-forward xquote eol t))
-            (setq done t)  ;; Current string not terminated?
-          ;;  Found end of current string
-          (setq eop (1- (point))) ;; Remember where it is
-          (if (= (point) (point-max))
-              (setq done t)
-            (setq neol (save-excursion (end-of-line) (forward-char 1) (end-of-line) (point)))
-            (if (not (re-search-forward white-quote neol t))
-                (setq done t)  ;; Have no start of next string?
-              ;;  Found start of next string
-              (setq bon (point))
-              (setq del-count (- bon eop))
-              (goto-char eop)
-              (delete-char del-count))))))
-    ))
-
-
-
-
-;;
-;;  shu-new-cunsplit
-;;
-(defun shu-new-cunsplit ()
   "The beginnings of a re-write of SHU-CUNSPLIT.
 Needs more testing.
 Undo the split that was done by csplit.  Place the cursor anywhere
@@ -1417,7 +1376,8 @@ in any of the strings and invoke this function."
           (skip-chars-backward shu-all-whitespace-regexp-scf)
           (if (not (> (point) (point-min)))
               (setq going nil)
-            (backward-char 1)
+            (when (not (looking-at "\""))
+              (backward-char 1))
             (if (not (looking-at "\""))
                 (setq going nil)
               (setq cend (point))
@@ -1433,6 +1393,8 @@ in any of the strings and invoke this function."
               (when (not x)
                 (setq going nil)))))))
     ))
+
+
 
 
 ;;
@@ -1451,7 +1413,7 @@ Assume you have the sample string that is shown in SHU-CSPLIT
 
 You with to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
-Then put the cursor into any part of the first line of the string to be replaced
+Then put the cursor into any part of any line of the string to be replaced
 and invoke this function.  This function will remove the old string, replace it
 with the contents of the string in the kill ring, and then split it up into
 shorter lines as in the following example.  The string in the kill ring may have
@@ -1512,7 +1474,7 @@ string, place the cursor in the old string, and replace it with the new."
           ;;
           (goto-char tstart) ; Position just after the quote
           (save-excursion  (shu-cunsplit)) ; Make it all one big string
-          (setq sos (point))
+          (setq sos (shu-point-in-string))
           (when have-quotes (setq sos (1- sos))) ;; Delete existing quote
           (re-search-forward xquote nil t)
           (forward-char -1) ;; Now sitting on top of closing quote

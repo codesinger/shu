@@ -42,10 +42,7 @@
 (defun shu-gen-bb-component (class-name)
   "Generate the three files for a new component: .cpp, .h, and .t.cpp"
   (interactive "sClass name?: ")
-  (let* (
-         (gbuf (get-buffer-create "***slp***"))
-         (debug-on-error t)
-         (author shu-cpp-author)
+  (let* ((author shu-cpp-author)
          (namespace shu-cpp-default-namespace)
          (base-class-name (downcase class-name))
 ;;;         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix (concat namespace "_")))
@@ -60,8 +57,6 @@
          (got-count 0)
          (file-file "File")
          )
-    (princ (format "file-prefix: %s\n" file-prefix) gbuf)
-    (princ (format "basename: %s\n" base-name) gbuf)
     (when (not file-prefix)
       (setq base-name base-class-name)
       (setq hfile-name (concat base-name ".h"))

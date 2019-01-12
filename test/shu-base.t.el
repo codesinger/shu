@@ -190,9 +190,9 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 ;;
-;;  shu-test-shu-point-in-string
+;;  shu-test-shu-point-in-string-1
 ;;
-(ert-deftest shu-test-shu-point-in-string ()
+(ert-deftest shu-test-shu-point-in-string-1 ()
   (let ((gbuf (get-buffer-create shu-unit-test-buffer))
        (p1))
     (with-temp-buffer
@@ -202,10 +202,10 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
       (should (= 2 p1)))
 
     (with-temp-buffer
-      (insert " \"Hello\"")
+      (insert "    \"Hello\"")
       (forward-char -4)
       (setq p1 (shu-point-in-string))
-      (should (= 3 p1)))
+      (should (= 6 p1)))
 
     (with-temp-buffer
       (insert " \"Hello\"")
@@ -213,16 +213,16 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
       (should (not p1)))
 
     (with-temp-buffer
-      (insert " \"o\"")
+      (insert  "         \"o\"")
       (forward-char -2)
       (setq p1 (shu-point-in-string))
-      (should (= 3 p1)))
+      (should (= 11 p1)))
 
     (with-temp-buffer
       (insert " \"\"")
       (forward-char -1)
       (setq p1 (shu-point-in-string))
-      (should (= 3 p1)))
+      (should (not p1)))
 
     (with-temp-buffer
       (insert " \"Hello\"\n\n\n        \"Hello\"")
@@ -231,6 +231,55 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
       (should (not p1)))
     ))
 
+
+
+;;
+;;  shu-test-shu-point-in-string-2
+;;
+(ert-deftest shu-test-shu-point-in-string-2 ()
+  (let ((gbuf (get-buffer-create shu-unit-test-buffer))
+       (p1))
+    (with-temp-buffer
+      (insert "\"A\"\"B\"")
+      (goto-char 5)
+      (setq p1 (shu-point-in-string))
+      (should (= 5 p1)))
+    (with-temp-buffer
+      (insert "\"A\"")
+      (goto-char 2)
+      (setq p1 (shu-point-in-string))
+      (should (= 2 p1)))
+    (with-temp-buffer
+      (insert " \"A\"")
+      (goto-char 3)
+      (setq p1 (shu-point-in-string))
+      (should (= 3 p1)))
+    (with-temp-buffer
+      (insert "  \"A\"")
+      (goto-char 4)
+      (setq p1 (shu-point-in-string))
+      (should (= 4 p1)))
+    (with-temp-buffer
+      (insert "   \"A\"")
+      (goto-char 5)
+      (setq p1 (shu-point-in-string))
+      (should (= 5 p1)))
+))
+
+
+
+;;
+;;  shu-test-shu-point-in-string-3
+;;
+(ert-deftest shu-test-shu-point-in-string-3 ()
+  (let ((gbuf (get-buffer-create shu-unit-test-buffer))
+       (p1))
+    (with-temp-buffer
+      (insert "\"A\"\"B\"")
+      (goto-char 6)
+      (setq p1 (shu-point-in-string))
+      (should (not p1)))
+))
 
 ;;
 ;;  shu-test-shu-remove-trailing-whitespace-1

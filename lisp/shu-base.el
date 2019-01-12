@@ -230,24 +230,32 @@ do a paste."
 (defun shu-point-in-string ()
   "Return the start position of the string text if point is sitting between a pair
 of non-escaped quotes (double quotes).  The left-hand quote (opening quote) must be
-on the same line as point.  Does not take into account comments, #if 0, etc.  It is
-assumed that someone who wants to operate on a string will generally position point
-within a legitimate string."
+on the same line as point.  The string must be on a single line.  If point is sitting
+on a quote, then it is not inside a string.  In order to be inside a string, point
+must lie bwetween two non-escaped quotes."
   (let ((xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
         ;; of a line or a quote not preceded by \
-        (start-pos )
-        (bol (save-excursion (beginning-of-line) (point))))
+        (start-pos)
+        (bol (line-beginning-position))
+        (eol (line-end-position)))
     (save-excursion
       ;; Search backwards for either a quote at beginning of line or a quote
       ;; not preceded by \.  If we find the quote not at the beginning of the
       ;; line, we are positioned one character before it.  If we find the quote
       ;; at the beginning of the line, we are sitting on top of it.
-      (when (re-search-backward xquote bol t)
-        ;; If in front of the quote, move to sitting on it
-        (when (not (looking-at "\\\"")) (forward-char 1))
-        (setq start-pos (1+ (point))) ;; This is where string text starts
-        (when (not (re-search-forward xquote nil t))
-          (setq start-pos nil))))
+      (if (looking-at "\"")
+          (setq start-pos nil)
+        (when (re-search-backward xquote bol t)
+          (when (not (and
+                      (= (point) bol)
+                      (looking-at "\"")))
+            (forward-char 1))
+          (forward-char 1)
+          (setq start-pos (point)) ;; This is where string text starts
+          (if (looking-at "\"")
+              (setq start-pos nil)
+            (when (not (re-search-forward xquote eol t))
+                (setq start-pos nil))))))
     start-pos
     ))
 

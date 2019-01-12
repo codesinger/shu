@@ -64,10 +64,7 @@
 ;;  shu-test-shu-dox-cbt-1
 ;;
 (ert-deftest shu-test-shu-dox-cbt-1 ()
-  (let (
-        (gbuf (get-buffer-create "**foo**"))
-        (result)
-        )
+  (let ((result))
           ;; Split of one long line starting in column 1
   (with-temp-buffer
       (insert shu-test-cpp-general--dox-cbt1-input)
@@ -76,9 +73,6 @@
       (should (= 67 (point)))
       ;; Make sure the result is what we expect
       (setq result (buffer-substring-no-properties (point-min) (point-max)))
-      (princ result gbuf)
-      (princ "\n\n" gbuf)
-      (princ shu-test-cpp-general-expected-dox-cbt1  gbuf)
       (should (string= shu-test-cpp-general-expected-dox-cbt1 result)))
 ))
 
@@ -297,6 +291,150 @@
       (setq actual-split (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= fail-case-unexpected-after-split actual-split))
       )
+    ))
+
+
+
+;;
+;;  shu-test-shu-cunsplit-1
+;;
+(ert-deftest shu-test-shu-cunsplit-1 ()
+  "Doc string."
+  (let ((data "\"A\" \"B\"")
+        (expected "\"AB\"")
+        (actual) )
+    (with-temp-buffer
+      (insert data)
+      (goto-char 6)
+      (shu-cunsplit)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cunsplit-2
+;;
+(ert-deftest shu-test-shu-cunsplit-2 ()
+  "Doc string."
+  (let ((data "\"A\" \"B\"")
+        (expected "\"AB\"")
+        (actual) )
+    (with-temp-buffer
+      (insert data)
+      (goto-char 6)
+      (shu-cunsplit)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cunsplit-3
+;;
+(ert-deftest shu-test-shu-cunsplit-3 ()
+  "Doc string."
+  (let ((data "\"A\"\n\"B\"")
+        (expected "\"AB\"")
+        (actual) )
+    (with-temp-buffer
+      (insert data)
+      (goto-char 6)
+      (shu-cunsplit)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cunsplit-4
+;;
+(ert-deftest shu-test-shu-cunsplit-4 ()
+  "Doc string."
+  (let ((data "\"Now is the \"\n\"time for all \"\n\"good men \"\n\"to come to the aid \"\n\"of the party\"\n")
+        (expected "\"Now is the time for all good men to come to the aid of the party\"\n")
+        (actual) )
+    (with-temp-buffer
+      (insert data)
+      (goto-char 7)
+      (shu-cunsplit)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cunsplit-5
+;;
+(ert-deftest shu-test-shu-cunsplit-5 ()
+  "Doc string."
+  (let ((data "\"Now is the \"\n\"time for all \"\n\"good men \"\n\"to come to the aid \"\n\"of the party\"\n")
+        (expected "\"Now is the time for all good men to come to the aid of the party\"\n")
+        (actual) )
+    (with-temp-buffer
+      (insert data)
+      (goto-char 24)
+      (shu-cunsplit)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cunsplit-6
+;;
+(ert-deftest shu-test-shu-cunsplit-6 ()
+  "Doc string."
+  (let ((data "\"Now is the \"\n\"time for all \"\n\"good men \"\n\"to come to the aid \"\n\"of the party\"\n")
+        (expected "\"Now is the time for all good men to come to the aid of the party\"\n")
+        (actual) )
+    (with-temp-buffer
+      (insert data)
+      (goto-char 34)
+      (shu-cunsplit)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cunsplit-6
+;;
+(ert-deftest shu-test-shu-cunsplit-6 ()
+  "Doc string."
+  (let ((data "\"Now is the \"\n\"time for all \"\n\"good men \"\n\"to come to the aid \"\n\"of the party\"\n")
+        (expected "\"Now is the time for all good men to come to the aid of the party\"\n")
+        (actual) )
+    (with-temp-buffer
+      (insert data)
+      (goto-char 44)
+      (shu-cunsplit)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cunsplit-7
+;;
+(ert-deftest shu-test-shu-cunsplit-7 ()
+  "Doc string."
+  (let ((data "\"Now is the \"\n\"time for all \"\n\"good men \"\n\"to come to the aid \"\n\"of the party\"\n")
+        (expected "\"Now is the time for all good men to come to the aid of the party\"\n")
+        (actual) )
+    (with-temp-buffer
+      (insert data)
+      (goto-char 70)
+      (shu-cunsplit)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
     ))
 
 
@@ -570,7 +708,7 @@
       (with-temp-buffer        ;; Put a different string in the kill ring
         (insert replace1)
         (copy-region-as-kill (point-min) (point-max)))
-      (goto-char 60)           ;; Go to first line of split string
+      (goto-char 626)          ;; Go to five lines from the bottom
       (shu-creplace)           ;; Replace with contents of kill ring
       ;; Buffer must hold the expected result
       (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
