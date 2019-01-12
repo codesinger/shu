@@ -38,6 +38,9 @@
 (defconst shu-version "1.3"
   "The version number of the Shu elisp package.")
 
+(defconst shu-date "2019 Jan 12"
+  "Date of the most recent merge with the master branch.")
+
 (defconst shu-all-commits
   (list
    (cons "1.2"   "8a0413fbc02d77f625ab0e54fc449ec159ea2f98")
@@ -46,7 +49,7 @@
 
 (defconst shu-last-commit "UNKNOWN"
   "The git SHA-1 of the most recent commit.  This cannot be the SHA-1 hash of
-the last commit because that is not known unti after the commit happens.  Just
+the last commit because that is not known until after the commit happens.  Just
 before the merge with master, a commit is done.  Its SHA-1 hash is copied into
 this constant.  Then one more commit is done to push this change out.  If you
 want to find this version in git, look for the commit after the one defined
@@ -232,7 +235,7 @@ do a paste."
 of non-escaped quotes (double quotes).  The left-hand quote (opening quote) must be
 on the same line as point.  The string must be on a single line.  If point is sitting
 on a quote, then it is not inside a string.  In order to be inside a string, point
-must lie bwetween two non-escaped quotes.  The optional argument POS, if specified,
+must lie between two non-escaped quotes.  The optional argument POS, if specified,
 is used in place of the position of point."
   (let ((xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
         ;; of a line or a quote not preceded by \

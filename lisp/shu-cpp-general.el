@@ -1841,7 +1841,7 @@ qualifier."
 string or a comment.
 
 We have found something at point POS that looks as though it might be a class
-name.  If it is in a string or is preceeded on the same line by \"//\" (also not
+name.  If it is in a string or is preceded on the same line by \"//\" (also not
 in a string), then it is either in a string or is probably in a comment, so we
 want to ignore it.  Return true if the class name should be ignored."
   (let ((bol (line-beginning-position))

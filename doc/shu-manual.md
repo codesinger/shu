@@ -57,7 +57,9 @@ Version 1.0 was merged with the master branch on 31 December 2018.
 
 Version 1.1 was merged with the master branch on 5 January 2019.
 
-This is Version 1.2 of the Shu elisp repository.
+Version 1.2 was merged with the master branch on 6 January 2019.
+
+This is Version 1.3 of the Shu elisp repository,
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -85,6 +87,13 @@ depend on this file.
 List of functions and variable definitions in this package.
 
 
+
+
+
+#### shu-all-commits ####
+[Constant]
+
+A list of all commits by version starting with version 1.2
 
 
 
@@ -235,6 +244,13 @@ Return the line number of the current line relative to the start of the buffer.
 
 
 
+#### shu-date ####
+[Constant]
+
+Date of the most recent merge with the master branch.
+
+
+
 #### shu-end-of-string ####
 shu-end-of-string *string-term*
 [Function]
@@ -243,6 +259,10 @@ Return the point that terminates the current quoted string in the buffer.
 The single argument *string-term* is a string containing the character that
 started the string (single or double quote).  Return nil if the current
 string is not terminated in the buffer.
+
+This function actually returns the position after the terminating quote and
+also moves point to that position.  This cannot be changed because other
+functions depend on this frankly strange behavior.
 
 
 
@@ -305,7 +325,7 @@ do a paste.
 [Constant]
 
 The git SHA-1 of the most recent commit.  This cannot be the SHA-1 hash of
-the last commit because that is not known unti after the commit happens.  Just
+the last commit because that is not known until after the commit happens.  Just
 before the merge with master, a commit is done.  Its SHA-1 hash is copied into
 this constant.  Then one more commit is done to push this change out.  If you
 want to find this version in git, look for the commit after the one defined
@@ -355,13 +375,15 @@ the left and right brackets in the class of characters to be skipped.
 
 
 #### shu-point-in-string ####
+shu-point-in-string **&optional** *pos*
 [Function]
 
 Return the start position of the string text if point is sitting between a pair
 of non-escaped quotes (double quotes).  The left-hand quote (opening quote) must be
-on the same line as point.  Does not take into account comments, #if 0, etc.  It is
-assumed that someone who wants to operate on a string will generally position point
-within a legitimate string.
+on the same line as point.  The string must be on a single line.  If point is sitting
+on a quote, then it is not inside a string.  In order to be inside a string, point
+must lie between two non-escaped quotes.  The optional argument *pos*, if specified,
+is used in place of the position of point.
 
 
 
@@ -1922,7 +1944,7 @@ Assume you have the sample string that is shown in *shu-csplit*
 
 You with to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
-Then put the cursor into any part of the first line of the string to be replaced
+Then put the cursor into any part of any line of the string to be replaced
 and invoke this function.  This function will remove the old string, replace it
 with the contents of the string in the kill ring, and then split it up into
 shorter lines as in the following example.  The string in the kill ring may have
@@ -1974,7 +1996,10 @@ of the above line after csplit was invoked:
 [Command]
  (Function: shu-cunsplit)
 
-Undo the split that was done by csplit.
+The beginnings of a re-write of *shu-cunsplit*.
+Needs more testing.
+Undo the split that was done by csplit.  Place the cursor anywhere
+in any of the strings and invoke this function.
 
 
 
@@ -2276,6 +2301,20 @@ Insert an empty if statement.
 
 
 
+#### shu-class-is-blocked ####
+shu-class-is-blocked *pos*
+[Function]
+
+Return true if a class name should be ignored because it is either in a
+string or a comment.
+
+We have found something at point *pos* that looks as though it might be a class
+name.  If it is in a string or is preceded on the same line by "//" (also not
+in a string), then it is either in a string or is probably in a comment, so we
+want to ignore it.  Return true if the class name should be ignored.
+
+
+
 #### shu-clc ####
 [Command]
  (Alias: clc)
@@ -2397,7 +2436,7 @@ Assume you have the sample string that is shown in *shu-csplit*
 
 You with to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
-Then put the cursor into any part of the first line of the string to be replaced
+Then put the cursor into any part of any line of the string to be replaced
 and invoke this function.  This function will remove the old string, replace it
 with the contents of the string in the kill ring, and then split it up into
 shorter lines as in the following example.  The string in the kill ring may have
@@ -2449,7 +2488,10 @@ of the above line after csplit was invoked:
 [Command]
  (Alias: cunsplit)
 
-Undo the split that was done by csplit.
+The beginnings of a re-write of *shu-cunsplit*.
+Needs more testing.
+Undo the split that was done by csplit.  Place the cursor anywhere
+in any of the strings and invoke this function.
 
 
 
@@ -5567,6 +5609,7 @@ within type.
 Associate a number with each type of variable
 
 
+
 # Index #
 
 * [acgen](#acgen)
@@ -5664,6 +5707,7 @@ Associate a number with each type of variable
 * [shu-add-cpp-h-extensions](#shu-add-cpp-h-extensions)
 * [shu-add-cpp-package-line](#shu-add-cpp-package-line)
 * [shu-aix-show-malloc-list](#shu-aix-show-malloc-list)
+* [shu-all-commits](#shu-all-commits)
 * [shu-all-whitespace-chars](#shu-all-whitespace-chars)
 * [shu-all-whitespace-regexp-scf](#shu-all-whitespace-regexp-scf)
 * [shu-all-whitespace-regexp](#shu-all-whitespace-regexp)
@@ -5787,6 +5831,7 @@ Associate a number with each type of variable
 * [shu-celse](#shu-celse)
 * [shu-cfor](#shu-cfor)
 * [shu-cif](#shu-cif)
+* [shu-class-is-blocked](#shu-class-is-blocked)
 * [shu-clc](#shu-clc)
 * [shu-clear-prefix](#shu-clear-prefix)
 * [shu-comma-names-to-letter](#shu-comma-names-to-letter)
@@ -5897,6 +5942,7 @@ Associate a number with each type of variable
 * [shu-cunsplit](#shu-cunsplit)
 * [shu-current-line](#shu-current-line)
 * [shu-cwhile](#shu-cwhile)
+* [shu-date](#shu-date)
 * [shu-dbx-summarize-malloc](#shu-dbx-summarize-malloc)
 * [shu-dcc](#shu-dcc)
 * [shu-dce](#shu-dce)
