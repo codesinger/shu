@@ -1,0 +1,8 @@
+Things that I would like to do someday ...
+
+- 13 Jan 2019 - Add a function that when sitting on an arbitrary file name in a
+   buffer will open that file.  Right now shu-project can open a file that is part
+   of a project.  This would be a simple function that tries to open the file if it
+   looks like a file name.  An example might be:
+
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/string.g

@@ -222,8 +222,8 @@ of every visited file.  Makes a useful history of all files visited."
 ;;
 (defun gincl ()
   (interactive)
-  "Visit the equivalent of /usr/include on Mavericks Xcode"
-  (dired  "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/include/")
+  "Visit the equivalent of /usr/include in MacOS Xcode"
+  (dired  "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/")
 )
 
 
