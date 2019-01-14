@@ -1777,7 +1777,7 @@ use a simple replace to do that, you will qualify variable names that resemble
 class names as well as class names that are already qualified.  This function
 only adds a namespace to a class name that does not already have a namespace
 qualifier."
-  (shu-replace-class-name target-name 'shu-qualify-class-fun namespace)
+  (shu-internal-replace-class-name target-name 'shu-qualify-class-fun namespace)
   )
 
 
@@ -1798,7 +1798,36 @@ constructs a new name and issues replace-match to replace it."
 ;;
 ;;  shu-replace-class-name
 ;;
-(defun shu-replace-class-name (target-name replace-func replace-arg &optional in-string in-comment)
+(defun shu-replace-class-name (target-name new-name &optional in-string in-comment)
+  "Find all instances of the class name TARGET-NAME and replace it with the name
+NEW-NAME.  If the target name is \"Mumble\", then all instances of \"Mumble\"
+that resemble class names are replaced.  But names such as \"d_Mumble\" or
+\"MumbleIn\" remain unchanged.  if IN-STRING is true, then instances of the
+class name found inside a string are replaced.  if IN-COMMENT is true, then
+instances of the class name found inside a comment are replaced."
+  (shu-internal-replace-class-name target-name 'shu-replace-class-fun
+                                   new-name in-string in-comment)
+  )
+
+
+
+;;
+;;  shu-replace-class-fun
+;;
+(defun shu-replace-class-fun (new-name name)
+  "This is the replacment function for SHU-REPLACE-CLASS-NAME.  It is called
+with the NEW-NAME to replace the class NAME.  It calls replace-match to replace
+NAME with NEW-NAME."
+    (replace-match new-name t t)
+    )
+
+
+
+;;
+;;  shu-internal-replace-class-name
+;;
+(defun shu-internal-replace-class-name (target-name replace-func replace-arg
+                                                    &optional in-string in-comment)
   "Find all instances of the class name TARGET-NAME and if it actually appears
 to be a class name, call REPLACE-FUN passing to it REPLACE-ARG and the class
 name.  REPLACE-FUN issues the appropriate replace-match call, constructing the
