@@ -1777,8 +1777,36 @@ use a simple replace to do that, you will qualify variable names that resemble
 class names as well as class names that are already qualified.  This function
 only adds a namespace to a class name that does not already have a namespace
 qualifier."
-  (let ((name-target (concat shu-cpp-name "+"))
-        (bol)
+  (shu-replace-class-name target-name 'shu-qualify-class-fun namespace)
+  )
+
+
+
+;;
+;;  shu-qualify-class-fun
+;;
+(defun shu-qualify-class-fun (namespace name)
+  "This is the replacment function for SHU-QUALIFY-CLASS-NAME.  It is called
+with the NAMESPACE to be applied to the class whose name is NAME.  It
+constructs a new name and issues replace-match to replace it."
+  (let ((rename (concat namespace "::" name)))
+    (replace-match rename t t)
+    ))
+
+
+
+;;
+;;  shu-replace-class-name
+;;
+(defun shu-replace-class-name (target-name replace-func replace-arg &optional in-string in-comment)
+  "Find all instances of the class name TARGET-NAME and if it actually appears
+to be a class name, call REPLACE-FUN passing to it REPLACE-ARG and the class
+name.  REPLACE-FUN issues the appropriate replace-match call, constructing the
+replacement for the class name from some combination of REPLACE-ARG and the
+class name.  IN-STRING is true if a class name inside of a string is to be
+replaced.  IN-COMMENT is true if a class name inside of a comment is to be
+replaced."
+  (let ((bol)
         (eol)
         (mbeg)
         (mend)
@@ -1787,8 +1815,8 @@ qualifier."
         (rename)
         (count 0)
         (prefix-rx "[:>.]")
-        (pis)
-        (case-fold-search nil))
+        (case-fold-search nil)
+        )
     (while (search-forward target-name nil t)
       (setq bol (line-beginning-position))
       (setq eol (line-end-position))
@@ -1799,7 +1827,7 @@ qualifier."
       (save-match-data
         (when (> mbeg bol)
           (save-excursion
-            (if (shu-class-is-blocked mbeg)
+            (if (shu-class-is-blocked mbeg in-string in-comment)
                 (setq have-match nil)
               (goto-char (1- mbeg))
               (if (looking-at shu-cpp-name)
@@ -1825,8 +1853,7 @@ qualifier."
             (when (re-search-forward "#\\s-*include" mbeg t)
               (setq have-match nil)))))
       (when have-match
-        (setq rename (concat namespace "::" name))
-        (replace-match rename t t)
+        (funcall replace-func replace-arg name)
         (setq count (1+ count))))
     count
     ))
@@ -1836,25 +1863,35 @@ qualifier."
 ;;
 ;;  shu-class-is-blocked
 ;;
-(defun shu-class-is-blocked (pos)
+(defun shu-class-is-blocked (pos  &optional in-string in-comment)
   "Return true if a class name should be ignored because it is either in a
 string or a comment.
 
 We have found something at point POS that looks as though it might be a class
 name.  If it is in a string or is preceded on the same line by \"//\" (also not
 in a string), then it is either in a string or is probably in a comment, so we
-want to ignore it.  Return true if the class name should be ignored."
+may want to ignore it.  IN-STRING is true if a class name inside of a string is
+to be replaced.  IN-COMMENT is true if a class name inside of a comment is to be
+replaced.
+
+Return true if the class name should be ignored."
   (let ((bol (line-beginning-position))
+        (no-string (not in-string))
+        (no-comment (not in-comment))
         (blocked))
     (save-excursion
-      (if (shu-point-in-string pos)
+      (if (and no-string
+               (shu-point-in-string pos))
           (setq blocked t)
         (goto-char bol)
-        (when (search-forward "//" pos t)
-          (when (not (shu-point-in-string))
-            (setq blocked t)))))
+        (when no-comment
+          (when (search-forward "//" pos t)
+            (when (not (shu-point-in-string))
+              (setq blocked t))))))
     blocked
     ))
+
+
 
 
 ;;
