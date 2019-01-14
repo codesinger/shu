@@ -744,6 +744,32 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
     ))
 
 
+
+;;
+;;  shu-gincl
+;;
+(defun shu-gincl()
+  "While in a file buffer, wrap the file name in a C++ include directive and
+put it in the kll ring.  The file name is delimited by double quotes unless
+SHU-CPP-INCLUDE-USER-BRACKETS variable is true, in which case the file name
+is delimited by left and right angle brackets."
+  (interactive)
+  (let ((name  (file-name-nondirectory (buffer-file-name)))
+        (left-delim (if shu-cpp-include-user-brackets
+                   "<"
+                 "\""))
+        (right-delim (if shu-cpp-include-user-brackets
+                   ">"
+                   "\""))
+        (incl))
+    (if (not name)
+        (ding)
+      (setq incl (concat "#include "
+                         left-delim name right-delim "\n"))
+      (shu-kill-new incl))
+    ))
+
+
 ;;
 ;; shu-dox-cvt
 ;;
@@ -2197,6 +2223,7 @@ shu- prefix removed."
   (defalias 'cother 'shu-cother)
   (defalias 'hother 'shu-hother)
   (defalias 'tother 'shu-tother)
+  (defalias 'gincl 'shu-gincl)
   (defalias 'dox-cvt 'shu-dox-cvt)
   (defalias 'dox-cbt 'shu-dox-cbt)
   (defalias 'new-x-file 'shu-new-x-file)
