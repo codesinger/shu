@@ -6,3 +6,12 @@ Things that I would like to do someday ...
    looks like a file name.  An example might be:
 
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/string.g
+
+
+
+- 14 Jan 2019 - shu-replace-class-name calls shu-internal-replace-class-name to do
+  the replacement.  But shu-internal-replace-class-name will not replace anything
+  that is prefixed by ":".  That is because it was originally intended to add a
+  namespace to a class and does not want to do that to a class that already has a
+  namespace.  But in the case of class name replacement, we do want to replace
+  qualified names.

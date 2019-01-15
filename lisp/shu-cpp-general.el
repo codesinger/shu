@@ -1786,6 +1786,79 @@ or right parenthesis or a left or right square bracket."
 
 
 ;;
+;;  shu-cpp-rmv-using
+;;
+(defun shu-cpp-rmv-using (class-list &optional top-name)
+  "Remove \"using namespace\" directives from a C++ file, adding the appropriate
+mamespace qualifier to all of the unqualified class names.  CLASS-LIST is an
+a-list in which the car of each entrhy is a namespace and the cdr of each entry
+is a class name.  Here is an example of such an a-list:
+
+     (list
+      (cons \"std\"    (list \"set\" \"string\" \"vector\"))
+      (cons \"world\"  (liat \"Hello\" \"Goodbye\")))
+
+TOP-NAME, if present is a higher level namespace.  Given a top level namespace
+of \"WhammoCorp\", then the following line:
+
+     using namespace WhammoCorp::world;
+
+would be ingterpreted as though it had been written:
+
+     using namespace world;"
+  (interactive)
+  (let ((gb (get-buffer-create "**chgs**"))
+        (using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
+        (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
+        (bol)
+        (ct 0)
+        (count 0)
+        (uc 0)
+        (unk "")
+        (name)
+        (mbeg)
+        (not-comment)
+        (x)
+        (classes)
+        (namespace)
+        (debug-on-error t)
+        (case-fold-search nil))
+    (goto-char (point-min))
+    (while (re-search-forward using nil t)
+      (setq name (match-string 1))
+      (setq mbeg (match-beginning 0))
+      (setq bol (line-beginning-position))
+      (save-match-data
+        (save-excursion
+          (setq not-comment t)
+          (goto-char bol)
+          (when (search-forward "//" mbeg t)
+            (setq not-comment nil))))
+      (when not-comment
+        (when top-name
+          (when (string-match top-qual name)
+            (setq name (match-string 1 name))))
+        (setq x (assoc name class-list))
+        (if (not x)
+            (progn
+              (princ (format "Unknown namespace: \"%s\"\n" name) gb)
+              (setq uc (1+ uc)))
+          (delete-region (line-beginning-position) (line-end-position))
+          (setq namespace (car x))
+          (setq classes (cdr x))
+          (save-excursion
+            (setq ct (shu-cpp-qualify-classes classes namespace gb)))
+          (setq count (+ count ct)))))
+    (goto-char (point-min))
+    (when (not (= 0 uc))
+      (setq unk (format " %d unknown namespaces. " uc)))
+    (message "Replaced %d occurrences.%s  See buffer **chgs**" count unk)
+    count
+    ))
+
+
+
+;;
 ;;  shu-qualify-class-name
 ;;
 (defun shu-qualify-class-name (target-name namespace)

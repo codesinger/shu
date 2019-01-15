@@ -1456,4 +1456,173 @@ This is most likely the name of an include file and not the name of a class."
       (should (string= expected actual)))
     ))
 
+
+
+;;
+;;  shu-test-shu-cpp-rmv-using-1
+;;
+(ert-deftest shu-test-shu-cpp-rmv-using-1 ()
+  (let ((data
+         (concat
+          "#include <something.h>\n"
+          "using namespace std;\n"
+          "   string    x;\n"
+          "   set<int>  y;\n"
+          "   vector<string>   q;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (classes
+         (list
+          (cons "std"  (list "string" "set" "map" "vector"))))
+        (expected
+         (concat
+          "#include <something.h>\n"
+          "\n"
+          "   std::string    x;\n"
+          "   std::set<int>  y;\n"
+          "   std::vector<std::string>   q;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (actual)
+        (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-rmv-using classes))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    (should (= 4 count))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-rmv-using-2
+;;
+(ert-deftest shu-test-shu-cpp-rmv-using-2 ()
+  (let ((data
+         (concat
+          "#include <something.h>\n"
+          "using namespace WhammoCorp::std;\n"
+          "   string    x;\n"
+          "   set<int>  y;\n"
+          "   vector<string>   q;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (classes
+         (list
+          (cons "std"  (list "string" "set" "map" "vector"))))
+        (top-name "WhammoCorp")
+        (expected
+         (concat
+          "#include <something.h>\n"
+          "\n"
+          "   std::string    x;\n"
+          "   std::set<int>  y;\n"
+          "   std::vector<std::string>   q;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (actual)
+        (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-rmv-using classes top-name))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    (should (= 4 count))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-rmv-using-3
+;;
+(ert-deftest shu-test-shu-cpp-rmv-using-3 ()
+  (let ((data
+         (concat
+          "#include <something.h>\n"
+          "using namespace std;\n"
+          "using namespace world;\n"
+          "   string    x;\n"
+          "   set<int>  y;\n"
+          "   Hello     q;\n"
+          "   vector<string>   q;\n"
+          "   Goodbye  g;\n"
+          "   Goodbyebye  bb;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (classes
+         (list
+          (cons "std"   (list "string" "set" "map" "vector"))
+          (cons "world" (list "Hello" "Goodbye"))))
+        (expected
+         (concat
+          "#include <something.h>\n"
+          "\n"
+          "\n"
+          "   std::string    x;\n"
+          "   std::set<int>  y;\n"
+          "   world::Hello     q;\n"
+          "   std::vector<std::string>   q;\n"
+          "   world::Goodbye  g;\n"
+          "   Goodbyebye  bb;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (actual)
+        (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-rmv-using classes))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    (should (= 6 count))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-rmv-using-4
+;;
+(ert-deftest shu-test-shu-cpp-rmv-using-4 ()
+  (let ((data
+         (concat
+          "#include <something.h>\n"
+          "using namespace std;\n"
+          "using namespace able;\n"
+          "using namespace world;\n"
+          "   string    x;\n"
+          "   set<int>  y;\n"
+          "   Hello     q;\n"
+          "   vector<string>   q;\n"
+          "   Goodbye  g;\n"
+          "   Goodbyebye  bb;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (classes
+         (list
+          (cons "std"   (list "string" "set" "map" "vector"))
+          (cons "world" (list "Hello" "Goodbye"))))
+        (expected
+         (concat
+          "#include <something.h>\n"
+          "\n"
+          "using namespace able;\n"
+          "\n"
+          "   std::string    x;\n"
+          "   std::set<int>  y;\n"
+          "   world::Hello     q;\n"
+          "   std::vector<std::string>   q;\n"
+          "   world::Goodbye  g;\n"
+          "   Goodbyebye  bb;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (actual)
+        (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-rmv-using classes))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    (should (= 6 count))
+    ))
+
 ;;; shu-cpp-general.t.el ends here
