@@ -1806,55 +1806,154 @@ of \"WhammoCorp\", then the following line:
 would be ingterpreted as though it had been written:
 
      using namespace world;"
-  (interactive)
-  (let ((gb (get-buffer-create "**chgs**"))
-        (using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
-        (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
-        (bol)
-        (ct 0)
-        (count 0)
-        (uc 0)
-        (unk "")
-        (name)
-        (mbeg)
-        (not-comment)
-        (x)
-        (classes)
-        (namespace)
-        (debug-on-error t)
-        (case-fold-search nil))
-    (goto-char (point-min))
-    (while (re-search-forward using nil t)
-      (setq name (match-string 1))
-      (setq mbeg (match-beginning 0))
-      (setq bol (line-beginning-position))
-      (save-match-data
-        (save-excursion
-          (setq not-comment t)
-          (goto-char bol)
-          (when (search-forward "//" mbeg t)
-            (setq not-comment nil))))
-      (when not-comment
-        (when top-name
-          (when (string-match top-qual name)
-            (setq name (match-string 1 name))))
-        (setq x (assoc name class-list))
-        (if (not x)
-            (progn
-              (princ (format "Unknown namespace: \"%s\"\n" name) gb)
-              (setq uc (1+ uc)))
-          (delete-region (line-beginning-position) (line-end-position))
-          (setq namespace (car x))
-          (setq classes (cdr x))
+  (let* (
+         (gb-name "**shu-chgs**")
+         (gb (get-buffer-create gb-name))
+         (using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
+         (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
+         (bol)
+         (ct 0)
+         (count 0)
+         (uc 0)
+         (unk "")
+         (name)
+         (mbeg)
+         (not-comment)
+         (x)
+         (classes)
+         (namespace)
+         (debug-on-error t)
+         (case-fold-search nil))
+    (if (shu-cpp-rmv-blocked class-list using top-qual gb)
+        (progn
+          (ding)
+          (message "Class ambiguity prevents change.  See buffer %s" gb-name)
+          )
+      (goto-char (point-min))
+      (while (re-search-forward using nil t)
+        (setq name (match-string 1))
+        (setq mbeg (match-beginning 0))
+        (setq bol (line-beginning-position))
+        (save-match-data
           (save-excursion
-            (setq ct (shu-cpp-qualify-classes classes namespace gb)))
-          (setq count (+ count ct)))))
-    (goto-char (point-min))
-    (when (not (= 0 uc))
-      (setq unk (format " %d unknown namespaces. " uc)))
-    (message "Replaced %d occurrences.%s  See buffer **chgs**" count unk)
+            (setq not-comment t)
+            (goto-char bol)
+            (when (search-forward "//" mbeg t)
+              (setq not-comment nil))))
+        (when not-comment
+          (when top-name
+            (when (string-match top-qual name)
+              (setq name (match-string 1 name))))
+          (setq x (assoc name class-list))
+          (if (not x)
+              (progn
+                (princ (format "Unknown namespace: \"%s\"\n" name) gb)
+                (setq uc (1+ uc)))
+            (delete-region (line-beginning-position) (line-end-position))
+            (setq namespace (car x))
+            (setq classes (cdr x))
+            (save-excursion
+              (setq ct (shu-cpp-qualify-classes classes namespace gb)))
+            (setq count (+ count ct))))
+        )
+      (goto-char (point-min))
+      (when (not (= 0 uc))
+        (setq unk (format " %d unknown namespaces. " uc)))
+      (message "Replaced %d occurrences.%s  See buffer **chgs**" count unk)
+      )
     count
     ))
+
+
+
+;;
+;;  shu-cpp-rmv-blocked
+;;
+(defun shu-cpp-rmv-blocked (class-list using top-qual gb)
+  "Do a pre-check on a file to see if we will be able to remove its \"using
+namespace\" directives.  CLASS-LIST is the a-list passed to SHU-CPP-RMV-USING.
+USING is the regular expression used to search for \"using namespace\"
+directives.  TOP-QUAL is the regular expression used to strip out a higher level
+qualifier from the class name in a \"using namespace\" directive, if any.  GB is
+the buffer into which diagnostic messages are written.
+
+This function finds all of the \"using namespace\" directives in the file and
+checks to see if there is any ambiguity in the resulting clsss list.  For
+example, if namespace \"mumble\" contains class \"Bumble\" and namespace
+\"stubble\" also conains class \"Bumble\", we will not know which namespace to
+apply to instances of class \"Bumble\".  But this is not an ambiguity if there
+is a \"using namespace\" directive for only one of those classes.  That is why
+we do the ambiguity check only for namespaces referenced by \"using namespace\"
+directives.
+
+This function returns true if such an ambiguity exists."
+  (let (
+        (name)
+        (mbeg)
+        (bol)
+        (not-comment)
+        (x)
+        (z)
+        (uc 0)
+        (clist)
+        (cl)
+        (ns)
+        (classes)
+        (class)
+        (listc)
+        (blocked)
+        )
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward using nil t)
+        (setq name (match-string 1))
+        (setq mbeg (match-beginning 0))
+        (setq bol (line-beginning-position))
+        (save-match-data
+          (save-excursion
+            (setq not-comment t)
+            (goto-char bol)
+            (when (search-forward "//" mbeg t)
+              (setq not-comment nil)
+              )
+            )
+          )
+        (when not-comment
+          (when top-qual
+            (when (string-match top-qual name)
+              (setq name (match-string 1 name))))
+          (setq x (assoc name class-list))
+          )
+        (when x
+          (setq clist (cons x clist))
+          )
+        )
+      )
+    (setq cl clist)
+    (while cl
+      (setq x (car cl))
+      (setq ns (car x))
+      (setq classes (cdr x))
+      (while classes
+        (setq class (car classes))
+        (setq x (cons class ns))
+        (if (not listc)
+            (setq listc (cons x listc))
+          (setq z (assoc class listc))
+          (if (not z)
+              (setq listc (cons x listc))
+            (princ (format "class %s in namespace %s conflicts with class %s in namespace %s\n"
+                           class ns (car z) (cdr z)) gb)
+            (setq blocked t)
+            )
+          )
+        (setq classes (cdr classes))
+        )
+      (setq cl (cdr cl))
+      )
+    blocked
+    ))
+
 
 
 

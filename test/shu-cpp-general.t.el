@@ -1625,4 +1625,37 @@ This is most likely the name of an include file and not the name of a class."
     (should (= 6 count))
     ))
 
+
+
+;;
+;;  shu-test-shu-cpp-rmv-using-5
+;;
+(ert-deftest shu-test-shu-cpp-rmv-using-5 ()
+  "Doc string."
+  (let* ((data
+          (concat
+           "#include <something.h>\n"
+           "using namespace WhammoCorp::std;\n"
+           "using namespace bsl;\n"
+           "   string    x;\n"
+           "   set<int>  y;\n"
+           "   vector<string>   q;\n"
+           "   z->set();\n"
+           "// vector<string> \n"))
+         (classes
+          (list
+           (cons "std"  (list "string" "set" "map" "vector"))
+           (cons "bsl"  (list "string" "set"))))
+         (top-name "WhammoCorp")
+         (expected data)
+         (actual)
+         (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-rmv-using classes top-name))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    (should (= 0 count))
+    ))
+
 ;;; shu-cpp-general.t.el ends here
