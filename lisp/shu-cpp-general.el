@@ -1806,8 +1806,7 @@ of \"WhammoCorp\", then the following line:
 would be ingterpreted as though it had been written:
 
      using namespace world;"
-  (let* (
-         (gb-name "**shu-chgs**")
+  (let* ((gb-name "**shu-chgs**")
          (gb (get-buffer-create gb-name))
          (using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
          (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
@@ -1827,8 +1826,7 @@ would be ingterpreted as though it had been written:
     (if (shu-cpp-rmv-blocked class-list using top-qual gb)
         (progn
           (ding)
-          (message "Class ambiguity prevents change.  See buffer %s" gb-name)
-          )
+          (message "Class ambiguity prevents change.  See buffer %s" gb-name))
       (goto-char (point-min))
       (while (re-search-forward using nil t)
         (setq name (match-string 1))
@@ -1854,13 +1852,11 @@ would be ingterpreted as though it had been written:
             (setq classes (cdr x))
             (save-excursion
               (setq ct (shu-cpp-qualify-classes classes namespace gb)))
-            (setq count (+ count ct))))
-        )
+            (setq count (+ count ct)))))
       (goto-char (point-min))
       (when (not (= 0 uc))
         (setq unk (format " %d unknown namespaces. " uc)))
-      (message "Replaced %d occurrences.%s  See buffer **chgs**" count unk)
-      )
+      (message "Replaced %d occurrences.%s  See buffer **chgs**" count unk))
     count
     ))
 
@@ -1887,8 +1883,7 @@ we do the ambiguity check only for namespaces referenced by \"using namespace\"
 directives.
 
 This function returns true if such an ambiguity exists."
-  (let (
-        (name)
+  (let ((name)
         (mbeg)
         (bol)
         (not-comment)
@@ -1901,8 +1896,7 @@ This function returns true if such an ambiguity exists."
         (classes)
         (class)
         (listc)
-        (blocked)
-        )
+        (blocked))
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward using nil t)
@@ -1914,21 +1908,14 @@ This function returns true if such an ambiguity exists."
             (setq not-comment t)
             (goto-char bol)
             (when (search-forward "//" mbeg t)
-              (setq not-comment nil)
-              )
-            )
-          )
+              (setq not-comment nil))))
         (when not-comment
           (when top-qual
             (when (string-match top-qual name)
               (setq name (match-string 1 name))))
-          (setq x (assoc name class-list))
-          )
+          (setq x (assoc name class-list)))
         (when x
-          (setq clist (cons x clist))
-          )
-        )
-      )
+          (setq clist (cons x clist)))))
     (setq cl clist)
     (while cl
       (setq x (car cl))
@@ -1944,13 +1931,10 @@ This function returns true if such an ambiguity exists."
               (setq listc (cons x listc))
             (princ (format "class %s in namespace %s conflicts with class %s in namespace %s\n"
                            class ns (car z) (cdr z)) gb)
-            (setq blocked t)
-            )
-          )
+            (setq blocked t)))
         (setq classes (cdr classes))
         )
-      (setq cl (cdr cl))
-      )
+      (setq cl (cdr cl)))
     blocked
     ))
 
