@@ -1913,9 +1913,9 @@ This function returns true if such an ambiguity exists."
           (when top-qual
             (when (string-match top-qual name)
               (setq name (match-string 1 name))))
-          (setq x (assoc name class-list)))
+          (setq x (assoc name class-list))
         (when x
-          (setq clist (cons x clist)))))
+          (setq clist (cons x clist))))))
     (setq cl clist)
     (while cl
       (setq x (car cl))
@@ -1932,8 +1932,7 @@ This function returns true if such an ambiguity exists."
             (princ (format "class %s in namespace %s conflicts with class %s in namespace %s\n"
                            class ns (car z) (cdr z)) gb)
             (setq blocked t)))
-        (setq classes (cdr classes))
-        )
+        (setq classes (cdr classes)))
       (setq cl (cdr cl)))
     blocked
     ))

@@ -15,3 +15,7 @@ Things that I would like to do someday ...
   namespace to a class and does not want to do that to a class that already has a
   namespace.  But in the case of class name replacement, we do want to replace
   qualified names.
+
+- 16 Jan 2019 - shu-cpp-rmv-using will detect a class conflict if the same namespace
+  is named twice, i.e. "using namespace std" twice in same file.  Need to filter
+  duplicates before doing conflict checks.
