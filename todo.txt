@@ -19,3 +19,10 @@ Things that I would like to do someday ...
 - 16 Jan 2019 - shu-cpp-rmv-using will detect a class conflict if the same namespace
   is named twice, i.e. "using namespace std" twice in same file.  Need to filter
   duplicates before doing conflict checks.
+
+- 16 Jan 2019 - shu-qualify-class name should put all of the classes into a single
+  regexp.  That way you can do an entire file in one pass.  You find a match in the
+  class name, look up its associated namespace, and then do the qulification.  So
+  instead of one iteration per class or one iteration per namespace, you can do the
+  entire thing in one iteration.  Use the logic from shu-cpp-rmv-blocked to build a
+  reverse index of class to namespace.
