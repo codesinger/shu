@@ -38,21 +38,23 @@ which they can be pasted into the appropriate place.
 
 ## Directories ##
 
-This repository contains five subdirectories.
+This repository contains six subdirectories.
 
  1. **lisp** contains the source code of the package
 
  2. **doc** contains the detailed documentation for all of the functions, constants,
     variables, etc.
 
- 2. **test** contains a set of unit tests for some, but not all, of the code in the
+ 3. **test** contains a set of unit tests for some, but not all, of the code in the
    `lisp` directory.
 
- 3. **personal** contains personal files that I use with emacs.  These are not part
+ 4. **personal** contains personal files that I use with emacs.  These are not part
     of the `shu` package.
 
- 4. **usr** conatains files that are normally modified or replaced by users of this
+ 5. **usr** contains files that are normally modified or replaced by users of this
    package.
+
+ 6. **exp** contains experimental code that may or may not be useful in the future.
 
 ## External names ##
 
@@ -60,7 +62,7 @@ All of the externally visible names in these packages (functions macros, constan
 etc.) begin with the prefix `shu-`.  This keeps them from interfering with names
 that are part of emacs or part of other packages.  But it also makes them a bit
 cumbersome to type.  Each lisp file contains a function that will create a short
-alias for each function name.  THis is usually the original function name with the
+alias for each function name.  This is usually the original function name with the
 `shu-` prefix removed.
 
 
@@ -77,3 +79,7 @@ See the files `shu-manual.md` `and shu-manual.pdf` in the `doc` directory.
 
 
 <https://github.com/bloomberg/bde/wiki/Introduction-to-BDE-Coding-Standards>
+
+<!--
+LocalWords:  Shu NY detaileddescription IDs doc shu usr exp md pdf BDE
+-->
