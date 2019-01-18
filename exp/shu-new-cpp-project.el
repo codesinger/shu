@@ -28,8 +28,8 @@
 
 ;;; Code:
 
-(requiree 'shu-cpp-project)
-(require 'shu-base)
+(require 'ert)
+(require 'shu-cpp-general)
 
 
 
@@ -109,11 +109,12 @@ then the returned list will contain
 
 
 ;;
-;;  shu-test-shu-cpp-project-collapse-list-
+;;  shu-test-shu-cpp-project-collapse-list-1
 ;;
-(ert-deftest shu-test-shu-cpp-project-collapse-list- ()
+(ert-deftest shu-test-shu-cpp-project-collapse-list-1 ()
   "Doc string."
   (let (
+        (gb (get-buffer-create "**boo**"))
         (data
          (list
           (cons "xxx_stumble.h"   "/foo/bar/xxx_stumble.h")
@@ -122,16 +123,19 @@ then the returned list will contain
           ))
         (expected
          (list
-          (cons "xxx_mumble.h"    (list "/foo/bar/xxx_mumble.h"))
-          (cons "xxx_stumble.h"   (list "/boo/baz/xxx_stumble.h"
-                                        "/foo/bar/xxx_stumble.h"))
+          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
+          (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
+                                              "/foo/bar/xxx_stumble.h")))
           ))
         (actual)
         )
     (setq actual (shu-cpp-project-collapse-list data))
+    (princ "\nexpected:\n" gb) (princ expected gb) (princ "\n" gb)
+    (princ "\nactual:\n" gb) (princ actual gb) (princ "\n" gb)
     (should actual)
     (should (listp actual))
     (should (equal expected actual))
+
 
     ))
 
