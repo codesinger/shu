@@ -107,12 +107,48 @@ then the returned list will contain
     ))
 
 
+;;
+;;  shu-cpp-project-invert-list
+;;
+(defun shu-cpp-project-invert-list (proj-list)
+  "PROJ-LIST is an alist in which the cdr of each item is the unqualified file name
+and the car of each item is the list of fully qualified file names to which
+the unqualified name refers.  The returned output is a single list of fully
+qualified file names."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (plist proj-list)
+        (file-list)
+        (item)
+        (flist)
+        (full-name)
+        (full-name-list)
+        (debug-on-error t)
+        )
+    (while plist
+      (setq item (car plist))
+      (princ "\nitem:\n" gb) (princ item gb) (princ "\n" gb)
+      (setq flist (cdr item))
+      (princ "\nflist:\n" gb) (princ flist gb) (princ "\n" gb)
+      (setq full-name-list (car flist))
+      (princ "\nfull-name-list:\n" gb) (princ full-name-list gb) (princ "\n" gb)
+      (while full-name-list
+        (setq full-name (car full-name-list))
+        (setq file-list (cons full-name file-list))
+        (princ "\nfile-list:\n" gb) (princ file-list gb) (princ "\n" gb)
+        (setq full-name-list (cdr full-name-list))
+        )
+      (setq plist (cdr plist))
+      )
+    (sort file-list 'string<)
+    ))
+
+
 
 ;;
 ;;  shu-test-shu-cpp-project-collapse-list-1
 ;;
 (ert-deftest shu-test-shu-cpp-project-collapse-list-1 ()
-  "Doc string."
   (let (
         (gb (get-buffer-create "**boo**"))
         (data
@@ -137,6 +173,37 @@ then the returned list will contain
     (should (equal expected actual))
 
 
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-project-invert-list-1
+;;
+(ert-deftest shu-test-shu-cpp-project-invert-list-1 ()
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (data
+         (list
+          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
+          (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
+                                              "/foo/bar/xxx_stumble.h")))
+          ))
+        (expected
+         (list
+          "/boo/baz/xxx_stumble.h"
+          "/foo/bar/xxx_mumble.h"
+          "/foo/bar/xxx_stumble.h"
+          ))
+        (actual)
+        )
+    (princ "\n\nexpected:\n" gb) (princ expected gb) (princ "\n" gb)
+    (setq actual (shu-cpp-project-invert-list data))
+    (should actual)
+    (princ "\n\nactual:\n" gb) (princ actual gb) (princ "\n" gb)
+    (should (listp actual))
+    (should (equal actual expected))
     ))
 
 
