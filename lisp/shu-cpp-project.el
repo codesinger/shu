@@ -399,7 +399,7 @@ is wanted."
             (setq limit nil))))
                                         ; Now have all properties for current name
       (when (> (length full-name-list) 1)
-        (sort full-name-list 'string<))
+        (setq full-name-list (sort full-name-list 'string<)))
       (setq item (cons file-name (list full-name-list)))
       (setq shu-cpp-class-list (cons item shu-cpp-class-list))
       (setq extension (file-name-extension file-name))

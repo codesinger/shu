@@ -97,7 +97,7 @@ then the returned list will contain
       (when (> (length full-name-list) 1)
         (setq full-name-list (delete-dups full-name-list))
         (when (> (length full-name-list) 1)
-          (sort full-name-list 'string<)
+          (setq full-name-list (sort full-name-list 'string<))
           )
         )
       (setq item (cons file-name (list full-name-list)))
