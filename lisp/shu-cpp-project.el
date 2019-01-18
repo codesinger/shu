@@ -55,7 +55,7 @@ shu-add-cpp-h-extensions.")
 (defvar shu-cpp-class-list nil
   "This is an alist whose keys are unqualified file names and whose
 values contain a list of the fully qualified files with the same
-name.")
+unqualified name.")
 
 (defvar shu-cpp-found-extensions (list)
   "This is a list of all of the file extensions found in the current project.  While
@@ -315,6 +315,10 @@ appropriate subdirectory."
         (setq key-list (append key-list (shu-add-cpp-package-line dir-name)))
         (setq tlist (cdr tlist)))
       ;;
+      ;;  key-list is now an a-list. In each entry, the car is the short
+      ;;  Unqualified name and the cdr is the fully qualified name.
+      ;;  See the doc-string for shu-cpp-subdir-for-package.
+      ;;
       ;;  Take all of the files we found and put the list of file names
       ;;  in shu-project-file-list to be used for project global changes.
       ;;
@@ -334,7 +338,15 @@ appropriate subdirectory."
 ;;  shu-cpp-finish-project
 ;;
 (defun shu-cpp-finish-project (&optional key-list)
-  "Finish constructing a C project from a user file list."
+  "Finish constructing a C project from a user file list.  The input is
+KEY-LIST, which is an a-list.  The cdr of each entry is the short (unqualified)
+file name.  The cdr of each entry is the fully qualified name.  This alist may
+have duplicate short names.  This function produces a new list.  The car of each
+item is still the short (unqualified) file name.  The cdr is a list of all of
+the fully qualified file names to which the short name maps.  If a user selects
+a file that has only one fully qualified file name, we open the file.  But if it
+has more than one fully qualified file name, we have to ask the user which one
+is wanted."
   (let ((ilist)
         (c1)
         (file-name)
