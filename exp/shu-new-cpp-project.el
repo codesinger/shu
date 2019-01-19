@@ -85,7 +85,7 @@ number of h files, and the number of duplicate names found in the list."
 ;;  shu-cpp-project-collapse-list
 ;;
 (defun shu-cpp-project-collapse-list (key-list)
-  "Input is an alist in which the cdr of each item is the unqualified file name
+  "KEY-LIST is an alist in which the cdr of each item is the unqualified file name
 and the car of each item is the fully qualified file name, including the path to
 the file.  The output is a different alist in which the car of each item is the
 unqualified file name and the cdr of each item is the list of fully qualified
@@ -101,8 +101,7 @@ then the returned list will contain
 
     (\"xxx_mumble.h\" . \"/foo/bar/xxx_mumble.h\")
     (\"xxx_stumble.h . \"/foo/bar/xxx_stumble..h\" \"/boo/baz/xxx_stumble..h\")"
-  (let (
-        (ilist)
+  (let ((ilist)
         (c1)
         (file-name)
         (full-name)
@@ -110,8 +109,7 @@ then the returned list will contain
         (limit)
         (nname)
         (item)
-        (rlist)
-        )
+        (rlist))
     (setq ilist (sort key-list
                       (lambda(obj1 obj2)
                         (string< (car obj1) (car obj2)))))
@@ -143,12 +141,9 @@ then the returned list will contain
       (when (> (length full-name-list) 1)
         (setq full-name-list (delete-dups full-name-list))
         (when (> (length full-name-list) 1)
-          (setq full-name-list (sort full-name-list 'string<))
-          )
-        )
+          (setq full-name-list (sort full-name-list 'string<))))
       (setq item (cons file-name (list full-name-list)))
-      (setq rlist (cons item rlist))
-      )
+      (setq rlist (cons item rlist)))
     (nreverse rlist)
     ))
 
@@ -161,25 +156,18 @@ then the returned list will contain
 and the car of each item is the list of fully qualified file names to which
 the unqualified name refers.  The returned output is a single list of fully
 qualified file names."
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (plist proj-list)
+  (let ((plist proj-list)
         (file-list)
         (file-name)
         (full-name)
-        (full-name-list)
-        (debug-on-error t)
-        )
+        (full-name-list))
     (while plist
       (shu-project-get-file-info plist file-name full-name-list)
       (while full-name-list
         (setq full-name (car full-name-list))
         (setq file-list (cons full-name file-list))
-        (princ "\nfile-list:\n" gb) (princ file-list gb) (princ "\n" gb)
-        (setq full-name-list (cdr full-name-list))
-        )
-      (setq plist (cdr plist))
-      )
+        (setq full-name-list (cdr full-name-list)))
+      (setq plist (cdr plist)))
     (sort file-list 'string<)
     ))
 
@@ -284,8 +272,8 @@ Return a cons cell of the form (prefix . short-name)"
       (setq pfx (car nlist))
       (setq nlist (cdr nlist))
       (when (= 1 (length pfx))
-          (setq pfx (concat pfx "_" (car nlist)))
-          (setq nlist (cdr nlist)))
+        (setq pfx (concat pfx "_" (car nlist)))
+        (setq nlist (cdr nlist)))
       (setq short (car nlist))
       (setq nlist (cdr nlist))
       (while nlist
@@ -298,21 +286,73 @@ Return a cons cell of the form (prefix . short-name)"
 
 
 ;;
+;;  shu-project-make-short-key-list
+;;
+(defun shu-project-make-short-key-list (key-list)
+  "KEY-LIST is an alist in which the cdr of each item is the unqualified file
+name and the car of each item is the fully qualified file name, including the
+path to the file.  This function creates two lists.  One is an alist of all of
+the file prefixes.  That car of each item is the prefix.  The cdr of each item
+is the number of times that prefix was found.  The second is a list similar to
+KEY-LIST with all of the file names changed to their equivalent short names.  If
+the long and short names are the same, then that item is omitted from the new
+list of short names.
+
+Return is a cons cell whose car is the prefix list and whose cdr is the short
+name list."
+  (let ((kl (sort key-list (lambda(obj1 obj2)
+                             (string< (car obj1) (car obj2)))))
+        (file-name)
+        (full-name-list)
+        (ps)
+        (prefix)
+        (short-name)
+        (short-keys)
+        (item)
+        (short-list)
+        (prefix-list)
+        (x)
+        (count))
+    (while kl
+      (shu-project-get-file-info kl file-name full-name-list)
+      (setq ps (shu-project-split-file-name file-name))
+      (setq prefix (car ps))
+      (setq short-name (cdr ps))
+      (when (not (string= short-name file-name))
+        (setq item (cons short-name (list full-name-list)))
+        (setq short-list (cons item short-list))
+        (setq item (cons prefix 1))
+        (if (not prefix-list)
+            (setq prefix-list (cons item prefix-list))
+          (setq x (assoc prefix prefix-list))
+          (if (not x)
+              (setq prefix-list (cons item prefix-list))
+            (setq count (cdr x))
+            (setq count (1+ count))
+            (setcdr x count))))
+      (setq kl (cdr kl)))
+    (setq short-list (sort short-list (lambda(obj1 obj2)
+                                        (string< (car obj1) (car obj2)))))
+    (setq prefix-list (sort prefix-list (lambda(obj1 obj2)
+                                          (string< (car obj1) (car obj2)))))
+    (cons prefix-list short-list)
+    ))
+
+
+
+;;
 ;;  shu-internal-list-c-project
 ;;
 (defun shu-internal-list-c-project (proj-list)
   "Insert into the current buffer the names of all of the code files in the
 project whose files are in PROJ-LIST."
   (let
-      (
-       (plist (shu-cpp-project-invert-list proj-list))
-       (full-name)
-       )
+      ((plist (shu-cpp-project-invert-list proj-list))
+       (full-name))
     (while plist
       (setq full-name (car plist))
       (insert (concat full-name "\n"))
-      (setq plist (cdr plist))
-      )
+      (setq plist (cdr plist)))
     ))
 
 

@@ -40,7 +40,6 @@
 ;;
 (ert-deftest shu-test-shu-cpp-project-collapse-list-1 ()
   (let (
-        (gb (get-buffer-create "**boo**"))
         (data
          (list
           (cons "xxx_stumble.h"   "/foo/bar/xxx_stumble.h")
@@ -53,8 +52,6 @@
                                               "/foo/bar/xxx_stumble.h")))))
         (actual))
     (setq actual (shu-cpp-project-collapse-list data))
-    (princ "\nexpected:\n" gb) (princ expected gb) (princ "\n" gb)
-    (princ "\nactual:\n" gb) (princ actual gb) (princ "\n" gb)
     (should actual)
     (should (listp actual))
     (should (equal expected actual))
@@ -70,7 +67,6 @@
 (ert-deftest shu-test-shu-cpp-project-invert-list-1 ()
   "Doc string."
   (let (
-        (gb (get-buffer-create "**boo**"))
         (data
          (list
           (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
@@ -85,10 +81,8 @@
           ))
         (actual)
         )
-    (princ "\n\nexpected:\n" gb) (princ expected gb) (princ "\n" gb)
     (setq actual (shu-cpp-project-invert-list data))
     (should actual)
-    (princ "\n\nactual:\n" gb) (princ actual gb) (princ "\n" gb)
     (should (listp actual))
     (should (equal actual expected))
     ))
@@ -275,6 +269,84 @@
     (setq actual-short-name (cdr ps))
     (should (string= expected-prefix actual-prefix))
     (should (string= expected-short-name actual-short-name))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-project-make-short-key-list-1
+;;
+(ert-deftest shu-test-shu-project-make-short-key-list-1 ()
+  (let ((data
+         (list
+          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
+          (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
+                                              "/foo/bar/xxx_stumble.h")))))
+        (expected-shorts
+         (list
+          (cons "mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
+          (cons "stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
+                                              "/foo/bar/xxx_stumble.h")))))
+        (expected-prefixes
+         (list
+          (cons "xxx" 2)))
+        (ps)
+        (actual-shorts)
+        (actual-prefixes))
+    (setq ps (shu-project-make-short-key-list data))
+    (should ps)
+    (should (consp ps))
+    (setq actual-prefixes (car ps))
+    (setq actual-shorts (cdr ps))
+    (should actual-prefixes)
+    (should (listp actual-prefixes))
+    (should (listp actual-prefixes))
+    (should (equal expected-prefixes actual-prefixes))
+    (should (equal expected-shorts actual-shorts))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-project-make-short-key-list-2
+;;
+(ert-deftest shu-test-shu-project-make-short-key-list-2 ()
+  (let ((data
+         (list
+          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
+          (cons "xxx_mumble.cpp"  (list (list "/foo/bar/xxx_mumble.cpp")))
+          (cons "zzz_stumble.h"   (list (list "/boo/baz/zzz_stumble.h"
+                                              "/foo/bar/zzz_stumble.h")))
+          (cons "zzz_stumble.cpp" (list (list "/boo/baz/zzz_stumble.cpp"
+                                              "/foo/bar/zzz_stumble.cpp")))))
+        (expected-shorts
+         (list
+          (cons "mumble.cpp"      (list (list "/foo/bar/xxx_mumble.cpp")))
+          (cons "mumble.h"        (list (list "/foo/bar/xxx_mumble.h")))
+          (cons "stumble.cpp"     (list (list "/boo/baz/zzz_stumble.cpp"
+                                              "/foo/bar/zzz_stumble.cpp")))
+          (cons "stumble.h"       (list (list "/boo/baz/zzz_stumble.h"
+                                              "/foo/bar/zzz_stumble.h")))))
+        (expected-prefixes
+         (list
+          (cons "xxx" 2)
+          (cons "zzz" 2)))
+        (ps)
+        (actual-shorts)
+        (actual-prefixes))
+    (setq ps (shu-project-make-short-key-list data))
+    (should ps)
+    (should (consp ps))
+    (setq actual-prefixes (car ps))
+    (setq actual-shorts (cdr ps))
+    (should actual-prefixes)
+    (should (listp actual-prefixes))
+    (should (listp actual-prefixes))
+    (should (equal expected-prefixes actual-prefixes))
+    (should (equal expected-shorts actual-shorts))
     ))
 
 
