@@ -300,8 +300,7 @@ list of short names.
 
 Return is a cons cell whose car is the prefix list and whose cdr is the short
 name list."
-  (let ((kl (sort key-list (lambda(obj1 obj2)
-                             (string< (car obj1) (car obj2)))))
+  (let ((kl key-list)
         (file-name)
         (full-name-list)
         (ps)
