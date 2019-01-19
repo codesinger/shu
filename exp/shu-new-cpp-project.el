@@ -34,6 +34,52 @@
 
 
 
+;;
+;;  shu-project-get-file-info
+;;
+(defmacro shu-project-get-file-info (plist file-name full-name-list)
+  "Extract the file information from one entry in shu-cpp-class-list."
+  (let ((titem (make-symbol "item"))
+        (tflist (make-symbol "flist")))
+    `(let ((,titem)
+           (,tflist))
+       (setq ,titem (car ,plist))
+       (setq ,file-name (car ,titem))
+       (setq ,tflist (cdr ,titem))
+       (setq ,full-name-list (car ,tflist)))
+    ))
+
+
+
+;;
+;;  shu-cpp-project-get-list-counts
+;;
+(defun shu-cpp-project-get-list-counts (proj-list)
+  "PROJ-LIST is an alist whose structure is identical to that of SHU-CPP-CLASS-LIST.
+This function returns a list with three items on it: the number of c / cpp files, the
+number of h files, and the number of duplicate names found in the list."
+  (let ((plist proj-list)
+        (c-count   0)
+        (h-count   0)
+        (dup-count 0)
+        (item)
+        (file-name)
+        (extension)
+        (flist)
+        (full-name-list))
+    (while plist
+      (shu-project-get-file-info plist file-name full-name-list)
+      (setq extension (file-name-extension file-name))
+      (if (member extension shu-cpp-c-extensions)
+          (setq c-count (+ c-count (length full-name-list)))
+        (setq h-count (+ h-count (length full-name-list))))
+      (when (> (length full-name-list) 1)
+        (setq dup-count (1+ dup-count)))
+      (setq plist (cdr plist)))
+    (list c-count h-count dup-count)
+    ))
+
+
 
 ;;
 ;;  shu-cpp-project-collapse-list
@@ -119,19 +165,13 @@ qualified file names."
         (gb (get-buffer-create "**boo**"))
         (plist proj-list)
         (file-list)
-        (item)
-        (flist)
+        (file-name)
         (full-name)
         (full-name-list)
         (debug-on-error t)
         )
     (while plist
-      (setq item (car plist))
-      (princ "\nitem:\n" gb) (princ item gb) (princ "\n" gb)
-      (setq flist (cdr item))
-      (princ "\nflist:\n" gb) (princ flist gb) (princ "\n" gb)
-      (setq full-name-list (car flist))
-      (princ "\nfull-name-list:\n" gb) (princ full-name-list gb) (princ "\n" gb)
+      (shu-project-get-file-info plist file-name full-name-list)
       (while full-name-list
         (setq full-name (car full-name-list))
         (setq file-list (cons full-name file-list))
@@ -141,6 +181,80 @@ qualified file names."
       (setq plist (cdr plist))
       )
     (sort file-list 'string<)
+    ))
+
+
+;;
+;;  shu-list-c-project
+;;
+(defun shu-list-c-project ()
+  "Insert into the current buffer the names of all of the code files in the
+current project."
+  (interactive)
+  (if (not shu-cpp-class-list)
+      (progn
+        (message "There is no project to list.")
+        (ding))
+    (shu-internal-list-c-project shu-cpp-class-list))
+  )
+
+
+;;
+;;  shu-cpp-finish-project
+;;
+(defun shu-cpp-finish-project (&optional key-list)
+  "Finish constructing a C project from a user file list.  The input is
+KEY-LIST, which is an a-list.  The cdr of each entry is the short (unqualified)
+file name.  The cdr of each entry is the fully qualified name.  This alist may
+have duplicate short names.  This function produces a new list.  The car of each
+item is still the short (unqualified) file name.  The cdr is a list of all of
+the fully qualified file names to which the short name maps.  If a user selects
+a file that has only one fully qualified file name, we open the file.  But if it
+has more than one fully qualified file name, we have to ask the user which one
+is wanted."
+  (let ((counts)
+        (c-count         0)
+        (h-count         0)
+        (dup-count       0)
+        (name-name       "name")
+        (occur-name      "occurs")
+        (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name)))
+    (setq shu-cpp-class-list (shu-cpp-project-collapse-list key-list))
+    (setq counts (shu-cpp-project-get-list-counts shu-cpp-class-list))
+    (setq c-count (car counts))
+    (setq counts (cdr counts))
+    (setq h-count (car counts))
+    (setq dup-count (cadr counts))
+    (setq shu-cpp-project-time (current-time))
+    (setq shu-cpp-c-file-count c-count)
+    (setq shu-cpp-h-file-count h-count)
+    (when (> dup-count 1)
+      (setq name-name "names")
+      (setq occur-name "occur"))
+    (if (= dup-count 0)
+        (message "%d C files, %d H files." c-count h-count)
+      (message "%d C files, %d H files.  %d %s %s multiple times."
+               c-count h-count dup-count name-name occur-name))
+    ))
+
+
+
+;;
+;;  shu-internal-list-c-project
+;;
+(defun shu-internal-list-c-project (proj-list)
+  "Insert into the current buffer the names of all of the code files in the
+project whose files are in PROJ-LIST."
+  (let
+      (
+       (plist (shu-cpp-project-invert-list proj-list))
+       (full-name)
+       )
+    (while plist
+      (setq full-name (car plist))
+      (insert (concat full-name "\n"))
+      (setq plist (cdr plist))
+      )
     ))
 
 
@@ -155,23 +269,20 @@ qualified file names."
          (list
           (cons "xxx_stumble.h"   "/foo/bar/xxx_stumble.h")
           (cons "xxx_mumble.h"    "/foo/bar/xxx_mumble.h")
-          (cons "xxx_stumble.h"   "/boo/baz/xxx_stumble.h")
-          ))
+          (cons "xxx_stumble.h"   "/boo/baz/xxx_stumble.h")))
         (expected
          (list
           (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
           (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
-                                              "/foo/bar/xxx_stumble.h")))
-          ))
-        (actual)
-        )
+                                              "/foo/bar/xxx_stumble.h")))))
+        (actual))
     (setq actual (shu-cpp-project-collapse-list data))
     (princ "\nexpected:\n" gb) (princ expected gb) (princ "\n" gb)
     (princ "\nactual:\n" gb) (princ actual gb) (princ "\n" gb)
     (should actual)
     (should (listp actual))
     (should (equal expected actual))
-
+    (shu-cpp-project-get-list-counts expected)
 
     ))
 
@@ -204,6 +315,64 @@ qualified file names."
     (princ "\n\nactual:\n" gb) (princ actual gb) (princ "\n" gb)
     (should (listp actual))
     (should (equal actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-project-get-list-counts-1
+;;
+(ert-deftest shu-test-shu-cpp-project-get-list-counts-1 ()
+  "Doc string."
+  (let (
+        (data
+         (list
+          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
+          (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
+                                              "/foo/bar/xxx_stumble.h")))))
+        (counts)
+        (c-count -1)
+        (h-count -1)
+        (dup-count -1)
+        )
+    (setq counts (shu-cpp-project-get-list-counts data))
+    (setq c-count (car counts))
+    (setq counts (cdr counts))
+    (setq h-count (car counts))
+    (setq dup-count (cadr counts))
+    (should (= 0 c-count))
+    (should (= 3 h-count))
+    (should (= 1 dup-count))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-project-get-list-counts-2
+;;
+(ert-deftest shu-test-shu-cpp-project-get-list-counts-2 ()
+  "Doc string."
+  (let (
+        (data
+         (list
+          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
+          (cons "xxx_mumble.cpp"  (list (list "/foo/bar/xxx_mumble.cpp")))
+          (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
+                                              "/foo/bar/xxx_stumble.h")))
+          (cons "xxx_stumble.cpp" (list (list "/boo/baz/xxx_stumble.cpp"
+                                              "/foo/bar/xxx_stumble.cpp")))))
+        (counts)
+        (c-count -1)
+        (h-count -1)
+        (dup-count -1))
+    (setq counts (shu-cpp-project-get-list-counts data))
+    (setq c-count (car counts))
+    (setq counts (cdr counts))
+    (setq h-count (car counts))
+    (setq dup-count (cadr counts))
+    (should (= 3 c-count))
+    (should (= 3 h-count))
+    (should (= 2 dup-count))
     ))
 
 

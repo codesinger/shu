@@ -26,3 +26,14 @@ Things that I would like to do someday ...
   instead of one iteration per class or one iteration per namespace, you can do the
   entire thing in one iteration.  Use the logic from shu-cpp-rmv-blocked to build a
   reverse index of class to namespace.
+
+- 18 Jan 2019 - In shu-internal-replace-class-name, if the class name is either
+  surrounded by parens foo(std::time) or followed by an equal sign
+  "int std::time = ", it is unlikely to be a class name.
+
+  Here is the hard one.  If it is preceded by something that looks like a class
+  name:
+
+  bdlt::Datetime  time;
+
+  "time" is very unlikely to be a class name.

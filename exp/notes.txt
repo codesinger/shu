@@ -1,0 +1,59 @@
+
+
+In the current shu-project, shu-cpp-class-list is only used for the completing read
+of a file name.
+
+In the new shu-project, shu-cpp-class-list (or something like it) will also be used
+for list-c-project.
+
+So we need two versions of shu-cpp-class-list.  One of them only contains the actual
+file names and is used for list-c-project.  The other one contains both the actual
+file names and the short file names and is used for the completing read.
+
+
+Next steps.
+
+1. Write a function that creates a short name from a long name
+
+    Server.cpp         ==> server.cpp
+    abcdec_mumble.cpp  ==> mumble.cpp
+    s_server_thing.cpp ==> thing.cpp
+
+2. After renew-c-project generates its key list, call shu-cpp-project-collapse-list
+   and save the result for use by shu-list-project.
+
+   Then renew-c-project should generate a second key list in which all of the file
+   name keys have been transformed to short names.  If a short name is the same as
+   the non-short name, do not save the entry.
+
+   Then merge the two lists so that shu-cpp-finish-project can save the combined
+   result in shu-cpp-class-list for use by completing read.
+
+3. If we are using short names (some sort of defconst??), then do not put the prefix
+   in the prompt area for the completing read.
+
+To see if a file name contains an underscore
+
+   (let (
+        (underscore (regexp-quote "_"))
+        )
+   (when (string-match underscore file-name) ...)
+
+         or
+
+   (when (string-match-p underscore file-name) ...)
+
+The latter does not change the match data
+
+Something to ponder.  Do we want to go through all of the file names looking for a
+common prefix?  Or for a small number of them?
+
+
+OTHER STUFF:
+
+renew-c-project displays number of h files, c files, and dup names.
+
+Now that we can derive the counts from a project list, renew-c-project should
+display both the old and new counts if there is a former project.
+
+Add some more show functions to show things like short to long name mappings, etc.
