@@ -239,6 +239,64 @@ is wanted."
 
 
 
+
+;;
+;;  shu-project-split-file-name
+;;
+(defun shu-project-split-file-name (file-name)
+  "Split FILE-NAME into two parts.  The first part is the prefix and the second
+part is the short name.  The rules for splitting are as follows:
+
+If the name has no underscores, then the prefix is empty and the short name is
+the whole name.
+
+If the name has one underscore in it (e.g., \"abcdef_mumble.cpp\"), then the
+prefix is the part before the underscore (\"abcdef\") and the short name is all
+of the rest (\"mumble.cpp\").
+
+If the name has more than one underscore in it (e.g., \"x_abcdef_mumble.cpp\"),
+then we look as the length of the first part (\"x\").  If its length is one,
+then the prefix is the concatenation of the first two parts (\"x_abcdef\"), and
+the short name is the rest (\"mumble.cpp\").  If the length of the first part is
+not one (e.g., file name is \"lovely_looking_mumble.cpp\"), then the prefix is
+the first part (\"lovely\") and the short name is the rest
+(\"looking_mumble.cpp\").
+
+After the split, the short name is converted to all lower case.
+
+Return a cons cell of the form (prefix . short-name)"
+  (let ((underscore (regexp-quote "_"))
+        (pos -1)
+        (nlist)
+        (pfx "")
+        (np)
+        (short))
+    (setq nlist (split-string file-name underscore t))
+    (setq np (length nlist))
+    (cond
+     ((= 1 np) ;; No underscores in name
+      (setq pfx "")
+      (setq short file-name))
+     ((= 2 np) ;; One underscore in name
+      (setq pfx (car nlist))
+      (setq short (cadr nlist)))
+     (t        ;; At least two underscores in name
+      (setq pfx (car nlist))
+      (setq nlist (cdr nlist))
+      (when (= 1 (length pfx))
+          (setq pfx (concat pfx "_" (car nlist)))
+          (setq nlist (cdr nlist)))
+      (setq short (car nlist))
+      (setq nlist (cdr nlist))
+      (while nlist
+        (setq short (concat short "_" (car nlist)))
+        (setq nlist (cdr nlist)))))
+    (setq short (downcase short))
+    (cons pfx short)
+    ))
+
+
+
 ;;
 ;;  shu-internal-list-c-project
 ;;
@@ -255,124 +313,6 @@ project whose files are in PROJ-LIST."
       (insert (concat full-name "\n"))
       (setq plist (cdr plist))
       )
-    ))
-
-
-
-;;
-;;  shu-test-shu-cpp-project-collapse-list-1
-;;
-(ert-deftest shu-test-shu-cpp-project-collapse-list-1 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (data
-         (list
-          (cons "xxx_stumble.h"   "/foo/bar/xxx_stumble.h")
-          (cons "xxx_mumble.h"    "/foo/bar/xxx_mumble.h")
-          (cons "xxx_stumble.h"   "/boo/baz/xxx_stumble.h")))
-        (expected
-         (list
-          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
-          (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
-                                              "/foo/bar/xxx_stumble.h")))))
-        (actual))
-    (setq actual (shu-cpp-project-collapse-list data))
-    (princ "\nexpected:\n" gb) (princ expected gb) (princ "\n" gb)
-    (princ "\nactual:\n" gb) (princ actual gb) (princ "\n" gb)
-    (should actual)
-    (should (listp actual))
-    (should (equal expected actual))
-    (shu-cpp-project-get-list-counts expected)
-
-    ))
-
-
-
-;;
-;;  shu-test-shu-cpp-project-invert-list-1
-;;
-(ert-deftest shu-test-shu-cpp-project-invert-list-1 ()
-  "Doc string."
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (data
-         (list
-          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
-          (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
-                                              "/foo/bar/xxx_stumble.h")))
-          ))
-        (expected
-         (list
-          "/boo/baz/xxx_stumble.h"
-          "/foo/bar/xxx_mumble.h"
-          "/foo/bar/xxx_stumble.h"
-          ))
-        (actual)
-        )
-    (princ "\n\nexpected:\n" gb) (princ expected gb) (princ "\n" gb)
-    (setq actual (shu-cpp-project-invert-list data))
-    (should actual)
-    (princ "\n\nactual:\n" gb) (princ actual gb) (princ "\n" gb)
-    (should (listp actual))
-    (should (equal actual expected))
-    ))
-
-
-
-;;
-;;  shu-test-shu-cpp-project-get-list-counts-1
-;;
-(ert-deftest shu-test-shu-cpp-project-get-list-counts-1 ()
-  "Doc string."
-  (let (
-        (data
-         (list
-          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
-          (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
-                                              "/foo/bar/xxx_stumble.h")))))
-        (counts)
-        (c-count -1)
-        (h-count -1)
-        (dup-count -1)
-        )
-    (setq counts (shu-cpp-project-get-list-counts data))
-    (setq c-count (car counts))
-    (setq counts (cdr counts))
-    (setq h-count (car counts))
-    (setq dup-count (cadr counts))
-    (should (= 0 c-count))
-    (should (= 3 h-count))
-    (should (= 1 dup-count))
-    ))
-
-
-
-;;
-;;  shu-test-shu-cpp-project-get-list-counts-2
-;;
-(ert-deftest shu-test-shu-cpp-project-get-list-counts-2 ()
-  "Doc string."
-  (let (
-        (data
-         (list
-          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
-          (cons "xxx_mumble.cpp"  (list (list "/foo/bar/xxx_mumble.cpp")))
-          (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
-                                              "/foo/bar/xxx_stumble.h")))
-          (cons "xxx_stumble.cpp" (list (list "/boo/baz/xxx_stumble.cpp"
-                                              "/foo/bar/xxx_stumble.cpp")))))
-        (counts)
-        (c-count -1)
-        (h-count -1)
-        (dup-count -1))
-    (setq counts (shu-cpp-project-get-list-counts data))
-    (setq c-count (car counts))
-    (setq counts (cdr counts))
-    (setq h-count (car counts))
-    (setq dup-count (cadr counts))
-    (should (= 3 c-count))
-    (should (= 3 h-count))
-    (should (= 2 dup-count))
     ))
 
 
