@@ -30,6 +30,7 @@
 
 (require 'ert)
 (require 'shu-cpp-general)
+(require 'shu-cpp-project)
 
 
 
@@ -101,7 +102,8 @@ then the returned list will contain
 
     (\"xxx_mumble.h\" . \"/foo/bar/xxx_mumble.h\")
     (\"xxx_stumble.h . \"/foo/bar/xxx_stumble..h\" \"/boo/baz/xxx_stumble..h\")"
-  (let ((ilist)
+  (let ((klist (copy-tree key-list))
+        (ilist)
         (c1)
         (file-name)
         (full-name)
@@ -110,7 +112,7 @@ then the returned list will contain
         (nname)
         (item)
         (rlist))
-    (setq ilist (sort key-list
+    (setq ilist (sort klist
                       (lambda(obj1 obj2)
                         (string< (car obj1) (car obj2)))))
 
@@ -134,14 +136,20 @@ then the returned list will contain
           (setq c1 (car ilist))
           (setq nname (car c1))
           (setq full-name (cdr c1))
-          (if (equal file-name nname)     ; Name remains the same
-              (setq full-name-list (cons full-name full-name-list))
-            (setq limit nil))))
+          (if (string= file-name nname)     ; Name remains the same
+              (progn
+                (setq full-name-list (cons full-name full-name-list))
+                )
+            (setq limit nil))
+          )
+        )
                                         ; Now have all properties for current name
       (when (> (length full-name-list) 1)
         (setq full-name-list (delete-dups full-name-list))
-        (when (> (length full-name-list) 1)
-          (setq full-name-list (sort full-name-list 'string<))))
+;        (when (> (length full-name-list) 1)
+;          (setq full-name-list (sort full-name-list 'string<))
+;          )
+        )
       (setq item (cons file-name (list full-name-list)))
       (setq rlist (cons item rlist)))
     (nreverse rlist)
@@ -188,9 +196,71 @@ current project."
 
 
 ;;
+;;  shu-renew-c-project
+;;
+(defun shu-renew-c-project ()
+  "Renew a previously established project to pick up any new files."
+  (interactive)
+  (let ((dir-name)
+        (ilist)
+        (key-list)
+        (c1)
+        (file-name)
+        (full-name)
+        (extension)
+        (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
+        (tlist)
+        (ps)
+        (short-keys)
+        (all-keys)
+        (plist)
+        )
+    (setq shu-project-user-class-count 0)
+    (setq shu-project-file-list nil)
+    (setq tlist shu-cpp-project-list)
+    (if (not tlist)
+        (progn
+          (message "There is no project to renew.")
+          (ding))
+      (while tlist
+        (setq dir-name (car tlist))
+        (setq key-list (append key-list (shu-add-cpp-package-line dir-name)))
+        (setq tlist (cdr tlist)))
+      ;;
+      ;;  key-list is now an a-list. In each entry, the car is the short
+      ;;  Unqualified name and the cdr is the fully qualified name.
+      ;;  See the doc-string for shu-cpp-subdir-for-package.
+      ;;
+      ;;  Take all of the files we found and put the list of file names
+      ;;  in shu-project-file-list to be used for project global changes.
+      ;;
+      (setq ilist key-list)
+      (while ilist
+        (setq c1 (car ilist))
+        (setq file-name (car c1))
+        (setq full-name (cdr c1))
+        (setq extension (file-name-extension file-name))
+        (setq shu-project-file-list (cons full-name shu-project-file-list))
+        (setq shu-project-user-class-count (1+ shu-project-user-class-count))
+        (setq ilist (cdr ilist)))
+        (setq shu-cpp-class-list (shu-cpp-project-collapse-list key-list))
+      (setq shu-cpp-prefix-list nil)
+      (if (not shu-cpp-project-short-names)
+          (setq shu-cpp-completing-list shu-cpp-class-list)
+        (setq ps (shu-project-make-short-key-list key-list))
+        (setq shu-cpp-prefix-list (car ps))
+        (setq short-keys (cdr ps))
+        (setq all-keys (append key-list short-keys))
+        (setq shu-cpp-completing-list (shu-cpp-project-collapse-list all-keys))
+        (shu-cpp-finish-project))
+      )
+    ))
+
+
+;;
 ;;  shu-cpp-finish-project
 ;;
-(defun shu-cpp-finish-project (&optional key-list)
+(defun shu-cpp-finish-project ()
   "Finish constructing a C project from a user file list.  The input is
 KEY-LIST, which is an a-list.  The cdr of each entry is the short (unqualified)
 file name.  The cdr of each entry is the fully qualified name.  This alist may
@@ -206,8 +276,11 @@ is wanted."
         (dup-count       0)
         (name-name       "name")
         (occur-name      "occurs")
-        (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name)))
-    (setq shu-cpp-class-list (shu-cpp-project-collapse-list key-list))
+        (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
+        (plist)
+        (file-name)
+        (full-name-list)
+        )
     (setq counts (shu-cpp-project-get-list-counts shu-cpp-class-list))
     (setq c-count (car counts))
     (setq counts (cdr counts))
@@ -216,6 +289,14 @@ is wanted."
     (setq shu-cpp-project-time (current-time))
     (setq shu-cpp-c-file-count c-count)
     (setq shu-cpp-h-file-count h-count)
+    (setq plist shu-cpp-completing-list)
+    (while plist
+      (shu-project-get-file-info plist file-name full-name-list)
+      (princ (concat file-name ":\n      ") shu-cpp-buffer)
+     (princ full-name-list shu-cpp-buffer)
+     (princ "\n" shu-cpp-buffer)
+     (setq plist (cdr plist))
+     )
     (when (> dup-count 1)
       (setq name-name "names")
       (setq occur-name "occur"))
@@ -289,8 +370,8 @@ Return a cons cell of the form (prefix . short-name)"
 ;;  shu-project-make-short-key-list
 ;;
 (defun shu-project-make-short-key-list (key-list)
-  "KEY-LIST is an alist in which the cdr of each item is the unqualified file
-name and the car of each item is the fully qualified file name, including the
+  "KEY-LIST is an alist in which the car of each item is the unqualified file
+name and the cdr of each item is the fully qualified file name, including the
 path to the file.  This function creates two lists.  One is an alist of all of
 the file prefixes.  That car of each item is the prefix.  The cdr of each item
 is the number of times that prefix was found.  The second is a list similar to
@@ -300,7 +381,8 @@ list of short names.
 
 Return is a cons cell whose car is the prefix list and whose cdr is the short
 name list."
-  (let ((kl key-list)
+  (let (
+        (kl (copy-tree key-list))
         (file-name)
         (full-name-list)
         (ps)
@@ -313,12 +395,14 @@ name list."
         (x)
         (count))
     (while kl
-      (shu-project-get-file-info kl file-name full-name-list)
+      (setq item (car kl))
+      (setq file-name (car item))
+      (setq full-name-list (cdr item))
       (setq ps (shu-project-split-file-name file-name))
       (setq prefix (car ps))
       (setq short-name (cdr ps))
       (when (not (string= short-name file-name))
-        (setq item (cons short-name (list full-name-list)))
+        (setq item (cons short-name full-name-list))
         (setq short-list (cons item short-list))
         (setq item (cons prefix 1))
         (if (not prefix-list)
@@ -354,5 +438,76 @@ project whose files are in PROJ-LIST."
       (setq plist (cdr plist)))
     ))
 
+
+
+
+;;
+;;  shu-vh - Visit a c or h file in a project
+;;
+;;    Note: At some point there seemed to be a bug in
+;;          completing-read.  Even when require-match is t
+;;          <return> does not complete-and-exit, it exits
+;;          with the text in the minibuffer, which may or
+;;          may not match an entry in the table.
+;;          This is the reason for the while loop that
+;;          keeps reading until there is a match.
+;;
+(defun shu-internal-visit-project-file (look-for-target)
+  "Visit a c or h file in a project."
+  (let
+      ((key-list)
+       (file-to-seek)
+       (real-file-to-seek)
+       (tfile)
+       (invitation "Visit c or h file: ")
+       (completion-prefix)
+       (default-file-string))
+    (setq debug-on-error t)
+    (when shu-completion-is-directory
+      (setq completion-prefix (shu-cpp-directory-prefix)))
+    (when shu-cpp-completion-prefix
+      (setq completion-prefix shu-cpp-completion-prefix)
+      (when shu-cpp-project-short-names
+        (setq completion-prefix nil)
+      ))
+    (if (not shu-cpp-completing-list)
+        (progn
+          (message "No project files have been defined.")
+          (ding))
+      (if look-for-target                                        ;
+          (setq shu-default-file-to-seek (shu-find-default-cpp-name))
+        (setq shu-default-file-to-seek nil)
+        (setq shu-cpp-target-file-line nil)
+        (setq shu-cpp-target-file-column nil))
+      (if shu-cpp-target-file-column
+          (setq default-file-string (format "%s:%d:%d" shu-default-file-to-seek
+                                            shu-cpp-target-file-line
+                                            shu-cpp-target-file-column))
+        (if shu-cpp-target-file-line
+            (setq default-file-string (format "%s:%d" shu-default-file-to-seek
+                                              shu-cpp-target-file-line))
+          (setq default-file-string shu-default-file-to-seek)))
+      (when shu-default-file-to-seek
+        (setq completion-prefix nil))
+      (while (not tfile)
+        (setq file-to-seek
+              (completing-read
+               (if default-file-string
+                   (format "%s(default %s) " invitation default-file-string)
+                 invitation)
+               shu-cpp-completing-list
+               nil
+               nil
+               completion-prefix
+               nil
+               shu-default-file-to-seek))
+        (if (equal file-to-seek "")
+            (or shu-default-file-to-seek (error "There is no default file")))
+
+        (setq tfile (assoc file-to-seek shu-cpp-completing-list))
+        (if (not tfile)
+            (ding)))
+      (shu-cpp-choose-file tfile))
+    ))
 
 ;;; shu-new-cpp-project.el ends here

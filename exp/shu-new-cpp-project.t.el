@@ -56,7 +56,83 @@
     (should (listp actual))
     (should (equal expected actual))
     (shu-cpp-project-get-list-counts expected)
+    ))
 
+
+
+
+;;
+;;  shu-test-shu-cpp-project-collapse-list-2
+;;
+(ert-deftest shu-test-shu-cpp-project-collapse-list-2 ()
+  (let (
+        (data
+         (list
+          (cons "stumble.h"   "/foo/bar/stumble.h")
+          (cons "mumble.h"    "/foo/bar/mumble.h")
+          (cons "stumble.h"   "/boo/baz/stumble.h")))
+        (expected
+         (list
+          (cons "mumble.h"    (list (list "/foo/bar/mumble.h")))
+          (cons "stumble.h"   (list (list "/boo/baz/stumble.h"
+                                          "/foo/bar/stumble.h")))))
+        (actual))
+    (setq actual (shu-cpp-project-collapse-list data))
+    (should actual)
+    (should (listp actual))
+    (should (equal expected actual))
+    (shu-cpp-project-get-list-counts expected)
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-project-collapse-list-3
+;;
+(ert-deftest shu-test-shu-cpp-project-collapse-list-3 ()
+  (let (
+        (data
+         (list
+          (cons "xxx_mumble.h"   "/foo/bar/xxx_mumble.h")))
+        (expected
+         (list
+          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))))
+        (actual))
+    (setq actual (shu-cpp-project-collapse-list data))
+    (should actual)
+    (should (listp actual))
+    (should (equal expected actual))
+    (shu-cpp-project-get-list-counts expected)
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-project-collapse-list-4
+;;
+(ert-deftest shu-test-shu-cpp-project-collapse-list-4 ()
+  (let (
+        (data
+         (list
+          (cons "stumble.h"   "/foo/bar/stumble.h")
+          (cons "dumble.h"    "/foo/bar/dumble.h")
+          (cons "mumble.h"    "/boo/baz/mumble.h")
+          )
+         )
+        (expected
+         (list
+          (cons "dumble.h"    (list (list "/foo/bar/dumble.h")))
+          (cons "mumble.h"    (list (list "/boo/baz/mumble.h")))
+          (cons "stumble.h"   (list (list "/foo/bar/stumble.h")))
+          )
+         )
+        (actual))
+    (setq actual (shu-cpp-project-collapse-list data))
+    (should actual)
+    (should (listp actual))
+    (should (equal expected actual))
+    (shu-cpp-project-get-list-counts expected)
     ))
 
 
@@ -279,22 +355,25 @@
 ;;  shu-test-shu-project-make-short-key-list-1
 ;;
 (ert-deftest shu-test-shu-project-make-short-key-list-1 ()
-  (let ((data
+  (let (
+        (data
          (list
-          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
-          (cons "xxx_stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
-                                              "/foo/bar/xxx_stumble.h")))))
+          (cons "xxx_mumble.h"    (list "/foo/bar/xxx_mumble.h"))
+          (cons "xxx_stumble.h"   (list "/boo/baz/xxx_stumble.h"
+                                        "/foo/bar/xxx_stumble.h"))
+          ))
         (expected-shorts
          (list
-          (cons "mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
-          (cons "stumble.h"   (list (list "/boo/baz/xxx_stumble.h"
-                                              "/foo/bar/xxx_stumble.h")))))
+          (cons "mumble.h"    (list "/foo/bar/xxx_mumble.h"))
+          (cons "stumble.h"   (list "/boo/baz/xxx_stumble.h"
+                                    "/foo/bar/xxx_stumble.h"))))
         (expected-prefixes
          (list
           (cons "xxx" 2)))
         (ps)
         (actual-shorts)
-        (actual-prefixes))
+        (actual-prefixes)
+        )
     (setq ps (shu-project-make-short-key-list data))
     (should ps)
     (should (consp ps))
@@ -316,20 +395,20 @@
 (ert-deftest shu-test-shu-project-make-short-key-list-2 ()
   (let ((data
          (list
-          (cons "xxx_mumble.h"    (list (list "/foo/bar/xxx_mumble.h")))
-          (cons "xxx_mumble.cpp"  (list (list "/foo/bar/xxx_mumble.cpp")))
-          (cons "zzz_stumble.h"   (list (list "/boo/baz/zzz_stumble.h"
-                                              "/foo/bar/zzz_stumble.h")))
-          (cons "zzz_stumble.cpp" (list (list "/boo/baz/zzz_stumble.cpp"
-                                              "/foo/bar/zzz_stumble.cpp")))))
+          (cons "xxx_mumble.h"    (list "/foo/bar/xxx_mumble.h"))
+          (cons "xxx_mumble.cpp"  (list "/foo/bar/xxx_mumble.cpp"))
+          (cons "zzz_stumble.h"   (list "/boo/baz/zzz_stumble.h"
+                                        "/foo/bar/zzz_stumble.h"))
+          (cons "zzz_stumble.cpp" (list "/boo/baz/zzz_stumble.cpp"
+                                        "/foo/bar/zzz_stumble.cpp"))))
         (expected-shorts
          (list
-          (cons "mumble.cpp"      (list (list "/foo/bar/xxx_mumble.cpp")))
-          (cons "mumble.h"        (list (list "/foo/bar/xxx_mumble.h")))
-          (cons "stumble.cpp"     (list (list "/boo/baz/zzz_stumble.cpp"
-                                              "/foo/bar/zzz_stumble.cpp")))
-          (cons "stumble.h"       (list (list "/boo/baz/zzz_stumble.h"
-                                              "/foo/bar/zzz_stumble.h")))))
+          (cons "mumble.cpp"      (list "/foo/bar/xxx_mumble.cpp"))
+          (cons "mumble.h"        (list "/foo/bar/xxx_mumble.h"))
+          (cons "stumble.cpp"     (list "/boo/baz/zzz_stumble.cpp"
+                                        "/foo/bar/zzz_stumble.cpp"))
+          (cons "stumble.h"       (list "/boo/baz/zzz_stumble.h"
+                                        "/foo/bar/zzz_stumble.h"))))
         (expected-prefixes
          (list
           (cons "xxx" 2)
@@ -347,6 +426,33 @@
     (should (listp actual-prefixes))
     (should (equal expected-prefixes actual-prefixes))
     (should (equal expected-shorts actual-shorts))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-project-make-short-key-list-3
+;;
+(ert-deftest shu-test-shu-project-make-short-key-list-3 ()
+  (let ((data
+         (list
+          (cons "mumble.h"    (list "/foo/bar/mumble.h"))
+          (cons "mumble.cpp"  (list "/foo/bar/mumble.cpp"))
+          (cons "stumble.h"   (list "/boo/baz/stumble.h"
+                                    "/foo/bar/stumble.h"))
+          (cons "stumble.cpp" (list "/boo/baz/stumble.cpp"
+                                    "/foo/bar/stumble.cpp"))))
+        (ps)
+        (actual-shorts)
+        (actual-prefixes))
+    (setq ps (shu-project-make-short-key-list data))
+    (should ps)
+    (should (consp ps))
+    (setq actual-prefixes (car ps))
+    (setq actual-shorts (cdr ps))
+    (should (not actual-prefixes))
+    (should (not actual-shorts))
     ))
 
 
