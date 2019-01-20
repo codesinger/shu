@@ -310,6 +310,36 @@ true, the function is interactive."
     ))
 
 
+
+;;
+;;  shu-new-lisp--while
+;;
+(defun shu-new-lisp--while (var-name)
+  "Insert at point a skeleton lisp while loop.  Prompt is issued for the
+variable name.  The while loop is of the form:
+
+     (while x
+
+       (setq x (cdr x))
+       )
+point is placed where the the first line of code in the loop belongs."
+  (interactive "*sVariable name?: ")
+  (let ((pad )
+        (pad-count (current-column))
+        (start ))
+    (setq pad (make-string pad-count ? ))
+    (insert (concat
+             "(while " var-name "\n"
+             pad "  "))
+    (setq start (point))
+    (insert (concat
+             "\n"
+             pad "  (setq "var-name " (cdr " var-name "))\n"
+             pad  "  )\n"))
+    (goto-char start)
+    ))
+
+
 ;;
 ;;  shu-dup - Insert a duplicate of the current line following it.
 ;;
@@ -846,6 +876,7 @@ shu- prefix removed."
   (defalias 'dup 'shu-dup)
   (defalias 'new-lisp 'shu-new-lisp)
   (defalias 'new-ert 'shu-new-ert)
+  (defalias 'new-lisp-while 'shu-new-lisp--while)
   (defalias 'reverse-comma-names 'shu-reverse-comma-names)
   (defalias 'comma-names-to-letter 'shu-comma-names-to-letter)
   (defalias 'remove-test-names 'shu-remove-test-names)
