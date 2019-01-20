@@ -28,6 +28,7 @@
 \section{Overview}
 
 
+
 This manual contains detailed information on all of the function, macro,
 variable, and constant definitions in this repository.
 
@@ -37,7 +38,9 @@ Version 1.1 was merged with the master branch on 5 January 2019.
 
 Version 1.2 was merged with the master branch on 6 January 2019.
 
-This is Version 1.3 of the Shu elisp repository,
+Version 1.3 was merged with the master branch on 12 January 2019.
+
+This is Version 1.3.5 of the Shu elisp repository,
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -531,7 +534,7 @@ The name of the buffer into which unit tests place their output and debug trace.
 \index{shu-version} \hfill [Constant]
 
 \begin{doc-string}
-The version number of the Shu elisp package.
+The version number of th Shu elisp package.
 \end{doc-string}
 
 \eject
@@ -2617,6 +2620,20 @@ variables.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{gincl }}
+\usebox{\funcname}
+\index{gincl} \hfill [Command]\\%
+ (Function: shu-gincl)
+
+\begin{doc-string}
+While in a file buffer, wrap the file name in a C++ include directive and
+put it in the kill ring.  The file name is delimited by double quotes unless
+\emph{shu-cpp-include-user-brackets} variable is true, in which case the file name
+is delimited by left and right angle brackets.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{hother }}
 \usebox{\funcname}
 \index{hother} \hfill [Command]\\%
@@ -2864,8 +2881,9 @@ Insert an empty if statement.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-class-is-blocked }}
-\usebox{\funcname}\emph{pos}
+\usebox{\funcname}\emph{pos} \textbf{\&optional} \emph{in-string}
 \index{shu-class-is-blocked} \hfill [Function]
+\hspace*{\wd\funcname}
 
 \begin{doc-string}
 Return true if a class name should be ignored because it is either in a
@@ -2874,7 +2892,11 @@ string or a comment.
 We have found something at point \emph{pos} that looks as though it might be a class
 name.  If it is in a string or is preceded on the same line by ``//'' (also not
 in a string), then it is either in a string or is probably in a comment, so we
-want to ignore it.  Return true if the class name should be ignored.
+may want to ignore it.  \emph{in-string} is true if a class name inside of a string is
+to be replaced.  \emph{in-comment} is true if a class name inside of a comment is to be
+replaced.
+
+Return true if the class name should be ignored.
 \end{doc-string}
 
 \vspace{1em}
@@ -2984,6 +3006,64 @@ in \emph{class-list} or is a list of namespaces each of which has a one to one
 correspondence with a class name in \emph{class-list}.  The optional \emph{buffer}
 argument may be a buffer in which the actions are recorded.  Return the
 number of names changed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-rmv-blocked }}
+\usebox{\funcname}\emph{class-list} \emph{using} \emph{top-qual} \emph{gb}
+\index{shu-cpp-rmv-blocked} \hfill [Function]
+
+\begin{doc-string}
+Do a pre-check on a file to see if we will be able to remove its ``using
+namespace'' directives.  \emph{class-list} is the a-list passed to \emph{shu-cpp-rmv-using}.
+\emph{using} is the regular expression used to search for ``using namespace''
+directives.  \emph{top-qual} is the regular expression used to strip out a higher level
+qualifier from the class name in a ``using namespace'' directive, if any.  \emph{gb} is
+the buffer into which diagnostic messages are written.
+
+This function finds all of the ``using namespace'' directives in the file and
+checks to see if there is any ambiguity in the resulting class list.  For
+example, if namespace ``mumble'' contains class ``Bumble'' and namespace
+``stubble'' also contains class ``Bumble'', we will not know which namespace to
+apply to instances of class ``Bumble''.  But this is not an ambiguity if there
+is a ``using namespace'' directive for only one of those classes.  That is why
+we do the ambiguity check only for namespaces referenced by ``using namespace''
+directives.
+
+This function returns true if such an ambiguity exists.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-rmv-using }}
+\usebox{\funcname}\emph{class-list} \textbf{\&optional} \emph{top-name}
+\index{shu-cpp-rmv-using} \hfill [Function]
+
+\begin{doc-string}
+Remove ``using namespace'' directives from a C++ file, adding the appropriate
+namespace qualifier to all of the unqualified class names.  \emph{class-list} is an
+a-list in which the car of each entry is a namespace and the cdr of each entry
+is a class name.  Here is an example of such an a-list:
+
+\small{\begin{verbatim}
+     (list
+      (cons ``std''    (list ``set'' ``string'' ``vector''))
+      (cons ``world''  (list ``Hello'' ``Goodbye'')))
+\end{verbatim}}
+
+\emph{top-name}, if present is a higher level namespace.  Given a top level namespace
+of ``WhammoCorp'', then the following line:
+
+\small{\begin{verbatim}
+     using namespace WhammoCorp::world;
+\end{verbatim}}
+
+would be interpreted as though it had been written:
+
+\small{\begin{verbatim}
+     using namespace world;
+\end{verbatim}}
 \end{doc-string}
 
 \vspace{1em}
@@ -3276,6 +3356,20 @@ variables.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-gincl }}
+\usebox{\funcname}
+\index{shu-gincl} \hfill [Command]\\%
+ (Alias: gincl)
+
+\begin{doc-string}
+While in a file buffer, wrap the file name in a C++ include directive and
+put it in the kill ring.  The file name is delimited by double quotes unless
+\emph{shu-cpp-include-user-brackets} variable is true, in which case the file name
+is delimited by left and right angle brackets.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-hother }}
 \usebox{\funcname}
 \index{shu-hother} \hfill [Command]\\%
@@ -3328,6 +3422,25 @@ Place a skeleton class definition in the current buffer at point.
 
 \begin{doc-string}
 Generate get and set functions for an instance variable in a C++ class.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-replace-class-name }}
+\usebox{\funcname}\emph{target-name}
+\index{shu-internal-replace-class-name} \hfill [Function]
+\hspace*{\wd\funcname}\emph{replace-arg}
+\hspace*{\wd\funcname}\emph{in-string}
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Find all instances of the class name \emph{target-name} and if it actually appears
+to be a class name, call REPLACE-FUN passing to it \emph{replace-arg} and the class
+name.  REPLACE-FUN issues the appropriate replace-match call, constructing the
+replacement for the class name from some combination of \emph{replace-arg} and the
+class name.  \emph{in-string} is true if a class name inside of a string is to be
+replaced.  \emph{in-comment} is true if a class name inside of a comment is to be
+replaced.
 \end{doc-string}
 
 \vspace{1em}
@@ -3441,6 +3554,18 @@ will be taken to the corresponding .h file
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-qualify-class-fun }}
+\usebox{\funcname}\emph{namespace} \emph{name}
+\index{shu-qualify-class-fun} \hfill [Function]
+
+\begin{doc-string}
+This is the replacement function for \emph{shu-qualify-class-name}.  It is called
+with the \emph{namespace} to be applied to the class whose name is \emph{name}.  It
+constructs a new name and issues replace-match to replace it.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-qualify-class-name }}
 \usebox{\funcname}\emph{target-name} \emph{namespace}
 \index{shu-qualify-class-name} \hfill [Function]
@@ -3484,6 +3609,34 @@ count of class names changed.
 \begin{doc-string}
 Add ``std'' namespace qualifier to some of the classes in ``std''.  Return the
 count of class names changed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-replace-class-fun }}
+\usebox{\funcname}\emph{new-name} \emph{name}
+\index{shu-replace-class-fun} \hfill [Function]
+
+\begin{doc-string}
+This is the replacement function for \emph{shu-replace-class-name}.  It is called
+with the \emph{new-name} to replace the class \emph{name}.  It calls replace-match to replace
+\emph{name} with \emph{new-name}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-replace-class-name }}
+\usebox{\funcname}\emph{target-name} \emph{new-name}
+\index{shu-replace-class-name} \hfill [Function]
+\hspace*{\wd\funcname}\emph{in-string} \emph{in-comment}
+
+\begin{doc-string}
+Find all instances of the class name \emph{target-name} and replace it with the name
+\emph{new-name}.  If the target name is ``Mumble'', then all instances of ``Mumble''
+that resemble class names are replaced.  But names such as ``d\_Mumble'' or
+``MumbleIn'' remain unchanged.  if \emph{in-string} is true, then instances of the
+class name found inside a string are replaced.  if \emph{in-comment} is true, then
+instances of the class name found inside a comment are replaced.
 \end{doc-string}
 
 \vspace{1em}
@@ -3914,13 +4067,63 @@ Insert into the current buffer the names of all of the directories in a project.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{list-c-prefixes }}
+\usebox{\funcname}
+\index{list-c-prefixes} \hfill [Command]\\%
+ (Function: shu-list-c-prefixes)
+
+\begin{doc-string}
+List all of the file prefixes found in the current project, if any.
+See the doc-string for \emph{shu-project-split-file-name} for further information
+about extracted file prefixes.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{list-c-project }}
 \usebox{\funcname}
 \index{list-c-project} \hfill [Command]\\%
  (Function: shu-list-c-project)
 
 \begin{doc-string}
-Insert into the current buffer the names of all of the code files in a project.
+Insert into the current buffer the names of all of the code files in the
+current project.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{list-completing-names }}
+\usebox{\funcname}
+\index{list-completing-names} \hfill [Command]\\%
+ (Function: shu-cpp-list-completing-names)
+
+\begin{doc-string}
+List all of the names that are used to do a completing read of a file name
+along with the names of the actual files to which they map.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{list-project-names }}
+\usebox{\funcname}
+\index{list-project-names} \hfill [Command]\\%
+ (Function: shu-cpp-list-project-names)
+
+\begin{doc-string}
+List all of the names in a project with the names of the files to
+which they map.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{list-short-names }}
+\usebox{\funcname}
+\index{list-short-names} \hfill [Command]\\%
+ (Function: shu-cpp-list-short-names)
+
+\begin{doc-string}
+List all of the short names in a project with the names of the files to
+which they map.
 \end{doc-string}
 
 \vspace{1em}
@@ -4135,9 +4338,10 @@ visit that file.
 \index{shu-cpp-class-list} \hfill [Variable]
 
 \begin{doc-string}
-This is an alist whose keys are unqualified file names and whose
-values contain a list of the fully qualified files with the same
-name.
+This is an alist whose keys are unqualified file names and whose values
+contain a list of the fully qualified files with the same unqualified name.  if
+\emph{shu-cpp-project-short-names} is nil, this list is identical to the one stored in
+\emph{shu-cpp-completing-list}.
 \end{doc-string}
 
 \vspace{1em}
@@ -4151,6 +4355,19 @@ Called when the user hits enter or clicks mouse button 2 on completion window.
 At this point the users selected choice is in the current buffer.  We get the
 answer from the current buffer and call the function that is currently
 pointed to by shu-cpp-completion-target.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-completing-list }}
+\usebox{\funcname}
+\index{shu-cpp-completing-list} \hfill [Variable]
+
+\begin{doc-string}
+This is an alist whose keys are unqualified file names and whose values
+contain a list of the fully qualified files with the same unqualified name.  If
+\emph{shu-cpp-project-short-names} is non-nil, then this alist includes the short file
+names as well.
 \end{doc-string}
 
 \vspace{1em}
@@ -4232,11 +4449,19 @@ by shu-make-c-project
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-finish-project }}
-\usebox{\funcname}\textbf{\&optional} \emph{key-list}
+\usebox{\funcname}
 \index{shu-cpp-finish-project} \hfill [Function]
 
 \begin{doc-string}
-Finish constructing a C project from a user file list.
+Finish constructing a C project from a user file list.  The input is
+KEY-LIST, which is an a-list.  The cdr of each entry is the short (unqualified)
+file name.  The cdr of each entry is the fully qualified name.  This alist may
+have duplicate short names.  This function produces a new list.  The car of each
+item is still the short (unqualified) file name.  The cdr is a list of all of
+the fully qualified file names to which the short name maps.  If a user selects
+a file that has only one fully qualified file name, we open the file.  But if it
+has more than one fully qualified file name, we have to ask the user which one
+is wanted.
 \end{doc-string}
 
 \vspace{1em}
@@ -4274,12 +4499,124 @@ This is the count of the number of H files found in the project.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-list-names }}
+\usebox{\funcname}\emph{name-list} \emph{type-name}
+\index{shu-cpp-internal-list-names} \hfill [Function]
+
+\begin{doc-string}
+Implementation function for \emph{shu-cpp-list-short-names},
+\emph{shu-cpp-list-project-names}, and \emph{shu-cpp-list-completing-names}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-list-completing-names }}
+\usebox{\funcname}
+\index{shu-cpp-list-completing-names} \hfill [Command]\\%
+ (Alias: list-completing-names)
+
+\begin{doc-string}
+List all of the names that are used to do a completing read of a file name
+along with the names of the actual files to which they map.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-list-project-names }}
+\usebox{\funcname}
+\index{shu-cpp-list-project-names} \hfill [Command]\\%
+ (Alias: list-project-names)
+
+\begin{doc-string}
+List all of the names in a project with the names of the files to
+which they map.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-list-short-names }}
+\usebox{\funcname}
+\index{shu-cpp-list-short-names} \hfill [Command]\\%
+ (Alias: list-short-names)
+
+\begin{doc-string}
+List all of the short names in a project with the names of the files to
+which they map.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-prefix-list }}
+\usebox{\funcname}
+\index{shu-cpp-prefix-list} \hfill [Variable]
+
+\begin{doc-string}
+This is the list of prefixes removed from the short names if
+\emph{shu-cpp-project-short-names} is non-nil.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-project-collapse-list }}
+\usebox{\funcname}\emph{key-list}
+\index{shu-cpp-project-collapse-list} \hfill [Function]
+
+\begin{doc-string}
+\emph{key-list} is an alist in which the cdr of each item is the unqualified file name
+and the car of each item is the fully qualified file name, including the path to
+the file.  The output is a different alist in which the car of each item is the
+unqualified file name and the cdr of each item is the list of fully qualified
+file names to which the unqualified file name refers.
+
+For example, if \emph{key-list} contains:
+
+\small{\begin{verbatim}
+    (``xxx_mumble.h'' . ``/foo/bar/xxx_mumble.h'')
+    (``xxx_stumble.h . ``/foo/bar/xxx_stumble..h'')
+    (``xxx_stumble.h . ``/boo/baz/xxx_stumble..h'')
+\end{verbatim}}
+
+then the returned list will contain
+
+\small{\begin{verbatim}
+    (``xxx_mumble.h'' . ``/foo/bar/xxx_mumble.h'')
+    (``xxx_stumble.h . ``/foo/bar/xxx_stumble..h'' ``/boo/baz/xxx_stumble..h'')
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-project-file }}
 \usebox{\funcname}
 \index{shu-cpp-project-file} \hfill [Variable]
 
 \begin{doc-string}
 The name of the file from which the current project was read.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-project-get-list-counts }}
+\usebox{\funcname}\emph{proj-list}
+\index{shu-cpp-project-get-list-counts} \hfill [Function]
+
+\begin{doc-string}
+\emph{proj-list} is an alist whose structure is identical to that of \emph{shu-cpp-class-list}.
+This function returns a list with three items on it: the number of c / cpp files, the
+number of h files, and the number of duplicate names found in the list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-project-invert-list }}
+\usebox{\funcname}\emph{proj-list}
+\index{shu-cpp-project-invert-list} \hfill [Function]
+
+\begin{doc-string}
+\emph{proj-list} is an alist in which the cdr of each item is the unqualified file name
+and the car of each item is the list of fully qualified file names to which
+the unqualified name refers.  The returned output is a single list of fully
+qualified file names.
 \end{doc-string}
 
 \vspace{1em}
@@ -4302,6 +4639,23 @@ List that holds all of the subdirectories in the current project.
 Set the common alias names for the functions in shu-cpp-project.
 These are generally the same as the function names with the leading
 shu- prefix removed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-project-short-names }}
+\usebox{\funcname}
+\index{shu-cpp-project-short-names} \hfill [Custom]
+
+\begin{doc-string}
+Set non-nil if shu-cpp-project creates short names for files in a project.  A
+short name is an approximation of the file name that may be easier to type.  For
+example, if all of the files in a project begin with a common prefix (e.g.,
+``x\_server\_mumble.cpp'' and ``x\_server\_stumble.cpp'', then the short names for
+these two files would be ``mumble.cpp'' and ``stumble.cpp''.  This means that
+the user does not have to type the prefix in order to find the file.  If the
+user types ``mumble.cpp'' as the file name, emacs will open the file
+``x\_server\_mumble.cpp''.
 \end{doc-string}
 
 \vspace{1em}
@@ -4341,6 +4695,18 @@ fully qualified file names.  Display all of the possibilities in a completion
 buffer and ask the user to choose the desired one.  The string containing the
 chosen fully qualified file name will then be passed to the function pointed
 to by target.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-short-list }}
+\usebox{\funcname}
+\index{shu-cpp-short-list} \hfill [Variable]
+
+\begin{doc-string}
+This is the list of short names, if there are any.  The car of each item is
+the short name.  The cdr of each item is the full path to the associated
+file name.
 \end{doc-string}
 
 \vspace{1em}
@@ -4495,6 +4861,17 @@ documentation is the string to put in the buffer to describe the operation.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-list-c-project }}
+\usebox{\funcname}\emph{proj-list}
+\index{shu-internal-list-c-project} \hfill [Function]
+
+\begin{doc-string}
+Insert into the current buffer the names of all of the code files in the
+project whose files are in \emph{proj-list}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-internal-visit-project-file }}
 \usebox{\funcname}\emph{look-for-target}
 \index{shu-internal-visit-project-file} \hfill [Function]
@@ -4526,13 +4903,27 @@ Insert into the current buffer the names of all of the directories in a project.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-list-c-prefixes }}
+\usebox{\funcname}
+\index{shu-list-c-prefixes} \hfill [Command]\\%
+ (Alias: list-c-prefixes)
+
+\begin{doc-string}
+List all of the file prefixes found in the current project, if any.
+See the doc-string for \emph{shu-project-split-file-name} for further information
+about extracted file prefixes.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-list-c-project }}
 \usebox{\funcname}
 \index{shu-list-c-project} \hfill [Command]\\%
  (Alias: list-c-project)
 
 \begin{doc-string}
-Insert into the current buffer the names of all of the code files in a project.
+Insert into the current buffer the names of all of the code files in the
+current project.
 \end{doc-string}
 
 \vspace{1em}
@@ -4607,6 +4998,67 @@ are being scanned.
 \begin{doc-string}
 This is a list of the full path and name of every file in the project.
 It is used when a global change needs to visit every file in the project.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-project-get-file-info }}
+\usebox{\funcname}\emph{plist} \emph{file-name}
+\index{shu-project-get-file-info} \hfill [Macro]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Extract the file information from one entry in shu-cpp-class-list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-project-make-short-key-list }}
+\usebox{\funcname}\emph{key-list}
+\index{shu-project-make-short-key-list} \hfill [Function]
+
+\begin{doc-string}
+\emph{key-list} is an alist in which the car of each item is the unqualified file
+name and the cdr of each item is the fully qualified file name, including the
+path to the file.  This function creates two lists.  One is an alist of all of
+the file prefixes.  That car of each item is the prefix.  The cdr of each item
+is the number of times that prefix was found.  The second is a list similar to
+\emph{key-list} with all of the file names changed to their equivalent short names.  If
+the long and short names are the same, then that item is omitted from the new
+list of short names.
+
+Return is a cons cell whose car is the prefix list and whose cdr is the short
+name list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-project-split-file-name }}
+\usebox{\funcname}\emph{file-name}
+\index{shu-project-split-file-name} \hfill [Function]
+
+\begin{doc-string}
+Split \emph{file-name} into two parts.  The first part is the prefix and the second
+part is the short name.  The rules for splitting are as follows:
+
+If the name has no underscores, then the prefix is empty and the short name is
+the whole name.
+
+If the name has one underscore in it (e.g., ``abcdef\_mumble.cpp''), then the
+prefix is the part before the underscore (``abcdef'') and the short name is all
+of the rest (``mumble.cpp'').
+
+If the name has more than one underscore in it (e.g., ``x\_abcdef\_mumble.cpp''),
+then we look as the length of the first part (``x'').  If its length is one,
+then the prefix is the concatenation of the first two parts (``x\_abcdef''), and
+the short name is the rest (``mumble.cpp'').  If the length of the first part is
+not one (e.g., file name is ``lovely\_looking\_mumble.cpp''), then the prefix is
+the first part (``lovely'') and the short name is the rest
+(``looking\_mumble.cpp'').
+
+After the split, the short name is converted to all lower case.
+
+Return a cons cell of the form (prefix . short-name)
 \end{doc-string}
 
 \vspace{1em}
@@ -5989,6 +6441,26 @@ name.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{new-lisp-while }}
+\usebox{\funcname}\emph{var-name}
+\index{new-lisp-while} \hfill [Command]\\%
+ (Function: shu-new-lisp--while)
+
+\begin{doc-string}
+Insert at point a skeleton lisp while loop.  Prompt is issued for the
+variable name.  The while loop is of the form:
+
+\small{\begin{verbatim}
+     (while x
+
+       (setq x (cdr x))
+       )
+\end{verbatim}}
+point is placed where the the first line of code in the loop belongs.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{number-commits }}
 \usebox{\funcname}
 \index{number-commits} \hfill [Command]\\%
@@ -6438,6 +6910,26 @@ Build a skeleton, empty LaTeX file.
 \begin{doc-string}
 Insert at point a skeleton lisp function.  Prompt is issued for the function
 name.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-new-lisp--while }}
+\usebox{\funcname}\emph{var-name}
+\index{shu-new-lisp--while} \hfill [Command]\\%
+ (Alias: new-lisp-while)
+
+\begin{doc-string}
+Insert at point a skeleton lisp while loop.  Prompt is issued for the
+variable name.  The while loop is of the form:
+
+\small{\begin{verbatim}
+     (while x
+
+       (setq x (cdr x))
+       )
+\end{verbatim}}
+point is placed where the the first line of code in the loop belongs.
 \end{doc-string}
 
 \vspace{1em}

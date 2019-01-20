@@ -28,6 +28,7 @@
 
 **Table Of Contents**
 
+
 * [Overview](#Overview)
 * [shu-base](#shu-base)
 * [shu-bde-cpp](#shu-bde-cpp)
@@ -47,6 +48,7 @@
 
 
 
+
 # Overview #
 
 
@@ -59,7 +61,9 @@ Version 1.1 was merged with the master branch on 5 January 2019.
 
 Version 1.2 was merged with the master branch on 6 January 2019.
 
-This is Version 1.3 of the Shu elisp repository,
+Version 1.3 was merged with the master branch on 12 January 2019.
+
+This is Version 1.3.5 of the Shu elisp repository,
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -450,7 +454,7 @@ The name of the buffer into which unit tests place their output and debug trace.
 #### shu-version ####
 [Constant]
 
-The version number of the Shu elisp package.
+The version number of th Shu elisp package.
 
 # shu-bde-cpp #
 
@@ -2111,6 +2115,17 @@ variables.
 
 
 
+#### gincl ####
+[Command]
+ (Function: shu-gincl)
+
+While in a file buffer, wrap the file name in a C++ include directive and
+put it in the kill ring.  The file name is delimited by double quotes unless
+*shu-cpp-include-user-brackets* variable is true, in which case the file name
+is delimited by left and right angle brackets.
+
+
+
 #### hother ####
 [Command]
  (Function: shu-hother)
@@ -2302,7 +2317,7 @@ Insert an empty if statement.
 
 
 #### shu-class-is-blocked ####
-shu-class-is-blocked *pos*
+shu-class-is-blocked *pos* **&optional** *in-string* *in-comment*
 [Function]
 
 Return true if a class name should be ignored because it is either in a
@@ -2311,7 +2326,11 @@ string or a comment.
 We have found something at point *pos* that looks as though it might be a class
 name.  If it is in a string or is preceded on the same line by "//" (also not
 in a string), then it is either in a string or is probably in a comment, so we
-want to ignore it.  Return true if the class name should be ignored.
+may want to ignore it.  *in-string* is true if a class name inside of a string is
+to be replaced.  *in-comment* is true if a class name inside of a comment is to be
+replaced.
+
+Return true if the class name should be ignored.
 
 
 
@@ -2397,6 +2416,60 @@ in *class-list* or is a list of namespaces each of which has a one to one
 correspondence with a class name in *class-list*.  The optional *buffer*
 argument may be a buffer in which the actions are recorded.  Return the
 number of names changed.
+
+
+
+#### shu-cpp-rmv-blocked ####
+shu-cpp-rmv-blocked *class-list* *using* *top-qual* *gb*
+[Function]
+
+Do a pre-check on a file to see if we will be able to remove its "using
+namespace" directives.  *class-list* is the a-list passed to *shu-cpp-rmv-using*.
+*using* is the regular expression used to search for "using namespace"
+directives.  *top-qual* is the regular expression used to strip out a higher level
+qualifier from the class name in a "using namespace" directive, if any.  *gb* is
+the buffer into which diagnostic messages are written.
+
+This function finds all of the "using namespace" directives in the file and
+checks to see if there is any ambiguity in the resulting class list.  For
+example, if namespace "mumble" contains class "Bumble" and namespace
+"stubble" also contains class "Bumble", we will not know which namespace to
+apply to instances of class "Bumble".  But this is not an ambiguity if there
+is a "using namespace" directive for only one of those classes.  That is why
+we do the ambiguity check only for namespaces referenced by "using namespace"
+directives.
+
+This function returns true if such an ambiguity exists.
+
+
+
+#### shu-cpp-rmv-using ####
+shu-cpp-rmv-using *class-list* **&optional** *top-name*
+[Function]
+
+Remove "using namespace" directives from a C++ file, adding the appropriate
+namespace qualifier to all of the unqualified class names.  *class-list* is an
+a-list in which the car of each entry is a namespace and the cdr of each entry
+is a class name.  Here is an example of such an a-list:
+
+```
+     (list
+      (cons "std"    (list "set" "string" "vector"))
+      (cons "world"  (list "Hello" "Goodbye")))
+```
+
+*top-name*, if present is a higher level namespace.  Given a top level namespace
+of "WhammoCorp", then the following line:
+
+```
+     using namespace WhammoCorp::world;
+```
+
+would be interpreted as though it had been written:
+
+```
+     using namespace world;
+```
 
 
 
@@ -2632,6 +2705,17 @@ variables.
 
 
 
+#### shu-gincl ####
+[Command]
+ (Alias: gincl)
+
+While in a file buffer, wrap the file name in a C++ include directive and
+put it in the kill ring.  The file name is delimited by double quotes unless
+*shu-cpp-include-user-brackets* variable is true, in which case the file name
+is delimited by left and right angle brackets.
+
+
+
 #### shu-hother ####
 [Command]
  (Alias: hother)
@@ -2675,6 +2759,20 @@ shu-internal-get-set *comment* *shu-lc-comment*
 [Command]
 
 Generate get and set functions for an instance variable in a C++ class.
+
+
+
+#### shu-internal-replace-class-name ####
+shu-internal-replace-class-name *target-name* *replace-func* *replace-arg* **&optional** *in-string* *in-comment*
+[Function]
+
+Find all instances of the class name *target-name* and if it actually appears
+to be a class name, call REPLACE-FUN passing to it *replace-arg* and the class
+name.  REPLACE-FUN issues the appropriate replace-match call, constructing the
+replacement for the class name from some combination of *replace-arg* and the
+class name.  *in-string* is true if a class name inside of a string is to be
+replaced.  *in-comment* is true if a class name inside of a comment is to be
+replaced.
 
 
 
@@ -2759,6 +2857,16 @@ will be taken to the corresponding .h file
 
 
 
+#### shu-qualify-class-fun ####
+shu-qualify-class-fun *namespace* *name*
+[Function]
+
+This is the replacement function for *shu-qualify-class-name*.  It is called
+with the *namespace* to be applied to the class whose name is *name*.  It
+constructs a new name and issues replace-match to replace it.
+
+
+
 #### shu-qualify-class-name ####
 shu-qualify-class-name *target-name* *namespace*
 [Function]
@@ -2795,6 +2903,29 @@ count of class names changed.
 
 Add "std" namespace qualifier to some of the classes in "std".  Return the
 count of class names changed.
+
+
+
+#### shu-replace-class-fun ####
+shu-replace-class-fun *new-name* *name*
+[Function]
+
+This is the replacement function for *shu-replace-class-name*.  It is called
+with the *new-name* to replace the class *name*.  It calls replace-match to replace
+*name* with *new-name*.
+
+
+
+#### shu-replace-class-name ####
+shu-replace-class-name *target-name* *new-name* **&optional** *in-string* *in-comment*
+[Function]
+
+Find all instances of the class name *target-name* and replace it with the name
+*new-name*.  If the target name is "Mumble", then all instances of "Mumble"
+that resemble class names are replaced.  But names such as "d_Mumble" or
+"MumbleIn" remain unchanged.  if *in-string* is true, then instances of the
+class name found inside a string are replaced.  if *in-comment* is true, then
+instances of the class name found inside a comment are replaced.
 
 
 
@@ -3134,11 +3265,49 @@ Insert into the current buffer the names of all of the directories in a project.
 
 
 
+#### list-c-prefixes ####
+[Command]
+ (Function: shu-list-c-prefixes)
+
+List all of the file prefixes found in the current project, if any.
+See the doc-string for *shu-project-split-file-name* for further information
+about extracted file prefixes.
+
+
+
 #### list-c-project ####
 [Command]
  (Function: shu-list-c-project)
 
-Insert into the current buffer the names of all of the code files in a project.
+Insert into the current buffer the names of all of the code files in the
+current project.
+
+
+
+#### list-completing-names ####
+[Command]
+ (Function: shu-cpp-list-completing-names)
+
+List all of the names that are used to do a completing read of a file name
+along with the names of the actual files to which they map.
+
+
+
+#### list-project-names ####
+[Command]
+ (Function: shu-cpp-list-project-names)
+
+List all of the names in a project with the names of the files to
+which they map.
+
+
+
+#### list-short-names ####
+[Command]
+ (Function: shu-cpp-list-short-names)
+
+List all of the short names in a project with the names of the files to
+which they map.
 
 
 
@@ -3309,9 +3478,10 @@ visit that file.
 #### shu-cpp-class-list ####
 [Variable]
 
-This is an alist whose keys are unqualified file names and whose
-values contain a list of the fully qualified files with the same
-name.
+This is an alist whose keys are unqualified file names and whose values
+contain a list of the fully qualified files with the same unqualified name.  if
+*shu-cpp-project-short-names* is nil, this list is identical to the one stored in
+*shu-cpp-completing-list*.
 
 
 
@@ -3322,6 +3492,16 @@ Called when the user hits enter or clicks mouse button 2 on completion window.
 At this point the users selected choice is in the current buffer.  We get the
 answer from the current buffer and call the function that is currently
 pointed to by shu-cpp-completion-target.
+
+
+
+#### shu-cpp-completing-list ####
+[Variable]
+
+This is an alist whose keys are unqualified file names and whose values
+contain a list of the fully qualified files with the same unqualified name.  If
+*shu-cpp-project-short-names* is non-nil, then this alist includes the short file
+names as well.
 
 
 
@@ -3381,10 +3561,17 @@ by shu-make-c-project
 
 
 #### shu-cpp-finish-project ####
-shu-cpp-finish-project **&optional** *key-list*
 [Function]
 
-Finish constructing a C project from a user file list.
+Finish constructing a C project from a user file list.  The input is
+KEY-LIST, which is an a-list.  The cdr of each entry is the short (unqualified)
+file name.  The cdr of each entry is the fully qualified name.  This alist may
+have duplicate short names.  This function produces a new list.  The car of each
+item is still the short (unqualified) file name.  The cdr is a list of all of
+the fully qualified file names to which the short name maps.  If a user selects
+a file that has only one fully qualified file name, we open the file.  But if it
+has more than one fully qualified file name, we have to ask the user which one
+is wanted.
 
 
 
@@ -3412,10 +3599,102 @@ This is the count of the number of H files found in the project.
 
 
 
+#### shu-cpp-internal-list-names ####
+shu-cpp-internal-list-names *name-list* *type-name*
+[Function]
+
+Implementation function for *shu-cpp-list-short-names*,
+*shu-cpp-list-project-names*, and *shu-cpp-list-completing-names*.
+
+
+
+#### shu-cpp-list-completing-names ####
+[Command]
+ (Alias: list-completing-names)
+
+List all of the names that are used to do a completing read of a file name
+along with the names of the actual files to which they map.
+
+
+
+#### shu-cpp-list-project-names ####
+[Command]
+ (Alias: list-project-names)
+
+List all of the names in a project with the names of the files to
+which they map.
+
+
+
+#### shu-cpp-list-short-names ####
+[Command]
+ (Alias: list-short-names)
+
+List all of the short names in a project with the names of the files to
+which they map.
+
+
+
+#### shu-cpp-prefix-list ####
+[Variable]
+
+This is the list of prefixes removed from the short names if
+*shu-cpp-project-short-names* is non-nil.
+
+
+
+#### shu-cpp-project-collapse-list ####
+shu-cpp-project-collapse-list *key-list*
+[Function]
+
+*key-list* is an alist in which the cdr of each item is the unqualified file name
+and the car of each item is the fully qualified file name, including the path to
+the file.  The output is a different alist in which the car of each item is the
+unqualified file name and the cdr of each item is the list of fully qualified
+file names to which the unqualified file name refers.
+
+For example, if *key-list* contains:
+
+```
+    ("xxx_mumble.h" . "/foo/bar/xxx_mumble.h")
+    ("xxx_stumble.h . "/foo/bar/xxx_stumble..h")
+    ("xxx_stumble.h . "/boo/baz/xxx_stumble..h")
+```
+
+then the returned list will contain
+
+```
+    ("xxx_mumble.h" . "/foo/bar/xxx_mumble.h")
+    ("xxx_stumble.h . "/foo/bar/xxx_stumble..h" "/boo/baz/xxx_stumble..h")
+```
+
+
+
 #### shu-cpp-project-file ####
 [Variable]
 
 The name of the file from which the current project was read.
+
+
+
+#### shu-cpp-project-get-list-counts ####
+shu-cpp-project-get-list-counts *proj-list*
+[Function]
+
+*proj-list* is an alist whose structure is identical to that of *shu-cpp-class-list*.
+This function returns a list with three items on it: the number of c / cpp files, the
+number of h files, and the number of duplicate names found in the list.
+
+
+
+#### shu-cpp-project-invert-list ####
+shu-cpp-project-invert-list *proj-list*
+[Function]
+
+*proj-list* is an alist in which the cdr of each item is the unqualified file name
+and the car of each item is the list of fully qualified file names to which
+the unqualified name refers.  The returned output is a single list of fully
+qualified file names.
 
 
 
@@ -3432,6 +3711,20 @@ List that holds all of the subdirectories in the current project.
 Set the common alias names for the functions in shu-cpp-project.
 These are generally the same as the function names with the leading
 shu- prefix removed.
+
+
+
+#### shu-cpp-project-short-names ####
+[Custom]
+
+Set non-nil if shu-cpp-project creates short names for files in a project.  A
+short name is an approximation of the file name that may be easier to type.  For
+example, if all of the files in a project begin with a common prefix (e.g.,
+"x_server_mumble.cpp" and "x_server_stumble.cpp", then the short names for
+these two files would be "mumble.cpp" and "stumble.cpp".  This means that
+the user does not have to type the prefix in order to find the file.  If the
+user types "mumble.cpp" as the file name, emacs will open the file
+"x_server_mumble.cpp".
 
 
 
@@ -3464,6 +3757,15 @@ fully qualified file names.  Display all of the possibilities in a completion
 buffer and ask the user to choose the desired one.  The string containing the
 chosen fully qualified file name will then be passed to the function pointed
 to by target.
+
+
+
+#### shu-cpp-short-list ####
+[Variable]
+
+This is the list of short names, if there are any.  The car of each item is
+the short name.  The cdr of each item is the full path to the associated
+file name.
 
 
 
@@ -3591,6 +3893,15 @@ documentation is the string to put in the buffer to describe the operation.
 
 
 
+#### shu-internal-list-c-project ####
+shu-internal-list-c-project *proj-list*
+[Function]
+
+Insert into the current buffer the names of all of the code files in the
+project whose files are in *proj-list*.
+
+
+
 #### shu-internal-visit-project-file ####
 shu-internal-visit-project-file *look-for-target*
 [Function]
@@ -3615,11 +3926,22 @@ Insert into the current buffer the names of all of the directories in a project.
 
 
 
+#### shu-list-c-prefixes ####
+[Command]
+ (Alias: list-c-prefixes)
+
+List all of the file prefixes found in the current project, if any.
+See the doc-string for *shu-project-split-file-name* for further information
+about extracted file prefixes.
+
+
+
 #### shu-list-c-project ####
 [Command]
  (Alias: list-c-project)
 
-Insert into the current buffer the names of all of the code files in a project.
+Insert into the current buffer the names of all of the code files in the
+current project.
 
 
 
@@ -3678,6 +4000,60 @@ are being scanned.
 
 This is a list of the full path and name of every file in the project.
 It is used when a global change needs to visit every file in the project.
+
+
+
+#### shu-project-get-file-info ####
+shu-project-get-file-info *plist* *file-name* *full-name-list*
+[Macro]
+
+Extract the file information from one entry in shu-cpp-class-list.
+
+
+
+#### shu-project-make-short-key-list ####
+shu-project-make-short-key-list *key-list*
+[Function]
+
+*key-list* is an alist in which the car of each item is the unqualified file
+name and the cdr of each item is the fully qualified file name, including the
+path to the file.  This function creates two lists.  One is an alist of all of
+the file prefixes.  That car of each item is the prefix.  The cdr of each item
+is the number of times that prefix was found.  The second is a list similar to
+*key-list* with all of the file names changed to their equivalent short names.  If
+the long and short names are the same, then that item is omitted from the new
+list of short names.
+
+Return is a cons cell whose car is the prefix list and whose cdr is the short
+name list.
+
+
+
+#### shu-project-split-file-name ####
+shu-project-split-file-name *file-name*
+[Function]
+
+Split *file-name* into two parts.  The first part is the prefix and the second
+part is the short name.  The rules for splitting are as follows:
+
+If the name has no underscores, then the prefix is empty and the short name is
+the whole name.
+
+If the name has one underscore in it (e.g., "abcdef_mumble.cpp"), then the
+prefix is the part before the underscore ("abcdef") and the short name is all
+of the rest ("mumble.cpp").
+
+If the name has more than one underscore in it (e.g., "x_abcdef_mumble.cpp"),
+then we look as the length of the first part ("x").  If its length is one,
+then the prefix is the concatenation of the first two parts ("x_abcdef"), and
+the short name is the rest ("mumble.cpp").  If the length of the first part is
+not one (e.g., file name is "lovely_looking_mumble.cpp"), then the prefix is
+the first part ("lovely") and the short name is the rest
+("looking_mumble.cpp").
+
+After the split, the short name is converted to all lower case.
+
+Return a cons cell of the form (prefix . short-name)
 
 
 
@@ -4780,6 +5156,24 @@ name.
 
 
 
+#### new-lisp-while ####
+new-lisp-while *var-name*
+[Command]
+ (Function: shu-new-lisp--while)
+
+Insert at point a skeleton lisp while loop.  Prompt is issued for the
+variable name.  The while loop is of the form:
+
+```
+     (while x
+
+       (setq x (cdr x))
+       )
+```
+point is placed where the the first line of code in the loop belongs.
+
+
+
 #### number-commits ####
 [Command]
  (Function: shu-git-number-commits)
@@ -5137,6 +5531,24 @@ shu-new-lisp *func-name*
 
 Insert at point a skeleton lisp function.  Prompt is issued for the function
 name.
+
+
+
+#### shu-new-lisp--while ####
+shu-new-lisp--while *var-name*
+[Command]
+ (Alias: new-lisp-while)
+
+Insert at point a skeleton lisp while loop.  Prompt is issued for the
+variable name.  The while loop is of the form:
+
+```
+     (while x
+
+       (setq x (cdr x))
+       )
+```
+point is placed where the the first line of code in the loop belongs.
 
 
 
@@ -5610,6 +6022,7 @@ Associate a number with each type of variable
 
 
 
+
 # Index #
 
 * [acgen](#acgen)
@@ -5664,6 +6077,7 @@ Associate a number with each type of variable
 * [gfc](#gfc)
 * [gfl](#gfl)
 * [gfn](#gfn)
+* [gincl](#gincl)
 * [gquote](#gquote)
 * [hcgen](#hcgen)
 * [hother](#hother)
@@ -5675,13 +6089,18 @@ Associate a number with each type of variable
 * [krurl](#krurl)
 * [krvf](#krvf)
 * [list-c-directories](#list-c-directories)
+* [list-c-prefixes](#list-c-prefixes)
 * [list-c-project](#list-c-project)
+* [list-completing-names](#list-completing-names)
+* [list-project-names](#list-project-names)
+* [list-short-names](#list-short-names)
 * [make-c-project](#make-c-project)
 * [new-c-class](#new-c-class)
 * [new-c-file](#new-c-file)
 * [new-ert](#new-ert)
 * [new-h-file](#new-h-file)
 * [new-latex](#new-latex)
+* [new-lisp-while](#new-lisp-while)
 * [new-lisp](#new-lisp)
 * [new-x-file](#new-x-file)
 * [number-commits](#number-commits)
@@ -5860,6 +6279,7 @@ Associate a number with each type of variable
 * [shu-cpp-compare-tlist-sans-comment](#shu-cpp-compare-tlist-sans-comment)
 * [shu-cpp-compare-token-info-sans-pos](#shu-cpp-compare-token-info-sans-pos)
 * [shu-cpp-compare-token-info](#shu-cpp-compare-token-info)
+* [shu-cpp-completing-list](#shu-cpp-completing-list)
 * [shu-cpp-completion-current-buffer](#shu-cpp-completion-current-buffer)
 * [shu-cpp-completion-prefix](#shu-cpp-completion-prefix)
 * [shu-cpp-completion-scratch](#shu-cpp-completion-scratch)
@@ -5884,9 +6304,13 @@ Associate a number with each type of variable
 * [shu-cpp-include-user-brackets](#shu-cpp-include-user-brackets)
 * [shu-cpp-indent-length](#shu-cpp-indent-length)
 * [shu-cpp-inner-cdecl](#shu-cpp-inner-cdecl)
+* [shu-cpp-internal-list-names](#shu-cpp-internal-list-names)
 * [shu-cpp-internal-stream-check](#shu-cpp-internal-stream-check)
 * [shu-cpp-is-enclosing-op](#shu-cpp-is-enclosing-op)
 * [shu-cpp-is-reverse-token-list-balanced](#shu-cpp-is-reverse-token-list-balanced)
+* [shu-cpp-list-completing-names](#shu-cpp-list-completing-names)
+* [shu-cpp-list-project-names](#shu-cpp-list-project-names)
+* [shu-cpp-list-short-names](#shu-cpp-list-short-names)
 * [shu-cpp-make-token-info](#shu-cpp-make-token-info)
 * [shu-cpp-member-prefix](#shu-cpp-member-prefix)
 * [shu-cpp-misc-set-alias](#shu-cpp-misc-set-alias)
@@ -5898,9 +6322,14 @@ Associate a number with each type of variable
 * [shu-cpp-operators-three](#shu-cpp-operators-three)
 * [shu-cpp-operators-two](#shu-cpp-operators-two)
 * [shu-cpp-parse-region](#shu-cpp-parse-region)
+* [shu-cpp-prefix-list](#shu-cpp-prefix-list)
+* [shu-cpp-project-collapse-list](#shu-cpp-project-collapse-list)
 * [shu-cpp-project-file](#shu-cpp-project-file)
+* [shu-cpp-project-get-list-counts](#shu-cpp-project-get-list-counts)
+* [shu-cpp-project-invert-list](#shu-cpp-project-invert-list)
 * [shu-cpp-project-list](#shu-cpp-project-list)
 * [shu-cpp-project-set-alias](#shu-cpp-project-set-alias)
+* [shu-cpp-project-short-names](#shu-cpp-project-short-names)
 * [shu-cpp-project-subdirs](#shu-cpp-project-subdirs)
 * [shu-cpp-project-time](#shu-cpp-project-time)
 * [shu-cpp-qualify-classes](#shu-cpp-qualify-classes)
@@ -5910,6 +6339,9 @@ Associate a number with each type of variable
 * [shu-cpp-reverse-parse-region](#shu-cpp-reverse-parse-region)
 * [shu-cpp-reverse-tokenize-region-for-command](#shu-cpp-reverse-tokenize-region-for-command)
 * [shu-cpp-reverse-tokenize-region](#shu-cpp-reverse-tokenize-region)
+* [shu-cpp-rmv-blocked](#shu-cpp-rmv-blocked)
+* [shu-cpp-rmv-using](#shu-cpp-rmv-using)
+* [shu-cpp-short-list](#shu-cpp-short-list)
 * [shu-cpp-subdir-for-package](#shu-cpp-subdir-for-package)
 * [shu-cpp-target-file-column](#shu-cpp-target-file-column)
 * [shu-cpp-target-file-line](#shu-cpp-target-file-line)
@@ -5995,6 +6427,7 @@ Associate a number with each type of variable
 * [shu-gfc](#shu-gfc)
 * [shu-gfl](#shu-gfl)
 * [shu-gfn](#shu-gfn)
+* [shu-gincl](#shu-gincl)
 * [shu-git-diff-commits](#shu-git-diff-commits)
 * [shu-git-find-short-hash](#shu-git-find-short-hash)
 * [shu-git-number-commits](#shu-git-number-commits)
@@ -6007,7 +6440,9 @@ Associate a number with each type of variable
 * [shu-interactive-qualify-class-name](#shu-interactive-qualify-class-name)
 * [shu-internal-cpp2-class](#shu-internal-cpp2-class)
 * [shu-internal-get-set](#shu-internal-get-set)
+* [shu-internal-list-c-project](#shu-internal-list-c-project)
 * [shu-internal-new-lisp](#shu-internal-new-lisp)
+* [shu-internal-replace-class-name](#shu-internal-replace-class-name)
 * [shu-internal-visit-project-file](#shu-internal-visit-project-file)
 * [shu-internal-which-c-project](#shu-internal-which-c-project)
 * [shu-is-const](#shu-is-const)
@@ -6045,6 +6480,7 @@ Associate a number with each type of variable
 * [shu-lc-comment](#shu-lc-comment)
 * [shu-line-and-column-at](#shu-line-and-column-at)
 * [shu-list-c-directories](#shu-list-c-directories)
+* [shu-list-c-prefixes](#shu-list-c-prefixes)
 * [shu-list-c-project](#shu-list-c-project)
 * [shu-list-in-cpp-directory](#shu-list-in-cpp-directory)
 * [shu-local-replace](#shu-local-replace)
@@ -6060,6 +6496,7 @@ Associate a number with each type of variable
 * [shu-new-ert](#shu-new-ert)
 * [shu-new-h-file](#shu-new-h-file)
 * [shu-new-latex](#shu-new-latex)
+* [shu-new-lisp--while](#shu-new-lisp--while)
 * [shu-new-lisp](#shu-new-lisp)
 * [shu-new-x-file](#shu-new-x-file)
 * [shu-non-cpp-name](#shu-non-cpp-name)
@@ -6089,8 +6526,12 @@ Associate a number with each type of variable
 * [shu-possible-cpp-file-name](#shu-possible-cpp-file-name)
 * [shu-project-cpp-buffer-name](#shu-project-cpp-buffer-name)
 * [shu-project-file-list](#shu-project-file-list)
+* [shu-project-get-file-info](#shu-project-get-file-info)
+* [shu-project-make-short-key-list](#shu-project-make-short-key-list)
+* [shu-project-split-file-name](#shu-project-split-file-name)
 * [shu-project-user-class-count](#shu-project-user-class-count)
 * [shu-put-line-near-top](#shu-put-line-near-top)
+* [shu-qualify-class-fun](#shu-qualify-class-fun)
 * [shu-qualify-class-name](#shu-qualify-class-name)
 * [shu-qualify-namespace-bsl](#shu-qualify-namespace-bsl)
 * [shu-qualify-namespace-std](#shu-qualify-namespace-std)
@@ -6098,6 +6539,8 @@ Associate a number with each type of variable
 * [shu-remove-test-names](#shu-remove-test-names)
 * [shu-remove-trailing-all-whitespace](#shu-remove-trailing-all-whitespace)
 * [shu-renew-c-project](#shu-renew-c-project)
+* [shu-replace-class-fun](#shu-replace-class-fun)
+* [shu-replace-class-name](#shu-replace-class-name)
 * [shu-return-ptr](#shu-return-ptr)
 * [shu-return-ref](#shu-return-ref)
 * [shu-reverse-comma-names](#shu-reverse-comma-names)
@@ -6152,6 +6595,8 @@ Associate a number with each type of variable
 
 
 
+
+
 <!--
 LocalWords:  shu regexp scf cpp doxygen namepace bde num arg cp Bloomberg gen bb fn
 LocalWords:  cfile hfile tfile decl ifndef endif sdecl struct sgen foo doc elisp md
@@ -6168,5 +6613,6 @@ LocalWords:  facebook setq gmail krurl em krid krpw kracct krfn krpin krvf vlist
 LocalWords:  urls Lastname Firstname diff dbc ee da ec dup eld gd dired gf gfc gfl
 LocalWords:  gfn gquote ert SHA dos eol CRLF unix LF winpath eob YYYY DDTHHMMSS DDD
 LocalWords:  DD mac CR nvplist org TODO expiry CANCELLED todo xref defs retval tex
-LocalWords:  funcall myclass toc unescaped nvpair prob gtest
+LocalWords:  funcall myclass toc unescaped nvpair prob gtest gincl rmv qual xxx
+LocalWords:  WhammoCorp plist abcdef
 -->

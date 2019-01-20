@@ -1796,7 +1796,7 @@ is a class name.  Here is an example of such an a-list:
 
      (list
       (cons \"std\"    (list \"set\" \"string\" \"vector\"))
-      (cons \"world\"  (lisrt \"Hello\" \"Goodbye\")))
+      (cons \"world\"  (list \"Hello\" \"Goodbye\")))
 
 TOP-NAME, if present is a higher level namespace.  Given a top level namespace
 of \"WhammoCorp\", then the following line:
@@ -1876,7 +1876,7 @@ the buffer into which diagnostic messages are written.
 This function finds all of the \"using namespace\" directives in the file and
 checks to see if there is any ambiguity in the resulting class list.  For
 example, if namespace \"mumble\" contains class \"Bumble\" and namespace
-\"stubble\" also conains class \"Bumble\", we will not know which namespace to
+\"stubble\" also contains class \"Bumble\", we will not know which namespace to
 apply to instances of class \"Bumble\".  But this is not an ambiguity if there
 is a \"using namespace\" directive for only one of those classes.  That is why
 we do the ambiguity check only for namespaces referenced by \"using namespace\"
