@@ -159,7 +159,7 @@ It is used when a global change needs to visit every file in the project.")
 ;; path to use as the prefis
 
 
-(defcustom shu-cpp-project-short-names t
+(defcustom shu-cpp-project-short-names nil
   "Set non-nil if shu-cpp-project creates short names for files in a project.  A
 short name is an approximation of the file name that may be easier to type.  For
 example, if all of the files in a project begin with a common prefix (e.g.,
@@ -389,6 +389,7 @@ appropriate subdirectory."
         (setq ps (shu-project-make-short-key-list key-list))
         (setq shu-cpp-prefix-list (car ps))
         (setq short-keys (cdr ps))
+        (setq shu-cpp-short-list (shu-cpp-project-collapse-list short-keys))
         (setq all-keys (append key-list short-keys))
         (setq shu-cpp-completing-list (shu-cpp-project-collapse-list all-keys))
         (shu-cpp-finish-project))
@@ -1165,6 +1166,94 @@ about exractged file prefixes."
     ))
 
 
+
+;;
+;;  shu-cpp-list-short-names
+;;
+(defun shu-cpp-list-short-names ()
+  "List all of the short names in a project with the names of the files to
+which they map."
+  (interactive)
+  (shu-cpp-internal-list-names shu-cpp-short-list "short names")
+  )
+
+
+;;
+;;  shu-cpp-list-project-names
+;;
+(defun shu-cpp-list-project-names ()
+  "List all of the names in a project with the names of the files to
+which they map."
+  (interactive)
+  (shu-cpp-internal-list-names shu-cpp-class-list "project names")
+  )
+
+
+
+;;
+;;  shu-cpp-list-completing-names
+;;
+(defun shu-cpp-list-completing-names ()
+  "List all of the names that are used to do a completing read of a file name
+along with the names of the actual files to which they map."
+  (interactive)
+  (shu-cpp-internal-list-names shu-cpp-completing-list "completing names")
+  )
+
+
+
+;;
+;;  shu-cpp-internal-list-names
+;;
+(defun shu-cpp-internal-list-names (name-list type-name)
+  "Implementation function for SHU-CPP-LIST-SHORT-NAMES,
+SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
+  (let ((sl (when name-list (copy-tree name-list)))
+        (pos (point))
+        (pad (make-string 18 ? ))
+        (item)
+        (name)
+        (full-name)
+        (full-names)
+        (full-name-list)
+        (name-count 0)
+        (file-count 0))
+    (if (not shu-cpp-class-list)
+        (progn
+          (message "There is no project in use.")
+          (ding))
+      (if (not sl)
+          (progn
+            (message "Current project has no %s" type-name)
+            (ding))
+        (while sl
+          (setq name-count (1+ name-count))
+          (setq item (car sl))
+          (setq name (car item))
+          (setq full-name-list (cdr item))
+          (insert (concat name ":\n"))
+          (while full-name-list
+            (setq full-names (car full-name-list))
+            (while full-names
+              (setq full-name (car full-names))
+              (insert (concat pad full-name "\n"))
+              (setq file-count (1+ file-count))
+              (setq full-names (cdr full-names)))
+            (setq full-name (car full-names))
+            (setq full-name-list (cdr full-name-list)))
+          (setq sl (cdr sl)))
+        (goto-char pos)
+        (insert
+         (concat
+          "\n"
+          (shu-group-number name-count)
+          " " type-name " map to "
+          (shu-group-number file-count)
+          " files:\n\n"))
+        (goto-char pos)))
+    ))
+
+
 ;;
 ;;  shu-list-c-directories
 ;;
@@ -1659,6 +1748,9 @@ shu- prefix removed."
   (defalias 'count-c-project 'shu-count-c-project)
   (defalias 'list-c-project 'shu-list-c-project)
   (defalias 'list-c-prefixes 'shu-list-c-prefixes)
+  (defalias 'list-short-names 'shu-cpp-list-short-names)
+  (defalias 'list-project-names 'shu-cpp-list-project-names)
+  (defalias 'list-completing-names 'shu-cpp-list-completing-names)
   (defalias 'list-c-directories 'shu-list-c-directories)
   (defalias 'which-c-project 'shu-which-c-project)
   )

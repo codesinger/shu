@@ -358,6 +358,8 @@ text))
   (setq explicit-sh.exe-args '("--login" "-i"))
   (add-to-list 'exec-path "C:/Users/spalmer62/AppData/Local/Programs/Git/bin"))
 
+;; Projects enable short names
+(setq shu-cpp-project-short-names t)
 
 (put 'upcase-region 'disabled nil)
 ;; Enable show-paren-mode
