@@ -750,7 +750,7 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
 ;;
 (defun shu-gincl()
   "While in a file buffer, wrap the file name in a C++ include directive and
-put it in the kll ring.  The file name is delimited by double quotes unless
+put it in the kill ring.  The file name is delimited by double quotes unless
 SHU-CPP-INCLUDE-USER-BRACKETS variable is true, in which case the file name
 is delimited by left and right angle brackets."
   (interactive)
@@ -1790,20 +1790,20 @@ or right parenthesis or a left or right square bracket."
 ;;
 (defun shu-cpp-rmv-using (class-list &optional top-name)
   "Remove \"using namespace\" directives from a C++ file, adding the appropriate
-mamespace qualifier to all of the unqualified class names.  CLASS-LIST is an
-a-list in which the car of each entrhy is a namespace and the cdr of each entry
+namespace qualifier to all of the unqualified class names.  CLASS-LIST is an
+a-list in which the car of each entry is a namespace and the cdr of each entry
 is a class name.  Here is an example of such an a-list:
 
      (list
       (cons \"std\"    (list \"set\" \"string\" \"vector\"))
-      (cons \"world\"  (liat \"Hello\" \"Goodbye\")))
+      (cons \"world\"  (lisrt \"Hello\" \"Goodbye\")))
 
 TOP-NAME, if present is a higher level namespace.  Given a top level namespace
 of \"WhammoCorp\", then the following line:
 
      using namespace WhammoCorp::world;
 
-would be ingterpreted as though it had been written:
+would be interpreted as though it had been written:
 
      using namespace world;"
   (let* ((gb-name "**shu-chgs**")
@@ -1874,7 +1874,7 @@ qualifier from the class name in a \"using namespace\" directive, if any.  GB is
 the buffer into which diagnostic messages are written.
 
 This function finds all of the \"using namespace\" directives in the file and
-checks to see if there is any ambiguity in the resulting clsss list.  For
+checks to see if there is any ambiguity in the resulting class list.  For
 example, if namespace \"mumble\" contains class \"Bumble\" and namespace
 \"stubble\" also conains class \"Bumble\", we will not know which namespace to
 apply to instances of class \"Bumble\".  But this is not an ambiguity if there
@@ -1967,7 +1967,7 @@ qualifier."
 ;;  shu-qualify-class-fun
 ;;
 (defun shu-qualify-class-fun (namespace name)
-  "This is the replacment function for SHU-QUALIFY-CLASS-NAME.  It is called
+  "This is the replacement function for SHU-QUALIFY-CLASS-NAME.  It is called
 with the NAMESPACE to be applied to the class whose name is NAME.  It
 constructs a new name and issues replace-match to replace it."
   (let ((rename (concat namespace "::" name)))
@@ -1996,7 +1996,7 @@ instances of the class name found inside a comment are replaced."
 ;;  shu-replace-class-fun
 ;;
 (defun shu-replace-class-fun (new-name name)
-  "This is the replacment function for SHU-REPLACE-CLASS-NAME.  It is called
+  "This is the replacement function for SHU-REPLACE-CLASS-NAME.  It is called
 with the NEW-NAME to replace the class NAME.  It calls replace-match to replace
 NAME with NEW-NAME."
     (replace-match new-name t t)

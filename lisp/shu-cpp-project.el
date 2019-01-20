@@ -1120,7 +1120,7 @@ project whose files are in PROJ-LIST."
 (defun shu-list-c-prefixes ()
   "List all of the file prefixes found in the current project, if any.
 See the doc-string for SHU-PROJECT-SPLIT-FILE-NAME for further information
-about exractged file prefixes."
+about extracted file prefixes."
   (interactive)
   (let ((pl shu-cpp-prefix-list)
         (max-prefix 20)
