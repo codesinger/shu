@@ -1496,10 +1496,8 @@ then the returned list will contain
       ;; Now have all properties for current name
       (when (> (length full-name-list) 1)
         (setq full-name-list (delete-dups full-name-list))
-                                        ;        (when (> (length full-name-list) 1)
-                                        ;          (setq full-name-list (sort full-name-list 'string<))
-                                        ;          )
-        )
+        (when (> (length full-name-list) 1)
+          (setq full-name-list (sort full-name-list 'string<))))
       (setq item (cons file-name (list full-name-list)))
       (setq rlist (cons item rlist)))
     (nreverse rlist)
