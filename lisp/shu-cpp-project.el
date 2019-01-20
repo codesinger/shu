@@ -376,7 +376,7 @@ appropriate subdirectory."
         (setq shu-project-file-list (cons full-name shu-project-file-list))
         (setq shu-project-user-class-count (1+ shu-project-user-class-count))
         (setq ilist (cdr ilist)))
-        (setq shu-cpp-class-list (shu-cpp-project-collapse-list key-list))
+      (setq shu-cpp-class-list (shu-cpp-project-collapse-list key-list))
       (setq shu-cpp-prefix-list nil)
       (if (not shu-cpp-project-short-names)
           (setq shu-cpp-completing-list shu-cpp-class-list)
@@ -426,10 +426,10 @@ is wanted."
     (while plist
       (shu-project-get-file-info plist file-name full-name-list)
       (princ (concat file-name ":\n      ") shu-cpp-buffer)
-     (princ full-name-list shu-cpp-buffer)
-     (princ "\n" shu-cpp-buffer)
-     (setq plist (cdr plist))
-     )
+      (princ full-name-list shu-cpp-buffer)
+      (princ "\n" shu-cpp-buffer)
+      (setq plist (cdr plist))
+      )
     (when (> dup-count 1)
       (setq name-name "names")
       (setq occur-name "occur"))
@@ -548,7 +548,7 @@ file typed in the completion buffer."
       (setq completion-prefix shu-cpp-completion-prefix)
       (when shu-cpp-project-short-names
         (setq completion-prefix nil)
-      ))
+        ))
     (if (not shu-cpp-completing-list)
         (progn
           (message "No project files have been defined.")
@@ -856,24 +856,24 @@ buffer and ask the user to choose the desired one.  The string containing the
 chosen fully qualified file name will then be passed to the function pointed
 to by target."
   (let (
-          (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
-    )
-  (princ "\nshu-cpp-resolve-choice\n" shu-cpp-buffer)
-  (princ full-name-list shu-cpp-buffer) (princ "\n\n" shu-cpp-buffer)
-  (princ target shu-cpp-buffer) (princ "\n\n" shu-cpp-buffer)
-  (ad-enable-advice 'choose-completion
-                    'after 'shu-cpp-choose-completion)
-  (ad-activate 'choose-completion)
-  (ad-enable-advice 'mouse-choose-completion
-                    'after 'shu-cpp-mouse-choose-completion)
-  (ad-activate 'mouse-choose-completion)
-  (setq shu-cpp-completion-target target)
-  (setq shu-cpp-completion-current-buffer (current-buffer))
-  (setq shu-cpp-completion-scratch (generate-new-buffer "*C Scratch*"))
-  (set-buffer shu-cpp-completion-scratch)
-  (with-output-to-temp-buffer "*C Completions*"
-    (display-completion-list full-name-list))
-  ))
+        (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
+        )
+    (princ "\nshu-cpp-resolve-choice\n" shu-cpp-buffer)
+    (princ full-name-list shu-cpp-buffer) (princ "\n\n" shu-cpp-buffer)
+    (princ target shu-cpp-buffer) (princ "\n\n" shu-cpp-buffer)
+    (ad-enable-advice 'choose-completion
+                      'after 'shu-cpp-choose-completion)
+    (ad-activate 'choose-completion)
+    (ad-enable-advice 'mouse-choose-completion
+                      'after 'shu-cpp-mouse-choose-completion)
+    (ad-activate 'mouse-choose-completion)
+    (setq shu-cpp-completion-target target)
+    (setq shu-cpp-completion-current-buffer (current-buffer))
+    (setq shu-cpp-completion-scratch (generate-new-buffer "*C Scratch*"))
+    (set-buffer shu-cpp-completion-scratch)
+    (with-output-to-temp-buffer "*C Completions*"
+      (display-completion-list full-name-list))
+    ))
 
                                         ; At this point this function exits and control resumes at
                                         ; the function shu-cpp-common-completion, which is called
@@ -1104,6 +1104,58 @@ project whose files are in PROJ-LIST."
       (setq full-name (car plist))
       (insert (concat full-name "\n"))
       (setq plist (cdr plist)))
+    ))
+
+
+;;
+;;  shu-list-c-prefixes
+;;
+(defun shu-list-c-prefixes ()
+  "List all of the file prefixes found in the current project, if any.
+See the doc-string for SHU-PROJECT-SPLIT-FILE-NAME for further information
+about exractged file prefixes."
+  (interactive)
+  (let ((pl shu-cpp-prefix-list)
+        (max-prefix 20)
+        (np 0)
+        (item)
+        (prefix)
+        (count)
+        (pad-length)
+        (pad))
+    (if (not shu-cpp-class-list)
+        (progn
+          (message "There is no project in use.")
+          (ding))
+      (while pl
+        (setq item (car pl))
+        (setq prefix (car item))
+        (setq np (1+ np))
+        (when (> (length prefix) max-prefix)
+          (setq max-prefix (length prefix)))
+        (setq pl (cdr pl)))
+      (if (not (> np 0))
+          (progn
+            (message "Current project has no prefixes.")
+            (ding))
+        (insert
+         (concat
+          "\n"
+          "prefix name               count\n"
+          "-----------               -----\n"))
+        (setq pl shu-cpp-prefix-list)
+        (while pl
+          (setq item (car pl))
+          (setq prefix (car item))
+          (setq count (cdr item))
+          (setq pad "")
+          (when (< (length prefix) max-prefix)
+            (setq pad-length (- max-prefix (length prefix)))
+            (setq pad (make-string pad-length ? )))
+          (insert
+           (concat
+            prefix pad (shu-fixed-format-num count 11) "\n"))
+          (setq pl (cdr pl)))))
     ))
 
 
@@ -1435,12 +1487,12 @@ then the returned list will contain
             (setq limit nil))
           )
         )
-                                        ; Now have all properties for current name
+      ;; Now have all properties for current name
       (when (> (length full-name-list) 1)
         (setq full-name-list (delete-dups full-name-list))
-;        (when (> (length full-name-list) 1)
-;          (setq full-name-list (sort full-name-list 'string<))
-;          )
+                                        ;        (when (> (length full-name-list) 1)
+                                        ;          (setq full-name-list (sort full-name-list 'string<))
+                                        ;          )
         )
       (setq item (cons file-name (list full-name-list)))
       (setq rlist (cons item rlist)))
@@ -1602,6 +1654,7 @@ shu- prefix removed."
   (defalias 'renew-c-project 'shu-renew-c-project)
   (defalias 'count-c-project 'shu-count-c-project)
   (defalias 'list-c-project 'shu-list-c-project)
+  (defalias 'list-c-prefixes 'shu-list-c-prefixes)
   (defalias 'list-c-directories 'shu-list-c-directories)
   (defalias 'which-c-project 'shu-which-c-project)
   )
