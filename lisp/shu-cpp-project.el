@@ -62,6 +62,11 @@ SHU-CPP-COMPLETING-LIST.")
   "This is the list of prefixes removed from the short names if
 SHU-CPP-PROJECT-SHORT-NAMES is non-nil.")
 
+(defvar shu-cpp-short-list nil
+  "This is the list of short names, if there are any.  The car of each item is
+the short name.  The cdr of each item is the full path to the associated
+file name.")
+
 (defvar shu-cpp-completing-list nil
   "This is an alist whose keys are unqualified file names and whose values
 contain a list of the fully qualified files with the same unqualified name.  If
@@ -378,6 +383,7 @@ appropriate subdirectory."
         (setq ilist (cdr ilist)))
       (setq shu-cpp-class-list (shu-cpp-project-collapse-list key-list))
       (setq shu-cpp-prefix-list nil)
+      (setq shu-cpp-short-list nil)
       (if (not shu-cpp-project-short-names)
           (setq shu-cpp-completing-list shu-cpp-class-list)
         (setq ps (shu-project-make-short-key-list key-list))
