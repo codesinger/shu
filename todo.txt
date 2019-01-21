@@ -37,3 +37,7 @@ Things that I would like to do someday ...
   bdlt::Datetime  time;
 
   "time" is very unlikely to be a class name.
+
+- 21 Jan 2019 - Might be useful to allow people to enter their own short name for a
+  file.  e.g., a frequently visited file has two long names to which it maps.  Have
+  some way to indicate that a different, user supplied name maps to one of them.
