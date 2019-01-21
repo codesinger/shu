@@ -466,7 +466,8 @@ ALIST.  ADDED-ITEM is either the item that was added or the item that was
 previously there.  If (eq ADDED-ITEM NEW-ITEM), then NEW-ITEM was added to the
 list.  If (not (eq ADDED-ITEM NEW-ITEM)), then the key already existed in the
 list and ADDED-ITEM is the item that was already on the list with a matching
-key."
+key.  equal is the function used to determine equality unless TESTFN is
+supplied, in which case TESTFN is used."
   `(if (not ,alist)
        (progn
          (push ,new-item alist)
