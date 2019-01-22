@@ -470,11 +470,11 @@ key.  equal is the function used to determine equality unless TESTFN is
 supplied, in which case TESTFN is used."
   `(if (not ,alist)
        (progn
-         (push ,new-item alist)
+         (push ,new-item ,alist)
          (setq ,added-item ,new-item))
      (setq ,added-item (assoc (car ,new-item) ,alist ,testfn))
      (when (not ,added-item)
-       (push ,new-item alist)
+       (push ,new-item ,alist)
        (setq ,added-item ,new-item)))
   )
 

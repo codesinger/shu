@@ -91,6 +91,10 @@ This is used by shu-internal-get-set when generating getters and setters for a c
 (defvar shu-lc-comment nil
   "Comment string with the first letter downcased.")
 
+(defvar shu-rmv-classes nil
+  "An alist of \"using namespace\" directives and their line numbers where first declared.
+Used to filter duplicates.")
+
 ;;
 ;;  Functions for customzing
 ;;
