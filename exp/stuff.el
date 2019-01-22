@@ -79,17 +79,14 @@ would be interpreted as though it had been written:
 
      using namespace world;"
   (interactive)
-  (let (
-        (using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
+ (let ((using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
         (looking t)
         (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
         (name)
         (using-name)
         (mbeg)
         (bol)
-        (not-comment)
-        (found-pos)
-        )
+        (not-comment))
     (while looking
       (setq using-name nil)
       (setq not-comment nil)
@@ -104,24 +101,14 @@ would be interpreted as though it had been written:
               (setq not-comment t)
               (goto-char bol)
               (when (search-forward "//" mbeg t)
-                (setq not-comment nil)
-                )
-              )
+                (setq not-comment nil)))
             (when not-comment
               (when top-qual
                 (when (string-match top-qual name)
-                  (setq name (match-string 1 name))
-                  )
-                )
-              )
+                  (setq name (match-string 1 name)))))
             (when not-comment
               (setq using-name name)
-              (setq looking nil)
-              )
-            )
-          )
-        )
-      )
+              (setq looking nil))))))
     using-name
     ))
 
@@ -176,9 +163,7 @@ would be interpreted as though it had been written:
           "\ninclude <something.h>\n"
           "using namespace glory;\n"
           "using namespace bob;\n"
-          "using namespace fred;\n"
-          ))
-
+          "using namespace fred;\n"))
         (expected1 "glory")
         (expected2 "bob")
         (expected3 "fred")
@@ -211,9 +196,7 @@ would be interpreted as though it had been written:
           "\ninclude <something.h>\n"
           "using namespace glory;\n"
           "// using namespace bob;\n"
-          "using namespace fred;\n"
-          ))
-
+          "using namespace fred;\n"))
         (expected1 "glory")
         (expected2 "fred")
         (actual))
@@ -241,9 +224,7 @@ would be interpreted as though it had been written:
           "\ninclude <something.h>\n"
           "using namespace glory;\n"
           "\"using namespace bob;\"\n"
-          "using namespace fred;\n"
-          ))
-
+          "using namespace fred;\n"))
         (expected1 "glory")
         (expected2 "fred")
         (actual))
@@ -271,8 +252,7 @@ would be interpreted as though it had been written:
           "\ninclude <something.h>\n"
           "using namespace glory;\n"
           "\"using namespace bob;\"\n"
-          "using namespace WhammoCorp::fred;\n"
-          ))
+          "using namespace WhammoCorp::fred;\n" ))
         (top-name "WhammoCorp")
         (expected1 "glory")
         (expected2 "fred")
