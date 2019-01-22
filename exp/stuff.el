@@ -3,153 +3,297 @@
 
 
 
-;;
-;;  shu-add-to-alist-1
-;;
-(defmacro shu-add-to-alist-1 (added-item new-item alist &optional testfn)
-  "Add an item to an alist.  The car of NEW-ITEM is a key to be added to the
-alist ALIST.  If the key does not already exist in ALIST, NEW-ITEM is added to
-ALIST.  ADDED-ITEM is either the item that was added or the item that was
-previously there.  If (eq ADDED-ITEM NEW-ITEM), then NEW-ITEM was added to the
-list.  If (not (eq ADDED-ITEM NEW-ITEM)), then the key already existed in the
-list and ADDED-ITEM is the item that was already on the list with a matching
-key."
-  `(if (not ,alist)
-       (progn
-         (setq ,alist (cons ,new-item ,alist))
-         (setq ,added-item ,new-item)
-         )
-     (setq ,added-item (assoc (car ,new-item) ,alist ,testfn))
-     (when (not ,added-item)
-       (setq ,alist (cons ,new-item ,alist))
-       )
-     )
-  )
-
-
-
-
 
 ;;
-;;  shu-add-to-alist
+;;  shu-cpp-rmv-using
 ;;
-(defmacro shu-add-to-alist (added-item new-item alist &optional testfn)
-  "Add an item to an alist.  The car of NEW-ITEM is a key to be added to the
-alist ALIST.  If the key does not already exist in ALIST, NEW-ITEM is added to
-ALIST.  ADDED-ITEM is either the item that was added or the item that was
-previously there.  If (eq ADDED-ITEM NEW-ITEM), then NEW-ITEM was added to the
-list.  If (not (eq ADDED-ITEM NEW-ITEM)), then the key already existed in the
-list and ADDED-ITEM is the item that was already on the list with a matching
-key."
-  `(if (not ,alist)
-       (progn
-         (push ,new-item alist)
-         (setq ,added-item ,new-item))
-     (setq ,added-item (assoc (car ,new-item) ,alist ,testfn))
-     (when (not ,added-item)
-       (push ,new-item alist)
-       (setq ,added-item ,new-item)))
-  )
+(defun shu-cpp-rmv-using (class-list &optional top-name)
+  "Remove \"using namespace\" directives from a C++ file, adding the appropriate
+namespace qualifier to all of the unqualified class names.  CLASS-LIST is an
+a-list in which the car of each entry is a namespace and the cdr of each entry
+is a class name.  Here is an example of such an a-list:
 
+     (list
+      (cons \"std\"    (list \"set\" \"string\" \"vector\"))
+      (cons \"world\"  (list \"Hello\" \"Goodbye\")))
 
+TOP-NAME, if present is a higher level namespace.  Given a top level namespace
+of \"WhammoCorp\", then the following line:
 
+     using namespace WhammoCorp::world;
 
+would be interpreted as though it had been written:
 
-
-;;
-;;  shu-test-shu-add-to-alist-1
-;;
-(ert-deftest shu-test-shu-add-to-alist-1 ()
-  (let ((alist)
-        (item (cons "A" 0))
-        (added-item))
-    (shu-add-to-alist added-item item alist)
-    (should added-item)
-    (should (consp added-item))
-    (should (stringp (car added-item)))
-    (should (numberp (cdr added-item)))
-    (should (string= (car item) (car added-item)))
-    (should (= (cdr item) (cdr added-item)))
-    (should (eq added-item item))
+     using namespace world;"
+  (let* ((gb-name "**shu-chgs**")
+         (gb (get-buffer-create gb-name))
+         (using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
+         (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
+         (bol)
+         (ct 0)
+         (count 0)
+         (uc 0)
+         (unk "")
+         (name)
+         (mbeg)
+         (not-comment)
+         (x)
+         (classes)
+         (namespace)
+         (class-list)
+         (item)
+         (count)
+         (inserted-item)
+         (case-fold-search nil))
+    (setq shu-rmv-classes nil)
+    (princ (concat "\nStart to remove \"using namespace\" for file "
+                   (buffer-file-name) "\n") gb)
+    (if (shu-cpp-rmv-blocked class-list using top-qual gb)
+        (progn
+          (ding)
+          (message "Class ambiguity prevents change.  See buffer %s" gb-name))
+      (goto-char (point-min))
+      (while (re-search-forward using nil t)
+        (setq name (match-string 1))
+        (setq mbeg (match-beginning 0))
+        (setq bol (line-beginning-position))
+        (save-match-data
+          (save-excursion
+            (if (shu-point-in-string)
+                (setq not-comment nil)
+              (setq not-comment t)
+              (goto-char bol)
+              (when (search-forward "//" mbeg t)
+                (setq not-comment nil)
+                )
+              )
+            )
+          )
+        (when not-comment
+          (when top-name
+            (when (string-match top-qual name)
+              (setq name (match-string 1 name))))
+          (setq x (assoc name class-list))
+          (if (not x)
+              (progn
+                (princ (format "Unknown namespace: \"%s\"\n" name) gb)
+                (setq uc (1+ uc)))
+            (setq item (cons name 0))
+            (shu-add-to-alist inserted-item item class-list)
+            (setq count (cdr inserted-item))
+            (setq count (1+ count))
+            (setcdr inserted-item count)
+            (delete-region (line-beginning-position) (line-end-position))
+;;            (if (> count 1)
+;;                (princ (format "Duplicate namespace: %s\n" name) gb)
+              (setq namespace (car x))
+              (setq classes (cdr x))
+              (save-excursion
+                (setq ct (shu-cpp-qualify-classes classes namespace gb)))
+              (setq count (+ count ct))
+;;              )
+            )
+          )
+        )
+      (goto-char (point-min))
+      (when (not (= 0 uc))
+        (setq unk (format " %d unknown namespaces. " uc)))
+      (message "Replaced %d occurrences.%s  See buffer **chgs**" count unk))
+    count
     ))
 
 
 
 ;;
-;;  shu-test-shu-add-to-alist-2
+;;  shu-cpp-rmv-blocked
 ;;
-(ert-deftest shu-test-shu-add-to-alist-2 ()
-  (let ((alist)
-        (item (cons "A" 0))
-        (item2 (cons "B" 0))
-        (added-item))
-    (shu-add-to-alist added-item item alist)
-    (shu-add-to-alist added-item item2 alist)
-    (should added-item)
-    (should (consp added-item))
-    (should (stringp (car added-item)))
-    (should (numberp (cdr added-item)))
-    (should (string= (car item2) (car added-item)))
-    (should (= (cdr item2) (cdr added-item)))
-    (should (eq added-item item2))
-    ))
+(defun shu-cpp-rmv-blocked (class-list using top-qual gb)
+  "Do a pre-check on a file to see if we will be able to remove its \"using
+namespace\" directives.  CLASS-LIST is the a-list passed to SHU-CPP-RMV-USING.
+USING is the regular expression used to search for \"using namespace\"
+directives.  TOP-QUAL is the regular expression used to strip out a higher level
+qualifier from the class name in a \"using namespace\" directive, if any.  GB is
+the buffer into which diagnostic messages are written.
 
+This function finds all of the \"using namespace\" directives in the file and
+checks to see if there is any ambiguity in the resulting class list.  For
+example, if namespace \"mumble\" contains class \"Bumble\" and namespace
+\"stubble\" also contains class \"Bumble\", we will not know which namespace to
+apply to instances of class \"Bumble\".  But this is not an ambiguity if there
+is a \"using namespace\" directive for only one of those classes.  That is why
+we do the ambiguity check only for namespaces referenced by \"using namespace\"
+directives.
 
-
-;;
-;;  shu-test-shu-add-to-alist-3
-;;
-(ert-deftest shu-test-shu-add-to-alist-3 ()
-  (let ((alist)
-        (item (cons "A" 0))
-        (item2 (cons "B" 0))
-        (item3 (cons "B" 0))
-        (added-item))
-    (shu-add-to-alist added-item item alist)
-    (shu-add-to-alist added-item item2 alist)
-    (shu-add-to-alist added-item item2 alist)
-    (should added-item)
-    (should (consp added-item))
-    (should (stringp (car added-item)))
-    (should (numberp (cdr added-item)))
-    (should (string= (car item3) (car added-item)))
-    (should (= (cdr item3) (cdr added-item)))
-    (should (not (eq added-item item3)))
-    ))
-
-
-
-;;
-;;  shu-test-shu-add-to-alist-4
-;;
-(ert-deftest shu-test-shu-add-to-alist-4 ()
-  (let ((alist)
-        (items (list "A" "B" "C" "A" "B"))
-        (item)
-        (count)
-        (expected
-         (list
-          (cons "A" 2)
-          (cons "B" 2)
-          (cons "C" 1)))
-        (actual)
+This function returns true if such an ambiguity exists."
+  (let ((name)
+        (mbeg)
+        (bol)
+        (not-comment)
         (x)
-        (added-item))
-    (while items
-      (setq x (car items))
-      (setq item (cons x 0))
-      (shu-add-to-alist added-item item alist)
-      (setq count (cdr added-item))
-      (setq count (1+ count))
-      (setcdr added-item count)
-      (setq items (cdr items)))
-    (should alist)
-    (should (listp alist))
-    (should (= 3 (length alist)))
-    (setq actual (sort alist
-                       (lambda(obj1 obj2)
-                         (string< (car obj1) (car obj2)))))
-    (should (equal expected actual))
+        (z)
+        (uc 0)
+        (clist)
+        (cl)
+        (ns)
+        (classes)
+        (class)
+        (listc)
+        (line-no)
+        (item)
+        (new-item)
+        (blocked))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward using nil t)
+        (setq name (match-string 1))
+        (setq mbeg (match-beginning 0))
+        (setq bol (line-beginning-position))
+        (save-match-data
+          (save-excursion
+            (if (shu-point-in-string)
+                (setq not-comment nil)
+              (setq not-comment t)
+              (goto-char bol)
+              (when (search-forward "//" mbeg t)
+                (setq not-comment nil)
+                )
+              )
+            )
+          )
+        (when not-comment
+          (when top-qual
+            (when (string-match top-qual name)
+              (setq name (match-string 1 name))))
+          (setq x (assoc name class-list))
+          (when x
+            (setq item (cons name (line-number-at-pos mbeg t)))
+            (setq new-item nil)
+            (shu-add-to-alist new-item item shu-rmv-classes)
+            (setq clist (cons x clist))
+            )
+          )
+        )
+      )
+    (setq cl clist)
+    (while cl
+      (setq x (car cl))
+      (setq ns (car x))
+      (setq classes (cdr x))
+      (while classes
+        (setq class (car classes))
+        (setq x (cons class ns))
+        (if (not listc)
+            (setq listc (cons x listc))
+          (setq z (assoc class listc))
+          (if (not z)
+              (setq listc (cons x listc))
+            (princ (format "class %s in namespace %s conflicts with class %s in namespace %s\n"
+                           class ns (car z) (cdr z)) gb)
+            (setq blocked t)))
+        (setq classes (cdr classes)))
+      (setq cl (cdr cl)))
+    blocked
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-rmv-using-7
+;;
+(ert-deftest shu-test-shu-cpp-rmv-using-7 ()
+  (let ((data
+         (concat
+          "#include <something.h>\n"
+          "using namespace std;\n"
+          "\" using namespace muddle; \"\n"
+          "using namespace world;\n"
+          "   string    x;\n"
+          "   set<int>  y;\n"
+          "   Hello     q;\n"
+          "   vector<string>   q;\n"
+          "   Goodbye  g;\n"
+          "   Goodbyebye  bb;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (classes
+         (list
+          (cons "std"   (list "string" "set" "map" "vector"))
+          (cons "muddle"   (list "Whirlwind"))
+          (cons "world" (list "Hello" "Goodbye"))))
+        (expected
+         (concat
+          "#include <something.h>\n"
+          "\n"
+          "\" using namespace muddle; \"\n"
+          "\n"
+          "   std::string    x;\n"
+          "   std::set<int>  y;\n"
+          "   world::Hello     q;\n"
+          "   std::vector<std::string>   q;\n"
+          "   world::Goodbye  g;\n"
+          "   Goodbyebye  bb;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (actual)
+        (count 0))
+    (setq debug-on-error t)
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-rmv-using classes))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    (should (= 6 count))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-rmv-using-8
+;;
+(ert-deftest shu-test-shu-cpp-rmv-using-8 ()
+  (let ((data
+         (concat
+          "#include <something.h>\n"
+          "using namespace std;\n"
+          "\" using namespace muddle; \"\n"
+          "using namespace world;\n"
+          "using namespace std;\n"
+          "   string    x;\n"
+          "   set<int>  y;\n"
+          "   Hello     q;\n"
+          "   vector<string>   q;\n"
+          "   Goodbye  g;\n"
+          "   Goodbyebye  bb;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (classes
+         (list
+          (cons "std"   (list "string" "set" "map" "vector"))
+          (cons "muddle"   (list "Whirlwind"))
+          (cons "world" (list "Hello" "Goodbye"))))
+        (expected
+         (concat
+          "#include <something.h>\n"
+          "\n"
+          "\" using namespace muddle; \"\n"
+          "\n"
+          "\n"
+          "   std::string    x;\n"
+          "   std::set<int>  y;\n"
+          "   world::Hello     q;\n"
+          "   std::vector<std::string>   q;\n"
+          "   world::Goodbye  g;\n"
+          "   Goodbyebye  bb;\n"
+          "   z->set();\n"
+          "// vector<string> \n"))
+        (actual)
+        (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-cpp-rmv-using classes))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    (should (= 6 count))
     ))
 
 
