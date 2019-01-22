@@ -5,6 +5,171 @@
 
 
 ;;
+;;  shu-cpp-find-using
+;;
+(defun shu-cpp-find-using (&optional top-name)
+  "Return the name of the class found on the next \"using namespace\" directive
+or nil of no such directive found.
+
+TOP-NAME, if present is a higher level namespace.  Given a top level namespace
+of \"WhammoCorp\", then the following line:
+
+     using namespace WhammoCorp::world;
+
+would be interpreted as though it had been written:
+
+     using namespace world;"
+  (interactive)
+  (let (
+        (using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
+        (looking t)
+        (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
+        (name)
+        (using-name)
+        (mbeg)
+        (bol)
+        (not-comment)
+        (found-pos)
+        )
+    (when (re-search-forward using nil t)
+      (setq name (match-string 1))
+      (setq mbeg (match-beginning 0))
+      (setq bol (line-beginning-position))
+      (save-match-data
+        (save-excursion
+          (when (not (shu-point-in-string (1- (point))))
+            (setq not-comment t)
+            (goto-char bol)
+            (when (search-forward "//" mbeg t)
+              (setq not-comment nil)
+              )
+            )
+          (when not-comment
+            (when top-qual
+              (when (string-match top-qual name)
+                (setq name (match-string 1 name))
+                )
+              )
+            )
+          )
+        )
+      )
+    (when not-comment
+      (setq using-name name)
+      )
+    using-name
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-using-1
+;;
+(ert-deftest shu-test-shu-cpp-find-using-1 ()
+  (let ((data
+         (concat
+          "\ninclude <something.h>\n"
+          "using namespace glory;\n"))
+        (expected "glory")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-using-2
+;;
+(ert-deftest shu-test-shu-cpp-find-using-2 ()
+  (let ((data
+         (concat
+          "\ninclude <something.h>\n"
+          " \"using namespace glory;\"\n"))
+        (expected "glory")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-cpp-find-using))
+      (should (not actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-using-3
+;;
+(ert-deftest shu-test-shu-cpp-find-using-3 ()
+  (let ((data
+         (concat
+          "\ninclude <something.h>\n"
+          "using namespace glory;\n"
+          "using namespace bob;\n"
+          "using namespace fred;\n"
+          ))
+
+        (expected1 "glory")
+        (expected2 "bob")
+        (expected3 "fred")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected1 actual))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected2 actual))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected3 actual))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-using-4
+;;
+(ert-deftest shu-test-shu-cpp-find-using-4 ()
+  (let ((data
+         (concat
+          "\ninclude <something.h>\n"
+          "using namespace glory;\n"
+          "// using namespace bob;\n"
+          "using namespace fred;\n"
+          ))
+
+        (expected1 "glory")
+        (expected2 "fred")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected1 actual))
+;;      (setq actual (shu-cpp-find-using))
+;;      (should actual)
+;;      (should (stringp actual))
+;;      (should (string= expected2 actual))
+      )
+    ))
+
+
+
+;;
 ;;  shu-cpp-rmv-using
 ;;
 (defun shu-cpp-rmv-using (class-list &optional top-name)
@@ -84,14 +249,14 @@ would be interpreted as though it had been written:
             (setq count (1+ count))
             (setcdr inserted-item count)
             (delete-region (line-beginning-position) (line-end-position))
-;;            (if (> count 1)
-;;                (princ (format "Duplicate namespace: %s\n" name) gb)
-              (setq namespace (car x))
-              (setq classes (cdr x))
-              (save-excursion
-                (setq ct (shu-cpp-qualify-classes classes namespace gb)))
-              (setq count (+ count ct))
-;;              )
+            ;;            (if (> count 1)
+            ;;                (princ (format "Duplicate namespace: %s\n" name) gb)
+            (setq namespace (car x))
+            (setq classes (cdr x))
+            (save-excursion
+              (setq ct (shu-cpp-qualify-classes classes namespace gb)))
+            (setq count (+ count ct))
+            ;;              )
             )
           )
         )
@@ -196,105 +361,6 @@ This function returns true if such an ambiguity exists."
     ))
 
 
-
-;;
-;;  shu-test-shu-cpp-rmv-using-7
-;;
-(ert-deftest shu-test-shu-cpp-rmv-using-7 ()
-  (let ((data
-         (concat
-          "#include <something.h>\n"
-          "using namespace std;\n"
-          "\" using namespace muddle; \"\n"
-          "using namespace world;\n"
-          "   string    x;\n"
-          "   set<int>  y;\n"
-          "   Hello     q;\n"
-          "   vector<string>   q;\n"
-          "   Goodbye  g;\n"
-          "   Goodbyebye  bb;\n"
-          "   z->set();\n"
-          "// vector<string> \n"))
-        (classes
-         (list
-          (cons "std"   (list "string" "set" "map" "vector"))
-          (cons "muddle"   (list "Whirlwind"))
-          (cons "world" (list "Hello" "Goodbye"))))
-        (expected
-         (concat
-          "#include <something.h>\n"
-          "\n"
-          "\" using namespace muddle; \"\n"
-          "\n"
-          "   std::string    x;\n"
-          "   std::set<int>  y;\n"
-          "   world::Hello     q;\n"
-          "   std::vector<std::string>   q;\n"
-          "   world::Goodbye  g;\n"
-          "   Goodbyebye  bb;\n"
-          "   z->set();\n"
-          "// vector<string> \n"))
-        (actual)
-        (count 0))
-    (setq debug-on-error t)
-    (with-temp-buffer
-      (insert data)
-      (setq count (shu-cpp-rmv-using classes))
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-      (should (string= expected actual)))
-    (should (= 6 count))
-    ))
-
-
-
-;;
-;;  shu-test-shu-cpp-rmv-using-8
-;;
-(ert-deftest shu-test-shu-cpp-rmv-using-8 ()
-  (let ((data
-         (concat
-          "#include <something.h>\n"
-          "using namespace std;\n"
-          "\" using namespace muddle; \"\n"
-          "using namespace world;\n"
-          "using namespace std;\n"
-          "   string    x;\n"
-          "   set<int>  y;\n"
-          "   Hello     q;\n"
-          "   vector<string>   q;\n"
-          "   Goodbye  g;\n"
-          "   Goodbyebye  bb;\n"
-          "   z->set();\n"
-          "// vector<string> \n"))
-        (classes
-         (list
-          (cons "std"   (list "string" "set" "map" "vector"))
-          (cons "muddle"   (list "Whirlwind"))
-          (cons "world" (list "Hello" "Goodbye"))))
-        (expected
-         (concat
-          "#include <something.h>\n"
-          "\n"
-          "\" using namespace muddle; \"\n"
-          "\n"
-          "\n"
-          "   std::string    x;\n"
-          "   std::set<int>  y;\n"
-          "   world::Hello     q;\n"
-          "   std::vector<std::string>   q;\n"
-          "   world::Goodbye  g;\n"
-          "   Goodbyebye  bb;\n"
-          "   z->set();\n"
-          "// vector<string> \n"))
-        (actual)
-        (count 0))
-    (with-temp-buffer
-      (insert data)
-      (setq count (shu-cpp-rmv-using classes))
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-      (should (string= expected actual)))
-    (should (= 6 count))
-    ))
 
 
 ;;
