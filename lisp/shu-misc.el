@@ -841,15 +841,44 @@ lot of file buffers that it created.
 If this function returns true, then the calling function should kill the
 buffer when it is finished with it."
   (interactive)
-  (let (
-        (fbuf (get-buffer file-name))
-        (file-buf)
-        )
+  (let ((fbuf (get-buffer file-name))
+        (file-buf))
     (if fbuf
         (setq file-buf fbuf)
       (setq file-buf (find-file-noselect file-name)))
     (set-buffer file-buf)
     fbuf
+    ))
+
+
+
+
+;;
+;;  shu-case-sensitive
+;;
+(defun shu-case-sensitive ()
+  "Set the variable case-fold-search to nil to make searches and matches respect
+case.  I can never remember which way to set case-fold-search, hence this
+simple, little function."
+  (interactive)
+  (let ((csnot (if case-fold-search " not" "")))
+    (setq case-fold-search nil)
+    (message "Previous setting was%s case sensitive" csnot)
+    ))
+
+
+
+;;
+;;  shu-case-insensitive
+;;
+(defun shu-case-insensitive ()
+  "Set the variable case-fold-search to t to make searches and matches ignore
+case.  I can never remember which way to set case-fold-search, hence this
+simple, little function."
+  (interactive)
+  (let ((csnot (if case-fold-search " not" "")))
+    (setq case-fold-search t)
+    (message "Previous setting was%s case sensitive" csnot)
     ))
 
 
@@ -882,6 +911,8 @@ shu- prefix removed."
   (defalias 'remove-test-names 'shu-remove-test-names)
   (defalias 'number-commits 'shu-git-number-commits)
   (defalias 'diff-commits 'shu-git-diff-commits)
+  (defalias 'case-sensitive 'shu-case-sensitive)
+  (defalias 'case-insensitive 'shu-case-insensitive)
   )
 
 ;;; shu-misc.el ends here
