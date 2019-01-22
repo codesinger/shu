@@ -882,6 +882,33 @@ simple, little function."
     ))
 
 
+
+;;
+;;  shu-number-lines
+;;
+(defun shu-number-lines ()
+  "Insert in front of each line in the buffer its line number.  Starts
+at point and continues to the end of the buffer."
+  (interactive)
+  (let ((pos (point))
+        (eof)
+        (x)
+        (y)
+        (wid))
+    (setq eof (line-number-at-pos (point-max)))
+    (setq y (number-to-string eof))
+    (setq wid (length y))
+    (save-excursion
+      (while (/= eof (line-number-at-pos))
+        (beginning-of-line)
+        (setq x (line-number-at-pos))
+        (insert
+         (concat
+          " " (shu-format-num x wid) ". "))
+        (forward-line 1)))
+    ))
+
+
 ;;
 ;;  shu-misc-set-alias
 ;;
@@ -913,6 +940,7 @@ shu- prefix removed."
   (defalias 'diff-commits 'shu-git-diff-commits)
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
+  (defalias 'number-lines 'shu-number-lines)
   )
 
 ;;; shu-misc.el ends here

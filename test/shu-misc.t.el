@@ -260,4 +260,50 @@
     (should (not actual)))
     ))
 
+
+
+;;
+;;  shu-test-shu-number-lines-1
+;;
+(ert-deftest shu-test-shu-number-lines-1 ()
+  (let (
+        (data
+         (concat
+          "Now is the time for all good men\n"
+          "to come to the aid of the party.\n"
+          "Now is the time for all good men\n"
+          "to come to the aid of the party.\n"
+          "Now is the time for all good men\n"
+          "to come to the aid of the party.\n"
+          "Now is the time for all good men\n"
+          "to come to the aid of the party.\n"
+          "Now is the time for all good men\n"
+          "to come to the aid of the party.\n"
+          "Now is the time for all good men\n"
+          "to come to the aid of the party.\n"))
+        (expected
+         (concat
+          "  1. Now is the time for all good men\n"
+          "  2. to come to the aid of the party.\n"
+          "  3. Now is the time for all good men\n"
+          "  4. to come to the aid of the party.\n"
+          "  5. Now is the time for all good men\n"
+          "  6. to come to the aid of the party.\n"
+          "  7. Now is the time for all good men\n"
+          "  8. to come to the aid of the party.\n"
+          "  9. Now is the time for all good men\n"
+          " 10. to come to the aid of the party.\n"
+          " 11. Now is the time for all good men\n"
+          " 12. to come to the aid of the party.\n"))
+        (actual)
+        )
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (shu-number-lines)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
 ;;; shu-misc.t.el ends here
