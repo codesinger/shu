@@ -54,14 +54,12 @@
 ;;  shu-jdate
 ;;
 (defun shu-jdate (serial-day)
-  "Convert a serial julian day number to month, day, year.  Return month,
-day, year in a list."
-  (let (
-        (j (- serial-day shu-jdate-const1))
+  "Convert a serial julian day number to year, month, day.  Return year,
+month, day in a list."
+  (let ((j (- serial-day shu-jdate-const1))
         (y)
         (m)
-        (d)
-        )
+        (d))
     (setq y (/ (1- (* j 4)) shu-jdate-const2))
     (setq j (- (1- (* j 4)) (* y shu-jdate-const2)))
     (setq d (/ j 4))
@@ -77,6 +75,52 @@ day, year in a list."
       (setq m (- m 9))
       (setq y (1+ y)))
     (list y m d)
+    ))
+
+
+
+
+;;
+;;  shu-jday
+;;
+(defun shu-jday (date)
+  "Convert a list containing year, month, day into a serial jiulian day number."
+  (interactive)
+  (let ((y (car date))
+        (m (cadr date))
+        (d (caddr date))
+        (c)
+        (j)
+        (ya))
+    (if (> m 2)
+        (setq m (- m 3))
+      (setq m (+ m 9))
+      (setq y (1- y)))
+    (setq c (/ y 100))
+    (setq ya (- y (* 100 c)))
+    (setq j (+
+             (/ (* c shu-jdate-const2) 4)
+             (/ (* ya shu-jdate-const3) 4)
+             (/ (+ (* m shu-jdate-const4) 2) 5)
+             d
+             shu-jdate-const1))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-jday-1
+;;
+(ert-deftest shu-test-shu-jday-1 ()
+  (let ((date (list 2019 1 22))
+        (new-date)
+        (j))
+    (setq j (shu-jday date))
+    (setq new-date (shu-jdate j))
+    (should new-date)
+    (should (listp date))
+    (should (equal date new-date))
     ))
 
 
