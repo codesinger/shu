@@ -25,11 +25,22 @@
 ;;; Commentary:
 
 ;;
-;; A miscellaneous collection of useful functions
+;; A miscellaneous collection of useful functions for dealing with dates.
+;;
+;; A shu date is the corresponding julian day number as defined below.
+;;
+;; A shu time is a cons cell in which the car is seconds since midnight
+;; and the cdr is microseconds.
+;;
+;; A shu datetime is a cons cell in which the car is the date and the
+;; cdr is the time.
+
 
 ;;; Code:
 
 (provide 'shu-date)
+
+
 
 
 
@@ -41,17 +52,40 @@
   (let (
         (dtrx
          (concat
-          "\\([0-9]\\{4\\}\\)"   ;; Year
+          "\\([0-9]\\{4\\}\\)"   ;; 1 - Year
           "-"
-          "\\([0-9]\\{2\\}\\)"   ;; Month
+          "\\([0-9]\\{2\\}\\)"   ;; 2 - Month
           "-"
-          "\\([0-9]\\{2\\}\\)"   ;; Day
+          "\\([0-9]\\{2\\}\\)"   ;; 3 - Day
           "T"
-          "\\([0-9]\\{2\\}\\)"   ;; Hour
-          "\\([0-9]\\{2\\}\\)"   ;; Minute
-          "\\([0-9]\\{2\\}\\)"   ;; Second
+          "\\([0-9]\\{2\\}\\)"   ;; 4 - Hour
+          "\\([0-9]\\{2\\}\\)"   ;; 5 - Minute
+          "\\([0-9]\\{2\\}\\)"   ;; 6 - Second
           "."
-          "\\([0-9]\\{3\\}\\)")) ;; Milliseconds
+          "\\([0-9]\\{3\\}\\)")) ;; 7 - Milliseconds
+        )
+    (shu-internal-convert-to-datetime-1 date-time-string dtrx)
+    ))
+
+
+
+;;
+;;  shu-inrternal-convert-to-datetime-1
+;;
+(defun shu-internal-convert-to-datetime-1 (date-time-string rx-parse)
+  "Convert a string to a shu datetime.  DATE-TIME-STRING is the string to be
+converted.  RX-PARSE is a regular expression used to parse the string.  The
+string may be in any format that can be parsed by RX-PARSE.  The strings
+produced by the string-match ust be as follows:
+
+   1 - four digit year
+   2 - month
+   3 - day
+   4 - hour
+   5 - minute
+   6 - second
+   7 - milliseconds"
+  (let (
         (dts date-time-string)
         (yy)
         (mm)
@@ -67,7 +101,7 @@
         (case-fold-search nil)
         )
     (setq debug-on-error t)
-    (when (string-match dtrx dts)
+    (when (string-match rx-parse dts)
       (setq yy (string-to-number (match-string 1 dts)))
       (setq mm (string-to-number (match-string 2 dts)))
       (setq dd (string-to-number (match-string 3 dts)))
