@@ -1,4 +1,4 @@
-;;; shu-cpp-project.el --- Shu project code for dealing wth C++ in Emacs
+;;; shu-cpp-misc.el --- Shu project code for dealing wth C++ in Emacs
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
