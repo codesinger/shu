@@ -270,16 +270,20 @@ is used in place of the position of point."
 ;;
 ;;  shu-format-num
 ;;
-(defun shu-format-num (num width)
+(defun shu-format-num (num width &optional pad-char)
   "Return a printable representation of NUM in a string right justified
-and pad filled to length WIDTH."
+and pad filled to length WIDTH.  The number is padded with blanks unless
+an optional PAD-CHAR i ssupplied, which is then used instead of blanks."
   (let ((num
          (if (stringp num)
              num
-           (number-to-string num))))
+           (number-to-string num)))
+        (pc (if pad-char
+                pad-char
+              ?\ )))
     (when (<= width (length num))
       (setq width (length num)))
-    (concat (make-string (- width (length num)) ?\ ) num)
+    (concat (make-string (- width (length num)) pc) num)
     ))
 
 

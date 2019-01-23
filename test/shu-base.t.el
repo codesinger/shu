@@ -367,6 +367,17 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 ;;
+;;  shu-test-shu-format-num-3
+;;
+(ert-deftest shu-test-shu-format-num-3 ()
+  (let ((x 902)
+      (gx "00902")
+       (result))
+    (setq result (shu-format-num x 5 ?0))
+    (should (string= gx result))))
+
+
+;;
 ;;  shu-test-shu-fixed-format-num-1
 ;;
 (ert-deftest shu-test-shu-fixed-format-num-1 ()
