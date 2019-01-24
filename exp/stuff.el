@@ -325,11 +325,15 @@ would be interpreted as though it had been written:
             (setq not-comment t)
             (goto-char bol)
             (when (search-forward "//" mbeg t)
-              (setq not-comment nil))))
+              (setq not-comment nil)
+              )
+            )
+          )
         (when not-comment
           (when top-name
             (when (string-match top-qual name)
-              (setq name (match-string 1 name))))
+              (setq name (match-string 1 name)))
+            )
           (setq x (assoc name class-list))
           (if (not x)
               (progn
@@ -340,7 +344,10 @@ would be interpreted as though it had been written:
             (setq classes (cdr x))
             (save-excursion
               (setq ct (shu-cpp-qualify-classes classes namespace gb)))
-            (setq count (+ count ct)))))
+            (setq count (+ count ct))
+            )
+          )
+        )
       (goto-char (point-min))
       (when (not (= 0 uc))
         (setq unk (format " %d unknown namespaces. " uc)))
@@ -396,14 +403,21 @@ This function returns true if such an ambiguity exists."
             (setq not-comment t)
             (goto-char bol)
             (when (search-forward "//" mbeg t)
-              (setq not-comment nil))))
+              (setq not-comment nil)
+              )
+            )
+          )
         (when not-comment
           (when top-qual
             (when (string-match top-qual name)
               (setq name (match-string 1 name))))
           (setq x (assoc name class-list))
         (when x
-          (setq clist (cons x clist))))))
+          (setq clist (cons x clist))
+          )
+        )
+        )
+      )
     (setq cl clist)
     (while cl
       (setq x (car cl))
@@ -419,9 +433,13 @@ This function returns true if such an ambiguity exists."
               (setq listc (cons x listc))
             (princ (format "class %s in namespace %s conflicts with class %s in namespace %s\n"
                            class ns (car z) (cdr z)) gb)
-            (setq blocked t)))
-        (setq classes (cdr classes)))
-      (setq cl (cdr cl)))
+            (setq blocked t)
+            )
+          )
+        (setq classes (cdr classes))
+        )
+      (setq cl (cdr cl))
+      )
     blocked
     ))
 
