@@ -271,11 +271,6 @@ would be interpreted as though it had been written:
               )
             )
           )
-        (when not-comment
-          (when top-name
-            (when (string-match top-qual name)
-              (setq name (match-string 1 name)))
-            )
           (setq x (assoc name class-list))
           (if (not x)
               (progn
@@ -288,12 +283,13 @@ would be interpreted as though it had been written:
               (setq ct (shu-cpp-qualify-classes classes namespace gb)))
             (setq count (+ count ct))
             )
-          )
+
         )
       (goto-char (point-min))
       (when (not (= 0 uc))
         (setq unk (format " %d unknown namespaces. " uc)))
-      (message "Replaced %d occurrences.%s  See buffer **chgs**" count unk))
+      (message "Replaced %d occurrences.%s  See buffer **chgs**" count unk)
+      )
     count
     ))
 
