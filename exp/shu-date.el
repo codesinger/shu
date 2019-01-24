@@ -163,38 +163,29 @@ produced by the string-match ust be as follows:
 respective month number."
   (let (
         (mm (downcase mon))
-        (num)
+        (num 0)
+        (x)
         )
-    (setq num
-          (cond
-           ((string= mm "jan")
-            1)
-           ((string= mm "feb")
-            2)
-           ((string= mm "mar")
-            3)
-           ((string= mm "apr")
-            4)
-           ((string= mm "may")
-            5)
-           ((string= mm "jun")
-            6)
-           ((string= mm "jul")
-            7)
-           ((string= mm "aug")
-            8)
-           ((string= mm "sep")
-            9)
-           ((string= mm "oct")
-            10)
-           ((string= mm "nov")
-            11)
-           ((string= mm "dec")
-            12)
-           (t
-            0)))
+    (setq x (assoc mm shu-date-mon-num-tab))
+    (when x
+      (setq num (cdr x))
+      )
     num
     ))
+
+(defconst shu-date-mon-num-tab
+  (list
+   (cons "jan"  1) (cons "feb"  2) (cons "mar"  3) (cons "apr"  4)
+   (cons "may"  5) (cons "jun"  6) (cons "jul"  7) (cons "aug"  8)
+   (cons "sep"  9) (cons "oct" 10) (cons "nov" 11) (cons "dec" 12))
+  "Alist used to convert 3 character month names to month numbers.")
+
+
+(defconst shu-date-num-mon-tab
+  ["jan" "feb" "mar" "apr"
+   "may" "jun" "jul" "aug"
+   "sep" "oct" "nov" "dec"]
+  "Array used to convert month numbers to three character month names.")
 
 
 
@@ -204,27 +195,11 @@ respective month number."
 (defun shu-number-to-mon (num)
   "Turn a momth umber into its three character abbreviation."
   (interactive)
-  (let (
-        (x)
-        (mt ["jan"
-             "feb"
-             "mar"
-             "apr"
-             "may"
-             "jun"
-             "jul"
-             "aug"
-             "sep"
-             "oct"
-             "nov"
-             "dec"])
-        (mon "???")
-        )
-    (when (and (> num 0)
-               (< num 13))
+  (let ((x)
+        (mon "???"))
+    (when (and (> num 0) (< num 13))
       (setq x (1- num))
-      (setq mon (aref mt x))
-      )
+      (setq mon (aref shu-date-num-mon-tab x)))
     mon
     ))
 
