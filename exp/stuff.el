@@ -79,7 +79,7 @@ would be interpreted as though it had been written:
 
      using namespace world;"
   (interactive)
- (let ((using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
+  (let ((using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
         (looking t)
         (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
         (name)
@@ -360,7 +360,7 @@ would be interpreted as though it had been written:
 ;;
 ;;  shu-cpp-rmv-blocked
 ;;
-(defun shu-cpp-rmv-blocked (class-list using top-qual gb)
+(defun shu-cpp-rmv-blocked (class-list using top-name gb)
   "Do a pre-check on a file to see if we will be able to remove its \"using
 namespace\" directives.  CLASS-LIST is the a-list passed to SHU-CPP-RMV-USING.
 USING is the regular expression used to search for \"using namespace\"
@@ -381,10 +381,13 @@ This function returns true if such an ambiguity exists."
   (let ((name)
         (mbeg)
         (bol)
-        (not-comment)
         (x)
         (z)
         (uc 0)
+        (looking)
+        (item)
+        (added-item)
+        (duplicates)
         (clist)
         (cl)
         (ns)
@@ -394,28 +397,21 @@ This function returns true if such an ambiguity exists."
         (blocked))
     (save-excursion
       (goto-char (point-min))
-      (while (re-search-forward using nil t)
-        (setq name (match-string 1))
-        (setq mbeg (match-beginning 0))
-        (setq bol (line-beginning-position))
-        (save-match-data
-          (save-excursion
-            (setq not-comment t)
-            (goto-char bol)
-            (when (search-forward "//" mbeg t)
-              (setq not-comment nil)
+      (setq looking t)
+      (while looking
+        (setq name (shu-cpp-find-using top-name))
+        (if (not name)
+            (setq looking nil)
+          (setq mbeg (match-beginning 0))
+          (setq item (cons name (line-number-at-pos mbeg)))
+          (shu-add-to-alist added-item item duplicates)
+          (when (eq added-item item) ;; Name is not duplicate
+            (setq x (assoc name class-list))
+            (when x
+              (setq clist (cons x clist))
               )
             )
           )
-        (when not-comment
-          (when top-qual
-            (when (string-match top-qual name)
-              (setq name (match-string 1 name))))
-          (setq x (assoc name class-list))
-        (when x
-          (setq clist (cons x clist))
-          )
-        )
         )
       )
     (setq cl clist)
