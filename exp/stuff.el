@@ -272,6 +272,7 @@ would be interpreted as though it had been written:
 
 
 
+
 ;;
 ;;  shu-cpp-rmv-using
 ;;
@@ -308,14 +309,8 @@ would be interpreted as though it had been written:
          (x)
          (classes)
          (namespace)
-         (class-list)
-         (item)
-         (count)
-         (inserted-item)
+         (debug-on-error t)
          (case-fold-search nil))
-    (setq shu-rmv-classes nil)
-    (princ (concat "\nStart to remove \"using namespace\" for file "
-                   (buffer-file-name) "\n") gb)
     (if (shu-cpp-rmv-blocked class-list using top-qual gb)
         (progn
           (ding)
@@ -327,16 +322,10 @@ would be interpreted as though it had been written:
         (setq bol (line-beginning-position))
         (save-match-data
           (save-excursion
-            (if (shu-point-in-string)
-                (setq not-comment nil)
-              (setq not-comment t)
-              (goto-char bol)
-              (when (search-forward "//" mbeg t)
-                (setq not-comment nil)
-                )
-              )
-            )
-          )
+            (setq not-comment t)
+            (goto-char bol)
+            (when (search-forward "//" mbeg t)
+              (setq not-comment nil))))
         (when not-comment
           (when top-name
             (when (string-match top-qual name)
@@ -346,23 +335,12 @@ would be interpreted as though it had been written:
               (progn
                 (princ (format "Unknown namespace: \"%s\"\n" name) gb)
                 (setq uc (1+ uc)))
-            (setq item (cons name 0))
-            (shu-add-to-alist inserted-item item class-list)
-            (setq count (cdr inserted-item))
-            (setq count (1+ count))
-            (setcdr inserted-item count)
             (delete-region (line-beginning-position) (line-end-position))
-            ;;            (if (> count 1)
-            ;;                (princ (format "Duplicate namespace: %s\n" name) gb)
             (setq namespace (car x))
             (setq classes (cdr x))
             (save-excursion
               (setq ct (shu-cpp-qualify-classes classes namespace gb)))
-            (setq count (+ count ct))
-            ;;              )
-            )
-          )
-        )
+            (setq count (+ count ct)))))
       (goto-char (point-min))
       (when (not (= 0 uc))
         (setq unk (format " %d unknown namespaces. " uc)))
@@ -406,9 +384,6 @@ This function returns true if such an ambiguity exists."
         (classes)
         (class)
         (listc)
-        (line-no)
-        (item)
-        (new-item)
         (blocked))
     (save-excursion
       (goto-char (point-min))
@@ -418,30 +393,17 @@ This function returns true if such an ambiguity exists."
         (setq bol (line-beginning-position))
         (save-match-data
           (save-excursion
-            (if (shu-point-in-string)
-                (setq not-comment nil)
-              (setq not-comment t)
-              (goto-char bol)
-              (when (search-forward "//" mbeg t)
-                (setq not-comment nil)
-                )
-              )
-            )
-          )
+            (setq not-comment t)
+            (goto-char bol)
+            (when (search-forward "//" mbeg t)
+              (setq not-comment nil))))
         (when not-comment
           (when top-qual
             (when (string-match top-qual name)
               (setq name (match-string 1 name))))
           (setq x (assoc name class-list))
-          (when x
-            (setq item (cons name (line-number-at-pos mbeg t)))
-            (setq new-item nil)
-            (shu-add-to-alist new-item item shu-rmv-classes)
-            (setq clist (cons x clist))
-            )
-          )
-        )
-      )
+        (when x
+          (setq clist (cons x clist))))))
     (setq cl clist)
     (while cl
       (setq x (car cl))
@@ -462,6 +424,7 @@ This function returns true if such an ambiguity exists."
       (setq cl (cdr cl)))
     blocked
     ))
+
 
 
 

@@ -68,3 +68,7 @@ shu-cpp-project-short-names is non-nil, this holds both the long and short names
 
 shu-cpp-class-list is the list used for everything other than completing read.  It
 never holds short names.
+
+DAYLIGHT SAVINGS TIME
+
+https://en.wikipedia.org/wiki/History_of_time_in_the_United_States
