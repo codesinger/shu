@@ -4,64 +4,6 @@
 
 
 
-;;
-;;  shu-cpp-find-using
-;;
-(defun zzzzzzzshu-cpp-find-using (&optional top-name)
-  "Return the name of the class found on the next \"using namespace\" directive
-or nil of no such directive found.
-
-TOP-NAME, if present is a higher level namespace.  Given a top level namespace
-of \"WhammoCorp\", then the following line:
-
-     using namespace WhammoCorp::world;
-
-would be interpreted as though it had been written:
-
-     using namespace world;"
-  (interactive)
-  (let (
-        (using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
-        (looking t)
-        (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
-        (name)
-        (using-name)
-        (mbeg)
-        (bol)
-        (not-comment)
-        (found-pos)
-        )
-    (when (re-search-forward using nil t)
-      (setq name (match-string 1))
-      (setq mbeg (match-beginning 0))
-      (setq bol (line-beginning-position))
-      (save-match-data
-        (save-excursion
-          (when (not (shu-point-in-string (1- (point))))
-            (setq not-comment t)
-            (goto-char bol)
-            (when (search-forward "//" mbeg t)
-              (setq not-comment nil)
-              )
-            )
-          (when not-comment
-            (when top-qual
-              (when (string-match top-qual name)
-                (setq name (match-string 1 name))
-                )
-              )
-            )
-          )
-        )
-      )
-    (when not-comment
-      (setq using-name name)
-      )
-    using-name
-    ))
-
-
-
 
 ;;
 ;;  shu-cpp-find-using
