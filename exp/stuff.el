@@ -150,4 +150,23 @@ results in the following output being returned:
 
 
 
+;;
+;;  shu-test-shu-invert-list-list-3
+;;
+(ert-deftest shu-test-shu-invert-list-list-3 ()
+  (let ((classes
+         (list
+          (cons "A" (list "X"))))
+        (x)
+        (actual)
+        (expected
+         (list
+          (cons "X" (list "A")))))
+    (setq x (shu-invert-list-list classes 'string<))
+    (setq actual (sort x (lambda(lhs rhs) (string< (car lhs) (car rhs)))))
+    (should (equal expected actual))
+    ))
+
+
+
 ;; ((Goodbye world) (Hello world) (map world std) (set world std) (string world std) (vector std))
