@@ -72,3 +72,14 @@ never holds short names.
 DAYLIGHT SAVINGS TIME
 
 https://en.wikipedia.org/wiki/History_of_time_in_the_United_States
+
+====================
+
+Inverting an alist
+
+Current class list has namespace as a key and the car is a list of classes that
+belong to that namespace.
+
+Need something that will invert that
+
+The key is a class name and the car is a list of namespaces to which that class belongs
