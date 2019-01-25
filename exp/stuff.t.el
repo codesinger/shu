@@ -4,9 +4,9 @@
 
 
 ;;
-;;  shu-test-shu-cpp-rmv-using-7
+;;  shu-test-shu-cpp-rmv-using-8
 ;;
-(ert-deftest shu-test-shu-cpp-rmv-using-7 ()
+(ert-deftest shu-test-shu-cpp-rmv-using-8 ()
   (let ((data
          (concat
           "#include <something.h>\n"
@@ -54,9 +54,9 @@
 
 
 ;;
-;;  shu-test-shu-cpp-rmv-using-8
+;;  shu-test-shu-cpp-rmv-using-9
 ;;
-(ert-deftest shu-test-shu-cpp-rmv-using-8 ()
+(ert-deftest shu-test-shu-cpp-rmv-using-9 ()
   (let ((data
          (concat
           "#include <something.h>\n"
