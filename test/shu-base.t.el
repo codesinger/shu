@@ -871,4 +871,76 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     (should (equal expected actual))
     ))
 
+
+
+
+;;
+;;  shu-test-shu-invert-list-list-1
+;;
+(ert-deftest shu-test-shu-invert-list-list-1 ()
+  (let ((classes
+         (list
+          (cons "A" (list "X" "Y" "Z"))
+          (cons "B" (list "Q" "X" "Z"))
+          (cons "C" (list "P" "X"))))
+        (x)
+        (actual)
+        (expected
+         (list
+          (cons "P" (list "C"))
+          (cons "Q" (list "B"))
+          (cons "X" (list "A" "B" "C"))
+          (cons "Y" (list "A"))
+          (cons "Z" (list "A" "B")))))
+    (setq x (shu-invert-list-list classes 'string<))
+    (setq actual (sort x (lambda(lhs rhs) (string< (car lhs) (car rhs)))))
+    (should (equal expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-invert-list-list-2
+;;
+(ert-deftest shu-test-shu-invert-list-list-2 ()
+  (let ((classes
+         (list
+          (cons "std"   (list "string" "set" "map" "vector"))
+          (cons "world" (list "Hello" "Goodbye" "string" "set" "map"))))
+        (x)
+        (actual)
+        (expected
+         (list
+          (cons "Goodbye" (list "world"))
+          (cons "Hello"   (list "world"))
+          (cons "map"     (list "world" "std"))
+          (cons "set"     (list "world" "std"))
+          (cons "string"  (list "world" "std"))
+          (cons "vector"  (list "std")))))
+    (setq x (shu-invert-list-list classes))
+    (setq actual (sort x (lambda(lhs rhs) (string< (car lhs) (car rhs)))))
+    (should (equal expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-invert-list-list-3
+;;
+(ert-deftest shu-test-shu-invert-list-list-3 ()
+  (let ((classes
+         (list
+          (cons "A" (list "X"))))
+        (x)
+        (actual)
+        (expected
+         (list
+          (cons "X" (list "A")))))
+    (setq x (shu-invert-list-list classes 'string<))
+    (setq actual (sort x (lambda(lhs rhs) (string< (car lhs) (car rhs)))))
+    (should (equal expected actual))
+    ))
+
+
 ;;; shu-base.t.el ends here
