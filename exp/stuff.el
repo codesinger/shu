@@ -61,9 +61,7 @@ results in the following output being returned:
      X -> (A B C)
      Y -> (A)
      Z -> (A B)"
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (al alist)
+  (let ((al alist)
         (item)
         (keys)
         (key)
@@ -73,7 +71,6 @@ results in the following output being returned:
         (added-item)
         (new-list)
         (nl))
-    (setq debug-on-error t)
     (while al
       (setq item (car al))
       (setq key (car item))
@@ -85,24 +82,17 @@ results in the following output being returned:
         (when (not (eq added-item new-item))
           (setq keys (cdr added-item))
           (push key keys)
-          (setcdr added-item keys)
-          )
-        (setq zalues (cdr zalues))
-        )
-      (setq al (cdr al))
-      )
+          (setcdr added-item keys))
+        (setq zalues (cdr zalues)))
+      (setq al (cdr al)))
     (when compare-fn
       (setq nl new-list)
       (while nl
         (setq item (car nl))
-        (princ "item:\n" gb) (princ item gb) (princ "\n" gb)
         (setq values (cdr item))
-        (princ "values:\n" gb) (princ values gb) (princ "\n" gb)
         (setq values (sort values compare-fn))
         (setcdr item values)
-        (setq nl (cdr nl))
-        )
-      )
+        (setq nl (cdr nl))))
     new-list
     ))
 
@@ -113,14 +103,11 @@ results in the following output being returned:
 ;;  shu-test-shu-invert-list-list-1
 ;;
 (ert-deftest shu-test-shu-invert-list-list-1 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (classes
+  (let ((classes
          (list
           (cons "A" (list "X" "Y" "Z"))
           (cons "B" (list "Q" "X" "Z"))
-          (cons "C" (list "P" "X"))
-          ))
+          (cons "C" (list "P" "X"))))
         (x)
         (actual)
         (expected
@@ -133,18 +120,9 @@ results in the following output being returned:
          )))
     (setq x (shu-invert-list-list classes 'string<))
     (setq actual (sort x (lambda(lhs rhs) (string< (car lhs) (car rhs)))))
-    (princ "\nexpected:\n" gb) (princ expected gb) (princ "\n" gb)
-    (princ "\nactual:\n" gb) (princ actual gb) (princ "\n" gb)
     (should (equal expected actual))
     ))
 
-;; ((P C) (Q B) (X A B C) (Y A) (Z A B))
-
-;; ((P C) (Q B) (X C B A) (Y A) (Z B A))
-;; ((P C) (Q B) (X C B A) (Y A) (Z B A))
-
-
-;; ((P C) (Q B) (X C A) (Y A) (Z A))
 
 
 
