@@ -875,9 +875,9 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 ;;
-;;  shu-test-shu-invert-list-list-1
+;;  shu-test-shu-invert-alist-list-1
 ;;
-(ert-deftest shu-test-shu-invert-list-list-1 ()
+(ert-deftest shu-test-shu-invert-alist-list-1 ()
   (let ((classes
          (list
           (cons "A" (list "X" "Y" "Z"))
@@ -892,7 +892,7 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
           (cons "X" (list "A" "B" "C"))
           (cons "Y" (list "A"))
           (cons "Z" (list "A" "B")))))
-    (setq x (shu-invert-list-list classes 'string<))
+    (setq x (shu-invert-alist-list classes 'string<))
     (setq actual (sort x (lambda(lhs rhs) (string< (car lhs) (car rhs)))))
     (should (equal expected actual))
     ))
@@ -901,9 +901,9 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 ;;
-;;  shu-test-shu-invert-list-list-2
+;;  shu-test-shu-invert-alist-list-2
 ;;
-(ert-deftest shu-test-shu-invert-list-list-2 ()
+(ert-deftest shu-test-shu-invert-alist-list-2 ()
   (let ((classes
          (list
           (cons "std"   (list "string" "set" "map" "vector"))
@@ -918,7 +918,7 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
           (cons "set"     (list "world" "std"))
           (cons "string"  (list "world" "std"))
           (cons "vector"  (list "std")))))
-    (setq x (shu-invert-list-list classes))
+    (setq x (shu-invert-alist-list classes))
     (setq actual (sort x (lambda(lhs rhs) (string< (car lhs) (car rhs)))))
     (should (equal expected actual))
     ))
@@ -926,9 +926,9 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 ;;
-;;  shu-test-shu-invert-list-list-3
+;;  shu-test-shu-invert-alist-list-3
 ;;
-(ert-deftest shu-test-shu-invert-list-list-3 ()
+(ert-deftest shu-test-shu-invert-alist-list-3 ()
   (let ((classes
          (list
           (cons "A" (list "X"))))
@@ -937,7 +937,7 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
         (expected
          (list
           (cons "X" (list "A")))))
-    (setq x (shu-invert-list-list classes 'string<))
+    (setq x (shu-invert-alist-list classes 'string<))
     (setq actual (sort x (lambda(lhs rhs) (string< (car lhs) (car rhs)))))
     (should (equal expected actual))
     ))
