@@ -267,7 +267,8 @@ would be interpreted as though it had been written:
           (setq mbeg (match-beginning 0))
           (setq item (cons name (line-number-at-pos mbeg)))
           (shu-add-to-alist added-item item duplicates)
-          (when (eq added-item item) ;; Name is not duplicate
+          (if (not (eq added-item item)) ;; Name is a duplicate
+              (delete-region (line-beginning-position) (line-end-position))
             (setq x (assoc name class-list))
             (if (not x)
                 (progn
