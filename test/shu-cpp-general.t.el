@@ -1759,4 +1759,163 @@ This is most likely the name of an include file and not the name of a class."
     (should (= 6 count))
     ))
 
+
+
+;;
+;;  shu-test-shu-cpp-find-using-1
+;;
+(ert-deftest shu-test-shu-cpp-find-using-1 ()
+  (let ((data
+         (concat
+          "\ninclude <something.h>\n"
+          "using namespace glory;\n"))
+        (expected "glory")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-using-2
+;;
+(ert-deftest shu-test-shu-cpp-find-using-2 ()
+  (let ((data
+         (concat
+          "\ninclude <something.h>\n"
+          " \"using namespace glory;\"\n"))
+        (expected "glory")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-cpp-find-using))
+      (should (not actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-using-3
+;;
+(ert-deftest shu-test-shu-cpp-find-using-3 ()
+  (let ((data
+         (concat
+          "\ninclude <something.h>\n"
+          "using namespace glory;\n"
+          "using namespace bob;\n"
+          "using namespace fred;\n"))
+        (expected1 "glory")
+        (expected2 "bob")
+        (expected3 "fred")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected1 actual))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected2 actual))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected3 actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-using-4
+;;
+(ert-deftest shu-test-shu-cpp-find-using-4 ()
+  (let ((data
+         (concat
+          "\ninclude <something.h>\n"
+          "using namespace glory;\n"
+          "// using namespace bob;\n"
+          "using namespace fred;\n"))
+        (expected1 "glory")
+        (expected2 "fred")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected1 actual))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected2 actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-using-5
+;;
+(ert-deftest shu-test-shu-cpp-find-using-5 ()
+  (let ((data
+         (concat
+          "\ninclude <something.h>\n"
+          "using namespace glory;\n"
+          "\"using namespace bob;\"\n"
+          "using namespace fred;\n"))
+        (expected1 "glory")
+        (expected2 "fred")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected1 actual))
+      (setq actual (shu-cpp-find-using))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected2 actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-using-6
+;;
+(ert-deftest shu-test-shu-cpp-find-using-6 ()
+  (let ((data
+         (concat
+          "\ninclude <something.h>\n"
+          "using namespace glory;\n"
+          "\"using namespace bob;\"\n"
+          "using namespace WhammoCorp::fred;\n" ))
+        (top-name "WhammoCorp")
+        (expected1 "glory")
+        (expected2 "fred")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-cpp-find-using top-name))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected1 actual))
+      (setq actual (shu-cpp-find-using top-name))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected2 actual)))
+    ))
+
+
 ;;; shu-cpp-general.t.el ends here

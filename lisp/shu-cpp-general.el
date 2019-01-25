@@ -1789,6 +1789,9 @@ or right parenthesis or a left or right square bracket."
 
 
 
+
+
+
 ;;
 ;;  shu-cpp-rmv-using
 ;;
@@ -1812,51 +1815,46 @@ would be interpreted as though it had been written:
      using namespace world;"
   (let* ((gb-name "**shu-chgs**")
          (gb (get-buffer-create gb-name))
-         (using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
-         (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
-         (bol)
          (ct 0)
          (count 0)
          (uc 0)
          (unk "")
+         (looking)
          (name)
          (mbeg)
-         (not-comment)
+         (item)
+         (added-item)
+         (duplicates)
          (x)
          (classes)
          (namespace)
-         (debug-on-error t)
          (case-fold-search nil))
-    (if (shu-cpp-rmv-blocked class-list using top-qual gb)
+    (if (shu-cpp-rmv-blocked class-list top-name gb)
         (progn
           (ding)
           (message "Class ambiguity prevents change.  See buffer %s" gb-name))
       (goto-char (point-min))
-      (while (re-search-forward using nil t)
-        (setq name (match-string 1))
-        (setq mbeg (match-beginning 0))
-        (setq bol (line-beginning-position))
-        (save-match-data
-          (save-excursion
-            (setq not-comment t)
-            (goto-char bol)
-            (when (search-forward "//" mbeg t)
-              (setq not-comment nil))))
-        (when not-comment
-          (when top-name
-            (when (string-match top-qual name)
-              (setq name (match-string 1 name))))
-          (setq x (assoc name class-list))
-          (if (not x)
-              (progn
-                (princ (format "Unknown namespace: \"%s\"\n" name) gb)
-                (setq uc (1+ uc)))
-            (delete-region (line-beginning-position) (line-end-position))
-            (setq namespace (car x))
-            (setq classes (cdr x))
-            (save-excursion
-              (setq ct (shu-cpp-qualify-classes classes namespace gb)))
-            (setq count (+ count ct)))))
+      (setq looking t)
+      (while looking
+        (setq name (shu-cpp-find-using top-name))
+        (if (not name)
+            (setq looking nil)
+          (setq mbeg (match-beginning 0))
+          (setq item (cons name (line-number-at-pos mbeg)))
+          (shu-add-to-alist added-item item duplicates)
+          (if (not (eq added-item item)) ;; Name is a duplicate
+              (delete-region (line-beginning-position) (line-end-position))
+            (setq x (assoc name class-list))
+            (if (not x)
+                (progn
+                  (princ (format "Unknown namespace: \"%s\"\n" name) gb)
+                  (setq uc (1+ uc)))
+              (delete-region (line-beginning-position) (line-end-position))
+              (setq namespace (car x))
+              (setq classes (cdr x))
+              (save-excursion
+                (setq ct (shu-cpp-qualify-classes classes namespace gb)))
+              (setq count (+ count ct))))))
       (goto-char (point-min))
       (when (not (= 0 uc))
         (setq unk (format " %d unknown namespaces. " uc)))
@@ -1869,7 +1867,7 @@ would be interpreted as though it had been written:
 ;;
 ;;  shu-cpp-rmv-blocked
 ;;
-(defun shu-cpp-rmv-blocked (class-list using top-qual gb)
+(defun shu-cpp-rmv-blocked (class-list top-name gb)
   "Do a pre-check on a file to see if we will be able to remove its \"using
 namespace\" directives.  CLASS-LIST is the a-list passed to SHU-CPP-RMV-USING.
 USING is the regular expression used to search for \"using namespace\"
@@ -1890,10 +1888,13 @@ This function returns true if such an ambiguity exists."
   (let ((name)
         (mbeg)
         (bol)
-        (not-comment)
         (x)
         (z)
         (uc 0)
+        (looking)
+        (item)
+        (added-item)
+        (duplicates)
         (clist)
         (cl)
         (ns)
@@ -1903,23 +1904,18 @@ This function returns true if such an ambiguity exists."
         (blocked))
     (save-excursion
       (goto-char (point-min))
-      (while (re-search-forward using nil t)
-        (setq name (match-string 1))
-        (setq mbeg (match-beginning 0))
-        (setq bol (line-beginning-position))
-        (save-match-data
-          (save-excursion
-            (setq not-comment t)
-            (goto-char bol)
-            (when (search-forward "//" mbeg t)
-              (setq not-comment nil))))
-        (when not-comment
-          (when top-qual
-            (when (string-match top-qual name)
-              (setq name (match-string 1 name))))
-          (setq x (assoc name class-list))
-        (when x
-          (setq clist (cons x clist))))))
+      (setq looking t)
+      (while looking
+        (setq name (shu-cpp-find-using top-name))
+        (if (not name)
+            (setq looking nil)
+          (setq mbeg (match-beginning 0))
+          (setq item (cons name (line-number-at-pos mbeg)))
+          (shu-add-to-alist added-item item duplicates)
+          (when (eq added-item item) ;; Name is not duplicate
+            (setq x (assoc name class-list))
+            (when x
+              (setq clist (cons x clist)))))))
     (setq cl clist)
     (while cl
       (setq x (car cl))
@@ -1939,6 +1935,57 @@ This function returns true if such an ambiguity exists."
         (setq classes (cdr classes)))
       (setq cl (cdr cl)))
     blocked
+    ))
+
+
+
+;;
+;;  shu-cpp-find-using
+;;
+(defun shu-cpp-find-using (&optional top-name)
+  "Return the name of the class found on the next \"using namespace\" directive
+or nil of no such directive found.
+
+TOP-NAME, if present is a higher level namespace.  Given a top level namespace
+of \"WhammoCorp\", then the following line:
+
+     using namespace WhammoCorp::world;
+
+would be interpreted as though it had been written:
+
+     using namespace world;"
+  (interactive)
+  (let ((using "using\\s-+namespace\\s-+\\([a-zA-Z0-9:_$]+\\)\\s-*;")
+        (looking t)
+        (top-qual (when top-name (concat top-name "::\\([a-zA-Z0-9_$]+\\)")))
+        (name)
+        (using-name)
+        (mbeg)
+        (bol)
+        (not-comment))
+    (while looking
+      (setq using-name nil)
+      (setq not-comment nil)
+      (if (not (re-search-forward using nil t))
+          (setq looking nil)
+        (setq name (match-string 1))
+        (setq mbeg (match-beginning 0))
+        (setq bol (line-beginning-position))
+        (save-match-data
+          (save-excursion
+            (when (not (shu-point-in-string (1- (point))))
+              (setq not-comment t)
+              (goto-char bol)
+              (when (search-forward "//" mbeg t)
+                (setq not-comment nil)))
+            (when not-comment
+              (when top-qual
+                (when (string-match top-qual name)
+                  (setq name (match-string 1 name)))))
+            (when not-comment
+              (setq using-name name)
+              (setq looking nil))))))
+    using-name
     ))
 
 

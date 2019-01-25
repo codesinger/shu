@@ -238,7 +238,6 @@ would be interpreted as though it had been written:
      using namespace world;"
   (let* ((gb-name "**shu-chgs**")
          (gb (get-buffer-create gb-name))
-         (bol)
          (ct 0)
          (count 0)
          (uc 0)
@@ -252,7 +251,6 @@ would be interpreted as though it had been written:
          (x)
          (classes)
          (namespace)
-         (debug-on-error t)
          (case-fold-search nil))
     (if (shu-cpp-rmv-blocked class-list top-name gb)
         (progn
