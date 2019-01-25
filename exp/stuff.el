@@ -35,7 +35,7 @@
 ;;
 ;;  shu-invert-list-list
 ;;
-(defun shu-invert-list-list (alist)
+(defun shu-invert-list-list (alist &optional compare-fn)
   "ALIST is an alist in which the car of each item is the key and the cdr of
 each item is a list of things associated with the key.  This function inverts
 the alist.  The car of each item in the new list is a member of one of the value
@@ -49,7 +49,9 @@ keys that map to the value that is now the key in the new list.
 
      P -> (C)
      Q -> (B)"
-  (let ((al alist)
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (al alist)
         (item)
         (keys)
         (key)
@@ -57,7 +59,8 @@ keys that map to the value that is now the key in the new list.
         (value)
         (new-item)
         (added-item)
-        (new-list))
+        (new-list)
+        (nl))
     (setq debug-on-error t)
     (while al
       (setq item (car al))
@@ -75,6 +78,18 @@ keys that map to the value that is now the key in the new list.
         (setq zalues (cdr zalues))
         )
       (setq al (cdr al))
+      )
+    (when compare-fn
+      (setq nl new-list)
+      (while nl
+        (setq item (car nl))
+        (princ "item:\n" gb) (princ item gb) (princ "\n" gb)
+        (setq values (cdr item))
+        (princ "values:\n" gb) (princ values gb) (princ "\n" gb)
+        (setq values (sort values compare-fn))
+        (setcdr item values)
+        (setq nl (cdr nl))
+        )
       )
     new-list
     ))
@@ -100,17 +115,18 @@ keys that map to the value that is now the key in the new list.
          (list
           (cons "P" (list "C"))
           (cons "Q" (list "B"))
-          (cons "X" (list "C" "B" "A"))
+          (cons "X" (list "A" "B" "C"))
           (cons "Y" (list "A"))
-          (cons "Z" (list "B" "A"))
+          (cons "Z" (list "A" "B"))
          )))
-    (setq x (shu-invert-list-list classes))
+    (setq x (shu-invert-list-list classes 'string<))
     (setq actual (sort x (lambda(lhs rhs) (string< (car lhs) (car rhs)))))
     (princ "\nexpected:\n" gb) (princ expected gb) (princ "\n" gb)
     (princ "\nactual:\n" gb) (princ actual gb) (princ "\n" gb)
     (should (equal expected actual))
     ))
 
+;; ((P C) (Q B) (X A B C) (Y A) (Z A B))
 
 ;; ((P C) (Q B) (X C B A) (Y A) (Z B A))
 ;; ((P C) (Q B) (X C B A) (Y A) (Z B A))
