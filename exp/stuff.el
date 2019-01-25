@@ -39,16 +39,28 @@
   "ALIST is an alist in which the car of each item is the key and the cdr of
 each item is a list of things associated with the key.  This function inverts
 the alist.  The car of each item in the new list is a member of one of the value
-lists in ALIST.  The cdr of each item in the new list is a l.ist of all of those
+lists in ALIST.  The cdr of each item in the new list is a list of all of those
 keys that map to the value that is now the key in the new list.
 
+If COMPARE-FN is non-nil, then the lists in the car of each item in the new list are
+sorted using COMPARE-FN.
+
+As an example, the following input:
+
      A -> (X Y Z)
-     B -> (Q)
+     B -> (Q X Z)
      C -> (P X)
 
+results in the following output being returned:
 
      P -> (C)
-     Q -> (B)"
+     Q -> (B)
+
+     P -> (C)
+     Q -> (B)
+     X -> (A B C)
+     Y -> (A)
+     Z -> (A B)"
   (let (
         (gb (get-buffer-create "**boo**"))
         (al alist)
