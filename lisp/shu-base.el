@@ -463,8 +463,27 @@ string.  String remains unmodified if it had no leading or trailing whitespace."
 ;;
 ;;  shu-add-to-alist
 ;;
-(defmacro shu-add-to-alist (added-item new-item alist &optional testfn)
-  "Add an item to an alist.  The car of NEW-ITEM is a key to be added to the
+(if (version< emacs-version "26.1")
+    (progn
+      (defmacro shu-add-to-alist (added-item new-item alist)
+        "Add an item to an alist.  The car of NEW-ITEM is a key to be added to the
+alist ALIST.  If the key does not already exist in ALIST, NEW-ITEM is added to
+ALIST.  ADDED-ITEM is either the item that was added or the item that was
+previously there.  If (eq ADDED-ITEM NEW-ITEM), then NEW-ITEM was added to the
+list.  If (not (eq ADDED-ITEM NEW-ITEM)), then the key already existed in the
+list and ADDED-ITEM is the item that was already on the list with a matching
+key.  equal is the function used to determine equality."
+        `(if (not ,alist)
+             (progn
+               (push ,new-item ,alist)
+               (setq ,added-item ,new-item))
+           (setq ,added-item (assoc (car ,new-item) ,alist))
+           (when (not ,added-item)
+             (push ,new-item ,alist)
+             (setq ,added-item ,new-item)))
+        ))
+  (defmacro shu-add-to-alist (added-item new-item alist &optional testfn)
+    "Add an item to an alist.  The car of NEW-ITEM is a key to be added to the
 alist ALIST.  If the key does not already exist in ALIST, NEW-ITEM is added to
 ALIST.  ADDED-ITEM is either the item that was added or the item that was
 previously there.  If (eq ADDED-ITEM NEW-ITEM), then NEW-ITEM was added to the
@@ -472,22 +491,22 @@ list.  If (not (eq ADDED-ITEM NEW-ITEM)), then the key already existed in the
 list and ADDED-ITEM is the item that was already on the list with a matching
 key.  equal is the function used to determine equality unless TESTFN is
 supplied, in which case TESTFN is used."
-  `(if (not ,alist)
-       (progn
+    `(if (not ,alist)
+         (progn
+           (push ,new-item ,alist)
+           (setq ,added-item ,new-item))
+       (setq ,added-item (assoc (car ,new-item) ,alist ,testfn))
+       (when (not ,added-item)
          (push ,new-item ,alist)
-         (setq ,added-item ,new-item))
-     (setq ,added-item (assoc (car ,new-item) ,alist ,testfn))
-     (when (not ,added-item)
-       (push ,new-item ,alist)
-       (setq ,added-item ,new-item)))
-  )
+         (setq ,added-item ,new-item)))
+    ))
 
 
 
 ;;
-;;  shu-invert-list-list
+;;  shu-invert-alist-list
 ;;
-(defun shu-invert-list-list (alist &optional compare-fn)
+(defun shu-invert-alist-list (alist &optional compare-fn)
   "ALIST is an alist in which the car of each item is the key and the cdr of
 each item is a list of things associated with the key.  This function inverts
 the alist.  The car of each item in the new list is a member of one of the value
