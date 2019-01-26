@@ -18,7 +18,7 @@ Things that I would like to do someday ...
 
 - 16 Jan 2019 - shu-cpp-rmv-using will detect a class conflict if the same namespace
   is named twice, i.e. "using namespace std" twice in same file.  Need to filter
-  duplicates before doing conflict checks.
+  duplicates before doing conflict checks.  DONE as of 1-25-19
 
 - 16 Jan 2019 - shu-qualify-class name should put all of the classes into a single
   regexp.  That way you can do an entire file in one pass.  You find a match in the
@@ -41,3 +41,6 @@ Things that I would like to do someday ...
 - 21 Jan 2019 - Might be useful to allow people to enter their own short name for a
   file.  e.g., a frequently visited file has two long names to which it maps.  Have
   some way to indicate that a different, user supplied name maps to one of them.
+
+
+- 25 Jan 2019 - Look into having shu-number-lines use (rectangle-number-lines)

@@ -109,6 +109,8 @@
 (when (file-readable-p "~/emacs/slpbb.elc")
   (load-file "~/emacs/shu-bb-cpp.elc")
   (load-file "~/emacs/slpbb.elc"))
+(when (file-readable-p "~/emacs/rmv-using.elc")
+  (load-file "~/emacs/rmv-usingw.elc"))
 (load-file "~/emacs/shu-cpp-token.elc")
 (load-file "~/emacs/shu-bde.elc")
 (load-file "~/emacs/shu-bde-cpp.elc")

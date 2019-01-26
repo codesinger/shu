@@ -1441,7 +1441,7 @@ Assume you have the sample string that is shown in SHU-CSPLIT
      static const std::string x(\"This is a very long line of text that look\"
                                 \"s as though it will go on forever.\");
 
-You with to replace it with a slightly different line of text, perhaps something
+You wish to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
 Then put the cursor into any part of any line of the string to be replaced
 and invoke this function.  This function will remove the old string, replace it
