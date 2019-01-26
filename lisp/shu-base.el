@@ -513,8 +513,8 @@ the alist.  The car of each item in the new list is a member of one of the value
 lists in ALIST.  The cdr of each item in the new list is a list of all of those
 keys that map to the value that is now the key in the new list.
 
-If COMPARE-FN is non-nil, then the lists in the car of each item in the new list are
-sorted using COMPARE-FN.
+If COMPARE-FN is non-nil, then the lists in the car of each item in the new list
+are sorted using COMPARE-FN.
 
 As an example, the following input:
 
@@ -533,7 +533,7 @@ results in the following output being returned:
         (item)
         (keys)
         (key)
-        (zalues)
+        (values)
         (value)
         (new-item)
         (added-item)
@@ -542,16 +542,16 @@ results in the following output being returned:
     (while al
       (setq item (car al))
       (setq key (car item))
-      (setq zalues (cdr item))
-      (while zalues
-        (setq value (car zalues))
+      (setq values (cdr item))
+      (while values
+        (setq value (car values))
         (setq new-item (cons value (list key)))
         (shu-add-to-alist added-item new-item new-list)
         (when (not (eq added-item new-item))
           (setq keys (cdr added-item))
           (push key keys)
           (setcdr added-item keys))
-        (setq zalues (cdr zalues)))
+        (setq values (cdr values)))
       (setq al (cdr al)))
     (when compare-fn
       (setq nl new-list)
