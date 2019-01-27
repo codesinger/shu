@@ -111,7 +111,7 @@
       (princ pl gb)
       (princ "\n" gb)
       (princ "          file: " gb) (princ (symbol-file name) gb) (princ "\n" gb)
-;;;      (princ "          function: " gb) (princ (symbol-function name) gb) (princ "\n" gb)
+      (princ "          function: " gb) (princ (symbol-function name) gb) (princ "\n" gb)
       (princ "          name: " gb) (princ (symbol-name name) gb) (princ "\n" gb)
 ;;;      (princ "          value: " gb) (princ (symbol-value name) gb) (princ "\n" gb)
       (when (functionp name)

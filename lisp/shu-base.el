@@ -271,9 +271,13 @@ is used in place of the position of point."
 ;;  shu-format-num
 ;;
 (defun shu-format-num (num width &optional pad-char)
-  "Return a printable representation of NUM in a string right justified
-and pad filled to length WIDTH.  The number is padded with blanks unless
-an optional PAD-CHAR i ssupplied, which is then used instead of blanks."
+  "Return a printable representation of NUM in a string right justified and pad
+filled to length WIDTH.  The number is padded with blanks unless an optional
+PAD-CHAR is supplied, which is then used instead of blanks.
+
+PAD-CHAR must be a character, not a string.  If you want the string
+representation of the number to be right justified and zero filled, specify a
+pad character of ?0.  Do not use a pad character of \"0\""
   (let ((num
          (if (stringp num)
              num
@@ -466,13 +470,16 @@ string.  String remains unmodified if it had no leading or trailing whitespace."
 (if (version< emacs-version "26.1")
     (progn
       (defmacro shu-add-to-alist (added-item new-item alist)
-        "Add an item to an alist.  The car of NEW-ITEM is a key to be added to the
-alist ALIST.  If the key does not already exist in ALIST, NEW-ITEM is added to
-ALIST.  ADDED-ITEM is either the item that was added or the item that was
+        "Add an item to an alist.  The car of NEW-ITEM is a key to be added to
+the alist ALIST.  If the key does not already exist in ALIST, NEW-ITEM is added
+to ALIST.  ADDED-ITEM is either the item that was added or the item that was
 previously there.  If (eq ADDED-ITEM NEW-ITEM), then NEW-ITEM was added to the
 list.  If (not (eq ADDED-ITEM NEW-ITEM)), then the key already existed in the
 list and ADDED-ITEM is the item that was already on the list with a matching
-key.  equal is the function used to determine equality."
+key.  equal is the function used to determine equality.
+
+This version of this macro is for versions of emacs older than 26.1, which was
+released on May 28, 2018"
         `(if (not ,alist)
              (progn
                (push ,new-item ,alist)
@@ -490,7 +497,10 @@ previously there.  If (eq ADDED-ITEM NEW-ITEM), then NEW-ITEM was added to the
 list.  If (not (eq ADDED-ITEM NEW-ITEM)), then the key already existed in the
 list and ADDED-ITEM is the item that was already on the list with a matching
 key.  equal is the function used to determine equality unless TESTFN is
-supplied, in which case TESTFN is used."
+supplied, in which case TESTFN is used.
+
+This version of this macro is for emacs 26.1 and later.  emacs 26.1 was released
+on May 28, 2018."
     `(if (not ,alist)
          (progn
            (push ,new-item ,alist)
