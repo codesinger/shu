@@ -91,6 +91,20 @@
 
 
 ;;
+;;  ddd
+;;
+(defun ddd ()
+  "Doc string."
+  (interactive)
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        )
+    (message "%s" (current-time-string))
+    ))
+
+
+
+;;
 ;;  show-names
 ;;
 (defun show-names (name-list gb)

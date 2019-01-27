@@ -40,6 +40,212 @@
 
 (provide 'shu-date)
 
+;;
+;;
+;;
+;;
+;;      Date:
+;;
+;;      is a single cons cell.  The sentinel is used for validation.
+;;      The serial day is as defined by shu-jday / shu-jdate below.
+;;
+;;
+;;       ----------------------------
+;;       |             |            |
+;;       |   Sentinel  | Serial Day |
+;;       |             |            |
+;;       ----------------------------
+;;
+;;
+;;
+;;
+;;
+;;      Time:
+;;
+;;      is a single cons cell.  The sentinel is used for validation.
+;;      The Time Cons is a cons cell as defined below:
+;;
+;;
+;;       ----------------------------
+;;       |             |            |
+;;       |   Sentinel  | Time Cons  |
+;;       |             |            |
+;;       ----------------------------
+;;
+;;
+;;          Time Cons:
+;;
+;;          is a single cons cell.
+;;          Seconds is seconds since midnight.
+;;          Microsecs is the microseconds part of the time
+;;
+;;
+;;           ----------------------------
+;;           |             |            |
+;;           |   Seconds   | Microsecs  |
+;;           |             |            |
+;;           ----------------------------
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;      Datetime:
+;;
+;;      is a single cons cell.  The sentinel is used for validation.
+;;      The DT Cons is a cons cell as defined below:
+;;
+;;
+;;       ----------------------------
+;;       |             |            |
+;;       |   Sentinel  |   DT Cons  |
+;;       |             |            |
+;;       ----------------------------
+;;
+;;
+;;          DT Cons:
+;;
+;;          is a single cons cell.
+;;          Date is a date as defined above
+;;          Time is a time as defined above
+;;
+;;
+;;           ----------------------------
+;;           |             |            |
+;;           |    Date     |    Time    |
+;;           |             |            |
+;;           ----------------------------
+;;
+
+(defconst shu-date-date-sentinel 184556
+  "The sentinel that is put into a date for validation.")
+
+
+(defconst shu-date-time-sentinel 186554
+  "The sentinel that is put into a time for validation.")
+
+
+;;
+;;  shu-date-make-date
+;;
+(defmacro shu-date-make-date (date-cons serial-day)
+  "DATE-CONS is the resulting date cons cell.  SERIAL-DAY is the serial day
+as defined by shu-jday / shu-jdate."
+  `(setq ,date-cons (cons shu-date-date-sentinel ,serial-day))
+  )
+
+
+;;
+;;  shu-date-extract-date
+;;
+(defmacro shu-date-extract-date (serial-day date-cons)
+  "DATE-CONS is cons cell that holds the date.  SERIAL-DAY is the serial day
+as defined by shu-jday / shu-jdate."
+  `(if (not (consp ,date-cons))
+       (error "Date is not a cons cell")
+     (if (not (numberp (car ,date-cons)))
+         (error "Date sentinel is not a number")
+       (if (/= shu-date-date-sentinel (car ,date-cons))
+           (error "Incorrect date sentinel")
+         (if (not (numberp (cdr ,date-cons)))
+             (error "Serial day of date is not a number")
+           (setq ,serial-day (car ,date-cons))
+           )
+         )
+       )
+     )
+  )
+
+
+;;
+;;  shu-date-make-time
+;;
+(defmacro shu-date-make-time (time-cons seconds microseconds)
+  "DATE-CONS is the resulting date cons cell.  SERIAL-DAY is the serial day
+as defined by shu-jday / shu-jdate."
+  (let (
+        (ttime-cons (make-symbol "ttime-cons"))
+        )
+    `(let (
+           (,ttime-cons)
+           )
+       (setq ,ttime-cons (cons ,seconds ,microseconds))
+       (setq ,time-cons (cons shu-date-time-sentinel ,ttime-cons)))
+    ))
+
+
+;;
+;;  shu-date-extract-time
+;;
+(defmacro shu-date-extract-time (seconds microseconds time-cons)
+  "DATE-CONS is the resulting date cons cell.  SERIAL-DAY is the serial day
+as defined by shu-jday / shu-jdate."
+  (let (
+        (ttime-cons (make-symbol "ttime-cons"))
+        )
+    `(let (
+           (,ttime-cons)
+           )
+       (if (not (consp ,time-cons))
+           (error "Time is not a cons cell")
+         (if (not (numberp (car ,time-cons)))
+             (error "Time sentinel is not a number")
+           (if (/= shu-date-time-sentinel (car ,time-cons))
+               (error "Incorrect time sentinel")
+             (setq ,ttime-cons (cdr ,time-cons))
+             (if (not (consp ,ttime-cons))
+                 (error "cdr of time-cons is not a cons cell")
+               (if (not (numberp (car ,ttime-cons)))
+                   (error "seconds value of time is not a number")
+                 (if (not (numberp (cdr ,ttime-cons)))
+                     (error "microseconds value is not a number")
+                   (setq ,seconds (car ,ttime-cons))
+                   (setq ,microseconds (cdr ,ttime-cons))
+                   )
+                 )
+               )
+             )
+           )
+         )
+       )
+    ))
+
+
+;;
+;;  shu-date-make-datetime
+;;
+(defmacro shu-date-make-datetime (datetime-cons serial-day seconds microseconds)
+  "DATE-CONS is the resulting date cons cell.  SERIAL-DAY is the serial day
+as defined by shu-jday / shu-jdate."
+  (let (
+        (tdate-cons (make-symbol "tdate-cons"))
+        (ttime-cons (make-symbol "ttime-cons"))
+        )
+    `(let (
+           (,tdate-cons)
+           (,ttime-cons)
+           )
+       (shu-date-make-date ,tdate-cons ,serial-day)
+       (shu-date-make-time ,ttime-cons ,seconds ,microseconds)
+       (setq ,datetime-cons (cons ,tdate-cons ,ttime-cons)))
+    ))
+
+
+;;
+;;  shu-date-extract-datetime
+;;
+(defmacro shu-date-extract-datetime (serial-day seconds microseconds datetime-cons)
+  "DATE-CONS is the resulting date cons cell.  SERIAL-DAY is the serial day
+as defined by shu-jday / shu-jdate."
+  `(if (not (consp ,datetime-cons))
+       (error "datetime is not a cons cell")
+     (shu-date-extract-date ,serial-day (car ,datetime-cons))
+     (shu-date-extract-time ,seconds ,microseconds (cdr ,datetime-cons))
+     )
+  )
+
 
 
 
@@ -68,6 +274,12 @@
     ))
 
 
+
+;;
+;;  NB: NEITHER FUNCTION BELOW USE THE DATE AND TIME FORMATS
+;;      OUTLINED ABOVE.  STILL TO BE DONE TO MAKE THESE USE
+;;      THE ABOVE FORMATS
+;;
 
 ;;
 ;;  shu-inrternal-convert-to-datetime-1
