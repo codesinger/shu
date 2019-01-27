@@ -348,6 +348,109 @@ as defined by shu-jday / shu-jdate."
     ))
 
 
+;;
+;;  shu-inrternal-convert-to-datetime-2
+;;
+(defun shu-internal-convert-to-datetime-2 (date-time-string rx-parse)
+  "Convert a string to a shu datetime.  DATE-TIME-STRING is the string to be
+converted.  RX-PARSE is a regular expression used to parse the string.  The
+string may be in any format that can be parsed by RX-PARSE.  The strings
+produced by the string-match ust be as follows:
+
+   1 - four digit year
+   2 - month
+   3 - day
+   4 - hour
+   5 - minute
+   6 - second
+   7 - milliseconds"
+  (let (
+        (dts date-time-string)
+        (yy)
+        (mm)
+        (dd)
+        (hh)
+        (min)
+        (ss)
+        (mil)
+        (jd)
+        (st)
+        (serial-time)
+        (date-time)
+        (case-fold-search nil)
+        )
+    (setq debug-on-error t)
+    (when (string-match rx-parse dts)
+      (setq yy (string-to-number (match-string 1 dts)))
+      (setq mm (string-to-number (match-string 2 dts)))
+      (setq dd (string-to-number (match-string 3 dts)))
+      (setq hh (string-to-number (match-string 4 dts)))
+      (setq min (string-to-number (match-string 5 dts)))
+      (setq ss (string-to-number (match-string 6 dts)))
+      (setq mil (string-to-number (match-string 7 dts)))
+      (setq jd (shu-jday (list yy mm dd)))
+      (setq st (+ (* hh 60 60) (* min 60) ss))
+      (shu-date-make-datetime date-time jd st (* 1000 mil))
+      )
+    date-time
+    ))
+
+
+
+;;
+;;  shu-format-datetime-2
+;;
+(defun shu-format-datetime-2 (datetime)
+  "Convert a shu datetime to a string of the form yyyy-mm-ddThhmmss.mmm."
+  (let* (
+         (serial-day)
+         (seconds)
+         (microseconds)
+         (zs)
+         (hour)
+         (minute)
+         (sec)
+         (mills)
+         (date-list)
+         (year)
+         (month)
+         (day)
+         (year-string)
+         (month-string)
+         (day-string)
+         (hour-string)
+         (minute-string)
+         (sec-string)
+         (mill-string)
+         (ftime)
+         )
+    (shu-date-extract-datetime serial-day seconds microseconds datetime)
+    (setq zs (shu-seconds-to-hhmmss seconds))
+    (setq hour (car zs))
+    (setq minute (cadr zs))
+    (setq sec (caddr zs))
+    (setq mills (shu-micros-to-millis microseconds))
+    (setq date-list (shu-jdate serial-day))
+    (setq year (car date-list))
+    (setq month (cadr date-list))
+    (setq day (caddr date-list))
+    (setq year-string (shu-format-num year 4 ?0))
+    (setq month-string (shu-format-num month 2 ?0))
+    (setq day-string (shu-format-num day 2 ?0))
+    (setq hour-string (shu-format-num hour 2 ?0))
+    (setq minute-string (shu-format-num minute 2 ?0))
+    (setq sec-string (shu-format-num sec 2 ?0))
+    (setq mill-string (shu-format-num mills 3 ?0))
+    (setq ftime
+     (format "%s-%s-%sT%s%s%s.%s"
+             year-string month-string day-string
+             hour-string minute-string sec-string
+             mill-string))
+    ftime
+    ))
+
+
+
 
 ;;
 ;;  NB: NEITHER FUNCTION BELOW USE THE DATE AND TIME FORMATS
