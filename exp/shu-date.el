@@ -88,35 +88,47 @@
 ;;
 ;;
 ;;
-;;
-;;
-;;
-;;
 ;;      Datetime:
 ;;
+;;      is a single cons cell.
+;;
+;;
+;;       ----------------------------
+;;       |             |            |
+;;       |    Date     |    Time    |
+;;       |             |            |
+;;       ----------------------------
+;;
+;;
+;;
+;;      Timeinterval:
+;;
 ;;      is a single cons cell.  The sentinel is used for validation.
-;;      The DT Cons is a cons cell as defined below:
+;;      The Time Cons is a cons cell as defined below:
 ;;
 ;;
 ;;       ----------------------------
 ;;       |             |            |
-;;       |   Sentinel  |   DT Cons  |
+;;       |   Sentinel  | Intvl Cons |
 ;;       |             |            |
 ;;       ----------------------------
 ;;
 ;;
-;;          DT Cons:
+;;          Intvl Cons:
 ;;
 ;;          is a single cons cell.
-;;          Date is a date as defined above
-;;          Time is a time as defined above
+;;          Days is the number of days in the time interval
+;;          Time is the number of seconds and microseconds
 ;;
 ;;
 ;;           ----------------------------
 ;;           |             |            |
-;;           |    Date     |    Time    |
+;;           |    Days     |    Time    |
 ;;           |             |            |
 ;;           ----------------------------
+;;
+;;
+;;
 ;;
 
 (defconst shu-date-date-sentinel 184556
@@ -125,6 +137,10 @@
 
 (defconst shu-date-time-sentinel 186554
   "The sentinel that is put into a time for validation.")
+
+
+(defconst shu-date-timeinterval-sentinel 186209
+  "The sentinel that is put into a time interval for validation.")
 
 
 ;;
@@ -245,6 +261,64 @@ as defined by shu-jday / shu-jdate."
      (shu-date-extract-time ,seconds ,microseconds (cdr ,datetime-cons))
      )
   )
+
+
+
+;;
+;;  shu-date-make-timeinterval
+;;
+(defmacro shu-date-make-timeinterval (intvl-cons days seconds microseconds)
+  "DATE-CONS is the resulting date cons cell.  SERIAL-DAY is the serial day
+as defined by shu-jday / shu-jdate."
+  (let (
+        (ttime-cons (make-symbol "ttime-cons"))
+        (tintvl-cons (make-symbol "tintvl-cons"))
+        )
+    `(let (
+           (,ttime-cons)
+           (,tintvl-cons)
+           )
+       (shu-date-make-time ,ttime-cons ,seconds ,microseconds)
+       (setq ,tintvl-cons (cons days ,ttime-cons))
+       (setq ,intvl-cons (cons shu-date-timeinterval-sentinel ,tintvl-cons)))
+    ))
+
+
+;;
+;;  shu-date-extract-timeinterval
+;;
+(defmacro shu-date-extract-timeinterval (days seconds microseconds intvl-cons)
+  "DATE-CONS is the resulting date cons cell.  SERIAL-DAY is the serial day
+as defined by shu-jday / shu-jdate."
+  (let (
+        (ttime-cons (make-symbol "ttime-cons"))
+        (tintvl-cons (make-symbol "tintvl-cons"))
+        )
+    `(let (
+           (,ttime-cons)
+           (,tintvl-cons)
+           )
+       (if (not (consp intvl-cons))
+           (error "Time intrval is not a cons cell")
+         (if (not (numberp (car intvl-cons)))
+             (error "car of time interval is not a number")
+           (if (/= shu-date-timeinterval-sentinel (car intvl-cons))
+               (error "Incorrect sentinel in time interval")
+             (setq ,tintvl-cons (cdr intvl-cons))
+             (if (not (consp ,tintvl-cons))
+                 (error "car of time interval is not a cons cell")
+               (if (not (numberp (car ,tintvl-cons)))
+                   (error "Days in time interval is not a number")
+                 (setq ,days (car ,tintvl-cons))
+                 (setq ,ttime-cons (cdr ,tintvl-cons))
+                 (shu-date-extract-time ,seconds ,microseconds ,ttime-cons)
+                 )
+               )
+             )
+           )
+         )
+       )
+    ))
 
 
 

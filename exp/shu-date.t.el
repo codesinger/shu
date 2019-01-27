@@ -32,7 +32,6 @@
 ;;  shu-test-shu-date-make-date-1
 ;;
 (ert-deftest shu-test-shu-date-make-date-1 ()
-  "Doc string."
   (let ((date-cons)
         (serial-day 1234567)
         (expected-day))
@@ -52,7 +51,6 @@
 ;;  shu-test-shu-date-make-time-1
 ;;
 (ert-deftest shu-test-shu-date-make-time-1 ()
-  "Doc string."
   (let ((time-cons)
         (seconds 1234567)
         (microseconds 654321)
@@ -76,7 +74,6 @@
 ;;  shu-test-shu-date-make-datetime-1
 ;;
 (ert-deftest shu-test-shu-date-make-datetime-1 ()
-  "Doc string."
   (let ((datetime-cons)
         (serial-day 90283911)
         (seconds 1234567)
@@ -94,6 +91,38 @@
     (should actual-microseconds)
     (should (numberp actual-microseconds))
     (should (= serial-day actual-serial-day))
+    (should (= seconds actual-seconds))
+    (should (= microseconds actual-microseconds))
+    ))
+
+
+
+;;
+;;  shu-test-shu-date-make-timeinterval-1
+;;
+(ert-deftest shu-test-shu-date-make-timeinterval-1 ()
+  (let (
+        (days 18)
+        (seconds 309288)
+        (microseconds 123456)
+        (intvl-cons)
+        (actual-days)
+        (actual-seconds)
+        (actual-microseconds)
+        )
+    (shu-date-make-timeinterval intvl-cons days seconds microseconds)
+    (should intvl-cons)
+    (should (consp intvl-cons))
+    (should (numberp (car intvl-cons)))
+    (should (= shu-date-timeinterval-sentinel (car intvl-cons)))
+    (shu-date-extract-timeinterval actual-days actual-seconds actual-microseconds intvl-cons)
+    (should actual-days)
+    (should actual-seconds)
+    (should actual-microseconds)
+    (should (numberp actual-days))
+    (should (numberp actual-seconds))
+    (should (numberp actual-microseconds))
+    (should (= days actual-days))
     (should (= seconds actual-seconds))
     (should (= microseconds actual-microseconds))
     ))
