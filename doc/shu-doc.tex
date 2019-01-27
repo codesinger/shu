@@ -28,7 +28,6 @@
 \section{Overview}
 
 
-
 This manual contains detailed information on all of the function, macro,
 variable, and constant definitions in this repository.
 
@@ -40,7 +39,7 @@ Version 1.2 was merged with the master branch on 6 January 2019.
 
 Version 1.3 was merged with the master branch on 12 January 2019.
 
-This is Version 1.3.5 of the Shu elisp repository,
+This is Version 1.3.13 of the Shu elisp repository,
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -69,6 +68,46 @@ depend on this file.
 List of functions and variable definitions in this package.
 
 
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-add-to-alist }}
+\usebox{\funcname}\emph{added-item} \emph{new-item} \emph{alist}
+\index{shu-add-to-alist} \hfill [Macro]
+\hspace*{\wd\funcname}\emph{testfn}
+
+\begin{doc-string}
+Add an item to an alist.  The car of \emph{new-item} is a key to be added to the
+alist \emph{alist}.  If the key does not already exist in \emph{alist}, \emph{new-item} is added to
+\emph{alist}.  \emph{added-item} is either the item that was added or the item that was
+previously there.  If (eq \emph{added-item} NEW-ITEM), then \emph{new-item} was added to the
+list.  If (not (eq \emph{added-item} NEW-ITEM)), then the key already existed in the
+list and \emph{added-item} is the item that was already on the list with a matching
+key.  equal is the function used to determine equality unless \emph{testfn} is
+supplied, in which case \emph{testfn} is used.
+
+This version of this macro is for emacs 26.1 and later.  emacs 26.1 was released
+on May 28, 2018.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-add-to-alist }}
+\usebox{\funcname}\emph{added-item} \emph{new-item} \emph{alist}
+\index{shu-add-to-alist} \hfill [Macro]
+
+\begin{doc-string}
+Add an item to an alist.  The car of \emph{new-item} is a key to be added to
+the alist \emph{alist}.  If the key does not already exist in \emph{alist}, \emph{new-item} is added
+to \emph{alist}.  \emph{added-item} is either the item that was added or the item that was
+previously there.  If (eq \emph{added-item} NEW-ITEM), then \emph{new-item} was added to the
+list.  If (not (eq \emph{added-item} NEW-ITEM)), then the key already existed in the
+list and \emph{added-item} is the item that was already on the list with a matching
+key.  equal is the function used to determine equality.
+
+This version of this macro is for versions of emacs older than 26.1, which was
+released on May 28, 2018
+\end{doc-string}
 
 \vspace{1em}
 \noindent
@@ -317,12 +356,17 @@ as defined by shu-group-number.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-format-num }}
-\usebox{\funcname}\emph{num} \emph{width}
+\usebox{\funcname}\emph{num} \emph{width} \textbf{\&optional} \emph{pad-char}
 \index{shu-format-num} \hfill [Function]
 
 \begin{doc-string}
-Return a printable representation of \emph{num} in a string right justified
-and pad filled to length \emph{width}.
+Return a printable representation of \emph{num} in a string right justified and pad
+filled to length \emph{width}.  The number is padded with blanks unless an optional
+\emph{pad-char} is supplied, which is then used instead of blanks.
+
+\emph{pad-char} must be a character, not a string.  If you want the string
+representation of the number to be right justified and zero filled, specify a
+pad character of ?0.  Do not use a pad character of ``0''
 \end{doc-string}
 
 \vspace{1em}
@@ -355,6 +399,41 @@ Move point to line \emph{line-number}.
 Format \emph{num} as string grouped to \emph{size} with \emph{char}.  Default \emph{size} if 3.  Default \emph{char}
 is ','.  e.g., 1234567 is formatted as 1,234,567.  Argument to be formatted may be
 either a string or a number.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-invert-alist-list }}
+\usebox{\funcname}\emph{alist} \textbf{\&optional} \emph{compare-fn}
+\index{shu-invert-alist-list} \hfill [Function]
+
+\begin{doc-string}
+\emph{alist} is an alist in which the car of each item is the key and the cdr of
+each item is a list of things associated with the key.  This function inverts
+the alist.  The car of each item in the new list is a member of one of the value
+lists in \emph{alist}.  The cdr of each item in the new list is a list of all of those
+keys that map to the value that is now the key in the new list.
+
+If \emph{compare-fn} is non-nil, then the lists in the car of each item in the new list
+are sorted using \emph{compare-fn}.
+
+As an example, the following input:
+
+\small{\begin{verbatim}
+     A -> (X Y Z)
+     B -> (Q X Z)
+     C -> (P X)
+\end{verbatim}}
+
+results in the following output being returned:
+
+\small{\begin{verbatim}
+     P -> (C)
+     Q -> (B)
+     X -> (A B C)
+     Y -> (A)
+     Z -> (A B)
+\end{verbatim}}
 \end{doc-string}
 
 \vspace{1em}
@@ -534,7 +613,7 @@ The name of the buffer into which unit tests place their output and debug trace.
 \index{shu-version} \hfill [Constant]
 
 \begin{doc-string}
-The version number of th Shu elisp package.
+The version number of the Shu elisp package.
 \end{doc-string}
 
 \eject
@@ -2412,7 +2491,7 @@ Assume you have the sample string that is shown in \emph{shu-csplit}
                                 ``s as though it will go on forever.'');
 \end{verbatim}}
 
-You with to replace it with a slightly different line of text, perhaps something
+You wish to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
 Then put the cursor into any part of any line of the string to be replaced
 and invoke this function.  This function will remove the old string, replace it
@@ -2947,6 +3026,30 @@ strings and that you are not missing any occurrences of $<$$<$.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-find-using }}
+\usebox{\funcname}\textbf{\&optional} \emph{top-name}
+\index{shu-cpp-find-using} \hfill [Command]
+
+\begin{doc-string}
+Return the name of the class found on the next ``using namespace'' directive
+or nil of no such directive found.
+
+\emph{top-name}, if present is a higher level namespace.  Given a top level namespace
+of ``WhammoCorp'', then the following line:
+
+\small{\begin{verbatim}
+     using namespace WhammoCorp::world;
+\end{verbatim}}
+
+would be interpreted as though it had been written:
+
+\small{\begin{verbatim}
+     using namespace world;
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-general-set-alias }}
 \usebox{\funcname}
 \index{shu-cpp-general-set-alias} \hfill [Function]
@@ -3011,14 +3114,14 @@ number of names changed.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-rmv-blocked }}
-\usebox{\funcname}\emph{class-list} \emph{using} \emph{top-qual} \emph{gb}
+\usebox{\funcname}\emph{class-list} \emph{top-name} \emph{gb}
 \index{shu-cpp-rmv-blocked} \hfill [Function]
 
 \begin{doc-string}
 Do a pre-check on a file to see if we will be able to remove its ``using
 namespace'' directives.  \emph{class-list} is the a-list passed to \emph{shu-cpp-rmv-using}.
-\emph{using} is the regular expression used to search for ``using namespace''
-directives.  \emph{top-qual} is the regular expression used to strip out a higher level
+USING is the regular expression used to search for ``using namespace''
+directives.  TOP-QUAL is the regular expression used to strip out a higher level
 qualifier from the class name in a ``using namespace'' directive, if any.  \emph{gb} is
 the buffer into which diagnostic messages are written.
 
@@ -3108,7 +3211,7 @@ Assume you have the sample string that is shown in \emph{shu-csplit}
                                 ``s as though it will go on forever.'');
 \end{verbatim}}
 
-You with to replace it with a slightly different line of text, perhaps something
+You wish to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
 Then put the cursor into any part of any line of the string to be replaced
 and invoke this function.  This function will remove the old string, replace it
@@ -3657,6 +3760,17 @@ Undocumented
 
 \begin{doc-string}
 Undocumented
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-rmv-classes }}
+\usebox{\funcname}
+\index{shu-rmv-classes} \hfill [Variable]
+
+\begin{doc-string}
+An alist of ``using namespace'' directives and their line numbers where first declared.
+Used to filter duplicates.
 \end{doc-string}
 
 \vspace{1em}
@@ -6276,6 +6390,32 @@ A list of aliases and associated function names.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{case-insensitive }}
+\usebox{\funcname}
+\index{case-insensitive} \hfill [Command]\\%
+ (Function: shu-case-insensitive)
+
+\begin{doc-string}
+Set the variable case-fold-search to t to make searches and matches ignore
+case.  I can never remember which way to set case-fold-search, hence this
+simple, little function.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{case-sensitive }}
+\usebox{\funcname}
+\index{case-sensitive} \hfill [Command]\\%
+ (Function: shu-case-sensitive)
+
+\begin{doc-string}
+Set the variable case-fold-search to nil to make searches and matches respect
+case.  I can never remember which way to set case-fold-search, hence this
+simple, little function.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{comma-names-to-letter }}
 \usebox{\funcname}
 \index{comma-names-to-letter} \hfill [Command]\\%
@@ -6484,6 +6624,18 @@ hexadecimal number.  Returns the count of the number of commits found.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{number-lines }}
+\usebox{\funcname}
+\index{number-lines} \hfill [Command]\\%
+ (Function: shu-number-lines)
+
+\begin{doc-string}
+Insert in front of each line in the buffer its line number.  Starts
+at point and continues to the end of the buffer.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{of }}
 \usebox{\funcname}
 \index{of} \hfill [Command]\\%
@@ -6567,6 +6719,32 @@ This makes it a valid path on windows machines.
 List of functions and variable definitions in this package.
 
 
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-case-insensitive }}
+\usebox{\funcname}
+\index{shu-case-insensitive} \hfill [Command]\\%
+ (Alias: case-insensitive)
+
+\begin{doc-string}
+Set the variable case-fold-search to t to make searches and matches ignore
+case.  I can never remember which way to set case-fold-search, hence this
+simple, little function.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-case-sensitive }}
+\usebox{\funcname}
+\index{shu-case-sensitive} \hfill [Command]\\%
+ (Alias: case-sensitive)
+
+\begin{doc-string}
+Set the variable case-fold-search to nil to make searches and matches respect
+case.  I can never remember which way to set case-fold-search, hence this
+simple, little function.
+\end{doc-string}
 
 \vspace{1em}
 \noindent
@@ -6930,6 +7108,18 @@ variable name.  The while loop is of the form:
        )
 \end{verbatim}}
 point is placed where the the first line of code in the loop belongs.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-number-lines }}
+\usebox{\funcname}
+\index{shu-number-lines} \hfill [Command]\\%
+ (Alias: number-lines)
+
+\begin{doc-string}
+Insert in front of each line in the buffer its line number.  Starts
+at point and continues to the end of the buffer.
 \end{doc-string}
 
 \vspace{1em}

@@ -52,6 +52,7 @@
 # Overview #
 
 
+
 This manual contains detailed information on all of the function, macro,
 variable, and constant definitions in this repository.
 
@@ -63,7 +64,7 @@ Version 1.2 was merged with the master branch on 6 January 2019.
 
 Version 1.3 was merged with the master branch on 12 January 2019.
 
-This is Version 1.3.5 of the Shu elisp repository,
+This is Version 1.3.13 of the Shu elisp repository,
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -91,6 +92,41 @@ depend on this file.
 List of functions and variable definitions in this package.
 
 
+
+
+
+#### shu-add-to-alist ####
+shu-add-to-alist *added-item* *new-item* *alist* **&optional** *testfn*
+[Macro]
+
+Add an item to an alist.  The car of *new-item* is a key to be added to the
+alist *alist*.  If the key does not already exist in *alist*, *new-item* is added to
+*alist*.  *added-item* is either the item that was added or the item that was
+previously there.  If (eq *added-item* NEW-ITEM), then *new-item* was added to the
+list.  If (not (eq *added-item* NEW-ITEM)), then the key already existed in the
+list and *added-item* is the item that was already on the list with a matching
+key.  equal is the function used to determine equality unless *testfn* is
+supplied, in which case *testfn* is used.
+
+This version of this macro is for emacs 26.1 and later.  emacs 26.1 was released
+on May 28, 2018.
+
+
+
+#### shu-add-to-alist ####
+shu-add-to-alist *added-item* *new-item* *alist*
+[Macro]
+
+Add an item to an alist.  The car of *new-item* is a key to be added to
+the alist *alist*.  If the key does not already exist in *alist*, *new-item* is added
+to *alist*.  *added-item* is either the item that was added or the item that was
+previously there.  If (eq *added-item* NEW-ITEM), then *new-item* was added to the
+list.  If (not (eq *added-item* NEW-ITEM)), then the key already existed in the
+list and *added-item* is the item that was already on the list with a matching
+key.  equal is the function used to determine equality.
+
+This version of this macro is for versions of emacs older than 26.1, which was
+released on May 28, 2018
 
 
 
@@ -281,11 +317,16 @@ as defined by shu-group-number.
 
 
 #### shu-format-num ####
-shu-format-num *num* *width*
+shu-format-num *num* *width* **&optional** *pad-char*
 [Function]
 
-Return a printable representation of *num* in a string right justified
-and pad filled to length *width*.
+Return a printable representation of *num* in a string right justified and pad
+filled to length *width*.  The number is padded with blanks unless an optional
+*pad-char* is supplied, which is then used instead of blanks.
+
+*pad-char* must be a character, not a string.  If you want the string
+representation of the number to be right justified and zero filled, specify a
+pad character of ?0.  Do not use a pad character of "0"
 
 
 
@@ -311,6 +352,39 @@ shu-group-number *num* **&optional** *size* *char*
 Format *num* as string grouped to *size* with *char*.  Default *size* if 3.  Default *char*
 is ','.  e.g., 1234567 is formatted as 1,234,567.  Argument to be formatted may be
 either a string or a number.
+
+
+
+#### shu-invert-alist-list ####
+shu-invert-alist-list *alist* **&optional** *compare-fn*
+[Function]
+
+*alist* is an alist in which the car of each item is the key and the cdr of
+each item is a list of things associated with the key.  This function inverts
+the alist.  The car of each item in the new list is a member of one of the value
+lists in *alist*.  The cdr of each item in the new list is a list of all of those
+keys that map to the value that is now the key in the new list.
+
+If *compare-fn* is non-nil, then the lists in the car of each item in the new list
+are sorted using *compare-fn*.
+
+As an example, the following input:
+
+```
+     A -> (X Y Z)
+     B -> (Q X Z)
+     C -> (P X)
+```
+
+results in the following output being returned:
+
+```
+     P -> (C)
+     Q -> (B)
+     X -> (A B C)
+     Y -> (A)
+     Z -> (A B)
+```
 
 
 
@@ -454,7 +528,7 @@ The name of the buffer into which unit tests place their output and debug trace.
 #### shu-version ####
 [Constant]
 
-The version number of th Shu elisp package.
+The version number of the Shu elisp package.
 
 # shu-bde-cpp #
 
@@ -1946,7 +2020,7 @@ Assume you have the sample string that is shown in *shu-csplit*
                                 "s as though it will go on forever.");
 ```
 
-You with to replace it with a slightly different line of text, perhaps something
+You wish to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
 Then put the cursor into any part of any line of the string to be replaced
 and invoke this function.  This function will remove the old string, replace it
@@ -2369,6 +2443,28 @@ strings and that you are not missing any occurrences of <<.
 
 
 
+#### shu-cpp-find-using ####
+shu-cpp-find-using **&optional** *top-name*
+[Command]
+
+Return the name of the class found on the next "using namespace" directive
+or nil of no such directive found.
+
+*top-name*, if present is a higher level namespace.  Given a top level namespace
+of "WhammoCorp", then the following line:
+
+```
+     using namespace WhammoCorp::world;
+```
+
+would be interpreted as though it had been written:
+
+```
+     using namespace world;
+```
+
+
+
 #### shu-cpp-general-set-alias ####
 [Function]
 
@@ -2420,13 +2516,13 @@ number of names changed.
 
 
 #### shu-cpp-rmv-blocked ####
-shu-cpp-rmv-blocked *class-list* *using* *top-qual* *gb*
+shu-cpp-rmv-blocked *class-list* *top-name* *gb*
 [Function]
 
 Do a pre-check on a file to see if we will be able to remove its "using
 namespace" directives.  *class-list* is the a-list passed to *shu-cpp-rmv-using*.
-*using* is the regular expression used to search for "using namespace"
-directives.  *top-qual* is the regular expression used to strip out a higher level
+USING is the regular expression used to search for "using namespace"
+directives.  TOP-QUAL is the regular expression used to strip out a higher level
 qualifier from the class name in a "using namespace" directive, if any.  *gb* is
 the buffer into which diagnostic messages are written.
 
@@ -2507,7 +2603,7 @@ Assume you have the sample string that is shown in *shu-csplit*
                                 "s as though it will go on forever.");
 ```
 
-You with to replace it with a slightly different line of text, perhaps something
+You wish to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
 Then put the cursor into any part of any line of the string to be replaced
 and invoke this function.  This function will remove the old string, replace it
@@ -2940,6 +3036,14 @@ Undocumented
 [Function]
 
 Undocumented
+
+
+
+#### shu-rmv-classes ####
+[Variable]
+
+An alist of "using namespace" directives and their line numbers where first declared.
+Used to filter duplicates.
 
 
 
@@ -5027,6 +5131,26 @@ A list of aliases and associated function names.
 
 
 
+#### case-insensitive ####
+[Command]
+ (Function: shu-case-insensitive)
+
+Set the variable case-fold-search to t to make searches and matches ignore
+case.  I can never remember which way to set case-fold-search, hence this
+simple, little function.
+
+
+
+#### case-sensitive ####
+[Command]
+ (Function: shu-case-sensitive)
+
+Set the variable case-fold-search to nil to make searches and matches respect
+case.  I can never remember which way to set case-fold-search, hence this
+simple, little function.
+
+
+
 #### comma-names-to-letter ####
 [Command]
  (Function: shu-comma-names-to-letter)
@@ -5194,6 +5318,15 @@ hexadecimal number.  Returns the count of the number of commits found.
 
 
 
+#### number-lines ####
+[Command]
+ (Function: shu-number-lines)
+
+Insert in front of each line in the buffer its line number.  Starts
+at point and continues to the end of the buffer.
+
+
+
 #### of ####
 [Command]
  (Function: shu-of)
@@ -5257,6 +5390,26 @@ This makes it a valid path on windows machines.
 List of functions and variable definitions in this package.
 
 
+
+
+
+#### shu-case-insensitive ####
+[Command]
+ (Alias: case-insensitive)
+
+Set the variable case-fold-search to t to make searches and matches ignore
+case.  I can never remember which way to set case-fold-search, hence this
+simple, little function.
+
+
+
+#### shu-case-sensitive ####
+[Command]
+ (Alias: case-sensitive)
+
+Set the variable case-fold-search to nil to make searches and matches respect
+case.  I can never remember which way to set case-fold-search, hence this
+simple, little function.
 
 
 
@@ -5549,6 +5702,15 @@ variable name.  The while loop is of the form:
        )
 ```
 point is placed where the the first line of code in the loop belongs.
+
+
+
+#### shu-number-lines ####
+[Command]
+ (Alias: number-lines)
+
+Insert in front of each line in the buffer its line number.  Starts
+at point and continues to the end of the buffer.
 
 
 
@@ -6022,7 +6184,6 @@ Associate a number with each type of variable
 
 
 
-
 # Index #
 
 * [acgen](#acgen)
@@ -6034,6 +6195,8 @@ Associate a number with each type of variable
 * [bde-include](#bde-include)
 * [bde-sdecl](#bde-sdecl)
 * [bde-sgen](#bde-sgen)
+* [case-insensitive](#case-insensitive)
+* [case-sensitive](#case-sensitive)
 * [ccdecl](#ccdecl)
 * [ccgen](#ccgen)
 * [cdecl](#cdecl)
@@ -6104,6 +6267,7 @@ Associate a number with each type of variable
 * [new-lisp](#new-lisp)
 * [new-x-file](#new-x-file)
 * [number-commits](#number-commits)
+* [number-lines](#number-lines)
 * [of](#of)
 * [operators](#operators)
 * [other](#other)
@@ -6125,6 +6289,8 @@ Associate a number with each type of variable
 * [shu-add-cpp-c-extensions](#shu-add-cpp-c-extensions)
 * [shu-add-cpp-h-extensions](#shu-add-cpp-h-extensions)
 * [shu-add-cpp-package-line](#shu-add-cpp-package-line)
+* [shu-add-to-alist](#shu-add-to-alist)
+* [shu-add-to-alist](#shu-add-to-alist)
 * [shu-aix-show-malloc-list](#shu-aix-show-malloc-list)
 * [shu-all-commits](#shu-all-commits)
 * [shu-all-whitespace-chars](#shu-all-whitespace-chars)
@@ -6246,6 +6412,8 @@ Associate a number with each type of variable
 * [shu-capture-show-list](#shu-capture-show-list)
 * [shu-capture-toc-buffer](#shu-capture-toc-buffer)
 * [shu-capture-vars](#shu-capture-vars)
+* [shu-case-insensitive](#shu-case-insensitive)
+* [shu-case-sensitive](#shu-case-sensitive)
 * [shu-cdo](#shu-cdo)
 * [shu-celse](#shu-celse)
 * [shu-cfor](#shu-cfor)
@@ -6291,6 +6459,7 @@ Associate a number with each type of variable
 * [shu-cpp-extensions](#shu-cpp-extensions)
 * [shu-cpp-file-name](#shu-cpp-file-name)
 * [shu-cpp-final-list](#shu-cpp-final-list)
+* [shu-cpp-find-using](#shu-cpp-find-using)
 * [shu-cpp-finish-project](#shu-cpp-finish-project)
 * [shu-cpp-found-extensions](#shu-cpp-found-extensions)
 * [shu-cpp-general-set-alias](#shu-cpp-general-set-alias)
@@ -6445,6 +6614,7 @@ Associate a number with each type of variable
 * [shu-internal-replace-class-name](#shu-internal-replace-class-name)
 * [shu-internal-visit-project-file](#shu-internal-visit-project-file)
 * [shu-internal-which-c-project](#shu-internal-which-c-project)
+* [shu-invert-alist-list](#shu-invert-alist-list)
 * [shu-is-const](#shu-is-const)
 * [shu-keyring-account-name](#shu-keyring-account-name)
 * [shu-keyring-add-values-to-index](#shu-keyring-add-values-to-index)
@@ -6501,6 +6671,7 @@ Associate a number with each type of variable
 * [shu-new-x-file](#shu-new-x-file)
 * [shu-non-cpp-name](#shu-non-cpp-name)
 * [shu-not-all-whitespace-regexp](#shu-not-all-whitespace-regexp)
+* [shu-number-lines](#shu-number-lines)
 * [shu-nvplist-get-item-number](#shu-nvplist-get-item-number)
 * [shu-nvplist-get-item-value](#shu-nvplist-get-item-value)
 * [shu-nvplist-make-item](#shu-nvplist-make-item)
@@ -6544,6 +6715,7 @@ Associate a number with each type of variable
 * [shu-return-ptr](#shu-return-ptr)
 * [shu-return-ref](#shu-return-ref)
 * [shu-reverse-comma-names](#shu-reverse-comma-names)
+* [shu-rmv-classes](#shu-rmv-classes)
 * [shu-s-mode-find-long-line](#shu-s-mode-find-long-line)
 * [shu-save-and-load](#shu-save-and-load)
 * [shu-set-author](#shu-set-author)
