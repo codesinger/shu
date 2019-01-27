@@ -418,6 +418,16 @@ respective month number."
 
 
 ;;
+;;  shu-hhmmss-to-seconds
+;;
+(defsubst shu-hhmmss-to-seconds (hours minutes seconds)
+  "Convert HOURS, MINUTES,  and SECONDS into seconds since midnight."
+    (+ (* hours 60 60) (* minutes 60) seconds)
+    )
+
+
+
+;;
 ;;  shu-seconds-to-hhmmss
 ;;
 (defsubst shu-seconds-to-hhmmss (serial-seconds)
