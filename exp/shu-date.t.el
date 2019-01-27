@@ -27,6 +27,78 @@
 
 
 
+
+;;
+;;  shu-test-shu-date-make-date-1
+;;
+(ert-deftest shu-test-shu-date-make-date-1 ()
+  "Doc string."
+  (let ((date-cons)
+        (serial-day 1234567)
+        (expected-day))
+    (shu-date-make-date date-cons serial-day)
+    (should (consp date-cons))
+    (should (numberp (cdr date-cons)))
+    (should (= serial-day (cdr date-cons)))
+    (shu-date-extract-date expected-day date-cons)
+    (should expected-day)
+    (should (numberp expected-day))
+    (should (= expected-day serial-day))
+    ))
+
+
+
+;;
+;;  shu-test-shu-date-make-time-1
+;;
+(ert-deftest shu-test-shu-date-make-time-1 ()
+  "Doc string."
+  (let ((time-cons)
+        (seconds 1234567)
+        (microseconds 654321)
+        (actual-seconds)
+        (actual-microseconds))
+    (shu-date-make-time time-cons seconds microseconds)
+    (should (consp time-cons))
+    (should (numberp (car time-cons)))
+    (shu-date-extract-time actual-seconds actual-microseconds time-cons)
+    (should actual-seconds)
+    (should (numberp actual-seconds))
+    (should actual-microseconds)
+    (should (numberp actual-microseconds))
+    (should (= seconds actual-seconds))
+    (should (= microseconds actual-microseconds))
+    ))
+
+
+
+;;
+;;  shu-test-shu-date-make-datetime-1
+;;
+(ert-deftest shu-test-shu-date-make-datetime-1 ()
+  "Doc string."
+  (let ((datetime-cons)
+        (serial-day 90283911)
+        (seconds 1234567)
+        (microseconds 654321)
+        (actual-serial-day)
+        (actual-seconds)
+        (actual-microseconds))
+    (shu-date-make-datetime datetime-cons serial-day seconds microseconds)
+    (should (consp datetime-cons))
+    (shu-date-extract-datetime actual-serial-day actual-seconds actual-microseconds datetime-cons)
+    (should actual-serial-day)
+    (should (numberp actual-serial-day))
+    (should actual-seconds)
+    (should (numberp actual-seconds))
+    (should actual-microseconds)
+    (should (numberp actual-microseconds))
+    (should (= serial-day actual-serial-day))
+    (should (= seconds actual-seconds))
+    (should (= microseconds actual-microseconds))
+    ))
+
+
 ;;
 ;;  shu-test-shu-convert-to-datetime-1-1
 ;;

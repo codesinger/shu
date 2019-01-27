@@ -151,7 +151,7 @@ as defined by shu-jday / shu-jdate."
            (error "Incorrect date sentinel")
          (if (not (numberp (cdr ,date-cons)))
              (error "Serial day of date is not a number")
-           (setq ,serial-day (car ,date-cons))
+           (setq ,serial-day (cdr ,date-cons))
            )
          )
        )
