@@ -232,6 +232,35 @@
 ;;  shu-test-shu-get-line-column-of-file-4
 ;;
 (ert-deftest shu-test-shu-get-line-column-of-file-4 ()
+  (let ((data "\"thing.cpp\", line 55.0: 1540-0064 (S) Syntax error:")
+        (expected-line   55)
+        (expected-col    1)
+        (actual)
+        (actual-line)
+        (actual-col))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (if (search-forward "cpp" nil t)
+          (progn
+            (setq actual (shu-get-line-column-of-file))
+            (should actual)
+            (should (listp actual))
+            (should (= 2 (length actual)))
+            (setq actual-line (car actual))
+            (should (= expected-line actual-line))
+            (setq actual (cdr actual))
+            (setq actual-col (car actual))
+            (should (= expected-col actual-col)))
+        (should nil)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-line-column-of-file-5
+;;
+(ert-deftest shu-test-shu-get-line-column-of-file-5 ()
   (let ((data " \"thing.cpp\", line 55: ")
         (expected-line   55)
         (actual)

@@ -156,6 +156,7 @@
 ;;
 (ert-deftest shu-test-shu-date-timep ()
   (let (
+        (gb (get-buffer-create "**boo**"))
         (a 1)
         (b (cons "a" "b"))
         (c (cons 1234 4321))
@@ -168,6 +169,7 @@
     (should (not (shu-date-timep c)))
     (should (not (shu-date-timep d)))
     (setq actual-time (shu-date-make-time time-cons 3601 123456))
+    (princ "actual-time:\n" gb) (princ actual-time gb) (princ "\n" gb)
     (should (shu-date-timep actual-time))
     ))
 

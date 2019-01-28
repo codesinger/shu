@@ -254,10 +254,10 @@ as defined by shu-jday / shu-jdate."
    (=  shu-date-time-sentinel (car time-cons))
    (consp (cdr time-cons))
    (numberp (cadr time-cons))
-   (numberp (caar time-cons))
+   (numberp (cddr time-cons))
    (<= (cadr time-cons)) (+ (* 60 60) 60 59)
-   (<= (caar time-cons) 999999))
-   )
+   (<= (cddr time-cons) 999999))
+  )
 
 
 ;;
