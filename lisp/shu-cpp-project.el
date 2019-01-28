@@ -827,6 +827,8 @@ and column number indications may be used."
     (when line-number
       (setq ret-list (list line-number))
       (when column-number
+        (when (< column-number 1)
+          (setq column-number 1))
         (setq ret-list (append ret-list (list column-number)))))
     ret-list
     ))
