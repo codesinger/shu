@@ -541,6 +541,9 @@ produced by the string-match ust be as follows:
 ;;      OUTLINED ABOVE.  STILL TO BE DONE TO MAKE THESE USE
 ;;      THE ABOVE FORMATS
 ;;
+;;      Above, there are versions of these kfunctions that
+;;      do use the date and time formats outlined above.
+;;
 
 ;;
 ;;  shu-inrternal-convert-to-datetime-1

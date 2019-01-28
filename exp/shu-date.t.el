@@ -129,6 +129,27 @@
 
 
 ;;
+;;  shu-test-shu-date-datep
+;;
+(ert-deftest shu-test-shu-date-datep ()
+  "Doc string."
+  (let (
+        (a 1)
+        (b (cons "a" "b"))
+        (c (cons 1234 4321))
+        (d (cons 1234 "d"))
+        (date-cons)
+        )
+    (should (not (shu-date-datep a)))
+    (should (not (shu-date-datep b)))
+    (should (not (shu-date-datep c)))
+    (should (not (shu-date-datep d)))
+    (setq actual-date (shu-date-make-date date-cons 123456))
+    (should (shu-date-datep actual-date))
+    ))
+
+
+;;
 ;;  shu-test-shu-convert-to-datetime-1-1
 ;;
 (ert-deftest shu-test-shu-convert-to-datetime-1-1 ()
@@ -159,24 +180,22 @@
 ;;
 (ert-deftest shu-test-shu-convert-to-datetime-2-1 ()
   (let (
-        (gb (get-buffer-create "**boo**"))
         (data "2019-01-22T092123.321")
         (expected
-         (cons 2458506          ;; Julian day
-               (cons 33683      ;; Seconds since midnght
-                     321000)))  ;; Microseconds
+         (cons
+         (cons shu-date-date-sentinel 2458506) ;; Date, serial day
+         (cons shu-date-time-sentinel          ;; Time
+               (cons 33683  321000))))         ;; Seconds, microseconds
         (actual)
         (fmt)
         )
     (setq debug-on-error t)
     (setq actual (shu-convert-to-datetime-2 data))
-    (princ "expected:\n" gb) (princ expected gb) (princ "\n" gb)
-    (princ "actual:\n" gb) (princ actual gb) (princ "\n" gb)
     (should actual)
     (should (consp actual))
     (should (consp (cdr actual)))
     (should (equal expected actual))
-    (setq fmt (shu-format-datetime-1 actual))
+    (setq fmt (shu-format-datetime-2 actual))
     (should fmt)
     (should (stringp fmt))
     (should (string= data fmt))
