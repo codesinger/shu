@@ -138,7 +138,9 @@
         (b (cons "a" "b"))
         (c (cons 1234 4321))
         (d (cons 1234 "d"))
+        (d (cons 1234 (cons "d" "e")))
         (date-cons)
+        (actual-date)
         )
     (should (not (shu-date-datep a)))
     (should (not (shu-date-datep b)))
@@ -146,6 +148,27 @@
     (should (not (shu-date-datep d)))
     (setq actual-date (shu-date-make-date date-cons 123456))
     (should (shu-date-datep actual-date))
+    ))
+
+
+;;
+;;  shu-test-shu-date-timep
+;;
+(ert-deftest shu-test-shu-date-timep ()
+  (let (
+        (a 1)
+        (b (cons "a" "b"))
+        (c (cons 1234 4321))
+        (d (cons 1234 "d"))
+        (time-cons)
+        (actual-time)
+        )
+    (should (not (shu-date-timep a)))
+    (should (not (shu-date-timep b)))
+    (should (not (shu-date-timep c)))
+    (should (not (shu-date-timep d)))
+    (setq actual-time (shu-date-make-time time-cons 3601 123456))
+    (should (shu-date-timep actual-time))
     ))
 
 
