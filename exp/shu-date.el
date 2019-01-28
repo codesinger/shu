@@ -176,6 +176,19 @@ as defined by shu-jday / shu-jdate."
 
 
 ;;
+;;  shu-date-datep
+;;
+(defsubst shu-date-datep (date-cons)
+  "Return true if DATE-CONS holds a date."
+  (and
+   (consp date-cons)
+   (numberp (car date-cons))
+   (=  shu-date-date-sentinel (car date-cons))
+   (numberp (cdr date-cons)))
+  )
+
+
+;;
 ;;  shu-date-make-time
 ;;
 (defmacro shu-date-make-time (time-cons seconds microseconds)
@@ -229,6 +242,24 @@ as defined by shu-jday / shu-jdate."
     ))
 
 
+
+;;
+;;  shu-date-timep
+;;
+(defsubst shu-date-timep (time-cons)
+  "Return true if TIME-CONS holds a time."
+  (and
+   (consp time-cons)
+   (numberp (car time-cons))
+   (=  shu-date-time-sentinel (car time-cons))
+   (consp (cdr time-cons))
+   (numberp (cadr time-cons))
+   (numberp (caar time-cons))
+   (<= (cadr time-cons)) (+ (* 60 60) 60 59)
+   (<= (caar time-cons) 999999))
+   )
+
+
 ;;
 ;;  shu-date-make-datetime
 ;;
@@ -260,6 +291,19 @@ as defined by shu-jday / shu-jdate."
      (shu-date-extract-date ,serial-day (car ,datetime-cons))
      (shu-date-extract-time ,seconds ,microseconds (cdr ,datetime-cons))
      )
+  )
+
+
+
+;;
+;;  shu-date-datetimep
+;;
+(defsubst shu-date-datetimep (datetime-cons)
+  "Return true if DAETIME-CONS holds a datetime."
+  (and
+   (consp datetime-cons)
+   (shu-date-datep (car datetime-cons))
+   (shu-date-timep (cdr datetime-cons)))
   )
 
 
@@ -306,7 +350,7 @@ as defined by shu-jday / shu-jdate."
                (error "Incorrect sentinel in time interval")
              (setq ,tintvl-cons (cdr intvl-cons))
              (if (not (consp ,tintvl-cons))
-                 (error "car of time interval is not a cons cell")
+                 (error "cdr of time interval is not a cons cell")
                (if (not (numberp (car ,tintvl-cons)))
                    (error "Days in time interval is not a number")
                  (setq ,days (car ,tintvl-cons))
@@ -321,6 +365,20 @@ as defined by shu-jday / shu-jdate."
     ))
 
 
+
+;;
+;;  shu-date-timeintervalp
+;;
+(defsubst shu-date-timeintervalp (intvl-cons)
+  "Return true if INTVL-CONS holds a timeinterval."
+  (and
+   (consp intvl-cons)
+   (numberp (car intvl-cons))
+   (= shu-date-timeinterval-sentinel (car intvl-cons))
+   (consp (cdr intvl-cons))
+   (numberp (cadr intvl-cons))
+   (shu-date-timep (caar intvl-cons)))
+  )
 
 
 
@@ -345,6 +403,32 @@ as defined by shu-jday / shu-jdate."
           "\\([0-9]\\{3\\}\\)")) ;; 7 - Milliseconds
         )
     (shu-internal-convert-to-datetime-1 date-time-string dtrx)
+    ))
+
+
+
+
+;;
+;;  shu-convert-to-datetime-2
+;;
+(defun shu-convert-to-datetime-2 (date-time-string)
+  "Convert a string of the form yyyy-mm-ddThhmmss.mmm to a shu datetime."
+  (let (
+        (dtrx
+         (concat
+          "\\([0-9]\\{4\\}\\)"   ;; 1 - Year
+          "-"
+          "\\([0-9]\\{2\\}\\)"   ;; 2 - Month
+          "-"
+          "\\([0-9]\\{2\\}\\)"   ;; 3 - Day
+          "T"
+          "\\([0-9]\\{2\\}\\)"   ;; 4 - Hour
+          "\\([0-9]\\{2\\}\\)"   ;; 5 - Minute
+          "\\([0-9]\\{2\\}\\)"   ;; 6 - Second
+          "."
+          "\\([0-9]\\{3\\}\\)")) ;; 7 - Milliseconds
+        )
+    (shu-internal-convert-to-datetime-2 date-time-string dtrx)
     ))
 
 

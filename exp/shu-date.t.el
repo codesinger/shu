@@ -154,6 +154,35 @@
     ))
 
 
+;;
+;;  shu-test-shu-convert-to-datetime-2-1
+;;
+(ert-deftest shu-test-shu-convert-to-datetime-2-1 ()
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (data "2019-01-22T092123.321")
+        (expected
+         (cons 2458506          ;; Julian day
+               (cons 33683      ;; Seconds since midnght
+                     321000)))  ;; Microseconds
+        (actual)
+        (fmt)
+        )
+    (setq debug-on-error t)
+    (setq actual (shu-convert-to-datetime-2 data))
+    (princ "expected:\n" gb) (princ expected gb) (princ "\n" gb)
+    (princ "actual:\n" gb) (princ actual gb) (princ "\n" gb)
+    (should actual)
+    (should (consp actual))
+    (should (consp (cdr actual)))
+    (should (equal expected actual))
+    (setq fmt (shu-format-datetime-1 actual))
+    (should fmt)
+    (should (stringp fmt))
+    (should (string= data fmt))
+    ))
+
+
 
 ;;
 ;;  shu-test-shu-mon-to-number
