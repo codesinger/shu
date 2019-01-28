@@ -750,6 +750,71 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
 
 
 ;;
+;;  shu-bincl
+;;
+(defun shu-bincl ()
+  "If point is sitting on something that resembles a fully qualified class name,
+use the standard BDE algorithm to turn the class name into the name of an
+include file.  The standard BDE algorithm replaces the :: between namespace and
+class name with an underscore, makes all letters lower case, and appends \".h\"
+to the end of the name.
+
+Thus \"abcdef::MumbleFrotz\" becomes \"abcdef_mumblefrotz.h\".
+
+An include directive for the file is then created and put into the kill ring for
+a subsequent yank.
+
+The file name is delimited by double quotes unless SHU-CPP-INCLUDE-USER-BRACKETS
+variable is true, in which case the file name is delimited by left and right
+angle brackets.
+
+Return true if a class name was found an an include generated.  This is for the
+benefit of unit tests."
+  (interactive)
+  (let* ((bol (line-beginning-position))
+        (eol (line-end-position))
+        (target-list (append shu-cpp-name-list (list ":")))
+        (target-char (regexp-opt target-list nil))
+        (target-name
+         (concat
+          "\\(" shu-cpp-name "+\\)"
+          "::"
+          "\\(" shu-cpp-name "+\\)"))
+        (namespace)
+        (class-name)
+        (file-name)
+        (include-name)
+        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+        (right-delim (if shu-cpp-include-user-brackets ">" "\""))
+        (got-it))
+    (save-excursion
+      (if (not (looking-at target-char)) ;; Looking at a legal class name character
+          (message "%s" "Not a properly formed class name")
+        (while (and (looking-at target-char) ;; Still on a file name char
+                    (> (point) bol)) ;; And still on same line
+          (backward-char 1))            ;; Keep moving back until we aren't on a file name char
+        ;;  or we hit the beginning of the line
+        (when (not (looking-at target-char)) ;; Moved backward past beginning of name
+          (forward-char 1))             ;; Move forward to what might be the beginning
+        (if (not (re-search-forward target-name eol t))
+            (message "%s" "Not a properly formed class name")
+          (setq namespace (match-string 1)) ;; Have something that matches file name syntax
+          (setq class-name (match-string 2))
+          (setq file-name (concat
+                           (downcase namespace) "_"
+                           (downcase class-name) ".h"))
+          (setq include-name (concat
+                              "#include "
+                              left-delim file-name right-delim))
+          (message "%s" include-name)
+          (shu-kill-new include-name)
+          (setq got-it t))))
+    got-it
+    ))
+
+
+
+;;
 ;;  shu-gincl
 ;;
 (defun shu-gincl()
@@ -2429,6 +2494,7 @@ shu- prefix removed."
   (defalias 'cother 'shu-cother)
   (defalias 'hother 'shu-hother)
   (defalias 'tother 'shu-tother)
+  (defalias 'bincl 'shu-bincl)
   (defalias 'gincl 'shu-gincl)
   (defalias 'dox-cvt 'shu-dox-cvt)
   (defalias 'dox-cbt 'shu-dox-cbt)

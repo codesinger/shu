@@ -2019,4 +2019,98 @@ This is most likely the name of an include file and not the name of a class."
     ))
 
 
+
+;;
+;;  shu-test-shu-bincl-1
+;;
+(ert-deftest shu-test-shu-bincl-1 ()
+  (let* ((data "  abcdef::MumbleFrotz  x(5);\n")
+        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+        (right-delim (if shu-cpp-include-user-brackets ">" "\""))
+        (actual)
+        (expected
+         (concat
+          "#include "
+          left-delim "abcdef_mumblefrotz.h" right-delim)))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "Mum"))
+      (shu-bincl))
+    (with-temp-buffer
+      (yank)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-bincl-2
+;;
+(ert-deftest shu-test-shu-bincl-2 ()
+  (let* ((data "  abcdef::MumbleFrotz  x(5);\n")
+        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+        (right-delim (if shu-cpp-include-user-brackets ">" "\""))
+        (actual)
+        (expected
+         (concat
+          "#include "
+          left-delim "abcdef_mumblefrotz.h" right-delim)))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "abc"))
+      (shu-bincl))
+    (with-temp-buffer
+      (yank)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-bincl-3
+;;
+(ert-deftest shu-test-shu-bincl-3 ()
+  (let* ((data "  abcdef::MumbleFrotz  x(5);\n")
+        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+        (right-delim (if shu-cpp-include-user-brackets ">" "\""))
+        (actual)
+        (expected
+         (concat
+          "#include "
+          left-delim "abcdef_mumblefrotz.h" right-delim)))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward ":"))
+      (shu-bincl))
+    (with-temp-buffer
+      (yank)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-bincl-4
+;;
+(ert-deftest shu-test-shu-bincl-4 ()
+  (let* ((data "  abcdef::MumbleFrotz xxx(5);\n")
+        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+        (right-delim (if shu-cpp-include-user-brackets ">" "\"")))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "xxx"))
+      (should (not (shu-bincl))))
+    ))
+
+
 ;;; shu-cpp-general.t.el ends here

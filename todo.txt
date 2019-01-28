@@ -44,3 +44,8 @@ Things that I would like to do someday ...
 
 
 - 25 Jan 2019 - Look into having shu-number-lines use (rectangle-number-lines)
+
+- 29 Jan 2019 - New way to generate include file name
+
+      Put corsor on alice::MumbleBob and have function generate
+      #include <alice_mumblebob.h>
