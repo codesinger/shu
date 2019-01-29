@@ -750,9 +750,9 @@ file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c fi
 
 
 ;;
-;;  shu-bincl
+;;  shu-binclude
 ;;
-(defun shu-bincl ()
+(defun shu-binclude ()
   "If point is sitting on something that resembles a fully qualified class name,
 use the standard BDE algorithm to turn the class name into the name of an
 include file.  The standard BDE algorithm replaces the :: between namespace and
@@ -815,9 +815,9 @@ benefit of unit tests."
 
 
 ;;
-;;  shu-gincl
+;;  shu-ginclude
 ;;
-(defun shu-gincl()
+(defun shu-ginclude()
   "While in a file buffer, wrap the file name in a C++ include directive and
 put it in the kill ring.  The file name is delimited by double quotes unless
 SHU-CPP-INCLUDE-USER-BRACKETS variable is true, in which case the file name
@@ -2494,8 +2494,8 @@ shu- prefix removed."
   (defalias 'cother 'shu-cother)
   (defalias 'hother 'shu-hother)
   (defalias 'tother 'shu-tother)
-  (defalias 'bincl 'shu-bincl)
-  (defalias 'gincl 'shu-gincl)
+  (defalias 'binclude 'shu-binclude)
+  (defalias 'ginclude 'shu-ginclude)
   (defalias 'dox-cvt 'shu-dox-cvt)
   (defalias 'dox-cbt 'shu-dox-cbt)
   (defalias 'new-x-file 'shu-new-x-file)

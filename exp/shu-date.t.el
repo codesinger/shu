@@ -133,15 +133,14 @@
 ;;
 (ert-deftest shu-test-shu-date-datep ()
   "Doc string."
-  (let (
-        (a 1)
+  (let ((a 1)
         (b (cons "a" "b"))
         (c (cons 1234 4321))
         (d (cons 1234 "d"))
         (d (cons 1234 (cons "d" "e")))
         (date-cons)
-        (actual-date)
-        )
+        (actual-date))
+    (should (not (shu-date-datep actual-date)))
     (should (not (shu-date-datep a)))
     (should (not (shu-date-datep b)))
     (should (not (shu-date-datep c)))
@@ -155,22 +154,46 @@
 ;;  shu-test-shu-date-timep
 ;;
 (ert-deftest shu-test-shu-date-timep ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (a 1)
+  (let ((a 1)
         (b (cons "a" "b"))
         (c (cons 1234 4321))
         (d (cons 1234 "d"))
         (time-cons)
-        (actual-time)
-        )
+        (actual-time))
+    (should (not (shu-date-timep actual-time)))
     (should (not (shu-date-timep a)))
     (should (not (shu-date-timep b)))
     (should (not (shu-date-timep c)))
     (should (not (shu-date-timep d)))
     (setq actual-time (shu-date-make-time time-cons 3601 123456))
-    (princ "actual-time:\n" gb) (princ actual-time gb) (princ "\n" gb)
     (should (shu-date-timep actual-time))
+    ))
+
+
+;;
+;;  shu-test-shu-date-datetimep
+;;
+(ert-deftest shu-test-shu-date-datetimep ()
+  (let ((a 1)
+        (b (cons "a" "b"))
+        (c (cons 1234 4321))
+        (d (cons 1234 "d"))
+        (time-cons)
+        (actual-date)
+        (actual-time)
+        (actual-datetime))
+    (setq debug-on-error t)
+    (should (not (shu-date-timep actual-datetime)))
+    (should (not (shu-date-timep a)))
+    (should (not (shu-date-timep b)))
+    (should (not (shu-date-timep c)))
+    (should (not (shu-date-timep d)))
+    (setq actual-time (shu-date-make-date actual-date 3601))
+    (should (not (shu-date-datetimep actual-date)))
+    (setq actual-time (shu-date-make-time actual-time 3601 123456))
+    (should (not (shu-date-datetimep actual-time)))
+    (setq actual-datetime (shu-date-make-datetime actual-datetime 309642 18022 123457))
+    (should (shu-date-datetimep actual-datetime))
     ))
 
 

@@ -181,6 +181,7 @@ as defined by shu-jday / shu-jdate."
 (defsubst shu-date-datep (date-cons)
   "Return true if DATE-CONS holds a date."
   (and
+   date-cons
    (consp date-cons)
    (numberp (car date-cons))
    (=  shu-date-date-sentinel (car date-cons))
@@ -249,6 +250,7 @@ as defined by shu-jday / shu-jdate."
 (defsubst shu-date-timep (time-cons)
   "Return true if TIME-CONS holds a time."
   (and
+   time-cons
    (consp time-cons)
    (numberp (car time-cons))
    (=  shu-date-time-sentinel (car time-cons))
@@ -301,6 +303,7 @@ as defined by shu-jday / shu-jdate."
 (defsubst shu-date-datetimep (datetime-cons)
   "Return true if DAETIME-CONS holds a datetime."
   (and
+   datetime-cons
    (consp datetime-cons)
    (shu-date-datep (car datetime-cons))
    (shu-date-timep (cdr datetime-cons)))
