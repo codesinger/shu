@@ -190,6 +190,32 @@ as defined by shu-jday / shu-jdate."
 
 
 ;;
+;;  shu-date-date-lessp
+;;
+(defun shu-date-date-lessp (lhs rhs)
+  "Return t if the date in LHS is less than the date in RHS."
+  (let ((lhsday)
+        (rhsday))
+    (shu-date-extract-date lhsday lhs)
+    (shu-date-extract-date rhsday rhs)
+    (< lhsday rhsday)
+    ))
+
+
+;;
+;;  shu-date-date-equalp
+;;
+(defun shu-date-date-equalp (lhs rhs)
+  "Return t if the date in LHS is equal to the date in RHS."
+  (let ((lhsday)
+        (rhsday))
+    (shu-date-extract-date lhsday lhs)
+    (shu-date-extract-date rhsday rhs)
+    (= lhsday rhsday)
+    ))
+
+
+;;
 ;;  shu-date-make-time
 ;;
 (defmacro shu-date-make-time (time-cons seconds microseconds)
@@ -262,6 +288,23 @@ as defined by shu-jday / shu-jdate."
   )
 
 
+
+;;
+;;  shu-date-time-lessp
+;;
+(defun shu-date-time-lessp (lhs rhs)
+  "Return t if the time in LHS is less than the time in RHS."
+  (let ((lhs-sec)
+        (lhs-mic)
+        (rhs-sec)
+        (rhs-mic))
+    (shu-date-extract-time lhs-sec lhs-mic lhs)
+    (shu-date-extract-time rhs-sec rhs-mic rhs)
+    (or (< lhs-sec rhs-sec)
+        (and (= lhs-sec rhs-sec) (< lhs-mic rhs-mic)))
+    ))
+
+
 ;;
 ;;  shu-date-make-datetime
 ;;
@@ -308,6 +351,18 @@ as defined by shu-jday / shu-jdate."
    (shu-date-datep (car datetime-cons))
    (shu-date-timep (cdr datetime-cons)))
   )
+
+
+
+;;
+;;  shu-date-datetime-lessp
+;;
+(defun shu-date-datetime-lessp (lhs rhs)
+  "Return t if the datetime in LHS is less than the datetime in RHS."
+    (or (shu-date-date-lessp (car lhs) (car rhs))
+        (and (shu-date-date-equalp (car lhs) (car rhs))
+             (shu-date-time-lessp (cdr lhs) (cdr rhs))))
+    )
 
 
 

@@ -277,6 +277,85 @@
 
 
 
+
+;;
+;;  shu-test-shu-date-date-lessp
+;;
+(ert-deftest shu-test-shu-date-date-lessp ()
+  (let ((lhs)
+        (rhs))
+    (shu-date-make-date lhs 1801)
+    (shu-date-make-date rhs 1802)
+    (should (shu-date-date-lessp lhs rhs))
+    (shu-date-make-date lhs 1801)
+    (shu-date-make-date rhs 1801)
+    (should (not (shu-date-date-lessp lhs rhs)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-date-time-lessp
+;;
+(ert-deftest shu-test-shu-date-time-lessp ()
+  (let ((lhs)
+        (rhs))
+    (shu-date-make-time lhs 1801 123456)
+    (shu-date-make-time rhs 1802 123456)
+    (should (shu-date-time-lessp lhs rhs))
+
+    (shu-date-make-time lhs 1801 123455)
+    (shu-date-make-time rhs 1801 123456)
+    (should (shu-date-time-lessp lhs rhs))
+
+    (shu-date-make-time lhs 1801 123455)
+    (shu-date-make-time rhs 1801 123455)
+    (should (not (shu-date-time-lessp lhs rhs)))
+
+    (shu-date-make-time lhs 1802 123456)
+    (shu-date-make-time rhs 1801 123456)
+    (should (not (shu-date-time-lessp lhs rhs)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-date-datetime-lessp
+;;
+(ert-deftest shu-test-shu-date-datetime-lessp ()
+  (let ((lhs)
+        (rhs))
+    (shu-date-make-datetime lhs 80 1801 123456)
+    (shu-date-make-datetime rhs 81 1801 123456)
+    (should (shu-date-datetime-lessp lhs rhs))
+
+    (shu-date-make-datetime lhs 81 1800 123456)
+    (shu-date-make-datetime rhs 81 1801 123456)
+    (should (shu-date-datetime-lessp lhs rhs))
+
+    (shu-date-make-datetime lhs 81 1801 123455)
+    (shu-date-make-datetime rhs 81 1801 123456)
+    (should (shu-date-datetime-lessp lhs rhs))
+
+    (shu-date-make-datetime lhs 81 1801 123456)
+    (shu-date-make-datetime rhs 81 1801 123456)
+    (should (not (shu-date-datetime-lessp lhs rhs)))
+
+    (shu-date-make-datetime lhs 82 1801 123456)
+    (shu-date-make-datetime rhs 81 1801 123456)
+    (should (not (shu-date-datetime-lessp lhs rhs)))
+
+    (shu-date-make-datetime lhs 81 1802 123456)
+    (shu-date-make-datetime rhs 81 1801 123456)
+    (should (not (shu-date-datetime-lessp lhs rhs)))
+
+    (shu-date-make-datetime lhs 81 1801 123457)
+    (shu-date-make-datetime rhs 81 1801 123456)
+    (should (not (shu-date-datetime-lessp lhs rhs)))
+    ))
+
+
+
 ;;
 ;;  shu-test-shu-mon-to-number
 ;;
