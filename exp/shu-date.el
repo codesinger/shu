@@ -326,7 +326,7 @@ as defined by shu-jday / shu-jdate."
            (,tintvl-cons)
            )
        (shu-date-make-time ,ttime-cons ,seconds ,microseconds)
-       (setq ,tintvl-cons (cons days ,ttime-cons))
+       (setq ,tintvl-cons (cons ,days ,ttime-cons))
        (setq ,intvl-cons (cons shu-date-timeinterval-sentinel ,tintvl-cons)))
     ))
 
@@ -375,12 +375,14 @@ as defined by shu-jday / shu-jdate."
 (defsubst shu-date-timeintervalp (intvl-cons)
   "Return true if INTVL-CONS holds a timeinterval."
   (and
+   intvl-cons
    (consp intvl-cons)
    (numberp (car intvl-cons))
    (= shu-date-timeinterval-sentinel (car intvl-cons))
    (consp (cdr intvl-cons))
    (numberp (cadr intvl-cons))
-   (shu-date-timep (caar intvl-cons)))
+   (shu-date-timep (cddr intvl-cons))
+   )
   )
 
 
