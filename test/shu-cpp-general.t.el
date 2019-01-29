@@ -2021,9 +2021,9 @@ This is most likely the name of an include file and not the name of a class."
 
 
 ;;
-;;  shu-test-shu-bincl-1
+;;  shu-test-shu-binclude-1
 ;;
-(ert-deftest shu-test-shu-bincl-1 ()
+(ert-deftest shu-test-shu-binclude-1 ()
   (let* ((data "  abcdef::MumbleFrotz  x(5);\n")
         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
         (right-delim (if shu-cpp-include-user-brackets ">" "\""))
@@ -2036,7 +2036,7 @@ This is most likely the name of an include file and not the name of a class."
       (insert data)
       (goto-char (point-min))
       (should (search-forward "Mum"))
-      (shu-bincl))
+      (shu-binclude))
     (with-temp-buffer
       (yank)
       (setq actual (buffer-substring-no-properties (point-min) (point-max))))
@@ -2047,9 +2047,9 @@ This is most likely the name of an include file and not the name of a class."
 
 
 ;;
-;;  shu-test-shu-bincl-2
+;;  shu-test-shu-binclude-2
 ;;
-(ert-deftest shu-test-shu-bincl-2 ()
+(ert-deftest shu-test-shu-binclude-2 ()
   (let* ((data "  abcdef::MumbleFrotz  x(5);\n")
         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
         (right-delim (if shu-cpp-include-user-brackets ">" "\""))
@@ -2062,7 +2062,7 @@ This is most likely the name of an include file and not the name of a class."
       (insert data)
       (goto-char (point-min))
       (should (search-forward "abc"))
-      (shu-bincl))
+      (shu-binclude))
     (with-temp-buffer
       (yank)
       (setq actual (buffer-substring-no-properties (point-min) (point-max))))
@@ -2073,9 +2073,9 @@ This is most likely the name of an include file and not the name of a class."
 
 
 ;;
-;;  shu-test-shu-bincl-3
+;;  shu-test-shu-binclude-3
 ;;
-(ert-deftest shu-test-shu-bincl-3 ()
+(ert-deftest shu-test-shu-binclude-3 ()
   (let* ((data "  abcdef::MumbleFrotz  x(5);\n")
         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
         (right-delim (if shu-cpp-include-user-brackets ">" "\""))
@@ -2088,7 +2088,7 @@ This is most likely the name of an include file and not the name of a class."
       (insert data)
       (goto-char (point-min))
       (should (search-forward ":"))
-      (shu-bincl))
+      (shu-binclude))
     (with-temp-buffer
       (yank)
       (setq actual (buffer-substring-no-properties (point-min) (point-max))))
@@ -2099,9 +2099,9 @@ This is most likely the name of an include file and not the name of a class."
 
 
 ;;
-;;  shu-test-shu-bincl-4
+;;  shu-test-shu-binclude-4
 ;;
-(ert-deftest shu-test-shu-bincl-4 ()
+(ert-deftest shu-test-shu-binclude-4 ()
   (let* ((data "  abcdef::MumbleFrotz xxx(5);\n")
         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
         (right-delim (if shu-cpp-include-user-brackets ">" "\"")))
@@ -2109,7 +2109,7 @@ This is most likely the name of an include file and not the name of a class."
       (insert data)
       (goto-char (point-min))
       (should (search-forward "xxx"))
-      (should (not (shu-bincl))))
+      (should (not (shu-binclude))))
     ))
 
 
