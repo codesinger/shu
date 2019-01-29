@@ -548,7 +548,6 @@ file typed in the completion buffer."
        (invitation "Visit c or h file: ")
        (completion-prefix)
        (default-file-string))
-    (setq debug-on-error t)
     (when shu-completion-is-directory
       (setq completion-prefix (shu-cpp-directory-prefix)))
     (when shu-cpp-completion-prefix

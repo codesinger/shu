@@ -263,7 +263,7 @@ in the form of \"foo.cpp:123:2\"."
   "Insert at point a skeleton lisp function.  Prompt is issued for the function
 name."
   (interactive "*sFunction name?: ")
-  (shu-internal-new-lisp "defun" func-name t)
+  (shu-internal-new-lisp "defun" func-name t t)
   )
 
 
@@ -281,7 +281,7 @@ function name."
 ;;
 ;;  shu-internal-new-lisp
 ;;
-(defun shu-internal-new-lisp (func-type func-name &optional interactive)
+(defun shu-internal-new-lisp (func-type func-name &optional doc-string interactive)
   "Insert at point a skeleton lisp function of type FUNC-TYPE whose name is
 FUNC-NAME.  FUNC-TYPE is not examined in any way but is only useful if its
 value is \"defun\", \"defmacro\", \"ert-deftest\", etc.  If INTERACTIVE is

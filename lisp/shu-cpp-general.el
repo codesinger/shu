@@ -1078,7 +1078,6 @@ variables."
           (dir-name  nil)
           ;;        (shu-cpp-buffer (get-buffer-create shu-cpp-buffer-name))
           (m (copy-marker 300 ) ) )
-      (setq debug-on-error t)
       (setq shu-cpp-project-list nil)
       (goto-char start)               ; Move to region start
                                         ; While we have not reached last line and
