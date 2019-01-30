@@ -356,6 +356,37 @@
 
 
 
+
+;;
+;;  shu-test-shu-date-timeinterval-lessp
+;;
+(ert-deftest shu-test-shu-date-timeinterval-lessp ()
+  (let (
+        (lhs)
+        (rhs)
+        )
+    (shu-date-make-timeinterval lhs 82 3183 123456)
+    (shu-date-make-timeinterval rhs 83 3183 123456)
+    (should (shu-date-timeinterval-lessp lhs rhs))
+
+    (shu-date-make-timeinterval lhs 83 3183 123455)
+    (shu-date-make-timeinterval rhs 83 3183 123456)
+    (should (shu-date-timeinterval-lessp lhs rhs))
+
+    (shu-date-make-timeinterval lhs 83 3182 123455)
+    (shu-date-make-timeinterval rhs 83 3183 123456)
+    (should (shu-date-timeinterval-lessp lhs rhs))
+
+    (shu-date-make-timeinterval lhs 84 3182 123455)
+    (shu-date-make-timeinterval rhs 83 3183 123456)
+    (should (not (shu-date-timeinterval-lessp lhs rhs)))
+
+    (shu-date-make-timeinterval lhs 83 3183 123456)
+    (shu-date-make-timeinterval rhs 83 3183 123456)
+    (should (not (shu-date-timeinterval-lessp lhs rhs)))
+    ))
+
+
 ;;
 ;;  shu-test-shu-mon-to-number
 ;;

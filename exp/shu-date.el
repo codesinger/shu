@@ -443,6 +443,23 @@ as defined by shu-jday / shu-jdate."
 
 
 ;;
+;;  shu-date-timeinterval-lessp
+;;
+(defun shu-date-timeinterval-lessp (lhs rhs)
+  "Return true if the timeinterval in LHS is less than the timeinterval in RHS."
+  (interactive)
+  (let ((lhs-days (cadr lhs))
+        (lhs-time (cddr lhs))
+        (rhs-days (cadr rhs))
+        (rhs-time (cddr rhs)))
+    (or (< lhs-days rhs-days)
+        (and (= lhs-days rhs-days)
+             (shu-date-time-lessp lhs-time rhs-time)))
+    ))
+
+
+
+;;
 ;;  shu-convert-to-datetime-1
 ;;
 (defun shu-convert-to-datetime-1 (date-time-string)
