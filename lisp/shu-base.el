@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.3.18
+;; Version: 1.3.19
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.3.18"
+(defconst shu-version "1.3.19"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Jan 12"

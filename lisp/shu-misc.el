@@ -295,8 +295,10 @@ true, the function is interactive."
       ";;\n"
       ";;  " func-name "\n"
       ";;\n"
-      "(" func-type " " func-name " ()\n"
-      "  \"Doc string.\"\n"))
+      "(" func-type " " func-name " ()\n"))
+    (when doc-string
+      (insert
+       "  \"Doc string.\"\n"))
     (when interactive
       (insert "  (interactive)\n"))
     (insert
