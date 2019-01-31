@@ -1,5 +1,18 @@
 
 
+;;
+;;  shu-date-date-equal
+;;
+(defun shu-date-date-equal (lhs rhs)
+  "Return t if the date in LHS is equal to the date in RHS."
+  (let ((lhsday)
+        (rhsday))
+    (shu-date-extract-date lhsday lhs)
+    (shu-date-extract-date rhsday rhs)
+    (= lhsday rhsday)
+    ))
+
+
 
 ;;
 ;;  shu-date-date-less
@@ -11,19 +24,6 @@
     (shu-date-extract-date lhsday lhs)
     (shu-date-extract-date rhsday rhs)
     (< lhsday rhsday)
-    ))
-
-
-;;
-;;  shu-date-date-equal
-;;
-(defun shu-date-date-equal (lhs rhs)
-  "Return t if the date in LHS is equal to the date in RHS."
-  (let ((lhsday)
-        (rhsday))
-    (shu-date-extract-date lhsday lhs)
-    (shu-date-extract-date rhsday rhs)
-    (= lhsday rhsday)
     ))
 
 
