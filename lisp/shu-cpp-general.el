@@ -1922,7 +1922,7 @@ would be interpreted as though it had been written:
       (goto-char (point-min))
       (when (not (= 0 uc))
         (setq unk (format " %d unknown namespaces. " uc)))
-      (message "Replaced %d occurrences.%s  See buffer **chgs**" count unk))
+      (message "Replaced %d occurrences.%s  See buffer %s" count unk gb-name))
     count
     ))
 
