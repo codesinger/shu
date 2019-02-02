@@ -49,3 +49,17 @@ Things that I would like to do someday ...
 
       Put corsor on alice::MumbleBob and have function generate
       #include <alice_mumblebob.h>
+
+- 1 Feb 2019
+
+      Extend the above for names of the form alice_MumbleBob
+
+- 1 Feb 2019
+
+  shu-hother, shu-tother, shu-cother just form the file name and try to open it in
+  the current directoty.  But if your test files are in a unit_test directory, your
+  code files in a src directory and the header files in an include directory this
+  does not work.
+
+  However, if a project exists, it knows where all of the tiles are.  You should be
+  able to pass the name to the shu-project code and have it find it for you.

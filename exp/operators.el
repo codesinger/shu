@@ -28,6 +28,15 @@
 
 
 
+;;
+;;  shu-date-date-greater
+;;
+(defsubst shu-date-date-greater (lhs rhs)
+  "Return t if the date in LHS is greater than the date in RHS."
+  (shu-date-date-less rhs lhs)
+)
+
+
 
 ;;
 ;;  shu-date-time-equal
