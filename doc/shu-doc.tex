@@ -39,7 +39,7 @@ Version 1.2 was merged with the master branch on 6 January 2019.
 
 Version 1.3 was merged with the master branch on 12 January 2019.
 
-This is Version 1.3.13 of the Shu elisp repository,
+This is Version 1.4.0 of the Shu elisp repository,
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -291,7 +291,7 @@ A regular expression to match a variable name in a C or C++ program.
 \index{shu-cpp-name-list} \hfill [Constant]
 
 \begin{doc-string}
-List of all characters that can be present in a C++ file name.
+List of all characters that can be present in a C++ variable name.
 \end{doc-string}
 
 \vspace{1em}
@@ -2344,12 +2344,6 @@ with some very long lines.  \emph{shu-csplit} can automatically split such a lin
 for you.  \emph{shu-cunsplit} can undo the split.  \emph{shu-creplace} can in one
 operation, replace a split line with a different string constant.
 
-\subsubsection{Toggle back and forth between files}
-
-If you are editing a C or C++ file and wish to switch to its associated
-header file, \emph{shu-hother} will switch to the header file.  \emph{shu-cother} will
-switch back to the original C or C++ file.  \emph{shu-tother} will switch to the
-associated unit test file that ends in ``1.cpp.""
 
 
 \subsection{List of functions by alias name}
@@ -2367,6 +2361,33 @@ A list of aliases and associated function names.
 
 \begin{doc-string}
 Insert the doxygen author tag in an existing file.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{binclude }}
+\usebox{\funcname}
+\index{binclude} \hfill [Command]\\%
+ (Function: shu-binclude)
+
+\begin{doc-string}
+If point is sitting on something that resembles a fully qualified class name,
+use the standard BDE algorithm to turn the class name into the name of an
+include file.  The standard BDE algorithm replaces the :: between namespace and
+class name with an underscore, makes all letters lower case, and appends ``.h''
+to the end of the name.
+
+Thus ``abcdef::MumbleFrotz'' becomes ``abcdef\_mumblefrotz.h''.
+
+An include directive for the file is then created and put into the kill ring for
+a subsequent yank.
+
+The file name is delimited by double quotes unless \emph{shu-cpp-include-user-brackets}
+variable is true, in which case the file name is delimited by left and right
+angle brackets.
+
+Return true if a class name was found an an include generated.  This is for the
+benefit of unit tests.
 \end{doc-string}
 
 \vspace{1em}
@@ -2435,18 +2456,6 @@ strings and that you are not missing any occurrences of $<$$<$.
 
 \begin{doc-string}
 Place a skeleton Doxygen header definition at point.
-\end{doc-string}
-
-\vspace{1em}
-\noindent
-\savebox{\funcname}{\noindent\texttt{cother }}
-\usebox{\funcname}
-\index{cother} \hfill [Command]\\%
- (Function: shu-cother)
-
-\begin{doc-string}
-Visit a .cpp file from the corresponding .t.cpp or .h file.  If visiting a t.cpp or .h
-file, invoke \emph{shu-cother} and you will be taken to the corresponding .cpp or .c file.
 \end{doc-string}
 
 \vspace{1em}
@@ -2699,28 +2708,16 @@ variables.
 
 \vspace{1em}
 \noindent
-\savebox{\funcname}{\noindent\texttt{gincl }}
+\savebox{\funcname}{\noindent\texttt{ginclude }}
 \usebox{\funcname}
-\index{gincl} \hfill [Command]\\%
- (Function: shu-gincl)
+\index{ginclude} \hfill [Command]\\%
+ (Function: shu-ginclude)
 
 \begin{doc-string}
 While in a file buffer, wrap the file name in a C++ include directive and
 put it in the kill ring.  The file name is delimited by double quotes unless
 \emph{shu-cpp-include-user-brackets} variable is true, in which case the file name
 is delimited by left and right angle brackets.
-\end{doc-string}
-
-\vspace{1em}
-\noindent
-\savebox{\funcname}{\noindent\texttt{hother }}
-\usebox{\funcname}
-\index{hother} \hfill [Command]\\%
- (Function: shu-hother)
-
-\begin{doc-string}
-Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a .cpp or
-t.cpp file, invoke \emph{shu-hother} and you will be taken to the corresponding .h file.
 \end{doc-string}
 
 \vspace{1em}
@@ -2776,20 +2773,6 @@ Generate a skeleton Doxygen \\file directive.
 
 \begin{doc-string}
 Place skeletons of all of the standard c++ operator functions at point.
-\end{doc-string}
-
-\vspace{1em}
-\noindent
-\savebox{\funcname}{\noindent\texttt{other }}
-\usebox{\funcname}
-\index{other} \hfill [Command]\\%
- (Function: shu-other)
-
-\begin{doc-string}
-Visit an h file from a c file or a c file from an h file
-If visiting a .h file, invoke \emph{shu-other} and you will be taken to the
-.c or .cpp file.  If visiting a .c or .cpp file, invoke other and you
-will be taken to the corresponding .h file
 \end{doc-string}
 
 \vspace{1em}
@@ -2851,19 +2834,6 @@ count of class names changed.
 Set the local namespace for C++ classes.
 \end{doc-string}
 
-\vspace{1em}
-\noindent
-\savebox{\funcname}{\noindent\texttt{tother }}
-\usebox{\funcname}
-\index{tother} \hfill [Command]\\%
- (Function: shu-tother)
-
-\begin{doc-string}
-Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c or
-.cpp file, invoke \emph{shu-tother} and you will be taken to the corresponding .t.cpp
-file.
-\end{doc-string}
-
 \subsection{List of functions and variables}
 
 List of functions and variable definitions in this package.
@@ -2911,6 +2881,33 @@ The name of an attribute.
 
 \begin{doc-string}
 Insert the doxygen author tag in an existing file.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-binclude }}
+\usebox{\funcname}
+\index{shu-binclude} \hfill [Command]\\%
+ (Alias: binclude)
+
+\begin{doc-string}
+If point is sitting on something that resembles a fully qualified class name,
+use the standard BDE algorithm to turn the class name into the name of an
+include file.  The standard BDE algorithm replaces the :: between namespace and
+class name with an underscore, makes all letters lower case, and appends ``.h''
+to the end of the name.
+
+Thus ``abcdef::MumbleFrotz'' becomes ``abcdef\_mumblefrotz.h''.
+
+An include directive for the file is then created and put into the kill ring for
+a subsequent yank.
+
+The file name is delimited by double quotes unless \emph{shu-cpp-include-user-brackets}
+variable is true, in which case the file name is delimited by left and right
+angle brackets.
+
+Return true if a class name was found an an include generated.  This is for the
+benefit of unit tests.
 \end{doc-string}
 
 \vspace{1em}
@@ -2987,18 +2984,6 @@ Return true if the class name should be ignored.
 
 \begin{doc-string}
 Place a skeleton Doxygen header definition at point.
-\end{doc-string}
-
-\vspace{1em}
-\noindent
-\savebox{\funcname}{\noindent\texttt{shu-cother }}
-\usebox{\funcname}
-\index{shu-cother} \hfill [Command]\\%
- (Alias: cother)
-
-\begin{doc-string}
-Visit a .cpp file from the corresponding .t.cpp or .h file.  If visiting a t.cpp or .h
-file, invoke \emph{shu-cother} and you will be taken to the corresponding .cpp or .c file.
 \end{doc-string}
 
 \vspace{1em}
@@ -3459,28 +3444,16 @@ variables.
 
 \vspace{1em}
 \noindent
-\savebox{\funcname}{\noindent\texttt{shu-gincl }}
+\savebox{\funcname}{\noindent\texttt{shu-ginclude }}
 \usebox{\funcname}
-\index{shu-gincl} \hfill [Command]\\%
- (Alias: gincl)
+\index{shu-ginclude} \hfill [Command]\\%
+ (Alias: ginclude)
 
 \begin{doc-string}
 While in a file buffer, wrap the file name in a C++ include directive and
 put it in the kill ring.  The file name is delimited by double quotes unless
 \emph{shu-cpp-include-user-brackets} variable is true, in which case the file name
 is delimited by left and right angle brackets.
-\end{doc-string}
-
-\vspace{1em}
-\noindent
-\savebox{\funcname}{\noindent\texttt{shu-hother }}
-\usebox{\funcname}
-\index{shu-hother} \hfill [Command]\\%
- (Alias: hother)
-
-\begin{doc-string}
-Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a .cpp or
-t.cpp file, invoke \emph{shu-hother} and you will be taken to the corresponding .h file.
 \end{doc-string}
 
 \vspace{1em}
@@ -3639,20 +3612,6 @@ Generate a skeleton Doxygen \\file directive.
 
 \begin{doc-string}
 Place skeletons of all of the standard c++ operator functions at point.
-\end{doc-string}
-
-\vspace{1em}
-\noindent
-\savebox{\funcname}{\noindent\texttt{shu-other }}
-\usebox{\funcname}
-\index{shu-other} \hfill [Command]\\%
- (Alias: other)
-
-\begin{doc-string}
-Visit an h file from a c file or a c file from an h file
-If visiting a .h file, invoke \emph{shu-other} and you will be taken to the
-.c or .cpp file.  If visiting a .c or .cpp file, invoke other and you
-will be taken to the corresponding .h file
 \end{doc-string}
 
 \vspace{1em}
@@ -3834,19 +3793,6 @@ Undocumented
 
 \begin{doc-string}
 Undocumented
-\end{doc-string}
-
-\vspace{1em}
-\noindent
-\savebox{\funcname}{\noindent\texttt{shu-tother }}
-\usebox{\funcname}
-\index{shu-tother} \hfill [Command]\\%
- (Alias: tother)
-
-\begin{doc-string}
-Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c or
-.cpp file, invoke \emph{shu-tother} and you will be taken to the corresponding .t.cpp
-file.
 \end{doc-string}
 
 \vspace{1em}
@@ -4136,12 +4082,30 @@ Generate a skeleton t.cpp file
 A collection of useful functions for dealing with project files and treating
 a set of source files in multiple directories as a single project
 
+\subsubsection{Toggle back and forth between files}
+
+If you are editing a C or C++ file and wish to switch to its associated
+header file, \emph{shu-hother} will switch to the header file.  \emph{shu-cother} will
+switch back to the original C or C++ file.  \emph{shu-tother} will switch to the
+associated unit test file that ends in ``t.cpp.""
+
 
 \subsection{List of functions by alias name}
 
 A list of aliases and associated function names.
 
 
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{clear-c-project }}
+\usebox{\funcname}
+\index{clear-c-project} \hfill [Command]\\%
+ (Function: shu-clear-c-project)
+
+\begin{doc-string}
+Clear an existing project, if any.
+\end{doc-string}
 
 \vspace{1em}
 \noindent
@@ -4157,6 +4121,20 @@ a project file and point is not sitting on something that resembles a file name.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{cother }}
+\usebox{\funcname}
+\index{cother} \hfill [Command]\\%
+ (Function: shu-cother)
+
+\begin{doc-string}
+Visit a .cpp file from the corresponding .t.cpp or .h file.  If visiting a
+t.cpp or .h file, invoke this function and you will be taken to the
+corresponding .cpp or .c file.  This function will use a project if one is
+active.  Otherwise, it will assume that all files reside in the same directory.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{count-c-project }}
 \usebox{\funcname}
 \index{count-c-project} \hfill [Command]\\%
@@ -4166,6 +4144,20 @@ a project file and point is not sitting on something that resembles a file name.
 Count the number of lines of code in a project.  The final count is shown in
 the minibuffer.  The counts of individual subdirectories are stored in the
 temporary buffer \emph\{*shu-project-count*\}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{hother }}
+\usebox{\funcname}
+\index{hother} \hfill [Command]\\%
+ (Function: shu-hother)
+
+\begin{doc-string}
+Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a
+.cpp or t.cpp file, invoke this function and you will be taken to the
+corresponding .h file.  This function will use a project if one is active.
+Otherwise, it will assume that all files reside in the same directory.
 \end{doc-string}
 
 \vspace{1em}
@@ -4256,6 +4248,21 @@ into the current file at point.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{other }}
+\usebox{\funcname}
+\index{other} \hfill [Command]\\%
+ (Function: shu-other)
+
+\begin{doc-string}
+Visit an h file from a c file or a c file from an h file If visiting a .h
+file, invoke this function and you will be taken to the .c or .cpp file.  If
+visiting a .c or .cpp file, invoke this function and you will be taken to the
+corresponding .h file.  This function will use a project if one is active.
+Otherwise, it will assume that all files reside in the same directory.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{renew-c-project }}
 \usebox{\funcname}
 \index{renew-c-project} \hfill [Command]\\%
@@ -4304,6 +4311,20 @@ something that resembles a file name.
 \begin{doc-string}
 Set the default file name prefix for those times when we are trying to visit
 a project file and point is not sitting on something that resembles a file name.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{tother }}
+\usebox{\funcname}
+\index{tother} \hfill [Command]\\%
+ (Function: shu-tother)
+
+\begin{doc-string}
+Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.t.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory.
 \end{doc-string}
 
 \vspace{1em}
@@ -4364,6 +4385,17 @@ files in the directory as described in shu-cpp-subdir-for-package.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-clear-c-project }}
+\usebox{\funcname}
+\index{shu-clear-c-project} \hfill [Command]\\%
+ (Alias: clear-c-project)
+
+\begin{doc-string}
+Clear an existing project, if any.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-clear-prefix }}
 \usebox{\funcname}
 \index{shu-clear-prefix} \hfill [Function]\\%
@@ -4382,6 +4414,20 @@ a project file and point is not sitting on something that resembles a file name.
 
 \begin{doc-string}
 True if we are to use the current directory name as the file name prefix.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cother }}
+\usebox{\funcname}
+\index{shu-cother} \hfill [Command]\\%
+ (Alias: cother)
+
+\begin{doc-string}
+Visit a .cpp file from the corresponding .t.cpp or .h file.  If visiting a
+t.cpp or .h file, invoke this function and you will be taken to the
+corresponding .cpp or .c file.  This function will use a project if one is
+active.  Otherwise, it will assume that all files reside in the same directory.
 \end{doc-string}
 
 \vspace{1em}
@@ -4443,6 +4489,33 @@ only one file associated with the name then visit it.  If there are
 multiple files put all of the fully qualified file names in the completion
 buffer and give the user the opportunity to select the desired file.  Then
 visit that file.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-choose-other-file }}
+\usebox{\funcname}\emph{newfile}
+\index{shu-cpp-choose-other-file} \hfill [Function]
+
+\begin{doc-string}
+Try to visit a file first within a project and, it not successful, in the
+current directory.  If no project is in use or if the file does not belong to
+the project, try to find the file in the current directory.  If a file was found
+and visited, return true.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-choose-project-file }}
+\usebox{\funcname}\emph{newfile}
+\index{shu-cpp-choose-project-file} \hfill [Function]
+
+\begin{doc-string}
+Try to visit a file within a project.  If a project is in use, try to visit
+the given file in the list of files that belong to the project.  This goes
+through the standard project selection process, including prompting the user to
+choose the desired file if more than one file with the same name exists.  If a
+file was found and visited, return true.
 \end{doc-string}
 
 \vspace{1em}
@@ -4975,6 +5048,20 @@ documentation is the string to put in the buffer to describe the operation.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-hother }}
+\usebox{\funcname}
+\index{shu-hother} \hfill [Command]\\%
+ (Alias: hother)
+
+\begin{doc-string}
+Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a
+.cpp or t.cpp file, invoke this function and you will be taken to the
+corresponding .h file.  This function will use a project if one is active.
+Otherwise, it will assume that all files reside in the same directory.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-internal-list-c-project }}
 \usebox{\funcname}\emph{proj-list}
 \index{shu-internal-list-c-project} \hfill [Function]
@@ -5074,6 +5161,21 @@ into the current file at point.
 Return the character position of the start of the current word if point is sitting
 anywhere on the word ``line''.  This is used pick up file positions of the form:
 ``line 628 of frobnitz.cpp''
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-other }}
+\usebox{\funcname}
+\index{shu-other} \hfill [Command]\\%
+ (Alias: other)
+
+\begin{doc-string}
+Visit an h file from a c file or a c file from an h file If visiting a .h
+file, invoke this function and you will be taken to the .c or .cpp file.  If
+visiting a .c or .cpp file, invoke this function and you will be taken to the
+corresponding .h file.  This function will use a project if one is active.
+Otherwise, it will assume that all files reside in the same directory.
 \end{doc-string}
 
 \vspace{1em}
@@ -5249,6 +5351,20 @@ create a file called ``files.txt'' with the name of every file found, invoke
 ctags on that file to build a new tags file, and then visit the tags file.
 \emph{proj-dir} is the name of the directory in which the project file exists and in
 which the tags file is to be built.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-tother }}
+\usebox{\funcname}
+\index{shu-tother} \hfill [Command]\\%
+ (Alias: tother)
+
+\begin{doc-string}
+Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.t.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory.
 \end{doc-string}
 
 \vspace{1em}
@@ -6999,7 +7115,7 @@ Insert a LaTeX quote environment and position the cursor for typing the quote.
 \savebox{\funcname}{\noindent\texttt{shu-internal-new-lisp }}
 \usebox{\funcname}\emph{func-type} \emph{func-name}
 \index{shu-internal-new-lisp} \hfill [Command]
-\hspace*{\wd\funcname}\emph{interactive}
+\hspace*{\wd\funcname}\emph{doc-string} \emph{interactive}
 
 \begin{doc-string}
 Insert at point a skeleton lisp function of type \emph{func-type} whose name is

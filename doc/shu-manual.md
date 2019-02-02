@@ -47,10 +47,7 @@
 
 
 
-
-
 # Overview #
-
 
 
 This manual contains detailed information on all of the function, macro,
@@ -64,7 +61,7 @@ Version 1.2 was merged with the master branch on 6 January 2019.
 
 Version 1.3 was merged with the master branch on 12 January 2019.
 
-This is Version 1.3.13 of the Shu elisp repository,
+This is Version 1.4.0 of the Shu elisp repository,
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -266,7 +263,7 @@ A regular expression to match a variable name in a C or C++ program.
 #### shu-cpp-name-list ####
 [Constant]
 
-List of all characters that can be present in a C++ file name.
+List of all characters that can be present in a C++ variable name.
 
 
 
@@ -1902,12 +1899,6 @@ with some very long lines.  *shu-csplit* can automatically split such a line
 for you.  *shu-cunsplit* can undo the split.  *shu-creplace* can in one
 operation, replace a split line with a different string constant.
 
-### Toggle back and forth between files ###
-
-If you are editing a C or C++ file and wish to switch to its associated
-header file, *shu-hother* will switch to the header file.  *shu-cother* will
-switch back to the original C or C++ file.  *shu-tother* will switch to the
-associated unit test file that ends in "1.cpp.""
 
 
 ## List of functions by alias name ##
@@ -1923,6 +1914,30 @@ A list of aliases and associated function names.
  (Function: shu-author)
 
 Insert the doxygen author tag in an existing file.
+
+
+
+#### binclude ####
+[Command]
+ (Function: shu-binclude)
+
+If point is sitting on something that resembles a fully qualified class name,
+use the standard BDE algorithm to turn the class name into the name of an
+include file.  The standard BDE algorithm replaces the :: between namespace and
+class name with an underscore, makes all letters lower case, and appends ".h"
+to the end of the name.
+
+Thus "abcdef::MumbleFrotz" becomes "abcdef_mumblefrotz.h".
+
+An include directive for the file is then created and put into the kill ring for
+a subsequent yank.
+
+The file name is delimited by double quotes unless *shu-cpp-include-user-brackets*
+variable is true, in which case the file name is delimited by left and right
+angle brackets.
+
+Return true if a class name was found an an include generated.  This is for the
+benefit of unit tests.
 
 
 
@@ -1974,15 +1989,6 @@ strings and that you are not missing any occurrences of <<.
  (Function: shu-clc)
 
 Place a skeleton Doxygen header definition at point.
-
-
-
-#### cother ####
-[Command]
- (Function: shu-cother)
-
-Visit a .cpp file from the corresponding .t.cpp or .h file.  If visiting a t.cpp or .h
-file, invoke *shu-cother* and you will be taken to the corresponding .cpp or .c file.
 
 
 
@@ -2189,23 +2195,14 @@ variables.
 
 
 
-#### gincl ####
+#### ginclude ####
 [Command]
- (Function: shu-gincl)
+ (Function: shu-ginclude)
 
 While in a file buffer, wrap the file name in a C++ include directive and
 put it in the kill ring.  The file name is delimited by double quotes unless
 *shu-cpp-include-user-brackets* variable is true, in which case the file name
 is delimited by left and right angle brackets.
-
-
-
-#### hother ####
-[Command]
- (Function: shu-hother)
-
-Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a .cpp or
-t.cpp file, invoke *shu-hother* and you will be taken to the corresponding .h file.
 
 
 
@@ -2247,17 +2244,6 @@ operators *class-name*
  (Function: shu-operators)
 
 Place skeletons of all of the standard c++ operator functions at point.
-
-
-
-#### other ####
-[Command]
- (Function: shu-other)
-
-Visit an h file from a c file or a c file from an h file
-If visiting a .h file, invoke *shu-other* and you will be taken to the
-.c or .cpp file.  If visiting a .c or .cpp file, invoke other and you
-will be taken to the corresponding .h file
 
 
 
@@ -2307,16 +2293,6 @@ set-default-namespace *name*
 
 Set the local namespace for C++ classes.
 
-
-
-#### tother ####
-[Command]
- (Function: shu-tother)
-
-Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c or
-.cpp file, invoke *shu-tother* and you will be taken to the corresponding .t.cpp
-file.
-
 ## List of functions and variables ##
 
 List of functions and variable definitions in this package.
@@ -2355,6 +2331,30 @@ The name of an attribute.
  (Alias: author)
 
 Insert the doxygen author tag in an existing file.
+
+
+
+#### shu-binclude ####
+[Command]
+ (Alias: binclude)
+
+If point is sitting on something that resembles a fully qualified class name,
+use the standard BDE algorithm to turn the class name into the name of an
+include file.  The standard BDE algorithm replaces the :: between namespace and
+class name with an underscore, makes all letters lower case, and appends ".h"
+to the end of the name.
+
+Thus "abcdef::MumbleFrotz" becomes "abcdef_mumblefrotz.h".
+
+An include directive for the file is then created and put into the kill ring for
+a subsequent yank.
+
+The file name is delimited by double quotes unless *shu-cpp-include-user-brackets*
+variable is true, in which case the file name is delimited by left and right
+angle brackets.
+
+Return true if a class name was found an an include generated.  This is for the
+benefit of unit tests.
 
 
 
@@ -2413,15 +2413,6 @@ Return true if the class name should be ignored.
  (Alias: clc)
 
 Place a skeleton Doxygen header definition at point.
-
-
-
-#### shu-cother ####
-[Command]
- (Alias: cother)
-
-Visit a .cpp file from the corresponding .t.cpp or .h file.  If visiting a t.cpp or .h
-file, invoke *shu-cother* and you will be taken to the corresponding .cpp or .c file.
 
 
 
@@ -2801,23 +2792,14 @@ variables.
 
 
 
-#### shu-gincl ####
+#### shu-ginclude ####
 [Command]
- (Alias: gincl)
+ (Alias: ginclude)
 
 While in a file buffer, wrap the file name in a C++ include directive and
 put it in the kill ring.  The file name is delimited by double quotes unless
 *shu-cpp-include-user-brackets* variable is true, in which case the file name
 is delimited by left and right angle brackets.
-
-
-
-#### shu-hother ####
-[Command]
- (Alias: hother)
-
-Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a .cpp or
-t.cpp file, invoke *shu-hother* and you will be taken to the corresponding .h file.
 
 
 
@@ -2939,17 +2921,6 @@ shu-operators *class-name*
  (Alias: operators)
 
 Place skeletons of all of the standard c++ operator functions at point.
-
-
-
-#### shu-other ####
-[Command]
- (Alias: other)
-
-Visit an h file from a c file or a c file from an h file
-If visiting a .h file, invoke *shu-other* and you will be taken to the
-.c or .cpp file.  If visiting a .c or .cpp file, invoke other and you
-will be taken to the corresponding .h file
 
 
 
@@ -3092,16 +3063,6 @@ Undocumented
 [Function]
 
 Undocumented
-
-
-
-#### shu-tother ####
-[Command]
- (Alias: tother)
-
-Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c or
-.cpp file, invoke *shu-tother* and you will be taken to the corresponding .t.cpp
-file.
 
 
 
@@ -3333,12 +3294,27 @@ Generate a skeleton t.cpp file
 A collection of useful functions for dealing with project files and treating
 a set of source files in multiple directories as a single project
 
+### Toggle back and forth between files ###
+
+If you are editing a C or C++ file and wish to switch to its associated
+header file, *shu-hother* will switch to the header file.  *shu-cother* will
+switch back to the original C or C++ file.  *shu-tother* will switch to the
+associated unit test file that ends in "t.cpp.""
+
 
 ## List of functions by alias name ##
 
 A list of aliases and associated function names.
 
 
+
+
+
+#### clear-c-project ####
+[Command]
+ (Function: shu-clear-c-project)
+
+Clear an existing project, if any.
 
 
 
@@ -3351,6 +3327,17 @@ a project file and point is not sitting on something that resembles a file name.
 
 
 
+#### cother ####
+[Command]
+ (Function: shu-cother)
+
+Visit a .cpp file from the corresponding .t.cpp or .h file.  If visiting a
+t.cpp or .h file, invoke this function and you will be taken to the
+corresponding .cpp or .c file.  This function will use a project if one is
+active.  Otherwise, it will assume that all files reside in the same directory.
+
+
+
 #### count-c-project ####
 [Command]
  (Function: shu-count-c-project)
@@ -3358,6 +3345,17 @@ a project file and point is not sitting on something that resembles a file name.
 Count the number of lines of code in a project.  The final count is shown in
 the minibuffer.  The counts of individual subdirectories are stored in the
 temporary buffer `*shu-project-count*`
+
+
+
+#### hother ####
+[Command]
+ (Function: shu-hother)
+
+Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a
+.cpp or t.cpp file, invoke this function and you will be taken to the
+corresponding .h file.  This function will use a project if one is active.
+Otherwise, it will assume that all files reside in the same directory.
 
 
 
@@ -3427,6 +3425,18 @@ into the current file at point.
 
 
 
+#### other ####
+[Command]
+ (Function: shu-other)
+
+Visit an h file from a c file or a c file from an h file If visiting a .h
+file, invoke this function and you will be taken to the .c or .cpp file.  If
+visiting a .c or .cpp file, invoke this function and you will be taken to the
+corresponding .h file.  This function will use a project if one is active.
+Otherwise, it will assume that all files reside in the same directory.
+
+
+
 #### renew-c-project ####
 [Command]
  (Function: shu-renew-c-project)
@@ -3467,6 +3477,17 @@ set-prefix *prefix*
 
 Set the default file name prefix for those times when we are trying to visit
 a project file and point is not sitting on something that resembles a file name.
+
+
+
+#### tother ####
+[Command]
+ (Function: shu-tother)
+
+Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.t.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory.
 
 
 
@@ -3517,6 +3538,14 @@ files in the directory as described in shu-cpp-subdir-for-package.
 
 
 
+#### shu-clear-c-project ####
+[Command]
+ (Alias: clear-c-project)
+
+Clear an existing project, if any.
+
+
+
 #### shu-clear-prefix ####
 [Function]
  (Alias: clear-prefix)
@@ -3530,6 +3559,17 @@ a project file and point is not sitting on something that resembles a file name.
 [Variable]
 
 True if we are to use the current directory name as the file name prefix.
+
+
+
+#### shu-cother ####
+[Command]
+ (Alias: cother)
+
+Visit a .cpp file from the corresponding .t.cpp or .h file.  If visiting a
+t.cpp or .h file, invoke this function and you will be taken to the
+corresponding .cpp or .c file.  This function will use a project if one is
+active.  Otherwise, it will assume that all files reside in the same directory.
 
 
 
@@ -3576,6 +3616,29 @@ only one file associated with the name then visit it.  If there are
 multiple files put all of the fully qualified file names in the completion
 buffer and give the user the opportunity to select the desired file.  Then
 visit that file.
+
+
+
+#### shu-cpp-choose-other-file ####
+shu-cpp-choose-other-file *newfile*
+[Function]
+
+Try to visit a file first within a project and, it not successful, in the
+current directory.  If no project is in use or if the file does not belong to
+the project, try to find the file in the current directory.  If a file was found
+and visited, return true.
+
+
+
+#### shu-cpp-choose-project-file ####
+shu-cpp-choose-project-file *newfile*
+[Function]
+
+Try to visit a file within a project.  If a project is in use, try to visit
+the given file in the list of files that belong to the project.  This goes
+through the standard project selection process, including prompting the user to
+choose the desired file if more than one file with the same name exists.  If a
+file was found and visited, return true.
 
 
 
@@ -3997,6 +4060,17 @@ documentation is the string to put in the buffer to describe the operation.
 
 
 
+#### shu-hother ####
+[Command]
+ (Alias: hother)
+
+Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a
+.cpp or t.cpp file, invoke this function and you will be taken to the
+corresponding .h file.  This function will use a project if one is active.
+Otherwise, it will assume that all files reside in the same directory.
+
+
+
 #### shu-internal-list-c-project ####
 shu-internal-list-c-project *proj-list*
 [Function]
@@ -4075,6 +4149,18 @@ into the current file at point.
 Return the character position of the start of the current word if point is sitting
 anywhere on the word "line".  This is used pick up file positions of the form:
 "line 628 of frobnitz.cpp"
+
+
+
+#### shu-other ####
+[Command]
+ (Alias: other)
+
+Visit an h file from a c file or a c file from an h file If visiting a .h
+file, invoke this function and you will be taken to the .c or .cpp file.  If
+visiting a .c or .cpp file, invoke this function and you will be taken to the
+corresponding .h file.  This function will use a project if one is active.
+Otherwise, it will assume that all files reside in the same directory.
 
 
 
@@ -4220,6 +4306,17 @@ create a file called "files.txt" with the name of every file found, invoke
 ctags on that file to build a new tags file, and then visit the tags file.
 *proj-dir* is the name of the directory in which the project file exists and in
 which the tags file is to be built.
+
+
+
+#### shu-tother ####
+[Command]
+ (Alias: tother)
+
+Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.t.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory.
 
 
 
@@ -5612,7 +5709,7 @@ Insert a LaTeX quote environment and position the cursor for typing the quote.
 
 
 #### shu-internal-new-lisp ####
-shu-internal-new-lisp *func-type* *func-name* **&optional** *interactive*
+shu-internal-new-lisp *func-type* *func-name* **&optional** *doc-string* *interactive*
 [Command]
 
 Insert at point a skeleton lisp function of type *func-type* whose name is
@@ -6182,8 +6279,6 @@ within type.
 
 Associate a number with each type of variable
 
-
-
 # Index #
 
 * [acgen](#acgen)
@@ -6195,6 +6290,7 @@ Associate a number with each type of variable
 * [bde-include](#bde-include)
 * [bde-sdecl](#bde-sdecl)
 * [bde-sgen](#bde-sgen)
+* [binclude](#binclude)
 * [case-insensitive](#case-insensitive)
 * [case-sensitive](#case-sensitive)
 * [ccdecl](#ccdecl)
@@ -6207,6 +6303,7 @@ Associate a number with each type of variable
 * [cif](#cif)
 * [ck](#ck)
 * [clc](#clc)
+* [clear-c-project](#clear-c-project)
 * [clear-prefix](#clear-prefix)
 * [comma-names-to-letter](#comma-names-to-letter)
 * [cother](#cother)
@@ -6240,7 +6337,7 @@ Associate a number with each type of variable
 * [gfc](#gfc)
 * [gfl](#gfl)
 * [gfn](#gfn)
-* [gincl](#gincl)
+* [ginclude](#ginclude)
 * [gquote](#gquote)
 * [hcgen](#hcgen)
 * [hother](#hother)
@@ -6315,6 +6412,7 @@ Associate a number with each type of variable
 * [shu-bde-sdecl](#shu-bde-sdecl)
 * [shu-bde-set-alias](#shu-bde-set-alias)
 * [shu-bde-sgen](#shu-bde-sgen)
+* [shu-binclude](#shu-binclude)
 * [shu-capture-a-type-after](#shu-capture-a-type-after)
 * [shu-capture-a-type-arg](#shu-capture-a-type-arg)
 * [shu-capture-a-type-before](#shu-capture-a-type-before)
@@ -6420,6 +6518,7 @@ Associate a number with each type of variable
 * [shu-cif](#shu-cif)
 * [shu-class-is-blocked](#shu-class-is-blocked)
 * [shu-clc](#shu-clc)
+* [shu-clear-c-project](#shu-clear-c-project)
 * [shu-clear-prefix](#shu-clear-prefix)
 * [shu-comma-names-to-letter](#shu-comma-names-to-letter)
 * [shu-comment-start-pattern](#shu-comment-start-pattern)
@@ -6440,6 +6539,8 @@ Associate a number with each type of variable
 * [shu-cpp-cgen](#shu-cpp-cgen)
 * [shu-cpp-check-streaming-op](#shu-cpp-check-streaming-op)
 * [shu-cpp-choose-file](#shu-cpp-choose-file)
+* [shu-cpp-choose-other-file](#shu-cpp-choose-other-file)
+* [shu-cpp-choose-project-file](#shu-cpp-choose-project-file)
 * [shu-cpp-class-list](#shu-cpp-class-list)
 * [shu-cpp-comment-end](#shu-cpp-comment-end)
 * [shu-cpp-comment-start](#shu-cpp-comment-start)
@@ -6596,7 +6697,7 @@ Associate a number with each type of variable
 * [shu-gfc](#shu-gfc)
 * [shu-gfl](#shu-gfl)
 * [shu-gfn](#shu-gfn)
-* [shu-gincl](#shu-gincl)
+* [shu-ginclude](#shu-ginclude)
 * [shu-git-diff-commits](#shu-git-diff-commits)
 * [shu-git-find-short-hash](#shu-git-find-short-hash)
 * [shu-git-number-commits](#shu-git-number-commits)
