@@ -6786,5 +6786,6 @@ LocalWords:  urls Lastname Firstname diff dbc ee da ec dup eld gd dired gf gfc g
 LocalWords:  gfn gquote ert SHA dos eol CRLF unix LF winpath eob YYYY DDTHHMMSS DDD
 LocalWords:  DD mac CR nvplist org TODO expiry CANCELLED todo xref defs retval tex
 LocalWords:  funcall myclass toc unescaped nvpair prob gtest gincl rmv qual xxx
-LocalWords:  WhammoCorp plist abcdef
+LocalWords:  WhammoCorp plist abcdef testfn eq binclude mumblefrotz
+LocalWords:  ginclude newfile
 -->

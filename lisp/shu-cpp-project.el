@@ -504,6 +504,20 @@ name \"/u/foo/bar/thing.c\"."
     ))
 
 
+;;
+;;  shu-clear-c-project
+;;
+(defun shu-clear-c-project ()
+  "Clear an existing project, if any."
+  (interactive)
+  (setq shu-cpp-project-file nil)
+  (setq shu-cpp-project-list nil)
+  (setq shu-cpp-class-list nil)
+  (setq shu-cpp-prefix-list nil)
+  (setq shu-cpp-short-list nil)
+  (setq shu-cpp-completing-list nil)
+  )
+
 
 ;;
 ;;  shu-vh - Visit a c or h file in a project
@@ -870,9 +884,7 @@ fully qualified file names.  Display all of the possibilities in a completion
 buffer and ask the user to choose the desired one.  The string containing the
 chosen fully qualified file name will then be passed to the function pointed
 to by target."
-  (let (
-        (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
-        )
+  (let ((shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name)))
     (princ "\nshu-cpp-resolve-choice\n" shu-cpp-buffer)
     (princ full-name-list shu-cpp-buffer) (princ "\n\n" shu-cpp-buffer)
     (princ target shu-cpp-buffer) (princ "\n\n" shu-cpp-buffer)
@@ -890,10 +902,10 @@ to by target."
       (display-completion-list full-name-list))
     ))
 
-                                        ; At this point this function exits and control resumes at
-                                        ; the function shu-cpp-common-completion, which is called
-                                        ; by either shu-cpp-choose-completion or shu-cpp-mouse-choose-completion
-                                        ; when the user hits enter or clicks mouse button 2.
+;; At this point this function exits and control resumes at
+;; the function shu-cpp-common-completion, which is called
+;; by either shu-cpp-choose-completion or shu-cpp-mouse-choose-completion
+;; when the user hits enter or clicks mouse button 2.
 
 
 
@@ -1871,6 +1883,7 @@ shu- prefix removed."
   (defalias 'make-c-project 'shu-make-c-project)
   (defalias 'set-c-project 'shu-set-c-project)
   (defalias 'renew-c-project 'shu-renew-c-project)
+  (defalias 'clear-c-project 'shu-clear-c-project)
   (defalias 'count-c-project 'shu-count-c-project)
   (defalias 'list-c-project 'shu-list-c-project)
   (defalias 'list-c-prefixes 'shu-list-c-prefixes)
