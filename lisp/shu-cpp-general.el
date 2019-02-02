@@ -37,12 +37,6 @@
 ;; for you.  SHU-CUNSPLIT can undo the split.  SHU-CREPLACE can in one
 ;; operation, replace a split line with a different string constant.
 ;;
-;; ### Toggle back and forth between files ###
-;;
-;; If you are editing a C or C++ file and wish to switch to its associated
-;; header file, SHU-HOTHER will switch to the header file.  SHU-COTHER will
-;; switch back to the original C or C++ file.  SHU-TOTHER will switch to the
-;; associated unit test file that ends in \"1.cpp.""
 
 ;;; Code:
 
@@ -652,99 +646,6 @@ This modifies shu-cpp-base-types."
              pad " * The destructor releases the latch.\n"
              pad " */"
              ))
-    ))
-
-
-;;
-;;  shu-other
-;;
-(defun shu-other ()
-  "Visit an h file from a c file or a c file from an h file
-If visiting a .h file, invoke SHU-OTHER and you will be taken to the
-.c or .cpp file.  If visiting a .c or .cpp file, invoke other and you
-will be taken to the corresponding .h file"
-  (interactive)
-  (let ((debug-on-error t)
-        (ext       (file-name-extension (buffer-file-name)))
-        (base-name (file-name-sans-extension (buffer-file-name)))
-        (newext    nil)
-        (tryc      nil)
-        (newfile   nil))
-    (when (string= ext "h")
-      (setq tryc t))
-    (if tryc
-        (progn
-          (setq newfile (concat base-name ".cpp"))
-          (if (file-readable-p newfile)
-              (find-file newfile)
-            (setq newfile (concat base-name ".c"))
-            (if (file-readable-p newfile)
-                (find-file newfile)
-              (message (concat "Cannot find other file for " base-name)))))
-      (setq newfile (concat base-name ".h"))
-      (if (file-readable-p newfile)
-          (find-file newfile)
-        (message (concat "Cannot find other file for " base-name))))
-    ))
-
-
-;;
-;;  shu-tother
-;;
-(defun shu-tother ()
-  "Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c or
-.cpp file, invoke SHU-TOTHER and you will be taken to the corresponding .t.cpp
-file."
-  (interactive)
-  (let ((base-name (file-name-sans-extension (buffer-file-name)))
-        (newfile ))
-
-    (setq newfile (concat base-name ".t.cpp"))
-    (if (file-readable-p newfile)
-        (find-file newfile)
-      (message (concat "Cannot find test file for " base-name)))
-    ))
-
-
-;;
-;;  shu-hother
-;;
-(defun shu-hother ()
-  "Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a .cpp or
-t.cpp file, invoke SHU-HOTHER and you will be taken to the corresponding .h file."
-  (interactive)
-  (let ((base-name (file-name-sans-extension (buffer-file-name)))
-        (newfile ))
-
-    (when (string= (file-name-extension base-name) "t")
-      (setq base-name (file-name-sans-extension base-name)))
-    (setq newfile (concat base-name ".h"))
-    (if (file-readable-p newfile)
-        (find-file newfile)
-      (message (concat "Cannot find H file for " base-name)))
-    ))
-
-
-
-;;
-;;  shu-cother
-;;
-(defun shu-cother ()
-  "Visit a .cpp file from the corresponding .t.cpp or .h file.  If visiting a t.cpp or .h
-file, invoke SHU-COTHER and you will be taken to the corresponding .cpp or .c file."
-  (interactive)
-  (let ((base-name (file-name-sans-extension (buffer-file-name)))
-        (newfile ))
-
-    (when (string= (file-name-extension base-name) "t")
-      (setq base-name (file-name-sans-extension base-name)))
-    (setq newfile (concat base-name ".cpp"))
-    (if (file-readable-p newfile)
-        (find-file newfile)
-      (setq newfile (concat base-name ".c"))
-      (if (file-readable-p newfile)
-          (find-file newfile)
-        (message (concat "Cannot find C file for " base-name))))
     ))
 
 
@@ -2489,10 +2390,6 @@ shu- prefix removed."
   (defalias 'dce 'shu-dce)
   (defalias 'clc 'shu-clc)
   (defalias 'drc 'shu-drc)
-  (defalias 'other 'shu-other)
-  (defalias 'cother 'shu-cother)
-  (defalias 'hother 'shu-hother)
-  (defalias 'tother 'shu-tother)
   (defalias 'binclude 'shu-binclude)
   (defalias 'ginclude 'shu-ginclude)
   (defalias 'dox-cvt 'shu-dox-cvt)

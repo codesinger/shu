@@ -26,6 +26,13 @@
 
 ;; A collection of useful functions for dealing with project files and treating
 ;; a set of source files in multiple directories as a single project
+;;
+;; ### Toggle back and forth between files ###
+;;
+;; If you are editing a C or C++ file and wish to switch to its associated
+;; header file, SHU-HOTHER will switch to the header file.  SHU-COTHER will
+;; switch back to the original C or C++ file.  SHU-TOTHER will switch to the
+;; associated unit test file that ends in \"t.cpp.""
 
 ;;; Code:
 
@@ -1734,6 +1741,124 @@ name list."
 
 
 ;;
+;;  shu-other
+;;
+(defun shu-other ()
+  "Visit an h file from a c file or a c file from an h file If visiting a .h
+file, invoke this function and you will be taken to the .c or .cpp file.  If
+visiting a .c or .cpp file, invoke this function and you will be taken to the
+corresponding .h file.  This function will use a project if one is active.
+Otherwise, it will assume that all files reside in the same directory."
+  (interactive)
+  (let ((ext       (file-name-extension (buffer-file-name))))
+    (if (string= ext "h")
+        (shu-cother)
+      (shu-hother))
+    ))
+
+
+;;
+;;  shu-cother
+;;
+(defun shu-cother ()
+  "Visit a .cpp file from the corresponding .t.cpp or .h file.  If visiting a
+t.cpp or .h file, invoke this function and you will be taken to the
+corresponding .cpp or .c file.  This function will use a project if one is
+active.  Otherwise, it will assume that all files reside in the same directory."
+  (interactive)
+  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+        (newfile)
+        (found))
+    (when (string= (file-name-extension base-name) "t")
+      (setq base-name (file-name-sans-extension base-name)))
+    (setq newfile (concat base-name ".cpp"))
+    (setq found (shu-cpp-choose-other-file newfile))
+    (when (not found)
+      (setq newfile (concat base-name ".c"))
+      (setq found (shu-cpp-choose-other-file newfile))
+      (when (not found)
+        (message (concat "Cannot find C file for " base-name))))
+    ))
+
+
+;;
+;;  shu-hother
+;;
+(defun shu-hother ()
+  "Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a
+.cpp or t.cpp file, invoke this function and you will be taken to the
+corresponding .h file.  This function will use a project if one is active.
+Otherwise, it will assume that all files reside in the same directory."
+  (interactive)
+  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+        (newfile ))
+    (when (string= (file-name-extension base-name) "t")
+      (setq base-name (file-name-sans-extension base-name)))
+    (setq newfile (concat base-name ".h"))
+    (when (not (shu-cpp-choose-other-file newfile))
+      (message "Cannot find H file for %s" base-name))
+    ))
+
+
+;;
+;;  shu-tother
+;;
+(defun shu-tother ()
+  "Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.t.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory."
+  (interactive)
+  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+        (newfile))
+    (setq newfile (concat base-name ".t.cpp"))
+    (when (not (shu-cpp-choose-other-file newfile))
+      (message "Cannot find test file for %s" base-name))
+    ))
+
+
+
+;;
+;;  shu-cpp-choose-other-file
+;;
+(defun shu-cpp-choose-other-file (newfile)
+  "Try to visit a file first within a project and, it not successful, in the
+current directory.  If no project is in use or if the file does not belong to
+the project, try to find the file in the current directory.  If a file was found
+and visited, return true."
+  (let ((nfile (file-name-nondirectory newfile))
+        (found))
+    (setq found (shu-cpp-choose-project-file nfile))
+    (when (and (not found)
+               (file-readable-p newfile))
+      (setq found t)
+      (find-file newfile))
+    found
+    ))
+
+
+
+;;
+;;  shu-cpp-choose-project-file
+;;
+(defun shu-cpp-choose-project-file (newfile)
+  "Try to visit a file within a project.  If a project is in use, try to visit
+the given file in the list of files that belong to the project.  This goes
+through the standard project selection process, including prompting the user to
+choose the desired file if more than one file with the same name exists.  If a
+file was found and visited, return true."
+  (let ((tfile)
+        (found))
+    (when shu-cpp-completing-list
+      (setq tfile (assoc newfile shu-cpp-completing-list))
+      (when tfile
+        (setq found t)
+        (shu-cpp-choose-file tfile)))
+    found
+    ))
+
+
+;;
 ;;  shu-cpp-project-set-alias
 ;;
 (defun shu-cpp-project-set-alias ()
@@ -1754,6 +1879,10 @@ shu- prefix removed."
   (defalias 'list-completing-names 'shu-cpp-list-completing-names)
   (defalias 'list-c-directories 'shu-list-c-directories)
   (defalias 'which-c-project 'shu-which-c-project)
+  (defalias 'other 'shu-other)
+  (defalias 'cother 'shu-cother)
+  (defalias 'hother 'shu-hother)
+  (defalias 'tother 'shu-tother)
   )
 
 ;;; shu-cpp-project.el ends here
