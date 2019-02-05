@@ -63,3 +63,9 @@ Things that I would like to do someday ...
 
   However, if a project exists, it knows where all of the tiles are.  You should be
   able to pass the name to the shu-project code and have it find it for you.
+
+- 4 Feb 2019
+
+  The new versions of shu-hother, etc that use the project to resolve names are
+  looking in the completing list.  The hother of nnnn_fooo.cpp is nnnn_fooo.h.  But
+  if a foo.h also exists, the user is asked which one is desired.

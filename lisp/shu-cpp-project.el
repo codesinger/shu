@@ -1861,7 +1861,7 @@ choose the desired file if more than one file with the same name exists.  If a
 file was found and visited, return true."
   (let ((tfile)
         (found))
-    (when shu-cpp-completing-list
+    (when shu-cpp-class-list
       (setq tfile (assoc newfile shu-cpp-completing-list))
       (when tfile
         (setq found t)
