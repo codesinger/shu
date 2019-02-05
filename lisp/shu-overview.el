@@ -36,7 +36,9 @@
 ;;
 ;; Version 1.3 was merged with the master branch on 12 January 2019.
 ;;
-;; This is Version 1.3.20 of the Shu elisp repository,
+;; Version 1.4.0 was merged with the master branch on 2 February 2019.
+;;
+;; This is Version 1.4.1 of the Shu elisp repository,
 ;;
 ;; What this document lacks lacks are detailed scenarios and work flows.  The
 ;; reader might well say that this is an interesting collection of parts, and
@@ -54,3 +56,5 @@
 
 ;; This file contains no code.  It is here only for the content of the Commentary
 ;; above
+
+;;; shu-overview.el ends here

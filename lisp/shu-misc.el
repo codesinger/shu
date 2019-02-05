@@ -828,6 +828,21 @@ if the given HASH is not a valid git revision."
 
 
 ;;
+;;  shu-git-find-branch
+;;
+(defun shu-git-find-branch ()
+  "Return the name of the current branch in a git repositiry."
+  (interactive)
+  (let ((branch))
+    (with-temp-buffer
+      (call-process "git" nil (current-buffer) nil "rev-parse" "--abbrev-ref" "HEAD")
+      (setq branch (buffer-substring-no-properties (point-min) (1- (point-max)))))
+    branch
+    ))
+
+
+
+;;
 ;;  shu-conditional-find-file
 ;;
 (defun shu-conditional-find-file (file-name)
@@ -939,6 +954,7 @@ shu- prefix removed."
   (defalias 'comma-names-to-letter 'shu-comma-names-to-letter)
   (defalias 'remove-test-names 'shu-remove-test-names)
   (defalias 'number-commits 'shu-git-number-commits)
+  (defalias 'git-branch 'shu-git-find-branch)
   (defalias 'diff-commits 'shu-git-diff-commits)
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
