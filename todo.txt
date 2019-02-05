@@ -45,7 +45,7 @@ Things that I would like to do someday ...
 
 - 25 Jan 2019 - Look into having shu-number-lines use (rectangle-number-lines)
 
-- 29 Jan 2019 - New way to generate include file name
+DONE - 29 Jan 2019 - New way to generate include file name
 
       Put corsor on alice::MumbleBob and have function generate
       #include <alice_mumblebob.h>
@@ -54,7 +54,7 @@ Things that I would like to do someday ...
 
       Extend the above for names of the form alice_MumbleBob
 
-- 1 Feb 2019
+DONE - 1 Feb 2019
 
   shu-hother, shu-tother, shu-cother just form the file name and try to open it in
   the current directoty.  But if your test files are in a unit_test directory, your
@@ -64,7 +64,7 @@ Things that I would like to do someday ...
   However, if a project exists, it knows where all of the tiles are.  You should be
   able to pass the name to the shu-project code and have it find it for you.
 
-- 4 Feb 2019
+DONE - 4 Feb 2019
 
   The new versions of shu-hother, etc that use the project to resolve names are
   looking in the completing list.  The hother of nnnn_fooo.cpp is nnnn_fooo.h.  But

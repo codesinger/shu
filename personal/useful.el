@@ -68,41 +68,68 @@ of every visited file.  Makes a useful history of all files visited."
 )
 
 ;;
-;;  lcategory  -  Insert BAEL_LOG_SET_CATEGORY, etc
+;;  lcategory  -  Insert BALL_LOG_SET_CATEGORY, etc
 ;;
 (defun lcategory ()
-  "Insert BAEL_LOG_SET_CATEGORY, etc. at point."
+  "Insert BALL_LOG_SET_CATEGORY, etc. at point."
   (interactive)
   (let ((tpoint))
-  (insert "BAEL_LOG_SET_CATEGORY(__func__);")
+  (insert "BALL_LOG_SET_CATEGORY(__func__);")
   (setq tpoint (point))
   (goto-char tpoint)))
 
 ;;
-;;  linfo  -  Insert BAEL_LOG_INFO, etc
+;;  linfo  -  Insert BALL_LOG_INFO, etc
 ;;
 (defun linfo ()
-  "Insert BAEL_LOG_INFO, etc. at point."
+  "Insert BALL_LOG_INFO, etc. at point."
   (interactive)
   (let ((tpoint))
-  (insert "BAEL_LOG_INFO << ")
+  (insert "BALL_LOG_INFO << ")
   (setq tpoint (point))
-  (insert " << BAEL_LOG_END;")
+  (insert " ;")
   (setq overwrite-mode nil)
   (goto-char tpoint)))
 
 ;;
-;;  lerror  -  Insert BAEL_LOG_ERROR, etc
+;;  lerror  -  Insert BALL_LOG_ERROR, etc
 ;;
 (defun lerror ()
-  "Insert BAEL_LOG_INFO, etc. at point."
+  "Insert BALL_LOG_INFO, etc. at point."
   (interactive)
   (let ((tpoint))
-  (insert "BAEL_LOG_ERROR << ")
+  (insert "BALL_LOG_ERROR << ")
   (setq tpoint (point))
-  (insert " << BAEL_LOG_END;")
+  (insert " ;")
   (setq overwrite-mode nil)
   (goto-char tpoint)))
+
+
+;;
+;;  lstream
+;;
+(defun lstream ()
+  "Insert a BALL_LOG_INFO_BLOCK at point."
+  (interactive)
+  (let (
+        (pos)
+        (pad)
+        (pad-count (current-column))
+        )
+    (setq pad (make-string pad-count ? ))
+    (insert
+     (concat
+      "BALL_LOG_INFO_BLOCK\n"
+      pad "{\n"
+      pad "    BALL_LOG_OUTPUT_STREAM << "))
+    (setq pos (point))
+    (insert
+     (concat
+      ";\n"
+      pad "}\n"))
+    (goto-char pos)
+    ))
+
 
 ;;
 ;;  cassert
