@@ -87,7 +87,7 @@ of every visited file.  Makes a useful history of all files visited."
   (let ((tpoint))
   (insert "BALL_LOG_INFO << ")
   (setq tpoint (point))
-  (insert " ;")
+  (insert ";")
   (setq overwrite-mode nil)
   (goto-char tpoint)))
 
@@ -100,7 +100,7 @@ of every visited file.  Makes a useful history of all files visited."
   (let ((tpoint))
   (insert "BALL_LOG_ERROR << ")
   (setq tpoint (point))
-  (insert " ;")
+  (insert ";")
   (setq overwrite-mode nil)
   (goto-char tpoint)))
 
@@ -129,6 +129,43 @@ of every visited file.  Makes a useful history of all files visited."
       pad "}\n"))
     (goto-char pos)
     ))
+
+
+;;
+;;  blos
+;;
+(defun blos ()
+  "Insert BALL_LOG_OUTPUT_STREAM at point."
+  (interactive)
+   (insert "BALL_LOG_OUTPUT_STREAM")
+   )
+
+
+;;
+;;  npg
+;;
+(defun npg ()
+  "Insert \"srvcctypes::NumpunctGuard  punct()\" at point."
+  (interactive)
+  (let (
+        (pos)
+        )
+    (insert "srvcctypes::NumpunctGuard  punct(")
+    (setq pos (point))
+    (insert ");")
+    (goto-char pos)
+    ))
+
+
+;;
+;;  npi
+;;
+(defun npi ()
+  "Insert \"#include <srvcctypes_localnumpunct.h>\" at point."
+  (interactive)
+    (insert "#include <srvcctypes_localnumpunct.h>")
+    )
+
 
 
 ;;
