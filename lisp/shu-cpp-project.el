@@ -1862,7 +1862,7 @@ file was found and visited, return true."
   (let ((tfile)
         (found))
     (when shu-cpp-class-list
-      (setq tfile (assoc newfile shu-cpp-completing-list))
+      (setq tfile (assoc newfile shu-cpp-class-list))
       (when tfile
         (setq found t)
         (shu-cpp-choose-file tfile)))
