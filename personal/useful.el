@@ -111,17 +111,44 @@ of every visited file.  Makes a useful history of all files visited."
 (defun lstream ()
   "Insert a BALL_LOG_INFO_BLOCK at point."
   (interactive)
-  (let (
-        (pos)
+  (let ((pos)
         (pad)
-        (pad-count (current-column))
-        )
+        (ipad)
+        (pad-count (current-column)))
     (setq pad (make-string pad-count ? ))
+    (setq ipad (make-string shu-cpp-indent-length ? ))
     (insert
      (concat
       "BALL_LOG_INFO_BLOCK\n"
       pad "{\n"
-      pad "    BALL_LOG_OUTPUT_STREAM << "))
+      pad ipad "BALL_LOG_OUTPUT_STREAM << "))
+    (setq pos (point))
+    (insert
+     (concat
+      ";\n"
+      pad "}\n"))
+    (goto-char pos)
+    ))
+
+
+;;
+;;  npglog
+;;
+(defun npglog ()
+  "Insert a BALL_LOG_INFO_BLOCK at point."
+  (interactive)
+  (let ((pos)
+        (pad)
+        (ipad)
+        (pad-count (current-column)))
+    (setq pad (make-string pad-count ? ))
+    (setq ipad (make-string shu-cpp-indent-length ? ))
+    (insert
+     (concat
+      "BALL_LOG_INFO_BLOCK\n"
+      pad "{\n"
+      pad ipad "srvcctypes::NumpunctGuard  punct(BALL_LOG_OUTPUT_STREAM);\n"
+      pad ipad "BALL_LOG_OUTPUT_STREAM << "))
     (setq pos (point))
     (insert
      (concat
