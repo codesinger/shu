@@ -172,20 +172,21 @@ template parameter \"int\"")
 ;;
 (defmacro shu-cpp-token-extract-info (token-info token token-type spoint epoint error-message)
   "Extract the information out of a token-info"
-  `(let (
-         (info)
-         (ext-info)
-         (point-pair)
-         )
-     (setq info (car ,token-info))
-     (setq ,token (cdr ,token-info))
-     (setq ,token-type (car info))
-     (setq ext-info (cdr info))
-     (setq ,error-message (car ext-info))
-     (setq point-pair (cdr ext-info))
-     (setq ,spoint (car point-pair))
-     (setq ,epoint (cdr point-pair))))
-
+  (let ((tinfo (make-symbol "info"))
+        (text-info (make-symbol "ext-info"))
+        (tpoint-pair (make-symbol "point-pair")))
+    `(let ((,tinfo)
+           (,text-info)
+           (,tpoint-pair))
+       (setq ,tinfo (car ,token-info))
+       (setq ,token (cdr ,token-info))
+       (setq ,token-type (car ,tinfo))
+       (setq ,text-info (cdr ,tinfo))
+       (setq ,error-message (car ,text-info))
+       (setq ,tpoint-pair (cdr ,text-info))
+       (setq ,spoint (car ,tpoint-pair))
+       (setq ,epoint (cdr ,tpoint-pair)))
+    ))
 
 
 ;;

@@ -69,3 +69,6 @@ DONE - 4 Feb 2019
   The new versions of shu-hother, etc that use the project to resolve names are
   looking in the completing list.  The hother of nnnn_fooo.cpp is nnnn_fooo.h.  But
   if a foo.h also exists, the user is asked which one is desired.
+
+9 Feb 2010 - The macro shu-cpp-token-extract-info should define its local variables
+             with make-sumbol.
