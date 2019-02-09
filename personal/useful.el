@@ -148,7 +148,8 @@ of every visited file.  Makes a useful history of all files visited."
       "BALL_LOG_INFO_BLOCK\n"
       pad "{\n"
       pad ipad "srvcctypes::NumpunctGuard  punct(BALL_LOG_OUTPUT_STREAM);\n"
-      pad ipad "BALL_LOG_OUTPUT_STREAM << "))
+      pad ipad "BALL_LOG_OUTPUT_STREAM\n"
+      pad ipad "    << "))
     (setq pos (point))
     (insert
      (concat
