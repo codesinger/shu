@@ -1,0 +1,28 @@
+12 Feb 2019
+
+
+For dealing with tokens ...
+
+Perhaps have a tokenization function that omits comments as they
+are encountered?  Could simplufy subsequent processing.
+
+Think back to the parser from RTS in Roseville.  Build a set of patterns
+to match
+
+Pointer to object
+
+  1. Unquoted token (name)
+  2. Operator "*"
+  3. Unquoted token (class name)
+  4. Operator "::"
+  5. Unquoted token (namespace)
+
+
+Const pointer to object
+
+  1. Unquoted token (name)
+  1. Unquoted token ("const")
+  2. Operator "*"
+  3. Unquoted token (class name)
+  4. Operator "::"
+  5. Unquoted token (namespace)

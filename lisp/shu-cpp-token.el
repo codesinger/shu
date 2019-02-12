@@ -252,7 +252,7 @@ tokens contained therein, displaying the result in the Shu unit test buffer."
 (defun shu-cpp-token-internal-parse-region (func start end)
   "Internal function to do a forward or reverse parse of the region between START
 and END.  FUNC holds the function to be invoked to do the parse.  This would be
-either shu-cpp-tokenize-region or shu-cpp-reverse-tokenize-region.  Once the
+either SHU-CPP-TOKENIZE-REGION or SHU-CPP-REVERSE-TOKENIZE-REGION.  Once the
 parse is complete, the token list is shown in the Shu unit test buffer.  If any
 error is detected, it is displayed at the point at which the error was
 detected."
