@@ -314,9 +314,9 @@ true, the function is interactive."
 
 
 ;;
-;;  shu-new-lisp--while
+;;  shu-new-lisp-while
 ;;
-(defun shu-new-lisp--while (var-name)
+(defun shu-new-lisp-while (var-name)
   "Insert at point a skeleton lisp while loop.  Prompt is issued for the
 variable name.  The while loop is of the form:
 
@@ -949,7 +949,7 @@ shu- prefix removed."
   (defalias 'dup 'shu-dup)
   (defalias 'new-lisp 'shu-new-lisp)
   (defalias 'new-ert 'shu-new-ert)
-  (defalias 'new-lisp-while 'shu-new-lisp--while)
+  (defalias 'new-lisp-while 'shu-new-lisp-while)
   (defalias 'reverse-comma-names 'shu-reverse-comma-names)
   (defalias 'comma-names-to-letter 'shu-comma-names-to-letter)
   (defalias 'remove-test-names 'shu-remove-test-names)

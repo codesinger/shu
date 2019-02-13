@@ -2113,4 +2113,65 @@ This is most likely the name of an include file and not the name of a class."
     ))
 
 
+
+
+;;
+;;  shu-test-shu-cpp-fix-prototype-1
+;;
+(ert-deftest shu-test-shu-cpp-fix-prototype-1 ()
+  (let* ((pad (make-string shu-cpp-indent-length ? ))
+         (data
+          (concat
+           "double Frobnitz::hitRatio(\n"
+           "    const int  reads,\n"
+           "    const int  writes)\n"
+           "const\n"))
+         (expected
+          (concat
+           pad "double hitRatio(\n"
+           pad "    const int  reads,\n"
+           pad "    const int  writes)\n"
+           pad "const;\n"))
+         (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (shu-cpp-fix-prototype)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-fix-prototype-2
+;;
+(ert-deftest shu-test-shu-cpp-fix-prototype-2 ()
+  (let* ((pad (make-string shu-cpp-indent-length ? ))
+         (data
+          (concat
+           "double Frobnitz::hitRatio(\n"
+           "    const int  reads,\n"
+           "    const int  writes)\n"
+           "\n"))
+         (expected
+          (concat
+           pad "double hitRatio(\n"
+           pad "    const int  reads,\n"
+           pad "    const int  writes);\n"
+           "\n"))
+         (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (shu-cpp-fix-prototype)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
 ;;; shu-cpp-general.t.el ends here

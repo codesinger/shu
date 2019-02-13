@@ -2371,6 +2371,65 @@ is placed in a separate buffer called **shu-aix-malloc**."
 
 
 
+;;
+;;  shu-cpp-fix-prototype
+;;
+(defun shu-cpp-fix-prototype ()
+  "Place the cursor on the beginning of a function declaration that has been
+copied from a .cpp file to a .h file.  This function fixes up the function
+prototype to make it suitable for a .h file.
+For exmple, this declaration:
+
+      double Frobnitz::hitRatio(
+          const int  reads,
+          const int  writes)
+      const
+
+would be transformed into
+
+          double hitRatio(
+              const int  reads,
+              const int  writes)
+          const;"
+  (interactive)
+  (let ((all-white (concat shu-not-all-whitespace-regexp "*"))
+        (bol (line-beginning-position))
+        (eol (line-end-position))
+        (eos (+ 10 (line-end-position)))
+        (bon)
+        (eon)
+        (ns-length)
+        (limit))
+    (if (not (re-search-forward all-white eol t))
+        (progn
+          (ding)
+          (message "%s" "No whitespace found to start namespace qualifier"))
+      (setq bon (1+ (point)))
+      (if (not (search-forward "::" eol t))
+          (progn
+            (ding)
+            (message "%s" "Cannot find \"::\" namespace separator"))
+        (setq eon (point))
+        (setq ns-length (- eon bon))
+        (if (not (search-forward "(" eos t))
+            (progn
+              (ding)
+              (message "%s" "Cannot find opening left parenthesis"))
+          (backward-char 1)
+          (forward-sexp)
+          (setq eos (point))
+          (setq limit (+ 11 eos))
+          (when (search-forward "const" limit t)
+            (setq eos (point)))
+          (goto-char eos)
+          (insert ";")
+          (setq eos (- eos ns-length))
+          (delete-region bon eon)
+          (shu-shift-region-of-text shu-cpp-indent-length bol eos))))
+    ))
+
+
+
 
 ;;
 ;;  shu-cpp-general-set-alias
@@ -2414,6 +2473,7 @@ shu- prefix removed."
   (defalias 'qualify-std 'shu-qualify-namespace-std)
   (defalias 'qualify-bsl 'shu-qualify-namespace-bsl)
   (defalias 'dbx-malloc 'shu-dbx-summarize-malloc)
+  (defalias 'fixp 'shu-cpp-fix-prototype)
   )
 
 ;;; shu-cpp-general.el ends here
