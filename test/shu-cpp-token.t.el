@@ -1842,4 +1842,43 @@ me anything.  It is printed on test failure to identify the test that failed."
       )
     ))
 
+
+
+;;
+;;  shu-test-shu-cpp-token-extract-type-1
+;;
+(ert-deftest shu-test-shu-cpp-token-extract-type-1 ()
+  (let ((token "// Hi there")
+        (ttype shu-cpp-token-type-ct)
+        (spoint 8092)
+        (epoint 9034)
+        (token-info)
+        (token-type))
+    (setq token-info (shu-cpp-make-token-info token ttype spoint epoint))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= shu-cpp-token-type-ct token-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-token-extract-type-2
+;;
+(ert-deftest shu-test-shu-cpp-token-extract-type-2 ()
+  (let ((token "\"Hi there, how are you?\"")
+        (ttype shu-cpp-token-type-qt)
+        (spoint 8092)
+        (epoint 9034)
+        (token-info)
+        (token-type))
+    (setq token-info (shu-cpp-make-token-info token ttype spoint epoint))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= shu-cpp-token-type-qt token-type))
+    ))
+
+
 ;;; shu-cpp-token.t.el ends here

@@ -30,7 +30,9 @@
 
 ;;; Code:
 
-(require 'shu-cpp-token-new)
+(require 'shu-cpp-token)
+
+
 
 
 
@@ -122,7 +124,7 @@
     (while in-comment
       (setq token-info (car tlist))
       (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
-      (if (= (token-type shu-cpp-token-type-ct))
+      (if (= token-type shu-cpp-token-type-ct)
           (setq tlist (cdr tlist))
         (setq in-comment nil)
         )

@@ -190,6 +190,15 @@ template parameter \"int\"")
 
 
 ;;
+;;  shu-cpp-token-extract-type
+;;
+(defsubst shu-cpp-token-extract-type (token-info)
+  "Return the token type from an instance of token-info."
+    (caar token-info)
+    )
+
+
+;;
 ;;  shu-cpp-token-token-type-name
 ;;
 (defun shu-cpp-token-token-type-name (token-type)

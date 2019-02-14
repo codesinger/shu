@@ -70,5 +70,34 @@ DONE - 4 Feb 2019
   looking in the completing list.  The hother of nnnn_fooo.cpp is nnnn_fooo.h.  But
   if a foo.h also exists, the user is asked which one is desired.
 
-9 Feb 2010 - The macro shu-cpp-token-extract-info should define its local variables
+DONE 9 Feb 2010 - The macro shu-cpp-token-extract-info should define its local variables
              with make-sumbol.
+
+14 Feb 2019 - Add a hook function so that the "binclude" function can call the
+hook for non-standard names that can be returned by the hook.  i.e., If hook
+exists, pass the name to the hook.  If the hook returns a string, use that as the
+name of the include file.  If the hook returns nil, then apply the default algorithm
+to generate the bame of the include file.
+
+14 Feb 2019 - Re-do shu-replace-class-name to use tokens instead.
+
+  1. Tokenize the region (in reverse)
+
+  2. Go through all tokens of type "unquoted symbol"
+
+  3. See if this symbol matches a class name
+
+  4. If there is a match, then look at the things directly in front of and following
+     the unquoted symbol/  Things like "->" in front or "::" in front mean that it
+     is probably not a class name that we wish to qualify.
+
+  5. Build a new list of class names and their locations (in reverse)
+
+  6. Go through the list adding the appropriate qualifiers to the names by simply
+  going to the beginning point and prefixing it with the namespace name and "::'.
+  No need for searching and replacing since you have found then all as tokens.
+  Guarantees that things in comments and strings will be completely ignored.
+
+  This means having an inverted alist in which the key is the class name and the
+  value is the namespace.  This list only contans class names for namespaces that
+  have been named on the "using namespace" directive.
