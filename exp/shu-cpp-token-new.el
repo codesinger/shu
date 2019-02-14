@@ -108,22 +108,17 @@
 ;;
 ;;  skip-comments
 ;;
-(defun skip-comments (tlist)
+(defsubst skip-comments (tlist)
   "Return tlist pointing to next non-comment."
   (interactive)
   (let (
-        (old-tlist tlist)
         (token-info)
-        (token)
         (token-type)
-        (spoint)
-        (epoint)
-        (error-message)
-        (in-commet t)
+        (in-comment t)
         )
     (while in-comment
       (setq token-info (car tlist))
-      (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
+      (setq token-type (shu-cpp-token-extract-type token-info))
       (if (= token-type shu-cpp-token-type-ct)
           (setq tlist (cdr tlist))
         (setq in-comment nil)
