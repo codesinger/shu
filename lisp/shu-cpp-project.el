@@ -56,6 +56,12 @@ shu-add-cpp-h-extensions.")
 (defvar shu-cpp-project-file nil
   "The name of the file from which the current project was read.")
 
+(defvar shu-cpp-project-name nil
+  "If the current project was established by either SHU-SETUP-PROJECT-AND-TAGS
+of SHU-VISIT-PROJECT-AND-TAGS, this is the name of the interactive function that
+was invoked by the user to set it up.  This is useful when you are in a project
+and you forgot the name of the interactive function that got you there.")
+
 (defvar shu-cpp-project-list nil
   "List that holds all of the subdirectories in the current project.")
 
@@ -312,13 +318,30 @@ source code."
 ;;  shu-set-c-project
 ;;
 (defun shu-set-c-project (start end)
+  "Mark a region in a file that contains one subdirectory name per line.  Then
+invoke set-c-project and it will find and remember all of the c and h files in
+those subdirectories.  You may then subsequently visit any of those files by
+invoking M-x vh which will allow you to type in the file name only (with auto
+completion) and will then visit the file in the appropriate subdirectory.  If
+this function is called interactively, it clears the project name that was
+established by either SHU-SETUP-PROJECT-AND-TAGS of SHU-VISIT-PROJECT-AND-TAGS."
+  (interactive "r")
+  (setq shu-cpp-project-name nil)
+  (shu-internal-set-c-project start end)
+  )
+
+
+
+;;
+;;  shu-internal-set-c-project
+;;
+(defun shu-internal-set-c-project (start end)
   "Mark a region in a file that contains one subdirectory name per line.
 Then invoke set-c-project and it will find and remember all of the c and h
 files in those subdirectories.  You may then subsequently visit any of
 those files by invoking M-x vh which will allow you to type in the file
 name only (with auto completion) and will then visit the file in the
 appropriate subdirectory."
-  (interactive "r")
   (save-excursion
     (let ((sline (shu-the-line-at start))
           (eline (shu-the-line-at end))
@@ -1340,6 +1363,8 @@ results in that buffer, and then quit out of the buffer."
           (message "There is no current project.")
           (ding))
       (princ (concat shu-cpp-project-file ":\n------------\n") pbuf)
+      (when shu-cpp-project-name
+        (princ (concat "Project name: " shu-cpp-project-name "\n") pbuf))
       (princ (format-time-string "Set on %a, %e %b %Y at %k:%M:%S." shu-cpp-project-time) pbuf)
       (princ "\n\n" pbuf)
       (while tlist
@@ -1373,10 +1398,11 @@ which the tags file is to be built."
        (etime)
        (c-count)
        (h-count))
+    (setq shu-cpp-project-name real-this-command)
     (setq sstring (format-time-string "on %a, %e %b %Y at %k:%M:%S" stime))
-    (princ (format "\nStart project setup in %s %s.\n\n" proj-dir sstring) gbuf)
+    (princ (format "\nStart project (%s) setup in %s %s.\n\n" shu-cpp-project-name proj-dir sstring) gbuf)
     (find-file proj-file)
-    (set-c-project (point-min) (point-max))
+    (shu-internal-set-c-project (point-min) (point-max))
     (setq elapsed (time-since stime))
     (kill-buffer (current-buffer))
     (setq sstring (format-time-string "%M:%S.%3N" elapsed))
@@ -1409,10 +1435,11 @@ which the tags file is to be built."
 ;;
 ;;  shu-visit-project-and-tags
 ;;
-(defun
-    shu-visit-project-and-tags (proj-dir)
+(defun shu-visit-project-and-tags (proj-dir)
   "Visit a project file, make a C project from the contents of the whole file,
-and load that tags table from the tags file in the specified directory."
+and load that tags table from the tags file in the specified directory.  This
+function uses the existing tags table, whereas SHU-SETUP-PROJECT-AND-TAGS
+creates a new tags table."
   (let
       ((tags-add-tables nil)
        (gbuf (get-buffer-create "*setup project*"))
@@ -1428,10 +1455,11 @@ and load that tags table from the tags file in the specified directory."
        (etime)
        (c-count)
        (h-count))
+    (setq shu-cpp-project-name real-this-command)
     (setq sstring (format-time-string "on %a, %e %b %Y at %k:%M:%S" stime))
-    (princ (format "\nStart project visit in %s %s.\n\n" proj-dir sstring) gbuf)
+    (princ (format "\nStart project (%s) setup in %s %s.\n\n" shu-cpp-project-name proj-dir sstring) gbuf)
     (find-file proj-file)
-    (set-c-project (point-min) (point-max))
+    (shu-internal-set-c-project (point-min) (point-max))
     (setq elapsed (time-since stime))
     (kill-buffer (current-buffer))
     (setq sstring (format-time-string "%M:%S.%3N" elapsed))
