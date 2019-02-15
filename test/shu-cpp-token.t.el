@@ -1917,9 +1917,9 @@ me anything.  It is printed on test failure to identify the test that failed."
 
 
 ;;
-;;  shu-test-shu-cpp-token-is-comment-2
+;;  shu-test-shu-cpp-token-is-comment-3
 ;;
-(ert-deftest shu-test-shu-cpp-token-is-comment-2 ()
+(ert-deftest shu-test-shu-cpp-token-is-comment-3 ()
   (let ((token "MumbleFrotz")
         (ttype shu-cpp-token-type-uq)
         (spoint 8092)
@@ -1929,6 +1929,54 @@ me anything.  It is printed on test failure to identify the test that failed."
     (setq token-info (shu-cpp-make-token-info token ttype spoint epoint))
     (setq is-comment (shu-cpp-token-is-comment token-info))
     (should (not is-comment))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-token-next-non-comment-1
+;;
+(ert-deftest shu-test-shu-cpp-token-next-non-comment-1 ()
+  (let ((token "// Hi there")
+        (ttype shu-cpp-token-type-cc)
+        (spoint 8092)
+        (epoint 9034)
+        (token-info)
+        (tlist)
+        (nlist))
+    (setq token-info (shu-cpp-make-token-info token ttype spoint epoint))
+    (setq tlist (cons token-info tlist))
+    (should (not nlist))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-token-next-non-comment-2
+;;
+(ert-deftest shu-test-shu-cpp-token-next-non-comment-2 ()
+  (let ((token1 "// Hi there")
+        (token2 "MumbleFrotz")
+        (ttype1 shu-cpp-token-type-cc)
+        (ttype2 shu-cpp-token-type-uq)
+        (ttype3)
+        (spoint 8092)
+        (epoint 9034)
+        (token-info)
+        (tlist)
+        (nlist))
+    (setq token-info (shu-cpp-make-token-info token2 ttype2 spoint epoint))
+    (setq tlist (cons token-info tlist))
+    (setq token-info (shu-cpp-make-token-info token1 ttype1 spoint epoint))
+    (setq tlist (cons token-info tlist))
+    (setq nlist (shu-cpp-token-next-non-comment tlist))
+    (should nlist)
+    (setq token-info (car nlist))
+    (should token-info)
+    (setq ttype3 (shu-cpp-token-extract-type token-info))
+    (should ttype3)
+    (should (numberp ttype3))
+    (should (= ttype3 shu-cpp-token-type-uq))
     ))
 
 

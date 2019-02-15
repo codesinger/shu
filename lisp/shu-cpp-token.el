@@ -201,11 +201,43 @@ template parameter \"int\"")
 ;;
 ;;  shu-cpp-token-is-comment
 ;;
-(defun shu-cpp-token-is-comment (token-info)
+(defsubst shu-cpp-token-is-comment (token-info)
   "Return true if the token-info represents a comment."
   (let ((ttype (shu-cpp-token-extract-type token-info)))
     (or (= ttype shu-cpp-token-type-ct)
         (= ttype shu-cpp-token-type-cc))
+    ))
+
+
+
+;;
+;;  shu-cpp-token-next-non-comment
+;;
+(defun shu-cpp-token-next-non-comment (tlist)
+  "TLIST points to a list of token-info.  Return TLIST pointing to the next
+token-info that does not hold a comment.  If you are scanning through a list
+of tokens, it is not uncommon to want to skip all of the comments.  Use this
+at the bottom of the loop in place of the usual \"setq tlist (cdr tlist))\".
+
+i.e.,
+
+     (while tlist
+        ...
+       (setq tlist (cdr tlist)))
+
+becomes
+
+     (while tlist
+        ...
+       (setq tlist (shu-cpp-token-next-non-comment tlist)))"
+  (let ((token-info)
+        (in-comment t))
+    (while (and in-comment tlist)
+      (setq token-info (car tlist))
+      (setq in-comment (shu-cpp-token-is-comment token-info))
+      (when in-comment
+        (setq tlist (cdr tlist))))
+    tlist
     ))
 
 
