@@ -34,6 +34,35 @@
 
 
 
+;;
+;;  shu-cpp-token-string-token-info
+;;
+(defun shu-cpp-token-string-token-info (token-info)
+  "Doc string."
+  (interactive)
+  (let (
+        (token)
+        (token-type)
+        (token-type-name)
+        (spoint)
+        (epoint)
+        (error-message)
+        (emsg "")
+        (name)
+        )
+    (if (not token-info)
+        (setq name "**none**")
+      (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
+      (setq token-type-name (shu-cpp-token-token-type-name token-type))
+      (when error-message
+        (setq emsg (concat " (" error-message ")")))
+      (setq name (format "(%s) \"%s\" %d  %s" token-type-name token spoint emsg)))
+    name
+    ))
+
+
+
+
 
 
 ;;
@@ -65,6 +94,64 @@
         )
       (setq tlist (cdr tlist))
       )
+
+    ))
+
+
+
+;;
+;;  rrr
+;;
+(defun rrr (start end)
+  "Doc string."
+  (interactive "r")
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (token-list)
+        (tlist)
+        (token-info)
+        (last-token-info)
+        (token)
+        (token-type)
+        (token-type-name)
+        (spoint)
+        (epoint)
+        (error-message)
+        (prev)
+        (next)
+        (this)
+        (ntoken-info)
+        (nlist)
+        (count 0)
+        )
+    (setq debug-on-error t)
+    (setq token-list (shu-cpp-reverse-tokenize-region-for-command start end))
+    (princ "tokenized\n\n" gb)
+    (setq tlist token-list)
+    (while tlist
+      (setq token-info (car tlist))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
+      (setq token-type-name (shu-cpp-token-token-type-name token-type))
+      (princ (format "type: %d %s %s %d\n" token-type token-type-name token spoint) gb)
+      (when (= token-type shu-cpp-token-type-uq)
+        (setq prev (shu-cpp-token-string-token-info last-token-info))
+        (setq next "")
+;;;        (setq nlist (shu-cpp-token-next-non-comment tlist))
+        (setq nlist (cdr tlist))
+        (when nlist
+          (setq ntoken-info (car nlist))
+          (setq next (shu-cpp-token-string-token-info ntoken-info))
+          )
+        (setq this (shu-cpp-token-string-token-info ntoken-info))
+        (princ (format "%s => %s => %s\n" prev this next) gb)
+
+        )
+      (setq last-token-info token-info)
+      (setq tlist (cdr tlist))
+;;;      (setq tlist (shu-cpp-token-next-non-comment tlist))
+      )
+
 
     ))
 
