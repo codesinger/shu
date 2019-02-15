@@ -199,6 +199,17 @@ template parameter \"int\"")
 
 
 ;;
+;;  shu-cpp-token-is-comment
+;;
+(defun shu-cpp-token-is-comment (token-info)
+  "Return true if the token-info represents a comment."
+  (let ((ttype (shu-cpp-token-extract-type token-info)))
+    (or (= ttype shu-cpp-token-type-ct)
+        (= ttype shu-cpp-token-type-cc))
+    ))
+
+
+;;
 ;;  shu-cpp-token-token-type-name
 ;;
 (defun shu-cpp-token-token-type-name (token-type)

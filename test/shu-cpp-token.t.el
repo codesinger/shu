@@ -1881,4 +1881,55 @@ me anything.  It is printed on test failure to identify the test that failed."
     ))
 
 
+
+;;
+;;  shu-test-shu-cpp-token-is-comment-1
+;;
+(ert-deftest shu-test-shu-cpp-token-is-comment-1 ()
+  (let ((token "// Hi there")
+        (ttype shu-cpp-token-type-ct)
+        (spoint 8092)
+        (epoint 9034)
+        (token-info)
+        (is-comment))
+    (setq token-info (shu-cpp-make-token-info token ttype spoint epoint))
+    (setq is-comment (shu-cpp-token-is-comment token-info))
+    (should is-comment)
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-token-is-comment-2
+;;
+(ert-deftest shu-test-shu-cpp-token-is-comment-2 ()
+  (let ((token "// Hi there")
+        (ttype shu-cpp-token-type-cc)
+        (spoint 8092)
+        (epoint 9034)
+        (token-info)
+        (is-comment))
+    (setq token-info (shu-cpp-make-token-info token ttype spoint epoint))
+    (setq is-comment (shu-cpp-token-is-comment token-info))
+    (should is-comment)
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-token-is-comment-2
+;;
+(ert-deftest shu-test-shu-cpp-token-is-comment-2 ()
+  (let ((token "MumbleFrotz")
+        (ttype shu-cpp-token-type-uq)
+        (spoint 8092)
+        (epoint 9034)
+        (token-info)
+        (is-comment))
+    (setq token-info (shu-cpp-make-token-info token ttype spoint epoint))
+    (setq is-comment (shu-cpp-token-is-comment token-info))
+    (should (not is-comment))
+    ))
+
+
 ;;; shu-cpp-token.t.el ends here
