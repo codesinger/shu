@@ -54,6 +54,7 @@
         (next)
         (ntoken-info)
         (olist)
+        (plist)
         (pad "      ")
         (count)
         )
@@ -64,7 +65,7 @@
     (setq tlist (shu-cpp-token-first-non-comment tlist))
     (while tlist
       (setq token-info (car tlist))
-      (push token-info olist )
+      (push token-info olist)
       (setq token-type (shu-cpp-token-extract-type token-info))
       (when (= token-type shu-cpp-token-type-uq)
         (setq this (shu-cpp-token-string-token-info token-info))
@@ -72,12 +73,18 @@
         ;;
         (setq nlist (shu-cpp-token-next-non-comment tlist))
         (setq count 0)
+        (setq plist nil)
         (while (and nlist (< count 3))
           (setq count (1+ count))
           (setq ntoken-info (car nlist))
+          (push ntoken-info plist)
+          (setq nlist (shu-cpp-token-next-non-comment nlist))
+          )
+        (while plist
+          (setq ntoken-info (car plist))
           (setq prev (shu-cpp-token-string-token-info ntoken-info))
           (princ (concat prev "\n") gb)
-          (setq nlist (shu-cpp-token-next-non-comment nlist))
+          (setq plist (cdr plist))
           )
         (princ (concat pad this "\n") gb)
         ;;
