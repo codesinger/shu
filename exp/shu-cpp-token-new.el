@@ -110,6 +110,74 @@ before and after."
 
 
 
+
+;;
+;;  www
+;;
+(defun www (start end)
+  "For each ; operator from a reverse scan, show the six tokens immediately
+before."
+  (interactive "r")
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (token-list)
+        (tlist)
+        (token-info)
+        (token-type)
+        (last-token-info)
+        (this)
+        (prev)
+        (nlist)
+        (next)
+        (ntoken-info)
+        (token)
+        (olist)
+        (plist)
+        (pad "      ")
+        (count)
+        (limit 6)
+        )
+    (setq debug-on-error t)
+    (setq token-list (shu-cpp-reverse-tokenize-region-for-command start end))
+    (princ "tokenized\n\n" gb)
+    (setq tlist token-list)
+    (setq tlist (shu-cpp-token-first-non-comment tlist))
+    (while tlist
+      (setq token-info (car tlist))
+      (push token-info olist)
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (when (and (= token-type shu-cpp-token-type-op)
+                 (string= token ";"))
+        (setq this (shu-cpp-token-string-token-info token-info))
+        (princ "\n\n" gb)
+        ;;
+        ;; The tokens in front are the next in the list
+        ;; but in reverse order
+        (setq nlist (shu-cpp-token-next-non-comment tlist))
+        (setq count 0)
+        (setq plist nil)
+        (while (and nlist (< count limit))
+          (setq count (1+ count))
+          (setq ntoken-info (car nlist))
+          (push ntoken-info plist)
+          (setq nlist (shu-cpp-token-next-non-comment nlist))
+          )
+        (while plist
+          (setq ntoken-info (car plist))
+          (setq prev (shu-cpp-token-string-token-info ntoken-info))
+          (princ (concat prev "\n") gb)
+          (setq plist (cdr plist))
+          )
+        (princ (concat pad this "\n") gb)
+        )
+      (setq last-token-info token-info)
+      (setq tlist (shu-cpp-token-next-non-comment tlist))
+      )
+    ))
+
+
+
 ;;
 ;;  ppp
 ;;
