@@ -61,15 +61,20 @@ becomes
 
 and you will scan through the liwt without seeing any comments."
   (let (
+        (gb (get-buffer-create "**boo**"))
         (token-info)
         (in-comment)
         )
     (when tlist
       (setq token-info (car tlist))
+      (princ (concat (shu-cpp-token-string-token-info token-info) "\n") gb)
       (setq in-comment (shu-cpp-token-is-comment token-info))
+      (princ "2\n" gb)
       (while (and in-comment tlist)
+      (princ "3\n" gb)
         (setq tlist (cdr tlist))
         (setq token-info (car tlist))
+        (princ (concat (shu-cpp-token-string-token-info token-info) "\n") gb)
         (setq in-comment (shu-cpp-token-is-comment token-info))
         )
       )
@@ -114,7 +119,8 @@ and you will scan through the liwt without seeing any comments."
         )
       (setq tlist (cdr tlist))
       )
-    (setq tlist (shu-cpp-token-first-non-comment token-list))
+    (setq tlist token-list)
+    (setq tlist (shu-cpp-token-first-non-comment tlist))
     (should tlist)
     (should (consp tlist))
     (setq token-info (car tlist))
