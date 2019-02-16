@@ -39,7 +39,8 @@
 ;;  jjj
 ;;
 (defun jjj (start end)
-  "Doc string."
+  "For each unquoted token from a reverse scan, show the four tokens immediately
+before and after."
   (interactive "r")
   (let (
         (gb (get-buffer-create "**boo**"))
@@ -57,6 +58,7 @@
         (plist)
         (pad "      ")
         (count)
+        (limit 4)
         )
     (setq debug-on-error t)
     (setq token-list (shu-cpp-reverse-tokenize-region-for-command start end))
@@ -71,10 +73,12 @@
         (setq this (shu-cpp-token-string-token-info token-info))
         (princ "\n\n" gb)
         ;;
+        ;; The tokens in front are the next in the list
+        ;; but in reverse order
         (setq nlist (shu-cpp-token-next-non-comment tlist))
         (setq count 0)
         (setq plist nil)
-        (while (and nlist (< count 3))
+        (while (and nlist (< count limit))
           (setq count (1+ count))
           (setq ntoken-info (car nlist))
           (push ntoken-info plist)
@@ -88,9 +92,10 @@
           )
         (princ (concat pad this "\n") gb)
         ;;
+        ;; The tokens following are the first on olist
         (setq nlist (cdr olist))
         (setq count 0)
-        (while (and nlist (< count 3))
+        (while (and nlist (< count limit))
           (setq count (1+ count))
           (setq ntoken-info (car nlist))
           (setq prev (shu-cpp-token-string-token-info ntoken-info))
