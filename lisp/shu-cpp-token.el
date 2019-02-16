@@ -234,12 +234,16 @@ becomes
 and you will scan through the liwt without seeing any comments."
   (let ((token-info)
         (in-comment t))
+    (when tlist
     (setq tlist (cdr tlist))
     (while (and in-comment tlist)
       (setq token-info (car tlist))
       (setq in-comment (shu-cpp-token-is-comment token-info))
       (when in-comment
-        (setq tlist (cdr tlist))))
+        (setq tlist (cdr tlist))
+        )
+      )
+    )
     tlist
     ))
 
