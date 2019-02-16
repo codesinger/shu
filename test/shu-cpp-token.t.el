@@ -2018,7 +2018,6 @@ me anything.  It is printed on test failure to identify the test that failed."
       (should (not (> ncount limit)))
       (setq token-info (car tlist))
       (should (not (shu-cpp-token-is-comment token-info)))
-      (setq this (shu-cpp-token-string-token-info token-info))
       (setq tlist (shu-cpp-token-next-non-comment tlist)))
     (should (= limit ncount))
     ))

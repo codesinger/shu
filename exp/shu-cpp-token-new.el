@@ -34,36 +34,6 @@
 
 
 
-;;
-;;  shu-cpp-token-string-token-info
-;;
-(defun shu-cpp-token-string-token-info (token-info)
-  "Doc string."
-  (interactive)
-  (let (
-        (token)
-        (token-type)
-        (token-type-name)
-        (spoint)
-        (epoint)
-        (error-message)
-        (emsg "")
-        (name)
-        )
-    (if (not token-info)
-        (setq name "**none**")
-      (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
-      (setq token-type-name (shu-cpp-token-token-type-name token-type))
-      (when error-message
-        (setq emsg (concat " (" error-message ")")))
-      (setq name (format "(%s) \"%s\" %d  %s" token-type-name token spoint emsg)))
-    name
-    ))
-
-
-
-
-
 
 ;;
 ;;  zzz
@@ -95,6 +65,52 @@
       (setq tlist (cdr tlist))
       )
 
+    ))
+
+
+
+;;
+;;  ppp
+;;
+(defun ppp (start end)
+  "Doc string."
+  (interactive "r")
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (token-list)
+        (tlist)
+        (token-info)
+        (last-token-info)
+        (this)
+        (prev)
+        (nlist)
+        (next)
+        (ntoken-info)
+        )
+    (setq debug-on-error t)
+    (setq token-list (shu-cpp-reverse-tokenize-region-for-command start end))
+    (princ "tokenized\n\n" gb)
+    (setq tlist token-list)
+    (while tlist
+      (setq token-info (car tlist))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (when (= token-type shu-cpp-token-type-uq)
+        (setq this (shu-cpp-token-string-token-info token-info))
+        (if last-token-info
+            (setq prev (shu-cpp-token-string-token-info last-token-info))
+          (setq prev "")
+          )
+        (setq nlist (shu-cpp-token-next-non-comment tlist))
+        (if (not nlist)
+            (setq next "")
+          (setq ntoken-info (car nlist))
+          (setq next (shu-cpp-token-string-token-info ntoken-info))
+          )
+        (princ (format "prev: %s, this: %s, next: %s\n" prev this next) gb)
+        )
+      (setq last-token-info token-info)
+      (setq tlist (shu-cpp-token-next-non-comment tlist))
+      )
     ))
 
 
@@ -157,97 +173,6 @@
 
 
 
-;;
-;;  shu-cpp-token-next-non-comment
-;;
-(defun shu-cpp-token-next-non-comment (tlist)
-  "TLIST points to a list of token-info.  Return TLIST pointing to the next
-token-info that does not hold a comment.  If you are scanning through a list
-of tokens, it is not uncommon to want to skip all of the comments.  Use this
-at the bottom of the loop in place of the usual \"setq tlist (cdr tlist))\".
-
-i.e.,
-
-     (while tlist
-        ...
-       (setq tlist (cdr tlist)))
-
-becomes
-
-     (while tlist
-        ...
-       (setq tlist (shu-cpp-token-next-non-comment tlist)))
-
-and you will scan through the liwt without weeing any comments."
-  (let ((token-info)
-        (in-comment t))
-      (setq tlist (cdr tlist))
-    (while (and in-comment tlist)
-      (setq token-info (car tlist))
-      (setq in-comment (shu-cpp-token-is-comment token-info))
-      (when in-comment
-        (setq tlist (cdr tlist))
-        )
-      )
-    tlist
-    ))
-
-
-
-;;
-;;  shu-test-shu-cpp-token-next-non-comment-3
-;;
-(ert-deftest shu-test-shu-cpp-token-next-non-comment-3 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (token-list)
-        (token-info)
-        (tlist)
-        (count 0)
-        (ncount 0)
-        (comment-count 0)
-        (limit)
-        (this)
-        (data
-         (concat
-          "    std:string   /* Hi! */  x;\n"
-          "    x =\"This is a fine kettle of fish is it not?\" // Again\n"
-          "    int  j; /* again */\n"
-          "    j++;\n"))
-        )
-    (with-temp-buffer
-      (insert data)
-      (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
-      )
-    (setq tlist token-list)
-    (while tlist
-      (setq count (1+ count))
-      (setq token-info (car tlist))
-      (when (shu-cpp-token-is-comment token-info)
-        (setq comment-count (1+ comment-count)))
-      (setq this (shu-cpp-token-string-token-info token-info))
-      (princ (format "%d: %s\n" count this) gb)
-      (setq tlist (cdr tlist))
-      )
-    (princ (format "count: %d, comment-count: %d\n\n" count comment-count) gb)
-    (should (> comment-count 0))
-    (setq limit (- count comment-count))
-    (setq tlist token-list)
-    (while tlist
-      (setq ncount (1+ ncount))
-      (should (not (> ncount limit)))
-      (setq token-info (car tlist))
-      (should (not (shu-cpp-token-is-comment token-info)))
-      (setq this (shu-cpp-token-string-token-info token-info))
-      (princ (format "%d: %s\n" ncount this) gb)
-      (setq tlist (shu-cpp-token-next-non-comment tlist))
-      )
-    (should (= limit ncount))
-
-    ))
-
-
-
 
 ;;
 ;;  sub-zzz
@@ -304,6 +229,55 @@ and you will scan through the liwt without weeing any comments."
         )
       )
     tlist
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-cpp-token-next-non-comment-4
+;;
+(ert-deftest shu-test-shu-cpp-token-next-non-comment-4 ()
+  (let ((token-list)
+        (token-info)
+        (tlist)
+        (nlist)
+        (count 0)
+        (ncount 0)
+        (comment-count 0)
+        (limit)
+        (this)
+        (data
+         (concat
+          "    std:string   /* Hi! */  x;\n"
+          "    x =\"This is a fine kettle of fish is it not?\" // Again\n"
+          "    int  j; /* again */\n"
+          "    j++;\n")))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max))))
+    (setq tlist token-list)
+    (while tlist
+      (setq count (1+ count))
+      (setq token-info (car tlist))
+      (when (shu-cpp-token-is-comment token-info)
+        (setq comment-count (1+ comment-count)))
+      (setq this (shu-cpp-token-string-token-info token-info))
+      (setq tlist (cdr tlist)))
+    (should (> comment-count 0))
+    (setq limit (- count comment-count))
+    (setq tlist token-list)
+    (while tlist
+      (setq ncount (1+ ncount))
+      (should (not (> ncount limit)))
+      (setq token-info (car tlist))
+      (should (not (shu-cpp-token-is-comment token-info)))
+      (setq this (shu-cpp-token-string-token-info token-info))
+      (setq nlist (shu-cpp-token-next-non-comment tlist))
+      (setq nlist (shu-cpp-token-next-non-comment tlist))
+      (setq tlist (shu-cpp-token-next-non-comment tlist)))
+    (should (= limit ncount))
     ))
 
 
