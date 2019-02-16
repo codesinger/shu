@@ -26,3 +26,10 @@ Const pointer to object
   3. Unquoted token (class name)
   4. Operator "::"
   5. Unquoted token (namespace)
+
+
+16 Feb 2019
+
+WHen walking through a reerse list, the things in front of the token are the things
+following it in the list and the things that come after the token are the things
+that precede it in the list.

@@ -36,6 +36,69 @@
 
 
 ;;
+;;  jjj
+;;
+(defun jjj (start end)
+  "Doc string."
+  (interactive "r")
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (token-list)
+        (tlist)
+        (token-info)
+        (token-type)
+        (last-token-info)
+        (this)
+        (prev)
+        (nlist)
+        (next)
+        (ntoken-info)
+        (olist)
+        (pad "      ")
+        (count)
+        )
+    (setq debug-on-error t)
+    (setq token-list (shu-cpp-reverse-tokenize-region-for-command start end))
+    (princ "tokenized\n\n" gb)
+    (setq tlist token-list)
+    (setq tlist (shu-cpp-token-first-non-comment tlist))
+    (while tlist
+      (setq token-info (car tlist))
+      (push token-info olist )
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (when (= token-type shu-cpp-token-type-uq)
+        (setq this (shu-cpp-token-string-token-info token-info))
+        (princ "\n\n" gb)
+        ;;
+        (setq nlist (shu-cpp-token-next-non-comment tlist))
+        (setq count 0)
+        (while (and nlist (< count 3))
+          (setq count (1+ count))
+          (setq ntoken-info (car nlist))
+          (setq prev (shu-cpp-token-string-token-info ntoken-info))
+          (princ (concat prev "\n") gb)
+          (setq nlist (shu-cpp-token-next-non-comment nlist))
+          )
+        (princ (concat pad this "\n") gb)
+        ;;
+        (setq nlist (cdr olist))
+        (setq count 0)
+        (while (and nlist (< count 3))
+          (setq count (1+ count))
+          (setq ntoken-info (car nlist))
+          (setq prev (shu-cpp-token-string-token-info ntoken-info))
+          (princ (concat prev "\n") gb)
+          (setq nlist (cdr nlist))
+          )
+        )
+      (setq last-token-info token-info)
+      (setq tlist (shu-cpp-token-next-non-comment tlist))
+      )
+    ))
+
+
+
+;;
 ;;  ppp
 ;;
 (defun ppp (start end)
@@ -109,6 +172,7 @@ bottom of the loop that we invoke shu-cpp-token-next-non-comment."
     (setq token-list (shu-cpp-reverse-tokenize-region-for-command start end))
     (princ "tokenized\n\n" gb)
     (setq tlist token-list)
+    (setq tlist (shu-cpp-token-first-non-comment tlist))
     (while tlist
       (setq token-info (car tlist))
       (setq token-type (shu-cpp-token-extract-type token-info))
@@ -127,6 +191,42 @@ bottom of the loop that we invoke shu-cpp-token-next-non-comment."
         (princ (format "prev: %s, this: %s, next: %s\n" prev this next) gb)
         )
       (setq last-token-info token-info)
+      (setq tlist (shu-cpp-token-next-non-comment tlist))
+      )
+    ))
+
+
+
+;;
+;;  zzz
+;;
+(defun zzz (start end)
+  "Doc string."
+  (interactive "r")
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (token-list)
+        (tlist)
+        (token-info)
+        (token-type)
+        (last-token-info)
+        (this)
+        (prev)
+        (nlist)
+        (next)
+        (count 0)
+        (ntoken-info)
+        )
+    (setq debug-on-error t)
+    (setq token-list (shu-cpp-reverse-tokenize-region-for-command start end))
+    (princ "tokenized\n\n" gb)
+    (setq tlist token-list)
+    (setq tlist (shu-cpp-token-first-non-comment tlist))
+    (while tlist
+      (setq count (1+ count))
+      (setq token-info (car tlist))
+      (setq this (shu-cpp-token-string-token-info token-info))
+      (princ (format "%d: %s\n" count this) gb)
       (setq tlist (shu-cpp-token-next-non-comment tlist))
       )
     ))
