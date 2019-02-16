@@ -35,108 +35,6 @@
 
 
 
-
-
-
-;;
-;;  shu-cpp-token-first-non-comment
-;;
-(defun shu-cpp-token-first-non-comment (tlist)
-  "TLIST points to a list of token-info.  Return TLIST pointing to the next
-token-info that does not hold a comment.  If you are scanning through a list
-of tokens, it is not uncommon to want to skip all of the comments.  Use this
-at the bottom of the loop in place of the usual \"setq tlist (cdr tlist))\".
-
-i.e.,
-
-     (while tlist
-        ...
-       (setq tlist (cdr tlist)))
-
-becomes
-
-     (setq tlist (shu-cpp-token-first-non-comment tlist))
-     (while tlist
-        ...
-       (setq tlist (shu-cpp-token-first-non-comment tlist)))
-
-and you will scan through the liwt without seeing any comments."
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (token-info)
-        (in-comment)
-        )
-    (when tlist
-      (princ "\n\n1:\n" gb) (princ tlist gb) (princ "/n/n" gb)
-      (setq token-info (car tlist))
-      (princ (concat (shu-cpp-token-string-token-info token-info) "\n") gb)
-      (setq in-comment (shu-cpp-token-is-comment token-info))
-      (princ "2\n" gb)
-      (while (and in-comment tlist)
-      (princ "3\n" gb)
-        (setq tlist (cdr tlist))
-        (setq token-info (car tlist))
-        (princ (concat (shu-cpp-token-string-token-info token-info) "\n") gb)
-        (setq in-comment (shu-cpp-token-is-comment token-info))
-        )
-      )
-      (princ "\n\n2:\n" gb) (princ tlist gb) (princ "/n/n" gb)
-    tlist
-    ))
-
-
-
-
-;;
-;;  shu-test-shu-cpp-token-first-non-comment-1
-;;
-(ert-deftest shu-test-shu-cpp-token-first-non-comment-1 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (token-list)
-        (token-info)
-        (token-type)
-        (tlist)
-        (count 0)
-        (ncount 0)
-        (comment-count 0)
-        (limit)
-        (this)
-        (first-non-comment-token-info)
-        (data
-         (concat
-          "    // This is a comment\n"
-          "  /* and yet another comment */\n"
-          "    x =\"This is a fine kettle of fish is it not?\" // Again\n"
-          "    int  j; /* again */\n"
-          "    j++;\n")))
-    (with-temp-buffer
-      (insert data)
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      )
-    (setq tlist token-list)
-    (while (and tlist (not first-non-comment-token-info))
-      (setq count (1+ count))
-      (setq token-info (car tlist))
-      (when (not (shu-cpp-token-is-comment token-info))
-        (setq first-non-comment-token-info token-info)
-      (princ (concat "XX: " (shu-cpp-token-string-token-info first-non-comment-token-info) "\n") gb)
-        )
-      (setq tlist (cdr tlist))
-      )
-    (setq tlist token-list)
-    (setq tlist (shu-cpp-token-first-non-comment tlist))
-    (princ "\n\n3:\n" gb) (princ tlist gb) (princ "/n/n" gb)
-    (should tlist)
-    (should (consp tlist))
-    (setq token-info (car tlist))
-      (princ (concat "ZZ: " (shu-cpp-token-string-token-info token-info) "\n") gb)
-    (should (equal first-non-comment-token-info token-info))
-    ))
-
-
-
-
 ;;
 ;;  ppp
 ;;
@@ -163,6 +61,7 @@ bottom of the loop that we invoke shu-cpp-token-next-non-comment."
     (setq token-list (shu-cpp-tokenize-region-for-command start end))
     (princ "tokenized\n\n" gb)
     (setq tlist token-list)
+    (setq tlist (shu-cpp-token-first-non-comment tlist))
     (while tlist
       (setq token-info (car tlist))
       (setq token-type (shu-cpp-token-extract-type token-info))
