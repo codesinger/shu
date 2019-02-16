@@ -199,6 +199,15 @@ template parameter \"int\"")
 
 
 ;;
+;;  shu-cpp-token-extract-token
+;;
+(defsubst shu-cpp-token-extract-token (token-info)
+  "Return the token from an instance of token-info."
+  (cdr token-info)
+  )
+
+
+;;
 ;;  shu-cpp-token-is-comment
 ;;
 (defsubst shu-cpp-token-is-comment (token-info)
