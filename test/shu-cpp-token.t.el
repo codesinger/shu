@@ -464,24 +464,24 @@
       (setq tlist token-list)
       (shu-cpp-tokenize-show-list token-list)
 
-    ;; 89 : 89 = [&](1)
-    ;; 84 : 86 = [int](3)
-    ;; 75 : 82 = [unsigned](3)
-    ;; 69 : 73 = [const](3)
-    ;; 64 : 64 = [;](1)
-    ;; 60 : 63 = [endl](3)
-    ;; 58 : 59 = [::](1)
-    ;; 55 : 57 = [std](3)
-    ;; 53 : 54 = [<<](1)
-    ;; 49 : 52 = [that](3)
-    ;; 38 : 47 = [/* Who? */](4)
-    ;; 36 : 36 = [+](1)
-    ;; 31 : 34 = [this](3)
-    ;; 16 : 29 = ["The sum is: "](2)
-    ;; 13 : 14 = [<<](1)
-    ;; 8 : 11 = [cout](3)
-    ;; 6 : 7 = [::](1)
-    ;; 3 : 5 = [std](3)
+      ;; 89 : 89 = [&](1)
+      ;; 84 : 86 = [int](3)
+      ;; 75 : 82 = [unsigned](3)
+      ;; 69 : 73 = [const](3)
+      ;; 64 : 64 = [;](1)
+      ;; 60 : 63 = [endl](3)
+      ;; 58 : 59 = [::](1)
+      ;; 55 : 57 = [std](3)
+      ;; 53 : 54 = [<<](1)
+      ;; 49 : 52 = [that](3)
+      ;; 38 : 47 = [/* Who? */](4)
+      ;; 36 : 36 = [+](1)
+      ;; 31 : 34 = [this](3)
+      ;; 16 : 29 = ["The sum is: "](2)
+      ;; 13 : 14 = [<<](1)
+      ;; 8 : 11 = [cout](3)
+      ;; 6 : 7 = [::](1)
+      ;; 3 : 5 = [std](3)
 
 
       (setq token-info (car tlist))
@@ -491,7 +491,7 @@
       (setq token-info (car tlist))
       (should (shu-test-check-shu-cpp-get-token "limit-2" token-info "int" shu-cpp-token-type-uq 84 86))
       (setq tlist (cdr tlist))
-)))
+      )))
 
 
 
@@ -504,7 +504,7 @@
       ((ret-val)
        (token-list)
        (error-message)
-           (tbuf      (get-buffer-create shu-unit-test-buffer))
+       (tbuf      (get-buffer-create shu-unit-test-buffer))
        (token-info)
        (tlist))
 
@@ -529,24 +529,24 @@
       (should (= 18 (length token-list)))
       (setq tlist token-list)
 
-    ;;  3 :  5 = [std](3)
-    ;;  6 :  7 = [::](1)
-    ;;  8 : 11 = [cout](3)
-    ;; 13 : 14 = [<<](1)
-    ;; 16 : 29 = ["The sum is: "](2)
-    ;; 31 : 34 = [this](3)
-    ;; 36 : 36 = [+](1)
-    ;; 38 : 47 = [/* Who? */](4)
-    ;; 49 : 52 = [that](3)
-    ;; 53 : 54 = [<<](1)
-    ;; 55 : 57 = [std](3)
-    ;; 58 : 59 = [::](1)
-    ;; 60 : 63 = [endl](3)
-    ;; 64 : 64 = [;](1)
-    ;; 69 : 73 = [const](3)
-    ;; 75 : 82 = [unsigned](3)
-    ;; 84 : 86 = [int](3)
-    ;; 89 : 89 = [&](1)
+      ;;  3 :  5 = [std](3)
+      ;;  6 :  7 = [::](1)
+      ;;  8 : 11 = [cout](3)
+      ;; 13 : 14 = [<<](1)
+      ;; 16 : 29 = ["The sum is: "](2)
+      ;; 31 : 34 = [this](3)
+      ;; 36 : 36 = [+](1)
+      ;; 38 : 47 = [/* Who? */](4)
+      ;; 49 : 52 = [that](3)
+      ;; 53 : 54 = [<<](1)
+      ;; 55 : 57 = [std](3)
+      ;; 58 : 59 = [::](1)
+      ;; 60 : 63 = [endl](3)
+      ;; 64 : 64 = [;](1)
+      ;; 69 : 73 = [const](3)
+      ;; 75 : 82 = [unsigned](3)
+      ;; 84 : 86 = [int](3)
+      ;; 89 : 89 = [&](1)
 
 
       (setq token-info (car tlist))
@@ -556,7 +556,7 @@
       (setq token-info (car tlist))
       (should (shu-test-check-shu-cpp-get-token "fwd-limit-2" token-info "::" shu-cpp-token-type-op 6 7))
       (setq tlist (cdr tlist))
-)))
+      )))
 
 
 ;;
@@ -705,35 +705,35 @@
         " void get_x() const\n"
         " { return x; }\n"))
 
-;;      111 : 111 = [}](1)
-;;      109 : 109 = [;](1)
-;;      108 : 108 = [x](3)
-;;      101 : 106 = [return](3)
-;;      99 : 99 = [{](1)
-;;      92 : 96 = [const](3)
-;;      90 : 90 = [)](1)
-;;      89 : 89 = [(](1)
-;;      84 : 88 = [get_x](3)
-;;      79 : 82 = [void](3)
-;;      65 : 77 = [// or other ](4)
-;;      48 : 62 = [/* Something */](4)
-;;      45 : 45 = [;](1)
-;;      44 : 44 = []](1)
-;;      43 : 43 = [4](3)
-;;      42 : 42 = [[](1)
-;;      41 : 41 = [)](1)
-;;      40 : 40 = [x](3)
-;;      39 : 39 = [*](1)
-;;      38 : 38 = [(](1)
-;;      33 : 35 = [foo](3)
-;;      31 : 32 = [::](1)
-;;      26 : 30 = [thing](3)
-;;      23 : 23 = [{](1)
-;;      15 : 21 = [brumble](3)
-;;      13 : 14 = [::](1)
-;;      7 : 12 = [mumble](3)
-;;      1 : 5 = [class](3)
-;;
+      ;;      111 : 111 = [}](1)
+      ;;      109 : 109 = [;](1)
+      ;;      108 : 108 = [x](3)
+      ;;      101 : 106 = [return](3)
+      ;;      99 : 99 = [{](1)
+      ;;      92 : 96 = [const](3)
+      ;;      90 : 90 = [)](1)
+      ;;      89 : 89 = [(](1)
+      ;;      84 : 88 = [get_x](3)
+      ;;      79 : 82 = [void](3)
+      ;;      65 : 77 = [// or other ](4)
+      ;;      48 : 62 = [/* Something */](4)
+      ;;      45 : 45 = [;](1)
+      ;;      44 : 44 = []](1)
+      ;;      43 : 43 = [4](3)
+      ;;      42 : 42 = [[](1)
+      ;;      41 : 41 = [)](1)
+      ;;      40 : 40 = [x](3)
+      ;;      39 : 39 = [*](1)
+      ;;      38 : 38 = [(](1)
+      ;;      33 : 35 = [foo](3)
+      ;;      31 : 32 = [::](1)
+      ;;      26 : 30 = [thing](3)
+      ;;      23 : 23 = [{](1)
+      ;;      15 : 21 = [brumble](3)
+      ;;      13 : 14 = [::](1)
+      ;;      7 : 12 = [mumble](3)
+      ;;      1 : 5 = [class](3)
+      ;;
 
       (goto-char (point-max))
       (setq token-list (shu-cpp-reverse-tokenize-region-for-command  (point-min) (point-max)))
@@ -813,13 +813,13 @@
   (let
       ((here-point)
        (token-list)
-        (ret-val)
-        (token-info)
-        (token)
-        (token-type)
-        (spoint)
-        (epoint)
-        (error-message))
+       (ret-val)
+       (token-info)
+       (token)
+       (token-type)
+       (spoint)
+       (epoint)
+       (error-message))
     (with-temp-buffer
       (insert
        (concat
@@ -828,7 +828,7 @@
       (setq here-point (point))
       (insert
        (concat
-          "ut << \"The sum is:      \n"
+        "ut << \"The sum is:      \n"
         "\n"
         "  const unsigned int  &*(x)[12];"))
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max) here-point))
@@ -848,13 +848,13 @@
   (let
       ((here-point)
        (token-list)
-        (ret-val)
-        (token-info)
-        (token)
-        (token-type)
-        (spoint)
-        (epoint)
-        (error-message))
+       (ret-val)
+       (token-info)
+       (token)
+       (token-type)
+       (spoint)
+       (epoint)
+       (error-message))
     (with-temp-buffer
       (insert
        (concat
@@ -863,7 +863,7 @@
       (setq here-point (point))
       (insert
        (concat
-          "ut << \"The sum is:      \n"
+        "ut << \"The sum is:      \n"
         "\n"
         "  const unsigned int  &*(x)[12];"))
       (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max) here-point))
@@ -882,15 +882,15 @@
 (ert-deftest shu-test-shu-cpp-token-find-spanning-info-token-fwd-2 ()
   (let
       ((here-point)
-        (ret-val)
+       (ret-val)
        (token-list)
-        (token-info)
-    (tbuf      (get-buffer-create shu-unit-test-buffer))
-        (token)
-        (token-type)
-        (spoint)
-        (epoint)
-        (error-message))
+       (token-info)
+       (tbuf      (get-buffer-create shu-unit-test-buffer))
+       (token)
+       (token-type)
+       (spoint)
+       (epoint)
+       (error-message))
     (with-temp-buffer
       (insert
        (concat
@@ -899,8 +899,8 @@
       (setq here-point (point))
       (insert
        (concat " is:     \"\n"
-        "\n"
-        "  const unsigned int  &*(x)[12];"))
+               "\n"
+               "  const unsigned int  &*(x)[12];"))
       (princ "shu-test-shu-cpp-token-find-spanning-info-token-fwd-2\n" tbuf)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max) here-point))
       (should token-list)
@@ -918,15 +918,15 @@
 (ert-deftest shu-test-shu-cpp-token-find-spanning-info-token-reverse-2 ()
   (let
       ((here-point)
-        (ret-val)
+       (ret-val)
        (token-list)
-        (token-info)
-    (tbuf      (get-buffer-create shu-unit-test-buffer))
-        (token)
-        (token-type)
-        (spoint)
-        (epoint)
-        (error-message))
+       (token-info)
+       (tbuf      (get-buffer-create shu-unit-test-buffer))
+       (token)
+       (token-type)
+       (spoint)
+       (epoint)
+       (error-message))
     (with-temp-buffer
       (insert
        (concat
@@ -935,8 +935,8 @@
       (setq here-point (point))
       (insert
        (concat " is:     \"\n"
-        "\n"
-        "  const unsigned int  &*(x)[12];"))
+               "\n"
+               "  const unsigned int  &*(x)[12];"))
       (princ "shu-test-shu-cpp-token-find-spanning-info-token-reverse-2\n" tbuf)
       (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max) here-point))
       (should token-list)
@@ -954,15 +954,15 @@
 (ert-deftest shu-test-shu-cpp-token-find-spanning-info-token-fwd-3 ()
   (let
       ((here-point)
-        (ret-val)
+       (ret-val)
        (token-list)
-        (token-info)
-    (tbuf      (get-buffer-create shu-unit-test-buffer))
-        (token)
-        (token-type)
-        (spoint)
-        (epoint)
-        (error-message))
+       (token-info)
+       (tbuf      (get-buffer-create shu-unit-test-buffer))
+       (token)
+       (token-type)
+       (spoint)
+       (epoint)
+       (error-message))
     (with-temp-buffer
       (insert
        (concat
@@ -971,8 +971,8 @@
       (setq here-point (point))
       (insert
        (concat "o!\"  */\n"
-        "\n"
-        "  const unsigned int  &*(x)[12];"))
+               "\n"
+               "  const unsigned int  &*(x)[12];"))
       (princ "shu-test-shu-cpp-token-find-spanning-info-token-fwd-3\n" tbuf)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max) here-point))
       (should token-list)
@@ -992,14 +992,14 @@
   (let
       ((here-point)
        (token-list)
-        (ret-val)
-        (token-info)
-    (tbuf      (get-buffer-create shu-unit-test-buffer))
-        (token)
-        (token-type)
-        (spoint)
-        (epoint)
-        (error-message))
+       (ret-val)
+       (token-info)
+       (tbuf      (get-buffer-create shu-unit-test-buffer))
+       (token)
+       (token-type)
+       (spoint)
+       (epoint)
+       (error-message))
     (with-temp-buffer
       (insert
        (concat
@@ -1008,8 +1008,8 @@
       (setq here-point (point))
       (insert
        (concat "o!\"  */\n"
-        "\n"
-        "  const unsigned int  &*(x)[12];"))
+               "\n"
+               "  const unsigned int  &*(x)[12];"))
       (princ "shu-test-shu-cpp-token-find-spanning-info-token-reverse-3\n" tbuf)
       (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max) here-point))
       (should token-list)
@@ -1028,14 +1028,14 @@
   (let
       ((here-point)
        (token-list)
-        (ret-val)
-        (token-info)
-    (tbuf      (get-buffer-create shu-unit-test-buffer))
-        (token)
-        (token-type)
-        (spoint)
-        (epoint)
-        (error-message))
+       (ret-val)
+       (token-info)
+       (tbuf      (get-buffer-create shu-unit-test-buffer))
+       (token)
+       (token-type)
+       (spoint)
+       (epoint)
+       (error-message))
     (with-temp-buffer
       (insert
        (concat
@@ -1045,8 +1045,8 @@
       (setq here-point (point))
       (insert
        (concat "new comment\n"
-        "\n"
-        "  const unsigned int  &*(x)[12];"))
+               "\n"
+               "  const unsigned int  &*(x)[12];"))
       (princ "shu-test-shu-cpp-token-find-spanning-info-token-fwd-4\n" tbuf)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max) here-point))
       (should token-list)
@@ -1065,14 +1065,14 @@
   (let
       ((here-point)
        (token-list)
-        (ret-val)
-        (token-info)
-    (tbuf      (get-buffer-create shu-unit-test-buffer))
-        (token)
-        (token-type)
-        (spoint)
-        (epoint)
-        (error-message))
+       (ret-val)
+       (token-info)
+       (tbuf      (get-buffer-create shu-unit-test-buffer))
+       (token)
+       (token-type)
+       (spoint)
+       (epoint)
+       (error-message))
     (with-temp-buffer
       (insert
        (concat
@@ -1082,8 +1082,8 @@
       (setq here-point (point))
       (insert
        (concat "new comment\n"
-        "\n"
-        "  const unsigned int  &*(x)[12];"))
+               "\n"
+               "  const unsigned int  &*(x)[12];"))
       (princ "shu-test-shu-cpp-token-find-spanning-info-token-reverse-4\n" tbuf)
       (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max) here-point))
       (should token-list)
@@ -1102,14 +1102,14 @@
   (let
       ((here-point)
        (token-list)
-        (ret-val)
-        (token-info)
-    (tbuf      (get-buffer-create shu-unit-test-buffer))
-        (token)
-        (token-type)
-        (spoint)
-        (epoint)
-        (error-message))
+       (ret-val)
+       (token-info)
+       (tbuf      (get-buffer-create shu-unit-test-buffer))
+       (token)
+       (token-type)
+       (spoint)
+       (epoint)
+       (error-message))
     (with-temp-buffer
       (insert
        (concat
@@ -1119,8 +1119,8 @@
       (setq here-point (point))
       (insert
        (concat "  d_count;\n"
-        "\n"
-        "  const unsigned int  &*(x)[12];"))
+               "\n"
+               "  const unsigned int  &*(x)[12];"))
       (princ "shu-test-shu-cpp-token-find-spanning-info-token-fwd-5\n" tbuf)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max) here-point))
       (should token-list)
@@ -1137,14 +1137,14 @@
   (let
       ((here-point)
        (token-list)
-        (ret-val)
-        (token-info)
-    (tbuf      (get-buffer-create shu-unit-test-buffer))
-        (token)
-        (token-type)
-        (spoint)
-        (epoint)
-        (error-message))
+       (ret-val)
+       (token-info)
+       (tbuf      (get-buffer-create shu-unit-test-buffer))
+       (token)
+       (token-type)
+       (spoint)
+       (epoint)
+       (error-message))
     (with-temp-buffer
       (insert
        (concat
@@ -1154,8 +1154,8 @@
       (setq here-point (point))
       (insert
        (concat "  d_count;\n"
-        "\n"
-        "  const unsigned int  &*(x)[12];"))
+               "\n"
+               "  const unsigned int  &*(x)[12];"))
       (princ "shu-test-shu-cpp-token-find-spanning-info-token-reverse-5\n" tbuf)
       (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max) here-point))
       (should token-list)
@@ -1494,7 +1494,7 @@
       (shu-cpp-tokenize-show-list token-list)
       (should (shu-cpp-is-reverse-token-list-balanced token-list "(" ")"))
       (should (shu-cpp-is-reverse-token-list-balanced token-list "<" ">")))
-   ))
+    ))
 (ert-deftest shu-test-shu-cpp-is-reverse-token-list-balanced-4 ()
   "Test SHU-CPP-IS-REVERSE-TOKEN-LIST-BALANCED with balanced () and <>."
   (let ((token-list))
@@ -1505,7 +1505,7 @@
       (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
       (should (shu-cpp-is-reverse-token-list-balanced token-list "(" ")"))
       (should (shu-cpp-is-reverse-token-list-balanced token-list "<" ">")))
-   ))
+    ))
 (ert-deftest shu-test-shu-cpp-is-reverse-token-list-balanced-5 ()
   "Test SHU-CPP-IS-REVERSE-TOKEN-LIST-BALANCED with balanced () and <>."
   (let ((token-list))
@@ -1516,7 +1516,7 @@
       (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
       (should (shu-cpp-is-reverse-token-list-balanced token-list "(" ")"))
       (should (shu-cpp-is-reverse-token-list-balanced token-list "<" ">")))
-   ))
+    ))
 (ert-deftest shu-test-shu-cpp-is-reverse-token-list-balanced-6 ()
   "Test SHU-CPP-IS-REVERSE-TOKEN-LIST-BALANCED with unbalanced ()."
   (let ((token-list))
@@ -1527,7 +1527,7 @@
       (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
       (should (not (shu-cpp-is-reverse-token-list-balanced token-list "(" ")")))
       (should (shu-cpp-is-reverse-token-list-balanced token-list "<" ">")))
-   ))
+    ))
 (ert-deftest shu-test-shu-cpp-is-reverse-token-list-balanced-7 ()
   "Test SHU-CPP-IS-REVERSE-TOKEN-LIST-BALANCED with unbalanced ()."
   (let ((token-list))
@@ -1538,7 +1538,7 @@
       (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
       (should (not (shu-cpp-is-reverse-token-list-balanced token-list "(" ")")))
       (should (shu-cpp-is-reverse-token-list-balanced token-list "<" ">")))
-   ))
+    ))
 
 
 
@@ -1645,11 +1645,11 @@ me anything.  It is printed on test failure to identify the test that failed."
   (interactive)
   (let (
         (count 0)
-       (gb      (get-buffer-create shu-unit-test-buffer))
-       (ss "\\s-+\\([0-9]+\\)\\s-+:\\s-+\\([0-9]+\\)\\s-+=\\s-+\\[\\([][!%&()*+,-./:<=>?^|~;{}]+\\)\\](1)")
-       (spoint)
-       (epoint)
-       (op-string)
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (ss "\\s-+\\([0-9]+\\)\\s-+:\\s-+\\([0-9]+\\)\\s-+=\\s-+\\[\\([][!%&()*+,-./:<=>?^|~;{}]+\\)\\](1)")
+        (spoint)
+        (epoint)
+        (op-string)
         )
     (with-temp-buffer
       (insert
@@ -1977,6 +1977,50 @@ me anything.  It is printed on test failure to identify the test that failed."
     (should ttype3)
     (should (numberp ttype3))
     (should (= ttype3 shu-cpp-token-type-uq))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-token-next-non-comment-3
+;;
+(ert-deftest shu-test-shu-cpp-token-next-non-comment-3 ()
+  (let ((token-list)
+        (token-info)
+        (tlist)
+        (count 0)
+        (ncount 0)
+        (comment-count 0)
+        (limit)
+        (this)
+        (data
+         (concat
+          "    std:string   /* Hi! */  x;\n"
+          "    x =\"This is a fine kettle of fish is it not?\" // Again\n"
+          "    int  j; /* again */\n"
+          "    j++;\n")))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max))))
+    (setq tlist token-list)
+    (while tlist
+      (setq count (1+ count))
+      (setq token-info (car tlist))
+      (when (shu-cpp-token-is-comment token-info)
+        (setq comment-count (1+ comment-count)))
+      (setq this (shu-cpp-token-string-token-info token-info))
+      (setq tlist (cdr tlist)))
+    (should (> comment-count 0))
+    (setq limit (- count comment-count))
+    (setq tlist token-list)
+    (while tlist
+      (setq ncount (1+ ncount))
+      (should (not (> ncount limit)))
+      (setq token-info (car tlist))
+      (should (not (shu-cpp-token-is-comment token-info)))
+      (setq this (shu-cpp-token-string-token-info token-info))
+      (setq tlist (shu-cpp-token-next-non-comment tlist)))
+    (should (= limit ncount))
     ))
 
 

@@ -158,6 +158,98 @@
 
 
 ;;
+;;  shu-cpp-token-next-non-comment
+;;
+(defun shu-cpp-token-next-non-comment (tlist)
+  "TLIST points to a list of token-info.  Return TLIST pointing to the next
+token-info that does not hold a comment.  If you are scanning through a list
+of tokens, it is not uncommon to want to skip all of the comments.  Use this
+at the bottom of the loop in place of the usual \"setq tlist (cdr tlist))\".
+
+i.e.,
+
+     (while tlist
+        ...
+       (setq tlist (cdr tlist)))
+
+becomes
+
+     (while tlist
+        ...
+       (setq tlist (shu-cpp-token-next-non-comment tlist)))
+
+and you will scan through the liwt without weeing any comments."
+  (let ((token-info)
+        (in-comment t))
+      (setq tlist (cdr tlist))
+    (while (and in-comment tlist)
+      (setq token-info (car tlist))
+      (setq in-comment (shu-cpp-token-is-comment token-info))
+      (when in-comment
+        (setq tlist (cdr tlist))
+        )
+      )
+    tlist
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-token-next-non-comment-3
+;;
+(ert-deftest shu-test-shu-cpp-token-next-non-comment-3 ()
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (token-list)
+        (token-info)
+        (tlist)
+        (count 0)
+        (ncount 0)
+        (comment-count 0)
+        (limit)
+        (this)
+        (data
+         (concat
+          "    std:string   /* Hi! */  x;\n"
+          "    x =\"This is a fine kettle of fish is it not?\" // Again\n"
+          "    int  j; /* again */\n"
+          "    j++;\n"))
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
+      )
+    (setq tlist token-list)
+    (while tlist
+      (setq count (1+ count))
+      (setq token-info (car tlist))
+      (when (shu-cpp-token-is-comment token-info)
+        (setq comment-count (1+ comment-count)))
+      (setq this (shu-cpp-token-string-token-info token-info))
+      (princ (format "%d: %s\n" count this) gb)
+      (setq tlist (cdr tlist))
+      )
+    (princ (format "count: %d, comment-count: %d\n\n" count comment-count) gb)
+    (should (> comment-count 0))
+    (setq limit (- count comment-count))
+    (setq tlist token-list)
+    (while tlist
+      (setq ncount (1+ ncount))
+      (should (not (> ncount limit)))
+      (setq token-info (car tlist))
+      (should (not (shu-cpp-token-is-comment token-info)))
+      (setq this (shu-cpp-token-string-token-info token-info))
+      (princ (format "%d: %s\n" ncount this) gb)
+      (setq tlist (shu-cpp-token-next-non-comment tlist))
+      )
+    (should (= limit ncount))
+
+    ))
+
+
+
+
+;;
 ;;  sub-zzz
 ;;
 (defun sub-zzz (tlist)

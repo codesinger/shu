@@ -194,8 +194,8 @@ template parameter \"int\"")
 ;;
 (defsubst shu-cpp-token-extract-type (token-info)
   "Return the token type from an instance of token-info."
-    (caar token-info)
-    )
+  (caar token-info)
+  )
 
 
 ;;
@@ -229,9 +229,12 @@ becomes
 
      (while tlist
         ...
-       (setq tlist (shu-cpp-token-next-non-comment tlist)))"
+       (setq tlist (shu-cpp-token-next-non-comment tlist)))
+
+and you will scan through the liwt without seeing any comments."
   (let ((token-info)
         (in-comment t))
+    (setq tlist (cdr tlist))
     (while (and in-comment tlist)
       (setq token-info (car tlist))
       (setq in-comment (shu-cpp-token-is-comment token-info))
@@ -1139,6 +1142,32 @@ of reverse parsed code have the same suffix."
                             (when token
                               (setq tok token))
                             (princ (format "%d : %d = [%s](%d (%s))%s\n" spoint epoint tok token-type token-type-name emsg) gb)))))))))))))
+    ))
+
+
+
+;;
+;;  shu-cpp-token-string-token-info
+;;
+(defun shu-cpp-token-string-token-info (token-info)
+  "Return a string that represents the contentw of the toke-info."
+  (interactive)
+  (let ((token)
+        (token-type)
+        (token-type-name)
+        (spoint)
+        (epoint)
+        (error-message)
+        (emsg "")
+        (name))
+    (if (not token-info)
+        (setq name "**none**")
+      (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
+      (setq token-type-name (shu-cpp-token-token-type-name token-type))
+      (when error-message
+        (setq emsg (concat " (" error-message ")")))
+      (setq name (format "(%s) \"%s\" %d  %s" token-type-name token spoint emsg)))
+    name
     ))
 
 
