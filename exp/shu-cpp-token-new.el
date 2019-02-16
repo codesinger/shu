@@ -55,6 +55,7 @@ i.e.,
 
 becomes
 
+     (setq tlist (shu-cpp-token-first-non-comment tlist))
      (while tlist
         ...
        (setq tlist (shu-cpp-token-first-non-comment tlist)))
@@ -66,6 +67,7 @@ and you will scan through the liwt without seeing any comments."
         (in-comment)
         )
     (when tlist
+      (princ "\n\n1:\n" gb) (princ tlist gb) (princ "/n/n" gb)
       (setq token-info (car tlist))
       (princ (concat (shu-cpp-token-string-token-info token-info) "\n") gb)
       (setq in-comment (shu-cpp-token-is-comment token-info))
@@ -78,6 +80,7 @@ and you will scan through the liwt without seeing any comments."
         (setq in-comment (shu-cpp-token-is-comment token-info))
         )
       )
+      (princ "\n\n2:\n" gb) (princ tlist gb) (princ "/n/n" gb)
     tlist
     ))
 
@@ -89,6 +92,7 @@ and you will scan through the liwt without seeing any comments."
 ;;
 (ert-deftest shu-test-shu-cpp-token-first-non-comment-1 ()
   (let (
+        (gb (get-buffer-create "**boo**"))
         (token-list)
         (token-info)
         (token-type)
@@ -114,16 +118,19 @@ and you will scan through the liwt without seeing any comments."
     (while (and tlist (not first-non-comment-token-info))
       (setq count (1+ count))
       (setq token-info (car tlist))
-      (when (shu-cpp-token-is-comment token-info)
+      (when (not (shu-cpp-token-is-comment token-info))
         (setq first-non-comment-token-info token-info)
+      (princ (concat "XX: " (shu-cpp-token-string-token-info first-non-comment-token-info) "\n") gb)
         )
       (setq tlist (cdr tlist))
       )
     (setq tlist token-list)
     (setq tlist (shu-cpp-token-first-non-comment tlist))
+    (princ "\n\n3:\n" gb) (princ tlist gb) (princ "/n/n" gb)
     (should tlist)
     (should (consp tlist))
     (setq token-info (car tlist))
+      (princ (concat "ZZ: " (shu-cpp-token-string-token-info token-info) "\n") gb)
     (should (equal first-non-comment-token-info token-info))
     ))
 

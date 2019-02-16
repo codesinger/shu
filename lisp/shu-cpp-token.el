@@ -235,15 +235,56 @@ and you will scan through the liwt without seeing any comments."
   (let ((token-info)
         (in-comment t))
     (when tlist
-    (setq tlist (cdr tlist))
-    (while (and in-comment tlist)
-      (setq token-info (car tlist))
-      (setq in-comment (shu-cpp-token-is-comment token-info))
-      (when in-comment
-        (setq tlist (cdr tlist))
+      (setq tlist (cdr tlist))
+      (while (and in-comment tlist)
+        (setq token-info (car tlist))
+        (setq in-comment (shu-cpp-token-is-comment token-info))
+        (when in-comment
+          (setq tlist (cdr tlist))
+          )
         )
       )
-    )
+    tlist
+    ))
+
+
+
+;;
+;;  shu-cpp-token-first-non-comment
+;;
+(defun shu-cpp-token-first-non-comment (tlist)
+  "TLIST points to a list of token-info.  Return TLIST pointing to the next
+token-info that does not hold a comment.  If you are scanning through a list
+of tokens, it is not uncommon to want to skip all of the comments.  Use this
+at the bottom of the loop in place of the usual \"setq tlist (cdr tlist))\".
+
+i.e.,
+
+     (while tlist
+        ...
+       (setq tlist (cdr tlist)))
+
+becomes
+
+     (setq tlist (shu-cpp-token-first-non-comment tlist))
+     (while tlist
+        ...
+       (setq tlist (shu-cpp-token-first-non-comment tlist)))
+
+and you will scan through the liwt without seeing any comments."
+  (let (
+        (token-info)
+        (in-comment)
+        )
+    (when tlist
+      (setq token-info (car tlist))
+      (setq in-comment (shu-cpp-token-is-comment token-info))
+      (while (and in-comment tlist)
+        (setq tlist (cdr tlist))
+        (setq token-info (car tlist))
+        (setq in-comment (shu-cpp-token-is-comment token-info))
+        )
+      )
     tlist
     ))
 

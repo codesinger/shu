@@ -2023,4 +2023,50 @@ me anything.  It is printed on test failure to identify the test that failed."
     ))
 
 
+
+
+;;
+;;  shu-test-shu-cpp-token-first-non-comment-1
+;;
+(ert-deftest shu-test-shu-cpp-token-first-non-comment-1 ()
+  (let (
+        (token-list)
+        (token-info)
+        (token-type)
+        (tlist)
+        (count 0)
+        (ncount 0)
+        (comment-count 0)
+        (limit)
+        (this)
+        (first-non-comment-token-info)
+        (data
+         (concat
+          "    // This is a comment\n"
+          "  /* and yet another comment */\n"
+          "    x =\"This is a fine kettle of fish is it not?\" // Again\n"
+          "    int  j; /* again */\n"
+          "    j++;\n")))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      )
+    (setq tlist token-list)
+    (while (and tlist (not first-non-comment-token-info))
+      (setq count (1+ count))
+      (setq token-info (car tlist))
+      (when (not (shu-cpp-token-is-comment token-info))
+        (setq first-non-comment-token-info token-info)
+        )
+      (setq tlist (cdr tlist))
+      )
+    (setq tlist token-list)
+    (setq tlist (shu-cpp-token-first-non-comment tlist))
+    (should tlist)
+    (should (consp tlist))
+    (setq token-info (car tlist))
+    (should (equal first-non-comment-token-info token-info))
+    ))
+
+
 ;;; shu-cpp-token.t.el ends here
