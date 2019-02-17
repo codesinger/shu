@@ -120,7 +120,7 @@
 
 (defconst shu-cpp-operators-one
   (regexp-opt (list
-               "(" ")" "[" "]" "." "+" "-" "!" "~" "*" "&" "*"
+               "(" ")" "[" "]" "." "+" "-" "!" "~" "*" "&" "*" "#"
                "/" "%" "<" ">" "&" "^" "|" "?" ":" "=" "," ";" "{" "}") nil )
   "Define the set of one character operators.  Note that we include ; as
 an operator, even though, strictly speaking, it is not an operator.")
