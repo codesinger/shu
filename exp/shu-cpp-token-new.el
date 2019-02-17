@@ -56,7 +56,7 @@ before and after."
         (ntoken-info)
         (olist)
         (plist)
-        (pad "      ")
+        (pad "        ")
         (count)
         (limit 4)
         )
@@ -111,6 +111,77 @@ before and after."
 
 
 
+
+;;
+;;  kkk
+;;
+(defun kkk (start end)
+  "For each unquoted token from a reverse scan, show the four tokens immediately
+before and after."
+  (interactive "r")
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (token-list)
+        (tlist)
+        (token-info)
+        (token-type)
+        (last-token-info)
+        (this)
+        (prev)
+        (nlist)
+        (next)
+        (ntoken-info)
+        (olist)
+        (plist)
+        (pad "        ")
+        (count)
+        (limit 4)
+        )
+    (setq debug-on-error t)
+    (setq token-list (shu-cpp-reverse-tokenize-region-for-command start end))
+    (princ "tokenized\n\n" gb)
+    (setq tlist token-list)
+    (setq tlist (shu-cpp-token-first-non-comment tlist))
+    (while tlist
+      (setq token-info (car tlist))
+      (push token-info olist)
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (when (= token-type shu-cpp-token-type-uq)
+        (setq this (shu-cpp-token-string-token-info token-info))
+        (princ "\n\n" gb)
+        ;;
+        ;; The tokens in front are the next in the list
+        ;; but in reverse order
+        (setq nlist (shu-cpp-token-next-non-comment tlist))
+        (setq count 0)
+        (while (and nlist (< count limit))
+          (setq count (1+ count))
+          (setq ntoken-info (car nlist))
+          (setq prev (shu-cpp-token-string-token-info ntoken-info))
+          (princ (concat prev "\n") gb)
+          (setq nlist (shu-cpp-token-next-non-comment nlist))
+          )
+        (princ (concat pad this "\n") gb)
+        ;;
+        ;; The tokens following are the first on olist
+        (setq nlist (cdr olist))
+        (setq count 0)
+        (while (and nlist (< count limit))
+          (setq count (1+ count))
+          (setq ntoken-info (car nlist))
+          (setq prev (shu-cpp-token-string-token-info ntoken-info))
+          (princ (concat prev "\n") gb)
+          (setq nlist (cdr nlist))
+          )
+        )
+      (setq last-token-info token-info)
+      (setq tlist (shu-cpp-token-next-non-comment tlist))
+      )
+    ))
+
+
+
+
 ;;
 ;;  www
 ;;
@@ -133,7 +204,7 @@ before."
         (token)
         (olist)
         (plist)
-        (pad "      ")
+        (pad "        ")
         (count)
         (limit 6)
         )
@@ -309,6 +380,59 @@ bottom of the loop that we invoke shu-cpp-token-next-non-comment."
       (princ (format "%d: %s\n" count this) gb)
       (setq tlist (shu-cpp-token-next-non-comment tlist))
       )
+    ))
+
+
+
+;;
+;;  yyy
+;;
+(defun yyy (start end)
+  "Loon for using namespace xxx"
+  (interactive "r")
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (token-list)
+        (tlist)
+        (token)
+        (token-info)
+        (token-type)
+        (nlist)
+        (nsname)
+        (nslist)
+        )
+    (setq debug-on-error t)
+    (setq token-list (shu-cpp-reverse-tokenize-region-for-command start end))
+    (princ "tokenized\n\n" gb)
+    (setq tlist token-list)
+    (setq tlist (shu-cpp-token-first-non-comment tlist))
+    (while tlist
+      (setq token-info (car tlist))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (when (= token-type shu-cpp-token-type-uq)
+        (setq token (shu-cpp-token-extract-token token-info))
+        (if (not (string= token "namespace"))
+            (setq nsname token)
+          (setq nlist (shu-cpp-token-next-non-comment tlist))
+          (when nlist
+            (setq token-info (car nlist))
+            (setq token-type (shu-cpp-token-extract-type token-info))
+            (setq token (shu-cpp-token-extract-token token-info))
+            (when (and (= token-type shu-cpp-token-type-uq)
+                       (string= token "using"))
+              (when nsname
+                (push nsname nslist)
+                (setq nsname nil)
+                )
+              )
+            )
+          )
+        ;;      (setq this (shu-cpp-token-string-token-info token-info))
+
+        )
+        (setq tlist (shu-cpp-token-next-non-comment tlist))
+      )
+    (princ nslist gb)
     ))
 
 

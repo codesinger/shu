@@ -36,3 +36,38 @@ starts a pattern and then seeing if that has a pattern that matches it.
 
 So you need an alist of things.  The key is a category, such as unquoted token, ";",
 etc.  The value is a list of all of the patterns that start with that thing.
+
+For finding a set of known class nsmes.
+
+  1. Find an unquoted token
+
+  2. See if it is one of the names we are looking for
+     - If not, skip it
+
+  3. If it is a sought after name, perhaps we can
+     then use patterns to see if it is
+     something we will consider to be a class name
+
+Possible patterns to exclude a potential class name
+
+  1. Is a C++ key word.  Be careful here.  "return" is a key word.  "right" and
+     "setw" are class names.
+
+  2. Does not match syntax of a class name
+
+  3. Followed by "="
+
+  4. Preceded by "->"
+
+  5. Preceded by "."
+
+  6. Preceded by {"#" "include" "<"} or by {"#" "include" "\""}
+
+  7. Followed  by ";"??
+
+
+============================================
+
+- Each time you find an unquoted token that is not "namespace", save it.
+
+- If you find namespace followed by using, you have one
