@@ -28,8 +28,11 @@ Const pointer to object
   5. Unquoted token (namespace)
 
 
-16 Feb 2019
+With the Roseville parser, you always started at the beginning of the string and
+tried to match patterns against it.
 
-WHen walking through a reerse list, the things in front of the token are the things
-following it in the list and the things that come after the token are the things
-that precede it in the list.
+In this case you are looking for a thing (semi-colon, unquoted token, etc) that
+starts a pattern and then seeing if that has a pattern that matches it.
+
+So you need an alist of things.  The key is a category, such as unquoted token, ";",
+etc.  The value is a list of all of the patterns that start with that thing.
