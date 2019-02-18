@@ -388,6 +388,41 @@
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
       )
     (princ token-list gb) (princ "\n\n" gb)
+    (let (
+          (tlist token-list)
+          (tinfo)
+          (count 0)
+          (name)
+          )
+      (while tlist
+        (setq count (1+ count))
+        (setq tinfo (car tlist))
+        (setq name (shu-cpp-token-string-token-info tinfo))
+        (princ (format "%d, %s\n" count name) gb)
+        (setq tlist (cdr tlist))
+        )
+
+      )
+    (let (
+          (mlist)
+          (match-info)
+           (op-code)
+           (match-eval-func)
+           (match-ret-ind)
+           (match-token-type)
+           (match-token-value)
+           (count 0)
+          )
+      (setq mlist (car match-lists))
+      (while mlist
+        (setq count (1+ count))
+        (setq match-info (car mlist))
+        (shu-cpp-match-extract-info match-info op-code match-eval-func
+                                    match-ret-ind match-token-type match-token-value)
+        (princ (format "%d, %s\n" count match-token-value) gb)
+        (setq mlist (cdr mlist))
+        )
+      )
     (setq token-info (shu-cpp-match-tokens match-lists token-list))
     (should token-info)
 
@@ -425,6 +460,7 @@ when matching of a match list succeeds, this is how the return value is
 determined.  if the return value indicator is true in one of the match-info of a
 successful match-list, return the token-info that matched, othertise return t."
   (let (
+        (gb (get-buffer-create "**boo**"))
         (match-list)
         (match-info)
         (outer-done)
@@ -450,8 +486,14 @@ successful match-list, return the token-info that matched, othertise return t."
         (setq token-info (car tlist))
         (shu-cpp-match-extract-info match-info op-code match-eval-func
                                     match-ret-ind match-token-type match-token-value)
-        (if (= op-code shu-cpp-token-match-type-skip)
-            (setq tlist (cdr tlist))
+        (when  (/= op-code shu-cpp-token-match-type-skip)
+          (let (
+                (token)
+                )
+            (setq token (shu-cpp-token-extract-token token-info))
+            (princ (format "token from token-info: %s\n" token) gb)
+            (princ (format "match-token-value: %s\n" match-token-value) gb)
+            )
           (setq did-match (funcall match-eval-func match-info token-info))
           (if (not did-match)
               (setq inner-done t)
@@ -495,11 +537,13 @@ successful match-list, return the token-info that matched, othertise return t."
   "Doc string."
   (interactive)
   (let (
+        (gb (get-buffer-create "**boo**"))
         (match-token-type (shu-cpp-match-extract-type match-info))
         (match-token (shu-cpp-match-extract-token match-info))
         (token-type (shu-cpp-token-extract-type token-info))
         (token (shu-cpp-token-extract-token token-info))
         )
+    (princ (format "shu-cpp-token-match-same: token-type: %d, match-token-type: %d, token: \"%s\", match-token: \"%s\"\n" token-type match-token-type token match-token) gb)
     (and (= token-type match-token-type)
          (string= token match-token))
     ))
