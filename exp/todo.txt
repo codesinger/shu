@@ -71,3 +71,14 @@ Possible patterns to exclude a potential class name
 - Each time you find an unquoted token that is not "namespace", save it.
 
 - If you find namespace followed by using, you have one
+
+
+18 Feb 2019
+
+Things in the pattern list
+
+  1. Op code
+  2. Token type
+  3. Comparison value
+  4. Valuation function
+  5. Return value indicator

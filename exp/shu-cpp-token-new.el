@@ -34,6 +34,128 @@
 
 
 
+;;
+;;  match-list:
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> Next in list
+;;        |
+;;        +-------------> match-info
+;;
+;;
+;;
+;;
+;;  match-info
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> match-ext
+;;        |
+;;        +-------------> op-code
+;;
+;;
+;;
+;;
+;;  match-ext
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> match-type
+;;        |
+;;        +-------------> match-func
+;;
+;;
+;;
+;;
+;;  match-func
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> match-eval-func
+;;        |
+;;        +-------------> match-ret-ind
+;;
+;;
+;;
+;;
+;;  match-type
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> match-token-type
+;;        |
+;;        +-------------> match-token-value
+;;
+;;
+;;
+
+
+
+;;
+;;  shu-cpp-match-extract-info
+;;
+(defmacro shu-cpp-match-extract-info (match-info op-code match-type match-eval-func
+                                      match-ret-ind match-token-type match-token-value)
+  "Extract the information out of a match-info"
+  (let (
+        (tmatch-ext (make-symbol "match-ext"))
+        (tmatch-func (make-symbol "match-func"))
+        (tmatch-type (make-symbol "match-type"))
+        )
+    `(let (
+           (,tmatch-ext)
+           (,tmatch-func)
+           (,tmatch-type)
+           )
+       (setq ,op-code (car ,tmatch-info))
+       (setq ,tmatch-ext (cdr ,tmatch-info))
+       (setq ,tmatch-func (car ,tmatch-ext))
+       (setq ,tmatch-type (cdr ,tmatch-ext))
+       (setq ,match-eval-func (cdr ,tmatch-func))
+       (setq ,match-ret-ind (car ,tmatch-func))
+       (setq ,match-token-type (cdr ,tmatch-type))
+       (setq ,match-token-value (car ,tmatch-type))
+       )
+    ))
+
+
+
+(defconst shu-cpp-token-match-type-skip-1 1
+  "The match type constant that indicates skip one input cell.")
+
+
+;;
+;;  shu-cpp-token-match-skip-1
+;;
+(defun shu-cpp-token-match-skip-1 (tlist)
+  "Skip one cell in the input list."
+  (if tlist
+      (cdr tlist)
+    tlist)
+  )
+
+
 
 ;;
 ;;  jjj
@@ -388,7 +510,7 @@ bottom of the loop that we invoke shu-cpp-token-next-non-comment."
 ;;  yyy
 ;;
 (defun yyy (start end)
-  "Loon for using namespace xxx"
+  "Look for using namespace xxx"
   (interactive "r")
   (let (
         (gb (get-buffer-create "**boo**"))
@@ -435,6 +557,52 @@ bottom of the loop that we invoke shu-cpp-token-next-non-comment."
     (princ nslist gb)
     ))
 
+
+
+
+;;
+;;  mmm
+;;
+(defun mmm (start end)
+  "Look for using namespace xxx"
+  (interactive "r")
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (token-list)
+        (tlist)
+        (olist)
+        (token)
+        (token-info)
+        (token-type)
+        (nlist)
+        (nsname)
+        (nslist)
+        )
+    (setq debug-on-error t)
+    (setq token-list (shu-cpp-reverse-tokenize-region-for-command start end))
+    (princ "tokenized\n\n" gb)
+    (setq tlist token-list)
+    (setq tlist (shu-cpp-token-first-non-comment tlist))
+    (while tlist
+      (setq token-info (car tlist))
+;;      (token-info olist)
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (when (= token-type shu-cpp-token-type-uq)
+        (setq token (shu-cpp-token-extract-token token-info))
+        (when (string= token "using")
+          (setq nlist olist)
+          (when nlist
+            (setq nlist (cdr nlist))
+            (when nlist
+              (setq ntoken-info (car nlist))
+              (setq token-type
+              )
+            )
+          )
+        )
+        )
+      )
+    ))
 
 
 
