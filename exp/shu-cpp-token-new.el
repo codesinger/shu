@@ -191,9 +191,11 @@
   (interactive)
   (let (
         (match-ext)
+        (match-type)
         )
     (setq match-ext (cdr match-info))
-    (cadr match-ext)
+    (setq match-type (cdr match-ext))
+    (cdr match-type)
     ))
 
 
@@ -227,8 +229,6 @@
     (should (= op-code xop-code))
     (should match-eval-func)
     (should (functionp match-eval-func))
-    (princ "match-eval-func: " gb) (princ match-eval-func gb) (princ "\n" gb)
-    (princ "xmatch-eval-func: " gb) (princ xmatch-eval-func gb) (princ "\n" gb)
     (should (equal match-eval-func xmatch-eval-func))
     (should (not xmatch-ret-ind))
     (should xmatch-token-type)
@@ -249,7 +249,7 @@
         (data
          (cons shu-cpp-token-match-type-same
                (cons
-                (cons 'shu-cpp-token-match-same nil)
+                (cons nil 'shu-cpp-token-match-same)
                 (cons shu-cpp-token-type-uq "using")
                 )
                )
@@ -262,8 +262,8 @@
     (princ "\ncdr data: " gb) (princ (cdr data) gb) (princ "\n" gb)
     (setq actual (shu-cpp-match-extract-token data))
     (should actual)
-;;    (should (stringp actual))
-;;    (should (string= expected actual))
+    (should (stringp actual))
+    (should (string= expected actual))
     ))
 
 
