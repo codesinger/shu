@@ -139,7 +139,7 @@
            (,tmatch-type)
            )
        (setq ,op-code (car ,match-info))
-       (setq ,tmatch-ext (cdr ,tmatch-info))
+       (setq ,tmatch-ext (cdr ,match-info))
        (setq ,tmatch-func (car ,tmatch-ext))
        (setq ,tmatch-type (cdr ,tmatch-ext))
        (setq ,match-eval-func (cdr ,tmatch-func))
@@ -177,6 +177,28 @@
     (cadr match-ext)
     ))
 
+
+;;
+;;  shu-test-shu-cpp-match-extract-token-1
+;;
+(ert-deftest shu-test-shu-cpp-match-extract-token-1 ()
+  (let (
+        (data
+         (cons shu-cpp-token-match-type-same
+               (cons
+                (cons 'shu-cpp-token-match-same nil)
+                (cons shu-cpp-token-type-uq "using")
+                )
+               )
+         )
+        (expected "using")
+        (actual)
+        )
+    (setq actual (shu-cpp-match-extract-token data))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
 
 
 
