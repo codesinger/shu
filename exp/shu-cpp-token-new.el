@@ -138,7 +138,7 @@
            (,tmatch-func)
            (,tmatch-type)
            )
-       (setq ,op-code (car ,tmatch-info))
+       (setq ,op-code (car ,match-info))
        (setq ,tmatch-ext (cdr ,tmatch-info))
        (setq ,tmatch-func (car ,tmatch-ext))
        (setq ,tmatch-type (cdr ,tmatch-ext))
@@ -150,9 +150,43 @@
     ))
 
 
+;;
+;;  shu-cpp-match-extract-type
+;;
+(defsubst shu-cpp-match-extract-type (match-info)
+  "Doc string."
+  (interactive)
+  (let (
+        (match-ext)
+        )
+    (setq match-ext (cdr match-info))
+    (cddr match-ext)
+    ))
+
+
+;;
+;;  shu-cpp-match-extract-token
+;;
+(defsubst shu-cpp-match-extract-token (match-info)
+  "Doc string."
+  (interactive)
+  (let (
+        (match-ext)
+        )
+    (setq match-ext (cdr match-info))
+    (cadr match-ext)
+    ))
+
+
+
 
 (defconst shu-cpp-token-match-type-skip-1 1
   "The match type constant that indicates skip one input cell.")
+
+
+(defconst shu-cpp-token-match-type-same 2
+  "The match type constant that indicates that the token type and token value
+must both match.")
 
 
 ;;
@@ -164,6 +198,23 @@
       (cdr tlist)
     tlist)
   )
+
+
+;;
+;;  shu-cpp-token-match-same
+;;
+(defun shu-cpp-token-match-same (match-info token-info)
+  "Doc string."
+  (interactive)
+  (let (
+        (match-token-type (shu-cpp-match-extract-type match-info))
+        (match-token (shu-cpp-match-extract-token match-info))
+        (token-type (shu-cpp-token-extract-type token-info))
+        (token (shu-cpp-token-extract-token))
+        )
+    (and (= token-type match-token-type)
+         (string= token match-token))
+    ))
 
 
 
