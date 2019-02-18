@@ -324,6 +324,28 @@
     ))
 
 
+
+;;
+;;  shu-test-shu-cpp-token-match-same-rx-1
+;;
+(ert-deftest shu-test-shu-cpp-token-match-same-rx-1 ()
+  (let* (
+         (token "using")
+         (token-type shu-cpp-token-type-uq)
+         (spoint 1022)
+         (epoint 1026)
+         (rx (concat shu-cpp-name "+"))
+         (token-info (shu-cpp-make-token-info token token-type spoint epoint))
+         (data
+          (cons shu-cpp-token-match-type-same
+                (cons
+                 (cons nil 'shu-cpp-token-match-same)
+                 (cons token-type rx))))
+         )
+    (should (shu-cpp-token-match-same-rx data token-info))
+    ))
+
+
 ;;
 ;; The data below has to become a list of lists
 ;; The list below can find
@@ -433,7 +455,7 @@ the token value must staisify the regular expression for a C++ variable name.")
   (let (
         (match-token-type (shu-cpp-match-extract-type match-info))
         (token-type (shu-cpp-token-extract-type token-info))
-        (token (shu-cpp-token-extract-token))
+        (token (shu-cpp-token-extract-token token-info))
         (rx (concat shu-cpp-name "+"))
         )
     (and (= token-type match-token-type)
