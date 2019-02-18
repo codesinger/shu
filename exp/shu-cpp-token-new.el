@@ -177,9 +177,11 @@
   (interactive)
   (let (
         (match-ext)
+        (match-type)
         )
     (setq match-ext (cdr match-info))
-    (cddr match-ext)
+    (setq match-type (cdr match-ext))
+    (car match-type)
     ))
 
 
@@ -244,26 +246,35 @@
 ;;  shu-test-shu-cpp-match-extract-token-1
 ;;
 (ert-deftest shu-test-shu-cpp-match-extract-token-1 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (data
+  (let ((data
          (cons shu-cpp-token-match-type-same
                (cons
                 (cons nil 'shu-cpp-token-match-same)
-                (cons shu-cpp-token-type-uq "using")
-                )
-               )
-         )
+                (cons shu-cpp-token-type-uq "using"))))
         (expected "using")
-        (actual)
-        )
-    (princ "\ndata: " gb) (princ data gb) (princ "\n" gb)
-    (princ "\ncar data: " gb) (princ (car data) gb) (princ "\n" gb)
-    (princ "\ncdr data: " gb) (princ (cdr data) gb) (princ "\n" gb)
+        (actual))
     (setq actual (shu-cpp-match-extract-token data))
     (should actual)
     (should (stringp actual))
     (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-match-extract-type-1
+;;
+(ert-deftest shu-test-shu-cpp-match-extract-type-1 ()
+  (let ((data
+         (cons shu-cpp-token-match-type-same
+               (cons
+                (cons nil 'shu-cpp-token-match-same)
+                (cons shu-cpp-token-type-uq "using"))))
+        (expected shu-cpp-token-type-uq)
+        (actual))
+    (setq actual (shu-cpp-match-extract-type data))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
     ))
 
 
@@ -722,6 +733,7 @@ bottom of the loop that we invoke shu-cpp-token-next-non-comment."
         (olist)
         (token)
         (token-info)
+        (ntoken-info)
         (token-type)
         (nlist)
         (nsname)
@@ -744,11 +756,10 @@ bottom of the loop that we invoke shu-cpp-token-next-non-comment."
             (setq nlist (cdr nlist))
             (when nlist
               (setq ntoken-info (car nlist))
-              (setq token-type
-              )
+              (setq token-type (shu-cpp-token-extract-type ntoken-info))
+        )
             )
           )
-        )
         )
       )
     ))
