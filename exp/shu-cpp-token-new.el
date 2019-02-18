@@ -406,6 +406,69 @@ must both match.")
 the token value must staisify the regular expression for a C++ variable name.")
 
 
+
+;;
+;;  shu-cpp-match-tokens
+;;
+(defun shu-cpp-match-tokens (match-lists token-list)
+  "match-lists is a list of match lists.  token-list is a list of tokens.  for
+each match-list in match-lists, try to match every element of the match list to
+the token list.  if a match fails or if you rach the end of the token list
+before reaching the end of the match list, move to the next match list and try
+again.  if all elements of a match list match the tokens in the token list, stop
+the matching process and return non-nil.
+
+when matching of a match list succeeds, this is how the return value is
+determined.  if the return value indicator is true in one of the match-info of a
+successful match-list, return the token-info that matched, othertise return t."
+  (let (
+        (match-list)
+        (match-info)
+        (outer-done)
+        (inner-done)
+        (did-match)
+        (mlist)
+        (tlist)
+        (token-info)
+        (return-value)
+        (op-code)
+        (match-eval-func)
+        (match-ret-ind)
+        (match-token-type)
+        (match-token-value)
+        )
+    (while (and match-lists (not outer-done))
+      (setq mlist (car match-lists))
+      (setq tlist token-list)
+      (setq inner-done nil)
+      (setq return-value nil)
+      (while (and tlist mlist (not inner-done))
+        (setq match-info (car mlist))
+        (setq token-info (car tlist))
+        (shu-cpp-match-extract-info match-info op-code match-eval-func
+                                 match-ret-ind match-token-type match-token-value)
+        (setq did-match (funcall match-eval-func match-info token-info))
+        (if (not did-match)
+            (setq inner-done t)
+          (when match-ret-ind
+            (setq return-value token-info)
+            )
+          )
+        (setq mlist (cdr mlist))
+        (setq tlist (cdr tlist))
+        )
+      (when (not mlist)
+        (setq outer-done t)
+        (when (not return-value)
+          (setq return-value t)
+          )
+        )
+      (setq match-lists (cdr match-lists))
+      )
+    return-value
+    ))
+
+
 ;;
 ;;  shu-cpp-token-match-skip
 ;;
