@@ -341,12 +341,13 @@
 ;; which is a list
 
 ;;
-;;  shu-test-shu-match-patterns
+;;  shu-test-shu-cpp-match-tokens
 ;;
-(ert-deftest shu-test-shu-match-patterns ()
+(ert-deftest shu-test-shu-cpp-match-tokens ()
   (let (
         (gb (get-buffer-create "**boo**"))
-        (match-data
+        (token-info)
+        (match-lists
          (list
           (list
            (cons shu-cpp-token-match-type-skip
@@ -387,6 +388,8 @@
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
       )
     (princ token-list gb) (princ "\n\n" gb)
+    (setq token-info (shu-cpp-match-tokens match-lists token-list))
+    (should token-info)
 
     ))
 
@@ -446,16 +449,21 @@ successful match-list, return the token-info that matched, othertise return t."
         (setq match-info (car mlist))
         (setq token-info (car tlist))
         (shu-cpp-match-extract-info match-info op-code match-eval-func
-                                 match-ret-ind match-token-type match-token-value)
-        (setq did-match (funcall match-eval-func match-info token-info))
-        (if (not did-match)
-            (setq inner-done t)
-          (when match-ret-ind
-            (setq return-value token-info)
+                                    match-ret-ind match-token-type match-token-value)
+        (if (= op-code shu-cpp-token-match-type-skip)
+            (setq tlist (cdr tlist))
+          (setq did-match (funcall match-eval-func match-info token-info))
+          (if (not did-match)
+              (setq inner-done t)
+            (when match-ret-ind
+              (setq return-value token-info)
+              )
             )
           )
         (setq mlist (cdr mlist))
-        (setq tlist (cdr tlist))
+        (when tlist
+          (setq tlist (cdr tlist))
+          )
         )
       (when (not mlist)
         (setq outer-done t)
