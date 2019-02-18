@@ -324,28 +324,6 @@
     ))
 
 
-
-;;
-;;  shu-test-shu-cpp-token-match-same-rx-1
-;;
-(ert-deftest shu-test-shu-cpp-token-match-same-rx-1 ()
-  (let* (
-         (token "using")
-         (token-type shu-cpp-token-type-uq)
-         (spoint 1022)
-         (epoint 1026)
-         (rx (concat shu-cpp-name "+"))
-         (token-info (shu-cpp-make-token-info token token-type spoint epoint))
-         (data
-          (cons shu-cpp-token-match-type-same
-                (cons
-                 (cons nil 'shu-cpp-token-match-same)
-                 (cons token-type rx))))
-         )
-    (should (shu-cpp-token-match-same-rx data token-info))
-    ))
-
-
 ;;
 ;; The data below has to become a list of lists
 ;; The list below can find
@@ -367,38 +345,48 @@
 ;;
 (ert-deftest shu-test-shu-match-patterns ()
   (let (
-        (data
+        (gb (get-buffer-create "**boo**"))
+        (match-data
          (list
-         (cons shu-cpp-token-match-type-skip
-               (cons
-                (cons nil 'shu-cpp-token-match-skip)
-                (cons 0 nil)
-                )
-               )
-         (cons shu-cpp-token-match-type-same
-               (cons
-                (cons nil 'shu-cpp-token-match-same)
-                (cons shu-cpp-token-type-uq "using")
-                )
-               )
-         (cons shu-cpp-token-match-type-same
-               (cons
-                (cons nil 'shu-cpp-token-match-same)
-                (cons shu-cpp-token-type-uq "namespace")
-                )
-               )
-         ;; This one has to have ret-ind true and has to have a
-         ;; regular expression that matches a C++ name to see
-         ;; if it is a namespace name.
-         (cons shu-cpp-token-match-type-same
-               (cons
-                (cons nil 'shu-cpp-token-match-same)
-                (cons shu-cpp-token-type-uq "namespace")
-                )
-               )
+          (list
+           (cons shu-cpp-token-match-type-skip
+                 (cons
+                  (cons nil 'shu-cpp-token-match-skip)
+                  (cons 0 nil)
+                  )
+                 )
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons nil 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-uq "using")
+                  )
+                 )
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons nil 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-uq "namespace")
+                  )
+                 )
+           (cons shu-cpp-token-match-type-same-rx
+                 (cons
+                  (cons t 'shu-cpp-token-match-same-rx)
+                  (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))
+                  )
+                 )
+           )
+          )
          )
-         )
+        (data
+         (concat
+          "x using namespace fumble;\n"
+          ))
+        (token-list)
         )
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      )
+    (princ token-list gb) (princ "\n\n" gb)
 
     ))
 
