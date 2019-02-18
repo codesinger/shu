@@ -277,6 +277,62 @@
     (should (= expected actual))
     ))
 
+;;
+;; The data below has to become a list of lists
+;; The list below can find
+;;   - "using"
+;;   - "namespace"
+;;   - namespace name
+;;
+;; We need another that finds
+;;   - "using"
+;;   - "namespace"
+;;   - "::"
+;;   - namespace name
+;;
+;; That gives us a list of length two, each of
+;; which is a list
+
+;;
+;;  shu-test-shu-match-patterns
+;;
+(ert-deftest shu-test-shu-match-patterns ()
+  (let (
+        (data
+         (list
+         (cons shu-cpp-token-match-type-skip
+               (cons
+                (cons nil 'shu-cpp-token-match-skip)
+                (cons 0 nil)
+                )
+               )
+         (cons shu-cpp-token-match-type-same
+               (cons
+                (cons nil 'shu-cpp-token-match-same)
+                (cons shu-cpp-token-type-uq "using")
+                )
+               )
+         (cons shu-cpp-token-match-type-same
+               (cons
+                (cons nil 'shu-cpp-token-match-same)
+                (cons shu-cpp-token-type-uq "namespace")
+                )
+               )
+         ;; This one has to have ret-ind true and has to have a
+         ;; regular expression that matches a C++ name to see
+         ;; if it is a namespace name.
+         (cons shu-cpp-token-match-type-same
+               (cons
+                (cons nil 'shu-cpp-token-match-same)
+                (cons shu-cpp-token-type-uq "namespace")
+                )
+               )
+         )
+         )
+        )
+
+    ))
+
 
 
 (defconst shu-cpp-token-match-type-skip-1 1
@@ -289,9 +345,9 @@ must both match.")
 
 
 ;;
-;;  shu-cpp-token-match-skip-1
+;;  shu-cpp-token-match-skip
 ;;
-(defun shu-cpp-token-match-skip-1 (tlist)
+(defun shu-cpp-token-match-skip (tlist)
   "Skip one cell in the input list."
   (if tlist
       (cdr tlist)
