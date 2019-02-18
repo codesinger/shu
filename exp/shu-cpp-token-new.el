@@ -277,6 +277,31 @@
     (should (= expected actual))
     ))
 
+
+
+
+;;
+;;  shu-test-shu-cpp-token-match-skip
+;;
+(ert-deftest shu-test-shu-cpp-token-match-skip ()
+  (let (
+        (tlist
+         (list
+          "a"
+          "b"))
+        (nlist)
+        (expected "b")
+        (actual)
+        )
+    (setq nlist (shu-cpp-token-match-skip tlist))
+    (should nlist)
+    (should (consp nlist))
+    (setq actual (car nlist))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
 ;;
 ;; The data below has to become a list of lists
 ;; The list below can find
@@ -335,13 +360,18 @@
 
 
 
-(defconst shu-cpp-token-match-type-skip-1 1
+(defconst shu-cpp-token-match-type-skip 1
   "The match type constant that indicates skip one input cell.")
 
 
 (defconst shu-cpp-token-match-type-same 2
   "The match type constant that indicates that the token type and token value
 must both match.")
+
+
+(defconst shu-cpp-token-match-type-same-rx 3
+  "The match type constant that indicates that the token type must match and
+the token value must staisify the regular expression for a C++ variable name.")
 
 
 ;;
@@ -366,11 +396,29 @@ must both match.")
         (match-token (shu-cpp-match-extract-token match-info))
         (token-type (shu-cpp-token-extract-type token-info))
         (token (shu-cpp-token-extract-token))
+        (rx (concat shu-cpp-name "+"))
         )
     (and (= token-type match-token-type)
          (string= token match-token))
     ))
 
+
+;;
+;;  shu-cpp-token-match-same-rx
+;;
+(defun shu-cpp-token-match-same-rx (match-info token-info)
+  "Doc string."
+  (interactive)
+  (let (
+        (match-token-type (shu-cpp-match-extract-type match-info))
+        (token-type (shu-cpp-token-extract-type token-info))
+        (token (shu-cpp-token-extract-token))
+        (rx (concat shu-cpp-name "+"))
+        )
+    (and (= token-type match-token-type)
+         (string-match rx token))
+
+    ))
 
 
 ;;
