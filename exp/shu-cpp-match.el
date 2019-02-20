@@ -26,7 +26,6 @@
 
 ;; Functions to match patterns against list of tokens produced by
 ;; shu-cpp-token.el.
-;; is shown below.
 
 ;;; Code:
 
