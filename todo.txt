@@ -101,3 +101,12 @@ to generate the bame of the include file.
   This means having an inverted alist in which the key is the class name and the
   value is the namespace.  This list only contans class names for namespaces that
   have been named on the "using namespace" directive.
+
+20 Feb 2019 - Have make-c-project convert all of the directory names to relative
+ones.  The actual list of directories stored by the project code has to hold
+avsolute names because you can visit them from anywhere.  But it would make the
+project files more portable if they held relative names.
+
+See the elisp functions locate-dominiating-file and file-relative-name.
+
+See also https://stackoverflow.com/questions/18366839/find-the-relative-path-of-a-file-in-a-project
