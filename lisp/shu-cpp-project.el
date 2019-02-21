@@ -260,13 +260,15 @@ any that contain c or h files.  It then inserts all of the directory names
 into the current file at point."
   (interactive "DRoot?: ")
   (let ((level     1)
-        (dtop      nil)
-        (tlist     nil))
+        (dtop)
+        (tlist)
+        (local-dir))
     (setq shu-cpp-final-list nil)
     (shu-cpp-project-subdirs (expand-file-name proj-root) level)
     (setq shu-cpp-final-list (sort shu-cpp-final-list 'string<))
     (while shu-cpp-final-list
-      (insert (concat (car shu-cpp-final-list) "\n"))
+      (setq local-dir (file-relative-name (car shu-cpp-final-list)))
+      (insert (concat local-dir "\n"))
       (setq shu-cpp-final-list (cdr shu-cpp-final-list)))
     ))
 
@@ -332,6 +334,7 @@ established by either SHU-SETUP-PROJECT-AND-TAGS of SHU-VISIT-PROJECT-AND-TAGS."
 
 
 
+
 ;;
 ;;  shu-internal-set-c-project
 ;;
@@ -348,6 +351,7 @@ appropriate subdirectory."
           (line-diff 0)
           (eol       nil)
           (dir-name  nil)
+          (local-dir (file-name-directory buffer-file-name))
           (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name)))
       (setq shu-cpp-project-list nil)
       (setq shu-cpp-project-file (buffer-file-name))
@@ -356,7 +360,7 @@ appropriate subdirectory."
       (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
         (setq eol (save-excursion (end-of-line) (point)))
         (when (> eol (point))
-          (setq dir-name (buffer-substring (point) eol))
+          (setq dir-name (concat local-dir (buffer-substring (point) eol)))
           (setq shu-cpp-project-list (cons dir-name shu-cpp-project-list)))
         (setq line-diff (forward-line 1)))
       (shu-renew-c-project))
