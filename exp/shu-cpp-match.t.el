@@ -171,9 +171,9 @@
 ;; which is a list
 
 ;;
-;;  shu-test-shu-cpp-match-tokens
+;;  shu-test-shu-cpp-match-tokens-1
 ;;
-(ert-deftest shu-test-shu-cpp-match-tokens ()
+(ert-deftest shu-test-shu-cpp-match-tokens-1 ()
   (let (
         (gb (get-buffer-create "**boo**"))
         (token-info)
@@ -255,6 +255,131 @@
       )
     (setq token-info (shu-cpp-match-tokens match-lists token-list))
     (should token-info)
+
+    ))
+
+
+
+;;
+;; The data below has to become a list of lists
+;; The list below can find
+;;   - "using"
+;;   - "namespace"
+;;   - namespace name
+;;
+;; We need another that finds
+;;   - "using"
+;;   - "namespace"
+;;   - "::"
+;;   - namespace name
+;;
+;; That gives us a list of length two, each of
+;; which is a list
+
+;;
+;;  shu-test-shu-cpp-match-tokens-2
+;;
+(ert-deftest shu-test-shu-cpp-match-tokens-2 ()
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (token-info)
+        (match-lists
+         (list
+          (list
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons nil 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-uq "using")
+                  )
+                 )
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons nil 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-uq "namespace")
+                  )
+                 )
+           (cons shu-cpp-token-match-type-same-rx
+                 (cons
+                  (cons t 'shu-cpp-token-match-same-rx)
+                  (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))
+                  )
+                 )
+           )
+          )
+         )
+        (data
+         (concat
+          "x using namespace fumble;\n"
+          "class blah {};\n"
+          ))
+        (token-list)
+        (olist)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
+      )
+    (princ token-list gb) (princ "\n\n" gb)
+    (let (
+          (tlist token-list)
+          (tinfo)
+          (count 0)
+          (name)
+          )
+      (while tlist
+        (setq count (1+ count))
+        (setq tinfo (car tlist))
+        (push tinfo olist)
+        (setq name (shu-cpp-token-string-token-info tinfo))
+        (princ (format "%d, %s\n" count name) gb)
+        (setq tlist (cdr tlist))
+        )
+      )
+    (let (
+          (mlist)
+          (match-info)
+           (op-code)
+           (match-eval-func)
+           (match-ret-ind)
+           (match-token-type)
+           (match-token-value)
+           (count 0)
+          )
+      (setq mlist (car match-lists))
+      (while mlist
+        (setq count (1+ count))
+        (setq match-info (car mlist))
+        (shu-cpp-match-extract-info match-info op-code match-eval-func
+                                    match-ret-ind match-token-type match-token-value)
+        (princ (format "%d, %s\n" count match-token-value) gb)
+        (setq mlist (cdr mlist))
+        )
+      )
+    (let (
+          (tlist olist)
+          (tinfo)
+          (count 0)
+          (name)
+          (token)
+          (token-type)
+          )
+      (princ "\n\n" gb)
+      (while tlist
+        (setq count (1+ count))
+        (setq tinfo (car tlist))
+        (push tinfo olist)
+        (setq name (shu-cpp-token-string-token-info tinfo))
+        (princ (format "%d, %s\n" count name) gb)
+        (setq token-type (shu-cpp-token-extract-type tinfo))
+        (setq token (shu-cpp-token-extract-token tinfo))
+        (when (and (= token-type shu-cpp-token-type-uq)
+                   (string= token "using"))
+          (setq token-info (shu-cpp-match-tokens match-lists tlist))
+          (should token-info)
+            )
+        (setq tlist (cdr tlist))
+        )
+      )
 
     ))
 
