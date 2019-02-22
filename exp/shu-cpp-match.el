@@ -141,7 +141,7 @@ the token value must staisify the regular expression for a C++ variable name.")
 ;;  shu-cpp-make-match-info
 ;;
 (defun shu-cpp-make-match-info (match-info op-code match-eval-func
-                                match-ret-ind match-token-type match-token-value)
+                                           match-ret-ind match-token-type match-token-value)
   "Doc string."
   (let (
         (match-type)
@@ -160,7 +160,7 @@ the token value must staisify the regular expression for a C++ variable name.")
 ;;  shu-cpp-match-extract-info
 ;;
 (defmacro shu-cpp-match-extract-info (match-info op-code match-eval-func
-                                      match-ret-ind match-token-type match-token-value)
+                                                 match-ret-ind match-token-type match-token-value)
   "Extract the information out of a match-info"
   (let (
         (tmatch-ext (make-symbol "match-ext"))
@@ -335,8 +335,59 @@ successful match-list, return the token-info that matched, othertise return t."
         )
     (and (= token-type match-token-type)
          (string-match rx token))
-
     ))
+
+
+(defconst shu-cpp-match-namespace-lists
+  (list
+   (list  ;; "using namespace <name>
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "using")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "namespace")))
+    (cons shu-cpp-token-match-type-same-rx
+          (cons
+           (cons t 'shu-cpp-token-match-same-rx)
+           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+")))))
+   (list  ;;  "using namespace ::std"
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "using")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "namespace")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-op "::")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons t 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "std"))))
+   (list  ;;  "using namespace ::bsl"
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "using")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "namespace")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-op "::")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons t 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "bsl")))))
+  "The list of patterns to look for to match a \"using namespace\" directive.")
 
 
 ;;; shu-cpp-match.el ends here
