@@ -274,9 +274,11 @@ successful match-list, return the token-info that matched, othertise return t."
               )
             )
           )
-        (setq mlist (cdr mlist))
-        (when tlist
-          (setq tlist (cdr tlist))
+        (when (not inner-done)
+          (setq mlist (cdr mlist))
+          (when tlist
+            (setq tlist (cdr tlist))
+            )
           )
         )
       (when (not mlist)
@@ -338,7 +340,7 @@ successful match-list, return the token-info that matched, othertise return t."
     ))
 
 
-(defconst shu-cpp-match-namespace-lists
+(defconst shu-cpp-namespace-match-list
   (list
    (list  ;; "using namespace <name>
     (cons shu-cpp-token-match-type-same
