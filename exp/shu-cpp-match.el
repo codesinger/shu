@@ -357,7 +357,7 @@ the list to ge returned unless it is already present in the list."
 
 (defconst shu-cpp-namespace-match-list
   (list
-   (list  ;; "using namespace <name>
+   (list  ;; "using namespace <name>;"
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
@@ -374,7 +374,7 @@ the list to ge returned unless it is already present in the list."
           (cons
            (cons nil 'shu-cpp-token-match-same)
            (cons shu-cpp-token-type-op ";"))))
-   (list  ;;  "using namespace ::std"
+   (list  ;;  "using namespace ::std;"
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
@@ -395,7 +395,7 @@ the list to ge returned unless it is already present in the list."
           (cons
            (cons nil 'shu-cpp-token-match-same)
            (cons shu-cpp-token-type-op ";"))))
-   (list  ;;  "using namespace ::bsl"
+   (list  ;;  "using namespace ::bsl;"
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
@@ -487,6 +487,7 @@ and end point of the entire \"using namespace\" directive."
         (olist)
         (rlist)
         (token-info)
+        (last-token-info)
         (token-type)
         (start-point)
         (token)
@@ -512,6 +513,7 @@ and end point of the entire \"using namespace\" directive."
             (when rlist
               (princ "rlist: " gb) (princ rlist gb) (princ "\n" gb)
               (setq token-info (car rlist))
+              (setq last-token-info (car (cdr rlist)))
               )
             (when token-info
               (let (
@@ -524,6 +526,7 @@ and end point of the entire \"using namespace\" directive."
                     (nspair)
                     )
                 (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
+                (setq epoint (shu-cpp-token-extract-epoint last-token-info))
                 (setq point-pair (cons start-point epoint))
                 (setq nspair (cons token point-pair))
                 (push nspair nslist)
