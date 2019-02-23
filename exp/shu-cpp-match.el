@@ -221,16 +221,17 @@ the token value must staisify the regular expression for a C++ variable name.")
 ;;  shu-cpp-match-tokens
 ;;
 (defun shu-cpp-match-tokens (match-lists token-list &optional skip-comments)
-  "match-lists is a list of match lists.  token-list is a list of tokens.  for
-each match-list in match-lists, try to match every element of the match list to
+  "MATCH-LISTS is a list of match lists.  token-list is a list of tokens.  for
+each match-list in MATCH-LISTS, try to match every element of the match list to
 the token list.  if a match fails or if you rach the end of the token list
 before reaching the end of the match list, move to the next match list and try
 again.  if all elements of a match list match the tokens in the token list, stop
-the matching process and return non-nil.
+the matching process and return a newly constructed list as described in the
+following paragraph.
 
-when matching of a match list succeeds, this is how the return value is
-determined.  if the return value indicator is true in one of the match-info of a
-successful match-list, return the token-info that matched, othertise return t."
+When an individual match succeeds, it is added to the list to be returned.
+When an entire match list is matched, the last token matched ia added to
+the list to ge returned unless it is already present in the list."
   (let (
         (gb (get-buffer-create "**boo**"))
         (match-list)
@@ -240,7 +241,9 @@ successful match-list, return the token-info that matched, othertise return t."
         (did-match)
         (mlist)
         (tlist)
+        (rlist)
         (token-info)
+        (last-token-info)
         (return-value)
         (op-code)
         (match-eval-func)
@@ -257,11 +260,12 @@ successful match-list, return the token-info that matched, othertise return t."
       (setq mlist (car match-lists))
       (setq tlist token-list)
       (setq inner-done nil)
-      (setq return-value nil)
+      (setq rlist nil)
       (while (and tlist mlist (not inner-done))
         (setq mcount (1+ mcount))
         (setq match-info (car mlist))
         (setq token-info (car tlist))
+        (setq last-token-info token-info)
         (shu-cpp-match-extract-info match-info op-code match-eval-func
                                     match-ret-ind match-token-type match-token-value)
         (when  (/= op-code shu-cpp-token-match-type-skip)
@@ -277,7 +281,7 @@ successful match-list, return the token-info that matched, othertise return t."
           (if (not did-match)
               (setq inner-done t)
             (when match-ret-ind
-              (setq return-value token-info)
+              (push token-info rlist)
               )
             )
           )
@@ -288,15 +292,19 @@ successful match-list, return the token-info that matched, othertise return t."
             )
           )
         )
-      (when (not mlist)
+      (if mlist
+          (setq match-lists (cdr match-lists))
         (setq outer-done t)
-        (when (not return-value)
-          (setq return-value t)
+        (if (not rlist)
+            (push token-info rlist)
+          (setq token-info (car rlist))
+          (when (not (eq token-info last-token-info))
+            (push last-token-info rlist)
+            )
           )
         )
-      (setq match-lists (cdr match-lists))
       )
-    return-value
+    (nreverse rlist)
     ))
 
 
@@ -361,7 +369,11 @@ successful match-list, return the token-info that matched, othertise return t."
     (cons shu-cpp-token-match-type-same-rx
           (cons
            (cons t 'shu-cpp-token-match-same-rx)
-           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+")))))
+           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-op ";"))))
    (list  ;;  "using namespace ::std"
     (cons shu-cpp-token-match-type-same
           (cons
@@ -378,7 +390,11 @@ successful match-list, return the token-info that matched, othertise return t."
     (cons shu-cpp-token-match-type-same
           (cons
            (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "std"))))
+           (cons shu-cpp-token-type-uq "std")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-op ";"))))
    (list  ;;  "using namespace ::bsl"
     (cons shu-cpp-token-match-type-same
           (cons
@@ -395,7 +411,11 @@ successful match-list, return the token-info that matched, othertise return t."
     (cons shu-cpp-token-match-type-same
           (cons
            (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "bsl")))))
+           (cons shu-cpp-token-type-uq "bsl")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-op ";")))))
   "The list of patterns to look for to match a \"using namespace\" directive.")
 
 
@@ -459,12 +479,13 @@ successful match-list, return the token-info that matched, othertise return t."
 SHU-CPP-TOKENIZE-REGION-FOR-COMMAND.  This function finds all occurrences of
 \"using namespace\" directives and returns the list of namespace-info.  Each
 entry in the list contains the name of the namespace as well as the start point
-and end point of the entire \"using namespace" directive."
+and end point of the entire \"using namespace\" directive."
   (let (
         (gb (get-buffer-create "**boo**"))
         (count 0)
         (tlist)
         (olist)
+        (rlist)
         (token-info)
         (token-type)
         (start-point)
@@ -487,7 +508,11 @@ and end point of the entire \"using namespace" directive."
           (when (string= token "using")
             (princ "   found using\n" gb)
             (setq start-point (shu-cpp-token-extract-spoint token-info))
-            (setq token-info (shu-cpp-match-tokens shu-cpp-namespace-match-list tlist t))
+            (setq rlist (shu-cpp-match-tokens shu-cpp-namespace-match-list tlist t))
+            (when rlist
+              (princ "rlist: " gb) (princ rlist gb) (princ "\n" gb)
+              (setq token-info (car rlist))
+              )
             (when token-info
               (let (
                     (token)
@@ -525,11 +550,11 @@ and end point of the entire \"using namespace" directive."
          (concat
           "// This is something\n"
           "using namespace std;\n"
-          "  using namespace ::bsl\n"
+          "  using namespace ::bsl;\n"
           "// This is something else\n"
           "    using \n"
           " // Hello\n"
-          " namespace /* there*/  whammo\n"
+          " namespace /* there*/  whammo;\n"
           " // again\n"
           ))
         )

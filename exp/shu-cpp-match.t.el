@@ -357,6 +357,7 @@
       )
     (let (
           (tlist olist)
+          (rlist)
           (tinfo)
           (count 0)
           (name)
@@ -374,8 +375,8 @@
         (setq token (shu-cpp-token-extract-token tinfo))
         (when (and (= token-type shu-cpp-token-type-uq)
                    (string= token "using"))
-          (setq token-info (shu-cpp-match-tokens match-lists tlist))
-          (should token-info)
+          (setq rlist (shu-cpp-match-tokens match-lists tlist))
+          (should rlist)
             )
         (setq tlist (cdr tlist))
         )
