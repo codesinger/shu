@@ -221,9 +221,9 @@ the token value must staisify the regular expression for a C++ variable name.")
 ;;  shu-cpp-match-tokens
 ;;
 (defun shu-cpp-match-tokens (match-lists token-list &optional skip-comments)
-  "MATCH-LISTS is a list of match lists.  token-list is a list of tokens.  for
+  "MATCH-LISTS is a list of match lists.  TOKEN-LIST is a list of tokens.  for
 each match-list in MATCH-LISTS, try to match every element of the match list to
-the token list.  if a match fails or if you rach the end of the token list
+the token list.  if a match fails or if you reach the end of the token list
 before reaching the end of the match list, move to the next match list and try
 again.  if all elements of a match list match the tokens in the token list, stop
 the matching process and return a newly constructed list which consists of
@@ -246,10 +246,11 @@ the matched token was to be added to the list."
         (match-ret-ind)
         (match-token-type)
         (match-token-value)
-        (next-tlist (if skip-comments 'shu-cpp-token-next-non-comment 'car))
+        (next-tlist (if skip-comments 'shu-cpp-token-next-non-comment 'cdr))
         (lcount 0)
         (mcount 0)
         )
+    (princ "\n\nshu-cpp-match-tokens:\n" gb)
     (while (and match-lists (not outer-done))
       (setq lcount (1+ lcount))
       (setq mcount 0)
@@ -267,6 +268,7 @@ the matched token was to be added to the list."
           (let (
                 (token)
                 )
+            (princ "   token-info: " gb) (princ token-info gb) (princ "\n" gb)
             (setq token (shu-cpp-token-extract-token token-info))
             (princ (format "   %d-%d: token from token-info: \"%s\"\n" lcount mcount token) gb)
             (princ (format "   %d-%d: match-token-value: \"%s\"\n" lcount mcount match-token-value) gb)
@@ -417,9 +419,18 @@ the matched token was to be added to the list."
   (let (
         (token-list)
         (ret)
+        (tlist)
+        (count 0)
         )
     (save-excursion
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+    (setq tlist token-list)
+    (while tlist
+      (setq token-info (car tlist))
+      (setq count (1+ count))
+      (princ (format "ZZ %d: " count) gb) (princ token-info gb) (princ "\n" gb)
+      (setq tlist (cdr tlist))
+      )
       (setq ret (shu-cpp-match-find-using token-list))
       )
     ret
@@ -549,7 +560,6 @@ and end point of the entire \"using namespace\" directive."
           " // again\n"
           ))
         )
-    (setq debug-on-error t)
     (with-temp-buffer
       (insert data)
       (setq nslist (ccc))

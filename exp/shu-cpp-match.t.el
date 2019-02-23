@@ -213,6 +213,7 @@
           ))
         (token-list)
         )
+    (setq debug-on-error t)
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
@@ -384,5 +385,94 @@
 
     ))
 
+
+
+
+;;
+;;  shu-test-shu-cpp-match-tokens-3
+;;
+(ert-deftest shu-test-shu-cpp-match-tokens-3 ()
+  (let (
+        (match-lists
+         (list
+          (list  ;; "using namespace <name>;"
+           (cons shu-cpp-token-match-type-skip
+                 (cons
+                  (cons nil 'shu-cpp-token-match-skip)
+                  (cons 0 nil)))
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons nil 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-uq "using")))
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons nil 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-uq "namespace")))
+           (cons shu-cpp-token-match-type-same-rx
+                 (cons
+                  (cons t 'shu-cpp-token-match-same-rx)
+                  (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons t 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-op ";"))))
+          (list  ;;  "using namespace ::std;"
+           (cons shu-cpp-token-match-type-skip
+                 (cons
+                  (cons nil 'shu-cpp-token-match-skip)
+                  (cons 0 nil)))
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons nil 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-uq "using")))
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons nil 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-uq "namespace")))
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons nil 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-op "::")))
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons t 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-uq "std")))
+           (cons shu-cpp-token-match-type-same
+                 (cons
+                  (cons t 'shu-cpp-token-match-same)
+                  (cons shu-cpp-token-type-op ";"))))))
+        (data
+         (concat
+          "  I using namespace ::std;\n"
+          "  // hello\n"))
+        (token-list)
+        (rlist)
+        (tlist)
+        (token-info)
+        (gb (get-buffer-create "**boo**"))
+        (count 0)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      )
+    (setq tlist token-list)
+    (while tlist
+      (setq token-info (car tlist))
+      (setq count (1+ count))
+      (princ (format "XX %d: " count) gb) (princ token-info gb) (princ "\n" gb)
+      (setq tlist (cdr tlist))
+      )
+
+    (setq rlist (shu-cpp-match-tokens match-lists token-list))
+    (should rlist)
+    (should (listp rlist))
+    (should (= 2 (length rlist)))
+    (setq token-info (car rlist))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token)
+    (should (stringp token))
+    (should (string= "std" token))
+    ))
 
 ;;; shu-cpp-match.t.el ends here
