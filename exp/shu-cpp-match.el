@@ -226,12 +226,9 @@ each match-list in MATCH-LISTS, try to match every element of the match list to
 the token list.  if a match fails or if you rach the end of the token list
 before reaching the end of the match list, move to the next match list and try
 again.  if all elements of a match list match the tokens in the token list, stop
-the matching process and return a newly constructed list as described in the
-following paragraph.
-
-When an individual match succeeds, it is added to the list to be returned.
-When an entire match list is matched, the last token matched ia added to
-the list to ge returned unless it is already present in the list."
+the matching process and return a newly constructed list which consists of
+matched tokens whose corresponding entry in the match list indicated that
+the matched token was to be added to the list."
   (let (
         (gb (get-buffer-create "**boo**"))
         (match-list)
@@ -243,7 +240,6 @@ the list to ge returned unless it is already present in the list."
         (tlist)
         (rlist)
         (token-info)
-        (last-token-info)
         (return-value)
         (op-code)
         (match-eval-func)
@@ -265,7 +261,6 @@ the list to ge returned unless it is already present in the list."
         (setq mcount (1+ mcount))
         (setq match-info (car mlist))
         (setq token-info (car tlist))
-        (setq last-token-info token-info)
         (shu-cpp-match-extract-info match-info op-code match-eval-func
                                     match-ret-ind match-token-type match-token-value)
         (when  (/= op-code shu-cpp-token-match-type-skip)
@@ -295,13 +290,6 @@ the list to ge returned unless it is already present in the list."
       (if mlist
           (setq match-lists (cdr match-lists))
         (setq outer-done t)
-        (if (not rlist)
-            (push token-info rlist)
-          (setq token-info (car rlist))
-          (when (not (eq token-info last-token-info))
-            (push last-token-info rlist)
-            )
-          )
         )
       )
     (nreverse rlist)
@@ -372,7 +360,7 @@ the list to ge returned unless it is already present in the list."
            (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
     (cons shu-cpp-token-match-type-same
           (cons
-           (cons nil 'shu-cpp-token-match-same)
+           (cons t 'shu-cpp-token-match-same)
            (cons shu-cpp-token-type-op ";"))))
    (list  ;;  "using namespace ::std;"
     (cons shu-cpp-token-match-type-same
@@ -393,7 +381,7 @@ the list to ge returned unless it is already present in the list."
            (cons shu-cpp-token-type-uq "std")))
     (cons shu-cpp-token-match-type-same
           (cons
-           (cons nil 'shu-cpp-token-match-same)
+           (cons t 'shu-cpp-token-match-same)
            (cons shu-cpp-token-type-op ";"))))
    (list  ;;  "using namespace ::bsl;"
     (cons shu-cpp-token-match-type-same
@@ -414,7 +402,7 @@ the list to ge returned unless it is already present in the list."
            (cons shu-cpp-token-type-uq "bsl")))
     (cons shu-cpp-token-match-type-same
           (cons
-           (cons nil 'shu-cpp-token-match-same)
+           (cons t 'shu-cpp-token-match-same)
            (cons shu-cpp-token-type-op ";")))))
   "The list of patterns to look for to match a \"using namespace\" directive.")
 
