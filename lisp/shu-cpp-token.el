@@ -208,6 +208,23 @@ template parameter \"int\"")
 
 
 ;;
+;;  shu-cpp-token-extract-spoint
+;;
+(defsubst shu-cpp-token-extract-spoint (token-info)
+  "Return the start point from an instance of token-info."
+  (let (
+        (info)
+        (ext-info)
+        (point-pair)
+        )
+    (setq info (car token-info))
+    (setq ext-info (cdr info))
+    (setq point-pair (cdr ext-info))
+    (car point-pair)
+  ))
+
+
+;;
 ;;  shu-cpp-token-is-comment
 ;;
 (defsubst shu-cpp-token-is-comment (token-info)

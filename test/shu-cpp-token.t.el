@@ -1899,6 +1899,24 @@ me anything.  It is printed on test failure to identify the test that failed."
     ))
 
 
+;;
+;;  shu-test-shu-cpp-token-extract-spoint-1
+;;
+(ert-deftest shu-test-shu-cpp-token-extract-spoint-1 ()
+  (let ((token "// Hi there")
+        (ttype shu-cpp-token-type-ct)
+        (spoint 8092)
+        (epoint 9034)
+        (token-info)
+        (xspoint))
+    (setq token-info (shu-cpp-make-token-info token ttype spoint epoint))
+    (setq xspoint (shu-cpp-token-extract-spoint token-info))
+    (should xspoint)
+    (should (numberp xspoint))
+    (should (= spoint xspoint))
+    ))
+
+
 
 ;;
 ;;  shu-test-shu-cpp-token-is-comment-1
