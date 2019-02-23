@@ -220,7 +220,7 @@ the token value must staisify the regular expression for a C++ variable name.")
 ;;
 ;;  shu-cpp-match-tokens
 ;;
-(defun shu-cpp-match-tokens (match-lists token-list)
+(defun shu-cpp-match-tokens (match-lists token-list &optional skip-comments)
   "match-lists is a list of match lists.  token-list is a list of tokens.  for
 each match-list in match-lists, try to match every element of the match list to
 the token list.  if a match fails or if you rach the end of the token list
@@ -247,13 +247,19 @@ successful match-list, return the token-info that matched, othertise return t."
         (match-ret-ind)
         (match-token-type)
         (match-token-value)
+        (next-tlist (if skip-comments 'shu-cpp-token-next-non-comment 'car))
+        (lcount 0)
+        (mcount 0)
         )
     (while (and match-lists (not outer-done))
+      (setq lcount (1+ lcount))
+      (setq mcount 0)
       (setq mlist (car match-lists))
       (setq tlist token-list)
       (setq inner-done nil)
       (setq return-value nil)
       (while (and tlist mlist (not inner-done))
+        (setq mcount (1+ mcount))
         (setq match-info (car mlist))
         (setq token-info (car tlist))
         (shu-cpp-match-extract-info match-info op-code match-eval-func
@@ -263,10 +269,11 @@ successful match-list, return the token-info that matched, othertise return t."
                 (token)
                 )
             (setq token (shu-cpp-token-extract-token token-info))
-            (princ (format "token from token-info: %s\n" token) gb)
-            (princ (format "match-token-value: %s\n" match-token-value) gb)
+            (princ (format "   %d-%d: token from token-info: \"%s\"\n" lcount mcount token) gb)
+            (princ (format "   %d-%d: match-token-value: \"%s\"\n" lcount mcount match-token-value) gb)
             )
           (setq did-match (funcall match-eval-func match-info token-info))
+          (princ "   did-match: " gb) (princ did-match gb) (princ "\n" gb)
           (if (not did-match)
               (setq inner-done t)
             (when match-ret-ind
@@ -277,7 +284,7 @@ successful match-list, return the token-info that matched, othertise return t."
         (when (not inner-done)
           (setq mlist (cdr mlist))
           (when tlist
-            (setq tlist (cdr tlist))
+            (setq tlist (funcall next-tlist tlist))
             )
           )
         )
@@ -390,6 +397,149 @@ successful match-list, return the token-info that matched, othertise return t."
            (cons t 'shu-cpp-token-match-same)
            (cons shu-cpp-token-type-uq "bsl")))))
   "The list of patterns to look for to match a \"using namespace\" directive.")
+
+
+
+;;
+;;  ccc
+;;
+(defun ccc ()
+  "Doc string."
+  (interactive)
+  (let (
+        (token-list)
+        (ret)
+        )
+    (save-excursion
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq ret (shu-cpp-match-find-using token-list))
+      )
+    ret
+    ))
+
+;;
+;; Returns a list of namespace-info
+;;
+;;  TODO: This does *not* include the start and end point of the
+;;        semi-colon that terminates the "using namespace"
+;;        directive.
+;;
+;;
+;;  namespace-info
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> point-pair
+;;        |
+;;        +-------------> namespace name
+;;
+;;
+;;  point-pair:
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> End point
+;;        |
+;;        +-------------> Start point
+;;
+;;
+;;
+;;  shu-cpp-match-find-using
+;;
+(defun shu-cpp-match-find-using (token-list)
+  "TOKEN-LIST is a list of tokens produced by
+SHU-CPP-TOKENIZE-REGION-FOR-COMMAND.  This function finds all occurrences of
+\"using namespace\" directives and returns the list of namespace-info.  Each
+entry in the list contains the name of the namespace as well as the start point
+and end point of the entire \"using namespace" directive."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (count 0)
+        (tlist)
+        (olist)
+        (token-info)
+        (token-type)
+        (start-point)
+        (token)
+        (nsname)
+        (nslist)
+        )
+    (save-excursion
+      (setq tlist (shu-cpp-token-first-non-comment token-list))
+      (while tlist
+        (setq token-info (car tlist))
+        (push token-info olist)
+        (setq count (1+ count))
+        (princ (format "%d: %s\n" count (shu-cpp-token-string-token-info token-info)) gb)
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (princ (format "      token-type: %d\n" token-type) gb)
+        (when (= token-type shu-cpp-token-type-uq)
+          (setq token (shu-cpp-token-extract-token token-info))
+          (princ (format "      token: \"%s\"\n" token) gb)
+          (when (string= token "using")
+            (princ "   found using\n" gb)
+            (setq start-point (shu-cpp-token-extract-spoint token-info))
+            (setq token-info (shu-cpp-match-tokens shu-cpp-namespace-match-list tlist t))
+            (when token-info
+              (let (
+                    (token)
+                    (token-type)
+                    (spoint)
+                    (epoint)
+                    (error-message)
+                    (point-pair)
+                    (nspair)
+                    )
+                (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
+                (setq point-pair (cons start-point epoint))
+                (setq nspair (cons token point-pair))
+                (push nspair nslist)
+                )
+              )
+            )
+          )
+        (setq tlist (shu-cpp-token-next-non-comment tlist))
+        )
+      )
+    nslist
+    ))
+
+
+
+;;
+;;  tccc
+;;
+(ert-deftest tccc ()
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (nslist)
+        (data
+         (concat
+          "// This is something\n"
+          "using namespace std;\n"
+          "  using namespace ::bsl\n"
+          "// This is something else\n"
+          "    using \n"
+          " // Hello\n"
+          " namespace /* there*/  whammo\n"
+          " // again\n"
+          ))
+        )
+    (setq debug-on-error t)
+    (with-temp-buffer
+      (insert data)
+      (setq nslist (ccc))
+      (princ "nslist: " gb) (princ nslist gb) (princ "\n" gb)
+      )
+    ))
 
 
 ;;; shu-cpp-match.el ends here
