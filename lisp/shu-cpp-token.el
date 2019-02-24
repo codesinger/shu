@@ -270,7 +270,7 @@ becomes
         ...
        (setq tlist (shu-cpp-token-next-non-comment tlist)))
 
-and you will scan through the liwt without seeing any comments."
+and you will scan through the list without seeing any comments."
   (let ((token-info)
         (in-comment t))
     (when tlist
@@ -310,7 +310,7 @@ becomes
         ...
        (setq tlist (shu-cpp-token-first-non-comment tlist)))
 
-and you will scan through the liwt without seeing any comments."
+and you will scan through the list without seeing any comments."
   (let (
         (token-info)
         (in-comment)
