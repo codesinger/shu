@@ -363,7 +363,68 @@ the matched token was to be added to the list."
     (cons shu-cpp-token-match-type-same
           (cons
            (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op ";"))))
+           (cons shu-cpp-token-type-op ";")))
+    )
+   (list  ;; "using namespace <name1>::<name2>;"
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "using")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "namespace")))
+    (cons shu-cpp-token-match-type-same-rx
+          (cons
+           (cons t 'shu-cpp-token-match-same-rx)
+           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-op "::")))
+    (cons shu-cpp-token-match-type-same-rx
+          (cons
+           (cons t 'shu-cpp-token-match-same-rx)
+           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons t 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-op ";")))
+    )
+   (list  ;; "using namespace <name1>::<name2>::<name3;"
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "using")))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-uq "namespace")))
+    (cons shu-cpp-token-match-type-same-rx
+          (cons
+           (cons t 'shu-cpp-token-match-same-rx)
+           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-op "::")))
+    (cons shu-cpp-token-match-type-same-rx
+          (cons
+           (cons t 'shu-cpp-token-match-same-rx)
+           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons nil 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-op "::")))
+    (cons shu-cpp-token-match-type-same-rx
+          (cons
+           (cons t 'shu-cpp-token-match-same-rx)
+           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
+    (cons shu-cpp-token-match-type-same
+          (cons
+           (cons t 'shu-cpp-token-match-same)
+           (cons shu-cpp-token-type-op ";")))
+    )
    (list  ;;  "using namespace ::std;"
     (cons shu-cpp-token-match-type-same
           (cons
@@ -405,7 +466,9 @@ the matched token was to be added to the list."
     (cons shu-cpp-token-match-type-same
           (cons
            (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op ";")))))
+           (cons shu-cpp-token-type-op ";")))
+    )
+   )
   "The list of patterns to look for to match a \"using namespace\" directive.")
 
 
@@ -417,7 +480,9 @@ the matched token was to be added to the list."
   "Doc string."
   (interactive)
   (let (
+        (gb (get-buffer-create "**boo**"))
         (token-list)
+        (token-info)
         (ret)
         (tlist)
         (count 0)
@@ -483,21 +548,25 @@ and end point of the entire \"using namespace\" directive."
         (gb (get-buffer-create "**boo**"))
         (count 0)
         (tlist)
-        (olist)
         (rlist)
         (token-info)
         (last-token-info)
         (token-type)
         (start-point)
+        (end-point)
         (token)
         (nsname)
         (nslist)
+        (nsnames)
+        (looking)
+        (prefix)
+        (point-pair)
+        (namespace-info)
         )
     (save-excursion
       (setq tlist (shu-cpp-token-first-non-comment token-list))
       (while tlist
         (setq token-info (car tlist))
-        (push token-info olist)
         (setq count (1+ count))
         (princ (format "%d: %s\n" count (shu-cpp-token-string-token-info token-info)) gb)
         (setq token-type (shu-cpp-token-extract-type token-info))
@@ -510,33 +579,68 @@ and end point of the entire \"using namespace\" directive."
             (setq start-point (shu-cpp-token-extract-spoint token-info))
             (setq rlist (shu-cpp-match-tokens shu-cpp-namespace-match-list tlist t))
             (when rlist
-              (princ "rlist: " gb) (princ rlist gb) (princ "\n" gb)
-              (setq token-info (car rlist))
-              (setq last-token-info (car (cdr rlist)))
-              )
-            (when token-info
-              (let (
-                    (token)
-                    (token-type)
-                    (spoint)
-                    (epoint)
-                    (error-message)
-                    (point-pair)
-                    (nspair)
+              (princ (format "rlist(%d): " (length rlist)) gb) (princ rlist gb) (princ "\n" gb)
+              (setq looking t)
+              (while (and rlist looking)
+                (setq token-info (car rlist))
+                (setq token-type (shu-cpp-token-extract-type token-info))
+                (cond
+                 ((= token-type shu-cpp-token-type-uq)
+                  (setq token (shu-cpp-token-extract-token token-info))
+                  (push token nsnames)
+                  (princ "nsnames[a]: " gb) (princ nsnames gb) (princ "\n" gb)
+                  )
+                 ((= token-type shu-cpp-token-type-op)
+                  (setq token (shu-cpp-token-extract-token token-info))
+                  (when (string= token ";")
+                    (setq end-point (shu-cpp-token-extract-epoint token-info))
+                    (setq looking nil)
                     )
-                (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
-                (setq epoint (shu-cpp-token-extract-epoint last-token-info))
-                (setq point-pair (cons start-point epoint))
-                (setq nspair (cons token point-pair))
-                (push nspair nslist)
+                  )
+                 )
+                (when looking
+                  (setq rlist (cdr rlist))
+                  )
+                )
+              (setq nsnames (nreverse nsnames))
+              (princ "nsnames[b]: " gb) (princ nsnames gb) (princ "\n" gb)
+              (setq prefix "")
+              (setq nsname "")
+              (while nsnames
+                (setq nsname (concat nsname prefix (car nsnames)))
+                (setq prefix "::")
+                (setq nsnames (cdr nsnames))
                 )
               )
+            (setq namespace-info (shu-cpp-make-namespace-info nsname start-point end-point))
+            (push namespace-info nslist)
             )
           )
         (setq tlist (shu-cpp-token-next-non-comment tlist))
         )
       )
     nslist
+    ))
+
+
+;;
+;;  shu-cpp-extract-namespace-name
+;;
+(defsubst shu-cpp-extract-namespace-name (namespace-info)
+  "Return the name of a namespace from an instance of namespace-info."
+  (car namespace-info)
+  )
+
+
+
+;;
+;;  shu-cpp-make-namespace-info
+;;
+(defsubst shu-cpp-make-namespace-info (name start-point end-point)
+  "Create a namespace-info from the NAME, START-POINT, and END-POINT."
+  (let ((point-pair))
+    (setq point-pair (cons start-point end-point))
+    (cons name point-pair)
     ))
 
 
@@ -558,6 +662,8 @@ and end point of the entire \"using namespace\" directive."
           " // Hello\n"
           " namespace /* there*/  whammo;\n"
           " // again\n"
+          " using namespace blammo::target;\n"
+          "  /*  Comment  */\n"
           ))
         )
     (with-temp-buffer

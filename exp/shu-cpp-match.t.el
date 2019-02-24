@@ -475,4 +475,24 @@
     (should (string= "std" token))
     ))
 
+
+
+;;
+;;  shu-test-shu-cpp-extract-namespace-name
+;;
+(ert-deftest shu-test-shu-cpp-extract-namespace-name ()
+  (let (
+        (name "Freddy")
+        (start-point 1023)
+        (end-point 1044)
+        (namespace-info)
+        (actual-name)
+        )
+    (setq namespace-info (shu-cpp-make-namespace-info name start-point end-point))
+    (setq actual-name (shu-cpp-extract-namespace-name namespace-info))
+    (should actual-name)
+    (should (stringp actual-name))
+    (should (string= name actual-name))
+    ))
+
 ;;; shu-cpp-match.t.el ends here
