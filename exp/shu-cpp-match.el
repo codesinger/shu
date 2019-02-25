@@ -220,6 +220,27 @@ the token value must staisify the regular expression for a C++ variable name.")
 ;;
 ;;  shu-cpp-match-tokens
 ;;
+;; TODO: Find some way to pass back the pointer to the next token
+;;       to be scanned.  This is the first token not examined after
+;;       a successful match.  Everything up to here has been matched.
+;;       No need to look at it again.
+;;
+;;       Need to have an entry in the match list that is the "name"
+;;       of the list.  Pass back the "name" of the matched list as
+;;       well so that the caller can tell what was matched.  This
+;;       is better than passing back the list index because that
+;;       will change if you add a new list to anywhere but the
+;;       end.  Depending on what is being matched, it may not be
+;;       possible to add it at the end.
+;;
+;;       If there ia a match-list op code that simply says "this
+;;       is a name to be passed back," you could consider passing
+;;       back a list of names and even of their corresponding tokens.
+;;
+;;       e.g., Entry 2 in a match list matches a variable name.
+;;       Entry 3 in the match list might be a name called "variable"
+;;       to which the previous token is attached.
+;;
 (defun shu-cpp-match-tokens (match-lists token-list &optional skip-comments)
   "MATCH-LISTS is a list of match lists.  TOKEN-LIST is a list of tokens.  for
 each match-list in MATCH-LISTS, try to match every element of the match list to
@@ -504,10 +525,6 @@ the matched token was to be added to the list."
 ;;
 ;; Returns a list of namespace-info
 ;;
-;;  TODO: This does *not* include the start and end point of the
-;;        semi-colon that terminates the "using namespace"
-;;        directive.
-;;
 ;;
 ;;  namespace-info
 ;;
@@ -672,6 +689,51 @@ and end point of the entire \"using namespace\" directive."
       (princ "nslist: " gb) (princ nslist gb) (princ "\n" gb)
       )
     ))
+
+
+
+;;
+;; Names for rmv-using
+;;
+;;
+;;  namespace-info
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> List of unqualified class names
+;;        |
+;;        +-------------> namespace names
+;;
+;;
+;;  namespace-names:
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> Replacement name
+;;        |
+;;        +-------------> Using name
+;;
+;;
+;;  using name is the name specified on "using namespace"
+;;
+;;  replacmenet name is the one that is added to the unqualified class name
+;;
+;; So there might be a using name of abcdef::mumble
+;;
+;; And a replacement name of mumble because the code was about to be
+;; enclosed in the namespace abcdef, so you would only have to qualify
+;; the class names with mumble.
+;;
+;;
+;;
 
 
 ;;; shu-cpp-match.el ends here
