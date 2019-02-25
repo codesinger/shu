@@ -1403,7 +1403,7 @@ which the tags file is to be built."
        (c-count)
        (h-count)
        (pname))
-    (setq pname (symbol-name real-this-command))
+    (setq pname (shu-get-real-this-command-name))
     (setq shu-cpp-project-name pname)
     (setq sstring (format-time-string "on %a, %e %b %Y at %k:%M:%S" stime))
     (princ (format "\nStart project (%s) setup in %s %s.\n\n" shu-cpp-project-name proj-dir sstring) gbuf)
@@ -1438,6 +1438,22 @@ which the tags file is to be built."
     (switch-to-buffer gbuf)
     ))
 
+
+
+;;
+;;  shu-get-real-this-command-name
+;;
+(defun shu-get-real-this-command-name ()
+  "Return the symbol name of the variable \"real-this-command\" if it is defined.
+If not defined, return the string \"**unknown**xs\".  Some older versions of emacs
+do not support real-this-command."
+    (if (intern-soft "real-this-command")
+        (symbol-name real-this-command)
+      "**unknown**")
+    )
+
+
+
 ;;
 ;;  shu-visit-project-and-tags
 ;;
@@ -1462,7 +1478,7 @@ creates a new tags table."
        (c-count)
        (h-count)
        (pname))
-    (setq pname (symbol-name real-this-command))
+    (setq pname (shu-get-real-this-command-name))
     (setq shu-cpp-project-name pname)
     (setq sstring (format-time-string "on %a, %e %b %Y at %k:%M:%S" stime))
     (princ (format "\nStart project (%s) setup in %s %s.\n\n" shu-cpp-project-name proj-dir sstring) gbuf)
