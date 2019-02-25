@@ -1447,7 +1447,7 @@ which the tags file is to be built."
   "Return the symbol name of the variable \"real-this-command\" if it is defined.
 If not defined, return the string \"**unknown**xs\".  Some older versions of emacs
 do not support real-this-command."
-  (if (version< emacs-version "25.2.0") "**unknown**" (symbol-name real-this-command))
+  (if (version< emacs-version "24.3.1") "**unknown**" (symbol-name real-this-command))
     )
 
 
