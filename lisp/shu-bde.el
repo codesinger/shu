@@ -525,7 +525,29 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
       (princ (concat "git add " cfile-name "\n") gitbuf)
       (princ (concat "git add " tfile-name "\n") gitbuf)
 
+      (princ (concat "git reset HEAD " hfile-name "\n") gitbuf)
+      (princ (concat "git reset HEAD " cfile-name "\n") gitbuf)
+      (princ (concat "git reset HEAD " tfile-name "\n") gitbuf)
+
+      (shu-generate-git-add hfile-name gitbuf)
+      (shu-generate-git-add cfile-name gitbuf)
+      (shu-generate-git-add tfile-name gitbuf)
       )))
+
+
+
+;;
+;;  shu-generate-git-add
+;;
+(defun shu-generate-git-add (filename gitbuf)
+  "Do a \"git add\" of FILENAME and show the result of the operation in
+the buffer GITBUF."
+  (let ((added))
+    (setq added (shu-git-add-file filename))
+    (if (> (length added) 1)
+        (princ (concat "Git added " filename ": " added "\n") gitbuf)
+      (princ (concat "Git added " filename "\n") gitbuf))
+    ))
 
 
 

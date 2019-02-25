@@ -826,6 +826,21 @@ if the given HASH is not a valid git revision."
 
 
 
+;;
+;;  shu-git-add-file
+;;
+(defun shu-git-add-file (filename)
+  "Do a \"git add\" for FILENAME.  Return empty string if add succeeds.  Otherwise,
+return git error nmessage."
+  (let ((result))
+    (with-temp-buffer
+      (call-process "git" nil (current-buffer) nil "add" filename)
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
+    (shu-trim-trailing result)
+    ))
+
+
+
 
 ;;
 ;;  shu-git-find-branch
