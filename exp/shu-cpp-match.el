@@ -241,6 +241,13 @@ the token value must staisify the regular expression for a C++ variable name.")
 ;;       Entry 3 in the match list might be a name called "variable"
 ;;       to which the previous token is attached.
 ;;
+;;       Perhaps the simplest thing to do would be to add a "name"
+;;       field to each entry in the match list and pass back to
+;;       the caller a pointer to the list that actually matched.
+;;
+;;       You can have a named list by simply naming the first entry
+;;       or you can choose to have other names in the list.
+;;
 (defun shu-cpp-match-tokens (match-lists token-list &optional skip-comments)
   "MATCH-LISTS is a list of match lists.  TOKEN-LIST is a list of tokens.  for
 each match-list in MATCH-LISTS, try to match every element of the match list to
