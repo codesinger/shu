@@ -2509,6 +2509,7 @@ otherwise, return nil."
         (eol (line-end-position))
         (var-name)
         )
+    (save-excursion
       (when (looking-at target-char) ;; Looking at a legal variable name character
         (while (and (looking-at target-char) ;; Still on a variable name char
                     (> (point) bol)) ;; And still on same line
@@ -2518,8 +2519,7 @@ otherwise, return nil."
           (forward-char 1))             ;; Move forward to what might be the beginning
         (when (re-search-forward target-name eol t)
           (setq var-name (match-string 0))
-          );; Have something that matches variable name syntax
-        )
+          ))) ;; Have something that matches variable name syntax
     var-name
     ))
 
