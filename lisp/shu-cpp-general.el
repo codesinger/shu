@@ -43,6 +43,7 @@
 
 (provide 'shu-cpp-general)
 (require 'shu-base)
+(require 'shu-cpp-token)
 
 
 (defconst shu-cpp-base-types
