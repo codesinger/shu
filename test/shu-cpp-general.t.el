@@ -2174,4 +2174,67 @@ This is most likely the name of an include file and not the name of a class."
     ))
 
 
+
+
+;;
+;;  shu-test-shu-cpp-get-variable-name-1
+;;
+(ert-deftest shu-test-shu-cpp-get-variable-name-1 ()
+  (let* ((expected-name "mumble")
+         (actual-name)
+        (data
+         (concat
+          "\n  // hello\n"
+          "x = " expected-name  " * 2\n")))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward expected-name nil t))
+      (backward-char 2)
+      (setq actual-name (shu-cpp-get-variable-name))
+      (should actual-name)
+      (should (stringp actual-name))
+      (should (string= expected-name actual-name)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-get-variable-name-2
+;;
+(ert-deftest shu-test-shu-cpp-get-variable-name-2 ()
+  (let* ((expected-name "mumble")
+         (actual-name)
+        (data expected-name))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward expected-name nil t))
+      (backward-char 2)
+      (setq actual-name (shu-cpp-get-variable-name))
+      (should actual-name)
+      (should (stringp actual-name))
+      (should (string= expected-name actual-name)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-get-variable-name-3
+;;
+(ert-deftest shu-test-shu-cpp-get-variable-name-3 ()
+  (let* ((non-name "@.@!")
+         (actual-name)
+        (data
+         (concat
+          "\n  // hello\n"
+          "x = " non-name  " * 2\n")))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward non-name nil t))
+      (backward-char 2)
+      (setq actual-name (shu-cpp-get-variable-name))
+      (should (not actual-name)))
+    ))
+
 ;;; shu-cpp-general.t.el ends here

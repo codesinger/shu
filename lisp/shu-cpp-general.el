@@ -2429,6 +2429,180 @@ would be transformed into
     ))
 
 
+;;
+;;  shu-simple-hother-file
+;;
+(defun shu-simple-hother-file ()
+  "Return the name of the .h file that corresponds to the .cpp file or .t.cpp file
+that is in the current buffer.  This version of the function creates the name of
+the .h file from the name of the file in the current buffer.  This is in contrast
+with the function shu-hother which finds the coprresponding .h file from the list
+of files in the current project."
+  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+        (newfile ))
+    (when (string= (file-name-extension base-name) "t")
+      (setq base-name (file-name-sans-extension base-name)))
+    (setq newfile (concat base-name ".h"))
+    (if (file-readable-p newfile)
+        newfile
+      nil)
+    ))
+
+
+
+;;
+;;  shu-cpp-find-h-definition
+;;
+(defun shu-cpp-find-h-definition ()
+  "While in a cpp file, position point on a variable name that is defined in the
+corresponding header file and invoke this function.  It will find all occurrences of
+the name in the header file and put them in the message area."
+  (interactive)
+  (let (
+        (hfile)
+        (fbuf)
+        (file-buf)
+        (var-name)
+        (lines)
+        (spoint)
+        )
+    (setq hfile (shu-simple-hother-file))
+    (if (not hfile)
+        (progn
+          (ding)
+          (message "%s" "There is no other h file")
+          )
+      (setq fbuf (get-file-buffer hfile))
+      (if fbuf
+          (setq file-buf fbuf)
+        (setq file-buf (find-file-noselect hfile))
+        )
+      (setq var-name (shu-cpp-get-variable-name))
+      (with-current-buffer file-buf
+        (goto-char (point-min))
+        (setq lines (shu-cpp-find-variable-name-lines-by-token var-name))
+        (if (not lines)
+            (progn
+              (ding)
+              (message "%s not found" var-name)
+              )
+          (message "%s" lines)
+            )
+       )
+      (when (not fbuf) ;; We created buffer
+        (kill-buffer file-buf))
+      )
+    ))
+
+
+
+;;
+;;  shu-cpp-get-variable-name
+;;
+(defun shu-cpp-get-variable-name ()
+  "If point is sitting on something that looks like a legal varuable name, return it,
+otherwise, return nil."
+  (let (
+        (target-char shu-cpp-name)
+        (target-name (concat shu-cpp-name "+"))
+        (bol (line-beginning-position))
+        (eol (line-end-position))
+        (var-name)
+        )
+      (when (looking-at target-char) ;; Looking at a legal variable name character
+        (while (and (looking-at target-char) ;; Still on a variable name char
+                    (> (point) bol)) ;; And still on same line
+          (backward-char 1))            ;; Keep moving back until we aren't on a variable name char
+        ;;  or we hit the beginning of the line
+        (when (not (looking-at target-char)) ;; Moved backward past beginning of name
+          (forward-char 1))             ;; Move forward to what might be the beginning
+        (when (re-search-forward target-name eol t)
+          (setq var-name (match-string 0))
+          );; Have something that matches variable name syntax
+        )
+    var-name
+    ))
+
+
+
+
+;;
+;;  shu-cpp-find-variable-name-by-token
+;;
+(defun shu-cpp-find-variable-name-by-token (var-name)
+  "Tokenize the entire buffer and return the position of the first token
+that matches var-name."
+  (let (
+        (token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
+        (tlist)
+        (token-info)
+        (token)
+        (token-type)
+        (spoint)
+        (epoint)
+        (error-message)
+        )
+    (setq tlist token-list)
+    (while tlist
+      (setq token-info (car tlist))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (when (= token-type shu-cpp-token-type-uq)
+        (setq token (shu-cpp-token-extract-token token-info))
+        (when (string= token var-name)
+          (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
+          )
+        )
+      (setq tlist (cdr tlist))
+      )
+    spoint
+    ))
+
+
+
+;;
+;;  shu-cpp-find-variable-name-lines-by-token
+;;
+(defun shu-cpp-find-variable-name-lines-by-token (var-name)
+  "Tokenize the entire buffer and return a string that is composed of each
+line that contains the token."
+  (let (
+        (token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+        (tlist)
+        (token-info)
+        (token)
+        (token-type)
+        (spoint)
+        (epoint)
+        (error-message)
+        (line)
+        (got-lines)
+        (lines "")
+        (prefix "")
+        )
+    (setq tlist token-list)
+    (while tlist
+      (setq token-info (car tlist))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (when (= token-type shu-cpp-token-type-uq)
+        (setq token (shu-cpp-token-extract-token token-info))
+        (when (string= token var-name)
+          (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
+          (goto-char spoint)
+          (setq line (shu-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+          (setq lines (concat lines prefix line))
+          (setq prefix "\n")
+          (setq got-lines t)
+          )
+        )
+      (setq tlist (cdr tlist))
+      )
+    (when (not got-lines)
+      (setq lines nil)
+      )
+    lines
+    ))
+
+
 
 
 ;;
@@ -2474,6 +2648,7 @@ shu- prefix removed."
   (defalias 'qualify-bsl 'shu-qualify-namespace-bsl)
   (defalias 'dbx-malloc 'shu-dbx-summarize-malloc)
   (defalias 'fixp 'shu-cpp-fix-prototype)
+  (defalias 'getdef 'shu-cpp-find-h-definition)
   )
 
 ;;; shu-cpp-general.el ends here
