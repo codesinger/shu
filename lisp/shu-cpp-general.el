@@ -2578,6 +2578,7 @@ line that contains the token."
         (got-lines)
         (lines "")
         (prefix "")
+        (line-no)
         )
     (setq tlist token-list)
     (while tlist
@@ -2588,7 +2589,11 @@ line that contains the token."
         (when (string= token var-name)
           (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
           (goto-char spoint)
-          (setq line (shu-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+          (setq line-no (number-to-string (shu-current-line)))
+          (setq line
+                (concat line-no ": "
+                        (shu-trim
+                         (buffer-substring-no-properties (line-beginning-position) (line-end-position)))))
           (setq lines (concat lines prefix line))
           (setq prefix "\n")
           (setq got-lines t)
