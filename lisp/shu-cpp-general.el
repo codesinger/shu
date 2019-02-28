@@ -2459,14 +2459,12 @@ of files in the current project."
 corresponding header file and invoke this function.  It will find all occurrences of
 the name in the header file and put them in the message area."
   (interactive)
-  (let (
-        (hfile)
+  (let ((hfile)
         (fbuf)
         (file-buf)
         (var-name)
         (lines)
-        (spoint)
-        )
+        (spoint))
     (setq hfile (shu-simple-hother-file))
     (if (not hfile)
         (progn
@@ -2476,8 +2474,7 @@ the name in the header file and put them in the message area."
       (setq fbuf (get-file-buffer hfile))
       (if fbuf
           (setq file-buf fbuf)
-        (setq file-buf (find-file-noselect hfile))
-        )
+        (setq file-buf (find-file-noselect hfile)))
       (setq var-name (shu-cpp-get-variable-name))
       (with-current-buffer file-buf
         (goto-char (point-min))
@@ -2485,14 +2482,10 @@ the name in the header file and put them in the message area."
         (if (not lines)
             (progn
               (ding)
-              (message "%s not found" var-name)
-              )
-          (message "%s" lines)
-            )
-       )
+              (message "%s not found" var-name))
+          (message "%s" lines)))
       (when (not fbuf) ;; We created buffer
-        (kill-buffer file-buf))
-      )
+        (kill-buffer file-buf)))
     ))
 
 
@@ -2503,13 +2496,11 @@ the name in the header file and put them in the message area."
 (defun shu-cpp-get-variable-name ()
   "If point is sitting on something that looks like a legal varuable name, return it,
 otherwise, return nil."
-  (let (
-        (target-char shu-cpp-name)
+  (let ((target-char shu-cpp-name)
         (target-name (concat shu-cpp-name "+"))
         (bol (line-beginning-position))
         (eol (line-end-position))
-        (var-name)
-        )
+        (var-name))
     (save-excursion
       (when (looking-at target-char) ;; Looking at a legal variable name character
         (while (and (looking-at target-char) ;; Still on a variable name char
@@ -2533,16 +2524,14 @@ otherwise, return nil."
 (defun shu-cpp-find-variable-name-by-token (var-name)
   "Tokenize the entire buffer and return the position of the first token
 that matches var-name."
-  (let (
-        (token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
+  (let ((token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
         (tlist)
         (token-info)
         (token)
         (token-type)
         (spoint)
         (epoint)
-        (error-message)
-        )
+        (error-message))
     (setq tlist token-list)
     (while tlist
       (setq token-info (car tlist))
@@ -2550,11 +2539,8 @@ that matches var-name."
       (when (= token-type shu-cpp-token-type-uq)
         (setq token (shu-cpp-token-extract-token token-info))
         (when (string= token var-name)
-          (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
-          )
-        )
-      (setq tlist (cdr tlist))
-      )
+          (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)))
+      (setq tlist (cdr tlist)))
     spoint
     ))
 
@@ -2566,8 +2552,7 @@ that matches var-name."
 (defun shu-cpp-find-variable-name-lines-by-token (var-name)
   "Tokenize the entire buffer and return a string that is composed of each
 line that contains the token."
-  (let (
-        (token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+  (let ((token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
         (tlist)
         (token-info)
         (token)
@@ -2579,8 +2564,7 @@ line that contains the token."
         (got-lines)
         (lines "")
         (prefix "")
-        (line-no)
-        )
+        (line-no))
     (setq tlist token-list)
     (while tlist
       (setq token-info (car tlist))
@@ -2597,14 +2581,10 @@ line that contains the token."
                          (buffer-substring-no-properties (line-beginning-position) (line-end-position)))))
           (setq lines (concat lines prefix line))
           (setq prefix "\n")
-          (setq got-lines t)
-          )
-        )
-      (setq tlist (cdr tlist))
-      )
+          (setq got-lines t)))
+      (setq tlist (cdr tlist)))
     (when (not got-lines)
-      (setq lines nil)
-      )
+      (setq lines nil))
     lines
     ))
 
