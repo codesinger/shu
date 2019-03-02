@@ -242,14 +242,22 @@ in the form of \"foo.cpp:123:2\"."
         (insert
          (concat
           "\\documentclass[12pt,onecolumn]{article}\n"
+          "\\usepackage{setspace}\n"
+          "\\newcommand{\\shuspace}{\\begin{spacing}{2.00}}\n"
+          "\\newcommand{\\shuendspace}{\\end{spacing}}\n"
+          "%\\newcommand{\\shuspace}{}\n"
+          "%\\newcommand{\\shuendspace}{}\n"
+          "\n"
           "\\begin{document}\n"
+          "\n"
+          "\\shuspace{}\n"
           "\n"))
         (setq p (point))
         (insert
          (concat
           "\n"
           "\n"
-          "\n"
+          "\\shuendspace{}\n"
           "\n"
           "\\end{document}\n"))))
     (goto-char p)
