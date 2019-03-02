@@ -380,6 +380,54 @@ that is on its own line and move it up to the end of the previous line."
     ))
 
 
+
+;;
+;;  shu-loosen-lisp
+;;
+(defun shu-loosen-lisp ()
+  "Doc string."
+  (interactive)
+  (let (
+        (ss (concat
+             "("
+             "\\s-*"
+             "\\(if"
+             "\\|when"
+             "\\|unless"
+             "\\|while"
+             "\\|let"
+             "\\|let\\*"
+             "\\|save-restriction"
+             "\\|save-excursion"
+             "\\|save-restriction"
+             "\\|with-temp-buffer"
+             "\\|save-match-data"
+             "\\|while"
+             "\\|while\\)\\"
+             "s-+"))
+        (doing t)
+        (p)
+        (pad)
+        (pad-length)
+        (start-col)
+        )
+    (while doing
+      (if (not (re-search-forward ss nil t))
+          (setq doing nil)
+        (setq p (1- (point)))
+        (goto-char (match-beginning 0))
+        (setq start-col (current-column))
+        (beginning-of-line)
+        (forward-sexp)
+        (backward-char 1)
+        (setq pad-length (1+ start-col))
+        (setq pad (concat "\n" (make-string pad-length ? )))
+        (insert pad)
+        (goto-char p)
+        ))
+    ))
+
+
 ;;
 ;;  shu-dup - Insert a duplicate of the current line following it.
 ;;
