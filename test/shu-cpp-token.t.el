@@ -41,6 +41,9 @@
     (setq x (shu-cpp-token-token-type-name shu-cpp-token-type-uq))
     (should (string= "unquoted token" x))
 
+    (setq x (shu-cpp-token-token-type-name shu-cpp-token-type-kw))
+    (should (string= "key word" x))
+
     (setq x (shu-cpp-token-token-type-name shu-cpp-token-type-ct))
     (should (string= "comment" x))
 
@@ -345,7 +348,7 @@
       (setq tlist (cdr tlist))
 
       (setq token-info (car tlist))
-      (should (shu-test-check-shu-cpp-get-token "general-6" token-info "this" shu-cpp-token-type-uq 31 34))
+      (should (shu-test-check-shu-cpp-get-token "general-6" token-info "this" shu-cpp-token-type-kw 31 34))
       (setq tlist (cdr tlist))
 
       (setq token-info (car tlist))
@@ -381,15 +384,15 @@
       (setq tlist (cdr tlist))
 
       (setq token-info (car tlist))
-      (should (shu-test-check-shu-cpp-get-token "general-15" token-info "const" shu-cpp-token-type-uq 69 73))
+      (should (shu-test-check-shu-cpp-get-token "general-15" token-info "const" shu-cpp-token-type-kw 69 73))
       (setq tlist (cdr tlist))
 
       (setq token-info (car tlist))
-      (should (shu-test-check-shu-cpp-get-token "general-16" token-info "unsigned" shu-cpp-token-type-uq 75 82))
+      (should (shu-test-check-shu-cpp-get-token "general-16" token-info "unsigned" shu-cpp-token-type-kw 75 82))
       (setq tlist (cdr tlist))
 
       (setq token-info (car tlist))
-      (should (shu-test-check-shu-cpp-get-token "general-17" token-info "int" shu-cpp-token-type-uq 84 86))
+      (should (shu-test-check-shu-cpp-get-token "general-17" token-info "int" shu-cpp-token-type-kw 84 86))
       (setq tlist (cdr tlist))
 
       (setq token-info (car tlist))
@@ -489,7 +492,7 @@
       (setq tlist (cdr tlist))
 
       (setq token-info (car tlist))
-      (should (shu-test-check-shu-cpp-get-token "limit-2" token-info "int" shu-cpp-token-type-uq 84 86))
+      (should (shu-test-check-shu-cpp-get-token "limit-2" token-info "int" shu-cpp-token-type-kw 84 86))
       (setq tlist (cdr tlist))
       )))
 
@@ -755,11 +758,11 @@
 
       (setq tlist (cdr tlist))
       (setq token-info (car tlist))
-      (should (shu-test-check-shu-cpp-get-token "rcmd-4" token-info "return" shu-cpp-token-type-uq 101 106))
+      (should (shu-test-check-shu-cpp-get-token "rcmd-4" token-info "return" shu-cpp-token-type-kw 101 106))
 
       (setq tlist (nthcdr 6 tlist))
       (setq token-info (car tlist))
-      (should (shu-test-check-shu-cpp-get-token "rcmd-5" token-info "void" shu-cpp-token-type-uq 79 82))
+      (should (shu-test-check-shu-cpp-get-token "rcmd-5" token-info "void" shu-cpp-token-type-kw 79 82))
 
       (setq tlist (cdr tlist))
       (setq token-info (car tlist))
@@ -2120,6 +2123,25 @@ me anything.  It is printed on test failure to identify the test that failed."
     (should (consp tlist))
     (setq token-info (car tlist))
     (should (equal first-non-comment-token-info token-info))
+    ))
+
+
+;;
+;;  shu-=test-shu-get-cpp-keywords-hash
+;;
+(ert-deftest shu-=test-shu-get-cpp-keywords-hash ()
+  (let ((kl shu-cpp-keywords)
+        (ht (shu-get-cpp-keywords-hash))
+        (kc)
+        (kw)
+        (nkw))
+    (while kl
+      (setq kc (car kl))
+      (setq kw (car kc))
+      (should (gethash kw ht))
+      (setq nkw (concat kw "something-or-other"))
+      (should (not (gethash nkw ht)))
+      (setq kl (cdr kl)))
     ))
 
 

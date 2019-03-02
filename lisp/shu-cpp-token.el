@@ -108,6 +108,9 @@
 ;;
 
 
+(defvar shu-cpp-keywords-hash nil
+  "The hash table of C++ key words")
+
 (defconst shu-cpp-operators-three
   (regexp-opt (list "->*" "<<=" ">>=") nil)
   "Define the set of three character C++ operators")
@@ -147,15 +150,18 @@ an operator, even though, strictly speaking, it is not an operator.")
 (defconst shu-cpp-token-type-uq 3
   "Token type that indicates an unquoted token")
 
-(defconst shu-cpp-token-type-ct 4
+(defconst shu-cpp-token-type-kw 4
+  "Token type that indicates a C++ key word")
+
+(defconst shu-cpp-token-type-ct 5
   "Token type that indicates a comment")
 
-(defconst shu-cpp-token-type-cc 5
+(defconst shu-cpp-token-type-cc 6
   "Token type that indicates a line in which the first non-blank item is a
 comment that starts in a column greater than or equal to the column defined
 by shu-cpp-comment-start.  This is known as a code comment with no code present.")
 
-(defconst shu-cpp-token-type-tp 6
+(defconst shu-cpp-token-type-tp 7
   "Token type that indicates a template parameter.  The standard parsing does nothing
 with template parameters.  Something like \"<int>\" is simply turned into three separate
 tokens, \"<\", \"int\", and \">\" (or \">\", \"int\", and \"<\" in a reverse parse).
@@ -165,6 +171,129 @@ template parameter \"int\"")
 (defconst shu-cpp-token-delimiter-end
   (regexp-opt shu-cpp-token-delimiter-chars  nil)
   "Regular expression to define that which terminates an unquoted token in C++")
+
+
+;;
+;;  shu-cpp-keywords
+;;
+(defconst shu-cpp-keywords
+  (list
+   (cons "alignas" 0)
+   (cons "alignof" 0)
+   (cons "and" 0)
+   (cons "and_eq" 0)
+   (cons "asm" 0)
+   (cons "atomic_cancel" 0)
+   (cons "atomic_commit" 0)
+   (cons "atomic_noexcept" 0)
+   (cons "auto" 0)
+   (cons "bitand" 0)
+   (cons "bitor" 0)
+   (cons "bool" 0)
+   (cons "break" 0)
+   (cons "case" 0)
+   (cons "catch" 0)
+   (cons "char" 0)
+   (cons "char8_t" 0)
+   (cons "char16_t" 0)
+   (cons "char32_t" 0)
+   (cons "class" 0)
+   (cons "compl" 0)
+   (cons "concept" 0)
+   (cons "const" 0)
+   (cons "consteval" 0)
+   (cons "constexpr" 0)
+   (cons "const_cast" 0)
+   (cons "continue" 0)
+   (cons "co_await" 0)
+   (cons "co_return" 0)
+   (cons "co_yield" 0)
+   (cons "decltype" 0)
+   (cons "default" 0)
+   (cons "delete" 0)
+   (cons "do" 0)
+   (cons "double" 0)
+   (cons "dynamic_cast" 0)
+   (cons "else" 0)
+   (cons "enum" 0)
+   (cons "explicit" 0)
+   (cons "export" 0)
+   (cons "extern" 0)
+   (cons "false" 0)
+   (cons "float" 0)
+   (cons "for" 0)
+   (cons "friend" 0)
+   (cons "goto" 0)
+   (cons "if" 0)
+   (cons "import" 0)
+   (cons "inline" 0)
+   (cons "int" 0)
+   (cons "long" 0)
+   (cons "module" 0)
+   (cons "mutable" 0)
+   (cons "namespace" 0)
+   (cons "new" 0)
+   (cons "noexcept" 0)
+   (cons "not" 0)
+   (cons "not_eq" 0)
+   (cons "nullptr" 0)
+   (cons "operator" 0)
+   (cons "or" 0)
+   (cons "or_eq" 0)
+   (cons "private" 0)
+   (cons "protected" 0)
+   (cons "public" 0)
+   (cons "reflexpr" 0)
+   (cons "register" 0)
+   (cons "reinterpret_cast" 0)
+   (cons "requires" 0)
+   (cons "return" 0)
+   (cons "short" 0)
+   (cons "signed" 0)
+   (cons "sizeof" 0)
+   (cons "static" 0)
+   (cons "static_assert" 0)
+   (cons "static_cast" 0)
+   (cons "struct" 0)
+   (cons "switch" 0)
+   (cons "synchronized" 0)
+   (cons "template" 0)
+   (cons "this" 0)
+   (cons "thread_local" 0)
+   (cons "throw" 0)
+   (cons "true" 0)
+   (cons "try" 0)
+   (cons "typedef" 0)
+   (cons "typeid" 0)
+   (cons "typename" 0)
+   (cons "union" 0)
+   (cons "unsigned" 0)
+   (cons "using" 0)
+   (cons "virtual" 0)
+   (cons "void" 0)
+   (cons "volatile" 0)
+   (cons "wchar_t" 0)
+   (cons "while" 0)
+   (cons "xor" 0)
+   (cons "xor_eq" 0))
+   "alist of C++ key words up to approximately C++17")
+
+
+;;
+;;  shu-get-cpp-keywords-hash
+;;
+(defun shu-get-cpp-keywords-hash ()
+  "Return a hash table containing all of the C++ key words."
+  (interactive)
+  (let ((ht (make-hash-table :test 'equal :size (length shu-cpp-keywords)))
+        (kl shu-cpp-keywords)
+        (kc))
+    (while kl
+      (setq kc (car kl))
+      (puthash (car kc) (cdr kc) ht)
+      (setq kl (cdr kl)))
+    ht
+    ))
 
 
 ;;
@@ -347,6 +476,8 @@ and you will scan through the list without seeing any comments."
           (setq type-name "quoted-string"))
          ((= token-type shu-cpp-token-type-uq)
           (setq type-name "unquoted token"))
+         ((= token-type shu-cpp-token-type-kw)
+          (setq type-name "key word"))
          ((= token-type shu-cpp-token-type-ct)
           (setq type-name "comment"))
          ((= token-type shu-cpp-token-type-cc)
@@ -586,6 +717,7 @@ first token that is beyond the point specified by LIMIT, we stop the scan."
        (ret-val)
        (stream-start (regexp-opt (list "<<")))
        (string-start (regexp-opt (list "'" "\"") nil)))
+    (setq shu-cpp-keywords-hash (shu-get-cpp-keywords-hash))
     (save-excursion
       (save-match-data
         (save-restriction
@@ -666,6 +798,8 @@ defines the end of an unquoted token."
         (forward-char 1)
         (setq epoint (point))))
     (setq token (buffer-substring-no-properties spoint epoint))
+    (when (gethash token shu-cpp-keywords-hash)
+      (setq token-type shu-cpp-token-type-kw))
     (setq token-info (shu-cpp-make-token-info token token-type spoint (1- epoint)))
     token-info
     ))

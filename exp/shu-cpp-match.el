@@ -379,11 +379,11 @@ the matched token was to be added to the list."
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "using")))
+           (cons shu-cpp-token-type-kw "using")))
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "namespace")))
+           (cons shu-cpp-token-type-kw "namespace")))
     (cons shu-cpp-token-match-type-same-rx
           (cons
            (cons t 'shu-cpp-token-match-same-rx)
@@ -397,11 +397,11 @@ the matched token was to be added to the list."
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "using")))
+           (cons shu-cpp-token-type-kw "using")))
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "namespace")))
+           (cons shu-cpp-token-type-kw "namespace")))
     (cons shu-cpp-token-match-type-same-rx
           (cons
            (cons t 'shu-cpp-token-match-same-rx)
@@ -423,11 +423,11 @@ the matched token was to be added to the list."
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "using")))
+           (cons shu-cpp-token-type-kw "using")))
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "namespace")))
+           (cons shu-cpp-token-type-kw "namespace")))
     (cons shu-cpp-token-match-type-same-rx
           (cons
            (cons t 'shu-cpp-token-match-same-rx)
@@ -457,11 +457,11 @@ the matched token was to be added to the list."
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "using")))
+           (cons shu-cpp-token-type-kw "using")))
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "namespace")))
+           (cons shu-cpp-token-type-kw "namespace")))
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
@@ -478,11 +478,11 @@ the matched token was to be added to the list."
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "using")))
+           (cons shu-cpp-token-type-kw "using")))
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "namespace")))
+           (cons shu-cpp-token-type-kw "namespace")))
     (cons shu-cpp-token-match-type-same
           (cons
            (cons nil 'shu-cpp-token-match-same)
@@ -595,7 +595,7 @@ and end point of the entire \"using namespace\" directive."
         (princ (format "%d: %s\n" count (shu-cpp-token-string-token-info token-info)) gb)
         (setq token-type (shu-cpp-token-extract-type token-info))
         (princ (format "      token-type: %d\n" token-type) gb)
-        (when (= token-type shu-cpp-token-type-uq)
+        (when (= token-type shu-cpp-token-type-kw)
           (setq token (shu-cpp-token-extract-token token-info))
           (princ (format "      token: \"%s\"\n" token) gb)
           (when (string= token "using")

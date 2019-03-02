@@ -42,7 +42,7 @@
         (op-code shu-cpp-token-match-type-same)
         (match-eval-func 'shu-cpp-token-match-same)
         (match-ret-ind nil)
-        (match-token-type shu-cpp-token-type-uq)
+        (match-token-type shu-cpp-token-type-kw)
         (match-token-value "using")
         (xop-code)
         (xmatch-eval-func)
@@ -80,7 +80,7 @@
          (cons shu-cpp-token-match-type-same
                (cons
                 (cons nil 'shu-cpp-token-match-same)
-                (cons shu-cpp-token-type-uq "using"))))
+                (cons shu-cpp-token-type-kw "using"))))
         (expected "using")
         (actual))
     (setq actual (shu-cpp-match-extract-token data))
@@ -98,8 +98,8 @@
          (cons shu-cpp-token-match-type-same
                (cons
                 (cons nil 'shu-cpp-token-match-same)
-                (cons shu-cpp-token-type-uq "using"))))
-        (expected shu-cpp-token-type-uq)
+                (cons shu-cpp-token-type-kw "using"))))
+        (expected shu-cpp-token-type-kw)
         (actual))
     (setq actual (shu-cpp-match-extract-type data))
     (should actual)
@@ -139,7 +139,7 @@
 (ert-deftest shu-test-shu-cpp-token-match-same-1 ()
   (let* (
          (token "using")
-         (token-type shu-cpp-token-type-uq)
+         (token-type shu-cpp-token-type-kw)
          (spoint 1022)
          (epoint 1026)
          (token-info (shu-cpp-make-token-info token token-type spoint epoint))
@@ -189,13 +189,13 @@
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-uq "using")
+                  (cons shu-cpp-token-type-kw "using")
                   )
                  )
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-uq "namespace")
+                  (cons shu-cpp-token-type-kw "namespace")
                   )
                  )
            (cons shu-cpp-token-match-type-same-rx
@@ -290,13 +290,13 @@
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-uq "using")
+                  (cons shu-cpp-token-type-kw "using")
                   )
                  )
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-uq "namespace")
+                  (cons shu-cpp-token-type-kw "namespace")
                   )
                  )
            (cons shu-cpp-token-match-type-same-rx
@@ -374,7 +374,7 @@
         (princ (format "%d, %s\n" count name) gb)
         (setq token-type (shu-cpp-token-extract-type tinfo))
         (setq token (shu-cpp-token-extract-token tinfo))
-        (when (and (= token-type shu-cpp-token-type-uq)
+        (when (and (= token-type shu-cpp-token-type-kw)
                    (string= token "using"))
           (setq rlist (shu-cpp-match-tokens match-lists tlist))
           (should rlist)
@@ -403,11 +403,11 @@
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-uq "using")))
+                  (cons shu-cpp-token-type-kw "using")))
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-uq "namespace")))
+                  (cons shu-cpp-token-type-kw "namespace")))
            (cons shu-cpp-token-match-type-same-rx
                  (cons
                   (cons t 'shu-cpp-token-match-same-rx)
@@ -424,11 +424,11 @@
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-uq "using")))
+                  (cons shu-cpp-token-type-kw "using")))
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-uq "namespace")))
+                  (cons shu-cpp-token-type-kw "namespace")))
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
