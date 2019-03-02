@@ -102,7 +102,7 @@ to generate the bame of the include file.
   value is the namespace.  This list only contans class names for namespaces that
   have been named on the "using namespace" directive.
 
-20 Feb 2019 - Have make-c-project convert all of the directory names to relative
+DONE 20 Feb 2019 - Have make-c-project convert all of the directory names to relative
 ones.  The actual list of directories stored by the project code has to hold
 avsolute names because you can visit them from anywhere.  But it would make the
 project files more portable if they held relative names.
@@ -110,3 +110,17 @@ project files more portable if they held relative names.
 See the elisp functions locate-dominiating-file and file-relative-name.
 
 See also https://stackoverflow.com/questions/18366839/find-the-relative-path-of-a-file-in-a-project
+
+2 March 2019 - Modern processors are sufficiently fast that we can probably
+resurrect visible.el as follows:
+
+At the beginning of the visible search:
+
+ 1. tokenize the entire file
+
+ 2. Turn the list of tokens into a "visible" list
+    - Should have an option to include or exclude comments
+
+ 3. Then visible searches are based on the well tested tokenization code.
+
+2 March 2019 - Add a new category to the tokenizer - C++ key word
