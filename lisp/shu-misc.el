@@ -350,6 +350,36 @@ point is placed where the the first line of code in the loop belongs."
     ))
 
 
+
+;;
+;;  shu-tighten-lisp
+;;
+(defun shu-tighten-lisp ()
+  "In region, \"tighten\" some lisp code.  Look for any single right parenthesis
+that is on its own line and move it up to the end of the previous line."
+  (interactive)
+  (let ((ss "\\s-+)$")
+        (ss2 "\\s-+($")
+        (bob)
+        (eob))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward ss nil t)
+        (setq eob (1- (point)))
+        (forward-line -1)
+        (end-of-line)
+        (setq bob (point))
+        (delete-region bob eob))
+      (goto-char (point-min))
+      (while (re-search-forward ss2 nil t)
+        (setq bob (point))
+        (forward-line 1)
+        (when (re-search-forward "^\\s-+(")
+          (setq eob (1- (point)))
+          (delete-region bob eob))))
+    ))
+
+
 ;;
 ;;  shu-dup - Insert a duplicate of the current line following it.
 ;;

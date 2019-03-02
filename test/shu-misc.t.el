@@ -306,4 +306,58 @@
       (should (string= expected actual)))
     ))
 
+
+
+
+;;
+;;  shu-test-shu-tighten-lisp
+;;
+(ert-deftest shu-test-shu-tighten-lisp ()
+  (let ((data
+         (concat
+          "(defun jjj ()\n"
+          "  \"Doc string.\"\n"
+          "  (interactive)\n"
+          "  (let (\n"
+          "        (bob)\n"
+          "        (bar)\n"
+          "        (boo)\n"
+          "        )\n"
+          "    (while bob\n"
+          "      (setq bar (cdr bob))\n"
+          "      (when bar\n"
+          "        (setq bar nil)\n"
+          "        (when boo\n"
+          "          (setq boo nil)\n"
+          "          )\n"
+          "        )\n"
+          "      (setq bob (cdr bob))\n"
+          "      )\n"
+          "    ))\n"))
+        (expected
+         (concat
+          "(defun jjj ()\n"
+          "  \"Doc string.\"\n"
+          "  (interactive)\n"
+          "  (let ((bob)\n"
+          "        (bar)\n"
+          "        (boo))\n"
+          "    (while bob\n"
+          "      (setq bar (cdr bob))\n"
+          "      (when bar\n"
+          "        (setq bar nil)\n"
+          "        (when boo\n"
+          "          (setq boo nil)))\n"
+          "      (setq bob (cdr bob)))\n"
+          "    ))\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-tighten-lisp)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
 ;;; shu-misc.t.el ends here

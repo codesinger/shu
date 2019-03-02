@@ -717,7 +717,7 @@ first token that is beyond the point specified by LIMIT, we stop the scan."
        (ret-val)
        (stream-start (regexp-opt (list "<<")))
        (string-start (regexp-opt (list "'" "\"") nil)))
-    (when (not shu-cpp-keywords-hash)
+    (unless shu-cpp-keywords-hash
       (setq shu-cpp-keywords-hash (shu-get-cpp-keywords-hash)))
     (save-excursion
       (save-match-data
