@@ -360,4 +360,62 @@
       (should (string= expected actual)))
     ))
 
+
+
+;;
+;;  shu-test-shu-loosen-lisp
+;;
+(ert-deftest shu-test-shu-loosen-lisp ()
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (data
+         (concat
+          "(defun jjj ()\n"
+          "  \"Doc string.\"\n"
+          "  (interactive)\n"
+          "  (let ((bob)\n"
+          "        (bar)\n"
+          "        (boo))\n"
+          "    (while bob\n"
+          "      (setq bar (cdr bob))\n"
+          "      (when bar\n"
+          "        (setq bar nil)\n"
+          "        (when boo\n"
+          "          (setq boo nil)))\n"
+          "      (setq bob (cdr bob)))\n"
+          "    ))\n"
+          ))
+        (expected
+         (concat
+          "(defun jjj ()\n"
+          "  \"Doc string.\"\n"
+          "  (interactive)\n"
+          "  (let ((bob)\n"
+          "        (bar)\n"
+          "        (boo))\n"
+          "    (while bob\n"
+          "      (setq bar (cdr bob))\n"
+          "      (when bar\n"
+          "        (setq bar nil)\n"
+          "        (when boo\n"
+          "          (setq boo nil)\n"
+          "          )\n"
+          "        )\n"
+          "      (setq bob (cdr bob))\n"
+          "      )\n"
+          "    \n"
+          "    ))\n"
+          ))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-loosen-lisp)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (princ (format "expected:\n[%s]\n" expected) gb)
+      (princ (format "actual:\n[%s]\n" actual) gb)
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
 ;;; shu-misc.t.el ends here

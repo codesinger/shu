@@ -451,7 +451,7 @@ parentheses back where they belong."
             (beginning-of-line)
             (forward-sexp)
             (backward-char 1)
-            (setq pad-length (1+ start-col))
+            (setq pad-length (+ start-col 2))
             (setq pad (concat "\n" (make-string pad-length ? )))
             (insert pad)
             (setq eof (shu-point-at-sexp bof))
