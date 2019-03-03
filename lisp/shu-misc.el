@@ -355,28 +355,45 @@ point is placed where the the first line of code in the loop belongs."
 ;;  shu-tighten-lisp
 ;;
 (defun shu-tighten-lisp ()
-  "In region, \"tighten\" some lisp code.  Look for any single right parenthesis
-that is on its own line and move it up to the end of the previous line."
+  "Withing the bounds of a lisp function or macro, \"tighten\" some lisp code.
+Look for any single right parenthesis that is on its own line and move it up to
+the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
   (interactive)
-  (let ((ss "\\s-+)$")
+  (let ((ssfun
+         (concat
+          "("
+          "\\s-*"
+          "\\(defun\\|defsubst\\|defmacro\\)"))
+        (bof)
+        (eof)
+        (ss "\\s-+)$")
         (ss2 "\\s-+($")
         (bob)
         (eob))
+    (setq debug-on-error t)
     (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward ss nil t)
-        (setq eob (1- (point)))
-        (forward-line -1)
-        (end-of-line)
-        (setq bob (point))
-        (delete-region bob eob))
-      (goto-char (point-min))
-      (while (re-search-forward ss2 nil t)
-        (setq bob (point))
-        (forward-line 1)
-        (when (re-search-forward "^\\s-+(")
+      (if (not (re-search-backward ssfun nil t))
+          (progn
+            (ding)
+            (message "%s" "Not inside a macro or function"))
+        (setq bof (match-beginning 0))
+        (setq eof (shu-point-at-sexp bof))
+        (goto-char bof)
+        (while (re-search-forward ss eof t)
           (setq eob (1- (point)))
-          (delete-region bob eob))))
+          (forward-line -1)
+          (end-of-line)
+          (setq bob (point))
+          (delete-region bob eob)
+          (setq eof (shu-point-at-sexp bof)))
+        (goto-char bof)
+        (while (re-search-forward ss2 eof t)
+          (setq bob (point))
+          (forward-line 1)
+          (when (re-search-forward "^\\s-+(")
+            (setq eob (1- (point)))
+            (delete-region bob eob)
+            (setq eof (shu-point-at-sexp bof))))))
     ))
 
 
