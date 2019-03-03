@@ -409,8 +409,7 @@ parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run SHU-TIGHTEN-LISP to put the
 parentheses back where they belong."
   (interactive)
-  (let (
-        (bof)
+  (let ((bof)
         (eof)
         (ssfun
          (concat
@@ -435,8 +434,7 @@ parentheses back where they belong."
         (p)
         (pad)
         (pad-length)
-        (start-col)
-        )
+        (start-col))
     (save-excursion
       (if (not (re-search-backward ssfun nil t))
           (progn
@@ -457,11 +455,7 @@ parentheses back where they belong."
             (setq pad (concat "\n" (make-string pad-length ? )))
             (insert pad)
             (setq eof (shu-point-at-sexp bof))
-            (goto-char p)
-            )
-          )
-        )
-      )
+            (goto-char p)))))
     ))
 
 
