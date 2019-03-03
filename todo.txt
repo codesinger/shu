@@ -124,3 +124,5 @@ At the beginning of the visible search:
  3. Then visible searches are based on the well tested tokenization code.
 
 2 March 2019 - Add a new category to the tokenizer - C++ key word
+
+3 Marxh 2019 - Unit tests for shu-loosen-lisp and shu-point-at-sexp
