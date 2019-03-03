@@ -430,12 +430,12 @@ parentheses back where they belong."
              "\\)"))
         (sslet
          (concat
-             "("
-             "\\s-*"
-             "\\(if"
-             "\\|let"
-             "\\|let\\*"
-             "\\)"))
+          "("
+          "\\s-*"
+          "\\(if"
+          "\\|let"
+          "\\|let\\*"
+          "\\)"))
         (doing t)
         (p)
         (pad)
