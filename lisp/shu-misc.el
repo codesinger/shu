@@ -409,7 +409,9 @@ parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run SHU-TIGHTEN-LISP to put the
 parentheses back where they belong."
   (interactive)
-  (let ((bof)
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (bof)
         (eof)
         (ssfun
          (concat
@@ -420,8 +422,6 @@ parentheses back where they belong."
              "("
              "\\s-*"
              "\\(if"
-             "\\|let"
-             "\\|let\\*"
              "\\|save-excursion"
              "\\|save-match-data"
              "\\|save-restriction"
@@ -429,12 +429,25 @@ parentheses back where they belong."
              "\\|when"
              "\\|while"
              "\\|with-temp-buffer"
-             "\\)"))
+             "\\)"
+             ))
+        (sslet
+         (concat
+             "("
+             "\\s-*"
+             "\\(if"
+             "\\|let"
+             "\\|let\\*"
+             "\\)"
+          ))
         (doing t)
         (p)
         (pad)
         (pad-length)
-        (start-col))
+        (start-col)
+        (actual)
+        (line)
+        )
     (save-excursion
       (if (not (re-search-backward ssfun nil t))
           (progn
@@ -442,11 +455,14 @@ parentheses back where they belong."
             (message "%s" "Not inside a macro or function"))
         (setq bof (match-beginning 0))
         (setq eof (shu-point-at-sexp bof))
+        ;; Handle all containing functions other than "let"
         (while doing
           (if (not (re-search-forward ss eof t))
               (setq doing nil)
             (setq p (1- (point)))
             (goto-char (match-beginning 0))
+            (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+            (princ (concat line "\n") gb)
             (setq start-col (current-column))
             (beginning-of-line)
             (forward-sexp)
@@ -454,8 +470,36 @@ parentheses back where they belong."
             (setq pad-length (+ start-col 2))
             (setq pad (concat "\n" (make-string pad-length ? )))
             (insert pad)
-            (setq eof (shu-point-at-sexp bof))
-            (goto-char p)))))
+            (setq eof (+ eof (length pad)))
+            (setq actual (buffer-substring-no-properties bof eof))
+            (princ (format "actual:\n[%s]" actual) gb)
+            )
+          )
+        ;; Handle "let" and "let*"
+        (goto-char bof)
+        (while (re-search-forward sslet eof t)
+          (when (re-search-forward "(\\s-*(" eof t)
+            (setq let-begin (match-beginning 0))
+            (backward-char 1)
+            (setq p (point))
+            (setq start-col (current-column))
+            (setq pad-length start-col)
+            (setq pad (concat "\n" (make-string pad-length ? )))
+            (insert pad)
+            (setq eof (+ eof (length pad)))
+            (goto-char p)
+            (when (re-search-backward "(\\s-*" let-begin t)
+              (forward-sexp)
+              (backward-char 1)
+              (setq pad-length (+ start-col 2))
+              (setq pad (concat "\n" (make-string pad-length ? )))
+              (insert pad)
+              (setq eof (+ eof (length pad)))
+              )
+            )
+          )
+        )
+      )
     ))
 
 
