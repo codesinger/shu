@@ -410,7 +410,6 @@ changes to the function are complete, you can run SHU-TIGHTEN-LISP to put the
 parentheses back where they belong."
   (interactive)
   (let (
-        (gb (get-buffer-create "**boo**"))
         (bof)
         (eof)
         (ssfun
@@ -445,8 +444,7 @@ parentheses back where they belong."
         (pad)
         (pad-length)
         (start-col)
-        (actual)
-        (line)
+        (let-begin)
         )
     (save-excursion
       (if (not (re-search-backward ssfun nil t))
@@ -456,13 +454,12 @@ parentheses back where they belong."
         (setq bof (match-beginning 0))
         (setq eof (shu-point-at-sexp bof))
         ;; Handle all containing functions other than "let"
+        (goto-char bof)
         (while doing
           (if (not (re-search-forward ss eof t))
               (setq doing nil)
             (setq p (1- (point)))
             (goto-char (match-beginning 0))
-            (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
-            (princ (concat line "\n") gb)
             (setq start-col (current-column))
             (beginning-of-line)
             (forward-sexp)
@@ -471,8 +468,7 @@ parentheses back where they belong."
             (setq pad (concat "\n" (make-string pad-length ? )))
             (insert pad)
             (setq eof (+ eof (length pad)))
-            (setq actual (buffer-substring-no-properties bof eof))
-            (princ (format "actual:\n[%s]" actual) gb)
+            (goto-char p)
             )
           )
         ;; Handle "let" and "let*"

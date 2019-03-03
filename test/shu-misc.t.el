@@ -390,9 +390,11 @@
           "(defun jjj ()\n"
           "  \"Doc string.\"\n"
           "  (interactive)\n"
-          "  (let ((bob)\n"
+          "  (let (\n"
+          "        (bob)\n"
           "        (bar)\n"
-          "        (boo))\n"
+          "        (boo)\n"
+          "          )\n"
           "    (while bob\n"
           "      (setq bar (cdr bob))\n"
           "      (when bar\n"
@@ -403,7 +405,6 @@
           "        )\n"
           "      (setq bob (cdr bob))\n"
           "      )\n"
-          "    \n"
           "    ))\n"
           ))
         (actual))
@@ -417,5 +418,7 @@
       (should (stringp actual))
       (should (string= expected actual)))
     ))
+
+
 
 ;;; shu-misc.t.el ends here
