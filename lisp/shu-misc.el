@@ -1046,6 +1046,8 @@ shu- prefix removed."
   (defalias 'gquote 'shu-gquote)
   (defalias 'new-latex 'shu-new-latex)
   (defalias 'dup 'shu-dup)
+  (defalias 'tighten-lisp 'shu-tighten-lisp)
+  (defalias 'loosen-lisp 'shu-loosen-lisp)
   (defalias 'new-lisp 'shu-new-lisp)
   (defalias 'new-ert 'shu-new-ert)
   (defalias 'new-lisp-while 'shu-new-lisp-while)
