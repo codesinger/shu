@@ -370,7 +370,6 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
         (ss2 "\\s-+($")
         (bob)
         (eob))
-    (setq debug-on-error t)
     (save-excursion
       (if (not (re-search-backward ssfun nil t))
           (progn
