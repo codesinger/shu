@@ -575,4 +575,20 @@ results in the following output being returned:
     new-list
     ))
 
+
+
+;;
+;;  shu-point-at-sexp
+;;
+(defsubst shu-point-at-sexp (sos)
+  "Return the point of the sexp that matches the point at SOS."
+  (interactive)
+  (let ((eos))
+    (save-excursion
+      (goto-char sos)
+      (forward-sexp)
+      (setq eos (point)))
+    eos
+    ))
+
 ;;; shu-base.el ends here

@@ -402,9 +402,21 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
 ;;  shu-loosen-lisp
 ;;
 (defun shu-loosen-lisp ()
-  "Doc string."
+  "Within the bounds of a lisp function, unwind the parentheses that terminate
+conditional and containing functions such that it is convenient to insert code
+inside of them without having to worry about which line contains the closing
+parenthesis.  All closing parentheses are now on separate lines.  Once the
+changes to the function are complete, you can run SHU-TIGHTEN-LISP to put the
+parentheses back where they belong."
   (interactive)
   (let (
+        (bof)
+        (eof)
+        (ssfun
+         (concat
+          "("
+          "\\s-*"
+          "\\(defun\\|defsubst\\|defmacro\\)"))
         (ss (concat
              "("
              "\\s-*"
@@ -425,19 +437,29 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
         (pad-length)
         (start-col)
         )
-    (while doing
-      (if (not (re-search-forward ss nil t))
-          (setq doing nil)
-        (setq p (1- (point)))
-        (goto-char (match-beginning 0))
-        (setq start-col (current-column))
-        (beginning-of-line)
-        (forward-sexp)
-        (backward-char 1)
-        (setq pad-length (1+ start-col))
-        (setq pad (concat "\n" (make-string pad-length ? )))
-        (insert pad)
-        (goto-char p)
+    (save-excursion
+      (if (not (re-search-backward ssfun nil t))
+          (progn
+            (ding)
+            (message "%s" "Not inside a macro or function"))
+        (setq bof (match-beginning 0))
+        (setq eof (shu-point-at-sexp bof))
+        (while doing
+          (if (not (re-search-forward ss eof t))
+              (setq doing nil)
+            (setq p (1- (point)))
+            (goto-char (match-beginning 0))
+            (setq start-col (current-column))
+            (beginning-of-line)
+            (forward-sexp)
+            (backward-char 1)
+            (setq pad-length (1+ start-col))
+            (setq pad (concat "\n" (make-string pad-length ? )))
+            (insert pad)
+            (setq eof (shu-point-at-sexp bof))
+            (goto-char p)
+            )
+          )
         )
       )
     ))
