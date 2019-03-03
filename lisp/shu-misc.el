@@ -405,7 +405,6 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
   "Doc string."
   (interactive)
   (let (
-        (gb (get-buffer-create "**boo**"))
         (ss (concat
              "("
              "\\s-*"
@@ -433,7 +432,6 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
         (goto-char (match-beginning 0))
         (setq start-col (current-column))
         (beginning-of-line)
-        (princ (format "%s\n" (buffer-substring-no-properties (line-beginning-position) (line-end-position))) gb)
         (forward-sexp)
         (backward-char 1)
         (setq pad-length (1+ start-col))
