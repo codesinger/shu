@@ -591,15 +591,6 @@ the buffer GITBUF."
       " */\n"
       "\n"))
     (run-hooks 'shu-bde-gen-file-identifier-hook)
-    (insert
-     (concat
-      "\n"
-      "//@PURPOSE: Provide an  ...\n"
-      "//         \n"
-      "//@CLASSES:\n"
-      "//   " namespace-name  namespace-sep class-name "\n"
-      "//\n"
-      "//@AUTHOR: " author "\n"))
     (run-hooks 'shu-bde-gen-h-includes-hook)
     (insert
      (concat
@@ -680,12 +671,6 @@ the buffer GITBUF."
       "\n"
       outer-namespace
       inner-namespace
-      "\n"
-      "\n"
-      "\n"
-      "namespace {\n"
-      "\n"
-      "}  // close anonymous namespace\n"
       "\n"
       "\n"
       "\n"
