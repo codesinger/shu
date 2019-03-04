@@ -104,3 +104,10 @@ Two things have to change.
      pointer to list of "::" followed by unquoted token and give a count of three.
      So the sub list may match up to three times to be considered successful, or
      something like that.
+
+  3. Once you have a side pointer to another list to follow, you can also use that
+     side pointer for a list of alternatives. e.g.,
+
+               1. Keyword class
+               2. Unquoted token
+               3. "{" or ":"
