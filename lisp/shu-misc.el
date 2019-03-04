@@ -369,7 +369,8 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
         (ss "\\s-+)$")
         (ss2 "\\s-+($")
         (bob)
-        (eob))
+        (eob)
+        (del-count))
     (save-excursion
       (if (not (re-search-backward ssfun nil t))
           (progn
@@ -392,7 +393,8 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
           (when (re-search-forward "^\\s-+(")
             (setq eob (1- (point)))
             (delete-region bob eob)
-            (setq eof (shu-point-at-sexp bof))))))
+            (setq del-count (1+ (- eob bob)))
+            (setq eof (- eof del-count))))))
     ))
 
 
