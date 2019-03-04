@@ -82,3 +82,25 @@ Things in the pattern list
   3. Comparison value
   4. Valuation function
   5. Return value indicator
+
+
+============================================
+
+Two things have to change.
+
+  1. You cannot just use cons cells to build up a match list.  If you want to change
+     the format of the match list, all of your manually =built lists are rubbish.
+
+  2. There has to be a match type that is "pointer to other match list", perhaps
+     with a count.
+
+     Right now, the lists for "using namespace" come in mseveral flavors:
+
+       using namespace a
+       using namespace a::b
+       using namespace a::b::c
+
+     Each one is a saparate list.  Yoiu could have "using namespace a" followed by
+     pointer to list of "::" followed by unquoted token and give a count of three.
+     So the sub list may match up to three times to be considered successful, or
+     something like that.
