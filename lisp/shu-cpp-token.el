@@ -891,17 +891,11 @@ line.  If it starts with /*, skip to terminating */.  If there is no terminating
 ;;
 (defun shu-cpp-make-token-info (token token-type spoint epoint &optional error-message)
   "Pack the supplied arguments into a TOKEN-INFO and return the TOKEN-INFO."
-  (let
-      ((token-info)
-       (info)
-       (ext-info)
-       (point-pair))
-    (setq point-pair (cons spoint epoint))
-    (setq ext-info (cons error-message point-pair))
-    (setq info (cons token-type ext-info))
-    (setq token-info (cons info token))
-    token-info
-    ))
+  (cons
+   (cons token-type
+         (cons error-message
+               (cons spoint epoint))) token)
+  )
 
 
 ;;
