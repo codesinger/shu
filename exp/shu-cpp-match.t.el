@@ -50,7 +50,7 @@
         (xmatch-token-type)
         (xmatch-token-value)
         )
-    (setq match-info (shu-cpp-make-match-info match-info op-code match-eval-func
+    (setq match-info (shu-cpp-make-match-info op-code match-eval-func
                                               match-ret-ind match-token-type
                                               match-token-value))
     (shu-cpp-match-extract-info match-info xop-code xmatch-eval-func

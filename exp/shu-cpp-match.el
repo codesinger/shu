@@ -140,19 +140,14 @@ the token value must staisify the regular expression for a C++ variable name.")
 ;;
 ;;  shu-cpp-make-match-info
 ;;
-(defun shu-cpp-make-match-info (match-info op-code match-eval-func
-                                           match-ret-ind match-token-type match-token-value)
-  "Doc string."
-  (let (
-        (match-type)
-        (match-func)
-        (match-ext)
-        )
-    (setq match-type (cons match-token-type match-token-value))
-    (setq match-func (cons match-ret-ind match-eval-func))
-    (setq match-ext (cons match-func match-type))
-    (setq match-info (cons op-code match-ext))
-    ))
+(defun shu-cpp-make-match-info (op-code match-eval-func match-ret-ind
+                                        match-token-type match-token-value)
+  "Return a match-info structure from the given arguments"
+  (cons op-code
+        (cons
+         (cons match-ret-ind match-eval-func)
+         (cons match-token-type match-token-value)))
+  )
 
 
 
