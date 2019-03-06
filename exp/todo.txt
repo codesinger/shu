@@ -111,3 +111,12 @@ Two things have to change.
                1. Keyword class
                2. Unquoted token
                3. "{" or ":"
+
+  4, You can also use the side pointer for a list to be mached zero or more times
+
+               1. Keyword class
+               2. Unquoted token
+               3. size list of "::" followed by unquoted toek
+
+     If the side list is not matched at all, you have a simple class name.
+     If it is matched once, you have a::b, etc.

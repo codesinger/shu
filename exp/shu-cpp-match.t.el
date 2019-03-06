@@ -28,6 +28,7 @@
 
 ;;; Code:
 
+(require 'ert)
 (require 'shu-cpp-match)
 
 
@@ -493,6 +494,30 @@
     (should actual-name)
     (should (stringp actual-name))
     (should (string= name actual-name))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-match-find-using-1
+;;
+(ert-deftest shu-test-shu-cpp-match-find-using-1 ()
+  (let ((token-list)
+        (token-info)
+        (ret)
+        (tlist)
+        (count 0)
+        (data
+         (concat
+          "// Hi there\n"
+          "using namespace ::std;\n"
+          "// Nother comment\n")))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq ret (shu-cpp-match-find-using token-list))
+      (should ret)
+      (should (listp ret)))
     ))
 
 ;;; shu-cpp-match.t.el ends here

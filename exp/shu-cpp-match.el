@@ -367,131 +367,133 @@ the matched token was to be added to the list."
          (string-match rx token))
     ))
 
-
+;;
+;;  shu-cpp-namespace-match-list
+;;
 (defconst shu-cpp-namespace-match-list
   (list
    (list  ;; "using namespace <name>;"
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-kw "using")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-kw "namespace")))
-    (cons shu-cpp-token-match-type-same-rx
-          (cons
-           (cons t 'shu-cpp-token-match-same-rx)
-           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op ";")))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-kw
+                               "using")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-kw
+                               "namespace")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                               (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
     )
    (list  ;; "using namespace <name1>::<name2>;"
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-kw "using")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-kw "namespace")))
-    (cons shu-cpp-token-match-type-same-rx
-          (cons
-           (cons t 'shu-cpp-token-match-same-rx)
-           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op "::")))
-    (cons shu-cpp-token-match-type-same-rx
-          (cons
-           (cons t 'shu-cpp-token-match-same-rx)
-           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op ";")))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-kw
+                               "using")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-kw
+                               "namespace")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                               (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                               "::")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                               (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
     )
    (list  ;; "using namespace <name1>::<name2>::<name3;"
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-kw "using")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-kw "namespace")))
-    (cons shu-cpp-token-match-type-same-rx
-          (cons
-           (cons t 'shu-cpp-token-match-same-rx)
-           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op "::")))
-    (cons shu-cpp-token-match-type-same-rx
-          (cons
-           (cons t 'shu-cpp-token-match-same-rx)
-           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op "::")))
-    (cons shu-cpp-token-match-type-same-rx
-          (cons
-           (cons t 'shu-cpp-token-match-same-rx)
-           (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op ";")))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-kw
+                               "using")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-kw
+                               "namespace")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                               (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                               "::")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                               (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                               "::")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                               (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
     )
    (list  ;;  "using namespace ::std;"
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-kw "using")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-kw "namespace")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op "::")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "std")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op ";"))))
-   (list  ;;  "using namespace ::bsl;"
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-kw "using")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-kw "namespace")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons nil 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op "::")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-uq "bsl")))
-    (cons shu-cpp-token-match-type-same
-          (cons
-           (cons t 'shu-cpp-token-match-same)
-           (cons shu-cpp-token-type-op ";")))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-kw
+                               "using")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-kw
+                               "namespace")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                               "::")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-uq
+                               "std")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
     )
-   )
+   (list  ;;  "using namespace ::bsl;"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-kw
+                               "using")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-kw
+                               "namespace")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                               "::")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-uq
+                               "bsl")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
+    ))
   "The list of patterns to look for to match a \"using namespace\" directive.")
 
 
