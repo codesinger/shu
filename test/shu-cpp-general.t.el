@@ -2237,4 +2237,38 @@ This is most likely the name of an include file and not the name of a class."
       (should (not actual-name)))
     ))
 
+
+
+;;
+;;  shu-test-shu-cpp-get-variable-name-position-1
+;;
+(ert-deftest shu-test-shu-cpp-get-variable-name-position-1 ()
+  (let ((data "  mumbleFrotz  ")
+        (ret-val)
+        (expected (cons 3 14)))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "mum" nil t))
+      (setq ret-val (shu-cpp-get-variable-name-position))
+      (should ret-val)
+      (should (consp ret-val))
+      (should (equal expected ret-val)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-get-variable-name-position-2
+;;
+(ert-deftest shu-test-shu-cpp-get-variable-name-position-2 ()
+  (let ((data "         ")
+        (ret-val))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 5)
+      (setq ret-val (shu-cpp-get-variable-name-position))
+      (should (not ret-val)))
+    ))
+
 ;;; shu-cpp-general.t.el ends here

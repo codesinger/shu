@@ -363,7 +363,7 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
          (concat
           "("
           "\\s-*"
-          "\\(defun\\|defsubst\\|defmacro\\)"))
+          "\\(defun\\|defsubst\\|defmacro\\|ert-deftest\\)"))
         (bof)
         (eof)
         (ss "\\s-+)$")
@@ -416,7 +416,7 @@ parentheses back where they belong."
          (concat
           "("
           "\\s-*"
-          "\\(defun\\|defsubst\\|defmacro\\)"))
+          "\\(defun\\|defsubst\\|defmacro\\\\|ert-deftest)"))
         (ss (concat
              "("
              "\\s-*"

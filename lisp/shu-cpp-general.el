@@ -2517,6 +2517,37 @@ otherwise, return nil."
 
 
 
+;;
+;;  shu-cpp-get-variable-name-position
+;;
+(defun shu-cpp-get-variable-name-position ()
+  "If point is sitting on something that looks like a legal varuable name,
+return a cons cell that contains the start and end positions of the name
+otherwise, return nil."
+  (let ((target-char shu-cpp-name)
+        (target-name (concat shu-cpp-name "+"))
+        (bol (line-beginning-position))
+        (eol (line-end-position))
+        (start-pos)
+        (end-pos)
+        (ret-val))
+    (save-excursion
+      (when (looking-at target-char) ;; Looking at a legal variable name character
+        (while (and (looking-at target-char) ;; Still on a variable name char
+                    (> (point) bol)) ;; And still on same line
+          (backward-char 1))            ;; Keep moving back until we aren't on a variable name char
+        ;;  or we hit the beginning of the line
+        (when (not (looking-at target-char)) ;; Moved backward past beginning of name
+          (forward-char 1))             ;; Move forward to what might be the beginning
+        (when (re-search-forward target-name eol t)
+          (setq start-pos (match-beginning 0))
+          (setq end-pos (match-end 0))
+          (setq ret-val (cons start-pos end-pos))
+          ))) ;; Have something that matches variable name syntax
+    ret-val
+    ))
+
+
 
 ;;
 ;;  shu-cpp-find-variable-name-by-token
@@ -2590,6 +2621,30 @@ line that contains the token."
 
 
 
+;;
+;;  shu-to-snake
+;;
+(defun shu-to-snake ()
+  "Convert the variabla name at point from camel case to snake case."
+  (interactive)
+  (let ((pos (shu-cpp-get-variable-name-position))
+        (start-pos)
+        (end-pos)
+        (case-fold-search nil))
+    (if (not pos)
+        (progn
+          (ding)
+          (message "%s" "Not sitting on a variable name"))
+      (setq start-pos (car pos))
+      (setq end-pos (cdr pos))
+      (goto-char start-pos)
+      (while (re-search-forward "\\([A-Z]\\)" end-pos t)
+        (replace-match (concat "_" (downcase (match-string 1))) t t)
+        (setq end-pos (1+ end-pos))))
+    ))
+
+
+
 
 ;;
 ;;  shu-cpp-general-set-alias
@@ -2635,6 +2690,7 @@ shu- prefix removed."
   (defalias 'dbx-malloc 'shu-dbx-summarize-malloc)
   (defalias 'fixp 'shu-cpp-fix-prototype)
   (defalias 'getdef 'shu-cpp-find-h-definition)
+  (defalias 'to-snake 'shu-to-snake)
   )
 
 ;;; shu-cpp-general.el ends here
