@@ -416,7 +416,11 @@ parentheses back where they belong."
          (concat
           "("
           "\\s-*"
-          "\\(defun\\|defsubst\\|defmacro\\\\|ert-deftest)"))
+          "\\(defun"
+          "\\|defsubst"
+          "\\|defmacro"
+          "\\|ert-deftest)"
+          "\\)"))
         (ss (concat
              "("
              "\\s-*"
