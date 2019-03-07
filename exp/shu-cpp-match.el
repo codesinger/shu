@@ -136,6 +136,21 @@ must both match.")
 the token value must staisify the regular expression for a C++ variable name.")
 
 
+(defconst shu-cpp-token-match-side-loop 1
+  "The match side constant that indicates a looping side list.  The token list
+must match the side list zero or more times.  If the first item in the list does
+not match, this is considered a success.  If the first item matches, then all
+items in the side list must match.  If all items in the side list match, we go
+back to the top of the side list and try again until we find a token that does
+not match the first item in the sice list.  The matchis considered a failure
+only of there is a partial match between the tokens and the side list.")
+
+(defconst shu-cpp-token-match-side-choose 2
+  "The match side constant that indicates a choice.  The match is considered a
+success if any one item in the side list matches the current token.")
+
+
+
 
 ;;
 ;;  shu-cpp-make-match-info
