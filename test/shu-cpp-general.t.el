@@ -2175,6 +2175,32 @@ This is most likely the name of an include file and not the name of a class."
 
 
 
+;;
+;;  shu-test-shu-cpp-fix-prototype-3
+;;
+;;(ert-deftest shu-test-shu-cpp-fix-prototype-3 ()
+;;  (let* ((pad (make-string shu-cpp-indent-length ? ))
+;;         (data
+;;          (concat
+;;           "const MetricsMap &MetricsCollection::metrics() const\n"
+;;           "\n"))
+;;         (expected
+;;          (concat
+;;           pad "const MetricsMap &metrics() const;\n"
+;;           "\n"))
+;;         (actual))
+;;    (with-temp-buffer
+;;      (insert data)
+;;      (goto-char (point-min))
+;;      (shu-cpp-fix-prototype)
+;;      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+;;      (should actual)
+;;      (should (stringp actual))
+;;      (should (string= expected actual)))
+;;    ))
+;;
+
+
 
 ;;
 ;;  shu-test-shu-cpp-get-variable-name-1
