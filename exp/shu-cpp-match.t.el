@@ -109,6 +109,24 @@
     ))
 
 
+;;
+;;  shu-test-shu-cpp-match-extract-op-code-1
+;;
+(ert-deftest shu-test-shu-cpp-match-extract-op-code-1 ()
+  (let ((data
+         (cons shu-cpp-token-match-type-same
+               (cons
+                (cons nil 'shu-cpp-token-match-same)
+                (cons shu-cpp-token-type-kw "using"))))
+        (expected shu-cpp-token-match-type-same)
+        (actual))
+    (setq actual (shu-cpp-match-extract-op-code data))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
 
 
 ;;

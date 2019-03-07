@@ -136,7 +136,7 @@ must both match.")
 the token value must staisify the regular expression for a C++ variable name.")
 
 
-(defconst shu-cpp-token-match-side-loop 1
+(defconst shu-cpp-token-match-type-side-loop 4
   "The match side constant that indicates a looping side list.  The token list
 must match the side list zero or more times.  If the first item in the list does
 not match, this is considered a success.  If the first item matches, then all
@@ -145,7 +145,7 @@ back to the top of the side list and try again until we find a token that does
 not match the first item in the sice list.  The matchis considered a failure
 only of there is a partial match between the tokens and the side list.")
 
-(defconst shu-cpp-token-match-side-choose 2
+(defconst shu-cpp-token-match-type-side-choose 5
   "The match side constant that indicates a choice.  The match is considered a
 success if any one item in the side list matches the current token.")
 
@@ -195,11 +195,19 @@ success if any one item in the side list matches the current token.")
 
 
 ;;
+;;  shu-cpp-match-extract-op-code
+;;
+(defsubst shu-cpp-match-extract-op-code (match-info)
+  "Return the op code from the match-info."
+  (car match-info)
+  )
+
+
+;;
 ;;  shu-cpp-match-extract-type
 ;;
 (defsubst shu-cpp-match-extract-type (match-info)
-  "Doc string."
-  (interactive)
+  "Return the token type from the match-info."
   (let (
         (match-ext)
         (match-type)
@@ -214,8 +222,7 @@ success if any one item in the side list matches the current token.")
 ;;  shu-cpp-match-extract-token
 ;;
 (defsubst shu-cpp-match-extract-token (match-info)
-  "Doc string."
-  (interactive)
+  "Return the token from the match-info."
   (let (
         (match-ext)
         (match-type)
