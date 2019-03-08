@@ -2625,7 +2625,9 @@ line that contains the token."
 ;;  shu-to-snake
 ;;
 (defun shu-to-snake ()
-  "Convert the variabla name at point from camel case to snake case."
+  "Convert the variabla name at point from camel case to snake case.
+
+For example, \"mumbleSomethingOther\" becomes \"mumble_something_other\"."
   (interactive)
   (let ((pos (shu-cpp-get-variable-name-position))
         (start-pos)
@@ -2635,12 +2637,13 @@ line that contains the token."
         (progn
           (ding)
           (message "%s" "Not sitting on a variable name"))
+      (save-excursion
       (setq start-pos (car pos))
       (setq end-pos (cdr pos))
       (goto-char start-pos)
       (while (re-search-forward "\\([A-Z]\\)" end-pos t)
         (replace-match (concat "_" (downcase (match-string 1))) t t)
-        (setq end-pos (1+ end-pos))))
+        (setq end-pos (1+ end-pos)))))
     ))
 
 
