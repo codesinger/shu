@@ -118,6 +118,24 @@
 ;;                     with or applied to the token-value from the token-info
 ;;
 ;;
+;;
+;; If op-code indicates that this is a side list, then we have the structure
+;; shown below, with side-list pointing to the first match-info in the side
+;; list.
+;;
+;;
+;;  match-info
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> side-list
+;;        |
+;;        +-------------> op-code
+;;
 
 
 
@@ -134,6 +152,10 @@ must both match.")
 (defconst shu-cpp-token-match-type-same-rx 3
   "The match type constant that indicates that the token type must match and
 the token value must staisify the regular expression for a C++ variable name.")
+
+
+(defconst shu-cpp-token-match-type-non-loop-max 3
+  "The maximum match type value that does not indicate a side loop.")
 
 
 (defconst shu-cpp-token-match-type-side-loop 4
@@ -162,6 +184,16 @@ success if any one item in the side list matches the current token.")
         (cons
          (cons match-ret-ind match-eval-func)
          (cons match-token-type match-token-value)))
+  )
+
+
+;;
+;;  shu-cpp-make-match-side-list
+;;
+(defun shu-cpp-make-match-side-list (op-code match-list)
+  "Return a match-info structure from the given arguments that represents a
+side list."
+  (cons op-code match-list)
   )
 
 
@@ -201,6 +233,25 @@ success if any one item in the side list matches the current token.")
   "Return the op code from the match-info."
   (car match-info)
   )
+
+
+;;
+;;  shu-cpp-match-extract-side-list
+;;
+(defsubst shu-cpp-match-extract-side-list (match-info)
+  "Return the op code from the match-info."
+  (cdr match-info)
+  )
+
+
+
+;;
+;;  shu-cpp-match-is-side-list
+;;
+(defsubst shu-cpp-match-is-side-list (op-code)
+  "Return true if the OP-CODE represents a side list operation."
+    (> op-code shu-cpp-token-match-type-non-loop-max)
+    )
 
 
 ;;
@@ -343,6 +394,49 @@ the matched token was to be added to the list."
     ))
 
 
+
+;;
+;;  shu-cpp-match-or-list
+;;
+(defun shu-cpp-match-or-list (rlist token-list match-info)
+  "RLIST points to the current return value list, if any.  TOKEN-LIST points to
+the next token-info to match.  MATCH-INFO is the head of the side list with
+which to match.  The match succeeds if the first token-info in TOKEN-LIST
+matches any of the match-info members of MATCH-INFO.  If the match fails, return
+nil.  If the match succeeds, return a cons cell pointing to two items.  The car
+is the next token-info in TOKEN-LIST.  The cdr is the return list, RLIST.  RLIST
+remains unchanged if the match-info that matched did not specify that the
+matched token-info was to be returned."
+  (let ((token-info (car token-list))
+        (side-list (shu-cpp-match-extract-side-list match-info))
+        (looking t)
+        (op-code)
+        (match-eval-func)
+        (match-ret-ind)
+        (match-token-type)
+        (match-token-value)
+        (did-match)
+        (ret-val))
+    (while (and looking side-list)
+      (setq match-info (car side-list))
+      (shu-cpp-match-extract-info match-info op-code match-eval-func
+                                  match-ret-ind match-token-type match-token-value)
+      (setq did-match (funcall match-eval-func match-info token-info))
+      (when did-match
+          (setq looking nil)
+        (when match-ret-ind
+          (push token-info rlist)))
+      (when looking
+        (if (not side-list)
+            (setq looking nil)
+          (setq side-list (cdr side-list)))))
+    (when did-match
+      (setq token-list (cdr token-list))
+      (setq ret-val (cons token-list rlist)))
+    ret-val
+    ))
+
+
 ;;
 ;;  shu-cpp-token-match-skip
 ;;
@@ -388,6 +482,22 @@ the matched token was to be added to the list."
     (and (= token-type match-token-type)
          (string-match rx token))
     ))
+
+;;
+;;  shu-cpp-brace-colon-or-list
+;;
+(defconst shu-cpp-brace-colon-or-list
+   (list  ;; operator "{"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                              "{")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                              ":")
+    )
+   )
 
 ;;
 ;;  shu-cpp-namespace-match-list
