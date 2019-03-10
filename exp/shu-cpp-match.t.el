@@ -564,8 +564,17 @@
 ;;  shu-test-shu-cpp-match-or-list-2
 ;;
 (ert-deftest shu-test-shu-cpp-match-or-list-2 ()
-  (let ((match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-choose
-                                                 shu-cpp-brace-colon-or-list))
+  (let ((match-info
+         (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-choose
+                                       (list  ;; operator "{" or operator ":"
+                                        (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                                                  'shu-cpp-token-match-same
+                                                                  nil shu-cpp-token-type-op
+                                                                  "{")
+                                        (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                                                  'shu-cpp-token-match-same
+                                                                  t shu-cpp-token-type-op
+                                                                  ":"))))
         (data ": something :")
         (token-list)
         (rlist)
@@ -583,7 +592,17 @@
     (should (consp ret-val))
     (setq new-token-list (car ret-val))
     (setq new-rlist (cdr ret-val))
-    (should (not new-rlist))
+    (should new-rlist)
+    (should (listp new-rlist))
+    (setq token-info (car new-rlist))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-op))
+    (should token)
+    (should (stringp token))
+    (should (string= token ":"))
     (should new-token-list)
     (should (listp new-token-list))
     (setq token-info (car new-token-list))
