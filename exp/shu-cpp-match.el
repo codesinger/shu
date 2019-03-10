@@ -437,6 +437,100 @@ matched token-info was to be returned."
     ))
 
 
+
+;;
+;;  shu-cpp-match-repeat-list
+;;
+(defun shu-cpp-match-repeat-list (rlist token-list match-info)
+  "RLIST points to the current return value list, if any.  TOKEN-LIST points to
+the next token-info to match.  MATCH-INFO is the head of the side list with
+which to match.  The match succeeds if the token-infos in TOKEN-LIST match all
+of the match-infos in MATCH-LIST zero or more times.  The token-infos are
+matched repeatedy against the match-infos.  If there is a failure matching the
+first match-info, the match is successful.  If there is a failure matching any
+other match-info, the match fails.
+
+This is useful when matching repeating but optional patterns.  For example, a
+C++ name could be any of the following:
+
+     a
+     a::b
+     a::b::c
+
+You can match this with a match list that requires an unquoted token that
+matches a C++ name, followed by a side list looking for operator \"::\" followed
+by an unquoted token.  If there is no match, then you have an unqualified name.
+If it matches once, you have a name with one level of qualification.  But if it
+fails in the middle, then you have found something that looks like \"a::\",
+which is not a valid C++ name."
+  (let (
+        (match-list (shu-cpp-match-extract-side-list match-info))
+        (looking t)
+        (ret-val)
+        (pret-val)
+        )
+    (while (and looking token-list)
+      (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
+      (if (not ret-val)
+          (progn
+            (setq ret-val pret-val)
+            (setq looking nil)
+            )
+        (setq match-list (shu-cpp-match-extract-side-list match-info))
+        (setq token-list (car ret-val))
+        (setq rlist (cdr ret-val))
+        (setq pret-val ret-val)
+        )
+      )
+    ))
+
+
+;;
+;;  shu-cpp-match-repeat-sub-list
+;;
+(defun shu-cpp-match-repeat-sub-list (rlist token-list match-list)
+  "Do ine iteration of the matching."
+  (interactive)
+  (let (
+        (looking t)
+        (orig-token-list token-list)
+        (token-info)
+        (match-info)
+        (did-match)
+        (match-success)
+        (op-code)
+        (match-eval-func)
+        (match-ret-ind)
+        (match-token-type)
+        (match-token-value)
+        (match-success)
+        (ret-val)
+        )
+    (while (and token-list match-list looking)
+      (setq token-info (car token-list))
+      (setq match-info (car match-list))
+      (shu-cpp-match-extract-info match-info op-code match-eval-func
+                                  match-ret-ind match-token-type match-token-value)
+      (setq did-match (funcall match-eval-func match-info token-info))
+      (when (not did-match)
+        (setq looking nil)
+        )
+      (when looking
+        (when match-ret-ind
+          (push token-info rlist)
+          )
+        (setq token-list (cdr token-list))
+        (setq match-list (cdr match-list))
+        )
+      )
+    (when (or did-match
+              (equal token-list orig-token-list))
+      (setq ret-val (cons token-list rlist))
+      )
+    ret-val
+    ))
+
+
 ;;
 ;;  shu-cpp-token-match-skip
 ;;
@@ -487,7 +581,7 @@ matched token-info was to be returned."
 ;;  shu-cpp-brace-colon-or-list
 ;;
 (defconst shu-cpp-brace-colon-or-list
-   (list  ;; operator "{"
+   (list  ;; operator "{" or operator ":"
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               nil shu-cpp-token-type-op
