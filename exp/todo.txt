@@ -88,10 +88,10 @@ Things in the pattern list
 
 Two things have to change.
 
-  1. You cannot just use cons cells to build up a match list.  If you want to change
+  DONE 1. You cannot just use cons cells to build up a match list.  If you want to change
      the format of the match list, all of your manually =built lists are rubbish.
 
-  2. There has to be a match type that is "pointer to other match list", perhaps
+  DONE 2. There has to be a match type that is "pointer to other match list", perhaps
      with a count.
 
      Right now, the lists for "using namespace" come in mseveral flavors:
@@ -120,3 +120,15 @@ Two things have to change.
 
      If the side list is not matched at all, you have a simple class name.
      If it is matched once, you have a::b, etc.
+
+
+============================================
+
+
+11 March 2019
+
+Re-think the real meaning of shu-cpp-match-repeat-list.
+
+It is a function that can never fail.  It either harvests some repeating information
+and advances the token list or it does nothing,  In either case, the scan resumes
+with the new token-list (which my be unchanged).
