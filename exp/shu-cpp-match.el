@@ -464,25 +464,36 @@ If it matches once, you have a name with one level of qualification.  But if it
 fails in the middle, then you have found something that looks like \"a::\",
 which is not a valid C++ name."
   (let (
+        (gb (get-buffer-create "**boo**"))
         (match-list (shu-cpp-match-extract-side-list match-info))
+        (orig-token-list)
         (looking t)
         (ret-val)
         (pret-val)
         )
     (while (and looking token-list)
+      (setq orig-token-list token-list)
       (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
       (if (not ret-val)
           (progn
+            (princ "   shu-cpp-match-repeat-list: NOT matched\n" gb)
             (setq ret-val pret-val)
             (setq looking nil)
             )
+        (princ "   shu-cpp-match-repeat-list: matched\n" gb)
+        (if (equal orig-token-list token-list)
+            (setq looking nil)
         (setq match-list (shu-cpp-match-extract-side-list match-info))
         (setq token-list (car ret-val))
         (setq rlist (cdr ret-val))
         (setq pret-val ret-val)
         )
+        )
       )
+    (princ "shu-cpp-match-repeat-list: ret-val: " gb) (princ ret-val gb) (princ "\n" gb)
+    ret-val
     ))
+
 
 
 ;;
@@ -492,6 +503,7 @@ which is not a valid C++ name."
   "Do ine iteration of the matching."
   (interactive)
   (let (
+        (gb (get-buffer-create "**boo**"))
         (looking t)
         (orig-token-list token-list)
         (token-info)
@@ -519,13 +531,18 @@ which is not a valid C++ name."
         (when match-ret-ind
           (push token-info rlist)
           )
-        (setq token-list (cdr token-list))
+        (setq token-list (shu-cpp-token-next-non-comment token-list))
         (setq match-list (cdr match-list))
         )
       )
-    (when (or did-match
-              (equal token-list orig-token-list))
-      (setq ret-val (cons token-list rlist))
+    (setq match-success (or did-match
+                            (equal token-list orig-token-list)))
+    (if match-success
+        (progn
+          (setq ret-val (cons token-list rlist))
+          (princ "   shu-cpp-match-repeat-sub-list: matched\n" gb)
+          )
+      (princ "   shu-cpp-match-repeat-sub-list: NOT matched\n" gb)
       )
     ret-val
     ))
@@ -554,10 +571,16 @@ which is not a valid C++ name."
         (match-token (shu-cpp-match-extract-token match-info))
         (token-type (shu-cpp-token-extract-type token-info))
         (token (shu-cpp-token-extract-token token-info))
+        (did-match)
         )
     (princ (format "shu-cpp-token-match-same: token-type: %d, match-token-type: %d, token: \"%s\", match-token: \"%s\"\n" token-type match-token-type token match-token) gb)
-    (and (= token-type match-token-type)
-         (string= token match-token))
+    (setq did-match (and (= token-type match-token-type)
+                         (string= token match-token)))
+    (if did-match
+        (princ "      matched\n" gb)
+        (princ "      NOT matched\n" gb)
+        )
+    did-match
     ))
 
 
@@ -568,13 +591,22 @@ which is not a valid C++ name."
   "Doc string."
   (interactive)
   (let (
+        (gb (get-buffer-create "**boo**"))
         (match-token-type (shu-cpp-match-extract-type match-info))
+        (match-token (shu-cpp-match-extract-token match-info))
         (token-type (shu-cpp-token-extract-type token-info))
         (token (shu-cpp-token-extract-token token-info))
         (rx (concat shu-cpp-name "+"))
+        (did-match)
         )
-    (and (= token-type match-token-type)
-         (string-match rx token))
+    (princ (format "shu-cpp-token-match-same-rx: token-type: %d, match-token-type: %d, token: \"%s\", match-token: \"%s\"\n" token-type match-token-type token match-token) gb)
+    (setq did-match (and (= token-type match-token-type)
+         (string-match rx token)))
+    (if did-match
+        (princ "      matched\n" gb)
+        (princ "      NOT matched\n" gb)
+        )
+    did-match
     ))
 
 ;;
@@ -895,31 +927,31 @@ and end point of the entire \"using namespace\" directive."
 ;;
 ;;  tccc
 ;;
-(ert-deftest tccc ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (nslist)
-        (data
-         (concat
-          "// This is something\n"
-          "using namespace std;\n"
-          "  using namespace ::bsl;\n"
-          "// This is something else\n"
-          "    using \n"
-          " // Hello\n"
-          " namespace /* there*/  whammo;\n"
-          " // again\n"
-          " using namespace blammo::target;\n"
-          "  /*  Comment  */\n"
-          ))
-        )
-    (with-temp-buffer
-      (insert data)
-      (setq nslist (ccc))
-      (princ "nslist: " gb) (princ nslist gb) (princ "\n" gb)
-      )
-    ))
-
+;;(ert-deftest tccc ()
+;;  (let (
+;;        (gb (get-buffer-create "**boo**"))
+;;        (nslist)
+;;        (data
+;;         (concat
+;;          "// This is something\n"
+;;          "using namespace std;\n"
+;;          "  using namespace ::bsl;\n"
+;;          "// This is something else\n"
+;;          "    using \n"
+;;          " // Hello\n"
+;;          " namespace /* there*/  whammo;\n"
+;;          " // again\n"
+;;          " using namespace blammo::target;\n"
+;;          "  /*  Comment  */\n"
+;;          ))
+;;        )
+;;    (with-temp-buffer
+;;      (insert data)
+;;      (setq nslist (ccc))
+;;      (princ "nslist: " gb) (princ nslist gb) (princ "\n" gb)
+;;      )
+;;    ))
+;;
 
 
 ;;
