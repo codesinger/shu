@@ -256,7 +256,6 @@
           ))
         (token-list)
         )
-    (setq debug-on-error t)
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
