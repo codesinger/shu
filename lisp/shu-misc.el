@@ -1093,6 +1093,57 @@ at point and continues to the end of the buffer."
     ))
 
 
+
+
+;;
+;;  shu-add-prefix
+;;
+(defun re-star (prefix)
+  "Put a prefix and a space in front of each line in the region.  Prompt is issued
+for the prefix."
+  (interactive "sPrefix? ")
+    (setq prefix (concat (shu-trim-trailing prefix) " "))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "\n" nil t)
+        (replace-match (concat "\n" prefix)))
+      ))
+
+
+
+
+;;
+;;  shu-de-star
+;;
+(defun shu-de-star ()
+  "Remove leading spaces and asterisk from each line in the region.  This is
+useful for editing doxygen comments of the form:
+
+   /*!
+    * This is some commentary.
+    * This is more commentary, etc.
+    */
+
+You snip out the middle lines and put them into a text file for formatting and
+spell-checking.  You want to get rid of all of the asterisks until you are
+done.
+
+This function gets rid of all the asterisks.  You can use SHU-ADD-PREFIX to
+put them back."
+  (interactive)
+  (let ((ss-blank "^\\s-*\\* ")
+    (ss-not "^\\s-*\\*"))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward ss-blank nil t)
+        (replace-match ""))
+      (goto-char (point-min))
+      (while (re-search-forward ss-not nil t)
+        (replace-match "")))
+    ))
+
+
+
 ;;
 ;;  shu-misc-set-alias
 ;;
@@ -1128,6 +1179,8 @@ shu- prefix removed."
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
   (defalias 'number-lines 'shu-number-lines)
+  (defalias 'add-prefix 'shu-add-prefix)
+  (defalias 'de-star 'shu-de-star)
   )
 
 ;;; shu-misc.el ends here
