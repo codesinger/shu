@@ -149,7 +149,7 @@
       "//\n"
       "//@AUTHOR: " author "\n"
       "\n"
-      "#include <bslalg_typetraits.h>\n"
+      "#include <bslmf_nestedtraitdeclaration.h>\n"
       "#include <bsl_iostream.h>\n"
       "\n"
       "\n"
