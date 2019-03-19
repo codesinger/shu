@@ -142,8 +142,8 @@
       "//\n"
       "//@AUTHOR: " author "\n"
       "\n"
-      "#include <bslmf_nestedtraitdeclaration.h>\n"
       "#include <bsl_iostream.h>\n"
+      "#include <bslmf_nestedtraitdeclaration.h>\n"
       "\n"
       "\n"
       "namespace BloombergLP {\n"
@@ -405,7 +405,16 @@
     (insert
      (concat
       "\n"
-      "  public:\n"
+      "  public:\n"))
+    (when use-allocator
+      (insert
+       (concat
+        "\n"
+        ipad "// TRAITS\n"
+        "\n"
+        ipad "BSLMF_NESTED_TRAIT_DECLARATION(BalmCollectionCallback, bslma::UsesBslmaAllocator);\n")))
+    (insert
+     (concat
       "\n"
       "    // CREATORS\n\n"
       ipad "/*!\n"
