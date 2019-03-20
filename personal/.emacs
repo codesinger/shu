@@ -107,7 +107,6 @@
 (load-file "~/emacs/shu-cpp-general.elc")
 (load-file "~/emacs/shu-cpp-misc.elc")
 (when (file-readable-p "~/emacs/slpbb.elc")
-  (load-file "~/emacs/shu-bb-cpp.elc")
   (load-file "~/emacs/slpbb.elc"))
 (when (file-readable-p "~/emacs/rmv-using.elc")
   (load-file "~/emacs/rmv-using.elc"))

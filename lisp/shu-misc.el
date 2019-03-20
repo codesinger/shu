@@ -1098,7 +1098,7 @@ at point and continues to the end of the buffer."
 ;;
 ;;  shu-add-prefix
 ;;
-(defun re-star (prefix)
+(defun shu-add-prefix (prefix)
   "Put a prefix and a space in front of each line in the region.  Prompt is issued
 for the prefix."
   (interactive "sPrefix? ")
