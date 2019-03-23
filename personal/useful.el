@@ -148,7 +148,7 @@ of every visited file.  Makes a useful history of all files visited."
      (concat
       "BALL_LOG_INFO_BLOCK\n"
       pad "{\n"
-      pad ipad "srvcctypes::NumpunctGuard  punct(BALL_LOG_OUTPUT_STREAM);\n"
+      pad ipad "fxpricingmetrics::NumpunctGuard  punct(BALL_LOG_OUTPUT_STREAM);\n"
       pad ipad "BALL_LOG_OUTPUT_STREAM\n"
       pad ipad "    << "))
     (setq pos (point))
@@ -174,12 +174,12 @@ of every visited file.  Makes a useful history of all files visited."
 ;;  npg
 ;;
 (defun npg ()
-  "Insert \"srvcctypes::NumpunctGuard  punct()\" at point."
+  "Insert \"fxpricingmetrics::NumpunctGuard  punct()\" at point."
   (interactive)
   (let (
         (pos)
         )
-    (insert "srvcctypes::NumpunctGuard  punct(")
+    (insert "fxpricingmetrics::NumpunctGuard  punct(")
     (setq pos (point))
     (insert ");")
     (goto-char pos)
@@ -190,9 +190,9 @@ of every visited file.  Makes a useful history of all files visited."
 ;;  npi
 ;;
 (defun npi ()
-  "Insert \"#include <srvcctypes_localnumpunct.h>\" at point."
+  "Insert \"#include <fxpricingmetrics_localnumpunct.h>\" at point."
   (interactive)
-    (insert "#include <srvcctypes_localnumpunct.h>")
+    (insert "#include <fxpricingmetrics_localnumpunct.h>")
     )
 
 
