@@ -351,13 +351,13 @@ text))
     text))
 )
 
-(setq shu-git-windows-shell-file "C:/Users/spalmer62/AppData/Local/Programs/Git/bin/sh.exe")
+(setq shu-git-windows-shell-file "c:/Program Files/Git/bin/sh.exe")
 (when (and (eq system-type 'windows-nt) (file-readable-p shu-git-windows-shell-file))
   (setq explicit-shell-file-name shu-git-windows-shell-file)
   ;; shell.el forms a variable name from the shell name.  In this case the shell
   ;; name sans-directory is sh.exe.  So the variable name is explicit-sh.exe-args.
   (setq explicit-sh.exe-args '("--login" "-i"))
-  (add-to-list 'exec-path "C:/Users/spalmer62/AppData/Local/Programs/Git/bin"))
+  (add-to-list 'exec-path "c:/Program Files/Git/bin"))
 
 ;; Projects enable short names
 (setq shu-cpp-project-short-names t)
