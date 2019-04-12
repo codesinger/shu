@@ -412,7 +412,7 @@
         "\n"
         ipad "// TRAITS\n"
         "\n"
-        ipad "BSLMF_NESTED_TRAIT_DECLARATION(BalmCollectionCallback, bslma::UsesBslmaAllocator);\n")))
+        ipad "BSLMF_NESTED_TRAIT_DECLARATION(" class-name ", bslma::UsesBslmaAllocator);\n")))
     (insert
      (concat
       "\n"
