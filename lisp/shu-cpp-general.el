@@ -726,6 +726,7 @@ SHU-CPP-INCLUDE-USER-BRACKETS variable is true, in which case the file name
 is delimited by left and right angle brackets."
   (interactive)
   (let ((name  (file-name-nondirectory (buffer-file-name)))
+        (ext)
         (left-delim (if shu-cpp-include-user-brackets
                    "<"
                  "\""))
@@ -735,9 +736,15 @@ is delimited by left and right angle brackets."
         (incl))
     (if (not name)
         (ding)
+      (setq ext (file-name-extension name))
+      (if (not (string= "H" (upcase ext)))
+          (progn
+            (ding)
+            (message "%s" "THIS IS NOT A HEADER FILE"))
       (setq incl (concat "#include "
                          left-delim name right-delim "\n"))
-      (shu-kill-new incl))
+      (shu-kill-new incl)
+      (message "%s" incl)))
     ))
 
 
