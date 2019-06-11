@@ -351,7 +351,7 @@ text))
     text))
 )
 
-(setq shu-git-path "C:/Program Files (x86)/Git/bin")
+(setq shu-git-path "C:/Program Files/Git/usr/bin/sh.exe")
 (setq shu-git-windows-shell-file (concat shu-git-path "/sh.exe"))
 (when (and (eq system-type 'windows-nt) (file-readable-p shu-git-windows-shell-file))
   (setq explicit-shell-file-name shu-git-windows-shell-file)
