@@ -1145,6 +1145,50 @@ put them back."
 
 
 ;;
+;;  shu-modified-buffers
+;;
+(defun shu-modified-buffers ()
+  "Show a list of all buffers associated with files whose status is modified.
+It is not uncommon to have many emacs windows open and to realize that one
+window has a file open and another window is also trying to edit it.  emacs
+warns the second window of the conflict, but it is sometimes difficult to tell
+which window holds the modified buffer.  The buffer list shows you all of the
+buffers with an asterisk next to each modified buffer, but if the buffer list
+is large, it can be difficult to find the one you seek.  This command lists
+only modified buffers that hold the contents of a file."
+  (interactive)
+  (let ((bl (buffer-list))
+        (buf)
+        (buf-name)
+        (buf-file-name)
+        (mod-list)
+        (gb))
+    (while bl
+      (setq buf (car bl))
+      (setq buf-name (buffer-name buf))
+      (when buf-name
+        (setq buf-file-name (buffer-file-name buf))
+        (when buf-file-name
+          (when (buffer-modified-p buf)
+            (push buf mod-list))))
+      (setq bl (cdr bl)))
+    (if (not mod-list)
+        (message "%s" "No modified buffers")
+      (setq gb (get-buffer-create "**shu-odified--buffers**"))
+      (switch-to-buffer gb)
+      (while mod-list
+        (setq buf (car mod-list))
+        (setq buf-name (buffer-name buf))
+        (setq buf-file-name (buffer-file-name buf))
+        (princ (concat buf-name "\n") gb)
+        (princ (concat "    " buf-file-name "\n") gb)
+        (setq mod-list (cdr mod-list)))
+      (goto-char (point-min)))
+    ))
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -1181,6 +1225,7 @@ shu- prefix removed."
   (defalias 'number-lines 'shu-number-lines)
   (defalias 'add-prefix 'shu-add-prefix)
   (defalias 'de-star 'shu-de-star)
+  (defalias 'modified-buffers 'shu-modified-buffers)
   )
 
 ;;; shu-misc.el ends here
