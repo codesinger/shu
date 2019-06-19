@@ -481,7 +481,7 @@
       "// FREE OPERATORS\n"
       "\n"
       "/*!\n"
-      " *  \\brief Stream an instance of " class-name " to the stream <code>os</code>\n"
+      " *  \\brief Stream an instance of " class-name " to the stream `os`\n"
       " */\n"
       std-name "::ostream &operator<<(\n"
       "    " std-name "::ostream" ostream-pad "  &os,\n"
