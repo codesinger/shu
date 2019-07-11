@@ -31,6 +31,11 @@
 
 (provide 'shu-misc)
 
+
+(defconst shu-dired-mode-name "Dired by date"
+  "The name of the mode for a dired buffer")
+
+
 ;;
 ;;  Control the EOL terminator
 ;;
@@ -1189,6 +1194,42 @@ only modified buffers that hold the contents of a file."
 
 
 ;;
+;;  shu-all-quit
+;;
+(defun shu-all-quit ()
+  "Kill all dired buffers and all buffers that contain a file and are unmodified.
+It is not uncommon to have dozens of buffers open that are unrelated to the current task
+and this is a convenience function for closing many buffers that do not need to
+be open."
+  (interactive)
+  (let ((gb (get-buffer-create "*shu-killed-buffers*"))
+        (buf-list (buffer-list))
+        (buf)
+        (mod-list)
+        (buf-fn)
+        (buf-name))
+    (while buf-list
+      (setq buf (car buf-list))
+      (setq mode-name (with-current-buffer buf mode-name))
+      (if (string= mode-name shu-dired-mode-name)
+          (push buf mod-list)
+        (setq buf-fn (buffer-file-name buf))
+        (when buf-fn
+          (when (not (buffer-modified-p buf))
+            (push buf mod-list))))
+      (setq buf-list (cdr buf-list)))
+    (while mod-list
+      (setq buf (car mod-list))
+      (setq mode-name (with-current-buffer buf mode-name))
+      (setq buf-name (buffer-name buf))
+      (princ (concat "Killing " buf-name " (" mode-name ")\n") gb)
+      (kill-buffer buf)
+      (setq mod-list (cdr mod-list)))
+    ))
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -1226,6 +1267,7 @@ shu- prefix removed."
   (defalias 'add-prefix 'shu-add-prefix)
   (defalias 'de-star 'shu-de-star)
   (defalias 'modified-buffers 'shu-modified-buffers)
+  (defalias 'all-quit 'shu-all-quit)
   )
 
 ;;; shu-misc.el ends here
