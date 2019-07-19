@@ -219,6 +219,8 @@
 (ert-deftest shu-test-shu-cpp-match-tokens-1 ()
   (let (
         (gb (get-buffer-create "**boo**"))
+        (ret-val)
+        (rlist)
         (token-info)
         (match-lists
          (list
@@ -296,7 +298,10 @@
         (setq mlist (cdr mlist))
         )
       )
-    (setq token-info (shu-cpp-match-tokens match-lists token-list))
+    (setq ret-val (shu-cpp-match-tokens match-lists token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq token-info (cdr ret-val))
     (should token-info)
 
     ))
@@ -325,6 +330,7 @@
 (ert-deftest shu-test-shu-cpp-match-tokens-2 ()
   (let (
         (gb (get-buffer-create "**boo**"))
+        (ret-val)
         (token-info)
         (match-lists
          (list
@@ -418,7 +424,10 @@
         (setq token (shu-cpp-token-extract-token tinfo))
         (when (and (= token-type shu-cpp-token-type-kw)
                    (string= token "using"))
-          (setq rlist (shu-cpp-match-tokens match-lists tlist))
+          (setq ret-val (shu-cpp-match-tokens match-lists tlist))
+          (should ret-val)
+          (should (consp ret-val))
+          (setq rlist (cdr ret-val))
           (should rlist)
             )
         (setq tlist (cdr tlist))
@@ -488,6 +497,7 @@
          (concat
           "  I using namespace ::std;\n"
           "  // hello\n"))
+        (ret-val)
         (token-list)
         (rlist)
         (tlist)
@@ -507,7 +517,10 @@
       (setq tlist (cdr tlist))
       )
 
-    (setq rlist (shu-cpp-match-tokens match-lists token-list))
+    (setq ret-val (shu-cpp-match-tokens match-lists token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq rlist (cdr ret-val))
     (should rlist)
     (should (listp rlist))
     (should (= 2 (length rlist)))

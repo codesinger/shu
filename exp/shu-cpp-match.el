@@ -293,6 +293,9 @@ side list."
 ;;       a successful match.  Everything up to here has been matched.
 ;;       No need to look at it again.
 ;;
+;;       As of 18 July 2019, this function rweturns a cons cell
+;        thet is the updated token list pointer and the rlist.
+;;
 ;;       Need to have an entry in the match list that is the "name"
 ;;       of the list.  Pass back the "name" of the matched list as
 ;;       well so that the caller can tell what was matched.  This
@@ -345,6 +348,7 @@ the matched token was to be added to the list."
         (next-tlist (if skip-comments 'shu-cpp-token-next-non-comment 'cdr))
         (lcount 0)
         (mcount 0)
+        (ret-val)
         )
     (princ "\n\nshu-cpp-match-tokens:\n" gb)
     (while (and match-lists (not outer-done))
@@ -388,9 +392,14 @@ the matched token was to be added to the list."
       (if mlist
           (setq match-lists (cdr match-lists))
         (setq outer-done t)
+        (setq token-list tlist)
         )
       )
-    (setq rlist (nreverse rlist))
+    (when rlist
+      (setq rlist (nreverse rlist))
+      )
+    (setq ret-val (cons token-list rlist))
+    ret-val
     ))
 
 
@@ -838,6 +847,7 @@ and end point of the entire \"using namespace\" directive."
   (let (
         (gb (get-buffer-create "**boo**"))
         (count 0)
+        (ret-val)
         (tlist)
         (rlist)
         (token-info)
@@ -868,7 +878,8 @@ and end point of the entire \"using namespace\" directive."
           (when (string= token "using")
             (princ "   found using\n" gb)
             (setq start-point (shu-cpp-token-extract-spoint token-info))
-            (setq rlist (shu-cpp-match-tokens shu-cpp-namespace-match-list tlist t))
+            (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list tlist t))
+            (setq rlist (cdr ret-val))
             (when rlist
               (princ (format "rlist(%d): " (length rlist)) gb) (princ rlist gb) (princ "\n" gb)
               (setq looking t)
