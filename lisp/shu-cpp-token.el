@@ -1295,7 +1295,7 @@ of reverse parsed code have the same suffix."
 ;;
 ;;  shu-cpp-token-show-token-info
 ;;
-(defun shu-cpp-token-show-token-info (token-info)
+(defun shu-cpp-token-show-token-info (token-info &optional title)
   "Show the data returned by one of the functions in this file that scans for tokens."
   (let
       ((gb      (get-buffer-create shu-unit-test-buffer))
@@ -1310,6 +1310,8 @@ of reverse parsed code have the same suffix."
        (epoint)
        (token)
        (tok ""))
+    (when title
+      (princ (concat title "\n") gb))
     (if (not token-info)
         (princ "shu-cpp-token-show-token-info, token-info is nil\n" gb)
       (if (not (consp token-info))
