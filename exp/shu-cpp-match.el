@@ -164,7 +164,7 @@ must match the side list zero or more times.  If the first item in the list does
 not match, this is considered a success.  If the first item matches, then all
 items in the side list must match.  If all items in the side list match, we go
 back to the top of the side list and try again until we find a token that does
-not match the first item in the sice list.  The matchis considered a failure
+not match the first item in the sice list.  The match is considered a failure
 only of there is a partial match between the tokens and the side list.")
 
 (defconst shu-cpp-token-match-type-side-choose 5
@@ -390,7 +390,7 @@ the matched token was to be added to the list."
         (setq outer-done t)
         )
       )
-    (nreverse rlist)
+    (setq rlist (nreverse rlist))
     ))
 
 
@@ -467,14 +467,16 @@ which is not a valid C++ name."
         (gb (get-buffer-create "**boo**"))
         (match-list (shu-cpp-match-extract-side-list match-info))
         (orig-token-list)
+        (nrlist rlist)
+        (ntoken-list token-list)
         (looking t)
         (ret-val)
         (pret-val)
         )
     (princ "\n\nSHU-CPP-MATCH-REPEAT-LIST\n" gb)
-    (while (and looking token-list)
-      (setq orig-token-list token-list)
-      (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
+    (while (and looking ntoken-list)
+      (setq orig-token-list ntoken-list)
+      (setq ret-val (shu-cpp-match-repeat-sub-list nrlist ntoken-list match-list))
       (if (not ret-val)
           (progn
             (princ "   shu-cpp-match-repeat-list: NOT matched\n" gb)
@@ -482,16 +484,22 @@ which is not a valid C++ name."
             (setq looking nil)
             )
         (princ "   shu-cpp-match-repeat-list: matched\n" gb)
-        (setq token-list (car ret-val))
-        (setq rlist (cdr ret-val))
-        (if (equal orig-token-list token-list)
-            (setq looking nil)
+        (setq ntoken-list (car ret-val))
+        (setq nrlist (cdr ret-val))
+        (if (equal orig-token-list ntoken-list)
+            (progn
+              (setq looking nil)
+              )
         (setq match-list (shu-cpp-match-extract-side-list match-info))
-        (setq token-list (car ret-val))
-        (setq rlist (cdr ret-val))
+        (setq ntoken-list (car ret-val))
+        (setq nrlist (cdr ret-val))
         (setq pret-val ret-val)
         )
         )
+      )
+    (when nrlist
+      (setq nrlist (nreverse nrlist))
+      (setq ret-val (cons ntoken-list nrlist))
       )
     (princ "shu-cpp-match-repeat-list: ret-val: " gb) (princ ret-val gb) (princ "\n" gb)
     ret-val
