@@ -511,7 +511,7 @@ which is not a valid C++ name."
 ;;  shu-cpp-match-repeat-sub-list
 ;;
 (defun shu-cpp-match-repeat-sub-list (rlist token-list match-list)
-  "Do ine iteration of the matching."
+  "Go through one iteration of the repeating list."
   (interactive)
   (let (
         (gb (get-buffer-create "**boo**"))
@@ -537,6 +537,7 @@ which is not a valid C++ name."
       (setq did-match (funcall match-eval-func match-info token-info))
       (when (not did-match)
         (setq looking nil)
+        (setq token-list orig-token-list)
         )
       (when looking
         (when match-ret-ind

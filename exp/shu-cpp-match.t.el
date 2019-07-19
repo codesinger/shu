@@ -905,6 +905,58 @@
 
 
 
+
+;;
+;;  shu-test-shu-cpp-match-repeat-list-5
+;;
+(ert-deftest shu-test-shu-cpp-match-repeat-list-5 ()
+  (let (
+        (data
+         (concat
+          "    ::  zzzz"
+          " :: yyyy"
+          " ::  ;  "
+          ))
+        (match-list
+         (list
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    nil shu-cpp-token-type-op
+                                    "::")
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                    'shu-cpp-token-match-same-rx
+                                    t shu-cpp-token-type-uq
+                                    (concat shu-cpp-name "+"))
+          )
+         )
+        (rlist)
+        (token-list)
+        (match-info)
+        (ret-val)
+        (new-token-list)
+        (new-rlist)
+        (token)
+        (token-type)
+        )
+    (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
+                                                  match-list))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      )
+    (setq ret-val (shu-cpp-match-repeat-list rlist token-list match-info))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq new-token-list (car ret-val))
+    (setq new-rlist (cdr ret-val))
+    (should new-token-list)
+    (should new-rlist)
+    (should (listp new-rlist))
+    (shu-cpp-tokenize-show-list new-rlist)
+    (shu-cpp-tokenize-show-list new-token-list)
+))
+
+
 ;;
 ;;  shu-test-shu-cpp-extract-namespace-name
 ;;
