@@ -174,6 +174,34 @@ only of there is a partial match between the tokens and the side list.")
 success if any one item in the side list matches the current token.")
 
 
+
+;;
+;;  shu-cpp-match-op-code-name
+;;
+(defun shu-cpp-match-op-code-name (op-code)
+  "Return the name of an op-code."
+  (let (
+        (op-code-name "**unknown** (nil)")
+        )
+    (when op-code
+      (if (not (numberp op-code))
+          (setq op-code-name "**unknown** (Not a number)")
+        (setq op-code-name (format "**unknown** (%d)" op-code))
+        (cond
+         ((= op-code shu-cpp-token-match-type-skip)
+          (setq op-code-name "skip"))
+         ((= op-code shu-cpp-token-match-type-same)
+          (setq op-code-name "match-same"))
+         ((= op-code shu-cpp-token-match-type-same-rx)
+          (setq op-code-name "match-rx"))
+         ((= op-code shu-cpp-token-match-type-side-loop)
+          (setq op-code-name "side-loop"))
+         ((= shu-cpp-token-match-type-side-choose)
+          (setq op-code-name "side-choose"))
+         )))
+    op-code-name
+    ))
+
 ;;
 ;;  shu-cpp-side-list-functions
 ;;
@@ -981,6 +1009,33 @@ and end point of the entire \"using namespace\" directive."
   (let ((point-pair))
     (setq point-pair (cons start-point end-point))
     (cons name point-pair)
+    ))
+
+
+
+
+;;
+;;  shu-cpp-token-show-match-info
+;;
+(defun shu-cpp-token-show-match-info (match-info &optional title)
+  "Show the data in an instance of match-info."
+  (let
+      ((gb      (get-buffer-create shu-unit-test-buffer))
+       )
+    (if (not match-info)
+        (princ "shu-cpp-token-show-match-info: match-info is nil\n" gb)
+      (if (not (consp match-info))
+          (princ "shu-cpp-token-show-match-info: match-info is not cons\n" gb)
+        (setq op-code (car match-info))
+        (setq match-ext (cdr match-info))
+        (if (not op-code)
+            (princ "shu-cpp-token-show-match-info: op-code is nil\n" gb)
+          (if (not (numberp op-code))
+            (princ "shu-cpp-token-show-match-info: op-code is not a number\n" gb)
+              )
+            )
+        )
+      )
     ))
 
 
