@@ -139,7 +139,9 @@
 
 
 
-
+;;
+;;   op-codes
+;;
 (defconst shu-cpp-token-match-type-skip 1
   "The match type constant that indicates skip one input cell.")
 
@@ -170,6 +172,16 @@ only of there is a partial match between the tokens and the side list.")
 (defconst shu-cpp-token-match-type-side-choose 5
   "The match side constant that indicates a choice.  The match is considered a
 success if any one item in the side list matches the current token.")
+
+
+;;
+;;  shu-cpp-side-list-functions
+;;
+(defconst shu-cpp-side-list-functions
+  (list
+   (cons shu-cpp-token-match-type-side-loop 'shu-cpp-match-repeat-list)
+   (cons shu-cpp-token-match-type-side-choose 'shu-cpp-match-or-list))
+  "A-list that maps a side list op-code to the function that implements it.")
 
 
 
@@ -399,6 +411,32 @@ the matched token was to be added to the list."
       (setq rlist (nreverse rlist))
       )
     (setq ret-val (cons token-list rlist))
+    ret-val
+    ))
+
+
+
+
+;;
+;;  shu-cpp-match-evaluate-side-list
+;;
+(defun shu-cpp-match-evaluate-side-list (op-code rlist token-list match-info)
+  "Doc string."
+  (let (
+        (assoc-item)
+        (loop-eval-func)
+        (ret-val (cons token-list rlist))
+        (new-token-list)
+        (new-rlist)
+        )
+    (setq assoc-item (assoc op-code shu-cpp-side-list-functions))
+    (when assoc-item
+      (setq loop-eval-func (cdr assoc-item))
+      (setq ret-val (funcall loop-eval-func rlist token-list match-info))
+      (setq new-token-list (car ret-val))
+      (setq new-rlist (cdr ret-val))
+      (setq ret-val (cons new-token-list new-rlist))
+      )
     ret-val
     ))
 

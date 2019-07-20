@@ -1160,5 +1160,4 @@
     (shu-cpp-tokenize-show-list rlist)
     ))
 
-
 ;;; shu-cpp-match.t.el ends here
