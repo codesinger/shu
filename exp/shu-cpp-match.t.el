@@ -932,6 +932,7 @@
          (concat
           "    ::  zzzz"
           " :: yyyy"
+          " :: wwww"
           " ::  ;  "
           ))
         (match-list
@@ -947,6 +948,7 @@
           )
          )
         (rlist)
+        (rlist-data " using namespace ")
         (token-list)
         (match-info)
         (ret-val)
@@ -956,7 +958,12 @@
         (token-type)
         )
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  match-list))
+                                                   match-list))
+    (with-temp-buffer
+      (insert rlist-data)
+      (setq rlist (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (shu-cpp-tokenize-show-list rlist "RLIST:")
+      )
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
@@ -969,8 +976,8 @@
     (should new-token-list)
     (should new-rlist)
     (should (listp new-rlist))
-    (shu-cpp-tokenize-show-list new-rlist)
-    (shu-cpp-tokenize-show-list new-token-list)
+    (shu-cpp-tokenize-show-list new-rlist "NEW-RLIST")
+    (shu-cpp-tokenize-show-list new-token-list "NEW_TOKEN_LIST")
 ))
 
 
