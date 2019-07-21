@@ -1125,6 +1125,7 @@
          "  using namespace andy ; \n"
          )
          )
+        (debug-on-error t)
         )
 
     (shu-cpp-token-show-match-lists shu-cpp-namespace-match-list-2 "\nshu-cpp-namespace-match-list-2\n")
