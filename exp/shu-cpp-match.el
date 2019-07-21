@@ -1015,25 +1015,122 @@ and end point of the entire \"using namespace\" directive."
 
 
 ;;
+;;  shu-cpp-token-show-match-lists
+;;
+(defun shu-cpp-token-show-match-lists (match-lists &optional title)
+  "Show the data in an instance of match-info."
+  (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (mlist match-lists)
+        (match-list)
+        )
+    (when title
+      (princ (concat title "\n") gb)
+      )
+    (while mlist
+      (setq match-list (car mlist))
+      (shu-cpp-token-show-match-list match-list)
+      (setq mlist (cdr mlist))
+      )
+    ))
+
+
+
+
+;;
+;;  shu-cpp-token-show-match-list
+;;
+(defun shu-cpp-token-show-match-list (match-list &optional title)
+  "Show the data in an instance of match-info."
+  (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (mlist match-list)
+        (match-info)
+        )
+    (when title
+      (princ (concat title "\n") gb)
+      )
+    (while mlist
+      (setq match-info (car mlist))
+      (shu-cpp-token-show-match-info match-info)
+      (setq mlist (cdr mlist))
+      )
+    ))
+
+
+
+
+;;
 ;;  shu-cpp-token-show-match-info
 ;;
-(defun shu-cpp-token-show-match-info (match-info &optional title)
+(defun shu-cpp-token-show-match-info (match-info)
   "Show the data in an instance of match-info."
-  (let
-      ((gb      (get-buffer-create shu-unit-test-buffer))
+  (let (
+      (gb      (get-buffer-create shu-unit-test-buffer))
+       (op-code)
+       (new-match-info)
+       (match-ext)
+       (match-func)
+       (match-type)
+       (match-ret-ind)
+       (match-eval-func)
+       (match-token-type)
+       (match-token-value)
        )
     (if (not match-info)
         (princ "shu-cpp-token-show-match-info: match-info is nil\n" gb)
       (if (not (consp match-info))
           (princ "shu-cpp-token-show-match-info: match-info is not cons\n" gb)
         (setq op-code (car match-info))
-        (setq match-ext (cdr match-info))
         (if (not op-code)
             (princ "shu-cpp-token-show-match-info: op-code is nil\n" gb)
           (if (not (numberp op-code))
-            (princ "shu-cpp-token-show-match-info: op-code is not a number\n" gb)
+              (princ "shu-cpp-token-show-match-info: op-code is not a number\n" gb)
+            (princ (format "op-code: %d (%s)\n" op-code (shu-cpp-match-op-code-name op-code)) gb)
+            (if (> op-code shu-cpp-token-match-type-non-loop-max)
+                (progn
+                  (setq new-match-info (shu-cpp-match-extract-side-list match-info))
+                  (shu-cpp-token-show-match-list new-match-info)
+                  )
+              (setq match-ext (cdr match-info))
+              (if (not match-ext)
+                  (princ "shu-cpp-token-show-match-info: match-ext is nil\n" gb)
+                (if (not (consp match-ext))
+                    (princ "shu-cpp-token-show-match-info: match-ext is nt cons cell\n" gb)
+                  (setq match-func (car match-ext))
+                  (setq match-type (cdr match-ext))
+                  (if (not match-func)
+                      (princ "shu-cpp-token-show-match-info: match-func is nil\n" gb)
+                    (if (not match-type)
+                        (princ "shu-cpp-token-show-match-info: match-type is nil\n" gb)
+                      (if (not (consp match-func))
+                          (princ "shu-cpp-token-show-match-info: match-func is nt cons cell\n" gb)
+                        (setq match-ret-ind (car match-func))
+                        (princ (concat "match-ret-ind: " match-ret-ind "\n") gb)
+                        (setq match-eval-func (cdr match-func))
+                        (if (not match-eval-func)
+                            (princ "shu-cpp-token-show-match-info: match-eval-func is nil\n" gb)
+                          (princ (concat "match-eval-func: " match-eval-func "\n") gb)
+                          (setq match-token-type (car match-type))
+                          (if (not (numberp match-token-type))
+                              (princ "shu-cpp-token-show-match-info: match-token-type is not a number\n" gb)
+                            (princ (format "match-token-type: %d (%s)\n" match-token-type (shu-cpp-token-token-type-name match-token-type)) gb)
+                            (if (not (stringp match-token-value))
+                                (princ "shu-cpp-token-show-match-info: match-token-value is not string\n" gb)
+                              (princ (concat "match-token-value: \"" match-token-value "\"\n") gb)
+                              )
+                            )
+                          )
+                        )
+                      )
+
+                    )
+                  )
+
+                )
               )
             )
+          )
         )
       )
     ))
