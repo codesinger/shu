@@ -678,6 +678,7 @@
         (new-rlist)
         (token)
         (token-type)
+        (token-info)
         )
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
                                                   match-list))
@@ -739,6 +740,7 @@
         (new-rlist)
         (token)
         (token-type)
+        (token-info)
         )
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
                                                   match-list))
@@ -801,6 +803,7 @@
         (new-rlist)
         (token)
         (token-type)
+        (token-info)
         )
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
                                                   match-list))
@@ -861,6 +864,7 @@
         (new-rlist)
         (token)
         (token-type)
+        (token-info)
         )
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
                                                   match-list))
@@ -1123,6 +1127,7 @@
          )
         )
 
+    (shu-cpp-token-show-match-lists shu-cpp-namespace-match-list-2 "\nshu-cpp-namespace-match-list-2\n")
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
