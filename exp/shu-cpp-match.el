@@ -1119,7 +1119,7 @@ and end point of the entire \"using namespace\" directive."
                         (setq match-eval-func (cdr match-func))
                         (if (not match-eval-func)
                             (princ "shu-cpp-token-show-match-info: match-eval-func is nil\n" gb)
-                          (princ (concat "match-eval-func: "  "\n") gb)
+                          (princ "match-eval-func: " gb) (princ match-eval-func gb) (princ "\n" gb)
                           (setq match-token-type (car match-type))
                           (if (not (numberp match-token-type))
                               (princ "shu-cpp-token-show-match-info: match-token-type is not a number\n" gb)
