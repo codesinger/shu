@@ -89,6 +89,12 @@ in a C or C++ program.")
   "A set of useful functions for dealing with C++ and other issues."
   :group 'applications)
 
+(defcustom shu-trim-file t
+  "If true, whitespace is trimmed from the end of lines and blank lines at the
+end of a file are deleted when a file is saved."
+  :type 'boolean
+  :group 'shu-base)
+
 (defcustom shu-cpp-indent-length 4
   "Size of the standard indent for names within class declarations, etc."
   :type '(number)
@@ -590,5 +596,17 @@ results in the following output being returned:
       (setq eos (point)))
     eos
     ))
+
+
+;;
+;;  shu-trim-file-hook
+;;
+(defun shu-trim-file-hook ()
+  "Run as a before-save-hook to trim trailing whitespace from the end of lines and
+to trim blank lines from the end of a file if SHU-TRIM-FILE is true."
+    (when shu-trim-file
+      (delete-trailing-whitespace))
+    )
+
 
 ;;; shu-base.el ends here

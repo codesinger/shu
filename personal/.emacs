@@ -133,8 +133,6 @@
 (shu-bde-set-alias)
 (shu-cpp-project-set-alias)
 (shu-misc-set-alias)
-(when (file-readable-p "~/emacs/shu-bb-cpp.elc")
-  (shu-bb-cpp-set-alias))
 (shu-cpp-misc-set-alias)
 (shu-keyring-set-alias)
 
@@ -212,7 +210,7 @@
 
 ;; Clear the keyring index whenever the keyring file is saved
 (add-hook 'after-save-hook 'shu-keyring-clear-index)
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(add-hook 'before-save-hook 'shu-trim-file-hook)
 (add-hook 'find-file-hook 'slp-record-visited-file)
 
 (setq shu-org-home "~/data/org")

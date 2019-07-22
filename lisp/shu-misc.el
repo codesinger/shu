@@ -1228,7 +1228,6 @@ be open."
     ))
 
 
-
 ;;
 ;;  shu-misc-set-alias
 ;;
