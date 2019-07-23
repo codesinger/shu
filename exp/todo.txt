@@ -142,9 +142,11 @@ with the new token-list (which my be unchanged).
  1. The current side list functions assume that the rlist is empty on entry.  They
     build an rlist and then nreverse the whole thing.
 
+    As of 23 July, this item is done.
+
  2. Need some unit tests that call the side list functions with an existing,
     non-empty rlist to make sure that they just add their stuff at the end.
 
  3. Have a new function similar to shu-cpp-token-show-token-info in shu-cpp-token.el
     that can print an entire match list.  It is shu-cpp-token-show-match-list in
-    shu-cpp-match.el.  Needs some clean up.
+    shu-cpp-match.el.  Done but needs some clean up.

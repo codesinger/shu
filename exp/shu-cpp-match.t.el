@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; Unit tests for the functions in shiu-match.el
+;; Unit tests for the functions in shu-match.el
 
 ;;; Code:
 
@@ -957,6 +957,7 @@
         (token)
         (token-type)
         (title)
+        (nrl)
         )
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
                                                    match-list))
@@ -981,6 +982,51 @@
     (should (listp new-rlist))
     (shu-cpp-tokenize-show-list new-rlist "NEW-RLIST")
     (shu-cpp-tokenize-show-list new-token-list "NEW_TOKEN_LIST")
+    (setq nrl new-rlist)
+    (let (
+          (token-info)
+          (token)
+          (token-type)
+          )
+      (setq token-info (car nrl))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should (= token-type shu-cpp-token-type-kw))
+      (should (string= token "using"))
+
+      (setq nrl (cdr nrl))
+      (should nrl)
+      (setq token-info (car nrl))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should (= token-type shu-cpp-token-type-kw))
+      (should (string= token "namespace"))
+
+      (setq nrl (cdr nrl))
+      (should nrl)
+      (setq token-info (car nrl))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should (= token-type shu-cpp-token-type-uq))
+      (should (string= token "zzzz"))
+
+      (setq nrl (cdr nrl))
+      (should nrl)
+      (setq token-info (car nrl))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should (= token-type shu-cpp-token-type-uq))
+      (should (string= token "yyyy"))
+
+      (setq nrl (cdr nrl))
+      (should nrl)
+      (setq token-info (car nrl))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should (= token-type shu-cpp-token-type-uq))
+      (should (string= token "wwww"))
+      (should (not (cdr nrl)))
+    )
 ))
 
 

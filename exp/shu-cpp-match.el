@@ -1082,8 +1082,7 @@ and end point of the entire \"using namespace\" directive."
 ;;
 (defun shu-cpp-token-show-match-info (match-info)
   "Show the data in an instance of match-info."
-  (let (
-      (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
        (op-code)
        (new-match-info)
        (match-ext)
@@ -1094,8 +1093,7 @@ and end point of the entire \"using namespace\" directive."
        (match-eval-func)
        (match-token-type)
        (match-token-value)
-       (debug-on-error t)
-       )
+       (debug-on-error t))
     (if (not match-info)
         (princ "shu-cpp-token-show-match-info: match-info is nil\n" gb)
       (if (not (consp match-info))
@@ -1109,8 +1107,7 @@ and end point of the entire \"using namespace\" directive."
             (if (> op-code shu-cpp-token-match-type-non-loop-max)
                 (progn
                   (setq new-match-info (shu-cpp-match-extract-side-list match-info))
-                  (shu-cpp-token-show-match-list new-match-info "\n side list")
-                  )
+                  (shu-cpp-token-show-match-list new-match-info "\n side list"))
               (setq match-ext (cdr match-info))
               (if (not match-ext)
                   (princ "shu-cpp-token-show-match-info: match-ext is nil\n" gb)
@@ -1123,7 +1120,7 @@ and end point of the entire \"using namespace\" directive."
                     (if (not match-type)
                         (princ "shu-cpp-token-show-match-info: match-type is nil\n" gb)
                       (if (not (consp match-func))
-                          (princ "shu-cpp-token-show-match-info: match-func is nt cons cell\n" gb)
+                          (princ "shu-cpp-token-show-match-info: match-func is not cons cell\n" gb)
                         (setq match-ret-ind (car match-func))
                         (setq match-ret-name "nil")
                         (when match-ret-ind
@@ -1136,26 +1133,12 @@ and end point of the entire \"using namespace\" directive."
                           (setq match-token-type (car match-type))
                           (if (not (numberp match-token-type))
                               (princ "shu-cpp-token-show-match-info: match-token-type is not a number\n" gb)
-                            (princ (format "match-token-type: %d (%s)\n" match-token-type (shu-cpp-token-token-type-name match-token-type)) gb)
+                            (princ (format "match-token-type: %d (%s)\n" match-token-type
+                                           (shu-cpp-token-token-type-name match-token-type)) gb)
                             (setq match-token-value (cdr match-type))
                             (if (not (stringp match-token-value))
                                 (princ "shu-cpp-token-show-match-info: match-token-value is not string\n" gb)
-                              (princ (concat "match-token-value: \"" match-token-value "\"\n") gb)
-                              )
-                            )
-                          )
-                        )
-                      )
-
-                    )
-                  )
-
-                )
-              )
-            )
-          )
-        )
-      )
+                              (princ (concat "match-token-value: \"" match-token-value "\"\n") gb))))))))))))))
     ))
 
 
