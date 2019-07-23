@@ -484,6 +484,7 @@ remains unchanged if the match-info that matched did not specify that the
 matched token-info was to be returned."
   (let ((token-info (car token-list))
         (side-list (shu-cpp-match-extract-side-list match-info))
+        (new-rlist)
         (looking t)
         (op-code)
         (match-eval-func)
@@ -498,16 +499,25 @@ matched token-info was to be returned."
                                   match-ret-ind match-token-type match-token-value)
       (setq did-match (funcall match-eval-func match-info token-info))
       (when did-match
-          (setq looking nil)
+        (setq looking nil)
         (when match-ret-ind
-          (push token-info rlist)))
+          (push token-info new-rlist)))
       (when looking
         (if (not side-list)
             (setq looking nil)
           (setq side-list (cdr side-list)))))
     (when did-match
       (setq token-list (cdr token-list))
-      (setq ret-val (cons token-list rlist)))
+      (if (not new-rlist)
+          (setq new-rlisr rlist)
+        (setq new-rlist (nreverse new-rlist))
+        (when rlist
+          (setq new-rlist (nconc rlist new-rlist))
+          (shu-cpp-tokenize-show-list new-rlist "NEW-RLIST(2) IN OR:")
+          )
+        )
+      (setq ret-val (cons token-list new-rlist))
+      )
     ret-val
     ))
 
@@ -542,13 +552,14 @@ which is not a valid C++ name."
         (gb (get-buffer-create "**boo**"))
         (match-list (shu-cpp-match-extract-side-list match-info))
         (orig-token-list)
-        (new-rlist rlist)
+        (new-rlist)
         (new-token-list token-list)
         (looking t)
         (ret-val)
         (pret-val)
+        (title (format "\n\nSHU-CPP-MATCH-REPEAT-LIST - length: %d: " (length rlist)))
         )
-    (princ "\n\nSHU-CPP-MATCH-REPEAT-LIST\n" gb)
+    (shu-cpp-tokenize-show-list rlist title)
     (while (and looking new-token-list)
       (setq orig-token-list new-token-list)
       (setq ret-val (shu-cpp-match-repeat-sub-list new-rlist new-token-list match-list))
@@ -572,10 +583,17 @@ which is not a valid C++ name."
         )
         )
       )
-    (when new-rlist
+    (shu-cpp-tokenize-show-list rlist "RLIST IN REPEAT:")
+    (shu-cpp-tokenize-show-list new-rlist "NEW-RLIST IN REPEAT:")
+    (if (not new-rlist)
+        (setq new-rlisr rlist)
       (setq new-rlist (nreverse new-rlist))
-      (setq ret-val (cons new-token-list new-rlist))
+      (when rlist
+        (setq new-rlist (nconc rlist new-rlist))
+        (shu-cpp-tokenize-show-list new-rlist "NEW-RLIST(2) IN REPEAT:")
+        )
       )
+    (setq ret-val (cons new-token-list new-rlist))
     (princ "shu-cpp-match-repeat-list: ret-val: " gb) (princ ret-val gb) (princ "\n" gb)
     ret-val
     ))

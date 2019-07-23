@@ -956,18 +956,21 @@
         (new-rlist)
         (token)
         (token-type)
+        (title)
         )
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
                                                    match-list))
     (with-temp-buffer
       (insert rlist-data)
       (setq rlist (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      (shu-cpp-tokenize-show-list rlist "RLIST:")
+      (shu-cpp-tokenize-show-list rlist "RLIST IN TEST5:")
       )
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
       )
+    (setq title (format "\nRLIST IN TEST5 BEFORE CALL, length: %d: " (length rlist)))
+    (shu-cpp-tokenize-show-list rlist title)
     (setq ret-val (shu-cpp-match-repeat-list rlist token-list match-info))
     (should ret-val)
     (should (consp ret-val))
