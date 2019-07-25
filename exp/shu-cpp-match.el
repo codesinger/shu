@@ -389,6 +389,7 @@ the matched token was to be added to the list."
         (lcount 0)
         (mcount 0)
         (ret-val)
+        (did-match-name)
         )
     (princ "\n\nshu-cpp-match-tokens:\n" gb)
     (while (and match-lists (not outer-done))
@@ -413,14 +414,28 @@ the matched token was to be added to the list."
             (princ (format "   %d-%d: token from token-info: \"%s\"\n" lcount mcount token) gb)
             (princ (format "   %d-%d: match-token-value: \"%s\"\n" lcount mcount match-token-value) gb)
             )
-          (setq did-match (funcall match-eval-func match-info token-info))
-          (princ "   did-match: " gb) (princ did-match gb) (princ "\n" gb)
-          (if (not did-match)
-              (setq inner-done t)
-            (when match-ret-ind
-              (push token-info rlist)
+          (if (> op-code shu-cpp-token-match-type-non-loop-max)
+              (progn
+                (setq ret-val (shu-cpp-match-evaluate-side-list op-code rlist tlist match-info))
+                (if (not ret-val)
+                    (setq inner-done t)
+                  (setq token-list (car ret-val))
+                  (setq rlist (cdr ret-val))
+                    )
+                )
+
+            (setq did-match (funcall match-eval-func match-info token-info))
+            (if did-match (setq did-match-name "t") (setq did-match-name "nil"))
+            (princ (concat "   did-match: " did-match-name "\n") gb)
+            (if (not did-match)
+                (setq inner-done t)
+              (when match-ret-ind
+                (push token-info rlist)
+                )
               )
             )
+
+
           )
         (when (not inner-done)
           (setq mlist (cdr mlist))
@@ -451,19 +466,27 @@ the matched token was to be added to the list."
 (defun shu-cpp-match-evaluate-side-list (op-code rlist token-list match-info)
   "Doc string."
   (let (
+        (gb (get-buffer-create "**boo**"))
         (assoc-item)
         (loop-eval-func)
         (ret-val (cons token-list rlist))
         (new-token-list)
         (new-rlist)
         )
+    (shu-cpp-tokenize-show-list token-list "\nshu-cpp-match-evaluate-side-list token-list:")
+    (shu-cpp-tokenize-show-list rlist "\nshu-cpp-match-evaluate-side-list rlist:")
+    (princ "shu-cpp-match-evaluate-side-list\n" gb)
     (setq assoc-item (assoc op-code shu-cpp-side-list-functions))
     (when assoc-item
       (setq loop-eval-func (cdr assoc-item))
       (setq ret-val (funcall loop-eval-func rlist token-list match-info))
       (setq new-token-list (car ret-val))
       (setq new-rlist (cdr ret-val))
+      (princ "shu-cpp-match-evaluate-side-list::new-rlist: " gb)(princ new-rlist gb)(princ "\n" gb)
+      (princ "shu-cpp-match-evaluate-side-list::new-token-list: " gb)(princ new-token-list gb)(princ "\n" gb)
       (setq ret-val (cons new-token-list new-rlist))
+      (shu-cpp-tokenize-show-list new-token-list "\nshu-cpp-match-evaluate-side-list new-token-list:")
+      (shu-cpp-tokenize-show-list new-rlist "\nshu-cpp-match-evaluate-side-list new-rlist:")
       )
     ret-val
     ))
@@ -509,7 +532,7 @@ matched token-info was to be returned."
     (when did-match
       (setq token-list (cdr token-list))
       (if (not new-rlist)
-          (setq new-rlisr rlist)
+          (setq new-rlist rlist)
         (setq new-rlist (nreverse new-rlist))
         (when rlist
           (setq new-rlist (nconc rlist new-rlist))
@@ -558,6 +581,7 @@ which is not a valid C++ name."
         (pret-val)
         (title (format "\n\nSHU-CPP-MATCH-REPEAT-LIST - length: %d: " (length rlist)))
         )
+    (shu-cpp-token-show-match-list match-list "\nshu-cpp-match-repeat-list:")
     (while (and looking new-token-list)
       (setq orig-token-list new-token-list)
       (setq ret-val (shu-cpp-match-repeat-sub-list new-rlist new-token-list match-list))
@@ -582,7 +606,7 @@ which is not a valid C++ name."
         )
       )
     (if (not new-rlist)
-        (setq new-rlisr rlist)
+        (setq new-rlist rlist)
       (setq new-rlist (nreverse new-rlist))
       (when rlist
         (setq new-rlist (nconc rlist new-rlist))

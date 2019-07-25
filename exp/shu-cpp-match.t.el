@@ -1325,4 +1325,64 @@
     (shu-cpp-tokenize-show-list rlist)
     ))
 
+
+
+;;
+;;  test-shu-cpp-match-tokens-with-ns2
+;;
+(ert-deftest test-shu-cpp-match-tokens-with-ns2 ()
+  (let (
+        (ret-val)
+        (rlist)
+        (token-list)
+        (new-token-list)
+        (data
+         (concat
+         "  using namespace fred ; \n"
+         "  using namespace bob ; \n"
+         "  using namespace alice::ted::jim ; \n"
+         )
+         )
+        (debug-on-error t)
+        )
+
+    (shu-cpp-token-show-match-lists shu-cpp-namespace-match-list-2 "\nshu-cpp-namespace-match-list-2\n")
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      )
+    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq rlist (cdr ret-val))
+    (should rlist)
+    (should (listp rlist))
+    (setq new-token-list (car ret-val))
+    (should new-token-list)
+    (should (listp new-token-list))
+    (shu-cpp-tokenize-show-list rlist "NS2")
+
+    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 new-token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq rlist (cdr ret-val))
+    (should rlist)
+    (should (listp rlist))
+    (setq new-token-list (car ret-val))
+    (should new-token-list)
+    (should (listp new-token-list))
+    (shu-cpp-tokenize-show-list rlist "NS2")
+
+    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 new-token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq rlist (cdr ret-val))
+    (should rlist)
+    (should (listp rlist))
+    (setq new-token-list (car ret-val))
+    (should (not new-token-list))
+    (shu-cpp-tokenize-show-list new-token-list "NS2")
+    (shu-cpp-tokenize-show-list rlist "NS2")
+    ))
+
 ;;; shu-cpp-match.t.el ends here

@@ -147,6 +147,15 @@ with the new token-list (which my be unchanged).
  2. Need some unit tests that call the side list functions with an existing,
     non-empty rlist to make sure that they just add their stuff at the end.
 
+    As of 24 July, this item is done.
+
  3. Have a new function similar to shu-cpp-token-show-token-info in shu-cpp-token.el
     that can print an entire match list.  It is shu-cpp-token-show-match-list in
-    shu-cpp-match.el.  Done but needs some clean up.
+    shu-cpp-match.el.
+
+    As of July 23, Done but needs some clean up.
+
+ 4. Need a unit test that actually incorporates a side list as part of a larger
+    match.
+
+    As of July 22, this might be partially done
