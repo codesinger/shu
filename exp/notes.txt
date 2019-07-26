@@ -83,3 +83,37 @@ belong to that namespace.
 Need something that will invert that
 
 The key is a class name and the car is a list of namespaces to which that class belongs
+
+================================================
+
+rlist and token-list return values
+
+The functions all accept arguments of rlist and token-list.
+
+If the match succeeds, tokens may have been pushed onto rlist and token-list will be
+advanced.  If the match fails, who restores these?
+
+There are a couple of places.  If shu-cpp-match-tokens completely fails, it will
+return nil and the caller still has the original values.  If the caller found some
+trigger to start a match (such as keyword "using"), it will have to manually advance
+token-list by one.
+
+If one of the lists passed to shu-cpp-match-tokens fails, shu-cpp-match-token has to
+restore both the original rlist and the original token-list in order to get a fresh
+start for the next list.  But a new rlist and new token-list are only passed back if
+a match succeeds.
+
+The side list functions will either return new values or nil.  So they can continue
+to work in the originals, passing back either the updated values or nil.
+
+So it appears that the only function that has to save and restore the original
+values is shu-cpp-match-tokens, which has to restore the originals at the start of
+each new list.
+
+Need a side list that is a set of lists to pursue.  So we can have a match that is
+"using" followed by "namespace" followed by a set of lists, each of which matches
+one of the three forms of using namespace.
+
+Scan through the tokens until you find keyword "using".  Try to match the above
+pattern.  If it matches you have found an occurrence of "using namespace".  If it
+does not match, advance the token list by one and start again.
