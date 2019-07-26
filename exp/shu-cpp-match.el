@@ -507,7 +507,7 @@ remains unchanged if the match-info that matched did not specify that the
 matched token-info was to be returned."
   (let ((token-info (car token-list))
         (side-list (shu-cpp-match-extract-side-list match-info))
-        (new-rlist)
+        (new-rlist rlist)
         (looking t)
         (op-code)
         (match-eval-func)
@@ -531,13 +531,6 @@ matched token-info was to be returned."
           (setq side-list (cdr side-list)))))
     (when did-match
       (setq token-list (cdr token-list))
-      (if (not new-rlist)
-          (setq new-rlist rlist)
-        (setq new-rlist (nreverse new-rlist))
-        (when rlist
-          (setq new-rlist (nconc rlist new-rlist))
-          )
-        )
       (setq ret-val (cons token-list new-rlist))
       )
     ret-val
