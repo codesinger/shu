@@ -370,6 +370,7 @@ matched tokens whose corresponding entry in the match list indicated that
 the matched token was to be added to the list."
   (let (
         (gb (get-buffer-create "**boo**"))
+        (gbu      (get-buffer-create shu-unit-test-buffer))
         (match-list)
         (match-info)
         (outer-done)
@@ -377,6 +378,7 @@ the matched token was to be added to the list."
         (did-match)
         (mlist)
         (tlist)
+        (advance-tlist)
         (rlist)
         (token-info)
         (return-value)
@@ -405,6 +407,7 @@ the matched token was to be added to the list."
         (setq token-info (car tlist))
         (shu-cpp-match-extract-info match-info op-code match-eval-func
                                     match-ret-ind match-token-type match-token-value)
+        (setq advance-tlist t)
         (when  (/= op-code shu-cpp-token-match-type-skip)
           (let (
                 (token)
@@ -420,6 +423,8 @@ the matched token was to be added to the list."
                 (if (not ret-val)
                     (setq inner-done t)
                   (setq token-list (car ret-val))
+                  (setq tlist token-list)
+                  (setq advance-tlist nil)
                   (setq rlist (cdr ret-val))
                     )
                 )
@@ -429,19 +434,23 @@ the matched token was to be added to the list."
             (princ (concat "   did-match: " did-match-name "\n") gb)
             (if (not did-match)
                 (setq inner-done t)
+              (setq advance-tlist t)
               (when match-ret-ind
                 (push token-info rlist)
                 )
               )
             )
-
-
+          (princ "inner-done: " gbu)(princ inner-done gbu)(princ "\n" gbu)
+          (princ "mlist: " gbu)(princ mlist gbu)(princ "\n" gbu)
+          (princ "tlist: " gbu)(princ tlist gbu)(princ "\n" gbu)
           )
         (when (not inner-done)
           (setq mlist (cdr mlist))
-          (when tlist
+          (when (and tlist advance-tlist)
             (setq tlist (funcall next-tlist tlist))
             )
+          (princ "mlist2: " gbu)(princ mlist gbu)(princ "\n" gbu)
+          (princ "tlist2: " gbu)(princ tlist gbu)(princ "\n" gbu)
           )
         )
       (if mlist

@@ -438,7 +438,6 @@
 
 
 
-
 ;;
 ;;  shu-test-shu-cpp-match-tokens-3
 ;;
@@ -500,9 +499,10 @@
         (ret-val)
         (token-list)
         (rlist)
+        (nrl)
         (tlist)
         (token-info)
-        (gb (get-buffer-create "**boo**"))
+        (token-type)
         (count 0)
         )
     (with-temp-buffer
@@ -513,7 +513,6 @@
     (while tlist
       (setq token-info (car tlist))
       (setq count (1+ count))
-      (princ (format "XX %d: " count) gb) (princ token-info gb) (princ "\n" gb)
       (setq tlist (cdr tlist))
       )
 
@@ -524,11 +523,34 @@
     (should rlist)
     (should (listp rlist))
     (should (= 2 (length rlist)))
-    (setq token-info (car rlist))
+
+    (setq nrl rlist)
+    (should nrl)
+    (setq token-info (car nrl))
+    (should token-info)
+    (should (consp token-info))
     (setq token (shu-cpp-token-extract-token token-info))
     (should token)
     (should (stringp token))
-    (should (string= "std" token))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+
+    (setq nrl (cdr nrl))
+    (should nrl)
+    (setq token-info (car nrl))
+    (should token-info)
+    (should (consp token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token)
+    (should (stringp token))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should (string= token "std"))
     ))
 
 
