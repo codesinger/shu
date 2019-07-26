@@ -450,9 +450,6 @@ the matched token was to be added to the list."
         (setq token-list tlist)
         )
       )
-    (when rlist
-      (setq rlist (nreverse rlist))
-      )
     (setq ret-val (cons token-list rlist))
     ret-val
     ))
