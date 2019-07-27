@@ -142,7 +142,8 @@ with the new token-list (which my be unchanged).
  1. The current side list functions assume that the rlist is empty on entry.  They
     build an rlist and then nreverse the whole thing.
 
-    As of 23 July, this item is done.
+    As of 23 July, this item is done.  None of the match functions should ever
+    reverse anything because only the top level caller knows when it is done.
 
  2. Need some unit tests that call the side list functions with an existing,
     non-empty rlist to make sure that they just add their stuff at the end.
@@ -162,6 +163,8 @@ with the new token-list (which my be unchanged).
 
  5. Need a unit test like that in 4 above in which the side list match fails.
 
+    Done as of July 27
+
  6. Need a unit test like that in 4 above in which the side list match succeeds but
     some subsequent match fails.
 
@@ -172,3 +175,8 @@ with the new token-list (which my be unchanged).
     list that matches "using namespace" followed by a choice of three lists for the
     three forms that a namespace name can take.  Should be handled by a recursive
     call to shu-cpp-match-tokens.
+
+    As of 27 July, above has been implemented but is totally untested
+
+ 8. shu-cpp-match-tokens has an optional skip-comments argument that is generally
+    not used, not tested, and probably not honored.

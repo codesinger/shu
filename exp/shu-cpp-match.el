@@ -173,6 +173,10 @@ only of there is a partial match between the tokens and the side list.")
   "The match side constant that indicates a choice.  The match is considered a
 success if any one item in the side list matches the current token.")
 
+(defconst shu-cpp-token-match-type-side-many 6
+  "The match side constant that indicates a choice among multiple lists.
+This does a recursive call to shu-cpp-match-tokens.")
+
 
 
 ;;
@@ -198,6 +202,8 @@ success if any one item in the side list matches the current token.")
           (setq op-code-name "side-loop"))
          ((= shu-cpp-token-match-type-side-choose)
           (setq op-code-name "side-choose"))
+         ((= shu-cpp-token-match-type-side-many)
+          (setq op-code-name "side-many"))
          )))
     op-code-name
     ))
@@ -208,7 +214,8 @@ success if any one item in the side list matches the current token.")
 (defconst shu-cpp-side-list-functions
   (list
    (cons shu-cpp-token-match-type-side-loop 'shu-cpp-match-repeat-list)
-   (cons shu-cpp-token-match-type-side-choose 'shu-cpp-match-or-list))
+   (cons shu-cpp-token-match-type-side-choose 'shu-cpp-match-or-list)
+   (cons shu-cpp-token-match-type-side-many 'shu-cpp-match-many-list))
   "A-list that maps a side list op-code to the function that implements it.")
 
 
@@ -410,7 +417,7 @@ the matched token was to be added to the list."
         (when  (/= op-code shu-cpp-token-match-type-skip)
           (if (> op-code shu-cpp-token-match-type-non-loop-max)
               (progn
-                (setq ret-val (shu-cpp-match-evaluate-side-list op-code rlist tlist match-info))
+                (setq ret-val (shu-cpp-match-evaluate-side-list op-code rlist tlist match-info skip-comments))
                 (if (not ret-val)
                     (setq inner-done t)
                   (setq token-list (car ret-val))
@@ -455,7 +462,7 @@ the matched token was to be added to the list."
 ;;
 ;;  shu-cpp-match-evaluate-side-list
 ;;
-(defun shu-cpp-match-evaluate-side-list (op-code rlist token-list match-info)
+(defun shu-cpp-match-evaluate-side-list (op-code rlist token-list match-info &optional skip-comments)
   "Doc string."
   (let (
         (gb (get-buffer-create "**boo**"))
@@ -471,7 +478,7 @@ the matched token was to be added to the list."
     (setq assoc-item (assoc op-code shu-cpp-side-list-functions))
     (when assoc-item
       (setq loop-eval-func (cdr assoc-item))
-      (setq ret-val (funcall loop-eval-func rlist token-list match-info))
+      (setq ret-val (funcall loop-eval-func rlist token-list match-info skip-comments))
       (setq new-token-list (car ret-val))
       (setq new-rlist (cdr ret-val))
       (princ "shu-cpp-match-evaluate-side-list::new-rlist: " gb)(princ new-rlist gb)(princ "\n" gb)
@@ -488,7 +495,7 @@ the matched token was to be added to the list."
 ;;
 ;;  shu-cpp-match-or-list
 ;;
-(defun shu-cpp-match-or-list (rlist token-list match-info)
+(defun shu-cpp-match-or-list (rlist token-list match-info &optional skip-comments)
   "RLIST points to the current return value list, if any.  TOKEN-LIST points to
 the next token-info to match.  MATCH-INFO is the head of the side list with
 which to match.  The match succeeds if the first token-info in TOKEN-LIST
@@ -531,9 +538,24 @@ matched token-info was to be returned."
 
 
 ;;
+;;  shu-cpp-match-many-list
+;;
+(defun shu-cpp-match-many-list (rlist token-list match-info &optional skip-comments)
+  "Do a recursive call to shu-cpp-match-tokens."
+  (let (
+        (match-lists (shu-cpp-match-extract-side-list match-info))
+        (ret-val)
+        )
+    (setq ret-val (shu-cpp-match-tokens match-lists token-list skip-comments))
+    ret-val
+    ))
+
+
+
+;;
 ;;  shu-cpp-match-repeat-list
 ;;
-(defun shu-cpp-match-repeat-list (rlist token-list match-info)
+(defun shu-cpp-match-repeat-list (rlist token-list match-info &optional skip-comments)
   "RLIST points to the current return value list, if any.  TOKEN-LIST points to
 the next token-info to match.  MATCH-INFO is the head of the side list with
 which to match.  The match succeeds if the token-infos in TOKEN-LIST match all
