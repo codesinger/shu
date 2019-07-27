@@ -1155,6 +1155,122 @@
 ))
 
 
+
+;;
+;;  shu-test-shu-cpp-match-repeat-list-6
+;;
+(ert-deftest shu-test-shu-cpp-match-repeat-list-6 ()
+  (let ((data
+         (concat
+          "    ::  zzzz"
+          " :: yyyy"
+          " :: :: wwww"
+          " ::  ;  "
+          ))
+        (match-list
+         (list
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    nil shu-cpp-token-type-op
+                                    "::")
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                    'shu-cpp-token-match-same-rx
+                                    t shu-cpp-token-type-uq
+                                    (concat shu-cpp-name "+"))))
+        (rlist)
+        (rlist-data " namespace using ")
+        (token-list)
+        (match-info)
+        (ret-val)
+        (new-token-list)
+        (new-rlist)
+        (token)
+        (token-type)
+        (title)
+        (nrl))
+    (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
+                                                   match-list))
+    (with-temp-buffer
+      (insert rlist-data)
+      (setq rlist (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (shu-cpp-tokenize-show-list rlist "RLIST IN TEST6:"))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq title (format "\nRLIST IN TEST6 BEFORE CALL, length: %d: " (length rlist)))
+    (shu-cpp-tokenize-show-list rlist title)
+    (setq ret-val (shu-cpp-match-repeat-list rlist token-list match-info))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq new-token-list (car ret-val))
+    (setq new-rlist (cdr ret-val))
+    (should new-token-list)
+    (should new-rlist)
+    (should (listp new-rlist))
+    (shu-cpp-tokenize-show-list new-rlist "NEW-RLIST-6")
+    (shu-cpp-tokenize-show-list new-token-list "NEW_TOKEN_LIST-6")
+    (setq nrl new-rlist)
+    (let ((token-info)
+          (token)
+          (token-type))
+
+      (should nrl)
+      (setq token-info (car nrl))
+      (should token-info)
+      (should (consp token-info))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should token)
+      (should (stringp token))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should token-type)
+      (should (numberp token-type))
+      (should (= token-type shu-cpp-token-type-uq))
+      (should (string= token "yyyy"))
+
+      (setq nrl (cdr nrl))
+      (should nrl)
+      (setq token-info (car nrl))
+      (should token-info)
+      (should (consp token-info))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should token)
+      (should (stringp token))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should token-type)
+      (should (numberp token-type))
+      (should (= token-type shu-cpp-token-type-uq))
+      (should (string= token "zzzz"))
+
+      (setq nrl (cdr nrl))
+      (should nrl)
+      (setq token-info (car nrl))
+      (should token-info)
+      (should (consp token-info))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should token)
+      (should (stringp token))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should token-type)
+      (should (numberp token-type))
+      (should (= token-type shu-cpp-token-type-kw))
+      (should (string= token "namespace"))
+
+      (setq nrl (cdr nrl))
+      (setq token-info (car nrl))
+      (should token-info)
+      (should (consp token-info))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should token)
+      (should (stringp token))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should token-type)
+      (should (numberp token-type))
+      (should (= token-type shu-cpp-token-type-kw))
+      (should (string= token "using"))
+      (should (not (cdr nrl))))
+))
+
+
 ;;
 ;;  shu-test-shu-cpp-extract-namespace-name
 ;;
@@ -1349,6 +1465,7 @@
 
 
 
+
 ;;
 ;;  test-shu-cpp-match-tokens-with-ns2
 ;;
@@ -1356,6 +1473,9 @@
   (let (
         (ret-val)
         (rlist)
+        (nrl)
+        (token)
+        (token-type)
         (token-list)
         (new-token-list)
         (data
@@ -1384,6 +1504,48 @@
     (should (listp new-token-list))
     (shu-cpp-tokenize-show-list rlist "NS2")
 
+    (setq nrl rlist)
+    (should nrl)
+    (setq token-info (car nrl))
+    (should token-info)
+    (should (consp token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token)
+    (should (stringp token))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+
+    (setq nrl (cdr nrl))
+    (should nrl)
+    (setq token-info (car nrl))
+    (should token-info)
+    (should (consp token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token)
+    (should (stringp token))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should (string= token "fred"))
+
+    (setq nrl (cdr nrl))
+    (should nrl)
+    (setq token-info (car nrl))
+    (should token-info)
+    (should (consp token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token)
+    (should (stringp token))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-kw))
+    (should (string= token "using"))
+
     (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 new-token-list))
     (should ret-val)
     (should (consp ret-val))
@@ -1405,6 +1567,76 @@
     (should (not new-token-list))
     (shu-cpp-tokenize-show-list new-token-list "NS2")
     (shu-cpp-tokenize-show-list rlist "NS2")
+
+    (setq nrl rlist)
+    (should nrl)
+    (setq token-info (car nrl))
+    (should token-info)
+    (should (consp token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token)
+    (should (stringp token))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+
+    (setq nrl (cdr nrl))
+    (should nrl)
+    (setq token-info (car nrl))
+    (should token-info)
+    (should (consp token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token)
+    (should (stringp token))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should (string= token "jim"))
+
+    (setq nrl (cdr nrl))
+    (should nrl)
+    (setq token-info (car nrl))
+    (should token-info)
+    (should (consp token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token)
+    (should (stringp token))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should (string= token "ted"))
+
+    (setq nrl (cdr nrl))
+    (should nrl)
+    (setq token-info (car nrl))
+    (should token-info)
+    (should (consp token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token)
+    (should (stringp token))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should (string= token "alice"))
+
+    (setq nrl (cdr nrl))
+    (should nrl)
+    (setq token-info (car nrl))
+    (should token-info)
+    (should (consp token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should token)
+    (should (stringp token))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-kw))
+    (should (string= token "using"))
     ))
 
 ;;; shu-cpp-match.t.el ends here
