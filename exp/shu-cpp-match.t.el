@@ -1685,4 +1685,29 @@
     (should (string= token "using"))
     ))
 
+
+
+
+;;
+;;  test-shu-cpp-match-tokens-with-ns3
+;;
+(ert-deftest test-shu-cpp-match-tokens-with-ns3 ()
+  (let ((ret-val)
+        (rlist)
+        (nrl)
+        (token)
+        (token-type)
+        (token-list)
+        (new-token-list)
+        (data
+         (concat
+         "  using namespace alice :: ; ted::jim ; \n")))
+    (shu-cpp-token-show-match-lists shu-cpp-namespace-match-list-2 "\nshu-cpp-namespace-match-list-2\n")
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 token-list))
+    (should (not ret-val))
+    ))
+
 ;;; shu-cpp-match.t.el ends here
