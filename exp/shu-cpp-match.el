@@ -332,8 +332,23 @@ side list."
 
 
 
+
 ;;
 ;;  shu-cpp-match-tokens
+;;
+(defun shu-cpp-match-tokens (match-lists token-list &optional skip-comments)
+  "doc"
+  (let (
+        (rlist)
+        (ret-val)
+        )
+    (setq ret-val (shu-cpp-internal-match-tokens rlist match-lists token-list skip-comments))
+    ret-val
+    ))
+
+
+;;
+;;  shu-cpp-internal-match-tokens
 ;;
 ;; TODO: Find some way to pass back the pointer to the next token
 ;;       to be scanned.  This is the first token not examined after
@@ -366,7 +381,7 @@ side list."
 ;;       You can have a named list by simply naming the first entry
 ;;       or you can choose to have other names in the list.
 ;;
-(defun shu-cpp-match-tokens (match-lists token-list &optional skip-comments)
+(defun shu-cpp-internal-match-tokens (rlist match-lists token-list &optional skip-comments)
   "MATCH-LISTS is a list of match lists.  TOKEN-LIST is a list of tokens.  for
 each match-list in MATCH-LISTS, try to match every element of the match list to
 the token list.  if a match fails or if you reach the end of the token list
@@ -385,8 +400,8 @@ the matched token was to be added to the list."
         (did-match)
         (mlist)
         (tlist)
+        (orig-rlist rlist)
         (advance-tlist)
-        (rlist)
         (token-info)
         (return-value)
         (op-code)
@@ -406,8 +421,9 @@ the matched token was to be added to the list."
       (setq mlist (car match-lists))
       (setq tlist token-list)
       (setq inner-done nil)
-      (setq rlist nil)
+      (setq rlist orig-rlist)
       (while (and tlist mlist (not inner-done))
+        (shu-cpp-tokenize-show-list rlist "IN-RLIST")
         (setq mcount (1+ mcount))
         (setq match-info (car mlist))
         (setq token-info (car tlist))
@@ -424,9 +440,14 @@ the matched token was to be added to the list."
                   (setq tlist token-list)
                   (setq advance-tlist nil)
                   (setq rlist (cdr ret-val))
+                  (princ "mlist33: " gbu)(princ mlist gbu)(princ "\n" gbu)
                     )
                 )
             (setq did-match (funcall match-eval-func match-info token-info))
+            (shu-cpp-token-show-token-info token-info "MID-MATCH")
+            (shu-cpp-token-show-match-info match-info)
+            (princ "did-match: " gbu)(princ did-match gbu)(princ "\n" gbu)
+            (shu-cpp-tokenize-show-list rlist "MID-RLIST")
             (if (not did-match)
                 (progn
                   (setq inner-done t)
@@ -445,14 +466,18 @@ the matched token was to be added to the list."
             (setq tlist (funcall next-tlist tlist))
             )
           )
+        (shu-cpp-tokenize-show-list rlist "OUT-RLIST")
+        (princ "mlist: " gbu)(princ mlist gbu)(princ "\n" gbu)
         )
+      (princ "mlist2: " gbu)(princ mlist gbu)(princ "\n" gbu)
       (if mlist
           (setq match-lists (cdr match-lists))
         (setq outer-done t)
         (setq token-list tlist)
         (setq ret-val (cons token-list rlist))
         )
-      )
+     )
+    (princ "ret-val: " gbu)(princ ret-val gbu)(princ "\n" gbu)
     ret-val
     ))
 
@@ -484,8 +509,8 @@ the matched token was to be added to the list."
       (princ "shu-cpp-match-evaluate-side-list::new-rlist: " gb)(princ new-rlist gb)(princ "\n" gb)
       (princ "shu-cpp-match-evaluate-side-list::new-token-list: " gb)(princ new-token-list gb)(princ "\n" gb)
       (setq ret-val (cons new-token-list new-rlist))
-      (shu-cpp-tokenize-show-list new-token-list "\nshu-cpp-match-evaluate-side-list new-token-list:")
-      (shu-cpp-tokenize-show-list new-rlist "\nshu-cpp-match-evaluate-side-list new-rlist:")
+      (shu-cpp-tokenize-show-list new-token-list "\nshu-cpp-match-evaluate-side-list-2 new-token-list:")
+      (shu-cpp-tokenize-show-list new-rlist "\nshu-cpp-match-evaluate-side-list-2 new-rlist:")
       )
     ret-val
     ))
@@ -546,7 +571,7 @@ matched token-info was to be returned."
         (match-lists (shu-cpp-match-extract-side-list match-info))
         (ret-val)
         )
-    (setq ret-val (shu-cpp-match-tokens match-lists token-list skip-comments))
+    (setq ret-val (shu-cpp-internal-match-tokens rlist match-lists token-list skip-comments))
     ret-val
     ))
 
