@@ -521,11 +521,13 @@ name \"/u/foo/bar/thing.c\"."
     (while directory-list
       (setq full-name (car directory-list))
       (setq file-name (file-name-nondirectory full-name))
-      (setq item (cons file-name full-name))
-      (setq key-list (cons item key-list))
-      (setq xtn-name (file-name-extension file-name))
-      (when (not (member xtn-name shu-cpp-found-extensions))
-        (setq shu-cpp-found-extensions (cons xtn-name shu-cpp-found-extensions)))
+      ;; Exclude emacs file reservations
+      (when (not (and (file-symlink-p full-name) (string= (substring file-name 0 2) ".#")))
+        (setq item (cons file-name full-name))
+        (setq key-list (cons item key-list))
+        (setq xtn-name (file-name-extension file-name))
+        (when (not (member xtn-name shu-cpp-found-extensions))
+          (setq shu-cpp-found-extensions (cons xtn-name shu-cpp-found-extensions))))
       (setq directory-list (cdr directory-list)))
     key-list
     ))
