@@ -176,7 +176,18 @@ with the new token-list (which my be unchanged).
     three forms that a namespace name can take.  Should be handled by a recursive
     call to shu-cpp-match-tokens.
 
-    As of 27 July, above has been implemented but is totally untested
+    As of 29 July, above has been implemented and somwhat tested.
+
+    The thing to remember about this is that one of the match many's must succeed.
+    The original unit test had three different name patternd in the many side list.
+    Then the next thing to match (Not in the "many" side list) was the terminating
+    semi-colon.  But if the semi-colon did not match, thre was nothing to indicate
+    that we should go back and try more of the "many" side lists  The solution was
+    to put the terminating semi-colon at the end of each of the "many" side-lists.
+    So if the last thing in a list is a semi-comol that does not match, we then go
+    try the next list.
+
+
 
  8. shu-cpp-match-tokens has an optional skip-comments argument that is generally
     not used, not tested, and probably not honored.

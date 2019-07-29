@@ -422,8 +422,10 @@ the matched token was to be added to the list."
       (setq tlist token-list)
       (setq inner-done nil)
       (setq rlist orig-rlist)
+      (princ (format "\nBegin List: %d\n" lcount) gbu)
       (while (and tlist mlist (not inner-done))
         (shu-cpp-tokenize-show-list rlist "IN-RLIST")
+        (princ "in-mlist: " gbu)(princ mlist gbu)(princ "\n" gbu)
         (setq mcount (1+ mcount))
         (setq match-info (car mlist))
         (setq token-info (car tlist))
@@ -433,6 +435,7 @@ the matched token was to be added to the list."
         (when  (/= op-code shu-cpp-token-match-type-skip)
           (if (> op-code shu-cpp-token-match-type-non-loop-max)
               (progn
+                (princ "mlist22: " gbu)(princ mlist gbu)(princ "\n" gbu)
                 (setq ret-val (shu-cpp-match-evaluate-side-list op-code rlist tlist match-info skip-comments))
                 (if (not ret-val)
                     (setq inner-done t)
@@ -441,6 +444,7 @@ the matched token was to be added to the list."
                   (setq advance-tlist nil)
                   (setq rlist (cdr ret-val))
                   (princ "mlist33: " gbu)(princ mlist gbu)(princ "\n" gbu)
+                  (princ "mlist44: " gbu)(princ (cdr mlist) gbu)(princ "\n" gbu)
                     )
                 )
             (setq did-match (funcall match-eval-func match-info token-info))
@@ -457,6 +461,8 @@ the matched token was to be added to the list."
               (when match-ret-ind
                 (push token-info rlist)
                 )
+              (shu-cpp-tokenize-show-list rlist "MID-RLIST-2")
+              (princ "mlist66: " gbu)(princ mlist gbu)(princ "\n" gbu)
               )
             )
           )
@@ -471,7 +477,11 @@ the matched token was to be added to the list."
         )
       (princ "mlist2: " gbu)(princ mlist gbu)(princ "\n" gbu)
       (if mlist
-          (setq match-lists (cdr match-lists))
+          (progn
+           (setq match-lists (cdr match-lists))
+           (princ "match-lists: " gbu)(princ match-lists gbu)(princ "\n" gbu)
+           (princ "outer-done: " gbu)(princ outer-done gbu)(princ "\n" gbu)
+           )
         (setq outer-done t)
         (setq token-list tlist)
         (setq ret-val (cons token-list rlist))
@@ -491,6 +501,7 @@ the matched token was to be added to the list."
   "Doc string."
   (let (
         (gb (get-buffer-create "**boo**"))
+        (gbu      (get-buffer-create shu-unit-test-buffer))
         (assoc-item)
         (loop-eval-func)
         (ret-val (cons token-list rlist))
@@ -503,6 +514,7 @@ the matched token was to be added to the list."
     (setq assoc-item (assoc op-code shu-cpp-side-list-functions))
     (when assoc-item
       (setq loop-eval-func (cdr assoc-item))
+      (princ "Calling " gbu)(princ loop-eval-func gbu) (princ "\n" gbu)
       (setq ret-val (funcall loop-eval-func rlist token-list match-info skip-comments))
       (setq new-token-list (car ret-val))
       (setq new-rlist (cdr ret-val))
@@ -603,7 +615,8 @@ If it matches once, you have a name with one level of qualification.  But if it
 fails in the middle, then you have found something that looks like \"a::\",
 which is not a valid C++ name."
   (let (
-        (gb (get-buffer-create "**boo**"))
+;;;        (gb (get-buffer-create "**boo**"))
+        (gb      (get-buffer-create shu-unit-test-buffer))
         (match-list (shu-cpp-match-extract-side-list match-info))
         (orig-token-list)
         (new-rlist rlist)
