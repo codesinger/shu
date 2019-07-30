@@ -1524,7 +1524,7 @@
          (concat
          "  using namespace fred ; \n"
          "  using namespace bob ; \n"
-         "  using namespace alice::ted::jim ; \n"
+         "  using namespace /* Hello */ alice::ted::jim ; \n"
          )
          )
         (debug-on-error t)

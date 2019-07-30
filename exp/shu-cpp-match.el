@@ -336,13 +336,13 @@ side list."
 ;;
 ;;  shu-cpp-match-tokens
 ;;
-(defun shu-cpp-match-tokens (match-lists token-list &optional skip-comments)
+(defun shu-cpp-match-tokens (match-lists token-list)
   "doc"
   (let (
         (rlist)
         (ret-val)
         )
-    (setq ret-val (shu-cpp-internal-match-tokens rlist match-lists token-list skip-comments))
+    (setq ret-val (shu-cpp-internal-match-tokens rlist match-lists token-list))
     ret-val
     ))
 
@@ -381,7 +381,7 @@ side list."
 ;;       You can have a named list by simply naming the first entry
 ;;       or you can choose to have other names in the list.
 ;;
-(defun shu-cpp-internal-match-tokens (rlist match-lists token-list &optional skip-comments)
+(defun shu-cpp-internal-match-tokens (rlist match-lists token-list)
   "MATCH-LISTS is a list of match lists.  TOKEN-LIST is a list of tokens.  for
 each match-list in MATCH-LISTS, try to match every element of the match list to
 the token list.  if a match fails or if you reach the end of the token list
@@ -409,7 +409,6 @@ the matched token was to be added to the list."
         (match-ret-ind)
         (match-token-type)
         (match-token-value)
-        (next-tlist (if skip-comments 'shu-cpp-token-next-non-comment 'cdr))
         (lcount 0)
         (mcount 0)
         (ret-val)
@@ -436,7 +435,7 @@ the matched token was to be added to the list."
           (if (> op-code shu-cpp-token-match-type-non-loop-max)
               (progn
                 (princ "mlist22: " gbu)(princ mlist gbu)(princ "\n" gbu)
-                (setq ret-val (shu-cpp-match-evaluate-side-list op-code rlist tlist match-info skip-comments))
+                (setq ret-val (shu-cpp-match-evaluate-side-list op-code rlist tlist match-info))
                 (if (not ret-val)
                     (setq inner-done t)
                   (setq token-list (car ret-val))
@@ -469,7 +468,7 @@ the matched token was to be added to the list."
         (when (not inner-done)
           (setq mlist (cdr mlist))
           (when (and tlist advance-tlist)
-            (setq tlist (funcall next-tlist tlist))
+            (setq tlist (shu-cpp-token-next-non-comment tlist))
             )
           )
         (shu-cpp-tokenize-show-list rlist "OUT-RLIST")
@@ -497,7 +496,7 @@ the matched token was to be added to the list."
 ;;
 ;;  shu-cpp-match-evaluate-side-list
 ;;
-(defun shu-cpp-match-evaluate-side-list (op-code rlist token-list match-info &optional skip-comments)
+(defun shu-cpp-match-evaluate-side-list (op-code rlist token-list match-info)
   "Doc string."
   (let (
         (gb (get-buffer-create "**boo**"))
@@ -515,7 +514,7 @@ the matched token was to be added to the list."
     (when assoc-item
       (setq loop-eval-func (cdr assoc-item))
       (princ "Calling " gbu)(princ loop-eval-func gbu) (princ "\n" gbu)
-      (setq ret-val (funcall loop-eval-func rlist token-list match-info skip-comments))
+      (setq ret-val (funcall loop-eval-func rlist token-list match-info))
       (setq new-token-list (car ret-val))
       (setq new-rlist (cdr ret-val))
       (princ "shu-cpp-match-evaluate-side-list::new-rlist: " gb)(princ new-rlist gb)(princ "\n" gb)
@@ -532,7 +531,7 @@ the matched token was to be added to the list."
 ;;
 ;;  shu-cpp-match-or-list
 ;;
-(defun shu-cpp-match-or-list (rlist token-list match-info &optional skip-comments)
+(defun shu-cpp-match-or-list (rlist token-list match-info)
   "RLIST points to the current return value list, if any.  TOKEN-LIST points to
 the next token-info to match.  MATCH-INFO is the head of the side list with
 which to match.  The match succeeds if the first token-info in TOKEN-LIST
@@ -577,13 +576,13 @@ matched token-info was to be returned."
 ;;
 ;;  shu-cpp-match-many-list
 ;;
-(defun shu-cpp-match-many-list (rlist token-list match-info &optional skip-comments)
+(defun shu-cpp-match-many-list (rlist token-list match-info)
   "Do a recursive call to shu-cpp-match-tokens."
   (let (
         (match-lists (shu-cpp-match-extract-side-list match-info))
         (ret-val)
         )
-    (setq ret-val (shu-cpp-internal-match-tokens rlist match-lists token-list skip-comments))
+    (setq ret-val (shu-cpp-internal-match-tokens rlist match-lists token-list))
     ret-val
     ))
 
@@ -592,7 +591,7 @@ matched token-info was to be returned."
 ;;
 ;;  shu-cpp-match-repeat-list
 ;;
-(defun shu-cpp-match-repeat-list (rlist token-list match-info &optional skip-comments)
+(defun shu-cpp-match-repeat-list (rlist token-list match-info)
   "RLIST points to the current return value list, if any.  TOKEN-LIST points to
 the next token-info to match.  MATCH-INFO is the head of the side list with
 which to match.  The match succeeds if the token-infos in TOKEN-LIST match all
@@ -1019,7 +1018,7 @@ and end point of the entire \"using namespace\" directive."
           (when (string= token "using")
             (princ "   found using\n" gb)
             (setq start-point (shu-cpp-token-extract-spoint token-info))
-            (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list tlist t))
+            (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list tlist))
             (setq rlist (cdr ret-val))
             (when rlist
               (princ (format "rlist(%d): " (length rlist)) gb) (princ rlist gb) (princ "\n" gb)
