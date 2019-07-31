@@ -45,6 +45,7 @@
 ;;
 (ert-deftest shu-cpp-mch-funs-test-data-1 ()
   (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
@@ -53,13 +54,15 @@
           "\n"
           "#include <strng>\n"
           "\n"
-          "using namespace alice;\n /* Hello */"
-          "using namespace alice;\n"
+          "using namespace alice;\n /* Hello */"  ;; 1
+          "using std::string;\n"                  ;; 2
+          "using namespace alice;\n"              ;; 3
           "// Hello\n"
-          "using namespace bob;\n"
+          "using namespace bob;\n"                ;; 4
           "// using namespace nonsense\n"
-          "using namespace /* Hello */ component::SomeClass;\n"
-          "using namespace Whammo::other::OtherClass;\n"
+          "using namespace /* Hello */ component::SomeClass;\n"   ;; 5
+          "using namespace Whammo::other::OtherClass;\n"          ;; 6
+          " using namespace ::std;\n"                             ;; 7
           "\n"
           "namespace Whammo\n"
           "{\n"
@@ -78,6 +81,7 @@
         (ret-val)
         (token)
         (token-type)
+        (item-number 0)
         )
     (with-temp-buffer
       (insert data)
@@ -92,16 +96,24 @@
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
-        (setq advance-tlist nil)
+        (setq item-number (1+ item-number))
         (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
-        (should ret-val)
-        (should (consp ret-val))
-        (setq rlist (cdr ret-val))
-        (should rlist)
-        (should (listp rlist))
-        (setq tlist (car ret-val))
-        (should tlist)
-        (should (listp tlist))
+        (princ (format "item-number: %d\n" item-number) gb)
+        (if (= item-number 2)
+            (progn
+              (should (not ret-val))
+              (setq rlist nil)
+              )
+          (setq advance-tlist nil)
+          (should ret-val)
+          (should (consp ret-val))
+          (setq tlist (car ret-val))
+          (should tlist)
+          (should (listp tlist))
+          (setq rlist (cdr ret-val))
+          (should rlist)
+          (should (listp rlist))
+          )
         (shu-cpp-tokenize-show-list rlist "FNS-RLIST")
         (shu-cpp-tokenize-show-list tlist "FNS-TLIST")
         )
