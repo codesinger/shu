@@ -37,6 +37,71 @@
 
 
 
+;;
+;;  shu-cpp-mch-funs-test-data-1
+;;
+(ert-deftest shu-cpp-mch-funs-test-data-1 ()
+  (let (
+        (data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "using namespace std;\n"
+          "// using namespace nonsense\n"
+          "using namespace /* Hello */ component::SomeClass;\n"
+          "using namespace Whammo::other::OtherClass;\n"
+          "\n"
+          "namespace Whammo\n"
+          "{\n"
+          "\n"
+          "namespace something\n"
+          "{\n"
+          "\n"
+          "}\n"
+          "}\n"
+          ))
+        (token-list)
+        (rlist)
+        (tlist)
+        (token-info)
+        (ret-val)
+        (token)
+        (token-type)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      )
+    (setq tlist token-list)
+    (while tlist
+      (setq token-info (car tlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (when (and
+             (= token-type shu-cpp-token-type-kw)
+             (string= token "using"))
+        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (should ret-val)
+        (should (consp ret-val))
+        (setq rlist (cdr ret-val))
+        (should rlist)
+        (should (listp rlist))
+        (setq tlist (car ret-val))
+        (should tlist)
+        (should (listp tlist))
+        (shu-cpp-tokenize-show-list rlist "FNS-RLIST")
+        (shu-cpp-tokenize-show-list tlist "FNS-TLIST")
+        )
+      (setq tlist (cdr tlist))
+      )
+
+
+    ))
+
 
 
 

@@ -48,7 +48,7 @@
                              t shu-cpp-token-type-uq
                              (concat shu-cpp-name "+"))
    )
-  "A repeating side list to match :: <name>")
+  "A repeating side list to match zero or more intances of {:: <name>}")
 
 
 ;;
