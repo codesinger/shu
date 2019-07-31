@@ -40,6 +40,9 @@
 ;;
 ;;  shu-cpp-mch-funs-test-data-1
 ;;
+;; This tests the match lists (and the underlying match code) used by
+;; shu-cpp-mch-funs.el
+;;
 (ert-deftest shu-cpp-mch-funs-test-data-1 ()
   (let (
         (data
@@ -50,7 +53,10 @@
           "\n"
           "#include <strng>\n"
           "\n"
-          "using namespace std;\n"
+          "using namespace alice;\n /* Hello */"
+          "using namespace alice;\n"
+          "// Hello\n"
+          "using namespace bob;\n"
           "// using namespace nonsense\n"
           "using namespace /* Hello */ component::SomeClass;\n"
           "using namespace Whammo::other::OtherClass;\n"
@@ -67,6 +73,7 @@
         (token-list)
         (rlist)
         (tlist)
+        (advance-tlist)
         (token-info)
         (ret-val)
         (token)
@@ -81,9 +88,11 @@
       (setq token-info (car tlist))
       (setq token (shu-cpp-token-extract-token token-info))
       (setq token-type (shu-cpp-token-extract-type token-info))
+      (setq advance-tlist t)
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
+        (setq advance-tlist nil)
         (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
         (should ret-val)
         (should (consp ret-val))
@@ -96,7 +105,9 @@
         (shu-cpp-tokenize-show-list rlist "FNS-RLIST")
         (shu-cpp-tokenize-show-list tlist "FNS-TLIST")
         )
-      (setq tlist (cdr tlist))
+      (when advance-tlist
+        (setq tlist (cdr tlist))
+        )
       )
 
 
