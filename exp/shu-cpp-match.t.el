@@ -1731,7 +1731,7 @@
 
 
 ;;
-;;  shu-cpp-namespace-forms
+;;  shu-cpp-match-namespace-forms
 ;;
 ;;
 ;;                                  using
@@ -1756,7 +1756,7 @@
 ;;
 ;;
 ;;
-(defconst shu-cpp-namespace-forms
+(defconst shu-cpp-match-namespace-forms
   (list
    (list  ;; "<name>"
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
@@ -1818,7 +1818,7 @@
                               nil shu-cpp-token-type-kw
                               "namespace")
     (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
-                                  shu-cpp-namespace-forms)
+                                  shu-cpp-match-namespace-forms)
     )
    )
   )
