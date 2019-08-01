@@ -187,7 +187,8 @@
       )
     (setq tlist token-list)
 
-    ;;; 1
+    ;;;  Item number 1
+
     (setq running t)
     (while (and tlist running)
       (setq token-info (car tlist))
@@ -211,7 +212,7 @@
         (should (listp rlist))
         (setq nlist (nreverse rlist))
 
-        (shu-cpp-tokenize-show-list nlist "FNS-NLIST")
+        (shu-cpp-tokenize-show-list nlist "FNS-NLIST1")
         (setq token-info (car nlist))
         (setq token-type (shu-cpp-token-extract-type token-info))
         (setq token (shu-cpp-token-extract-token token-info))
@@ -243,6 +244,33 @@
         (setq tlist (cdr tlist))
         )
       )
+
+    (shu-cpp-tokenize-show-list tlist "FNS-NLTIST2")
+
+    ;;;  Item number 2
+
+    (setq running t)
+    (while (and tlist running)
+      (setq token-info (car tlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (setq advance-tlist t)
+      (when (and
+             (= token-type shu-cpp-token-type-kw)
+             (string= token "using"))
+        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (princ "item-number: 2\n" gb)
+        (setq advance-tlist t)
+        (setq running nil)
+        (should (not ret-val))
+        )
+      (when advance-tlist
+        (setq tlist (cdr tlist))
+        )
+      )
+
+    (shu-cpp-tokenize-show-list tlist "FNS-NLTIST3")
+
 
 
     ))
