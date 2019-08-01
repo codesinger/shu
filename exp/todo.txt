@@ -190,4 +190,11 @@ with the new token-list (which my be unchanged).
 
 
  8. shu-cpp-match-tokens has an optional skip-comments argument that is generally
-    not used, not tested, and probably not honored.
+    not used, not tested, and probably not honored.  And has been removed because it
+    could never work.
+
+ 9. Need a variant of match-tokens in which a single list is passed in and it keeps
+    looping through the token list until there is a match for the first item in the
+    list.  If a match fails, it continues loooping through the tokens until the
+    first one matches.  It only returns when there is a successful match or there
+    are no more tokens.
