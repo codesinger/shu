@@ -131,5 +131,123 @@
 
 
 
+;;
+;;  shu-cpp-mch-funs-test-data-2
+;;
+;; This tests the match lists (and the underlying match code) used by
+;; shu-cpp-mch-funs.el
+;;
+(ert-deftest shu-cpp-mch-funs-test-data-2 ()
+  (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "using namespace alice;\n /* Hello */"  ;; 1
+          "using std::string;\n"                  ;; 2
+          "using namespace alice;\n"              ;; 3
+          "// Hello\n"
+          "using namespace bob;\n"                ;; 4
+          "// using namespace nonsense\n"
+          " using namespace a::b:: ; \n"          ;; 5
+          "using namespace /* Hello */ component::SomeClass;\n"   ;; 6
+          "using namespace Whammo::other::OtherClass;\n"          ;; 7
+          " using namespace ::std;\n"                             ;; 8
+          " using namespace a::b::c::d::e::f::g::h::i;\n"         ;; 9
+          "\n"
+          "namespace Whammo\n"
+          "{\n"
+          "\n"
+          "namespace something\n"
+          "{\n"
+          "\n"
+          "}\n"
+          "}\n"
+          ))
+        (token-list)
+        (rlist)
+        (nlist)
+        (tlist)
+        (advance-tlist)
+        (token-info)
+        (ret-val)
+        (token)
+        (token-type)
+        (item-number 0)
+        (running)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      )
+    (setq tlist token-list)
+
+    ;;; 1
+    (setq running t)
+    (while (and tlist running)
+      (setq token-info (car tlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (setq advance-tlist t)
+      (when (and
+             (= token-type shu-cpp-token-type-kw)
+             (string= token "using"))
+        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (princ "item-number: 1\n" gb)
+        (setq advance-tlist nil)
+        (setq running nil)
+        (should ret-val)
+        (should (consp ret-val))
+        (setq tlist (car ret-val))
+        (should tlist)
+        (should (listp tlist))
+        (setq rlist (cdr ret-val))
+        (should rlist)
+        (should (listp rlist))
+        (setq nlist (nreverse rlist))
+
+        (shu-cpp-tokenize-show-list nlist "FNS-NLIST")
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-kw))
+        (should (string= token "using"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-kw))
+        (should (string= token "namespace"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-uq))
+        (should (string= token "alice"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-op))
+        (should (string= token ";"))
+        )
+      (when advance-tlist
+        (setq tlist (cdr tlist))
+        )
+      )
+
+
+    ))
+
+
+
 
 ;;; shu-cpp-mch-funs.t.el ends here
