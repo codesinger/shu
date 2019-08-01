@@ -60,9 +60,11 @@
           "// Hello\n"
           "using namespace bob;\n"                ;; 4
           "// using namespace nonsense\n"
-          "using namespace /* Hello */ component::SomeClass;\n"   ;; 5
-          "using namespace Whammo::other::OtherClass;\n"          ;; 6
-          " using namespace ::std;\n"                             ;; 7
+          " using namespace a::b:: ; \n"          ;; 5
+          "using namespace /* Hello */ component::SomeClass;\n"   ;; 6
+          "using namespace Whammo::other::OtherClass;\n"          ;; 7
+          " using namespace ::std;\n"                             ;; 8
+          " using namespace a::b::c::d::e::f::g::h::i;\n"         ;; 9
           "\n"
           "namespace Whammo\n"
           "{\n"
@@ -99,9 +101,11 @@
         (setq item-number (1+ item-number))
         (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
         (princ (format "item-number: %d\n" item-number) gb)
-        (if (= item-number 2)
+        (if (or
+            (= item-number 2)
+            (= item-number 5))
             (progn
-              (should (not ret-val))
+;;              (should (not ret-val))
               (setq rlist nil)
               )
           (setq advance-tlist nil)
