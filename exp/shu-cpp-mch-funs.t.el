@@ -622,6 +622,125 @@
     (shu-cpp-tokenize-show-list tlist "FNS-NLTIST9")
 
 
+    ;;;  Item number 9
+
+    (setq running t)
+    (while (and tlist running)
+      (setq token-info (car tlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (setq advance-tlist t)
+      (when (and
+             (= token-type shu-cpp-token-type-kw)
+             (string= token "using"))
+        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (princ "item-number: 9\n" gb)
+        (setq advance-tlist nil)
+        (setq running nil)
+        (should ret-val)
+        (should (consp ret-val))
+        (setq tlist (car ret-val))
+        (should tlist)
+        (should (listp tlist))
+        (setq rlist (cdr ret-val))
+        (should rlist)
+        (should (listp rlist))
+        (setq nlist (nreverse rlist))
+
+        (shu-cpp-tokenize-show-list nlist "FNS-NLIST1")
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-kw))
+        (should (string= token "using"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-kw))
+        (should (string= token "namespace"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-uq))
+        (should (string= token "a"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-uq))
+        (should (string= token "b"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-uq))
+        (should (string= token "c"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-uq))
+        (should (string= token "d"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-uq))
+        (should (string= token "e"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-uq))
+        (should (string= token "f"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-uq))
+        (should (string= token "g"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-uq))
+        (should (string= token "h"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-uq))
+        (should (string= token "i"))
+
+        (setq nlist (cdr nlist))
+        (setq token-info (car nlist))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (should (= token-type shu-cpp-token-type-op))
+        (should (string= token ";"))
+        )
+      (when advance-tlist
+        (setq tlist (cdr tlist))
+        )
+      )
+
+    (shu-cpp-tokenize-show-list tlist "FNS-NLTIST10")
+
+
+
+
 
 
     ))
