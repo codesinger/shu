@@ -334,6 +334,72 @@ side list."
 
 
 ;;
+;;  shu-cpp-search-match-tokens
+;;
+(defun shu-cpp-search-match-tokens (rlist match-list token-list)
+  "A function that advances through the TOKEN-LIST until the first item in the
+single MATCH-LIST matches the token.  If that happens, try to match the whole
+list.  If the whole list is matched, return.  If the whole list does not match,
+restore the original RLIST and TOKEN-LIST and continue.  Return only when the
+whole list is matched or the TOKEN-LIST is exhausted."
+  (interactive)
+  (let (
+        (something t)
+        (orig-rlist rlist)
+        (tlist token-list)
+        (mlist match-list)
+        (advance-tlist)
+        (match-info)
+        (op-code)
+        (match-eval-func)
+        (match-ret-ind)
+        (match-token-type)
+        (match-token-value)
+        (did-match)
+        (inner-ret)
+        (ret-val)
+        (nret-val)
+        )
+    (setq match-info (car mlist))
+    (shu-cpp-match-extract-info match-info op-code match-eval-func
+                                match-ret-ind match-token-type match-token-value)
+    (while something
+      (setq advance-tlist t)
+      (setq token-info (car tlist))
+      (setq did-match (funcall match-eval-func match-info token-info))
+      (if did-match
+          (progn
+            (setq inner-ret (shu-cpp-internal-sub-match-tokens rlist mlist tlist))
+            (setq nret-val (cdr inner-ret))
+            (setq mlist (car inner-ret))
+            (setq tlist (car nret-val))
+            (setq rlist (cdr nret-val))
+            (when (not mlist)
+              (setq advance-tlist nil)
+              (setq ret-val (cons tlist rlist))
+              (setq something nil)
+              )
+            )
+        (setq rlist orig-rlist)
+        (setq tlist token-list)
+        (setq advance-tlist nil)
+        )
+      (when (not tlist)
+        (setq advance-tlist nil)
+        (setq ret-val (cons tlist rlist))
+        (setq something nil)
+        )
+      (when (and tlist advance-tlist)
+        (setq tlist (shu-cpp-token-next-non-comment tlist))
+        )
+      )
+    ret-val
+    ))
+
+
+
+
+;;
 ;;  shu-cpp-match-tokens
 ;;
 (defun shu-cpp-match-tokens (match-lists token-list)
@@ -432,9 +498,47 @@ the matched token was to be added to the list."
     ))
 
 
-
 ;;
 ;;  shu-cpp-internal-sub-match-tokens
+;;
+;; This function has to return three values
+;;
+;;   mlist
+;;   rlist
+;;   token-list
+;;
+;; It returns a single cons cell leading to the three values
+;; as follows:
+;;
+;;
+;;  inner-ret
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> ret-val
+;;        |
+;;        +-------------> mlist
+;;
+;;
+;;
+;;
+;;  ret-val
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> rlist
+;;        |
+;;        +-------------> token-list
+;;
+;;
 ;;
 (defun shu-cpp-internal-sub-match-tokens (rlist mlist tlist)
   "Do the matching for one list only."
