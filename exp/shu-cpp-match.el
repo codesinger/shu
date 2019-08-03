@@ -363,7 +363,7 @@ whole list is matched or the TOKEN-LIST is exhausted."
     (setq match-info (car mlist))
     (shu-cpp-match-extract-info match-info op-code match-eval-func
                                 match-ret-ind match-token-type match-token-value)
-    (while something
+    (while (and something tlist)
       (setq advance-tlist t)
       (setq token-info (car tlist))
       (setq did-match (funcall match-eval-func match-info token-info))
@@ -382,12 +382,7 @@ whole list is matched or the TOKEN-LIST is exhausted."
             )
         (setq rlist orig-rlist)
         (setq tlist token-list)
-        (setq advance-tlist nil)
-        )
-      (when (not tlist)
-        (setq advance-tlist nil)
-        (setq ret-val (cons tlist rlist))
-        (setq something nil)
+        (setq advance-tlist t)
         )
       (when (and tlist advance-tlist)
         (setq tlist (shu-cpp-token-next-non-comment tlist))
