@@ -1290,7 +1290,25 @@ of reverse parsed code have the same suffix."
       (princ (concat title "\n") gb))
     (while tlist
       (setq token-info (car tlist))
-      (shu-cpp-token-show-token-info token-info)
+      (shu-cpp-token-show-token-info-buffer token-info gb)
+      (setq tlist (cdr tlist)))
+    ))
+
+
+
+;;
+;;  shu-cpp-tokenize-show-list-buffer
+;;
+(defun shu-cpp-tokenize-show-list-buffer (token-list gb &optional title)
+  (let (
+        (tlist token-list)
+        (token-info)
+        )
+    (when title
+      (princ (concat title "\n") gb))
+    (while tlist
+      (setq token-info (car tlist))
+      (shu-cpp-token-show-token-info-buffer token-info gb)
       (setq tlist (cdr tlist)))
     ))
 
@@ -1303,6 +1321,17 @@ of reverse parsed code have the same suffix."
   (let
       (
        (gb      (get-buffer-create shu-unit-test-buffer))
+       )
+    ))
+
+
+;;
+;;  shu-cpp-token-show-token-info-buffer
+;;
+(defun shu-cpp-token-show-token-info-buffer (token-info gb &optional title)
+  "Show the data returned by one of the functions in this file that scans for tokens."
+  (let
+      (
        (info)
        (token-type)
        (token-type-name)
