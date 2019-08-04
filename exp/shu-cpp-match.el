@@ -344,12 +344,15 @@ restore the original RLIST and TOKEN-LIST and continue.  Return only when the
 whole list is matched or the TOKEN-LIST is exhausted."
   (interactive)
   (let (
+        (gbu      (get-buffer-create "**goo**"))
         (something t)
         (orig-rlist rlist)
         (tlist token-list)
+        (slist)
         (mlist match-list)
         (advance-tlist)
         (match-info)
+        (token-info)
         (op-code)
         (match-eval-func)
         (match-ret-ind)
@@ -359,30 +362,51 @@ whole list is matched or the TOKEN-LIST is exhausted."
         (inner-ret)
         (ret-val)
         (nret-val)
+        (lcount 0)
         )
     (setq match-info (car mlist))
     (shu-cpp-match-extract-info match-info op-code match-eval-func
                                 match-ret-ind match-token-type match-token-value)
+    (shu-cpp-token-show-match-info-buffer match-info gbu)
+    (shu-cpp-tokenize-show-list-buffer tlist gbu "\n\nSTART:")
     (while (and something tlist)
+      (setq lcount (1+ lcount))
+      (when (= lcount 9000)
+        (setq something nil)
+        )
       (setq advance-tlist t)
       (setq token-info (car tlist))
+      (shu-cpp-token-show-token-info-buffer token-info gbu)
       (setq did-match (funcall match-eval-func match-info token-info))
+      (princ "did-match: " gbu)(princ did-match gbu)(princ "\n" gbu)
       (if did-match
           (progn
+            (setq slist tlist)
             (setq inner-ret (shu-cpp-internal-sub-match-tokens rlist mlist tlist))
             (setq nret-val (cdr inner-ret))
             (setq mlist (car inner-ret))
             (setq tlist (car nret-val))
             (setq rlist (cdr nret-val))
-            (when (not mlist)
+            (princ "\nmlist: " gbu)(princ mlist gbu)(princ "\n" gbu)
+            (princ "\ntlist: " gbu)(princ tlist gbu)(princ "\n" gbu)
+            (princ "\nrlist: " gbu)(princ rlist gbu)(princ "\n" gbu)
+            (if mlist
+                (progn
+                  (princ "LIST NOT MATCHED, mlist: " gbu)(princ mlist gbu)(princ "\n" gbu)
+                  (setq mlist match-list)
+                  (setq rlist orig-rlist)
+                  (setq tlist slist)
+                  (setq advance-tlist t)
+                  )
+              (princ "LIST MATCHED\n" gbu)
               (setq advance-tlist nil)
               (setq ret-val (cons tlist rlist))
               (setq something nil)
               )
             )
-        (setq rlist orig-rlist)
-        (setq tlist token-list)
-        (setq advance-tlist t)
+       ;; (setq rlist orig-rlist)
+       ;; (setq tlist token-list)
+       ;; (setq advance-tlist t)
         )
       (when (and tlist advance-tlist)
         (setq tlist (shu-cpp-token-next-non-comment tlist))
@@ -788,6 +812,7 @@ which is not a valid C++ name."
   (let (
         (gb (get-buffer-create "**boo**"))
         (looking t)
+        (orig-rlist rlist)
         (orig-token-list token-list)
         (token-info)
         (match-info)
@@ -827,6 +852,7 @@ which is not a valid C++ name."
           (princ "   shu-cpp-match-repeat-sub-list: matched\n" gb)
           )
       (princ "   shu-cpp-match-repeat-sub-list: NOT matched\n" gb)
+      (setq ret-val (cons orig-token-list orig-rlist))
       )
     ret-val
     ))
@@ -1267,6 +1293,19 @@ and end point of the entire \"using namespace\" directive."
 (defun shu-cpp-token-show-match-info (match-info)
   "Show the data in an instance of match-info."
   (let ((gb      (get-buffer-create shu-unit-test-buffer))
+        )
+    (shu-cpp-token-show-match-info-buffer match-info gb)
+    ))
+
+
+
+
+;;
+;;  shu-cpp-token-show-match-info-buffer
+;;
+(defun shu-cpp-token-show-match-info-buffer (match-info gb)
+  "Show the data in an instance of match-info."
+  (let (
        (op-code)
        (new-match-info)
        (match-ext)
@@ -1286,7 +1325,10 @@ and end point of the entire \"using namespace\" directive."
         (if (not op-code)
             (princ "shu-cpp-token-show-match-info: op-code is nil\n" gb)
           (if (not (numberp op-code))
-              (princ "shu-cpp-token-show-match-info: op-code is not a number\n" gb)
+              (progn
+                (princ "shu-cpp-token-show-match-info: op-code is not a number\n" gb)
+                (princ "\n    op-code: " gb)(princ op-code gb)(princ "\n" gb)
+                )
             (princ (format "op-code: %d (%s)\n" op-code (shu-cpp-match-op-code-name op-code)) gb)
             (if (> op-code shu-cpp-token-match-type-non-loop-max)
                 (progn

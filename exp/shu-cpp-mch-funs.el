@@ -146,6 +146,26 @@
 
 
 
+;;
+;;  shu-cpp-mch-namespace-list-single
+;;
+(defconst shu-cpp-mch-namespace-list-single
+  (list  ;; "using namespace <name>;"
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             t shu-cpp-token-type-kw
+                             "using")
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             t shu-cpp-token-type-kw
+                             "namespace")
+   (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
+                                 shu-cpp-mch-namespace-forms)
+   )
+  )
+
+
+
 
 
 

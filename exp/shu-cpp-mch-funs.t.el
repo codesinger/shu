@@ -747,5 +747,4 @@
 
 
 
-
 ;;; shu-cpp-mch-funs.t.el ends here
