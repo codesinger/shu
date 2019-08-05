@@ -1620,6 +1620,47 @@ characters in length."
     ))
 
 
+
+;;
+;;  shu-new-deallocate
+;;
+(defun shu-new-deallocate (var-name class-name)
+  "Insert the code to do a standard dealloacation of memory alloacated by a
+specific allocator.  First prompt reads the variable name that points to the
+memory to be deallocated.  Second prompt reads the name of the class whode
+destructor is to be called.
+
+This generates a ode sequence as follows:
+
+        if (var-name)
+        {
+            var-name->~class-name();
+            m_allocator->deallocate(var-name);
+            var-name = 0;
+        }
+
+VAR-NAME and CLASS-NAME are read from two prompts.  The number of spaces to
+indent inside that braces is defined in the custom variable
+shu-cpp-indent-length.  The name of the member variable that points to the
+allocator in use by the class comes from the custom variable
+shu-cpp-default-allocator-name"
+  (interactive "*sVariable name?: \nsClass name?: ")
+  (let ((pad)
+        (pad-count (current-column))
+        (start)
+        (ipad (make-string shu-cpp-indent-length ? )))
+    (setq pad (make-string pad-count ? ))
+    (insert
+     (concat
+      "if (" var-name ")\n"
+      pad "{\n"
+      pad ipad var-name "->~" class-name "();\n"
+      pad ipad shu-cpp-default-allocator-name "->deallocate(" var-name ");\n"
+      pad ipad var-name " = 0;\n"
+      pad "}\n"))
+    ))
+
+
 ;;
 ;;  TODO: Any bunch of stuff that appears between << operators must have
 ;;        balanced parenthesis.
@@ -2692,6 +2733,7 @@ shu- prefix removed."
   (defalias 'cfor 'shu-cfor)
   (defalias 'cwhile 'shu-cwhile)
   (defalias 'cdo 'shu-cdo)
+  (defalias `new-deallocate `shu-new-deallocate)
   (defalias 'ck 'shu-cpp-check-streaming-op)
   (defalias 'set-default-namespace 'shu-set-default-namespace)
   (defalias 'qualify-class 'shu-interactive-qualify-class-name)
