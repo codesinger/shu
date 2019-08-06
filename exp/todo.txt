@@ -198,3 +198,60 @@ with the new token-list (which my be unchanged).
     list.  If a match fails, it continues loooping through the tokens until the
     first one matches.  It only returns when there is a successful match or there
     are no more tokens.
+
+
+================================================================
+
+Return values from match functions
+
+shu-cpp-match-evaluate-side-list will break if nil returned to it from calling the
+side list function.  Extracts new-rlist and new-token-list from cdr and car of the
+return value.
+
+What should it return?  Its only caller (shu-cpp-internal-sub-match-tokens) can
+accept nil..
+
+shu-cpp-match-or-list - Returns nil if there was no match
+   Called by shu-cpp-match-evaluate-side-list
+
+
+
+shu-cpp-match-repeat-sub-list - NOW Returns nil if there was no match
+   Called by shu-cpp-match-repeat-list - ALWAYS returns non-nil (????)
+       Called by shu-cpp-match-evaluate-side-list
+          Which is called by shu-cpp-match-evaluate-side-list
+
+
+shu-cpp-internal-sub-match-tokens
+    Called by shu-cpp-search-match-tokens and shu-cpp-internal-match-tokens
+
+    shu-cpp-search-match-tokens is only called by external callers
+    shu-cpp-internal-match-tokens is called by external callers
+       and by shu-cpp-match-many-list
+
+
+If you are not going to return the rlist, how do you indicate a failure of a match?
+You do not need to.  If the match fails, the rlist remains unchanged.
+
+If the match succeeds, the caller gets back an updated rlist and an updated tlist.
+If the match fails, the caller should get back nothing (nither the rlist nor the
+tlist has changed) and the top level caller can resture the rlist and tlist.
+
+
+shu-cpp-internal-sub-match-tokens makes no statement about whether the match
+succeeded.  It merely returns mlist, rlist, and tlist.
+
+
+shu-cpp-match-tokens is called externally
+
+    it calls shu-cpp-internal-match-tokens
+
+        it calls shu-cpp-internal-sub-match-tokens, which always returns a value
+
+    In shu-cpp-internal-match-tokens, if one of the lists matches, it returns a
+    ret-val with the updated tlist and rlist.  If none of the lists match, it
+    returns nil.
+
+
+ 1. shu-cpp-match-evaluate-side-list has to be changed to accept a nil return
+    value.  The functions that call it can accept a nil return value.  DONE.
