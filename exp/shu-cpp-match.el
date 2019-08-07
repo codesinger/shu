@@ -184,9 +184,7 @@ This does a recursive call to shu-cpp-match-tokens.")
 ;;
 (defun shu-cpp-match-op-code-name (op-code)
   "Return the name of an op-code."
-  (let (
-        (op-code-name "**unknown** (nil)")
-        )
+  (let ((op-code-name "**unknown** (nil)"))
     (when op-code
       (if (not (numberp op-code))
           (setq op-code-name "**unknown** (Not a number)")
@@ -251,16 +249,12 @@ side list."
 (defmacro shu-cpp-match-extract-info (match-info op-code match-eval-func
                                                  match-ret-ind match-token-type match-token-value)
   "Extract the information out of a match-info"
-  (let (
-        (tmatch-ext (make-symbol "match-ext"))
+  (let ((tmatch-ext (make-symbol "match-ext"))
         (tmatch-func (make-symbol "match-func"))
-        (tmatch-type (make-symbol "match-type"))
-        )
-    `(let (
-           (,tmatch-ext)
+        (tmatch-type (make-symbol "match-type")))
+    `(let ((,tmatch-ext)
            (,tmatch-func)
-           (,tmatch-type)
-           )
+           (,tmatch-type))
        (setq ,op-code (car ,match-info))
        (setq ,tmatch-ext (cdr ,match-info))
        (setq ,tmatch-func (car ,tmatch-ext))
@@ -268,8 +262,7 @@ side list."
        (setq ,match-eval-func (cdr ,tmatch-func))
        (setq ,match-ret-ind (car ,tmatch-func))
        (setq ,match-token-type (car ,tmatch-type))
-       (setq ,match-token-value (cdr ,tmatch-type))
-       )
+       (setq ,match-token-value (cdr ,tmatch-type)))
     ))
 
 
@@ -306,10 +299,8 @@ side list."
 ;;
 (defsubst shu-cpp-match-extract-type (match-info)
   "Return the token type from the match-info."
-  (let (
-        (match-ext)
-        (match-type)
-        )
+  (let ((match-ext)
+        (match-type))
     (setq match-ext (cdr match-info))
     (setq match-type (cdr match-ext))
     (car match-type)
@@ -321,10 +312,8 @@ side list."
 ;;
 (defsubst shu-cpp-match-extract-token (match-info)
   "Return the token from the match-info."
-  (let (
-        (match-ext)
-        (match-type)
-        )
+  (let ((match-ext)
+        (match-type))
     (setq match-ext (cdr match-info))
     (setq match-type (cdr match-ext))
     (cdr match-type)
