@@ -333,6 +333,81 @@ and end point of the entire \"using namespace\" directive."
     ))
 
 
+
+;;
+;;  tccc
+;;
+;;(ert-deftest tccc ()
+;;  (let (
+;;        (gb (get-buffer-create "**boo**"))
+;;        (nslist)
+;;        (data
+;;         (concat
+;;          "// This is something\n"
+;;          "using namespace std;\n"
+;;          "  using namespace ::bsl;\n"
+;;          "// This is something else\n"
+;;          "    using \n"
+;;          " // Hello\n"
+;;          " namespace /* there*/  whammo;\n"
+;;          " // again\n"
+;;          " using namespace blammo::target;\n"
+;;          "  /*  Comment  */\n"
+;;          ))
+;;        )
+;;    (with-temp-buffer
+;;      (insert data)
+;;      (setq nslist (ccc))
+;;      (princ "nslist: " gb) (princ nslist gb) (princ "\n" gb)
+;;      )
+;;    ))
+;;
+
+
+;;
+;; Names for rmv-using
+;;
+;;
+;;  namespace-info
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> List of unqualified class names
+;;        |
+;;        +-------------> namespace names
+;;
+;;
+;;  namespace-names:
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> Replacement name
+;;        |
+;;        +-------------> Using name
+;;
+;;
+;;  using name is the name specified on "using namespace"
+;;
+;;  replacmenet name is the one that is added to the unqualified class name
+;;
+;; So there might be a using name of abcdef::mumble
+;;
+;; And a replacement name of mumble because the code was about to be
+;; enclosed in the namespace abcdef, so you would only have to qualify
+;; the class names with mumble.
+;;
+;;
+;;
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
