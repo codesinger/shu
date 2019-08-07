@@ -556,6 +556,24 @@
 
 
 ;;
+;;  shu-cpp-brace-colon-or-list
+;;
+(defconst shu-cpp-brace-colon-or-list
+   (list  ;; operator "{" or operator ":"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                              "{")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                              ":")
+    )
+   )
+
+
+
+;;
 ;;  shu-test-shu-cpp-match-or-list-1
 ;;
 (ert-deftest shu-test-shu-cpp-match-or-list-1 ()

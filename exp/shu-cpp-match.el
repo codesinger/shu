@@ -872,47 +872,24 @@ which is not a valid C++ name."
     ))
 
 
+
 ;;
 ;;  shu-cpp-token-match-same-rx
 ;;
 (defun shu-cpp-token-match-same-rx (match-info token-info)
-  "Doc string."
-  (interactive)
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (match-token-type (shu-cpp-match-extract-type match-info))
+  "Perform a single match operation by regular expression between an item in a
+token list and an item in a match list.  The token types must be the same and
+the regular expression in the match list must match (via string-match) the token
+in the token list."
+  (let ((match-token-type (shu-cpp-match-extract-type match-info))
         (match-token (shu-cpp-match-extract-token match-info))
         (token-type (shu-cpp-token-extract-type token-info))
         (token (shu-cpp-token-extract-token token-info))
-        (rx (concat shu-cpp-name "+"))
-        (did-match)
-        )
-    (princ (format "shu-cpp-token-match-same-rx: token-type: %d, match-token-type: %d, token: \"%s\", match-token: \"%s\"\n" token-type match-token-type token match-token) gb)
+        (did-match))
     (setq did-match (and (= token-type match-token-type)
-         (string-match rx token)))
-    (if did-match
-        (princ "      matched\n" gb)
-        (princ "      NOT matched\n" gb)
-        )
+                         (string-match match-token token)))
     did-match
     ))
-
-;;
-;;  shu-cpp-brace-colon-or-list
-;;
-(defconst shu-cpp-brace-colon-or-list
-   (list  ;; operator "{" or operator ":"
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
-                              'shu-cpp-token-match-same
-                              nil shu-cpp-token-type-op
-                              "{")
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
-                              'shu-cpp-token-match-same
-                              nil shu-cpp-token-type-op
-                              ":")
-    )
-   )
-
 
 
 
@@ -922,23 +899,19 @@ which is not a valid C++ name."
 ;;
 (defun shu-cpp-token-show-match-lists (match-lists &optional title)
   "Show the data in an instance of match-info."
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (mlist match-lists)
         (match-list)
         (ln 0)
-        (local-title)
-        )
+        (local-title))
     (when title
-      (princ (concat title "\n") gb)
-      )
+      (princ (concat title "\n") gb))
     (while mlist
       (setq match-list (car mlist))
       (setq local-title (format "\nlist-%d" ln))
       (shu-cpp-token-show-match-list match-list local-title)
       (setq ln (1+ ln))
-      (setq mlist (cdr mlist))
-      )
+      (setq mlist (cdr mlist)))
     ))
 
 
@@ -949,19 +922,15 @@ which is not a valid C++ name."
 ;;
 (defun shu-cpp-token-show-match-list (match-list &optional title)
   "Show the data in an instance of match-info."
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (mlist match-list)
-        (match-info)
-        )
+        (match-info))
     (when title
-      (princ (concat title "\n") gb)
-      )
+      (princ (concat title "\n") gb))
     (while mlist
       (setq match-info (car mlist))
       (shu-cpp-token-show-match-info match-info)
-      (setq mlist (cdr mlist))
-      )
+      (setq mlist (cdr mlist)))
     ))
 
 
@@ -972,8 +941,7 @@ which is not a valid C++ name."
 ;;
 (defun shu-cpp-token-show-match-info (match-info)
   "Show the data in an instance of match-info."
-  (let ((gb      (get-buffer-create shu-unit-test-buffer))
-        )
+  (let ((gb      (get-buffer-create shu-unit-test-buffer)))
     (shu-cpp-token-show-match-info-buffer match-info gb)
     ))
 
@@ -985,8 +953,7 @@ which is not a valid C++ name."
 ;;
 (defun shu-cpp-token-show-match-info-buffer (match-info gb)
   "Show the data in an instance of match-info."
-  (let (
-       (op-code)
+  (let ((op-code)
        (new-match-info)
        (match-ext)
        (match-func)
@@ -1007,8 +974,7 @@ which is not a valid C++ name."
           (if (not (numberp op-code))
               (progn
                 (princ "shu-cpp-token-show-match-info: op-code is not a number\n" gb)
-                (princ "\n    op-code: " gb)(princ op-code gb)(princ "\n" gb)
-                )
+                (princ "\n    op-code: " gb)(princ op-code gb)(princ "\n" gb))
             (princ (format "op-code: %d (%s)\n" op-code (shu-cpp-match-op-code-name op-code)) gb)
             (if (> op-code shu-cpp-token-match-type-non-loop-max)
                 (progn
