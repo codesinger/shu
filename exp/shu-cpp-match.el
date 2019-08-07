@@ -851,23 +851,16 @@ which is not a valid C++ name."
 ;;  shu-cpp-token-match-same
 ;;
 (defun shu-cpp-token-match-same (match-info token-info)
-  "Doc string."
-  (interactive)
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (match-token-type (shu-cpp-match-extract-type match-info))
+  "Perform a single match operation between an item in a token list and an item
+in a match list.  The token types must be the same and the token value in the
+match list must be the same as the token value in the token list."
+  (let ((match-token-type (shu-cpp-match-extract-type match-info))
         (match-token (shu-cpp-match-extract-token match-info))
         (token-type (shu-cpp-token-extract-type token-info))
         (token (shu-cpp-token-extract-token token-info))
-        (did-match)
-        )
-    (princ (format "shu-cpp-token-match-same: token-type: %d, match-token-type: %d, token: \"%s\", match-token: \"%s\"\n" token-type match-token-type token match-token) gb)
+        (did-match))
     (setq did-match (and (= token-type match-token-type)
                          (string= token match-token)))
-    (if did-match
-        (princ "      matched\n" gb)
-        (princ "      NOT matched\n" gb)
-        )
     did-match
     ))
 
@@ -877,10 +870,10 @@ which is not a valid C++ name."
 ;;  shu-cpp-token-match-same-rx
 ;;
 (defun shu-cpp-token-match-same-rx (match-info token-info)
-  "Perform a single match operation by regular expression between an item in a
-token list and an item in a match list.  The token types must be the same and
-the regular expression in the match list must match (via string-match) the token
-in the token list."
+  "Perform a single match operation by regular expression between an
+item in a token list and an item in a match list.  The token types
+must be the same and the regular expression in the match list must
+match (via string-match) the token in the token list."
   (let ((match-token-type (shu-cpp-match-extract-type match-info))
         (match-token (shu-cpp-match-extract-token match-info))
         (token-type (shu-cpp-token-extract-type token-info))
