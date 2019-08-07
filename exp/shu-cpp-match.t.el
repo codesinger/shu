@@ -298,7 +298,7 @@
         (setq mlist (cdr mlist))
         )
       )
-    (setq ret-val (shu-cpp-match-tokens match-lists token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist match-lists token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq token-info (cdr ret-val))
@@ -424,7 +424,7 @@
         (setq token (shu-cpp-token-extract-token tinfo))
         (when (and (= token-type shu-cpp-token-type-kw)
                    (string= token "using"))
-          (setq ret-val (shu-cpp-match-tokens match-lists tlist))
+          (setq ret-val (shu-cpp-match-tokens rlist match-lists tlist))
           (should ret-val)
           (should (consp ret-val))
           (setq rlist (cdr ret-val))
@@ -516,7 +516,7 @@
       (setq tlist (cdr tlist))
       )
 
-    (setq ret-val (shu-cpp-match-tokens match-lists token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist match-lists token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq rlist (cdr ret-val))
@@ -1472,7 +1472,7 @@
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
       )
-    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-2 token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq rlist (cdr ret-val))
@@ -1483,7 +1483,7 @@
     (should (listp new-token-list))
     (shu-cpp-tokenize-show-list rlist)
 
-    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 new-token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-2 new-token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq rlist (cdr ret-val))
@@ -1494,7 +1494,7 @@
     (should (listp new-token-list))
     (shu-cpp-tokenize-show-list rlist)
 
-    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 new-token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-2 new-token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq rlist (cdr ret-val))
@@ -1517,6 +1517,7 @@
         (rlist)
         (nrl)
         (token)
+        (token-info)
         (token-type)
         (token-list)
         (new-token-list)
@@ -1535,7 +1536,7 @@
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
       )
-    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-2 token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq rlist (cdr ret-val))
@@ -1588,7 +1589,7 @@
     (should (= token-type shu-cpp-token-type-kw))
     (should (string= token "using"))
 
-    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 new-token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-2 new-token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq rlist (cdr ret-val))
@@ -1599,7 +1600,7 @@
     (should (listp new-token-list))
     (shu-cpp-tokenize-show-list rlist "NS2")
 
-    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 new-token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-2 new-token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq rlist (cdr ret-val))
@@ -1702,7 +1703,7 @@
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
-    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-2 token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-2 token-list))
     (should (not ret-val))
     ))
 
@@ -1856,7 +1857,7 @@
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
       )
-    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-3 token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-3 token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq rlist (cdr ret-val))
@@ -1911,7 +1912,7 @@
     (should (string= token "using"))
 
 
-    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-3 new-token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-3 new-token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq rlist (cdr ret-val))
@@ -1965,7 +1966,7 @@
     (should (string= token "using"))
 
 
-    (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list-3 new-token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-3 new-token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq rlist (cdr ret-val))

@@ -99,7 +99,8 @@
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
         (setq item-number (1+ item-number))
-        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (setq rlist nil)
+        (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-mch-namespace-list tlist))
         (princ (format "item-number: %d\n" item-number) gb)
         (if (or
             (= item-number 2)
@@ -198,7 +199,8 @@
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
-        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (setq rlist nil)
+        (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-mch-namespace-list tlist))
         (princ "item-number: 1\n" gb)
         (setq advance-tlist nil)
         (setq running nil)
@@ -258,7 +260,8 @@
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
-        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (setq rlist nil)
+        (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-mch-namespace-list tlist))
         (princ "item-number: 2\n" gb)
         (setq advance-tlist t)
         (setq running nil)
@@ -282,7 +285,8 @@
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
-        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (setq rlist nil)
+        (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-mch-namespace-list tlist))
         (princ "item-number: 3\n" gb)
         (setq advance-tlist nil)
         (setq running nil)
@@ -342,7 +346,8 @@
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
-        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (setq rlist nil)
+        (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-mch-namespace-list tlist))
         (princ "item-number: 4\n" gb)
         (setq advance-tlist nil)
         (setq running nil)
@@ -403,7 +408,8 @@
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
-        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (setq rlist nil)
+        (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-mch-namespace-list tlist))
         (princ "item-number: 5\n" gb)
         (setq advance-tlist t)
         (setq running nil)
@@ -429,7 +435,8 @@
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
-        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (setq rlist nil)
+        (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-mch-namespace-list tlist))
         (princ "item-number: 6\n" gb)
         (setq advance-tlist nil)
         (setq running nil)
@@ -497,7 +504,8 @@
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
-        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (setq rlist nil)
+        (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-mch-namespace-list tlist))
         (princ "item-number: 7\n" gb)
         (setq advance-tlist nil)
         (setq running nil)
@@ -572,7 +580,8 @@
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
-        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (setq rlist nil)
+        (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-mch-namespace-list tlist))
         (princ "item-number: 8\n" gb)
         (setq advance-tlist nil)
         (setq running nil)
@@ -633,7 +642,8 @@
       (when (and
              (= token-type shu-cpp-token-type-kw)
              (string= token "using"))
-        (setq ret-val (shu-cpp-match-tokens shu-cpp-mch-namespace-list tlist))
+        (setq rlist nil)
+        (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-mch-namespace-list tlist))
         (princ "item-number: 9\n" gb)
         (setq advance-tlist nil)
         (setq running nil)
@@ -789,6 +799,7 @@
           ))
         (token-list)
         (rlist)
+        (nlist)
         (tlist)
         (advance-tlist)
         (token-info)

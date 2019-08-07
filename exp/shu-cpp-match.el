@@ -406,23 +406,8 @@ whole list is matched or the TOKEN-LIST is exhausted."
 
 
 
-
 ;;
 ;;  shu-cpp-match-tokens
-;;
-(defun shu-cpp-match-tokens (match-lists token-list)
-  "doc"
-  (let (
-        (rlist)
-        (ret-val)
-        )
-    (setq ret-val (shu-cpp-internal-match-tokens rlist match-lists token-list))
-    ret-val
-    ))
-
-
-;;
-;;  shu-cpp-internal-match-tokens
 ;;
 ;; TODO: Find some way to pass back the pointer to the next token
 ;;       to be scanned.  This is the first token not examined after
@@ -455,7 +440,7 @@ whole list is matched or the TOKEN-LIST is exhausted."
 ;;       You can have a named list by simply naming the first entry
 ;;       or you can choose to have other names in the list.
 ;;
-(defun shu-cpp-internal-match-tokens (rlist match-lists token-list)
+(defun shu-cpp-match-tokens (rlist match-lists token-list)
   "MATCH-LISTS is a list of match lists.  TOKEN-LIST is a list of tokens.  for
 each match-list in MATCH-LISTS, try to match every element of the match list to
 the token list.  if a match fails or if you reach the end of the token list
@@ -720,7 +705,7 @@ matched token-info was to be returned."
         (match-lists (shu-cpp-match-extract-side-list match-info))
         (ret-val)
         )
-    (setq ret-val (shu-cpp-internal-match-tokens rlist match-lists token-list))
+    (setq ret-val (shu-cpp-match-tokens rlist match-lists token-list))
     ret-val
     ))
 
@@ -1160,7 +1145,7 @@ and end point of the entire \"using namespace\" directive."
           (when (string= token "using")
             (princ "   found using\n" gb)
             (setq start-point (shu-cpp-token-extract-spoint token-info))
-            (setq ret-val (shu-cpp-match-tokens shu-cpp-namespace-match-list tlist))
+            (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list tlist))
             (setq rlist (cdr ret-val))
             (when rlist
               (princ (format "rlist(%d): " (length rlist)) gb) (princ rlist gb) (princ "\n" gb)
