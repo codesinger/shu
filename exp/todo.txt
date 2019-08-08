@@ -255,3 +255,33 @@ shu-cpp-match-tokens is called externally
 
  1. shu-cpp-match-evaluate-side-list has to be changed to accept a nil return
     value.  The functions that call it can accept a nil return value.  DONE.
+
+=========================================
+
+8 Aug 2019
+
+shu-cpp-match-repeat-list has a fundamental problem..
+
+If a repeat list fails on the first entry in the list, this is a "sort of" success.
+You are loking for zero or more instances and you found zero.  (BTW: You might
+consider having an option that says one or more instead of a blanket zero or
+more). But if it fails on anything other than the first entry, it is a failure.
+
+shu-cpp-match-repeat-sub-list does not distinguish between a failure on the first
+one and a failure on any other one  It must do that or shu-cpp-match-repeat-list
+cannot figure out what happened.
+
+Then the question is, what does shu-cpp-match-repeat-list return if it gets a
+failure on the first (which is a sort of success)?
+
+The answer is simple.  shu-cpp-match-repeat-sub-list has to keep track of whether
+the failure happened on the first or not.  If it happens on the first, it returns an
+unmodified tlist and rlist.
+
+shu-cpp-match-repeat-list knows that it has finished the evaluation when one of two
+things happens:
+
+ 1. shu-cpp-match-repeat-sub-list returns nil
+
+ 2. shu-cpp-match-repeat-sub-list returns an unmodified tlist / rlist.  In the
+    latter case the entire repeating match is considered successful.
