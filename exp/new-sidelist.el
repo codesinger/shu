@@ -87,26 +87,64 @@ side list."
 
 
 ;;
-;;  shu-cpp-match-extract-info
+;;  shu-cpp-match-extract-side-list
 ;;
-(defmacro shu-cpp-match-extract-info (match-info op-code match-eval-func
-                                                 match-ret-ind match-token-type match-token-value)
-  "Extract the information out of a match-info"
-  (let ((tmatch-ext (make-symbol "match-ext"))
-        (tmatch-func (make-symbol "match-func"))
-        (tmatch-type (make-symbol "match-type")))
-    `(let ((,tmatch-ext)
-           (,tmatch-func)
-           (,tmatch-type))
+(defmacro shu-cpp-match-extract-side-list (match-info op-code side-list side-parameter)
+  "Extract the side-list information out of a match-info that represents a side-list.."
+  (let ((tmatch-side (make-symbol "match-side")))
+    `(let ((,tmatch-side))
        (setq ,op-code (car ,match-info))
-       (setq ,tmatch-ext (cdr ,match-info))
-       (setq ,tmatch-func (car ,tmatch-ext))
-       (setq ,tmatch-type (cdr ,tmatch-ext))
-       (setq ,match-eval-func (cdr ,tmatch-func))
-       (setq ,match-ret-ind (car ,tmatch-func))
-       (setq ,match-token-type (car ,tmatch-type))
-       (setq ,match-token-value (cdr ,tmatch-type)))
+       (setq ,tmatch-side (cdr ,match-info))
+       (setq ,side-parameter (car ,tmatch-side))
+       (setq ,side-list (cdr ,tmatch-side)))
     ))
+
+
+
+;;
+;;  shu-cpp-match-extract-side-list-only
+;;
+(defun shu-cpp-match-extract-side-list-only (match-info)
+  "Extract only the side list from the match info.  This is in contract to
+shu-cpp-match-extract-side-list, which extracts all of the properties of a
+side list."
+    (cddr match-info)
+    )
+
+
+
+
+
+
+;;
+;;  shu-test-shu-cpp-make-match-side-list-1
+;;
+(ert-deftest shu-test-shu-cpp-make-match-side-list-1 ()
+  (let (
+        (op-code 101)
+        (match-list 303)
+        (side-parameter)
+        (match-info)
+        (xop-code)
+        (xmatch-list)
+        (xside-parameter)
+        )
+    (setq match-info (shu-cpp-make-match-side-list op-code match-list))
+    (shu-cpp-match-extract-side-list match-info xop-code xmatch-list xside-parameter)
+    (should (= op-code xop-code))
+    (should (= match-list xmatch-list))
+    (should (equal side-parameter xside-parameter))
+
+    (setq op-code 202)
+    (setq match-list 303)
+    (setq side-parameter 404)
+    (setq match-info (shu-cpp-make-match-side-list op-code match-list side-parameter))
+    (shu-cpp-match-extract-side-list match-info xop-code xmatch-list xside-parameter)
+    (should (= op-code xop-code))
+    (should (= match-list xmatch-list))
+    (should (= side-parameter xside-parameter))
+    ))
+
 
 
 ;;; new-sidelist.el ends here

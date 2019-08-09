@@ -235,11 +235,14 @@ This does a recursive call to shu-cpp-match-tokens.")
 ;;
 ;;  shu-cpp-make-match-side-list
 ;;
-(defun shu-cpp-make-match-side-list (op-code match-list)
+(defun shu-cpp-make-match-side-list (op-code match-list &optional side-parameter)
   "Return a match-info structure from the given arguments that represents a
 side list."
-  (cons op-code match-list)
-  )
+  (let (
+        (match-side (cons side-parameter match-list))
+        )
+  (cons op-code match-side)
+  ))
 
 
 
@@ -275,13 +278,31 @@ side list."
   )
 
 
+
 ;;
 ;;  shu-cpp-match-extract-side-list
 ;;
-(defsubst shu-cpp-match-extract-side-list (match-info)
-  "Return the op code from the match-info."
-  (cdr match-info)
-  )
+(defmacro shu-cpp-match-extract-side-list (match-info op-code side-list side-parameter)
+  "Extract the side-list information out of a match-info that represents a side-list.."
+  (let ((tmatch-side (make-symbol "match-side")))
+    `(let ((,tmatch-side))
+       (setq ,op-code (car ,match-info))
+       (setq ,tmatch-side (cdr ,match-info))
+       (setq ,side-parameter (car ,tmatch-side))
+       (setq ,side-list (cdr ,tmatch-side)))
+    ))
+
+
+
+;;
+;;  shu-cpp-match-extract-side-list-only
+;;
+(defun shu-cpp-match-extract-side-list-only (match-info)
+  "Extract only the side list from the match info.  This is in contract to
+shu-cpp-match-extract-side-list, which extracts all of the properties of a
+side list."
+    (cddr match-info)
+    )
 
 
 
@@ -664,7 +685,7 @@ is the next token-info in TOKEN-LIST.  The cdr is the return list, RLIST.  RLIST
 remains unchanged if the match-info that matched did not specify that the
 matched token-info was to be returned."
   (let ((token-info (car token-list))
-        (side-list (shu-cpp-match-extract-side-list match-info))
+        (side-list (shu-cpp-match-extract-side-list-only match-info))
         (new-rlist rlist)
         (looking t)
         (op-code)
@@ -702,7 +723,7 @@ matched token-info was to be returned."
 (defun shu-cpp-match-many-list (rlist token-list match-info)
   "Do a recursive call to shu-cpp-match-tokens."
   (let (
-        (match-lists (shu-cpp-match-extract-side-list match-info))
+        (match-lists (shu-cpp-match-extract-side-list-only match-info))
         (ret-val)
         )
     (setq ret-val (shu-cpp-match-tokens rlist match-lists token-list))
@@ -739,7 +760,7 @@ which is not a valid C++ name."
   (let (
 ;;;        (gb (get-buffer-create "**boo**"))
         (gb      (get-buffer-create shu-unit-test-buffer))
-        (match-list (shu-cpp-match-extract-side-list match-info))
+        (match-list (shu-cpp-match-extract-side-list-only match-info))
         (orig-token-list)
         (new-rlist rlist)
         (new-token-list token-list)
@@ -765,7 +786,7 @@ which is not a valid C++ name."
             (progn
               (setq looking nil)
               )
-        (setq match-list (shu-cpp-match-extract-side-list match-info))
+        (setq match-list (shu-cpp-match-extract-side-list-only match-info))
         (setq new-token-list (car ret-val))
         (setq new-rlist (cdr ret-val))
         (setq pret-val ret-val)
@@ -971,7 +992,7 @@ match (via string-match) the token in the token list."
             (princ (format "op-code: %d (%s)\n" op-code (shu-cpp-match-op-code-name op-code)) gb)
             (if (> op-code shu-cpp-token-match-type-non-loop-max)
                 (progn
-                  (setq new-match-info (shu-cpp-match-extract-side-list match-info))
+                  (setq new-match-info (shu-cpp-match-extract-side-list-only match-info))
                   (shu-cpp-token-show-match-list new-match-info "\n side list"))
               (setq match-ext (cdr match-info))
               (if (not match-ext)

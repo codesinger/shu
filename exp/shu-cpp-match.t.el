@@ -128,6 +128,38 @@
 
 
 
+
+;;
+;;  shu-test-shu-cpp-make-match-side-list-1
+;;
+(ert-deftest shu-test-shu-cpp-make-match-side-list-1 ()
+  (let (
+        (op-code 101)
+        (match-list 303)
+        (side-parameter)
+        (match-info)
+        (xop-code)
+        (xmatch-list)
+        (xside-parameter)
+        )
+    (setq match-info (shu-cpp-make-match-side-list op-code match-list))
+    (shu-cpp-match-extract-side-list match-info xop-code xmatch-list xside-parameter)
+    (should (= op-code xop-code))
+    (should (= match-list xmatch-list))
+    (should (equal side-parameter xside-parameter))
+
+    (setq op-code 202)
+    (setq match-list 303)
+    (setq side-parameter 404)
+    (setq match-info (shu-cpp-make-match-side-list op-code match-list side-parameter))
+    (shu-cpp-match-extract-side-list match-info xop-code xmatch-list xside-parameter)
+    (should (= op-code xop-code))
+    (should (= match-list xmatch-list))
+    (should (= side-parameter xside-parameter))
+    ))
+
+
+
 ;;
 ;;  shu-test-shu-cpp-match-is-side-list-1
 ;;
