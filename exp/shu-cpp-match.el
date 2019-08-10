@@ -108,12 +108,14 @@
 ;;
 ;;
 ;;
-;; op-code saya what the matching operation is
-;; match-eval-func - If non-nil, call this function to do tbe evaluation
-;; match-ret-ind - If true, return this token-info as the return value
-;;                 iff the evaluation succeeds
-;; match-token-type - Is a token type to compare against the token-type from
-;;                    the token-info
+;; op-code           - Says what the matching operation is
+;;                     This could be a single comparison or it could be a
+;;                     side-list to be evaluated.
+;; match-eval-func   - This id thr function to call do tbe evaluation
+;; match-ret-ind     - If true, return this token-info as the return value
+;;                     iff the evaluation succeeds
+;; match-token-type  - Is a token type to compare against the token-type from
+;;                     the token-info
 ;; match-token-value - Is a possible value or regular expresson to be compared
 ;;                     with or applied to the token-value from the token-info
 ;;
