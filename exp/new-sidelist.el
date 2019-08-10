@@ -462,7 +462,7 @@ other than the first fails, nil is returned."
     (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
     (should (not ret-val))
 
-
+))
 
 
 
@@ -521,6 +521,5 @@ other than the first fails, nil is returned."
 
 ))
 
-))
 
 ;;; new-sidelist.el ends here

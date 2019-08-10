@@ -119,6 +119,7 @@
 ;;
 ;;
 ;;
+;;
 ;; If op-code indicates that this is a side list, then we have the structure
 ;; shown below, with side-list pointing to the first match-info in the side
 ;; list.
@@ -132,9 +133,29 @@
 ;;   |    |   |   |    |
 ;;   -----|-------|-----
 ;;        |       |
-;;        |       +-----> side-list
+;;        |       +-----> match-side
 ;;        |
 ;;        +-------------> op-code
+;;
+;;
+;;
+;;  match-side
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> side-list
+;;        |
+;;        +-------------> side-parameter
+;;
+;;
+;;  side-parameter is whatever the side list requires, but is currently unused.
+;;  It may be used by something like shu-cpp-match-repeat-list to indicate a
+;;  required minimum number of matches.  Right now that function succceeds if there
+;;  are zero or more matches.
 ;;
 
 
@@ -735,6 +756,15 @@ matched token-info was to be returned."
 ;;
 ;;  shu-cpp-match-repeat-list
 ;;
+;; Two termination conditions
+;;
+;; 1. shu-cpp-match-repeat-sub-list returns nil
+;; 2. shu-cpp-match-repeat-sub-list returns unaltered rlist / token-list
+;;
+;; In both cases, the ret-val from shu-cpp-match-repeat-sub-list
+;; is the one to return to the caller.
+
+;;
 (defun shu-cpp-match-repeat-list (rlist token-list match-info)
   "RLIST points to the current return value list, if any.  TOKEN-LIST points to
 the next token-info to match.  MATCH-INFO is the head of the side list with
@@ -758,43 +788,33 @@ If it matches once, you have a name with one level of qualification.  But if it
 fails in the middle, then you have found something that looks like \"a::\",
 which is not a valid C++ name."
   (let (
-;;;        (gb (get-buffer-create "**boo**"))
-        (gb      (get-buffer-create shu-unit-test-buffer))
         (match-list (shu-cpp-match-extract-side-list-only match-info))
+        (orig-match-list (shu-cpp-match-extract-side-list-only match-info))
         (orig-token-list)
+        (orig-rlist)
         (new-rlist rlist)
         (new-token-list token-list)
         (looking t)
         (ret-val)
-        (pret-val)
-        (title (format "\n\nSHU-CPP-MATCH-REPEAT-LIST - length: %d: " (length rlist)))
         )
-    (shu-cpp-token-show-match-list match-list "\nshu-cpp-match-repeat-list:")
-    (while (and looking new-token-list)
+
+    (while looking
       (setq orig-token-list new-token-list)
+      (setq orig-rlist new-rlist)
       (setq ret-val (shu-cpp-match-repeat-sub-list new-rlist new-token-list match-list))
       (if (not ret-val)
-          (progn
-            (princ "   shu-cpp-match-repeat-list: NOT matched\n" gb)
-            (setq ret-val pret-val)
+          (setq looking nil)
+        (setq new-token-list (car ret-val))
+        (setq new-rlist (cdr ret-val))
+        (if (and
+             (eq orig-token-list new-token-list)
+             (eq orig-rlist new-rlist)
+             )
             (setq looking nil)
-            )
-        (princ "   shu-cpp-match-repeat-list: matched\n" gb)
-        (setq new-token-list (car ret-val))
-        (setq new-rlist (cdr ret-val))
-        (if (equal orig-token-list new-token-list)
-            (progn
-              (setq looking nil)
-              )
-        (setq match-list (shu-cpp-match-extract-side-list-only match-info))
-        (setq new-token-list (car ret-val))
-        (setq new-rlist (cdr ret-val))
-        (setq pret-val ret-val)
-        )
+          (setq match-list orig-match-list)
+          )
         )
       )
-    (setq ret-val (cons new-token-list new-rlist))
-    (princ "shu-cpp-match-repeat-list: ret-val: " gb) (princ ret-val gb) (princ "\n" gb)
     ret-val
     ))
 
@@ -804,54 +824,70 @@ which is not a valid C++ name."
 ;;  shu-cpp-match-repeat-sub-list
 ;;
 (defun shu-cpp-match-repeat-sub-list (rlist token-list match-list)
-  "Go through one iteration of the repeating list."
-  (interactive)
+  "Go through one iteration of the repeating list.  The iteration is considered
+a success if either of the following are true: 1. The first match fails, or
+2. All matches succeed.  If all matches succeed, the updated RLIST and
+TOKEN-LIST are returned.  If the first match fails, the RLIST and TOKEN-LIST are
+returned unaltered.  It is as though no match was ever attempted.  If some match
+other than the first fails, nil is returned."
   (let (
-        (gb (get-buffer-create "**boo**"))
+        (gb      (get-buffer-create shu-unit-test-buffer))
         (looking t)
+        (ret-val (cons token-list rlist))
         (orig-rlist rlist)
         (orig-token-list token-list)
-        (token-info)
+        (mcount 0)
         (match-info)
-        (did-match)
-        (match-success)
+        (token-info)
         (op-code)
         (match-eval-func)
         (match-ret-ind)
         (match-token-type)
         (match-token-value)
-        (match-success)
-        (ret-val)
+        (did-match)
         )
-    (while (and token-list match-list looking)
-      (setq token-info (car token-list))
-      (setq match-info (car match-list))
-      (shu-cpp-match-extract-info match-info op-code match-eval-func
-                                  match-ret-ind match-token-type match-token-value)
-      (setq did-match (funcall match-eval-func match-info token-info))
-      (when (not did-match)
-        (setq looking nil)
-        (setq token-list orig-token-list)
-        )
-      (when looking
-        (when match-ret-ind
-          (push token-info rlist)
+    (when token-list
+      (while looking
+        (setq mcount (1+ mcount))
+        (setq token-info (car token-list))
+        (setq match-info (car match-list))
+        (shu-cpp-match-extract-info match-info op-code match-eval-func
+                                    match-ret-ind match-token-type match-token-value)
+        (princ "token-info: " gb)(princ token-info gb)(princ "\n" gb)
+        (princ "match-info: " gb)(princ match-info gb)(princ "\n" gb)
+        (princ "match-eval-func: " gb)(princ match-eval-func gb)(princ "\n" gb)
+        (setq did-match (funcall match-eval-func match-info token-info))
+        (princ "did-match: " gb)(princ did-match gb)(princ "\n" gb)
+        (if (not did-match)
+            (progn
+              (princ "not branch\n" gb)
+              (setq looking nil)
+              (when (/= mcount 1)
+                (setq ret-val nil)
+                )
+              )
+          (princ "yes branch\n" gb)
+          (when match-ret-ind
+            (push token-info rlist)
+            (princ "rlist: " gb)(princ rlist gb)(princ "\n" gb)
+            )
+          (setq token-list (shu-cpp-token-next-non-comment token-list))
+          (setq match-list (cdr match-list))
+          (princ "token-list: " gb)(princ token-list gb)(princ "\n" gb)
+          (princ "match-list: " gb)(princ match-list gb)(princ "\n" gb)
+          (if match-list
+              (progn
+                (princ "have match-list\n" gb)
+                (when (not token-list)
+                  (setq ret-val nil)
+                  (setq looking nil)
+                  )
+                )
+            (setq ret-val (cons token-list rlist))
+            (setq looking nil)
+            )
           )
-        (setq token-list (shu-cpp-token-next-non-comment token-list))
-        (setq match-list (cdr match-list))
         )
-      )
-    (princ "did-match: " gb)(princ did-match gb)(princ "\n" gb)
-    (princ "token-list: " gb)(princ token-list gb)(princ "\n" gb)
-    (princ "orig-token-list: " gb)(princ orig-token-list gb)(princ "\n" gb)
-    (setq match-success did-match)
-    (if match-success
-        (progn
-          (setq ret-val (cons token-list rlist))
-          (princ "   shu-cpp-match-repeat-sub-list: matched\n" gb)
-          )
-      (princ "   shu-cpp-match-repeat-sub-list: NOT matched\n" gb)
-      (setq ret-val nil)
       )
     ret-val
     ))
