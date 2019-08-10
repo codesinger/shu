@@ -197,6 +197,25 @@ other than the first fails, nil is returned."
     (princ "new-rlist: " gb)(princ new-rlist gb)(princ "\n" gb)
     (princ "new-token-list: " gb)(princ new-token-list gb)(princ "\n" gb)
 
+    (setq token-info (car new-rlist))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (= token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+
+    (setq new-rlist (cdr new-rlist))
+    (setq token-info (car new-rlist))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should (string= token "bbbb"))
+
+    (setq new-rlist (cdr new-rlist))
+    (setq token-info (car new-rlist))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (= token-type shu-cpp-token-type-op))
+    (should (string= token "::"))
 ))
 
 
@@ -251,6 +270,8 @@ other than the first fails, nil is returned."
     (shu-cpp-token-show-token-info new-token-list "NEW_TOKEN-LIST 8889")
     (princ "new-rlist-2: " gb)(princ new-rlist gb)(princ "\n" gb)
     (princ "new-token-list-2: " gb)(princ new-token-list gb)(princ "\n" gb)
+    (should (eq rlist new-rlist))
+    (should (eq token-list new-token-list))
 
 ))
 
