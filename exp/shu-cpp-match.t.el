@@ -163,7 +163,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-is-side-list-1 ()
   (let ((op-code shu-cpp-token-match-type-same)
-    (actual))
+        (actual))
     (setq actual (shu-cpp-match-is-side-list op-code))
     (should (not actual))
     ))
@@ -175,7 +175,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-is-side-list-2 ()
   (let ((op-code shu-cpp-token-match-type-side-loop)
-    (actual))
+        (actual))
     (setq actual (shu-cpp-match-is-side-list op-code))
     (should actual)
     ))
@@ -289,15 +289,15 @@
         (setq name (shu-cpp-token-string-token-info tinfo))
         (princ (format "%d, %s\n" count name) gb)
         (setq tlist (cdr tlist)))
-)
+      )
     (let ((mlist)
           (match-info)
-           (op-code)
-           (match-eval-func)
-           (match-ret-ind)
-           (match-token-type)
-           (match-token-value)
-           (count 0))
+          (op-code)
+          (match-eval-func)
+          (match-ret-ind)
+          (match-token-type)
+          (match-token-value)
+          (count 0))
       (setq mlist (car match-lists))
       (while mlist
         (setq count (1+ count))
@@ -377,12 +377,12 @@
         (setq tlist (cdr tlist))))
     (let ((mlist)
           (match-info)
-           (op-code)
-           (match-eval-func)
-           (match-ret-ind)
-           (match-token-type)
-           (match-token-value)
-           (count 0))
+          (op-code)
+          (match-eval-func)
+          (match-ret-ind)
+          (match-token-type)
+          (match-token-value)
+          (count 0))
       (setq mlist (car match-lists))
       (while mlist
         (setq count (1+ count))
@@ -536,17 +536,17 @@
 ;;  shu-test-cpp-brace-colon-or-list
 ;;
 (defconst shu-test-cpp-brace-colon-or-list
-   (list  ;; operator "{" or operator ":"
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
-                              'shu-cpp-token-match-same
-                              nil shu-cpp-token-type-op
-                              "{")
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
-                              'shu-cpp-token-match-same
-                              nil shu-cpp-token-type-op
-                              ":")
-    )
+  (list  ;; operator "{" or operator ":"
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             nil shu-cpp-token-type-op
+                             "{")
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             nil shu-cpp-token-type-op
+                             ":")
    )
+  )
 
 
 
@@ -555,7 +555,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-or-list-1 ()
   (let ((match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-choose
-                                                 shu-test-cpp-brace-colon-or-list))
+                                                  shu-test-cpp-brace-colon-or-list))
         (data "{ something }")
         (token-list)
         (rlist)
@@ -753,7 +753,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-or-list-4 ()
   (let ((match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-choose
-                                                 shu-test-cpp-brace-colon-or-list))
+                                                  shu-test-cpp-brace-colon-or-list))
         (data "; something ;")
         (token-list)
         (rlist)
@@ -836,7 +836,7 @@
     (setq token (shu-cpp-token-extract-token token-info))
     (should (= token-type shu-cpp-token-type-op))
     (should (string= token "::"))
-))
+    ))
 
 
 
@@ -890,7 +890,7 @@
     (should (eq rlist new-rlist))
     (should (eq token-list new-token-list))
 
-))
+    ))
 
 
 
@@ -934,7 +934,7 @@
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
     (should (not ret-val))
-))
+    ))
 
 
 
@@ -1020,7 +1020,7 @@
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
     (should (not ret-val))
-))
+    ))
 
 
 
@@ -1074,7 +1074,7 @@
     (princ "new-token-list-2: " gb)(princ new-token-list gb)(princ "\n" gb)
     (should (eq rlist new-rlist))
     (should (eq token-list new-token-list))
-))
+    ))
 
 
 
@@ -1106,7 +1106,7 @@
         (token-type)
         (token-info))
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  match-list))
+                                                   match-list))
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
@@ -1163,7 +1163,7 @@
         (token-type)
         (token-info))
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  match-list))
+                                                   match-list))
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
@@ -1221,7 +1221,7 @@
         (token-type)
         (token-info))
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  match-list))
+                                                   match-list))
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
@@ -1277,7 +1277,7 @@
         (token-type)
         (token-info))
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  match-list))
+                                                   match-list))
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
@@ -1378,7 +1378,7 @@
     (shu-cpp-tokenize-show-list rlist title)
     (setq ret-val (shu-cpp-match-repeat-list rlist token-list match-info))
     (should (not ret-val))
-))
+    ))
 
 
 
@@ -1428,7 +1428,7 @@
     (shu-cpp-tokenize-show-list rlist title)
     (setq ret-val (shu-cpp-match-repeat-list rlist token-list match-info))
     (should (not ret-val))
-))
+    ))
 
 
 
@@ -1463,7 +1463,7 @@
         (token-type)
         (token-info))
     (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  match-list))
+                                                   match-list))
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
@@ -1499,64 +1499,64 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-kw
-                               "using")
+                              "using")
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               nil shu-cpp-token-type-kw
-                               "namespace")
+                              "namespace")
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
-                               (concat shu-cpp-name "+"))
+                              (concat shu-cpp-name "+"))
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";"))
+                              ";"))
 
 
    (list  ;; "using namespace :: <name>;"
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-kw
-                               "using")
+                              "using")
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               nil shu-cpp-token-type-kw
-                               "namespace")
+                              "namespace")
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               nil shu-cpp-token-type-op
-                               "::")
+                              "::")
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
-                               (concat shu-cpp-name "+"))
+                              (concat shu-cpp-name "+"))
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";"))
+                              ";"))
 
 
    (list  ;; "using namespace <name> {:: <name>};"
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-kw
-                               "using")
+                              "using")
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               nil shu-cpp-token-type-kw
-                               "namespace")
+                              "namespace")
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
                               (concat shu-cpp-name "+"))
 
     (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  shu-test-shu-cpp-colon-name)
+                                  shu-test-shu-cpp-colon-name)
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";"))))
+                              ";"))))
 
 
 
@@ -1570,9 +1570,9 @@
         (new-token-list)
         (data
          (concat
-         "  using namespace fred ; \n"
-         "  using namespace bob ; \n"
-         "  using namespace andy ; \n"))
+          "  using namespace fred ; \n"
+          "  using namespace bob ; \n"
+          "  using namespace andy ; \n"))
         (debug-on-error t))
 
     (shu-cpp-token-show-match-lists shu-cpp-namespace-match-list-2 "\nshu-cpp-namespace-match-list-2\n")
@@ -1629,9 +1629,9 @@
         (new-token-list)
         (data
          (concat
-         "  using namespace fred ; \n"
-         "  using namespace bob ; \n"
-         "  using namespace /* Hello */ alice::ted::jim ; \n"))
+          "  using namespace fred ; \n"
+          "  using namespace bob ; \n"
+          "  using namespace /* Hello */ alice::ted::jim ; \n"))
         (debug-on-error t))
 
     (shu-cpp-token-show-match-lists shu-cpp-namespace-match-list-2 "\nshu-cpp-namespace-match-list-2\n")
@@ -1800,7 +1800,7 @@
         (new-token-list)
         (data
          (concat
-         "  using namespace alice :: ; ted::jim ; \n")))
+          "  using namespace alice :: ; ted::jim ; \n")))
     (shu-cpp-token-show-match-lists shu-cpp-namespace-match-list-2 "\nshu-cpp-namespace-match-list-2\n")
     (with-temp-buffer
       (insert data)
@@ -1865,26 +1865,26 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
-                               (concat shu-cpp-name "+"))
+                              (concat shu-cpp-name "+"))
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";"))
+                              ";"))
 
 
    (list  ;; ":: <name>"
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               nil shu-cpp-token-type-op
-                               "::")
+                              "::")
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
-                               (concat shu-cpp-name "+"))
+                              (concat shu-cpp-name "+"))
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";"))
+                              ";"))
 
 
    (list  ;; "<name> {:: <name>};"
@@ -1894,11 +1894,11 @@
                               (concat shu-cpp-name "+"))
 
     (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  shu-test-shu-cpp-colon-name)
+                                  shu-test-shu-cpp-colon-name)
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";"))))
+                              ";"))))
 
 
 ;;
