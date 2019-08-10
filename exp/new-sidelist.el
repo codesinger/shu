@@ -76,7 +76,8 @@
 
 ;; Three termination conditions
 ;;
-;; 1. No more tokens left to match
+;; 1. shu-cpp-match-repeat-sub-list returns nil
+;; 2. shu-cpp-match-repeat-sub-list returns unaltered rlist / token-list
 
 ;;
 ;;  shu-cpp-match-repeat-list
@@ -96,9 +97,6 @@
         (title (format "\n\nSHU-CPP-MATCH-REPEAT-LIST - length: %d: " (length rlist)))
         )
 
-    (while
-
-        )
 
     ))
 
@@ -129,44 +127,46 @@ other than the first fails, nil is returned."
         (match-token-value)
         (did-match)
         )
-    (while looking
-      (setq mcount (1+ mcount))
-      (setq token-info (car token-list))
-      (setq match-info (car match-list))
-      (shu-cpp-match-extract-info match-info op-code match-eval-func
-                                  match-ret-ind match-token-type match-token-value)
-      (princ "token-info: " gb)(princ token-info gb)(princ "\n" gb)
-      (princ "match-info: " gb)(princ match-info gb)(princ "\n" gb)
-      (princ "match-eval-func: " gb)(princ match-eval-func gb)(princ "\n" gb)
-      (setq did-match (funcall match-eval-func match-info token-info))
-      (princ "did-match: " gb)(princ did-match gb)(princ "\n" gb)
-      (if (not did-match)
-          (progn
-            (princ "not branch\n" gb)
-            (setq looking nil)
-            (when (/= mcount 1)
-              (setq ret-val nil)
-              )
-            )
-        (princ "yes branch\n" gb)
-        (when match-ret-ind
-          (push token-info rlist)
-          (princ "rlist: " gb)(princ rlist gb)(princ "\n" gb)
-          )
-        (setq token-list (shu-cpp-token-next-non-comment token-list))
-        (setq match-list (cdr match-list))
-        (princ "token-list: " gb)(princ token-list gb)(princ "\n" gb)
-        (princ "match-list: " gb)(princ match-list gb)(princ "\n" gb)
-        (if match-list
+    (when token-list
+      (while looking
+        (setq mcount (1+ mcount))
+        (setq token-info (car token-list))
+        (setq match-info (car match-list))
+        (shu-cpp-match-extract-info match-info op-code match-eval-func
+                                    match-ret-ind match-token-type match-token-value)
+        (princ "token-info: " gb)(princ token-info gb)(princ "\n" gb)
+        (princ "match-info: " gb)(princ match-info gb)(princ "\n" gb)
+        (princ "match-eval-func: " gb)(princ match-eval-func gb)(princ "\n" gb)
+        (setq did-match (funcall match-eval-func match-info token-info))
+        (princ "did-match: " gb)(princ did-match gb)(princ "\n" gb)
+        (if (not did-match)
             (progn
-              (princ "have match-list\n" gb)
-              (when (not token-list)
+              (princ "not branch\n" gb)
+              (setq looking nil)
+              (when (/= mcount 1)
                 (setq ret-val nil)
-                (setq looking nil)
                 )
               )
-          (setq ret-val (cons token-list rlist))
-          (setq looking nil)
+          (princ "yes branch\n" gb)
+          (when match-ret-ind
+            (push token-info rlist)
+            (princ "rlist: " gb)(princ rlist gb)(princ "\n" gb)
+            )
+          (setq token-list (shu-cpp-token-next-non-comment token-list))
+          (setq match-list (cdr match-list))
+          (princ "token-list: " gb)(princ token-list gb)(princ "\n" gb)
+          (princ "match-list: " gb)(princ match-list gb)(princ "\n" gb)
+          (if match-list
+              (progn
+                (princ "have match-list\n" gb)
+                (when (not token-list)
+                  (setq ret-val nil)
+                  (setq looking nil)
+                  )
+                )
+            (setq ret-val (cons token-list rlist))
+            (setq looking nil)
+            )
           )
         )
       )
@@ -443,6 +443,65 @@ other than the first fails, nil is returned."
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
     (should (not ret-val))
+
+
+
+
+
+;;
+;;  shu-test-shu-cpp-match-repeat-sub-list-6
+;;
+(ert-deftest shu-test-shu-cpp-match-repeat-sub-list-6 ()
+  "Token list is empty.  Original token-list and rlist returned."
+  (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          " ; bbbb  ;"
+          ))
+        (match-list
+         (list
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    t shu-cpp-token-type-op
+                                    "::")
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                    'shu-cpp-token-match-same-rx
+                                    t shu-cpp-token-type-uq
+                                    (concat shu-cpp-name "+"))
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    t shu-cpp-token-type-op
+                                    ";")
+          )
+         )
+        (rlist)
+        (token-list)
+        (match-info)
+        (ret-val)
+        (new-token-list)
+        (new-rlist)
+        (token)
+        (token-type)
+        (token-info))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq rlist token-list)
+    (setq token-list nil)
+    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq new-token-list (car ret-val))
+    (setq new-rlist (cdr ret-val))
+    (shu-cpp-token-show-token-info new-rlist "NEW_RLIST 8889")
+    (shu-cpp-token-show-token-info new-token-list "NEW_TOKEN-LIST 8889")
+    (princ "new-rlist-2: " gb)(princ new-rlist gb)(princ "\n" gb)
+    (princ "new-token-list-2: " gb)(princ new-token-list gb)(princ "\n" gb)
+    (should (eq rlist new-rlist))
+    (should (eq token-list new-token-list))
+
+))
 
 ))
 
