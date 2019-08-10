@@ -588,9 +588,9 @@
 
 
 ;;
-;;  shu-cpp-brace-colon-or-list
+;;  shu-test-cpp-brace-colon-or-list
 ;;
-(defconst shu-cpp-brace-colon-or-list
+(defconst shu-test-cpp-brace-colon-or-list
    (list  ;; operator "{" or operator ":"
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
@@ -610,7 +610,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-or-list-1 ()
   (let ((match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-choose
-                                                 shu-cpp-brace-colon-or-list))
+                                                 shu-test-cpp-brace-colon-or-list))
         (data "{ something }")
         (token-list)
         (rlist)
@@ -808,7 +808,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-or-list-4 ()
   (let ((match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-choose
-                                                 shu-cpp-brace-colon-or-list))
+                                                 shu-test-cpp-brace-colon-or-list))
         (data "; something ;")
         (token-list)
         (rlist)
