@@ -74,6 +74,35 @@
 
 
 
+;; Three termination conditions
+;;
+;; 1. No more tokens left to match
+
+;;
+;;  shu-cpp-match-repeat-list
+;;
+(defun shu-cpp-match-repeat-list-new (rlist token-list match-info)
+  "Doc"
+  (let (
+;;;        (gb (get-buffer-create "**boo**"))
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (match-list (shu-cpp-match-extract-side-list-only match-info))
+        (orig-token-list)
+        (new-rlist rlist)
+        (new-token-list token-list)
+        (looking t)
+        (ret-val)
+        (pret-val)
+        (title (format "\n\nSHU-CPP-MATCH-REPEAT-LIST - length: %d: " (length rlist)))
+        )
+
+    (while
+
+        )
+
+    ))
+
+
 ;;
 ;;  shu-cpp-match-repeat-sub-list
 ;;
@@ -351,6 +380,53 @@ other than the first fails, nil is returned."
                                     'shu-cpp-token-match-same
                                     t shu-cpp-token-type-op
                                     "::")
+          )
+         )
+        (rlist)
+        (token-list)
+        (match-info)
+        (ret-val)
+        (new-token-list)
+        (new-rlist)
+        (token)
+        (token-type)
+        (token-info))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
+    (should (not ret-val))
+
+))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-match-repeat-sub-list-5
+;;
+(ert-deftest shu-test-shu-cpp-match-repeat-sub-list-5 ()
+  "Token list is too short, nil returned."
+  (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          " :: bbbb  "
+          ))
+        (match-list
+         (list
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    t shu-cpp-token-type-op
+                                    "::")
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                    'shu-cpp-token-match-same-rx
+                                    t shu-cpp-token-type-uq
+                                    (concat shu-cpp-name "+"))
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    t shu-cpp-token-type-op
+                                    ";")
           )
          )
         (rlist)
