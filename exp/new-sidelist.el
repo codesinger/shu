@@ -74,30 +74,48 @@
 
 
 
-;; Three termination conditions
+;; Two termination conditions
 ;;
 ;; 1. shu-cpp-match-repeat-sub-list returns nil
 ;; 2. shu-cpp-match-repeat-sub-list returns unaltered rlist / token-list
+;;
+;; In both cases, the ret-val from shu-cpp-match-repeat-sub-list
+;; is the one to return to the caller.
 
 ;;
 ;;  shu-cpp-match-repeat-list
 ;;
-(defun shu-cpp-match-repeat-list-new (rlist token-list match-info)
+(defun shu-cpp-match-repeat-list (rlist token-list match-info)
   "Doc"
   (let (
-;;;        (gb (get-buffer-create "**boo**"))
-        (gb      (get-buffer-create shu-unit-test-buffer))
         (match-list (shu-cpp-match-extract-side-list-only match-info))
+        (orig-match-list (shu-cpp-match-extract-side-list-only match-info))
         (orig-token-list)
+        (orig-rlist)
         (new-rlist rlist)
         (new-token-list token-list)
         (looking t)
         (ret-val)
-        (pret-val)
-        (title (format "\n\nSHU-CPP-MATCH-REPEAT-LIST - length: %d: " (length rlist)))
         )
 
-
+    (while looking
+      (setq orig-token-list new-token-list)
+      (setq orig-rlist new-rlist)
+      (setq ret-val (shu-cpp-match-repeat-sub-list new-rlist new-token-list match-list))
+      (if (not ret-val)
+          (setq looking nil)
+        (setq new-token-list (car ret-val))
+        (setq new-rlist (cdr ret-val))
+        (if (and
+             (eq orig-token-list new-token-list)
+             (eq orig-rlist new-rlist)
+             )
+            (setq looking nil)
+          (setq match-list orig-match-list)
+          )
+        )
+      )
+    ret-val
     ))
 
 
