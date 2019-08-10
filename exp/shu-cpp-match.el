@@ -789,17 +789,14 @@ by an unquoted token.  If there is no match, then you have an unqualified name.
 If it matches once, you have a name with one level of qualification.  But if it
 fails in the middle, then you have found something that looks like \"a::\",
 which is not a valid C++ name."
-  (let (
-        (match-list (shu-cpp-match-extract-side-list-only match-info))
+  (let ((match-list (shu-cpp-match-extract-side-list-only match-info))
         (orig-match-list (shu-cpp-match-extract-side-list-only match-info))
         (orig-token-list)
         (orig-rlist)
         (new-rlist rlist)
         (new-token-list token-list)
         (looking t)
-        (ret-val)
-        )
-
+        (ret-val))
     (while looking
       (setq orig-token-list new-token-list)
       (setq orig-rlist new-rlist)
@@ -810,13 +807,9 @@ which is not a valid C++ name."
         (setq new-rlist (cdr ret-val))
         (if (and
              (eq orig-token-list new-token-list)
-             (eq orig-rlist new-rlist)
-             )
+             (eq orig-rlist new-rlist))
             (setq looking nil)
-          (setq match-list orig-match-list)
-          )
-        )
-      )
+          (setq match-list orig-match-list))))
     ret-val
     ))
 
@@ -831,10 +824,9 @@ a success if either of the following are true: 1. The first match fails, or
 2. All matches succeed.  If all matches succeed, the updated RLIST and
 TOKEN-LIST are returned.  If the first match fails, the RLIST and TOKEN-LIST are
 returned unaltered.  It is as though no match was ever attempted.  If some match
-other than the first fails, nil is returned."
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
-        (looking t)
+other than the first fails, nil is returned.  If the TOKEN-LIST is nil on entry,
+this is the equivalent of a first match failure."
+  (let ((looking t)
         (ret-val (cons token-list rlist))
         (orig-rlist rlist)
         (orig-token-list token-list)
@@ -846,8 +838,7 @@ other than the first fails, nil is returned."
         (match-ret-ind)
         (match-token-type)
         (match-token-value)
-        (did-match)
-        )
+        (did-match))
     (when token-list
       (while looking
         (setq mcount (1+ mcount))
@@ -855,42 +846,23 @@ other than the first fails, nil is returned."
         (setq match-info (car match-list))
         (shu-cpp-match-extract-info match-info op-code match-eval-func
                                     match-ret-ind match-token-type match-token-value)
-        (princ "token-info: " gb)(princ token-info gb)(princ "\n" gb)
-        (princ "match-info: " gb)(princ match-info gb)(princ "\n" gb)
-        (princ "match-eval-func: " gb)(princ match-eval-func gb)(princ "\n" gb)
         (setq did-match (funcall match-eval-func match-info token-info))
-        (princ "did-match: " gb)(princ did-match gb)(princ "\n" gb)
         (if (not did-match)
             (progn
-              (princ "not branch\n" gb)
               (setq looking nil)
               (when (/= mcount 1)
-                (setq ret-val nil)
-                )
-              )
-          (princ "yes branch\n" gb)
+                (setq ret-val nil)))
           (when match-ret-ind
-            (push token-info rlist)
-            (princ "rlist: " gb)(princ rlist gb)(princ "\n" gb)
-            )
+            (push token-info rlist))
           (setq token-list (shu-cpp-token-next-non-comment token-list))
           (setq match-list (cdr match-list))
-          (princ "token-list: " gb)(princ token-list gb)(princ "\n" gb)
-          (princ "match-list: " gb)(princ match-list gb)(princ "\n" gb)
           (if match-list
               (progn
-                (princ "have match-list\n" gb)
                 (when (not token-list)
                   (setq ret-val nil)
-                  (setq looking nil)
-                  )
-                )
+                  (setq looking nil)))
             (setq ret-val (cons token-list rlist))
-            (setq looking nil)
-            )
-          )
-        )
-      )
+            (setq looking nil)))))
     ret-val
     ))
 
