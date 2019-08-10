@@ -37,8 +37,7 @@
 ;;  shu-test-shu-cpp-make-match-info-1
 ;;
 (ert-deftest shu-test-shu-cpp-make-match-info-1 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (match-info)
         (op-code shu-cpp-token-match-type-same)
         (match-eval-func 'shu-cpp-token-match-same)
@@ -49,8 +48,7 @@
         (xmatch-eval-func)
         (xmatch-ret-ind)
         (xmatch-token-type)
-        (xmatch-token-value)
-        )
+        (xmatch-token-value))
     (setq match-info (shu-cpp-make-match-info op-code match-eval-func
                                               match-ret-ind match-token-type
                                               match-token-value))
@@ -249,8 +247,7 @@
 ;;  shu-test-shu-cpp-match-tokens-1
 ;;
 (ert-deftest shu-test-shu-cpp-match-tokens-1 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (ret-val)
         (rlist)
         (token-info)
@@ -260,66 +257,47 @@
            (cons shu-cpp-token-match-type-skip
                  (cons
                   (cons nil 'shu-cpp-token-match-skip)
-                  (cons 0 nil)
-                  )
-                 )
+                  (cons 0 nil)))
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-kw "using")
-                  )
-                 )
+                  (cons shu-cpp-token-type-kw "using")))
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-kw "namespace")
-                  )
-                 )
+                  (cons shu-cpp-token-type-kw "namespace")))
            (cons shu-cpp-token-match-type-same-rx
                  (cons
                   (cons t 'shu-cpp-token-match-same-rx)
-                  (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))
-                  )
-                 )
-           )
-          )
-         )
+                  (cons shu-cpp-token-type-uq (concat shu-cpp-name "+")))))))
         (data
          (concat
           "x using namespace fumble;\n"
           ))
-        (token-list)
-        )
+        (token-list))
     (with-temp-buffer
       (insert data)
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      )
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (princ token-list gb) (princ "\n\n" gb)
-    (let (
-          (tlist token-list)
+    (let ((tlist token-list)
           (tinfo)
           (count 0)
-          (name)
-          )
+          (name))
       (while tlist
         (setq count (1+ count))
         (setq tinfo (car tlist))
         (setq name (shu-cpp-token-string-token-info tinfo))
         (princ (format "%d, %s\n" count name) gb)
-        (setq tlist (cdr tlist))
-        )
-
-      )
-    (let (
-          (mlist)
+        (setq tlist (cdr tlist)))
+)
+    (let ((mlist)
           (match-info)
            (op-code)
            (match-eval-func)
            (match-ret-ind)
            (match-token-type)
            (match-token-value)
-           (count 0)
-          )
+           (count 0))
       (setq mlist (car match-lists))
       (while mlist
         (setq count (1+ count))
@@ -327,15 +305,12 @@
         (shu-cpp-match-extract-info match-info op-code match-eval-func
                                     match-ret-ind match-token-type match-token-value)
         (princ (format "%d, %s\n" count match-token-value) gb)
-        (setq mlist (cdr mlist))
-        )
-      )
+        (setq mlist (cdr mlist))))
     (setq ret-val (shu-cpp-match-tokens rlist match-lists token-list))
     (should ret-val)
     (should (consp ret-val))
     (setq token-info (cdr ret-val))
     (should token-info)
-
     ))
 
 
@@ -360,8 +335,7 @@
 ;;  shu-test-shu-cpp-match-tokens-2
 ;;
 (ert-deftest shu-test-shu-cpp-match-tokens-2 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (ret-val)
         (token-info)
         (match-lists
@@ -370,62 +344,45 @@
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-kw "using")
-                  )
-                 )
+                  (cons shu-cpp-token-type-kw "using")))
            (cons shu-cpp-token-match-type-same
                  (cons
                   (cons nil 'shu-cpp-token-match-same)
-                  (cons shu-cpp-token-type-kw "namespace")
-                  )
-                 )
+                  (cons shu-cpp-token-type-kw "namespace")))
            (cons shu-cpp-token-match-type-same-rx
                  (cons
                   (cons t 'shu-cpp-token-match-same-rx)
-                  (cons shu-cpp-token-type-uq (concat shu-cpp-name "+"))
-                  )
-                 )
-           )
-          )
-         )
+                  (cons shu-cpp-token-type-uq (concat shu-cpp-name "+")))))))
         (data
          (concat
           "x using namespace fumble;\n"
           "class blah {};\n"
           ))
         (token-list)
-        (olist)
-        )
+        (olist))
     (with-temp-buffer
       (insert data)
-      (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
-      )
+      (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max))))
     (princ token-list gb) (princ "\n\n" gb)
-    (let (
-          (tlist token-list)
+    (let ((tlist token-list)
           (tinfo)
           (count 0)
-          (name)
-          )
+          (name))
       (while tlist
         (setq count (1+ count))
         (setq tinfo (car tlist))
         (push tinfo olist)
         (setq name (shu-cpp-token-string-token-info tinfo))
         (princ (format "%d, %s\n" count name) gb)
-        (setq tlist (cdr tlist))
-        )
-      )
-    (let (
-          (mlist)
+        (setq tlist (cdr tlist))))
+    (let ((mlist)
           (match-info)
            (op-code)
            (match-eval-func)
            (match-ret-ind)
            (match-token-type)
            (match-token-value)
-           (count 0)
-          )
+           (count 0))
       (setq mlist (car match-lists))
       (while mlist
         (setq count (1+ count))
@@ -433,18 +390,14 @@
         (shu-cpp-match-extract-info match-info op-code match-eval-func
                                     match-ret-ind match-token-type match-token-value)
         (princ (format "%d, %s\n" count match-token-value) gb)
-        (setq mlist (cdr mlist))
-        )
-      )
-    (let (
-          (tlist olist)
+        (setq mlist (cdr mlist))))
+    (let ((tlist olist)
           (rlist)
           (tinfo)
           (count 0)
           (name)
           (token)
-          (token-type)
-          )
+          (token-type))
       (princ "\n\n" gb)
       (while tlist
         (setq count (1+ count))
@@ -460,12 +413,8 @@
           (should ret-val)
           (should (consp ret-val))
           (setq rlist (cdr ret-val))
-          (should rlist)
-            )
-        (setq tlist (cdr tlist))
-        )
-      )
-
+          (should rlist))
+        (setq tlist (cdr tlist))))
     ))
 
 
@@ -474,8 +423,7 @@
 ;;  shu-test-shu-cpp-match-tokens-3
 ;;
 (ert-deftest shu-test-shu-cpp-match-tokens-3 ()
-  (let (
-        (token)
+  (let ((token)
         (match-lists
          (list
           (list  ;; "using namespace <name>;"
@@ -535,18 +483,15 @@
         (tlist)
         (token-info)
         (token-type)
-        (count 0)
-        )
+        (count 0))
     (with-temp-buffer
       (insert data)
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      )
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq tlist token-list)
     (while tlist
       (setq token-info (car tlist))
       (setq count (1+ count))
-      (setq tlist (cdr tlist))
-      )
+      (setq tlist (cdr tlist)))
 
     (setq ret-val (shu-cpp-match-tokens rlist match-lists token-list))
     (should ret-val)
@@ -902,8 +847,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-repeat-sub-list-2 ()
   "First item does not match.  Original and rlist returned."
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           " ; bbbb  ;"
@@ -921,9 +865,7 @@
           (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                                     'shu-cpp-token-match-same
                                     t shu-cpp-token-type-op
-                                    ";")
-          )
-         )
+                                    ";")))
         (rlist)
         (token-list)
         (match-info)
@@ -959,8 +901,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-repeat-sub-list-3 ()
   "Second item does not match, nil returned."
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           " :: bbbb  ;"
@@ -978,9 +919,7 @@
           (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                                     'shu-cpp-token-match-same
                                     t shu-cpp-token-type-op
-                                    ";")
-          )
-         )
+                                    ";")))
         (rlist)
         (token-list)
         (match-info)
@@ -995,7 +934,6 @@
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
     (should (not ret-val))
-
 ))
 
 
@@ -1006,8 +944,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-repeat-sub-list-4 ()
   "Third item does not match, nil returned."
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           " :: bbbb  ;"
@@ -1025,9 +962,7 @@
           (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                                     'shu-cpp-token-match-same
                                     t shu-cpp-token-type-op
-                                    "::")
-          )
-         )
+                                    "::")))
         (rlist)
         (token-list)
         (match-info)
@@ -1042,8 +977,7 @@
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
     (should (not ret-val))
-
-))
+    ))
 
 
 
@@ -1053,8 +987,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-repeat-sub-list-5 ()
   "Token list is too short, nil returned."
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           " :: bbbb  "
@@ -1072,9 +1005,7 @@
           (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                                     'shu-cpp-token-match-same
                                     t shu-cpp-token-type-op
-                                    ";")
-          )
-         )
+                                    ";")))
         (rlist)
         (token-list)
         (match-info)
@@ -1089,7 +1020,6 @@
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
     (should (not ret-val))
-
 ))
 
 
@@ -1100,8 +1030,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-match-repeat-sub-list-6 ()
   "Token list is empty.  Original token-list and rlist returned."
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           " ; bbbb  ;"
@@ -1119,9 +1048,7 @@
           (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                                     'shu-cpp-token-match-same
                                     t shu-cpp-token-type-op
-                                    ";")
-          )
-         )
+                                    ";")))
         (rlist)
         (token-list)
         (match-info)
@@ -1147,7 +1074,6 @@
     (princ "new-token-list-2: " gb)(princ new-token-list gb)(princ "\n" gb)
     (should (eq rlist new-rlist))
     (should (eq token-list new-token-list))
-
 ))
 
 
@@ -1559,9 +1485,10 @@
    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                              'shu-cpp-token-match-same-rx
                              t shu-cpp-token-type-uq
-                             (concat shu-cpp-name "+"))
-   )
+                             (concat shu-cpp-name "+")))
   "A repeating side list to match :: <name>")
+
+
 
 ;;
 ;;  shu-cpp-namespace-match-list-2
@@ -1584,8 +1511,7 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
-    )
+                               ";"))
 
 
    (list  ;; "using namespace :: <name>;"
@@ -1608,8 +1534,7 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
-    )
+                               ";"))
 
 
    (list  ;; "using namespace <name> {:: <name>};"
@@ -1631,10 +1556,7 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
-    )
-   )
-  )
+                               ";"))))
 
 
 
@@ -1642,8 +1564,7 @@
 ;;  test-shu-cpp-match-tokens-with-ns1
 ;;
 (ert-deftest test-shu-cpp-match-tokens-with-ns1 ()
-  (let (
-        (ret-val)
+  (let ((ret-val)
         (rlist)
         (token-list)
         (new-token-list)
@@ -1651,17 +1572,13 @@
          (concat
          "  using namespace fred ; \n"
          "  using namespace bob ; \n"
-         "  using namespace andy ; \n"
-         )
-         )
-        (debug-on-error t)
-        )
+         "  using namespace andy ; \n"))
+        (debug-on-error t))
 
     (shu-cpp-token-show-match-lists shu-cpp-namespace-match-list-2 "\nshu-cpp-namespace-match-list-2\n")
     (with-temp-buffer
       (insert data)
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      )
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-2 token-list))
     (should ret-val)
     (should (consp ret-val))
@@ -1702,8 +1619,7 @@
 ;;  test-shu-cpp-match-tokens-with-ns2
 ;;
 (ert-deftest test-shu-cpp-match-tokens-with-ns2 ()
-  (let (
-        (ret-val)
+  (let ((ret-val)
         (rlist)
         (nrl)
         (token)
@@ -1715,17 +1631,13 @@
          (concat
          "  using namespace fred ; \n"
          "  using namespace bob ; \n"
-         "  using namespace /* Hello */ alice::ted::jim ; \n"
-         )
-         )
-        (debug-on-error t)
-        )
+         "  using namespace /* Hello */ alice::ted::jim ; \n"))
+        (debug-on-error t))
 
     (shu-cpp-token-show-match-lists shu-cpp-namespace-match-list-2 "\nshu-cpp-namespace-match-list-2\n")
     (with-temp-buffer
       (insert data)
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      )
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-2 token-list))
     (should ret-val)
     (should (consp ret-val))
@@ -1957,8 +1869,7 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
-    )
+                               ";"))
 
 
    (list  ;; ":: <name>"
@@ -1973,8 +1884,7 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
-    )
+                               ";"))
 
 
    (list  ;; "<name> {:: <name>};"
@@ -1988,10 +1898,7 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
-    )
-   )
-  )
+                               ";"))))
 
 
 ;;
@@ -2009,10 +1916,7 @@
                               nil shu-cpp-token-type-kw
                               "namespace")
     (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
-                                  shu-cpp-match-namespace-forms)
-    )
-   )
-  )
+                                  shu-cpp-match-namespace-forms))))
 
 
 
@@ -2022,8 +1926,7 @@
 ;;  test-shu-cpp-match-tokens-with-ns4
 ;;
 (ert-deftest test-shu-cpp-match-tokens-with-ns4 ()
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (ret-val)
         (rlist)
         (nrl)
@@ -2036,17 +1939,13 @@
          (concat
           " using  namespace fred; \n "
           "  using namespace :: bob ; \n"
-          "  using namespace alice :: jeff :: ted ; \n"
-         )
-         )
-        (debug-on-error t)
-        )
+          "  using namespace alice :: jeff :: ted ; \n"))
+        (debug-on-error t))
 
     (shu-cpp-token-show-match-lists shu-cpp-namespace-match-list-3 "\nshu-cpp-namespace-match-list-3\n")
     (with-temp-buffer
       (insert data)
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      )
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-match-tokens rlist shu-cpp-namespace-match-list-3 token-list))
     (should ret-val)
     (should (consp ret-val))
