@@ -1179,9 +1179,94 @@
     (setq token (shu-cpp-token-extract-token token-info))
     (should (= token-type shu-cpp-token-type-op))
     (should (string= token ";"))
-
-
     ))
 
+
+
+
+
+;;
+;;  shu-cpp-mch-funs-test-search-2
+;;
+;; This is a snippet of code that can find each occurrence of
+;; \"using namespace\" and accumulate a list of such occurrences."
+;;
+(ert-deftest shu-cpp-mch-funs-test-search-2 ()
+  (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "using namespace alice;\n /* Hello */"  ;; 1
+          "using std::string;\n"                  ;; 2
+          "using namespace alice;\n"              ;; 3
+          "// Hello\n"
+          "using namespace bob;\n"                ;; 4
+          "// using namespace nonsense\n"
+          " using namespace a::b:: ; \n"          ;; 5
+          "using namespace /* Hello */ component::SomeClass;\n"   ;; 6
+          "using namespace Whammo::other::OtherClass;\n"          ;; 7
+          " using namespace ::std;\n"                             ;; 8
+          " using namespace a::b::c::d::e::f::g::h::i;\n"         ;; 9
+          "\n"
+          "namespace Whammo\n"
+          "{\n"
+          "\n"
+          "namespace something\n"
+          "{\n"
+          "\n"
+          "}\n"
+          "}\n"
+          ))
+        (token-list)
+        (rlist)
+        (rlists)
+        (tlist)
+        (advance-tlist)
+        (token-info)
+        (ret-val)
+        (token)
+        (token-type)
+        (item-number 0)
+        (something t)
+        (lcount 0)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      )
+    (setq tlist token-list)
+    (shu-cpp-tokenize-show-list tlist)
+    (while something
+      (setq ret-val (shu-cpp-search-match-tokens rlist shu-cpp-mch-namespace-list-single tlist))
+      (if (not ret-val)
+          (setq something nil)
+        (should ret-val)
+        (should (consp ret-val))
+        (setq tlist (car ret-val))
+        (should tlist)
+        (should (listp tlist))
+        (setq rlist (cdr ret-val))
+        (should rlist)
+        (should (listp rlist))
+        (setq rlist (nreverse rlist))
+        (push rlist rlists)
+        (setq rlist nil)
+      )
+      )
+    (setq rlists (nreverse rlists))
+    (while rlists
+      (setq lcount (1+ lcount))
+      (princ (format "\nRLIST %d:\n" lcount) gb)
+      (setq rlist (car rlists))
+      (shu-cpp-tokenize-show-list rlist)
+      (setq rlists (cdr rlists))
+      )
+))
 
 ;;; shu-cpp-mch-funs.t.el ends here
