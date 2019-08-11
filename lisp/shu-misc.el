@@ -1230,6 +1230,34 @@ be open."
     ))
 
 
+
+
+;;
+;;  shu-erase-region
+;;
+(defun shu-erase-region (start end)
+  "Replace everything in the region between START and END with blanks.  This is
+exactly like delete-region escept that the deleted text is replacd with blanks.
+As with delete-region, the end point is not included in the delete.  It erases
+everything up but not including the end point.  The order of START and END does
+not matter."
+  (let ((spoint start)
+        (epoint end)
+        (len 0)
+        (pad))
+    (when (> spoint epoint)
+      (setq spoint end)
+      (setq epoint start))
+    (setq len (- epoint spoint))
+    (setq pad (make-string len ? ))
+    (save-excursion
+      (delete-region spoint epoint)
+      (goto-char spoint)
+      (insert pad))
+    ))
+
+
+
 ;;
 ;;  shu-misc-set-alias
 ;;

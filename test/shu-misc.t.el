@@ -421,4 +421,94 @@
 
 
 
+
+
+
+;;
+;;  shu-test-shu-erase-region-1
+;;
+(ert-deftest shu-test-shu-erase-region-1 ()
+  (let ((data
+         "12345678901234567890")
+        (expected
+         "1234   8901234567890")
+        (actual)
+        (spoint 5)
+        (epoint 8))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (shu-erase-region spoint epoint)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-erase-region-2
+;;
+(ert-deftest shu-test-shu-erase-region-2 ()
+  (let ((data
+         "12345678901234567890")
+        (expected
+         "1234   8901234567890")
+        (actual)
+        (spoint 8)
+        (epoint 5))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (shu-erase-region spoint epoint)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-erase-region-3
+;;
+(ert-deftest shu-test-shu-erase-region-3 ()
+  (let ((data
+         "1234567890")
+        (expected
+         "   4567890")
+        (actual)
+        (spoint 1)
+        (epoint 4))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (shu-erase-region spoint epoint)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-erase-region-4
+;;
+(ert-deftest shu-test-shu-erase-region-4 ()
+  (let ((data
+         "1234567890")
+        (expected
+         "12345678 0")
+        (actual)
+        (spoint 9)
+        (epoint 10))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (shu-erase-region spoint epoint)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
 ;;; shu-misc.t.el ends here
