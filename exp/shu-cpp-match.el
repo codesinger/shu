@@ -539,8 +539,7 @@ list.  If the whole list is matched, return.  If the whole list does not match,
 restore the original RLIST and TOKEN-LIST and continue.  Return only when the
 whole list is matched or the TOKEN-LIST is exhausted."
   (interactive)
-  (let (
-        (something t)
+  (let ((something t)
         (orig-rlist rlist)
         (tlist token-list)
         (slist)
@@ -557,16 +556,14 @@ whole list is matched or the TOKEN-LIST is exhausted."
         (inner-ret)
         (ret-val)
         (nret-val)
-        (lcount 0)
-        )
+        (lcount 0))
     (setq match-info (car mlist))
     (shu-cpp-match-extract-info match-info op-code match-eval-func
                                 match-ret-ind match-token-type match-token-value)
     (while (and something tlist)
       (setq lcount (1+ lcount))
       (when (= lcount 9000)
-        (setq something nil)
-        )
+        (setq something nil))
       (setq advance-tlist t)
       (setq token-info (car tlist))
       (setq did-match (funcall match-eval-func match-info token-info))
@@ -587,17 +584,9 @@ whole list is matched or the TOKEN-LIST is exhausted."
                   )
               (setq advance-tlist nil)
               (setq ret-val (cons tlist rlist))
-              (setq something nil)
-              )
-            )
-       ;; (setq rlist orig-rlist)
-       ;; (setq tlist token-list)
-       ;; (setq advance-tlist t)
-        )
+              (setq something nil))))
       (when (and tlist advance-tlist)
-        (setq tlist (shu-cpp-token-next-non-comment tlist))
-        )
-      )
+        (setq tlist (shu-cpp-token-next-non-comment tlist))))
     ret-val
     ))
 
