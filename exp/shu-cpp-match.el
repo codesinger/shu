@@ -540,7 +540,6 @@ restore the original RLIST and TOKEN-LIST and continue.  Return only when the
 whole list is matched or the TOKEN-LIST is exhausted."
   (interactive)
   (let (
-        (gbu      (get-buffer-create "**goo**"))
         (something t)
         (orig-rlist rlist)
         (tlist token-list)
@@ -563,8 +562,6 @@ whole list is matched or the TOKEN-LIST is exhausted."
     (setq match-info (car mlist))
     (shu-cpp-match-extract-info match-info op-code match-eval-func
                                 match-ret-ind match-token-type match-token-value)
-    (shu-cpp-token-show-match-info-buffer match-info gbu)
-    (shu-cpp-tokenize-show-list-buffer tlist gbu "\n\nSTART:")
     (while (and something tlist)
       (setq lcount (1+ lcount))
       (when (= lcount 9000)
@@ -572,9 +569,7 @@ whole list is matched or the TOKEN-LIST is exhausted."
         )
       (setq advance-tlist t)
       (setq token-info (car tlist))
-      (shu-cpp-token-show-token-info-buffer token-info gbu)
       (setq did-match (funcall match-eval-func match-info token-info))
-      (princ "did-match: " gbu)(princ did-match gbu)(princ "\n" gbu)
       (if did-match
           (progn
             (setq slist tlist)
@@ -583,18 +578,13 @@ whole list is matched or the TOKEN-LIST is exhausted."
             (setq mlist (car inner-ret))
             (setq tlist (car nret-val))
             (setq rlist (cdr nret-val))
-            (princ "\nmlist: " gbu)(princ mlist gbu)(princ "\n" gbu)
-            (princ "\ntlist: " gbu)(princ tlist gbu)(princ "\n" gbu)
-            (princ "\nrlist: " gbu)(princ rlist gbu)(princ "\n" gbu)
             (if mlist
                 (progn
-                  (princ "LIST NOT MATCHED, mlist: " gbu)(princ mlist gbu)(princ "\n" gbu)
                   (setq mlist match-list)
                   (setq rlist orig-rlist)
                   (setq tlist slist)
                   (setq advance-tlist t)
                   )
-              (princ "LIST MATCHED\n" gbu)
               (setq advance-tlist nil)
               (setq ret-val (cons tlist rlist))
               (setq something nil)
@@ -627,8 +617,6 @@ the matching process and return (pushed onto RLIST) a list which consists of
 matched tokens whose corresponding entry in the match list indicated that the
 matched token was to be added to the list to be returned."
   (let (
-        (gb (get-buffer-create "**boo**"))
-        (gbu      (get-buffer-create shu-unit-test-buffer))
         (outer-done)
         (mlist)
         (tlist)
@@ -645,25 +633,20 @@ matched token was to be added to the list to be returned."
       (setq mlist (car match-lists))
       (setq tlist token-list)
       (setq rlist orig-rlist)
-      (princ (format "\nBegin List: %d\n" lcount) gbu)
       (setq inner-ret (shu-cpp-internal-sub-match-tokens rlist mlist tlist))
       (setq nret-val (cdr inner-ret))
       (setq mlist (car inner-ret))
       (setq tlist (car nret-val))
       (setq rlist (cdr nret-val))
-      (princ "mlist2: " gbu)(princ mlist gbu)(princ "\n" gbu)
       (if mlist
           (progn
            (setq match-lists (cdr match-lists))
-           (princ "match-lists: " gbu)(princ match-lists gbu)(princ "\n" gbu)
-           (princ "outer-done: " gbu)(princ outer-done gbu)(princ "\n" gbu)
            )
         (setq outer-done t)
         (setq token-list tlist)
         (setq ret-val (cons token-list rlist))
         )
      )
-    (princ "ret-val: " gbu)(princ ret-val gbu)(princ "\n" gbu)
     ret-val
     ))
 
@@ -714,7 +697,6 @@ matched token was to be added to the list to be returned."
   "Do the matching for one list only."
   (interactive)
   (let (
-        (gbu      (get-buffer-create shu-unit-test-buffer))
         (inner-done)
         (mcount 0)
         (match-info)
@@ -733,7 +715,6 @@ matched token was to be added to the list to be returned."
         )
       (while (and tlist mlist (not inner-done))
         (shu-cpp-tokenize-show-list rlist "IN-RLIST")
-        (princ "in-mlist: " gbu)(princ mlist gbu)(princ "\n" gbu)
         (setq mcount (1+ mcount))
         (setq match-info (car mlist))
         (setq token-info (car tlist))
@@ -743,7 +724,6 @@ matched token was to be added to the list to be returned."
         (when  (/= op-code shu-cpp-token-match-type-skip)
           (if (> op-code shu-cpp-token-match-type-non-loop-max)
               (progn
-                (princ "mlist22: " gbu)(princ mlist gbu)(princ "\n" gbu)
                 (setq ret-val (shu-cpp-match-evaluate-side-list op-code rlist tlist match-info))
                 (if (not ret-val)
                     (setq inner-done t)
@@ -751,15 +731,9 @@ matched token was to be added to the list to be returned."
                   (setq tlist token-list)
                   (setq advance-tlist nil)
                   (setq rlist (cdr ret-val))
-                  (princ "mlist33: " gbu)(princ mlist gbu)(princ "\n" gbu)
-                  (princ "mlist44: " gbu)(princ (cdr mlist) gbu)(princ "\n" gbu)
                     )
                 )
             (setq did-match (funcall match-eval-func match-info token-info))
-            (shu-cpp-token-show-token-info token-info "MID-MATCH")
-            (shu-cpp-token-show-match-info match-info)
-            (princ "did-match: " gbu)(princ did-match gbu)(princ "\n" gbu)
-            (shu-cpp-tokenize-show-list rlist "MID-RLIST")
             (if (not did-match)
                 (progn
                   (setq inner-done t)
@@ -770,7 +744,6 @@ matched token was to be added to the list to be returned."
                 (push token-info rlist)
                 )
               (shu-cpp-tokenize-show-list rlist "MID-RLIST-2")
-              (princ "mlist66: " gbu)(princ mlist gbu)(princ "\n" gbu)
               )
             )
           )
@@ -781,7 +754,6 @@ matched token was to be added to the list to be returned."
             )
           )
         (shu-cpp-tokenize-show-list rlist "OUT-RLIST")
-        (princ "mlist: " gbu)(princ mlist gbu)(princ "\n" gbu)
         )
       (setq ret-val (cons tlist rlist))
       (setq inner-ret (cons mlist ret-val))
@@ -798,8 +770,6 @@ matched token was to be added to the list to be returned."
   "Evaluate a side list in a macth list.  Use the op-code inthe match item to
 find the function that should evaluate the side list."
   (let (
-        (gb (get-buffer-create "**boo**"))
-        (gbu      (get-buffer-create shu-unit-test-buffer))
         (assoc-item)
         (loop-eval-func)
         (ret-val)
@@ -808,17 +778,13 @@ find the function that should evaluate the side list."
         )
     (shu-cpp-tokenize-show-list token-list "\nshu-cpp-match-evaluate-side-list token-list:")
     (shu-cpp-tokenize-show-list rlist "\nshu-cpp-match-evaluate-side-list rlist:")
-    (princ "shu-cpp-match-evaluate-side-list\n" gb)
     (setq assoc-item (assoc op-code shu-cpp-side-list-functions))
     (when assoc-item
       (setq loop-eval-func (cdr assoc-item))
-      (princ "Calling " gbu)(princ loop-eval-func gbu) (princ "\n" gbu)
       (setq ret-val (funcall loop-eval-func rlist token-list match-info))
       (when ret-val
         (setq new-token-list (car ret-val))
         (setq new-rlist (cdr ret-val))
-        (princ "shu-cpp-match-evaluate-side-list::new-rlist: " gb)(princ new-rlist gb)(princ "\n" gb)
-        (princ "shu-cpp-match-evaluate-side-list::new-token-list: " gb)(princ new-token-list gb)(princ "\n" gb)
         (setq ret-val (cons new-token-list new-rlist))
         (shu-cpp-tokenize-show-list new-token-list "\nshu-cpp-match-evaluate-side-list-2 new-token-list:")
         (shu-cpp-tokenize-show-list new-rlist "\nshu-cpp-match-evaluate-side-list-2 new-rlist:")

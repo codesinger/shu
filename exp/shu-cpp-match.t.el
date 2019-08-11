@@ -37,7 +37,7 @@
 ;;  shu-test-shu-cpp-make-match-info-1
 ;;
 (ert-deftest shu-test-shu-cpp-make-match-info-1 ()
-  (let ((gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create shu-unit-test-buffer))
         (match-info)
         (op-code shu-cpp-token-match-type-same)
         (match-eval-func 'shu-cpp-token-match-same)
@@ -247,7 +247,7 @@
 ;;  shu-test-shu-cpp-match-tokens-1
 ;;
 (ert-deftest shu-test-shu-cpp-match-tokens-1 ()
-  (let ((gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create shu-unit-test-buffer))
         (ret-val)
         (rlist)
         (token-info)
@@ -335,7 +335,7 @@
 ;;  shu-test-shu-cpp-match-tokens-2
 ;;
 (ert-deftest shu-test-shu-cpp-match-tokens-2 ()
-  (let ((gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create shu-unit-test-buffer))
         (ret-val)
         (token-info)
         (match-lists
