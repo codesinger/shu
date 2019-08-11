@@ -605,8 +605,7 @@ again.  if all elements of a match list match the tokens in the token list, stop
 the matching process and return (pushed onto RLIST) a list which consists of
 matched tokens whose corresponding entry in the match list indicated that the
 matched token was to be added to the list to be returned."
-  (let (
-        (outer-done)
+  (let ((outer-done)
         (mlist)
         (tlist)
         (orig-rlist rlist)
@@ -614,8 +613,7 @@ matched token was to be added to the list to be returned."
         (mcount 0)
         (ret-val)
         (nret-val)
-        (inner-ret)
-        )
+        (inner-ret))
     (while (and match-lists (not outer-done))
       (setq lcount (1+ lcount))
       (setq mcount 0)
@@ -629,13 +627,10 @@ matched token was to be added to the list to be returned."
       (setq rlist (cdr nret-val))
       (if mlist
           (progn
-           (setq match-lists (cdr match-lists))
-           )
+           (setq match-lists (cdr match-lists)))
         (setq outer-done t)
         (setq token-list tlist)
-        (setq ret-val (cons token-list rlist))
-        )
-     )
+        (setq ret-val (cons token-list rlist))))
     ret-val
     ))
 
@@ -685,8 +680,7 @@ matched token was to be added to the list to be returned."
 (defun shu-cpp-internal-sub-match-tokens (rlist mlist tlist)
   "Do the matching for one list only."
   (interactive)
-  (let (
-        (inner-done)
+  (let ((inner-done)
         (mcount 0)
         (match-info)
         (token-info)
@@ -700,8 +694,7 @@ matched token was to be added to the list to be returned."
         (inner-ret)
         (inner-done)
         (token-list)
-        (did-match)
-        )
+        (did-match))
       (while (and tlist mlist (not inner-done))
         (shu-cpp-tokenize-show-list rlist "IN-RLIST")
         (setq mcount (1+ mcount))
@@ -719,31 +712,21 @@ matched token was to be added to the list to be returned."
                   (setq token-list (car ret-val))
                   (setq tlist token-list)
                   (setq advance-tlist nil)
-                  (setq rlist (cdr ret-val))
-                    )
-                )
+                  (setq rlist (cdr ret-val))))
             (setq did-match (funcall match-eval-func match-info token-info))
             (if (not did-match)
                 (progn
                   (setq inner-done t)
-                  (setq ret-val nil)
-                  )
+                  (setq ret-val nil))
               (setq advance-tlist t)
               (when match-ret-ind
-                (push token-info rlist)
-                )
-              (shu-cpp-tokenize-show-list rlist "MID-RLIST-2")
-              )
-            )
-          )
+                (push token-info rlist))
+              (shu-cpp-tokenize-show-list rlist "MID-RLIST-2"))))
         (when (not inner-done)
           (setq mlist (cdr mlist))
           (when (and tlist advance-tlist)
-            (setq tlist (shu-cpp-token-next-non-comment tlist))
-            )
-          )
-        (shu-cpp-tokenize-show-list rlist "OUT-RLIST")
-        )
+            (setq tlist (shu-cpp-token-next-non-comment tlist))))
+        (shu-cpp-tokenize-show-list rlist "OUT-RLIST"))
       (setq ret-val (cons tlist rlist))
       (setq inner-ret (cons mlist ret-val))
       inner-ret
