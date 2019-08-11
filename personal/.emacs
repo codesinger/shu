@@ -111,6 +111,7 @@
 (when (file-readable-p "~/emacs/rmv-using.elc")
   (load-file "~/emacs/rmv-using.elc"))
 (load-file "~/emacs/shu-cpp-token.elc")
+(load-file "~/emacs/shu-cpp-match.elc")
 (load-file "~/emacs/shu-bde.elc")
 (load-file "~/emacs/shu-bde-cpp.elc")
 (load-file "~/emacs/shu-cpp-project.elc")
