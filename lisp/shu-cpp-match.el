@@ -696,7 +696,6 @@ matched token was to be added to the list to be returned."
         (token-list)
         (did-match))
       (while (and tlist mlist (not inner-done))
-        (shu-cpp-tokenize-show-list rlist "IN-RLIST")
         (setq mcount (1+ mcount))
         (setq match-info (car mlist))
         (setq token-info (car tlist))
@@ -720,13 +719,11 @@ matched token was to be added to the list to be returned."
                   (setq ret-val nil))
               (setq advance-tlist t)
               (when match-ret-ind
-                (push token-info rlist))
-              (shu-cpp-tokenize-show-list rlist "MID-RLIST-2"))))
+                (push token-info rlist)))))
         (when (not inner-done)
           (setq mlist (cdr mlist))
           (when (and tlist advance-tlist)
-            (setq tlist (shu-cpp-token-next-non-comment tlist))))
-        (shu-cpp-tokenize-show-list rlist "OUT-RLIST"))
+            (setq tlist (shu-cpp-token-next-non-comment tlist)))))
       (setq ret-val (cons tlist rlist))
       (setq inner-ret (cons mlist ret-val))
       inner-ret
@@ -746,8 +743,6 @@ find the function that should evaluate the side list."
         (ret-val)
         (new-token-list)
         (new-rlist))
-    (shu-cpp-tokenize-show-list token-list "\nshu-cpp-match-evaluate-side-list token-list:")
-    (shu-cpp-tokenize-show-list rlist "\nshu-cpp-match-evaluate-side-list rlist:")
     (setq assoc-item (assoc op-code shu-cpp-side-list-functions))
     (when assoc-item
       (setq loop-eval-func (cdr assoc-item))
@@ -755,9 +750,7 @@ find the function that should evaluate the side list."
       (when ret-val
         (setq new-token-list (car ret-val))
         (setq new-rlist (cdr ret-val))
-        (setq ret-val (cons new-token-list new-rlist))
-        (shu-cpp-tokenize-show-list new-token-list "\nshu-cpp-match-evaluate-side-list-2 new-token-list:")
-        (shu-cpp-tokenize-show-list new-rlist "\nshu-cpp-match-evaluate-side-list-2 new-rlist:")))
+        (setq ret-val (cons new-token-list new-rlist))))
     ret-val
     ))
 

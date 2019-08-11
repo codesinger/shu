@@ -1813,7 +1813,7 @@ or right parenthesis or a left or right square bracket."
   "Remove \"using namespace\" directives from a C++ file, adding the appropriate
 namespace qualifier to all of the unqualified class names.  CLASS-LIST is an
 a-list in which the car of each entry is a namespace and the cdr of each entry
-is a class name.  Here is an example of such an a-list:
+is a list of class names.  Here is an example of such an a-list:
 
      (list
       (cons \"std\"    (list \"set\" \"string\" \"vector\"))
