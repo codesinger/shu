@@ -27,6 +27,169 @@
 ;; Functions to match patterns against list of tokens produced by
 ;; shu-cpp-token.el.
 
+;;
+;; The functions in shu-cpp-token.el can scan a section of C++ source code and
+;; turn it into a list of tokens.  Each token has a type (comment, string,
+;; keyword, operator or unquoted token) and a value, which is the token itself.
+;; Each token also contains its start and end position within the file.
+;;
+;; The functions in this file, shu-cpp-match.el, allow one to use data
+;; structures to describe patterns to be found in a list of tokens.
+;;
+;; The simplest data structure consists of a list of match items that must
+;; exactly match a list of tokens.  If you want to find something that looks
+;; like
+;;
+;;       pointer->thing
+;;
+;; you put together a list of three match items.  The first specifies a regular
+;; expression that can match a C++ name.  The second is an exact match for the
+;; operator "->", and the third is another regular expression that can match a
+;; C++ name.
+;;
+;; You can also search for more than one pattern at a time by supplying a list
+;; of lists of match items.  Suppose you want to search for an occurrence of a
+;; "using namespace" directive.  You might have one list that matches "using
+;; namespace name;", another list that matches "using namespace ::name;", and
+;; another list that matches "using namespace component::name";.
+;;
+;; If you try to match this set of three lists against the following string
+;;
+;;       using namespace thing::Bob
+;;
+;; The three lists are evaluated as follows:
+;;
+;; The first list matches "using," "namespace," "thing," but fails when it does
+;; not find a semi-colon following "thing."
+;;
+;; The second list matches "using," "namespace," but fails when it does not find
+;; an operator "::".
+;;
+;; The third list matches "using," "namespace," "thing," "::," "Bob," and ";".
+;;
+;; With one function call, you have found a reasonably complex pattern.  The
+;; tokens scanned to not include comments.  This means that the above example
+;; would have worked identically on a list of tokens derived from
+;;
+;;       using /* Hello */ namespace
+;;       // Something here
+;;       thing /* How are you? */ :: Bob ;
+;;
+;; A list of match items can also include a side list.  A side list is another
+;; list of match items that is to be matched.  There are different types of side
+;; lists.  One of them is a repeating side list.  A repeating side list matches
+;; zero or more occurrences of a list.
+;;
+;; In the above example, we matched the name thing::Bob by having three match
+;; items.  But what if we want to match an arbitrary nesting of namespaces, such
+;; as
+;;
+;;       thing::Bob::Fred::Ted
+;;
+;; One way to do this is with a repeating side list.
+;;
+;; This list of tokens above could be matched by a single match item followed by
+;; a repeating side list.  The first item in the list is a regular expression
+;; match for a C++ name.  The second item in the list is a repeating side list,
+;; which contains two items, the first of which is an exact match for operator
+;; "::", and the second of which is a regular expression that matches a C++
+;; name.
+;;
+;; The match would work as follows:
+;;
+;; The first match item would match "thing".  Then the repeating side list would
+;; match "::," "Bob," "::," "Fred," "::," and "Ted."
+;;
+;; On return from a successful match, how do you know what was matched?  Each
+;; match item can specify that when the item is matched, the matched item is to
+;; be added to a list of items to be returned to the caller.
+;;
+;; Let us return to our original example in which we had three lists, the last
+;; of which finally matched.
+;;
+;;                 *       *     *
+;;       using namespace thing::Bob
+;;
+;; An asterisk has been placed over each item that is marked to be returned to
+;; the caller.  At the end of the match, the matching function would return the
+;; list
+;;
+;;       namespace
+;;       thing
+;;       Bob
+;;
+;; Now the caller knows what was matched and has a copy of the matched tokens.
+;;
+;; In our example of matching a nested namespace name, the function might return
+;;
+;;       thing
+;;       Bob
+;;       Fred
+;;       Ted
+;;
+;; Now the caller can tell from the length of the list, how deeply nested the
+;; namespace name is.
+;;
+;; Note that since the matched tokens are pushed onto the list, the list is
+;; actually returned in reverse order, which the caller can reverse with
+;; nreverse.
+;;
+;; Each matching function also accepts a return list to which it will add newly
+;; matched items.  The caller can then match several patterns that build up an
+;; ever expanding return list of tokens.  Only the caller knows when it makes
+;; sense to reverse the list and to then start processing the reversed list.
+;;
+;; A final example is the list of match items that is actually used elsewhere to
+;; find occurrences of using namespace directives.  It uses another type of side
+;; list, which is a list of lists.  This is an illustration of that match
+;; structure:
+;;
+;;
+;;
+;;                                   using
+;;                                     |
+;;                                     V
+;;                                 namespace
+;;                                     |
+;;                                     |
+;;           +-------------------------+-------------------------+
+;;           |                         |                         |
+;;           |                         |                         |
+;;           V                         V                         V
+;;         <name>                     ::                       <name>
+;;           |                         |                         |
+;;           |                         |                         |
+;;           |                         V                         V
+;;           |                       <name>           loop of :: followed by <name>
+;;           |                         |                         |
+;;           |                         |                         |
+;;           V                         V                         V
+;;           ;                         ;                         ;
+;;
+;; This is how the above match structure would match
+;;
+;;       using namespace thing::Bob::Ted;
+;;
+;; The first two tokens "using" and "namespace" are matched exactly.  The we
+;; come to three lists to be evaluated.  The first one matches "thing" but fails
+;; to match the ";".  The second fails trying to match "::".  The third matches
+;; "thing" and then the repeating side list matches "::," "Bob", "::," and
+;; "Ted."  The repeating side list stops the matching when it encounters the
+;; terminating semi-colon, and then the next match item in the list matches the
+;; terminating semi-colon.
+;;
+;; The returned list would be
+;;
+;;       using
+;;       namespace
+;;       thing
+;;       Bob
+;;       Ted
+;;
+;; You can look in the unit tests and in other code that uses the matching code
+;; here for more examples of the power of match lists.
+;;
+
 ;;; Code:
 
 (provide 'shu-cpp-match)
@@ -453,46 +616,16 @@ whole list is matched or the TOKEN-LIST is exhausted."
 ;;
 ;;  shu-cpp-match-tokens
 ;;
-;; TODO: Find some way to pass back the pointer to the next token
-;;       to be scanned.  This is the first token not examined after
-;;       a successful match.  Everything up to here has been matched.
-;;       No need to look at it again.
-;;
-;;       As of 18 July 2019, this function rweturns a cons cell
-;        thet is the updated token list pointer and the rlist.
-;;
-;;       Need to have an entry in the match list that is the "name"
-;;       of the list.  Pass back the "name" of the matched list as
-;;       well so that the caller can tell what was matched.  This
-;;       is better than passing back the list index because that
-;;       will change if you add a new list to anywhere but the
-;;       end.  Depending on what is being matched, it may not be
-;;       possible to add it at the end.
-;;
-;;       If there ia a match-list op code that simply says "this
-;;       is a name to be passed back," you could consider passing
-;;       back a list of names and even of their corresponding tokens.
-;;
-;;       e.g., Entry 2 in a match list matches a variable name.
-;;       Entry 3 in the match list might be a name called "variable"
-;;       to which the previous token is attached.
-;;
-;;       Perhaps the simplest thing to do would be to add a "name"
-;;       field to each entry in the match list and pass back to
-;;       the caller a pointer to the list that actually matched.
-;;
-;;       You can have a named list by simply naming the first entry
-;;       or you can choose to have other names in the list.
-;;
 (defun shu-cpp-match-tokens (rlist match-lists token-list)
-  "MATCH-LISTS is a list of match lists.  TOKEN-LIST is a list of tokens.  for
+  "MATCH-LISTS is a list of match lists.  TOKEN-LIST is a list of tokens.  RLIST
+is either nil or an existing list of returned tokens on which to build.  For
 each match-list in MATCH-LISTS, try to match every element of the match list to
 the token list.  if a match fails or if you reach the end of the token list
 before reaching the end of the match list, move to the next match list and try
 again.  if all elements of a match list match the tokens in the token list, stop
-the matching process and return a newly constructed list which consists of
-matched tokens whose corresponding entry in the match list indicated that
-the matched token was to be added to the list."
+the matching process and return (pushed onto RLIST) a list which consists of
+matched tokens whose corresponding entry in the match list indicated that the
+matched token was to be added to the list to be returned."
   (let (
         (gb (get-buffer-create "**boo**"))
         (gbu      (get-buffer-create shu-unit-test-buffer))
@@ -662,7 +795,8 @@ the matched token was to be added to the list."
 ;;  shu-cpp-match-evaluate-side-list
 ;;
 (defun shu-cpp-match-evaluate-side-list (op-code rlist token-list match-info)
-  "Doc string."
+  "Evaluate a side list in a macth list.  Use the op-code inthe match item to
+find the function that should evaluate the side list."
   (let (
         (gb (get-buffer-create "**boo**"))
         (gbu      (get-buffer-create shu-unit-test-buffer))
@@ -745,10 +879,8 @@ matched token-info was to be returned."
 ;;
 (defun shu-cpp-match-many-list (rlist token-list match-info)
   "Do a recursive call to shu-cpp-match-tokens."
-  (let (
-        (match-lists (shu-cpp-match-extract-side-list-only match-info))
-        (ret-val)
-        )
+  (let ((match-lists (shu-cpp-match-extract-side-list-only match-info))
+        (ret-val))
     (setq ret-val (shu-cpp-match-tokens rlist match-lists token-list))
     ret-val
     ))

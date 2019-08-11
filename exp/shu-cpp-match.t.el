@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; Unit tests for the functions in shu-match.el
+;; Unit tests for the functions in shu-cpp-match.el
 
 ;;; Code:
 
