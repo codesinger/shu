@@ -741,13 +741,11 @@ matched token was to be added to the list to be returned."
 (defun shu-cpp-match-evaluate-side-list (op-code rlist token-list match-info)
   "Evaluate a side list in a macth list.  Use the op-code inthe match item to
 find the function that should evaluate the side list."
-  (let (
-        (assoc-item)
+  (let ((assoc-item)
         (loop-eval-func)
         (ret-val)
         (new-token-list)
-        (new-rlist)
-        )
+        (new-rlist))
     (shu-cpp-tokenize-show-list token-list "\nshu-cpp-match-evaluate-side-list token-list:")
     (shu-cpp-tokenize-show-list rlist "\nshu-cpp-match-evaluate-side-list rlist:")
     (setq assoc-item (assoc op-code shu-cpp-side-list-functions))
@@ -759,9 +757,7 @@ find the function that should evaluate the side list."
         (setq new-rlist (cdr ret-val))
         (setq ret-val (cons new-token-list new-rlist))
         (shu-cpp-tokenize-show-list new-token-list "\nshu-cpp-match-evaluate-side-list-2 new-token-list:")
-        (shu-cpp-tokenize-show-list new-rlist "\nshu-cpp-match-evaluate-side-list-2 new-rlist:")
-        )
-      )
+        (shu-cpp-tokenize-show-list new-rlist "\nshu-cpp-match-evaluate-side-list-2 new-rlist:")))
     ret-val
     ))
 
