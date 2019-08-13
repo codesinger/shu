@@ -285,3 +285,49 @@ things happens:
 
  2. shu-cpp-match-repeat-sub-list returns an unmodified tlist / rlist.  In the
     latter case the entire repeating match is considered successful.
+
+==================================================
+
+12 August 2019
+
+Notes on new-rmv-using
+
+Input is the class list for the existing shu-rmv-using.  It is an alist in which the
+car is a namespace name and the cdr is a list of class names.
+
+Invert this to get an alist in which the car is the class name and the cdr is the
+namespace name.  Consider making it a hash table because you will look up every
+unquoted token in the file.
+
+Check to ensure that you do not have two class names that map to two different
+namespaces.
+
+
+ 1. Find all occurences of "using namespace".  See shu-cpp-mch-funs-test-search-2.
+
+ 2. Go through the "using namespace" directives as follows.
+
+    - If the first unquoted token is ewual to the global top level namespace,
+      discard it..
+
+    - Take all of the remaining names and [ut them together with "::" between each
+      one.  If the top level name was Whammo and you have three names Whammo, sam,
+      fred; discard "Whammo" and turn the "sam", "fred" tokens into one string:
+      "sam::fred".
+
+
+
+ 2. Find all namespaces mentioned in the "using namespace" directives in the
+    original class list and save them.  Discard all the rest.
+
+    Now you have all of the class names for the using namespace directives in the
+    file.  If there are any "using namespace" directives for which you do not have a
+    corresponding definition in the class list, remove the "using namespace"
+    directives from the namespace list.  We will not be deleting it from the file.
+
+ 3. Invert the new class list so that you have an alist with the class name as the
+    car and the namespace name as the cdr.  If you have a class name that maps to
+    more than one namespace name, quit.  You have an unresolvable ambiguity.
+
+    Consider putting this new alist into a hash table since you will be searching it
+    for each unquoted token in the file.

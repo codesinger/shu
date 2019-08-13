@@ -537,7 +537,13 @@ side list."
 single MATCH-LIST matches the token.  If that happens, try to match the whole
 list.  If the whole list is matched, return.  If the whole list does not match,
 restore the original RLIST and TOKEN-LIST and continue.  Return only when the
-whole list is matched or the TOKEN-LIST is exhausted."
+whole list is matched or the TOKEN-LIST is exhausted.
+
+This could be extended to multiple lists by having the search part check for a
+match with the head of any of the lists in order.  When the head of one list
+matches, pursue that list.  If the list match fails, move to the next list.
+When no list head or entire list matches the current token, then move to the
+next token."
   (interactive)
   (let ((something t)
         (orig-rlist rlist)
