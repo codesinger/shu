@@ -51,6 +51,8 @@
   "A repeating side list to match zero or more intances of {:: <name>}")
 
 
+
+
 ;;
 ;;  shu-cpp-mch-namespace-forms
 ;;
@@ -247,7 +249,14 @@
                                ";")
     )
    )
-  )
+  "These two lists matche the form of name that can follow a \"using\" directive
+that is not a \"using namespace\" directive.  This is either <name> or
+<name>::<name>>, <name>::<name>::<name>, etc.  The first list above matches
+<name> followed by semicolon..  The second list matches <name> followed
+by a looping side list for zero or more occurrences of \"::\" followed by <name>")
+
+
+
 
 
 
@@ -271,7 +280,12 @@
     )
 
    )
-  )
+  "These two lists match what may follow the key word \"using\".  The first list
+matches the key word \"namespace\" followed by any of the different name types
+that may follow \"using namespace\".  The second list matches any of the name
+forms that may following the key word \"using\" when it is not followed by the
+key word \"namespace\"." )
+
 
 
 ;;
@@ -286,7 +300,9 @@
    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
                                  shu-cpp-mch-many-using-list)
    )
-  )
+  "This is a sigle list that is the top level list for matching anything
+that may follow the key word \"using\".")
+
 
 
 
