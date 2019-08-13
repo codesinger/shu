@@ -170,30 +170,125 @@
 ;;
 ;;
 ;;
-;;                                                                          using
-;;                                                                            |
-;;                                                                            |
-;;                                   +----------------------------------------+-----------------------------*
-;;                                   |                                                                      |
-;;                                   |                                                                      |
-;;                                   V                                                                      |
-;;                               namespace                                                                  |
-;;                                   |                                                                      |
-;;                                   |                                                                      |
-;;         +-------------------------+-------------------------+                           +----------------+---------------+
-;;         |                         |                         |                           |                               |
-;;         |                         |                         |                           |                               |
-;;         V                         V                         V                           V                               V
-;;       <name>                     ::                       <name>                      <name>                          <name>
-;;         |                         |                         |                           |                               |
-;;         |                         |                         |                           |                               |
-;;         |                         V                         V                           |                               V
-;;         |                       <name>           loop of :: followed by <na me>         |                    loop of :: followed by <name>
-;;         |                         |                         |                           |                               |
-;;         |                         |                         |                           |                               |
-;;         V                         V                         V                           V                               V
-;;         ;                         ;                         ;                           ;                               ;
+;;                                                        using
+;;                                                          |
+;;                                                          |
+;;                              +---------------------------+----------------------+
+;;                              |                                                  |
+;;                              |                                                  |
+;;                              V                                                  |
+;;                          namespace                                              |
+;;                              |                                                  |
+;;                              |                                                  |
+;;    +-------------------------+-------------------------+                        |
+;;    |                         |                         |                        |
+;;    |                         |                         |                        |
+;;    V                         V                         V                        |
+;;  <name>                     ::                       <name>                     |
+;;    |                         |                         |                        |
+;;    |                         |                         |                        |
+;;    |                         V                         V                        |
+;;    |                       <name>           loop of :: followed by <name>       |
+;;    |                         |                         |                        |
+;;    |                         |                         |                        |
+;;    V                         V                         V                        |
+;;    ;                         ;                         ;                        |
+;;                                                                                 |
+;;                                                                                 |
+;;                                                                                 |
+;;                                                                                 |
+;;                                                                                 |
+;;                                                  +------------------------------+
+;;                                                  |
+;;                                                  |
+;;                                 +----------------+---------------+
+;;                                 |                                |
+;;                                 |                                |
+;;                                 V                                V
+;;                               <name>                           <name>
+;;                                 |                                |
+;;                                 |                                |
+;;                                 |                                V
+;;                                 |                     loop of :: followed by <name>
+;;                                 |                                |
+;;                                 |                                |
+;;                                 V                                V
+;;                                 ;                                ;
 ;;
+;;
+
+
+;;
+(defconst shu-cpp-mch-using-forms
+  (list
+   (list  ;; "<name>"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                               (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
+    )
+
+
+   (list  ;; "<name> {:: <name>};"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                              (concat shu-cpp-name "+"))
+
+    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
+                                                  shu-cpp-mch-colon-name)
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
+    )
+   )
+  )
+
+
+
+;;
+;;  shu-cpp-mch-many-using-list
+;;
+(defconst shu-cpp-mch-many-using-list
+  (list
+   (list  ;; "namespace <name>;"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-kw
+                              "namespace")
+    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
+                                  shu-cpp-mch-namespace-forms)
+    )
+
+   (list  ;; "using namespace <name>;"
+    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
+                                  shu-cpp-mch-using-forms)
+    )
+
+   )
+  )
+
+
+;;
+;;  shu-cpp-mch-using-list-single
+;;
+(defconst shu-cpp-mch-using-list-single
+  (list  ;; "using namespace <name>;"
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             t shu-cpp-token-type-kw
+                             "using")
+   (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
+                                 shu-cpp-mch-many-using-list)
+   )
+  )
+
+
 
 
 
