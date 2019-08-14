@@ -249,7 +249,7 @@
                                ";")
     )
    )
-  "These two lists matche the form of name that can follow a \"using\" directive
+  "These two lists match the form of name that can follow a \"using\" directive
 that is not a \"using namespace\" directive.  This is either <name> or
 <name>::<name>>, <name>::<name>::<name>, etc.  The first list above matches
 <name> followed by semicolon..  The second list matches <name> followed
