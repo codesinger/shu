@@ -1726,6 +1726,7 @@ The generated code sequence is as follows:
 If optional CONST is true, a const iterator is generated."
   (interactive "*sType name?: \nsVariable name?: ")
   (let ((const-qual (if const "const_" ""))
+        (rpoint)
         (pad)
         (pad-count (current-column))
         (start)
