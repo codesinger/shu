@@ -1630,7 +1630,7 @@ specific allocator.  First prompt reads the variable name that points to the
 memory to be deallocated.  Second prompt reads the name of the class whode
 destructor is to be called.
 
-This generates a ode sequence as follows:
+This generates a code sequence as follows:
 
         if (var-name)
         {
@@ -1659,6 +1659,93 @@ shu-cpp-default-allocator-name"
       pad ipad var-name " = 0;\n"
       pad "}\n"))
     ))
+
+
+
+;;
+;;  shu-citerate
+;;
+(defun shu-citerate (type-name var-name)
+  "Insert the code to iterate through a data structure of type TYPE-NAME whose
+instance is identified by VAR-NAME.  First prompt reads the variable name.
+Second prompt read the variable name.
+
+The generated code sequence is as follows:
+
+      for (type_name::iterator it = var_name.begin();
+           it != var_name.end(); ++it)
+      {
+      }
+
+The number of spaces to indent inside that braces is defined in the custom
+variable shu-cpp-indent-length."
+  (interactive "*sType name?: \nsVariable name?: ")
+  (shu-internal-citerate type-name var-name)
+    )
+
+
+
+;;
+;;  shu-cciterate
+;;
+(defun shu-cciterate (type-name var-name)
+  "Insert the code to iterate through a data structure of type TYPE-NAME whose
+instance is identified by VAR-NAME.  First prompt reads the variable name.
+Second prompt read the variable name.
+
+The generated code sequence is as follows:
+
+      for (type_name::const_iterator it = var_name.begin();
+           it != var_name.end(); ++it)
+      {
+      }
+
+The number of spaces to indent inside that braces is defined in the custom
+variable shu-cpp-indent-length."
+  (interactive "*sType name?: \nsVariable name?: ")
+  (shu-internal-citerate type-name var-name t)
+    )
+
+
+
+;;
+;;  shu-internal-citerate
+;;
+(defun shu-internal-citerate (type-name var-name &optional const)
+  "Insert the code to iterate through a data structure of type TYPE-NAME whose
+instance is identified by VAR-NAME.  First prompt reads the variable name.
+Second prompt read the variable name.
+
+The generated code sequence is as follows:
+
+      for (type_name::iterator it = var_name.begin();
+           it != var_name.end(); ++it)
+      {
+      }
+
+If optional CONST is true, a const iterator is generated."
+  (interactive "*sType name?: \nsVariable name?: ")
+  (let ((const-qual (if const "const_" ""))
+        (pad)
+        (pad-count (current-column))
+        (start)
+        (ipad (make-string shu-cpp-indent-length ? )))
+    (setq pad (make-string pad-count ? ))
+    (insert
+     (concat
+      "for (" type-name "::" const-qual "iterator it = " var-name ".begin();\n"
+      pad
+      "     it != " var-name  ".end(); ++it)\n"
+      pad "{\n"
+      pad ipad))
+    (setq rpoint (point))
+    (insert
+     (concat
+      "\n"
+      pad "}\n"))
+    (goto-char rpoint)
+    ))
+
 
 
 ;;
@@ -2734,6 +2821,8 @@ shu- prefix removed."
   (defalias 'cwhile 'shu-cwhile)
   (defalias 'cdo 'shu-cdo)
   (defalias `new-deallocate `shu-new-deallocate)
+  (defalias `citerate `shu-citerate)
+  (defalias `cciterate `shu-cciterate)
   (defalias 'ck 'shu-cpp-check-streaming-op)
   (defalias 'set-default-namespace 'shu-set-default-namespace)
   (defalias 'qualify-class 'shu-interactive-qualify-class-name)
