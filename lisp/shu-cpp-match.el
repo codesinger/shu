@@ -530,6 +530,31 @@ side list."
 
 
 ;;
+;;  shu-cpp-all-search-match-tokens
+;;
+(defun shu-cpp-all-search-match-tokens (rlist match-list token-list)
+  "Repeatedly call shu-cpp-search-match-tokens until there are no remaining tokens
+to match.  If the return value is nil, there were no tokens found to match.  If
+the return value is non-nil, its RLIST is the list of all of the returned tokens
+from all of the matches."
+  (let ((tlist token-list)
+        (rlist)
+        (ret-val)
+        (pret-val)
+        (something t))
+    (while something
+      (setq ret-val (shu-cpp-search-match-tokens rlist match-list tlist))
+      (if (not ret-val)
+          (setq something nil)
+        (setq pret-val ret-val)
+        (setq tlist (car ret-val))
+        (setq rlist (cdr ret-val))))
+    pret-val
+    ))
+
+
+
+;;
 ;;  shu-cpp-search-match-tokens
 ;;
 (defun shu-cpp-search-match-tokens (rlist match-list token-list)

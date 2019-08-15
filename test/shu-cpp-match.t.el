@@ -2137,4 +2137,76 @@
     (should (string= token "using"))
     ))
 
+
+
+
+
+
+;;
+;;  shu-test-shu-cpp-all-search-match-tokens
+;;
+(ert-deftest shu-test-shu-cpp-all-search-match-tokens ()
+  (let ((data
+         (concat
+          "  unsigned int   x;\n"
+          "  double    /* Hi */     boo;\n"
+          "  PriceMap       moo /* OK */;\n"
+          ))
+        (token-list)
+        (ret-val)
+        (find-name-list
+        (list  ;; semicolon followed by name
+         (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                   'shu-cpp-token-match-same
+                                   nil shu-cpp-token-type-op
+                                   ";")
+         (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                   'shu-cpp-token-match-same-rx
+                                   t shu-cpp-token-type-uq
+                                   (concat shu-cpp-name "+"))
+         ))
+        (tlist)
+        (rlist)
+        (token)
+        (token-type)
+        (token-info)
+        (ret-val))
+    (with-temp-buffer
+     (insert data)
+     (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-cpp-all-search-match-tokens rlist find-name-list token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq rlist (cdr ret-val))
+    (should rlist)
+    (shu-cpp-tokenize-show-list rlist "\nRLIST 999")
+
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should (string= token "x"))
+
+    (setq rlist (cdr rlist))
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should (string= token "boo"))
+
+    (setq rlist (cdr rlist))
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should (string= token "moo"))
+
+    (setq rlist (cdr rlist))
+    (should (not rlist))
+    ))
+
+
 ;;; shu-cpp-match.t.el ends here
