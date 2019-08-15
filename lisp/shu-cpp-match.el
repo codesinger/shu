@@ -427,8 +427,8 @@ side list."
   (let (
         (match-side (cons side-parameter match-list))
         )
-  (cons op-code match-side)
-  ))
+    (cons op-code match-side)
+    ))
 
 
 
@@ -487,8 +487,8 @@ side list."
   "Extract only the side list from the match info.  This is in contract to
 shu-cpp-match-extract-side-list, which extracts all of the properties of a
 side list."
-    (cddr match-info)
-    )
+  (cddr match-info)
+  )
 
 
 
@@ -497,8 +497,8 @@ side list."
 ;;
 (defsubst shu-cpp-match-is-side-list (op-code)
   "Return true if the OP-CODE represents a side list operation."
-    (> op-code shu-cpp-token-match-type-non-loop-max)
-    )
+  (> op-code shu-cpp-token-match-type-non-loop-max)
+  )
 
 
 ;;
@@ -658,7 +658,7 @@ matched token was to be added to the list to be returned."
       (setq rlist (cdr nret-val))
       (if mlist
           (progn
-           (setq match-lists (cdr match-lists)))
+            (setq match-lists (cdr match-lists)))
         (setq outer-done t)
         (setq token-list tlist)
         (setq ret-val (cons token-list rlist))))
@@ -726,38 +726,38 @@ matched token was to be added to the list to be returned."
         (inner-done)
         (token-list)
         (did-match))
-      (while (and tlist mlist (not inner-done))
-        (setq mcount (1+ mcount))
-        (setq match-info (car mlist))
-        (setq token-info (car tlist))
-        (shu-cpp-match-extract-info match-info op-code match-eval-func
-                                    match-ret-ind match-token-type match-token-value)
-        (setq advance-tlist t)
-        (when  (/= op-code shu-cpp-token-match-type-skip)
-          (if (> op-code shu-cpp-token-match-type-non-loop-max)
-              (progn
-                (setq ret-val (shu-cpp-match-evaluate-side-list op-code rlist tlist match-info))
-                (if (not ret-val)
-                    (setq inner-done t)
-                  (setq token-list (car ret-val))
-                  (setq tlist token-list)
-                  (setq advance-tlist nil)
-                  (setq rlist (cdr ret-val))))
-            (setq did-match (funcall match-eval-func match-info token-info))
-            (if (not did-match)
-                (progn
+    (while (and tlist mlist (not inner-done))
+      (setq mcount (1+ mcount))
+      (setq match-info (car mlist))
+      (setq token-info (car tlist))
+      (shu-cpp-match-extract-info match-info op-code match-eval-func
+                                  match-ret-ind match-token-type match-token-value)
+      (setq advance-tlist t)
+      (when  (/= op-code shu-cpp-token-match-type-skip)
+        (if (> op-code shu-cpp-token-match-type-non-loop-max)
+            (progn
+              (setq ret-val (shu-cpp-match-evaluate-side-list op-code rlist tlist match-info))
+              (if (not ret-val)
                   (setq inner-done t)
-                  (setq ret-val nil))
-              (setq advance-tlist t)
-              (when match-ret-ind
-                (push token-info rlist)))))
-        (when (not inner-done)
-          (setq mlist (cdr mlist))
-          (when (and tlist advance-tlist)
-            (setq tlist (shu-cpp-token-next-non-comment tlist)))))
-      (setq ret-val (cons tlist rlist))
-      (setq inner-ret (cons mlist ret-val))
-      inner-ret
+                (setq token-list (car ret-val))
+                (setq tlist token-list)
+                (setq advance-tlist nil)
+                (setq rlist (cdr ret-val))))
+          (setq did-match (funcall match-eval-func match-info token-info))
+          (if (not did-match)
+              (progn
+                (setq inner-done t)
+                (setq ret-val nil))
+            (setq advance-tlist t)
+            (when match-ret-ind
+              (push token-info rlist)))))
+      (when (not inner-done)
+        (setq mlist (cdr mlist))
+        (when (and tlist advance-tlist)
+          (setq tlist (shu-cpp-token-next-non-comment tlist)))))
+    (setq ret-val (cons tlist rlist))
+    (setq inner-ret (cons mlist ret-val))
+    inner-ret
     ))
 
 
@@ -1068,16 +1068,16 @@ match (via string-match) the token in the token list."
 (defun shu-cpp-token-show-match-info-buffer (match-info gb)
   "Show the data in an instance of match-info."
   (let ((op-code)
-       (new-match-info)
-       (match-ext)
-       (match-func)
-       (match-type)
-       (match-ret-ind)
-       (match-ret-name)
-       (match-eval-func)
-       (match-token-type)
-       (match-token-value)
-       (debug-on-error t))
+        (new-match-info)
+        (match-ext)
+        (match-func)
+        (match-type)
+        (match-ret-ind)
+        (match-ret-name)
+        (match-eval-func)
+        (match-token-type)
+        (match-token-value)
+        (debug-on-error t))
     (if (not match-info)
         (princ "shu-cpp-token-show-match-info: match-info is nil\n" gb)
       (if (not (consp match-info))

@@ -2155,16 +2155,15 @@
         (token-list)
         (ret-val)
         (find-name-list
-        (list  ;; semicolon followed by name
-         (shu-cpp-make-match-info  shu-cpp-token-match-type-same
-                                   'shu-cpp-token-match-same
-                                   nil shu-cpp-token-type-op
-                                   ";")
-         (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
-                                   'shu-cpp-token-match-same-rx
-                                   t shu-cpp-token-type-uq
-                                   (concat shu-cpp-name "+"))
-         ))
+         (list  ;; semicolon followed by name
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    nil shu-cpp-token-type-op
+                                    ";")
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                    'shu-cpp-token-match-same-rx
+                                    t shu-cpp-token-type-uq
+                                    (concat shu-cpp-name "+"))))
         (tlist)
         (rlist)
         (token)
@@ -2172,8 +2171,8 @@
         (token-info)
         (ret-val))
     (with-temp-buffer
-     (insert data)
-     (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max))))
+      (insert data)
+      (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-all-search-match-tokens rlist find-name-list token-list))
     (should ret-val)
     (should (consp ret-val))
