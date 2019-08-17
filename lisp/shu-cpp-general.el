@@ -1625,9 +1625,9 @@ characters in length."
 ;;  shu-new-deallocate
 ;;
 (defun shu-new-deallocate (var-name class-name)
-  "Insert the code to do a standard dealloacation of memory alloacated by a
+  "Insert the code to do a standard deallocation of memory allocated by a
 specific allocator.  First prompt reads the variable name that points to the
-memory to be deallocated.  Second prompt reads the name of the class whode
+memory to be deallocated.  Second prompt reads the name of the class whose
 destructor is to be called.
 
 This generates a code sequence as follows:
@@ -2515,7 +2515,7 @@ is placed in a separate buffer called **shu-aix-malloc**."
   "Place the cursor on the beginning of a function declaration that has been
 copied from a .cpp file to a .h file.  This function fixes up the function
 prototype to make it suitable for a .h file.
-For exmple, this declaration:
+For example, this declaration:
 
       double Frobnitz::hitRatio(
           const int  reads,
@@ -2630,7 +2630,7 @@ the name in the header file and put them in the message area."
 ;;  shu-cpp-get-variable-name
 ;;
 (defun shu-cpp-get-variable-name ()
-  "If point is sitting on something that looks like a legal varuable name, return it,
+  "If point is sitting on something that looks like a legal variable name, return it,
 otherwise, return nil."
   (let ((target-char shu-cpp-name)
         (target-name (concat shu-cpp-name "+"))
@@ -2657,7 +2657,7 @@ otherwise, return nil."
 ;;  shu-cpp-get-variable-name-position
 ;;
 (defun shu-cpp-get-variable-name-position ()
-  "If point is sitting on something that looks like a legal varuable name,
+  "If point is sitting on something that looks like a legal variable name,
 return a cons cell that contains the start and end positions of the name
 otherwise, return nil."
   (let ((target-char shu-cpp-name)
@@ -2761,7 +2761,7 @@ line that contains the token."
 ;;  shu-to-snake
 ;;
 (defun shu-to-snake ()
-  "Convert the variabla name at point from camel case to snake case.
+  "Convert the variable name at point from camel case to snake case.
 
 For example, \"mumbleSomethingOther\" becomes \"mumble_something_other\"."
   (interactive)

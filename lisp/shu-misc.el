@@ -360,7 +360,7 @@ point is placed where the the first line of code in the loop belongs."
 ;;  shu-tighten-lisp
 ;;
 (defun shu-tighten-lisp ()
-  "Withing the bounds of a lisp function or macro, \"tighten\" some lisp code.
+  "Within the bounds of a lisp function or macro, \"tighten\" some lisp code.
 Look for any single right parenthesis that is on its own line and move it up to
 the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
   (interactive)
@@ -1005,7 +1005,7 @@ return git error nmessage."
 ;;  shu-git-find-branch
 ;;
 (defun shu-git-find-branch ()
-  "Return the name of the current branch in a git repositiry."
+  "Return the name of the current branch in a git repository."
   (interactive)
   (let ((branch))
     (with-temp-buffer
@@ -1237,7 +1237,7 @@ be open."
 ;;
 (defun shu-erase-region (start end)
   "Replace everything in the region between START and END with blanks.  This is
-exactly like delete-region escept that the deleted text is replacd with blanks.
+exactly like delete-region except that the deleted text is replacd with blanks.
 As with delete-region, the end point is not included in the delete.  It erases
 everything up but not including the end point.  The order of START and END does
 not matter."

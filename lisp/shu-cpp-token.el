@@ -1398,7 +1398,7 @@ of reverse parsed code have the same suffix."
 ;;  shu-cpp-token-string-token-info
 ;;
 (defun shu-cpp-token-string-token-info (token-info)
-  "Return a string that represents the contentw of the toke-info."
+  "Return a string that represents the contents of the token-info."
   (interactive)
   (let ((token)
         (token-type)

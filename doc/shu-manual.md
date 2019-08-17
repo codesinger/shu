@@ -6886,7 +6886,8 @@ LocalWords:  facebook setq gmail krurl em krid krpw kracct krfn krpin krvf vlist
 LocalWords:  urls Lastname Firstname diff dbc ee da ec dup eld gd dired gf gfc gfl
 LocalWords:  gfn gquote ert SHA dos eol CRLF unix LF winpath eob YYYY DDTHHMMSS DDD
 LocalWords:  DD mac CR nvplist org TODO expiry CANCELLED todo xref defs retval tex
-LocalWords:  funcall myclass toc unescaped nvpair prob gtest gincl rmv qual xxx
-LocalWords:  WhammoCorp plist abcdef testfn eq binclude mumblefrotz
-LocalWords:  ginclude newfile
+LocalWords:  funcall myclass toc unescaped nvpair prob gtest gincl rmv qual xxx ret
+LocalWords:  WhammoCorp plist abcdef testfn eq binclude mumblefrotz sexp gitbuf ind
+LocalWords:  ginclude newfile fixp hitRatio getdef mumbleSomethingOther cciterate
+LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de
 -->

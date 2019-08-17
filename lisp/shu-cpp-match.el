@@ -339,7 +339,7 @@ must both match.")
 
 (defconst shu-cpp-token-match-type-same-rx 3
   "The match type constant that indicates that the token type must match and
-the token value must staisify the regular expression for a C++ variable name.")
+the token value must satisfy the regular expression for a C++ variable name.")
 
 
 (defconst shu-cpp-token-match-type-non-loop-max 3
@@ -352,7 +352,7 @@ must match the side list zero or more times.  If the first item in the list does
 not match, this is considered a success.  If the first item matches, then all
 items in the side list must match.  If all items in the side list match, we go
 back to the top of the side list and try again until we find a token that does
-not match the first item in the sice list.  The match is considered a failure
+not match the first item in the side list.  The match is considered a failure
 only of there is a partial match between the tokens and the side list.")
 
 (defconst shu-cpp-token-match-type-side-choose 5
@@ -767,7 +767,7 @@ matched token was to be added to the list to be returned."
 ;;  shu-cpp-match-evaluate-side-list
 ;;
 (defun shu-cpp-match-evaluate-side-list (op-code rlist token-list match-info)
-  "Evaluate a side list in a macth list.  Use the op-code inthe match item to
+  "Evaluate a side list in a match list.  Use the op-code in  the match item to
 find the function that should evaluate the side list."
   (let ((assoc-item)
         (loop-eval-func)
@@ -862,7 +862,7 @@ matched token-info was to be returned."
 the next token-info to match.  MATCH-INFO is the head of the side list with
 which to match.  The match succeeds if the token-infos in TOKEN-LIST match all
 of the match-infos in MATCH-LIST zero or more times.  The token-infos are
-matched repeatedy against the match-infos.  If there is a failure matching the
+matched repeatedly against the match-infos.  If there is a failure matching the
 first match-info, the match is successful.  If there is a failure matching any
 other match-info, the match fails.
 
