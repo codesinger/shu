@@ -2573,7 +2573,7 @@ would be transformed into
   "Return the name of the .h file that corresponds to the .cpp file or .t.cpp file
 that is in the current buffer.  This version of the function creates the name of
 the .h file from the name of the file in the current buffer.  This is in contrast
-with the function shu-hother which finds the coprresponding .h file from the list
+with the function shu-hother which finds the corresponding .h file from the list
 of files in the current project."
   (let ((base-name (file-name-sans-extension (buffer-file-name)))
         (newfile ))

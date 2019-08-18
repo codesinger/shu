@@ -39,7 +39,9 @@ Version 1.2 was merged with the master branch on 6 January 2019.
 
 Version 1.3 was merged with the master branch on 12 January 2019.
 
-This is Version 1.4.0 of the Shu elisp repository,
+Version 1.4.0 was merged with the master branch on 2 February 2019.
+
+This is Version 1.4.30 of the Shu elisp repository,
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -200,6 +202,17 @@ Standard end point (right hand margin) for C style comments.
 \begin{doc-string}
 Column in which a standard comment starts.  Any comment that starts to the left of
 this point is assumed to be a block comment.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-default-allocator-name }}
+\usebox{\funcname}
+\index{shu-cpp-default-allocator-name} \hfill [Custom]
+
+\begin{doc-string}
+The name of the class member variable that holds the pointer to the allocator
+used by the class.
 \end{doc-string}
 
 \vspace{1em}
@@ -518,6 +531,16 @@ the left and right brackets in the class of characters to be skipped.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-point-at-sexp }}
+\usebox{\funcname}\emph{sos}
+\index{shu-point-at-sexp} \hfill [Command]
+
+\begin{doc-string}
+Return the point of the sexp that matches the point at \emph{sos}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-point-in-string }}
 \usebox{\funcname}\textbf{\&optional} \emph{pos}
 \index{shu-point-in-string} \hfill [Function]
@@ -572,6 +595,28 @@ relative to the start of the buffer, whether or not narrowing is in effect.
 \begin{doc-string}
 Trim leading and trailing whitespace from \emph{string}.  Return the modified
 string.  String remains unmodified if it had no leading or trailing whitespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-trim-file }}
+\usebox{\funcname}
+\index{shu-trim-file} \hfill [Custom]
+
+\begin{doc-string}
+If true, whitespace is trimmed from the end of lines and blank lines at the
+end of a file are deleted when a file is saved.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-trim-file-hook }}
+\usebox{\funcname}
+\index{shu-trim-file-hook} \hfill [Function]
+
+\begin{doc-string}
+Run as a before-save-hook to trim trailing whitespace from the end of lines and
+to trim blank lines from the end of a file if \emph{shu-trim-file} is true.
 \end{doc-string}
 
 \vspace{1em}
@@ -1046,6 +1091,17 @@ Generate a skeleton header file
 
 \begin{doc-string}
 Generate a skeleton t.cpp file
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-generate-git-add }}
+\usebox{\funcname}\emph{filename} \emph{gitbuf}
+\index{shu-generate-git-add} \hfill [Function]
+
+\begin{doc-string}
+Do a ``git add'' of \emph{filename} and show the result of the operation in
+the buffer \emph{gitbuf}.
 \end{doc-string}
 
 \eject
@@ -2682,6 +2738,36 @@ Place a skeleton Doxygen header definition at point.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{fixp }}
+\usebox{\funcname}
+\index{fixp} \hfill [Command]\\%
+ (Function: shu-cpp-fix-prototype)
+
+\begin{doc-string}
+Place the cursor on the beginning of a function declaration that has been
+copied from a .cpp file to a .h file.  This function fixes up the function
+prototype to make it suitable for a .h file.
+For example, this declaration:
+
+\small{\begin{verbatim}
+      double Frobnitz::hitRatio(
+          const int  reads,
+          const int  writes)
+      const
+\end{verbatim}}
+
+would be transformed into
+
+\small{\begin{verbatim}
+          double hitRatio(
+              const int  reads,
+              const int  writes)
+          const;
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{get-set }}
 \usebox{\funcname}
 \index{get-set} \hfill [Command]\\%
@@ -2691,6 +2777,19 @@ Place a skeleton Doxygen header definition at point.
 Generate get and set functions for an instance variable in a C++ class.
 Position the cursor ahead of the Doxygen comment above the variable.  The get
 and set functions will be placed in the buffer \emph\{*get-set*.\}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{getdef }}
+\usebox{\funcname}
+\index{getdef} \hfill [Command]\\%
+ (Function: shu-cpp-find-h-definition)
+
+\begin{doc-string}
+While in a cpp file, position point on a variable name that is defined in the
+corresponding header file and invoke this function.  It will find all occurrences of
+the name in the header file and put them in the message area.
 \end{doc-string}
 
 \vspace{1em}
@@ -2834,6 +2933,19 @@ count of class names changed.
 Set the local namespace for C++ classes.
 \end{doc-string}
 
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{to-snake }}
+\usebox{\funcname}
+\index{to-snake} \hfill [Command]\\%
+ (Function: shu-to-snake)
+
+\begin{doc-string}
+Convert the variable name at point from camel case to snake case.
+
+For example, ``mumbleSomethingOther'' becomes ``mumble\_something\_other''.
+\end{doc-string}
+
 \subsection{List of functions and variables}
 
 List of functions and variable definitions in this package.
@@ -2912,6 +3024,30 @@ benefit of unit tests.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cciterate }}
+\usebox{\funcname}\emph{type-name} \emph{var-name}
+\index{shu-cciterate} \hfill [Command]
+
+\begin{doc-string}
+Insert the code to iterate through a data structure of type \emph{type-name} whose
+instance is identified by \emph{var-name}.  First prompt reads the variable name.
+Second prompt read the variable name.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (type_name::const_iterator it = var_name.begin();
+           it != var_name.end(); ++it)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside that braces is defined in the custom
+variable shu-cpp-indent-length.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cdo }}
 \usebox{\funcname}
 \index{shu-cdo} \hfill [Command]\\%
@@ -2952,6 +3088,30 @@ Insert an empty for statement.
 
 \begin{doc-string}
 Insert an empty if statement.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-citerate }}
+\usebox{\funcname}\emph{type-name} \emph{var-name}
+\index{shu-citerate} \hfill [Command]
+
+\begin{doc-string}
+Insert the code to iterate through a data structure of type \emph{type-name} whose
+instance is identified by \emph{var-name}.  First prompt reads the variable name.
+Second prompt read the variable name.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (type_name::iterator it = var_name.begin();
+           it != var_name.end(); ++it)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside that braces is defined in the custom
+variable shu-cpp-indent-length.
 \end{doc-string}
 
 \vspace{1em}
@@ -3011,6 +3171,19 @@ strings and that you are not missing any occurrences of $<$$<$.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-find-h-definition }}
+\usebox{\funcname}
+\index{shu-cpp-find-h-definition} \hfill [Command]\\%
+ (Alias: getdef)
+
+\begin{doc-string}
+While in a cpp file, position point on a variable name that is defined in the
+corresponding header file and invoke this function.  It will find all occurrences of
+the name in the header file and put them in the message area.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-find-using }}
 \usebox{\funcname}\textbf{\&optional} \emph{top-name}
 \index{shu-cpp-find-using} \hfill [Command]
@@ -3035,6 +3208,58 @@ would be interpreted as though it had been written:
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-find-variable-name-by-token }}
+\usebox{\funcname}\emph{var-name}
+\index{shu-cpp-find-variable-name-by-token} \hfill [Function]
+
+\begin{doc-string}
+Tokenize the entire buffer and return the position of the first token
+that matches var-name.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-find-variable-name-lines-by-token }}
+\usebox{\funcname}\emph{var-name}
+\index{shu-cpp-find-variable-name-lines-by-token} \hfill [Function]
+
+\begin{doc-string}
+Tokenize the entire buffer and return a string that is composed of each
+line that contains the token.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-fix-prototype }}
+\usebox{\funcname}
+\index{shu-cpp-fix-prototype} \hfill [Command]\\%
+ (Alias: fixp)
+
+\begin{doc-string}
+Place the cursor on the beginning of a function declaration that has been
+copied from a .cpp file to a .h file.  This function fixes up the function
+prototype to make it suitable for a .h file.
+For example, this declaration:
+
+\small{\begin{verbatim}
+      double Frobnitz::hitRatio(
+          const int  reads,
+          const int  writes)
+      const
+\end{verbatim}}
+
+would be transformed into
+
+\small{\begin{verbatim}
+          double hitRatio(
+              const int  reads,
+              const int  writes)
+          const;
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-general-set-alias }}
 \usebox{\funcname}
 \index{shu-cpp-general-set-alias} \hfill [Function]
@@ -3043,6 +3268,29 @@ would be interpreted as though it had been written:
 Set the common alias names for the functions in shu-cpp-general.
 These are generally the same as the function names with the leading
 shu- prefix removed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-get-variable-name }}
+\usebox{\funcname}
+\index{shu-cpp-get-variable-name} \hfill [Function]
+
+\begin{doc-string}
+If point is sitting on something that looks like a legal variable name, return it,
+otherwise, return nil.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-get-variable-name-position }}
+\usebox{\funcname}
+\index{shu-cpp-get-variable-name-position} \hfill [Function]
+
+\begin{doc-string}
+If point is sitting on something that looks like a legal variable name,
+return a cons cell that contains the start and end positions of the name
+otherwise, return nil.
 \end{doc-string}
 
 \vspace{1em}
@@ -3132,7 +3380,7 @@ This function returns true if such an ambiguity exists.
 Remove ``using namespace'' directives from a C++ file, adding the appropriate
 namespace qualifier to all of the unqualified class names.  \emph{class-list} is an
 a-list in which the car of each entry is a namespace and the cdr of each entry
-is a class name.  Here is an example of such an a-list:
+is a list of class names.  Here is an example of such an a-list:
 
 \small{\begin{verbatim}
      (list
@@ -3482,6 +3730,30 @@ qualifier.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-citerate }}
+\usebox{\funcname}\emph{type-name} \emph{var-name} \textbf{\&optional}
+\index{shu-internal-citerate} \hfill [Command]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Insert the code to iterate through a data structure of type \emph{type-name} whose
+instance is identified by \emph{var-name}.  First prompt reads the variable name.
+Second prompt read the variable name.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (type_name::iterator it = var_name.begin();
+           it != var_name.end(); ++it)
+      {
+      }
+\end{verbatim}}
+
+If optional \emph{const} is true, a const iterator is generated.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-internal-cpp2-class }}
 \usebox{\funcname}\emph{class-name}
 \index{shu-internal-cpp2-class} \hfill [Function]
@@ -3579,6 +3851,36 @@ Place a skeleton class definition in the current buffer at point.
 
 \begin{doc-string}
 Generate a skeleton code file for a C or C++ file.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-new-deallocate }}
+\usebox{\funcname}\emph{var-name} \emph{class-name}
+\index{shu-new-deallocate} \hfill [Command]
+
+\begin{doc-string}
+Insert the code to do a standard deallocation of memory allocated by a
+specific allocator.  First prompt reads the variable name that points to the
+memory to be deallocated.  Second prompt reads the name of the class whose
+destructor is to be called.
+
+This generates a code sequence as follows:
+
+\small{\begin{verbatim}
+        if (var-name)
+        {
+            var-name->~class-name();
+            m_allocator->deallocate(var-name);
+            var-name = 0;
+        }
+\end{verbatim}}
+
+\emph{var-name} and \emph{class-name} are read from two prompts.  The number of spaces to
+indent inside that braces is defined in the custom variable
+shu-cpp-indent-length.  The name of the member variable that points to the
+allocator in use by the class comes from the custom variable
+shu-cpp-default-allocator-name
 \end{doc-string}
 
 \vspace{1em}
@@ -3797,12 +4099,666 @@ Undocumented
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-simple-hother-file }}
+\usebox{\funcname}
+\index{shu-simple-hother-file} \hfill [Function]
+
+\begin{doc-string}
+Return the name of the .h file that corresponds to the .cpp file or .t.cpp file
+that is in the current buffer.  This version of the function creates the name of
+the .h file from the name of the file in the current buffer.  This is in contrast
+with the function shu-hother which finds the corresponding .h file from the list
+of files in the current project.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-to-snake }}
+\usebox{\funcname}
+\index{shu-to-snake} \hfill [Command]\\%
+ (Alias: to-snake)
+
+\begin{doc-string}
+Convert the variable name at point from camel case to snake case.
+
+For example, ``mumbleSomethingOther'' becomes ``mumble\_something\_other''.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-var-name }}
 \usebox{\funcname}
 \index{shu-var-name} \hfill [Variable]
 
 \begin{doc-string}
 The variable name that corresponds to an attribute name.
+\end{doc-string}
+
+\eject
+\section{shu-cpp-match}
+
+
+Functions to match patterns against list of tokens produced by
+shu-cpp-token.el.
+
+
+The functions in shu-cpp-token.el can scan a section of C++ source code and
+turn it into a list of tokens.  Each token has a type (comment, string,
+keyword, operator or unquoted token) and a value, which is the token itself.
+Each token also contains its start and end position within the file.
+
+The functions in this file, shu-cpp-match.el, allow one to use data
+structures to describe patterns to be found in a list of tokens.
+
+The simplest data structure consists of a list of match items that must
+exactly match a list of tokens.  If you want to find something that looks
+like
+
+\small{\begin{verbatim}
+      pointer->thing
+\end{verbatim}}
+
+you put together a list of three match items.  The first specifies a regular
+expression that can match a C++ name.  The second is an exact match for the
+operator "-$>$", and the third is another regular expression that can match a
+C++ name.
+
+You can also search for more than one pattern at a time by supplying a list
+of lists of match items.  Suppose you want to search for an occurrence of a
+"using namespace" directive.  You might have one list that matches "using
+namespace name;", another list that matches "using namespace ::name;", and
+another list that matches "using namespace component::name";.
+
+If you try to match this set of three lists against the following string
+
+\small{\begin{verbatim}
+      using namespace thing::Bob
+\end{verbatim}}
+
+The three lists are evaluated as follows:
+
+The first list matches "using," "namespace," "thing," but fails when it does
+not find a semi-colon following "thing."
+
+The second list matches "using," "namespace," but fails when it does not find
+an operator "::".
+
+The third list matches "using," "namespace," "thing," "::," "Bob," and ";".
+
+With one function call, you have found a reasonably complex pattern.  The
+tokens scanned to not include comments.  This means that the above example
+would have worked identically on a list of tokens derived from
+
+\small{\begin{verbatim}
+      using /* Hello \emph{*/} namespace
+      // Something here
+      thing /* How are you? \emph{*/} :: Bob ;
+\end{verbatim}}
+
+A list of match items can also include a side list.  A side list is another
+list of match items that is to be matched.  There are different types of side
+lists.  One of them is a repeating side list.  A repeating side list matches
+zero or more occurrences of a list.
+
+In the above example, we matched the name thing::Bob by having three match
+items.  But what if we want to match an arbitrary nesting of namespaces, such
+as
+
+\small{\begin{verbatim}
+      thing::Bob::Fred::Ted
+\end{verbatim}}
+
+One way to do this is with a repeating side list.
+
+This list of tokens above could be matched by a single match item followed by
+a repeating side list.  The first item in the list is a regular expression
+match for a C++ name.  The second item in the list is a repeating side list,
+which contains two items, the first of which is an exact match for operator
+"::", and the second of which is a regular expression that matches a C++
+name.
+
+The match would work as follows:
+
+The first match item would match "thing".  Then the repeating side list would
+match "::," "Bob," "::," "Fred," "::," and "Ted."
+
+On return from a successful match, how do you know what was matched?  Each
+match item can specify that when the item is matched, the matched item is to
+be added to a list of items to be returned to the caller.
+
+Let us return to our original example in which we had three lists, the last
+of which finally matched.
+
+\small{\begin{verbatim}
+                *       *     *
+      using namespace thing::Bob
+\end{verbatim}}
+
+An asterisk has been placed over each item that is marked to be returned to
+the caller.  At the end of the match, the matching function would return the
+list
+
+\small{\begin{verbatim}
+      namespace
+      thing
+      Bob
+\end{verbatim}}
+
+Now the caller knows what was matched and has a copy of the matched tokens.
+
+In our example of matching a nested namespace name, the function might return
+
+\small{\begin{verbatim}
+      thing
+      Bob
+      Fred
+      Ted
+\end{verbatim}}
+
+Now the caller can tell from the length of the list, how deeply nested the
+namespace name is.
+
+Note that since the matched tokens are pushed onto the list, the list is
+actually returned in reverse order, which the caller can reverse with
+nreverse.
+
+Each matching function also accepts a return list to which it will add newly
+matched items.  The caller can then match several patterns that build up an
+ever expanding return list of tokens.  Only the caller knows when it makes
+sense to reverse the list and to then start processing the reversed list.
+
+A final example is the list of match items that is actually used elsewhere to
+find occurrences of using namespace directives.  It uses another type of side
+list, which is a list of lists.  This is an illustration of that match
+structure:
+
+
+
+\small{\begin{verbatim}
+                                  using
+                                    |
+                                    V
+                                namespace
+                                    |
+                                    |
+          +-------------------------+-------------------------+
+          |                         |                         |
+          |                         |                         |
+          V                         V                         V
+        <name>                     ::                       <name>
+          |                         |                         |
+          |                         |                         |
+          |                         V                         V
+          |                       <name>           loop of :: followed by <name>
+          |                         |                         |
+          |                         |                         |
+          V                         V                         V
+          ;                         ;                         ;
+\end{verbatim}}
+
+This is how the above match structure would match
+
+\small{\begin{verbatim}
+      using namespace thing::Bob::Ted;
+\end{verbatim}}
+
+The first two tokens "using" and "namespace" are matched exactly.  The we
+come to three lists to be evaluated.  The first one matches "thing" but fails
+to match the ";".  The second fails trying to match "::".  The third matches
+"thing" and then the repeating side list matches "::," "Bob", "::," and
+"Ted."  The repeating side list stops the matching when it encounters the
+terminating semi-colon, and then the next match item in the list matches the
+terminating semi-colon.
+
+The returned list would be
+
+\small{\begin{verbatim}
+      using
+      namespace
+      thing
+      Bob
+      Ted
+\end{verbatim}}
+
+You can look in the unit tests and in other code that uses the matching code
+here for more examples of the power of match lists.
+
+
+
+\subsection{List of functions and variables}
+
+List of functions and variable definitions in this package.
+
+
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-all-search-match-tokens }}
+\usebox{\funcname}\emph{rlist} \emph{match-list}
+\index{shu-cpp-all-search-match-tokens} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Repeatedly call shu-cpp-search-match-tokens until there are no remaining tokens
+to match.  If the return value is nil, there were no tokens found to match.  If
+the return value is non-nil, its \emph{rlist} is the list of all of the returned tokens
+from all of the matches.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-sub-match-tokens }}
+\usebox{\funcname}\emph{rlist} \emph{mlist}
+\index{shu-cpp-internal-sub-match-tokens} \hfill [Command]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Do the matching for one list only.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-make-match-info }}
+\usebox{\funcname}\emph{op-code} \emph{match-eval-func}
+\index{shu-cpp-make-match-info} \hfill [Function]
+\hspace*{\wd\funcname}\emph{match-token-type}
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Return a match-info structure from the given arguments
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-make-match-side-list }}
+\usebox{\funcname}\emph{op-code} \emph{match-list}
+\index{shu-cpp-make-match-side-list} \hfill [Function]
+\hspace*{\wd\funcname}\emph{side-parameter}
+
+\begin{doc-string}
+Return a match-info structure from the given arguments that represents a
+side list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-evaluate-side-list }}
+\usebox{\funcname}\emph{op-code} \emph{rlist}
+\index{shu-cpp-match-evaluate-side-list} \hfill [Function]
+\hspace*{\wd\funcname}\emph{match-info}
+
+\begin{doc-string}
+Evaluate a side list in a match list.  Use the op-code in  the match item to
+find the function that should evaluate the side list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-extract-info }}
+\usebox{\funcname}\emph{match-info} \emph{op-code}
+\index{shu-cpp-match-extract-info} \hfill [Macro]
+\hspace*{\wd\funcname}\emph{match-ret-ind}
+\hspace*{\wd\funcname}\emph{match-token-value}
+
+\begin{doc-string}
+Extract the information out of a match-info
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-extract-op-code }}
+\usebox{\funcname}\emph{match-info}
+\index{shu-cpp-match-extract-op-code} \hfill [Function]
+
+\begin{doc-string}
+Return the op code from the match-info.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-extract-side-list }}
+\usebox{\funcname}\emph{match-info} \emph{op-code}
+\index{shu-cpp-match-extract-side-list} \hfill [Macro]
+\hspace*{\wd\funcname}\emph{side-parameter}
+
+\begin{doc-string}
+Extract the side-list information out of a match-info that represents a side-list..
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-extract-side-list-only }}
+\usebox{\funcname}\emph{match-info}
+\index{shu-cpp-match-extract-side-list-only} \hfill [Function]
+
+\begin{doc-string}
+Extract only the side list from the match info.  This is in contract to
+shu-cpp-match-extract-side-list, which extracts all of the properties of a
+side list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-extract-token }}
+\usebox{\funcname}\emph{match-info}
+\index{shu-cpp-match-extract-token} \hfill [Function]
+
+\begin{doc-string}
+Return the token from the match-info.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-extract-type }}
+\usebox{\funcname}\emph{match-info}
+\index{shu-cpp-match-extract-type} \hfill [Function]
+
+\begin{doc-string}
+Return the token type from the match-info.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-is-side-list }}
+\usebox{\funcname}\emph{op-code}
+\index{shu-cpp-match-is-side-list} \hfill [Function]
+
+\begin{doc-string}
+Return true if the \emph{op-code} represents a side list operation.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-many-list }}
+\usebox{\funcname}\emph{rlist} \emph{token-list}
+\index{shu-cpp-match-many-list} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Do a recursive call to shu-cpp-match-tokens.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-op-code-name }}
+\usebox{\funcname}\emph{op-code}
+\index{shu-cpp-match-op-code-name} \hfill [Function]
+
+\begin{doc-string}
+Return the name of an op-code.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-or-list }}
+\usebox{\funcname}\emph{rlist} \emph{token-list} \emph{match-info}
+\index{shu-cpp-match-or-list} \hfill [Function]
+
+\begin{doc-string}
+\emph{rlist} points to the current return value list, if any.  \emph{token-list} points to
+the next token-info to match.  \emph{match-info} is the head of the side list with
+which to match.  The match succeeds if the first token-info in \emph{token-list}
+matches any of the match-info members of \emph{match-info}.  If the match fails, return
+nil.  If the match succeeds, return a cons cell pointing to two items.  The car
+is the next token-info in \emph{token-list}.  The cdr is the return list, \emph{rlist}.  \emph{rlist}
+remains unchanged if the match-info that matched did not specify that the
+matched token-info was to be returned.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-repeat-list }}
+\usebox{\funcname}\emph{rlist} \emph{token-list}
+\index{shu-cpp-match-repeat-list} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+\emph{rlist} points to the current return value list, if any.  \emph{token-list} points to
+the next token-info to match.  \emph{match-info} is the head of the side list with
+which to match.  The match succeeds if the token-infos in \emph{token-list} match all
+of the match-infos in MATCH-LIST zero or more times.  The token-infos are
+matched repeatedly against the match-infos.  If there is a failure matching the
+first match-info, the match is successful.  If there is a failure matching any
+other match-info, the match fails.
+
+This is useful when matching repeating but optional patterns.  For example, a
+C++ name could be any of the following:
+
+\small{\begin{verbatim}
+     a
+     a::b
+     a::b::c
+\end{verbatim}}
+
+You can match this with a match list that requires an unquoted token that
+matches a C++ name, followed by a side list looking for operator ``::'' followed
+by an unquoted token.  If there is no match, then you have an unqualified name.
+If it matches once, you have a name with one level of qualification.  But if it
+fails in the middle, then you have found something that looks like ``a::'',
+which is not a valid C++ name.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-repeat-sub-list }}
+\usebox{\funcname}\emph{rlist} \emph{token-list}
+\index{shu-cpp-match-repeat-sub-list} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Go through one iteration of the repeating list.  The iteration is considered
+a success if either of the following are true: 1. The first match fails, or
+2. All matches succeed.  If all matches succeed, the updated \emph{rlist} and
+\emph{token-list} are returned.  If the first match fails, the \emph{rlist} and \emph{token-list} are
+returned unaltered.  It is as though no match was ever attempted.  If some match
+other than the first fails, nil is returned.  If the \emph{token-list} is nil on entry,
+this is the equivalent of a first match failure.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-tokens }}
+\usebox{\funcname}\emph{rlist} \emph{match-lists} \emph{token-list}
+\index{shu-cpp-match-tokens} \hfill [Function]
+
+\begin{doc-string}
+\emph{match-lists} is a list of match lists.  \emph{token-list} is a list of tokens.  \emph{rlist}
+is either nil or an existing list of returned tokens on which to build.  For
+each match-list in \emph{match-lists}, try to match every element of the match list to
+the token list.  if a match fails or if you reach the end of the token list
+before reaching the end of the match list, move to the next match list and try
+again.  if all elements of a match list match the tokens in the token list, stop
+the matching process and return (pushed onto RLIST) a list which consists of
+matched tokens whose corresponding entry in the match list indicated that the
+matched token was to be added to the list to be returned.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-search-match-tokens }}
+\usebox{\funcname}\emph{rlist} \emph{match-list}
+\index{shu-cpp-search-match-tokens} \hfill [Command]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+A function that advances through the \emph{token-list} until the first item in the
+single \emph{match-list} matches the token.  If that happens, try to match the whole
+list.  If the whole list is matched, return.  If the whole list does not match,
+restore the original \emph{rlist} and \emph{token-list} and continue.  Return only when the
+whole list is matched or the \emph{token-list} is exhausted.
+
+This could be extended to multiple lists by having the search part check for a
+match with the head of any of the lists in order.  When the head of one list
+matches, pursue that list.  If the list match fails, move to the next list.
+When no list head or entire list matches the current token, then move to the
+next token.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-side-list-functions }}
+\usebox{\funcname}
+\index{shu-cpp-side-list-functions} \hfill [Constant]
+
+\begin{doc-string}
+A-list that maps a side list op-code to the function that implements it.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-same }}
+\usebox{\funcname}\emph{match-info} \emph{token-info}
+\index{shu-cpp-token-match-same} \hfill [Function]
+
+\begin{doc-string}
+Perform a single match operation between an item in a token list and an item
+in a match list.  The token types must be the same and the token value in the
+match list must be the same as the token value in the token list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-same-rx }}
+\usebox{\funcname}\emph{match-info} \emph{token-info}
+\index{shu-cpp-token-match-same-rx} \hfill [Function]
+
+\begin{doc-string}
+Perform a single match operation by regular expression between an
+item in a token list and an item in a match list.  The token types
+must be the same and the regular expression in the match list must
+match (via string-match) the token in the token list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-skip }}
+\usebox{\funcname}\emph{tlist}
+\index{shu-cpp-token-match-skip} \hfill [Function]
+
+\begin{doc-string}
+Skip one cell in the input list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-type-non-loop-max }}
+\usebox{\funcname}
+\index{shu-cpp-token-match-type-non-loop-max} \hfill [Constant]
+
+\begin{doc-string}
+The maximum match type value that does not indicate a side loop.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-type-same }}
+\usebox{\funcname}
+\index{shu-cpp-token-match-type-same} \hfill [Constant]
+
+\begin{doc-string}
+The match type constant that indicates that the token type and token value
+must both match.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-type-same-rx }}
+\usebox{\funcname}
+\index{shu-cpp-token-match-type-same-rx} \hfill [Constant]
+
+\begin{doc-string}
+The match type constant that indicates that the token type must match and
+the token value must satisfy the regular expression for a C++ variable name.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-type-side-choose }}
+\usebox{\funcname}
+\index{shu-cpp-token-match-type-side-choose} \hfill [Constant]
+
+\begin{doc-string}
+The match side constant that indicates a choice.  The match is considered a
+success if any one item in the side list matches the current token.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-type-side-loop }}
+\usebox{\funcname}
+\index{shu-cpp-token-match-type-side-loop} \hfill [Constant]
+
+\begin{doc-string}
+The match side constant that indicates a looping side list.  The token list
+must match the side list zero or more times.  If the first item in the list does
+not match, this is considered a success.  If the first item matches, then all
+items in the side list must match.  If all items in the side list match, we go
+back to the top of the side list and try again until we find a token that does
+not match the first item in the side list.  The match is considered a failure
+only of there is a partial match between the tokens and the side list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-type-side-many }}
+\usebox{\funcname}
+\index{shu-cpp-token-match-type-side-many} \hfill [Constant]
+
+\begin{doc-string}
+The match side constant that indicates a choice among multiple lists.
+This does a recursive call to shu-cpp-match-tokens.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-type-skip }}
+\usebox{\funcname}
+\index{shu-cpp-token-match-type-skip} \hfill [Constant]
+
+\begin{doc-string}
+The match type constant that indicates skip one input cell.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-show-match-info }}
+\usebox{\funcname}\emph{match-info}
+\index{shu-cpp-token-show-match-info} \hfill [Function]
+
+\begin{doc-string}
+Show the data in an instance of match-info.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-show-match-info-buffer }}
+\usebox{\funcname}\emph{match-info} \emph{gb}
+\index{shu-cpp-token-show-match-info-buffer} \hfill [Function]
+
+\begin{doc-string}
+Show the data in an instance of match-info.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-show-match-list }}
+\usebox{\funcname}\emph{match-list} \textbf{\&optional}
+\index{shu-cpp-token-show-match-list} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Show the data in an instance of match-info.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-show-match-lists }}
+\usebox{\funcname}\emph{match-lists}
+\index{shu-cpp-token-show-match-lists} \hfill [Function]
+\hspace*{\wd\funcname}\emph{title}
+
+\begin{doc-string}
+Show the data in an instance of match-info.
 \end{doc-string}
 
 \eject
@@ -4280,12 +5236,13 @@ Renew a previously established project to pick up any new files.
  (Function: shu-set-c-project)
 
 \begin{doc-string}
-Mark a region in a file that contains one subdirectory name per line.
-Then invoke set-c-project and it will find and remember all of the c and h
-files in those subdirectories.  You may then subsequently visit any of
-those files by invoking M-x vh which will allow you to type in the file
-name only (with auto completion) and will then visit the file in the
-appropriate subdirectory.
+Mark a region in a file that contains one subdirectory name per line.  Then
+invoke set-c-project and it will find and remember all of the c and h files in
+those subdirectories.  You may then subsequently visit any of those files by
+invoking M-x vh which will allow you to type in the file name only (with auto
+completion) and will then visit the file in the appropriate subdirectory.  If
+this function is called interactively, it clears the project name that was
+established by either \emph{shu-setup-project-and-tags} of \emph{shu-visit-project-and-tags}.
 \end{doc-string}
 
 \vspace{1em}
@@ -4818,6 +5775,19 @@ List that holds all of the subdirectories in the current project.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-project-name }}
+\usebox{\funcname}
+\index{shu-cpp-project-name} \hfill [Variable]
+
+\begin{doc-string}
+If the current project was established by either \emph{shu-setup-project-and-tags}
+of \emph{shu-visit-project-and-tags}, this is the name of the interactive function that
+was invoked by the user to set it up.  This is useful when you are in a project
+and you forgot the name of the interactive function that got you there.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-project-set-alias }}
 \usebox{\funcname}
 \index{shu-cpp-project-set-alias} \hfill [Function]
@@ -5035,6 +6005,18 @@ and column number indications may be used.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-real-this-command-name }}
+\usebox{\funcname}
+\index{shu-get-real-this-command-name} \hfill [Function]
+
+\begin{doc-string}
+Return the symbol name of the variable ``real-this-command'' if it is defined.
+If not defined, return the string ``\emph\{**unknown**\}''.  Some older versions of emacs
+do not support real-this-command.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-global-operation }}
 \usebox{\funcname}\emph{documentation}
 \index{shu-global-operation} \hfill [Function]
@@ -5069,6 +6051,21 @@ Otherwise, it will assume that all files reside in the same directory.
 \begin{doc-string}
 Insert into the current buffer the names of all of the code files in the
 project whose files are in \emph{proj-list}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-set-c-project }}
+\usebox{\funcname}\emph{start} \emph{end}
+\index{shu-internal-set-c-project} \hfill [Function]
+
+\begin{doc-string}
+Mark a region in a file that contains one subdirectory name per line.
+Then invoke set-c-project and it will find and remember all of the c and h
+files in those subdirectories.  You may then subsequently visit any of
+those files by invoking M-x vh which will allow you to type in the file
+name only (with auto completion) and will then visit the file in the
+appropriate subdirectory.
 \end{doc-string}
 
 \vspace{1em}
@@ -5306,12 +6303,13 @@ Renew a previously established project to pick up any new files.
  (Alias: set-c-project)
 
 \begin{doc-string}
-Mark a region in a file that contains one subdirectory name per line.
-Then invoke set-c-project and it will find and remember all of the c and h
-files in those subdirectories.  You may then subsequently visit any of
-those files by invoking M-x vh which will allow you to type in the file
-name only (with auto completion) and will then visit the file in the
-appropriate subdirectory.
+Mark a region in a file that contains one subdirectory name per line.  Then
+invoke set-c-project and it will find and remember all of the c and h files in
+those subdirectories.  You may then subsequently visit any of those files by
+invoking M-x vh which will allow you to type in the file name only (with auto
+completion) and will then visit the file in the appropriate subdirectory.  If
+this function is called interactively, it clears the project name that was
+established by either \emph{shu-setup-project-and-tags} of \emph{shu-visit-project-and-tags}.
 \end{doc-string}
 
 \vspace{1em}
@@ -5378,6 +6376,19 @@ Visit a c or h file in a project.  If point is on something that resembles a fil
 name, then visit that file.  If the file name is followed by a colon and a number
 then go to that line in the file.  If the line number is followed by a colon and
 a number then use the second number as the column number within the line.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-visit-project-and-tags }}
+\usebox{\funcname}\emph{proj-dir}
+\index{shu-visit-project-and-tags} \hfill [Function]
+
+\begin{doc-string}
+Visit a project file, make a C project from the contents of the whole file,
+and load that tags table from the tags file in the specified directory.  This
+function uses the existing tags table, whereas \emph{shu-setup-project-and-tags}
+creates a new tags table.
 \end{doc-string}
 
 \vspace{1em}
@@ -5580,6 +6591,26 @@ returns t if there are no occurrences of \emph{open-char} and \emph{close-char}
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-keywords }}
+\usebox{\funcname}
+\index{shu-cpp-keywords} \hfill [Constant]
+
+\begin{doc-string}
+alist of C++ key words up to approximately C++17
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-keywords-hash }}
+\usebox{\funcname}
+\index{shu-cpp-keywords-hash} \hfill [Variable]
+
+\begin{doc-string}
+The hash table of C++ key words
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-make-token-info }}
 \usebox{\funcname}\emph{token} \emph{token-type} \emph{spoint}
 \index{shu-cpp-make-token-info} \hfill [Function]
@@ -5756,6 +6787,16 @@ Regular expression to define that which terminates an unquoted token in C++
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-extract-epoint }}
+\usebox{\funcname}\emph{token-info}
+\index{shu-cpp-token-extract-epoint} \hfill [Function]
+
+\begin{doc-string}
+Return the end point from an instance of token-info.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-token-extract-info }}
 \usebox{\funcname}\emph{token-info} \emph{token}
 \index{shu-cpp-token-extract-info} \hfill [Macro]
@@ -5764,6 +6805,36 @@ Regular expression to define that which terminates an unquoted token in C++
 
 \begin{doc-string}
 Extract the information out of a token-info
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-extract-spoint }}
+\usebox{\funcname}\emph{token-info}
+\index{shu-cpp-token-extract-spoint} \hfill [Function]
+
+\begin{doc-string}
+Return the start point from an instance of token-info.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-extract-token }}
+\usebox{\funcname}\emph{token-info}
+\index{shu-cpp-token-extract-token} \hfill [Function]
+
+\begin{doc-string}
+Return the token from an instance of token-info.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-extract-type }}
+\usebox{\funcname}\emph{token-info}
+\index{shu-cpp-token-extract-type} \hfill [Function]
+
+\begin{doc-string}
+Return the token type from an instance of token-info.
 \end{doc-string}
 
 \vspace{1em}
@@ -5778,6 +6849,38 @@ Find the token-info in \emph{token-list} that spans \emph{here-point}, if any.  
 is no such token-info return nil.  If there is such a token-info, return a
 cons cell whose car is the spanning token-info and whose cdr is a pointer
 to the next token-info in the tlist.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-first-non-comment }}
+\usebox{\funcname}\emph{tlist}
+\index{shu-cpp-token-first-non-comment} \hfill [Function]
+
+\begin{doc-string}
+\emph{tlist} points to a list of token-info.  Return \emph{tlist} pointing to the next
+token-info that does not hold a comment.  If you are scanning through a list
+of tokens, it is not uncommon to want to skip all of the comments.  Use this
+at the bottom of the loop in place of the usual ``setq tlist (cdr tlist))''.
+
+i.e.,
+
+\small{\begin{verbatim}
+     (while tlist
+        ...
+       (setq tlist (cdr tlist)))
+\end{verbatim}}
+
+becomes
+
+\small{\begin{verbatim}
+     (setq tlist (shu-cpp-token-first-non-comment tlist))
+     (while tlist
+        ...
+       (setq tlist (shu-cpp-token-first-non-comment tlist)))
+\end{verbatim}}
+
+and you will scan through the list without seeing any comments.
 \end{doc-string}
 
 \vspace{1em}
@@ -5812,7 +6915,7 @@ modified \emph{token-info}
 \begin{doc-string}
 Internal function to do a forward or reverse parse of the region between \emph{start}
 and \emph{end}.  \emph{func} holds the function to be invoked to do the parse.  This would be
-either shu-cpp-tokenize-region or shu-cpp-reverse-tokenize-region.  Once the
+either \emph{shu-cpp-tokenize-region} or \emph{shu-cpp-reverse-tokenize-region}.  Once the
 parse is complete, the token list is shown in the Shu unit test buffer.  If any
 error is detected, it is displayed at the point at which the error was
 detected.
@@ -5841,6 +6944,47 @@ already been displayed.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-is-comment }}
+\usebox{\funcname}\emph{token-info}
+\index{shu-cpp-token-is-comment} \hfill [Function]
+
+\begin{doc-string}
+Return true if the token-info represents a comment.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-next-non-comment }}
+\usebox{\funcname}\emph{tlist}
+\index{shu-cpp-token-next-non-comment} \hfill [Function]
+
+\begin{doc-string}
+\emph{tlist} points to a list of token-info.  Return \emph{tlist} pointing to the next
+token-info that does not hold a comment.  If you are scanning through a list
+of tokens, it is not uncommon to want to skip all of the comments.  Use this
+at the bottom of the loop in place of the usual ``setq tlist (cdr tlist))''.
+
+i.e.,
+
+\small{\begin{verbatim}
+     (while tlist
+        ...
+       (setq tlist (cdr tlist)))
+\end{verbatim}}
+
+becomes
+
+\small{\begin{verbatim}
+     (while tlist
+        ...
+       (setq tlist (shu-cpp-token-next-non-comment tlist)))
+\end{verbatim}}
+
+and you will scan through the list without seeing any comments.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-token-set-alias }}
 \usebox{\funcname}
 \index{shu-cpp-token-set-alias} \hfill [Function]
@@ -5854,11 +6998,33 @@ shu- prefix removed.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-token-show-token-info }}
-\usebox{\funcname}\emph{token-info}
+\usebox{\funcname}\emph{token-info} \textbf{\&optional}
 \index{shu-cpp-token-show-token-info} \hfill [Function]
+\hspace*{\wd\funcname}
 
 \begin{doc-string}
 Show the data returned by one of the functions in this file that scans for tokens.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-show-token-info-buffer }}
+\usebox{\funcname}\emph{token-info} \emph{gb}
+\index{shu-cpp-token-show-token-info-buffer} \hfill [Function]
+\hspace*{\wd\funcname}\emph{title}
+
+\begin{doc-string}
+Show the data returned by one of the functions in this file that scans for tokens.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-string-token-info }}
+\usebox{\funcname}\emph{token-info}
+\index{shu-cpp-token-string-token-info} \hfill [Command]
+
+\begin{doc-string}
+Return a string that represents the contents of the token-info.
 \end{doc-string}
 
 \vspace{1em}
@@ -5891,6 +7057,16 @@ by shu-cpp-comment-start.  This is known as a code comment with no code present.
 
 \begin{doc-string}
 Token type that indicates a comment
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-type-kw }}
+\usebox{\funcname}
+\index{shu-cpp-token-type-kw} \hfill [Constant]
+
+\begin{doc-string}
+Token type that indicates a C++ key word
 \end{doc-string}
 
 \vspace{1em}
@@ -5968,11 +7144,33 @@ error, return the token list, else return nil
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-tokenize-show-list }}
-\usebox{\funcname}\emph{token-list}
+\usebox{\funcname}\emph{token-list} \textbf{\&optional}
 \index{shu-cpp-tokenize-show-list} \hfill [Function]
+\hspace*{\wd\funcname}
 
 \begin{doc-string}
 Undocumented
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-tokenize-show-list-buffer }}
+\usebox{\funcname}\emph{token-list} \emph{gb}
+\index{shu-cpp-tokenize-show-list-buffer} \hfill [Function]
+\hspace*{\wd\funcname}\emph{title}
+
+\begin{doc-string}
+Undocumented
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-cpp-keywords-hash }}
+\usebox{\funcname}
+\index{shu-get-cpp-keywords-hash} \hfill [Command]
+
+\begin{doc-string}
+Return a hash table containing all of the C++ key words.
 \end{doc-string}
 
 \eject
@@ -6491,6 +7689,77 @@ about syntax errors in the file.
 \end{doc-string}
 
 \eject
+\section{shu-match}
+
+
+Functions that use functions in shu-match.el
+
+
+\subsection{List of functions by alias name}
+
+A list of aliases and associated function names.
+
+
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{find-variables }}
+\usebox{\funcname}
+\index{find-variables} \hfill [Command]\\%
+ (Function: shu-match-find-variables)
+
+\begin{doc-string}
+Find what might be all of the variable declarations in a header file by doing
+a reverse tokenized scan looking for all occurrences of operator ``;'' followed
+by something that matches the regular expression for a C++ name.  Then take each
+line that matches and put it in the buffer ``\emph\{**shu-vars**\}''.
+\end{doc-string}
+
+\subsection{List of functions and variables}
+
+List of functions and variable definitions in this package.
+
+
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-find-semi-names }}
+\usebox{\funcname}\emph{token-list}
+\index{shu-match-find-semi-names} \hfill [Function]
+
+\begin{doc-string}
+With a match list that is a semi-colon followed by the regular expression for
+a C++ name, do a reverse tokenized match for all occurrences, then take each line
+that holds a match and put it into the buffer ``\emph\{**shu-vars**\}'',
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-find-variables }}
+\usebox{\funcname}
+\index{shu-match-find-variables} \hfill [Command]\\%
+ (Alias: find-variables)
+
+\begin{doc-string}
+Find what might be all of the variable declarations in a header file by doing
+a reverse tokenized scan looking for all occurrences of operator ``;'' followed
+by something that matches the regular expression for a C++ name.  Then take each
+line that matches and put it in the buffer ``\emph\{**shu-vars**\}''.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-set-alias }}
+\usebox{\funcname}
+\index{shu-match-set-alias} \hfill [Function]
+
+\begin{doc-string}
+Set the common alias names for the functions in shu-match,
+These are generally the same as the function names with the leading
+shu- prefix removed.
+\end{doc-string}
+
+\eject
 \section{shu-misc}
 
 
@@ -6503,6 +7772,32 @@ A miscellaneous collection of useful functions
 A list of aliases and associated function names.
 
 
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{add-prefix }}
+\usebox{\funcname}\emph{prefix}
+\index{add-prefix} \hfill [Command]\\%
+ (Function: shu-add-prefix)
+
+\begin{doc-string}
+Put a prefix and a space in front of each line in the region.  Prompt is issued
+for the prefix.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{all-quit }}
+\usebox{\funcname}
+\index{all-quit} \hfill [Command]\\%
+ (Function: shu-all-quit)
+
+\begin{doc-string}
+Kill all dired buffers and all buffers that contain a file and are unmodified.
+It is not uncommon to have dozens of buffers open that are unrelated to the current task
+and this is a convenience function for closing many buffers that do not need to
+be open.
+\end{doc-string}
 
 \vspace{1em}
 \noindent
@@ -6541,6 +7836,32 @@ simple, little function.
 In a list of names, change all occurrences
 of Lastname, Firstname to an empty Latex letter.
 Position to the start of the file and invoke once.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{de-star }}
+\usebox{\funcname}
+\index{de-star} \hfill [Command]\\%
+ (Function: shu-de-star)
+
+\begin{doc-string}
+Remove leading spaces and asterisk from each line in the region.  This is
+useful for editing doxygen comments of the form:
+
+   /*!
+\small{\begin{verbatim}
+    * This is some commentary.
+    * This is more commentary, etc.
+    \emph{*/}
+\end{verbatim}}
+
+You snip out the middle lines and put them into a text file for formatting and
+spell-checking.  You want to get rid of all of the asterisks until you are
+done.
+
+This function gets rid of all the asterisks.  You can use \emph{shu-add-prefix} to
+put them back.
 \end{doc-string}
 
 \vspace{1em}
@@ -6651,6 +7972,17 @@ While in a file buffer, put the name of the current file into the kill ring.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{git-branch }}
+\usebox{\funcname}
+\index{git-branch} \hfill [Command]\\%
+ (Function: shu-git-find-branch)
+
+\begin{doc-string}
+Return the name of the current branch in a git repository.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{gquote }}
 \usebox{\funcname}
 \index{gquote} \hfill [Command]\\%
@@ -6658,6 +7990,40 @@ While in a file buffer, put the name of the current file into the kill ring.
 
 \begin{doc-string}
 Insert a LaTeX quote environment and position the cursor for typing the quote.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{loosen-lisp }}
+\usebox{\funcname}
+\index{loosen-lisp} \hfill [Command]\\%
+ (Function: shu-loosen-lisp)
+
+\begin{doc-string}
+Within the bounds of a lisp function, unwind the parentheses that terminate
+conditional and containing functions such that it is convenient to insert code
+inside of them without having to worry about which line contains the closing
+parenthesis.  All closing parentheses are now on separate lines.  Once the
+changes to the function are complete, you can run \emph{shu-tighten-lisp} to put the
+parentheses back where they belong.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{modified-buffers }}
+\usebox{\funcname}
+\index{modified-buffers} \hfill [Command]\\%
+ (Function: shu-modified-buffers)
+
+\begin{doc-string}
+Show a list of all buffers associated with files whose status is modified.
+It is not uncommon to have many emacs windows open and to realize that one
+window has a file open and another window is also trying to edit it.  emacs
+warns the second window of the conflict, but it is sometimes difficult to tell
+which window holds the modified buffer.  The buffer list shows you all of the
+buffers with an asterisk next to each modified buffer, but if the buffer list
+is large, it can be difficult to find the one you seek.  This command lists
+only modified buffers that hold the contents of a file.
 \end{doc-string}
 
 \vspace{1em}
@@ -6700,7 +8066,7 @@ name.
 \savebox{\funcname}{\noindent\texttt{new-lisp-while }}
 \usebox{\funcname}\emph{var-name}
 \index{new-lisp-while} \hfill [Command]\\%
- (Function: shu-new-lisp--while)
+ (Function: shu-new-lisp-while)
 
 \begin{doc-string}
 Insert at point a skeleton lisp while loop.  Prompt is issued for the
@@ -6809,6 +8175,19 @@ Set the end of line delimiter to be the Unix standard (LF).
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{tighten-lisp }}
+\usebox{\funcname}
+\index{tighten-lisp} \hfill [Command]\\%
+ (Function: shu-tighten-lisp)
+
+\begin{doc-string}
+Within the bounds of a lisp function or macro, ``tighten'' some lisp code.
+Look for any single right parenthesis that is on its own line and move it up to
+the end of the previous line.  This function is the opposite of \emph{shu-loosen-lisp}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{trim-trailing-blanks }}
 \usebox{\funcname}
 \index{trim-trailing-blanks} \hfill [Command]\\%
@@ -6835,6 +8214,32 @@ This makes it a valid path on windows machines.
 List of functions and variable definitions in this package.
 
 
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-add-prefix }}
+\usebox{\funcname}\emph{prefix}
+\index{shu-add-prefix} \hfill [Command]\\%
+ (Alias: add-prefix)
+
+\begin{doc-string}
+Put a prefix and a space in front of each line in the region.  Prompt is issued
+for the prefix.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-all-quit }}
+\usebox{\funcname}
+\index{shu-all-quit} \hfill [Command]\\%
+ (Alias: all-quit)
+
+\begin{doc-string}
+Kill all dired buffers and all buffers that contain a file and are unmodified.
+It is not uncommon to have dozens of buffers open that are unrelated to the current task
+and this is a convenience function for closing many buffers that do not need to
+be open.
+\end{doc-string}
 
 \vspace{1em}
 \noindent
@@ -6897,6 +8302,42 @@ buffer when it is finished with it.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-de-star }}
+\usebox{\funcname}
+\index{shu-de-star} \hfill [Command]\\%
+ (Alias: de-star)
+
+\begin{doc-string}
+Remove leading spaces and asterisk from each line in the region.  This is
+useful for editing doxygen comments of the form:
+
+   /*!
+\small{\begin{verbatim}
+    * This is some commentary.
+    * This is more commentary, etc.
+    \emph{*/}
+\end{verbatim}}
+
+You snip out the middle lines and put them into a text file for formatting and
+spell-checking.  You want to get rid of all of the asterisks until you are
+done.
+
+This function gets rid of all the asterisks.  You can use \emph{shu-add-prefix} to
+put them back.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-dired-mode-name }}
+\usebox{\funcname}
+\index{shu-dired-mode-name} \hfill [Constant]
+
+\begin{doc-string}
+The name of the mode for a dired buffer
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-disabled-quit }}
 \usebox{\funcname}
 \index{shu-disabled-quit} \hfill [Command]
@@ -6927,6 +8368,20 @@ Insert a duplicate of the current line, following it.
 \begin{doc-string}
 Go to end of buffer without setting mark.  Like end-of-buffer
 but does not set mark - just goes there.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-erase-region }}
+\usebox{\funcname}\emph{start} \emph{end}
+\index{shu-erase-region} \hfill [Function]
+
+\begin{doc-string}
+Replace everything in the region between \emph{start} and \emph{end} with blanks.  This is
+exactly like delete-region except that the deleted text is replaced with spaces.
+As with delete-region, the end point is not included in the delete.  It erases
+everything up but not including the end point.  The order of \emph{start} and \emph{end} does
+not matter.
 \end{doc-string}
 
 \vspace{1em}
@@ -7041,6 +8496,17 @@ While in a file buffer, put the name of the current file into the kill ring.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-add-file }}
+\usebox{\funcname}\emph{filename}
+\index{shu-git-add-file} \hfill [Function]
+
+\begin{doc-string}
+Do a ``git add'' for \emph{filename}.  Return empty string if add succeeds.  Otherwise,
+return git error message.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-git-diff-commits }}
 \usebox{\funcname}\emph{commit-range}
 \index{shu-git-diff-commits} \hfill [Command]\\%
@@ -7063,6 +8529,17 @@ is put into the kill ring:
 \small{\begin{verbatim}
     ``git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 ``
 \end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-find-branch }}
+\usebox{\funcname}
+\index{shu-git-find-branch} \hfill [Command]\\%
+ (Alias: git-branch)
+
+\begin{doc-string}
+Return the name of the current branch in a git repository.
 \end{doc-string}
 
 \vspace{1em}
@@ -7149,6 +8626,22 @@ case-fold-search.  The user should set it before calling this function.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-loosen-lisp }}
+\usebox{\funcname}
+\index{shu-loosen-lisp} \hfill [Command]\\%
+ (Alias: loosen-lisp)
+
+\begin{doc-string}
+Within the bounds of a lisp function, unwind the parentheses that terminate
+conditional and containing functions such that it is convenient to insert code
+inside of them without having to worry about which line contains the closing
+parenthesis.  All closing parentheses are now on separate lines.  Once the
+changes to the function are complete, you can run \emph{shu-tighten-lisp} to put the
+parentheses back where they belong.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-misc-set-alias }}
 \usebox{\funcname}
 \index{shu-misc-set-alias} \hfill [Function]
@@ -7157,6 +8650,24 @@ case-fold-search.  The user should set it before calling this function.
 Set the common alias names for the functions in shu-misc.
 These are generally the same as the function names with the leading
 shu- prefix removed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-modified-buffers }}
+\usebox{\funcname}
+\index{shu-modified-buffers} \hfill [Command]\\%
+ (Alias: modified-buffers)
+
+\begin{doc-string}
+Show a list of all buffers associated with files whose status is modified.
+It is not uncommon to have many emacs windows open and to realize that one
+window has a file open and another window is also trying to edit it.  emacs
+warns the second window of the conflict, but it is sometimes difficult to tell
+which window holds the modified buffer.  The buffer list shows you all of the
+buffers with an asterisk next to each modified buffer, but if the buffer list
+is large, it can be difficult to find the one you seek.  This command lists
+only modified buffers that hold the contents of a file.
 \end{doc-string}
 
 \vspace{1em}
@@ -7208,9 +8719,9 @@ name.
 
 \vspace{1em}
 \noindent
-\savebox{\funcname}{\noindent\texttt{shu-new-lisp--while }}
+\savebox{\funcname}{\noindent\texttt{shu-new-lisp-while }}
 \usebox{\funcname}\emph{var-name}
-\index{shu-new-lisp--while} \hfill [Command]\\%
+\index{shu-new-lisp-while} \hfill [Command]\\%
  (Alias: new-lisp-while)
 
 \begin{doc-string}
@@ -7406,6 +8917,19 @@ and the cdr of the cons cell are nil.
 
 For example, ``99+2'' has start 99 and end 101.  ``99-2'' has start 99 and end 97.
 ``99.103'' has start 99, end 103.  ``98'' has start 98 and end is nil.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-tighten-lisp }}
+\usebox{\funcname}
+\index{shu-tighten-lisp} \hfill [Command]\\%
+ (Alias: tighten-lisp)
+
+\begin{doc-string}
+Within the bounds of a lisp function or macro, ``tighten'' some lisp code.
+Look for any single right parenthesis that is on its own line and move it up to
+the end of the previous line.  This function is the opposite of \emph{shu-loosen-lisp}
 \end{doc-string}
 
 \vspace{1em}

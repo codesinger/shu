@@ -990,7 +990,7 @@ if the given HASH is not a valid git revision."
 ;;
 (defun shu-git-add-file (filename)
   "Do a \"git add\" for FILENAME.  Return empty string if add succeeds.  Otherwise,
-return git error nmessage."
+return git error message."
   (let ((result))
     (with-temp-buffer
       (call-process "git" nil (current-buffer) nil "add" filename)
@@ -1237,7 +1237,7 @@ be open."
 ;;
 (defun shu-erase-region (start end)
   "Replace everything in the region between START and END with blanks.  This is
-exactly like delete-region except that the deleted text is replacd with blanks.
+exactly like delete-region except that the deleted text is replaced with spaces.
 As with delete-region, the end point is not included in the delete.  It erases
 everything up but not including the end point.  The order of START and END does
 not matter."

@@ -2,7 +2,7 @@
 ;;
 ;; Copyright (C) 2019 Stewart L. Palmer
 ;;
-;; Package: shu-cpp-match
+;; Package: shu-match
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; Functions that use functions in shu-cpp-match.el
+;; Functions that use functions in shu-match.el
 
 
 ;;; Code:
