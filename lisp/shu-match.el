@@ -106,7 +106,7 @@ that holds a match and put it into the buffer \"**shu-vars**\","
   "Set the common alias names for the functions in shu-match,
 These are generally the same as the function names with the leading
 shu- prefix removed."
-  (defalias 'find-variables 'shu-match-find-variables)
+  (defalias 'find-all-variables 'shu-match-find-variables)
   )
 
 

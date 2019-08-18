@@ -137,6 +137,7 @@
 (shu-misc-set-alias)
 (shu-cpp-misc-set-alias)
 (shu-keyring-set-alias)
+(shu-match-set-alias)
 
 (defalias 'sc 'shu-shift-region-of-text)
 (defalias 'sli 'shu-shift-line)
