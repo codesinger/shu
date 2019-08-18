@@ -26,7 +26,6 @@
 
 
 
-
 * [Overview](#Overview)
 * [shu-base](#shu-base)
 * [shu-bde-cpp](#shu-bde-cpp)
@@ -47,6 +46,7 @@
 
 
 
+
 # Overview #
 
 
@@ -63,7 +63,8 @@ Version 1.3 was merged with the master branch on 12 January 2019.
 
 Version 1.4.0 was merged with the master branch on 2 February 2019.
 
-This is Version 1.4.30 of the Shu elisp repository,
+This is Version 1.5.0 of the Shu elisp repository, which was merged
+with the master branch on 18 August 2019.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -7553,6 +7554,8 @@ within type.
 
 Associate a number with each type of variable
 
+
+# Index #
 
 * [acgen](#acgen)
 * [add-prefix](#add-prefix)
