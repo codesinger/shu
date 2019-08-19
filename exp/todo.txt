@@ -331,3 +331,25 @@ namespaces.
 
     Consider putting this new alist into a hash table since you will be searching it
     for each unquoted token in the file.
+
+
+
+
+==================================
+
+18 August 2019
+
+More things to add to shu-cpp-match:
+
+ 1. The ability to invoke an arbitrary function.
+
+    For example, when scanning a type backwards, one might encounter ">", which
+    is the end of some number of template arguments.  You need some way to
+    inhale everything between the ">" and its matching "<".  Then you find the
+    location of the first thing following the "<" and the last thing following
+    the ">" and you get that string out of the buffer.  Now you have one string
+    that represents the entire set of template parameters.
+
+    Perhaps instead of an arbitrary function, you have an op code that
+    says gather up everything between the matching whatevers ("{" and "}", or "<"
+    and ">" or "(" and ")".

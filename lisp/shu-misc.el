@@ -808,7 +808,7 @@ hexadecimal number.  Returns the count of the number of commits found."
 
 
 ;;
-;;  shu-fix-tmeimes
+;;  shu-fix-times
 ;;
 (defun shu-fix-times ()
   "Go through a buffer that contains timestamps of the form
@@ -1101,6 +1101,50 @@ at point and continues to the end of the buffer."
 
 
 
+;;
+;;  shu-buffer-number-lines
+;;
+(defun shu-buffer-number-lines ()
+  "Create a buffer whose name is derived from the file name of the current
+buffer but with the string \"-numbered\" added to the name.  Thus \"foo.cpp\"
+would become \"foo-numbered.cpp\" Into this new buffer, copy the contents of the
+current file with each line prefixed with its line number.  This is designed for
+those times when you want to copy snippets of code with the lne number in front
+of each line because you are commenting on code and want the person receiving
+the comments to sea the line number in front of each line."
+  (interactive)
+  (let ((line-diff 0)
+        (bf (buffer-file-name))
+        (fn)
+        (fx)
+        (bn)
+        (buf)
+        (count)
+        (eline)
+        (line)
+        (lno))
+    (if (not bf)
+        (progn
+          (ding)
+          (message "%s" "Buffer has no file name"))
+      (setq fn (file-name-nondirectory (file-name-sans-extension bf)))
+      (setq fx (file-name-extension bf))
+      (setq bn (concat fn "-numbered.." fx))
+      (setq buf (get-buffer-create bn))
+      (setq count 0)
+      (save-excursion
+        (setq eline (shu-the-line-at (point-max)))
+        (goto-char (point-min))
+        (while (and (<= (shu-current-line) eline) (= line-diff 0))
+          (setq count (1+ count))
+          (setq lno (shu-format-num count 4))
+          (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+          (setq line-diff (forward-line 1))
+          (princ (concat lno ". " line "\n") buf))))
+    ))
+
+
+
 
 ;;
 ;;  shu-add-prefix
@@ -1109,12 +1153,12 @@ at point and continues to the end of the buffer."
   "Put a prefix and a space in front of each line in the region.  Prompt is issued
 for the prefix."
   (interactive "sPrefix? ")
-    (setq prefix (concat (shu-trim-trailing prefix) " "))
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward "\n" nil t)
-        (replace-match (concat "\n" prefix)))
-      ))
+  (setq prefix (concat (shu-trim-trailing prefix) " "))
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "\n" nil t)
+      (replace-match (concat "\n" prefix)))
+    ))
 
 
 
@@ -1139,7 +1183,7 @@ This function gets rid of all the asterisks.  You can use SHU-ADD-PREFIX to
 put them back."
   (interactive)
   (let ((ss-blank "^\\s-*\\* ")
-    (ss-not "^\\s-*\\*"))
+        (ss-not "^\\s-*\\*"))
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward ss-blank nil t)
@@ -1293,6 +1337,7 @@ shu- prefix removed."
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
   (defalias 'number-lines 'shu-number-lines)
+  (defalias 'buffer-number-lines 'shu-buffer-number-lines)
   (defalias 'add-prefix 'shu-add-prefix)
   (defalias 'de-star 'shu-de-star)
   (defalias 'modified-buffers 'shu-modified-buffers)

@@ -276,7 +276,7 @@ template parameter \"int\"")
    (cons "while" 0)
    (cons "xor" 0)
    (cons "xor_eq" 0))
-   "alist of C++ key words up to approximately C++17")
+  "alist of C++ key words up to approximately C++17")
 
 
 ;;
@@ -348,7 +348,7 @@ template parameter \"int\"")
     (setq ext-info (cdr info))
     (setq point-pair (cdr ext-info))
     (car point-pair)
-  ))
+    ))
 
 
 ;;
@@ -363,7 +363,7 @@ template parameter \"int\"")
     (setq ext-info (cdr info))
     (setq point-pair (cdr ext-info))
     (cdr point-pair)
-  ))
+    ))
 
 
 ;;
@@ -408,10 +408,7 @@ and you will scan through the list without seeing any comments."
         (setq token-info (car tlist))
         (setq in-comment (shu-cpp-token-is-comment token-info))
         (when in-comment
-          (setq tlist (cdr tlist))
-          )
-        )
-      )
+          (setq tlist (cdr tlist)))))
     tlist
     ))
 
@@ -440,19 +437,15 @@ becomes
        (setq tlist (shu-cpp-token-first-non-comment tlist)))
 
 and you will scan through the list without seeing any comments."
-  (let (
-        (token-info)
-        (in-comment)
-        )
+  (let ((token-info)
+        (in-comment))
     (when tlist
       (setq token-info (car tlist))
       (setq in-comment (shu-cpp-token-is-comment token-info))
       (while (and in-comment tlist)
         (setq tlist (cdr tlist))
         (setq token-info (car tlist))
-        (setq in-comment (shu-cpp-token-is-comment token-info))
-        )
-      )
+        (setq in-comment (shu-cpp-token-is-comment token-info))))
     tlist
     ))
 
@@ -750,8 +743,7 @@ first token that is beyond the point specified by LIMIT, we stop the scan."
                   (setq error-token-info token-info)
                   (setq done t))))
             (when (>= (point) end)
-              (setq done t))
-            ))))
+              (setq done t))))))
     (setq ret-val (cons error-token-info token-list))
     ret-val
     ))
