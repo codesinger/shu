@@ -869,11 +869,8 @@ line.  If it starts with /*, skip to terminating */.  If there is no terminating
               (setq token (buffer-substring-no-properties spoint (point)))
               (setq epoint (point)))
           (setq error-message "Comment started by /* is unterminated")
-          (setq epoint (point))
-          )
-        )
-      (setq token-info (shu-cpp-make-token-info token token-type spoint (1- epoint) error-message))
-      )
+          (setq epoint (point))))
+      (setq token-info (shu-cpp-make-token-info token token-type spoint (1- epoint) error-message)))
     token-info
     ))
 
@@ -1030,8 +1027,7 @@ If imbalance is present, print error message and return nil.  Typically OPEN-CHA
 might be a left parenthesis and CLOSE-CHAR might be a right parenthesis.  Or they
 might be \"<\" and \">\", or any other pair types.  Note that this function
 returns t if there are no occurrences of OPEN-CHAR and CLOSE-CHAR"
-  (let (
-        (tlist)
+  (let ((tlist)
         (token-info)
         (token)
         (token-type)
@@ -1041,8 +1037,7 @@ returns t if there are no occurrences of OPEN-CHAR and CLOSE-CHAR"
         (epoint1)
         (balanced t)
         (error-message)
-        (plevel 0)
-        )
+        (plevel 0))
     (setq tlist token-list)
     (setq token-info (car tlist))
     (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
@@ -1126,9 +1121,7 @@ the variable name."
         (setq plevel (1+ plevel))
         (when (eq plevel 1)
           (setq adjusted-epoint epoint)
-          (setq prior-to-close-tlist prior-tlist)
-          )
-        )
+          (setq prior-to-close-tlist prior-tlist)))
       (when (and (= token-type shu-cpp-token-type-op)
                  (string= token "<"))
         (setq plevel (1- plevel))
@@ -1200,8 +1193,7 @@ one new token of type SHU-CPP-TOKEN-TYPE-TP whose token value is \"int, double\"
   "Compare the two lists of TOKEN-INFO skipping comments and stopping at the end
 of the shortest one.  The purpose of this function is to determine if two bits
 of reverse parsed code have the same suffix."
-  (let(
-       (tlist1 token-list1)
+  (let((tlist1 token-list1)
        (tlist2 token-list2)
        (token-info1)
        (token-info2)
@@ -1218,8 +1210,7 @@ of reverse parsed code have the same suffix."
        (continue t)
        (continue1)
        (continue2)
-       (same t)
-       )
+       (same t))
     (while continue
       (setq token-info1 (car tlist1))
       (setq token-info2 (car tlist2))
@@ -1262,8 +1253,7 @@ of reverse parsed code have the same suffix."
           (when (and tlist1 tlist2)
             (setq tlist2 (cdr tlist2))))
         (when (or (not tlist1) (not tlist2))
-          (setq continue nil)))
-      )
+          (setq continue nil))))
     same
     ))
 
@@ -1292,10 +1282,8 @@ of reverse parsed code have the same suffix."
 ;;  shu-cpp-tokenize-show-list-buffer
 ;;
 (defun shu-cpp-tokenize-show-list-buffer (token-list gb &optional title)
-  (let (
-        (tlist token-list)
-        (token-info)
-        )
+  (let ((tlist token-list)
+        (token-info))
     (when title
       (princ (concat title "\n") gb))
     (while tlist
@@ -1311,9 +1299,8 @@ of reverse parsed code have the same suffix."
 (defun shu-cpp-token-show-token-info (token-info &optional title)
   "Show the data returned by one of the functions in this file that scans for tokens."
   (let
-      (
-       (gb      (get-buffer-create shu-unit-test-buffer))
-       )
+      ((gb      (get-buffer-create shu-unit-test-buffer)))
+    (shu-cpp-token-show-token-info-buffer token-info gb title)
     ))
 
 
