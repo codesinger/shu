@@ -1833,4 +1833,400 @@
 ))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defconst shu-match-inverse-op
+  [0                       ;;   0  NUL (null)
+   0                       ;;   1  SOH (start of heading)
+   0                       ;;   2  STX (start of text)
+   0                       ;;   3  ETX (end of text)
+   0                       ;;   4  EOT (end of transmission)
+   0                       ;;   5  ENQ (enquiry)
+   0                       ;;   6  ACK (acknowledge)
+   0                       ;;   7  BEL (bell)
+   0                       ;;   8  BS  (backspace)
+   0                       ;;   9  TAB (horizontal tab)
+   0                       ;;  10  LF  (NL line feed  new line)
+   0                       ;;  11  VT  (vertical tab)
+   0                       ;;  12  FF  (NP form feed  new page)
+   0                       ;;  13  CR  (carriage return)
+   0                       ;;  14  SO  (shift out)
+   0                       ;;  15  SI  (shift in)
+   0                       ;;  16  DLE (data link escape)
+   0                       ;;  17  DC1 (device control 1)
+   0                       ;;  18  DC2 (device control 2)
+   0                       ;;  19  DC3 (device control 3)
+   0                       ;;  20  DC4 (device control 4)
+   0                       ;;  21  NAK (negative acknowledge)
+   0                       ;;  22  SYN (synchronous idle)
+   0                       ;;  23  ETB (end of trans. block)
+   0                       ;;  24  CAN (cancel)
+   0                       ;;  25  EM  (end of medium)
+   0                       ;;  26  SUB (substitute)
+   0                       ;;  27  ESC (escape)
+   0                       ;;  28  FS  (file separator)
+   0                       ;;  29  GS  (group separator)
+   0                       ;;  30  RS  (record separator)
+   0                       ;;  31  US  (unit separator)
+   0                       ;;  32  SPACE
+   0                       ;;  33  !
+   0                       ;;  34  "
+   0                       ;;  35  #
+   0                       ;;  36  $
+   0                       ;;  37  %
+   0                       ;;  38  &
+   0                       ;;  39  '
+   ?\)                     ;;  40  (
+   ?\(                     ;;  41  )
+   0                       ;;  42  *
+   0                       ;;  43  +
+   0                       ;;  44
+   0                       ;;  45  -
+   0                       ;;  46  .
+   0                       ;;  47  /
+   0                       ;;  48  0
+   0                       ;;  49  1
+   0                       ;;  50  2
+   0                       ;;  51  3
+   0                       ;;  52  4
+   0                       ;;  53  5
+   0                       ;;  54  6
+   0                       ;;  55  7
+   0                       ;;  56  8
+   0                       ;;  57  9
+   0                       ;;  58  :
+   0                       ;;  59  ;
+   ?>                      ;;  60  <
+   0                       ;;  61  =
+   ?<                      ;;  62  >
+   0                       ;;  63  ?
+   0                       ;;  64  @
+   0                       ;;  65  A
+   0                       ;;  66  B
+   0                       ;;  67  C
+   0                       ;;  68  D
+   0                       ;;  69  E
+   0                       ;;  70  F
+   0                       ;;  71  G
+   0                       ;;  72  H
+   0                       ;;  73  I
+   0                       ;;  74  J
+   0                       ;;  75  K
+   0                       ;;  76  L
+   0                       ;;  77  M
+   0                       ;;  78  N
+   0                       ;;  79  O
+   0                       ;;  80  P
+   0                       ;;  81  Q
+   0                       ;;  82  R
+   0                       ;;  83  S
+   0                       ;;  84  T
+   0                       ;;  85  U
+   0                       ;;  86  V
+   0                       ;;  87  W
+   0                       ;;  88  X
+   0                       ;;  89  Y
+   0                       ;;  90  Z
+   ?\]                     ;;  91  [
+   0                       ;;  92  (back slash)
+   ?\[                     ;;  93  ]
+   0                       ;;  94  ^
+   0                       ;;  95  _
+   0                       ;;  96  `
+   0                       ;;  97  a
+   0                       ;;  98  b
+   0                       ;;  99  c
+   0                       ;; 100  d
+   0                       ;; 101  e
+   0                       ;; 102  f
+   0                       ;; 103  g
+   0                       ;; 104  h
+   0                       ;; 105  i
+   0                       ;; 106  j
+   0                       ;; 107  k
+   0                       ;; 108  l
+   0                       ;; 109  m
+   0                       ;; 110  n
+   0                       ;; 111  o
+   0                       ;; 112  p
+   0                       ;; 113  q
+   0                       ;; 114  r
+   0                       ;; 115  s
+   0                       ;; 116  t
+   0                       ;; 117  u
+   0                       ;; 118  v
+   0                       ;; 119  w
+   0                       ;; 120  x
+   0                       ;; 121  y
+   0                       ;; 122  z
+   ?}                      ;; 123  {
+   0                       ;; 124  |
+   ?{                      ;; 125  }
+   0                       ;; 126  ~
+   0                       ;; 127  DEL
+   0                       ;; 128
+   0                       ;; 129
+   0                       ;; 130
+   0                       ;; 131
+   0                       ;; 132
+   0                       ;; 133
+   0                       ;; 134
+   0                       ;; 135
+   0                       ;; 136
+   0                       ;; 137
+   0                       ;; 138
+   0                       ;; 139
+   0                       ;; 140
+   0                       ;; 141
+   0                       ;; 142
+   0                       ;; 143
+   0                       ;; 144
+   0                       ;; 145
+   0                       ;; 146
+   0                       ;; 147
+   0                       ;; 148
+   0                       ;; 149
+   0                       ;; 150
+   0                       ;; 151
+   0                       ;; 152
+   0                       ;; 153
+   0                       ;; 154
+   0                       ;; 155
+   0                       ;; 156
+   0                       ;; 157
+   0                       ;; 158
+   0                       ;; 159
+   0                       ;; 160
+   0                       ;; 161
+   0                       ;; 162
+   0                       ;; 163
+   0                       ;; 164
+   0                       ;; 165
+   0                       ;; 166
+   0                       ;; 167
+   0                       ;; 168
+   0                       ;; 169
+   0                       ;; 170
+   0                       ;; 171
+   0                       ;; 172
+   0                       ;; 173
+   0                       ;; 174
+   0                       ;; 175
+   0                       ;; 176
+   0                       ;; 177
+   0                       ;; 178
+   0                       ;; 179
+   0                       ;; 180
+   0                       ;; 181
+   0                       ;; 182
+   0                       ;; 183
+   0                       ;; 184
+   0                       ;; 185
+   0                       ;; 186
+   0                       ;; 187
+   0                       ;; 188
+   0                       ;; 189
+   0                       ;; 190
+   0                       ;; 191
+   0                       ;; 192
+   0                       ;; 193
+   0                       ;; 194
+   0                       ;; 195
+   0                       ;; 196
+   0                       ;; 197
+   0                       ;; 198
+   0                       ;; 199
+   0                       ;; 200
+   0                       ;; 201
+   0                       ;; 202
+   0                       ;; 203
+   0                       ;; 204
+   0                       ;; 205
+   0                       ;; 206
+   0                       ;; 207
+   0                       ;; 208
+   0                       ;; 209
+   0                       ;; 210
+   0                       ;; 211
+   0                       ;; 212
+   0                       ;; 213
+   0                       ;; 214
+   0                       ;; 215
+   0                       ;; 216
+   0                       ;; 217
+   0                       ;; 218
+   0                       ;; 219
+   0                       ;; 220
+   0                       ;; 221
+   0                       ;; 222
+   0                       ;; 223
+   0                       ;; 224
+   0                       ;; 225
+   0                       ;; 226
+   0                       ;; 227
+   0                       ;; 228
+   0                       ;; 229
+   0                       ;; 230
+   0                       ;; 231
+   0                       ;; 232
+   0                       ;; 233
+   0                       ;; 234
+   0                       ;; 235
+   0                       ;; 236
+   0                       ;; 237
+   0                       ;; 238
+   0                       ;; 239
+   0                       ;; 240
+   0                       ;; 241
+   0                       ;; 242
+   0                       ;; 243
+   0                       ;; 244
+   0                       ;; 245
+   0                       ;; 246
+   0                       ;; 247
+   0                       ;; 248
+   0                       ;; 249
+   0                       ;; 250
+   0                       ;; 251
+   0                       ;; 252
+   0                       ;; 253
+   0                       ;; 254
+   0]                      ;; 255
+  "A vector of length 256 that can be indexed by a character value.  If the character is
+an opening or closing delimeter, the value found at the index is the inverse delimeter.
+e.g., If the character '{', then (aref shu-match-inverse-op char) yields '}'.  If the
+character is '>', then (aref shu-match-inverse-op char) yields '<'.")
+
+;;; NB: Use aref to extract the first character from a token-value as an integer.
+
+
+
+;;
+;;  shu-test-shu-match-inverse-op
+;;
+(ert-deftest shu-test-shu-match-inverse-op ()
+  (let (
+        (tless ?<)
+        (tgreater ?>)
+        (tlparen ?\()
+        (trparen ?\))
+        (tlbrace ?{)
+        (trbrace ?})
+        (tlbrack ?\[)
+        (trbrack ?\])
+        (x)
+        )
+
+    (setq x (aref shu-match-inverse-op tless))
+    (should (= x tgreater))
+    (setq x (aref shu-match-inverse-op tgreater))
+    (should (= x tless))
+    (setq x (aref shu-match-inverse-op tlparen))
+    (should (= x trparen))
+    (setq x (aref shu-match-inverse-op trparen))
+    (should (= x tlparen))
+    (setq x (aref shu-match-inverse-op tlbrace))
+    (should (= x trbrace))
+    (setq x (aref shu-match-inverse-op trbrace))
+    (should (= x tlbrace))
+    (setq x (aref shu-match-inverse-op trbrace))
+    (should (= x tlbrace))
+    (setq x (aref shu-match-inverse-op trbrack))
+    (should (= x tlbrack))
+    (setq x (aref shu-match-inverse-op trbrack))
+    (should (= x tlbrack))
+    ))
+
+
+;;
+;;  shu-test-something
+;;
+(ert-deftest shu-test-something ()
+  (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "bsl::vector<bsl::vector<std::string> >\n"
+          ))
+        (token-list)
+        (tlist)
+        (level 0)
+        (token-info-start)
+        (token-info)
+        (token-info-end)
+        (token)
+        (token-type)
+        (spoint)
+        (epoint)
+        (error-message)
+        (sdelim)
+        (edelim)
+        (sstring)
+        (estring)
+        (looking)
+        (sp1)
+        (sp2)
+        (x)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-reverse-tokenize-region-for-command  (point-min) (point-max)))
+      (shu-cpp-tokenize-show-list token-list)
+      (setq tlist token-list)
+      (setq token-info-start (car tlist))
+      (shu-cpp-token-extract-info token-info-start token token-type spoint epoint error-message)
+      (setq sstring token)
+      (setq sdelim (aref token 0))
+      (setq edelim (aref shu-match-inverse-op sdelim))
+      (setq estring (make-string 1 edelim))
+      (princ (format "estring: \"%s\"\n" estring) gb)
+      (setq looking t)
+      (setq level 1)
+      (setq tlist (cdr tlist))
+      (while (and tlist looking)
+        (setq token-info (car tlist))
+        (shu-cpp-token-extract-info token-info token token-type spoint epoint error-message)
+        (shu-cpp-token-show-token-info token-info)
+        (princ (format "level: %d\n" level) gb)
+        (if (and
+             (= token-type shu-cpp-token-type-op)
+             (string= estring token)
+             )
+            (progn
+              (setq level (1- level))
+              (when (= level 0)
+                (setq looking nil)
+                (setq token-info-end token-info)
+                )
+              )
+          (when (and
+                 (= token-type shu-cpp-token-type-op)
+                 (string= sstring token)
+                 (setq level (1+ level))
+                 )
+            )
+          )
+        (setq tlist (cdr tlist))
+        )
+      (shu-cpp-token-show-token-info token-info-end "END")
+      (setq sp1 (shu-cpp-token-extract-spoint token-info-start))
+      (setq sp2 (shu-cpp-token-extract-spoint token-info-end))
+      (if (< sp1 sp2)
+          (progn
+            (setq spoint (1+ (shu-cpp-token-extract-epoint token-info-start)))
+            (setq epoint sp2)
+            )
+        (setq spoint (1+ (shu-cpp-token-extract-epoint token-info-end)))
+        (setq epoint sp1)
+        )
+      (princ (format "spoint: %d, epoint: %d\n" spoint epoint) gb)
+      (setq x (buffer-substring-no-properties spoint epoint))
+      (princ (format "\"%s\"\n" x) gb)
+      )
+
+
+    ))
+
+
+
 ;;; shu-cpp-mch-funs.t.el ends here
