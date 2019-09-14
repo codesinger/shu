@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; Functions that use functions in shu-match.el
+;; Functions that use functions in shu-cpp-match.el
 
 
 ;;; Code:
@@ -96,6 +96,281 @@ that holds a match and put it into the buffer \"**shu-vars**\","
       (princ (concat line-no ". " line "\n") gb)
       (setq rlist (cdr rlist)))
     ))
+
+
+
+
+(defconst shu-cpp-match-colon-name
+  (list
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             nil shu-cpp-token-type-op
+                             "::")
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                             'shu-cpp-token-match-same-rx
+                             t shu-cpp-token-type-uq
+                             (concat shu-cpp-name "+"))
+   )
+  "A repeating side list to match zero or more intances of {:: <name>}")
+
+
+
+
+;;
+;;  shu-cpp-match-namespace-forms
+;;
+;;
+;;                                  using
+;;                                    |
+;;                                    V
+;;                                namespace
+;;                                    |
+;;                                    |
+;;          +-------------------------+-------------------------+
+;;          |                         |                         |
+;;          |                         |                         |
+;;          V                         V                         V
+;;        <name>                     ::                       <name>
+;;          |                         |                         |
+;;          |                         |                         |
+;;          |                         V                         V
+;;          |                       <name>           loop of :: followed by <name>
+;;          |                         |                         |
+;;          |                         |                         |
+;;          V                         V                         V
+;;          ;                         ;                         ;
+;;
+;;
+;;
+(defconst shu-cpp-match-namespace-forms
+  (list
+   (list  ;; "<name>"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                               (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
+    )
+
+
+   (list  ;; ":: <name>"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                               "::")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                               (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
+    )
+
+
+   (list  ;; "<name> {:: <name>};"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                              (concat shu-cpp-name "+"))
+
+    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
+                                                  shu-cpp-match-colon-name)
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
+    )
+   )
+  )
+
+
+;;
+;;  shu-cpp-match-namespace-list
+;;
+(defconst shu-cpp-match-namespace-list
+  (list
+   (list  ;; "using namespace <name>;"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-kw
+                              "using")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-kw
+                              "namespace")
+    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
+                                  shu-cpp-match-namespace-forms)
+    )
+   )
+  )
+
+
+
+;;
+;;  shu-cpp-match-namespace-list-single
+;;
+(defconst shu-cpp-match-namespace-list-single
+  (list  ;; "using namespace <name>;"
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             t shu-cpp-token-type-kw
+                             "using")
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             t shu-cpp-token-type-kw
+                             "namespace")
+   (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
+                                 shu-cpp-match-namespace-forms)
+   )
+  )
+
+
+
+
+;;
+;;
+;;
+;;
+;;
+;;
+;;                                                        using
+;;                                                          |
+;;                                                          |
+;;                              +---------------------------+----------------------+
+;;                              |                                                  |
+;;                              |                                                  |
+;;                              V                                                  |
+;;                          namespace                                              |
+;;                              |                                                  |
+;;                              |                                                  |
+;;    +-------------------------+-------------------------+                        |
+;;    |                         |                         |                        |
+;;    |                         |                         |                        |
+;;    V                         V                         V                        |
+;;  <name>                     ::                       <name>                     |
+;;    |                         |                         |                        |
+;;    |                         |                         |                        |
+;;    |                         V                         V                        |
+;;    |                       <name>           loop of :: followed by <name>       |
+;;    |                         |                         |                        |
+;;    |                         |                         |                        |
+;;    V                         V                         V                        |
+;;    ;                         ;                         ;                        |
+;;                                                                                 |
+;;                                                                                 |
+;;                                                                                 |
+;;                                                                                 |
+;;                                                                                 |
+;;                                                  +------------------------------+
+;;                                                  |
+;;                                                  |
+;;                                 +----------------+---------------+
+;;                                 |                                |
+;;                                 |                                |
+;;                                 V                                V
+;;                               <name>                           <name>
+;;                                 |                                |
+;;                                 |                                |
+;;                                 |                                V
+;;                                 |                     loop of :: followed by <name>
+;;                                 |                                |
+;;                                 |                                |
+;;                                 V                                V
+;;                                 ;                                ;
+;;
+;;
+
+
+;;
+(defconst shu-cpp-match-using-forms
+  (list
+   (list  ;; "<name>"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                               (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
+    )
+
+
+   (list  ;; "<name> {:: <name>};"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                              (concat shu-cpp-name "+"))
+
+    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
+                                                  shu-cpp-match-colon-name)
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-op
+                               ";")
+    )
+   )
+  "These two lists match the form of name that can follow a \"using\" directive
+that is not a \"using namespace\" directive.  This is either <name> or
+<name>::<name>>, <name>::<name>::<name>, etc.  The first list above matches
+<name> followed by semicolon..  The second list matches <name> followed
+by a looping side list for zero or more occurrences of \"::\" followed by <name>")
+
+
+
+
+
+
+;;
+;;  shu-cpp-match-many-using-list
+;;
+(defconst shu-cpp-match-many-using-list
+  (list
+   (list  ;; "namespace <name>;"
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              t shu-cpp-token-type-kw
+                              "namespace")
+    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
+                                  shu-cpp-match-namespace-forms)
+    )
+
+   (list  ;; "using namespace <name>;"
+    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
+                                  shu-cpp-match-using-forms)
+    )
+
+   )
+  "These two lists match what may follow the key word \"using\".  The first list
+matches the key word \"namespace\" followed by any of the different name types
+that may follow \"using namespace\".  The second list matches any of the name
+forms that may following the key word \"using\" when it is not followed by the
+key word \"namespace\"." )
+
+
+
+;;
+;;  shu-cpp-match-using-list-single
+;;
+(defconst shu-cpp-match-using-list-single
+  (list  ;; "using namespace <name>;"
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             t shu-cpp-token-type-kw
+                             "using")
+   (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
+                                 shu-cpp-match-many-using-list)
+   )
+  "This is a sigle list that is the top level list for matching anything
+that may follow the key word \"using\".")
+
+
+
 
 
 
