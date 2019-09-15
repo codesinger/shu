@@ -524,6 +524,30 @@ whose cdr is the class name."
 
 
 ;;
+;;  shu-match-get-start-end-pos
+;;
+(defun shu-match-get-start-end-pos (rlist)
+  "Given an RLIST return the beginning and end positions.  The beginning position is
+the position of the first character of the first token.  The end position is the
+position of the last character of the last token.  These two are returned as a cons
+cell whose car is the beginning position and whose cdr is the end position."
+  (let ((token-info (car rlist))
+        (ptoken-info)
+        (spoint)
+        (epoint))
+    (setq spoint (shu-cpp-token-extract-spoint token-info))
+    (while rlist
+      (setq token-info (car rlist))
+      (setq rlist (cdr rlist))
+      (when (not rlist)
+        (setq epoint (shu-cpp-token-extract-epoint token-info))))
+    (cons spoint epoint)
+    ))
+
+
+
+
+;;
 ;;  shu-match-set-alias
 ;;
 (defun shu-match-set-alias ()
