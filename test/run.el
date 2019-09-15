@@ -18,9 +18,10 @@
          "shu-base.t.elc"
          "shu-capture-doc.t.elc"
          "shu-cpp-general.t.elc"
+         "shu-cpp-match.t.elc"
          "shu-cpp-project.t.elc"
          "shu-cpp-token.t.elc"
-         "shu-cpp-match.t.elc"
+         "shu-match.t.elc"
          "shu-misc.t.elc"
          "shu-nvplist.t.elc"
          "shu-xref.t.elc"))

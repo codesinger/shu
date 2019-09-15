@@ -373,6 +373,55 @@ that may follow the key word \"using\".")
 
 
 
+;;
+;;  shu-match-find-all-using-internal
+;;
+(defun shu-match-find-all-using-internal (token-list)
+  "Given a token list, return two different lists.  The first is a list of all
+\"using namespace\" statements.  The second is a list of all \"using\"
+statements that are not \"using namespace\" statements.  \"using namespace
+std;\" is an example of the first type.  \"using std::string\" is an example of
+the second type.
+The return value of this function is a single cons cell in which the cdr points
+to the first list and the car points to the second list.
+If neither list is present, then the return value is nil."
+  (let ((something t)
+        (ret-val t)
+        (tlist token-list)
+        (rlist)
+        (nn)
+        (token-info)
+        (token-type)
+        (token)
+        (uns-list)
+        (un-list))
+    (while ret-val
+      (setq ret-val (shu-cpp-search-match-tokens rlist shu-cpp-match-using-list-single tlist))
+      (when ret-val
+        (setq tlist (car ret-val))
+        (setq rlist (cdr ret-val))
+        (setq rlist (nreverse rlist))
+        (setq nn (cdr rlist))
+        (setq token-info (car nn))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (if (and
+             (eq token-type shu-cpp-token-type-kw)
+             (string= token "namespace"))
+            (push rlist uns-list)
+          (push rlist un-list))
+        (setq rlist nil)))
+    (when uns-list
+      (setq uns-list (nreverse uns-list)))
+    (when un-list
+      (setq un-list (nreverse un-list)))
+    (when (or uns-list un-list)
+      (setq ret-val (cons uns-list un-list)))
+    ret-val
+    ))
+
+
+
 
 ;;
 ;;  shu-match-set-alias

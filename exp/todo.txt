@@ -353,3 +353,28 @@ More things to add to shu-cpp-match:
     Perhaps instead of an arbitrary function, you have an op code that
     says gather up everything between the matching whatevers ("{" and "}", or "<"
     and ">" or "(" and ")".
+
+
+============================================================
+
+14 September 2019
+
+New rmv-using
+
+ 1. Find all occurrences of "using name" and "using namespacd name"
+
+ 2. Make one list of the "using namespace name" entries and a separate list of the
+    "using name" entries.
+
+    From "using namespace name":
+      1. Start and and of the statement,
+      2. The string that is the fully qualified namespace name minus the global name
+
+    From "using name"
+      1. Start and and of the statement,
+      2. The string that is the fully qualified namespace name minus the global name
+      3. The class name (e.g., "string" from "uaing std::string;"
+
+ 3. Select from the class list all of the namespace names in the list of "using
+     namespace name" stataments.  If there is a "using namespces name" statement
+     that does not have an entry in the class list, we will not be using it.

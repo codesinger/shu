@@ -43,8 +43,7 @@
 ;; shu-cpp-match-funs.el
 ;;
 (ert-deftest shu-cpp-match-funs-test-search-1 ()
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
@@ -83,12 +82,10 @@
         (ret-val)
         (token)
         (token-type)
-        (item-number 0)
-        )
+        (item-number 0))
     (with-temp-buffer
       (insert data)
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      )
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq tlist token-list)
     (shu-cpp-tokenize-show-list tlist)
 
@@ -469,8 +466,7 @@
 ;; \"using namespace\" and accumulate a list of such occurrences."
 ;;
 (ert-deftest shu-cpp-match-funs-test-search-2 ()
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
@@ -511,12 +507,10 @@
         (token-type)
         (item-number 0)
         (something t)
-        (lcount 0)
-        )
+        (lcount 0))
     (with-temp-buffer
       (insert data)
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      )
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq tlist token-list)
     (shu-cpp-tokenize-show-list tlist)
     (while something
@@ -533,17 +527,14 @@
         (should (listp rlist))
         (setq rlist (nreverse rlist))
         (push rlist rlists)
-        (setq rlist nil)
-      )
-      )
+        (setq rlist nil)))
     (setq rlists (nreverse rlists))
     (while rlists
       (setq lcount (1+ lcount))
       (princ (format "\nRLIST %d:\n" lcount) gb)
       (setq rlist (car rlists))
       (shu-cpp-tokenize-show-list rlist)
-      (setq rlists (cdr rlists))
-      )
+      (setq rlists (cdr rlists)))
 ))
 
 
@@ -559,8 +550,7 @@
 ;; \"using namespace\" and accumulate a list of such occurrences."
 ;;
 (ert-deftest shu-cpp-match-funs-test-search-3 ()
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
@@ -603,12 +593,10 @@
         (token-type)
         (item-number 0)
         (something t)
-        (lcount 0)
-        )
+        (lcount 0))
     (with-temp-buffer
       (insert data)
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      )
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq tlist token-list)
     (shu-cpp-tokenize-show-list tlist)
     (while something
@@ -625,17 +613,14 @@
         (should (listp rlist))
         (setq rlist (nreverse rlist))
         (push rlist rlists)
-        (setq rlist nil)
-      )
-      )
+        (setq rlist nil)))
     (setq rlists (nreverse rlists))
     (while rlists
       (setq lcount (1+ lcount))
       (princ (format "\nRLIST %d:\n" lcount) gb)
       (setq rlist (car rlists))
       (shu-cpp-tokenize-show-list rlist)
-      (setq rlists (cdr rlists))
-      )
+      (setq rlists (cdr rlists)))
 ))
 
 
@@ -650,8 +635,7 @@
 ;; \"using namespace\" and accumulate a list of such occurrences."
 ;;
 (ert-deftest shu-cpp-match-funs-test-search-4 ()
-  (let (
-        (gb      (get-buffer-create shu-unit-test-buffer))
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
@@ -694,12 +678,10 @@
         (token-type)
         (item-number 0)
         (something t)
-        (lcount 0)
-        )
+        (lcount 0))
     (with-temp-buffer
       (insert data)
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      )
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq tlist token-list)
     (shu-cpp-tokenize-show-list tlist)
     (while something
@@ -716,17 +698,14 @@
         (should (listp rlist))
         (setq rlist (nreverse rlist))
         (push rlist rlists)
-        (setq rlist nil)
-      )
-      )
+        (setq rlist nil)))
     (setq rlists (nreverse rlists))
     (while rlists
       (setq lcount (1+ lcount))
       (princ (format "\nRLIST %d:\n" lcount) gb)
       (setq rlist (car rlists))
       (shu-cpp-tokenize-show-list rlist)
-      (setq rlists (cdr rlists))
-      )
+      (setq rlists (cdr rlists)))
 
     (setq tlist token-list)
 
@@ -1112,6 +1091,495 @@
 ))
 
 
+
+
+
+;;
+;;  shu-test-shu-match-find-all-using-internal-1
+;;
+(ert-deftest shu-test-shu-match-find-all-using-internal-1 ()
+  "Test SHU-MATCH-FIND-ALL-USING-INTERNAL with a buffer that contains no
+C++ code at all."
+  (let ((data
+         (concat
+          "Whan that Aprille with his shoures soote\n"
+          "The droghte of Marche hath perced to the roote,\n"
+          "And bathed every veyne in swich licour,\n"
+          "Of which vertu engendred is the flour;\n"
+          "Whan Zephirus eek with his swete breeth\n"
+          "Inspired hath in every holt and heeth\n"
+          "The tendre croppes, and the yonge sonne\n"
+          "Hath in the Ram his halfe cours y-ronne,\n"
+          "And smale fowles maken melodye,\n"
+          "That slepen al the night with open ye,\n"
+          "(So priketh hem nature in hir corages:\n"
+          "Than longen folk to goon on pilgrimages,\n"
+          ))
+        (token-list)
+        (ret-val))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-match-find-all-using-internal token-list))
+    (should (not ret-val))
+    ))
+
+
+
+;;
+;;  shu-test-shu-match-find-all-using-internal-2
+;;
+(ert-deftest shu-test-shu-match-find-all-using-internal-2 ()
+  "Test SHU-MATCH-FIND-ALL-USING-INTERNAL with a buffer that contains only
+using namespace statements."
+  (let ((data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "using namespace alice;\n /* Hello */"
+          "using namespace b::c;\n"
+          "// Hello\n"
+         ))
+        (token-list)
+        (ret-val)
+        (uns-list)
+        (un-list)
+        (rlist)
+        (token-info)
+        (token)
+        (token-type))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-match-find-all-using-internal token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq uns-list (car ret-val))
+    (should uns-list)
+    (should (listp uns-list))
+    (setq un-list (cdr ret-val))
+    (should (not un-list))
+    (setq rlist (car uns-list))
+    (should rlist)
+    (should (listp rlist))
+    ;;;
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "using"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "namespace"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "alice"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+    ;;;
+    (setq uns-list (cdr uns-list))
+    (should uns-list)
+    (setq rlist (car uns-list))
+    (should rlist)
+    (should (listp rlist))
+    ;;;
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "using"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "namespace"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "b"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "c"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-match-find-all-using-internal-3
+;;
+(ert-deftest shu-test-shu-match-find-all-using-internal-3 ()
+  "Test SHU-MATCH-FIND-ALL-USING-INTERNAL with a buffer that contains only
+using statememts."
+  (let ((data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "using std::string;\n /* Hello */"
+          "using b::c;\n"
+          "// Hello\n"
+         ))
+        (token-list)
+        (ret-val)
+        (uns-list)
+        (un-list)
+        (rlist)
+        (token-info)
+        (token)
+        (token-type))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-match-find-all-using-internal token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq uns-list (car ret-val))
+    (should (not uns-list))
+    (setq un-list (cdr ret-val))
+    (should un-list)
+    (should (listp un-list))
+    (setq rlist (car un-list))
+    (should rlist)
+    (should (listp rlist))
+    ;;;
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "using"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "std"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "string"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+    ;;;
+    (setq un-list (cdr un-list))
+    (should un-list)
+    (setq rlist (car un-list))
+    (should rlist)
+    (should (listp rlist))
+    ;;;
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "using"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "b"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "c"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-match-find-all-using-internal-4
+;;
+(ert-deftest shu-test-shu-match-find-all-using-internal-4 ()
+  "Test SHU-MATCH-FIND-ALL-USING-INTERNAL with a buffer that contains only
+using namespace statements."
+  (let ((data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "using namespace alice;\n /* Hello */"
+          "using std::string;\n"
+          "using namespace b::c;\n"
+          "using d::e;\n"
+          "// Hello\n"
+         ))
+        (token-list)
+        (ret-val)
+        (uns-list)
+        (un-list)
+        (rlist)
+        (token-info)
+        (token)
+        (token-type))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-match-find-all-using-internal token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq uns-list (car ret-val))
+    (should uns-list)
+    (should (listp uns-list))
+    (setq un-list (cdr ret-val))
+    (should un-list)
+    (should (listp un-list))
+    (setq rlist (car uns-list))
+    (should rlist)
+    (should (listp rlist))
+    ;;;
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "using"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "namespace"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "alice"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+    ;;;
+    (setq uns-list (cdr uns-list))
+    (should uns-list)
+    (setq rlist (car uns-list))
+    (should rlist)
+    (should (listp rlist))
+    ;;;
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "using"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "namespace"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "b"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "c"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+
+    (setq rlist (car un-list))
+    (should rlist)
+    (should (listp rlist))
+    ;;;
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "using"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "std"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "string"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+    ;;;
+    (setq un-list (cdr un-list))
+    (should un-list)
+    (setq rlist (car un-list))
+    (should rlist)
+    (should (listp rlist))
+    ;;;
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-kw))
+    (should (string= token "using"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "d"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-uq))
+    (should (string= token "e"))
+    ;;;
+    (setq rlist (cdr rlist))
+    (should rlist)
+    (setq token-info (car rlist))
+    (should token-info)
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (eq token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+    ))
 
 
 
