@@ -422,6 +422,41 @@ If neither list is present, then the return value is nil."
 
 
 
+;;
+;;  shu-match-using-namespace-string
+;;
+(defun shu-match-using-namespace-string (rlist &optional top-name)
+  "Given an RLIST that contains a \"using namespace\" statement, return the string
+that is the fully qualified namespace name.  If the firdt part of the name is the
+optional TOP-NAME, it is omitted from the final result."
+  (let ((nlist (cddr rlist))
+        (sep-char "")
+        (name "")
+        (x 0)
+        (token-info)
+        (token-type)
+        (token))
+    (while nlist
+      (setq token-info (car nlist))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (if (and
+           (eq x 0)
+           (eq token-type shu-cpp-token-type-uq)
+           top-name
+           (stringp top-name)
+           (string= token top-name))
+          nil
+        (when (eq token-type shu-cpp-token-type-uq)
+          (setq name (concat name sep-char token))
+          (setq sep-char "::")))
+      (setq x (1+ x))
+      (setq nlist (cdr nlist)))
+    name
+    ))
+
+
+
 
 ;;
 ;;  shu-match-set-alias

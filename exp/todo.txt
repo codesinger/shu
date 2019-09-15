@@ -378,3 +378,18 @@ New rmv-using
  3. Select from the class list all of the namespace names in the list of "using
      namespace name" stataments.  If there is a "using namespces name" statement
      that does not have an entry in the class list, we will not be using it.
+
+============================================================
+
+15 September 2019
+
+Need two simple functions:
+
+ 1. Given an rlist that contains "using namespace name", return a string that is the
+    fully qualified namespace name.  If the first nae is the top level name, it has
+    been removed.
+
+ 2. Given an rlist that contains "using name", return
+    a. The string that is the fully qualified namespace name (with optional top
+    level name removed from the front)
+    b. The srting that is the class name
