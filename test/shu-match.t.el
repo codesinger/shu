@@ -1793,4 +1793,210 @@ using namespace statements."
 
 
 
+
+;;
+;;  shu-test-shu-match-using-string-1
+;;
+(ert-deftest shu-test-shu-match-using-string-1 ()
+  "Simple, one level namespace name"
+  (let ((data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "using std::string;\n /* Hello */"
+          "// Hello\n"
+          ))
+        (token-list)
+        (ret-val)
+        (un-list)
+        (rlist)
+        (ret-val)
+        (ns-name)
+        (class-name))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-match-find-all-using-internal token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq un-list (cdr ret-val))
+    (should un-list)
+    (should (listp un-list))
+    (setq rlist (car un-list))
+    (should rlist)
+    (should (listp rlist))
+    (setq ret-val (shu-match-using-string rlist))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq ns-name (car ret-val))
+    (should ns-name)
+    (should (stringp ns-name))
+    (setq class-name (cdr ret-val))
+    (should class-name)
+    (should (stringp class-name))
+    (should (string= "std" ns-name))
+    (should (string= "string" class-name))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-match-using-string-2
+;;
+(ert-deftest shu-test-shu-match-using-string-2 ()
+  "Multi level namespace name"
+  (let ((data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "using abc::std::string;\n /* Hello */"
+          "// Hello\n"
+          ))
+        (token-list)
+        (ret-val)
+        (un-list)
+        (rlist)
+        (ret-val)
+        (ns-name)
+        (class-name))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-match-find-all-using-internal token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq un-list (cdr ret-val))
+    (should un-list)
+    (should (listp un-list))
+    (setq rlist (car un-list))
+    (should rlist)
+    (should (listp rlist))
+    (setq ret-val (shu-match-using-string rlist))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq ns-name (car ret-val))
+    (should ns-name)
+    (should (stringp ns-name))
+    (setq class-name (cdr ret-val))
+    (should class-name)
+    (should (stringp class-name))
+    (should (string= "abc::std" ns-name))
+    (should (string= "string" class-name))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-match-using-string-3
+;;
+(ert-deftest shu-test-shu-match-using-string-3 ()
+  "Multi level namespace name with top name that does not match anything"
+  (let ((data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "using abc::std::string;\n /* Hello */"
+          "// Hello\n"
+          ))
+        (token-list)
+        (ret-val)
+        (un-list)
+        (rlist)
+        (ret-val)
+        (ns-name)
+        (class-name)
+        (top-name "WhammoCorp"))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-match-find-all-using-internal token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq un-list (cdr ret-val))
+    (should un-list)
+    (should (listp un-list))
+    (setq rlist (car un-list))
+    (should rlist)
+    (should (listp rlist))
+    (setq ret-val (shu-match-using-string rlist top-name))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq ns-name (car ret-val))
+    (should ns-name)
+    (should (stringp ns-name))
+    (setq class-name (cdr ret-val))
+    (should class-name)
+    (should (stringp class-name))
+    (should (string= "abc::std" ns-name))
+    (should (string= "string" class-name))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-match-using-string-4
+;;
+(ert-deftest shu-test-shu-match-using-string-4 ()
+  "Multi level namespace name with top name that matches the beginning"
+  (let ((data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "using WhammoCorp::abc::std::string;\n /* Hello */"
+          "// Hello\n"
+          ))
+        (token-list)
+        (ret-val)
+        (un-list)
+        (rlist)
+        (ret-val)
+        (ns-name)
+        (class-name)
+        (top-name "WhammoCorp"))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-match-find-all-using-internal token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq un-list (cdr ret-val))
+    (should un-list)
+    (should (listp un-list))
+    (setq rlist (car un-list))
+    (should rlist)
+    (should (listp rlist))
+    (setq ret-val (shu-match-using-string rlist top-name))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq ns-name (car ret-val))
+    (should ns-name)
+    (should (stringp ns-name))
+    (setq class-name (cdr ret-val))
+    (should class-name)
+    (should (stringp class-name))
+    (should (string= "abc::std" ns-name))
+    (should (string= "string" class-name))
+    ))
+
+
+
 ;;; shu-match.t.el ends here

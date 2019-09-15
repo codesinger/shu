@@ -427,7 +427,7 @@ If neither list is present, then the return value is nil."
 ;;
 (defun shu-match-using-namespace-string (rlist &optional top-name)
   "Given an RLIST that contains a \"using namespace\" statement, return the string
-that is the fully qualified namespace name.  If the firdt part of the name is the
+that is the fully qualified namespace name.  If the first part of the name is the
 optional TOP-NAME, it is omitted from the final result."
   (let ((nlist (cddr rlist))
         (sep-char "")
@@ -453,6 +453,71 @@ optional TOP-NAME, it is omitted from the final result."
       (setq x (1+ x))
       (setq nlist (cdr nlist)))
     name
+    ))
+
+
+
+
+;;
+;;  shu-match-using-string
+;;
+(defun shu-match-using-string (rlist &optional top-name)
+  "Given an RLIST that contains a \"using\" statement (as opposed to \"using
+namespace\"), return two strings.  One is the class name.  The other is the
+fully qualified namespace name.  For example, if the statement is \"using
+std::string,\" the fully qualified namespace name is \"std\" and the class name
+is \"string\".
+The two strings are returned in a cons cell whose car is the namespace name and
+whose cdr is the class name."
+  (let ((nlist (cdr rlist))
+        (rlist)
+        (sep-char "")
+        (name "")
+        (x 0)
+        (count 0)
+        (cx 0)
+        (token-info)
+        (token-type)
+        (token)
+        (ptoken)
+        (class-name))
+    (setq rlist nlist)
+    (setq count 0)
+    ;;; Find the class name on the end
+    (while rlist
+      (setq token-info (car rlist))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (when (and
+           (eq token-type shu-cpp-token-type-op)
+           (string= token ";"))
+        (setq cx (1- count))
+        (setq class-name ptoken))
+      (setq ptoken token)
+      (setq count (1+ count))
+      (setq rlist (cdr rlist)))
+    ;;; Find the namespace name
+    (setq count 0)
+    (setq rlist nlist)
+    (while (< count cx)
+      (setq token-info (car rlist))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (if (and
+           (eq x 0)
+           (eq token-type shu-cpp-token-type-uq)
+           top-name
+           (stringp top-name)
+           (string= token top-name))
+          nil
+        (when (eq token-type shu-cpp-token-type-uq)
+          (setq name (concat name sep-char token))
+          (setq sep-char "::")))
+      (setq x (1+ x))
+      (setq rlist (cdr rlist))
+      (setq count (1+ count))
+      (setq x (1+ x)))
+    (cons name class-name)
     ))
 
 
