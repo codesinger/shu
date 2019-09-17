@@ -527,11 +527,41 @@
 
 
 ;;
-;;  shu-test-shu-make-md-index-name
+;;  shu-test-shu-make-md-index-name-1
 ;;
-(ert-deftest shu-test-shu-make-md-index-name ()
+(ert-deftest shu-test-shu-make-md-index-name-1 ()
   (let ((name "This is an Overviwew")
         (expected "thisisanoverviwew")
+        (actual))
+    (setq actual (shu-make-md-index-name name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-md-index-name-2
+;;
+(ert-deftest shu-test-shu-make-md-index-name-2 ()
+  (let ((name "This is an Overviwew (Round 2)")
+        (expected "thisisanoverviwewround2")
+        (actual))
+    (setq actual (shu-make-md-index-name name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-md-index-name-3
+;;
+(ert-deftest shu-test-shu-make-md-index-name-3 ()
+  (let ((name "This is an Overviwew `Mumble`")
+        (expected "thisisanoverviwewmumble")
         (actual))
     (setq actual (shu-make-md-index-name name))
     (should actual)

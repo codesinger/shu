@@ -1371,11 +1371,15 @@ The returned string would be
 
      thisisanoverview"
   (let ((section-name (shu-make-md-section-name name))
-        (index-name))
+        (index-name)
+        (no-index-chars "[()`]"))
     (with-temp-buffer
       (insert section-name)
       (goto-char (point-min))
       (while (re-search-forward shu-all-whitespace-regexp nil t)
+        (replace-match ""))
+      (goto-char (point-min))
+      (while (re-search-forward no-index-chars nil t)
         (replace-match ""))
       (downcase-region (point-min) (point-max))
       (setq index-name (buffer-substring-no-properties (point-min) (point-max))))
