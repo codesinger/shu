@@ -511,4 +511,33 @@
 
 
 
+;;
+;;  shu-test-shu-make-md-section-name
+;;
+(ert-deftest shu-test-shu-make-md-section-name ()
+  (let ((name "## This is an Overviwew ##")
+        (expected "This is an Overviwew")
+        (actual))
+    (setq actual (shu-make-md-section-name name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-md-index-name
+;;
+(ert-deftest shu-test-shu-make-md-index-name ()
+  (let ((name "This is an Overviwew")
+        (expected "thisisanoverviwew")
+        (actual))
+    (setq actual (shu-make-md-index-name name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
 ;;; shu-misc.t.el ends here

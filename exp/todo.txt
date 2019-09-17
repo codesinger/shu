@@ -393,3 +393,26 @@ Need two simple functions:
     a. The string that is the fully qualified namespace name (with optional top
     level name removed from the front)
     b. The srting that is the class name
+
+DONE THE ABOVE
+
+============================
+
+Next steps
+
+ 1. Invoke shu-match-find-all-using-internal
+    This returns two lists
+    a. All instances of "using namespace name"
+    b. All instances of "using name"
+
+ 2. Go through all "using namespace name".  For each one:
+    a. Call shu-match-using-namespace-string to find the namespace name
+    b. Look up the namespace in the class list
+       If found, then
+       1. Add the rlist to a list of rlists that will be processed
+          proc-rlists
+       2. Add the class list entry to a list of class list entries that will be
+          processed. - proc-classes
+       If not found, then
+       1. Add the rlist to a list of rlists that will not be processed
+          np-rlists

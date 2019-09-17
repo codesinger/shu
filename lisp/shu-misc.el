@@ -1317,24 +1317,92 @@ of contents entry created and inserted at point will be
   (interactive)
   (let ((section-name (current-kill 0))
         (index-name)
-        (debug-on-error t))
+        (toc-name))
+    (setq toc-name (shu-make-md-section-name section-name))
+    (setq index-name (shu-make-md-index-name toc-name))
+    (insert
+     (concat
+      " * [" toc-name "]"
+      "(#" index-name ")"))
+    ))
+
+
+
+
+;;
+;;  shu-make-md-name-entry
+;;
+(defun shu-make-md-name-entry ()
+  "The latest item in the kill ring is assumed to be the text of a markdown
+section name.  This function creates from that section name, a markdown table of
+contents name that will identify the section in the table of contents.
+
+For example, if the kill ring contains \"## This is the Overview\", the table
+of contents name created and inserted at point will be:
+
+        <a name=thisistheoverview></a>"
+  (interactive)
+  (let ((section-name (current-kill 0))
+        (index-name)
+        (toc-name))
+    (setq toc-name (shu-make-md-section-name section-name))
+    (setq index-name (shu-make-md-index-name toc-name))
+    (insert
+     (concat
+      " <a name="
+      index-name "></a>"))
+    ))
+
+
+
+;;
+;;  shu-make-md-index-name
+;;
+(defun shu-make-md-index-name (name)
+  "The inout is a string that is assumed to be a markdown seaction heading from
+a markdown table of contents.
+The return value is an all lower case string with any whitespace characters
+removed.
+For example, if the input string is
+
+     This is an Overview
+
+The returned string would be
+
+     thisisanoverview"
+  (let ((section-name (shu-make-md-section-name name)))
     (with-temp-buffer
       (insert section-name)
-      (goto-char (point-min))
-      (while (search-forward "#" nil t)
-        (replace-match ""))
-      (setq section-name (shu-trim (buffer-substring-no-properties (point-min) (point-max))))
       (goto-char (point-min))
       (while (re-search-forward shu-all-whitespace-regexp nil t)
         (replace-match ""))
       (downcase-region (point-min) (point-max))
       (setq index-name (buffer-substring-no-properties (point-min) (point-max))))
-    (insert
-     (concat
-      " * [" section-name "]"
-      "(#" index-name ")"))
+    index-name
     ))
 
+
+
+;;
+;;  shu-make-md-section-name
+;;
+(defun shu-make-md-section-name (section-name)
+  "The inout is a string that is assumed to be a markdown seaction heading.  The
+return value is a string with any leading and trailing \"#\" characters removed.
+For example, if the input string is
+
+     ## This is an Overview ##
+
+The returned string would be
+
+     This is an Overview"
+    (with-temp-buffer
+      (insert section-name)
+      (goto-char (point-min))
+      (while (search-forward "#" nil t)
+        (replace-match ""))
+      (setq section-name (shu-trim (buffer-substring-no-properties (point-min) (point-max)))))
+    section-name)
 
 
 ;;
@@ -1378,6 +1446,7 @@ shu- prefix removed."
   (defalias 'modified-buffers 'shu-modified-buffers)
   (defalias 'all-quit 'shu-all-quit)
   (defalias 'md-toc 'shu-make-md-toc-entry)
+  (defalias 'md-name 'shu-make-md-name-entry)
   )
 
 ;;; shu-misc.el ends here
