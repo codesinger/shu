@@ -1303,6 +1303,41 @@ not matter."
 
 
 ;;
+;;  shu-make-md-toc-entry
+;;
+(defun shu-make-md-toc-entry ()
+  "The latest item in the kill ring is assumed to be the text of a markdown
+section name.  This function creates from that section name, a markdown table of
+contents entry and inserts that entry at point.
+
+For example, if the kill ring contains \"## This is the Overview ##\", the table
+of contents entry created and inserted at point will be
+
+       * [This is the overview](#thisistheoverview)"
+  (interactive)
+  (let ((section-name (current-kill 0))
+        (index-name)
+        (debug-on-error t))
+    (with-temp-buffer
+      (insert section-name)
+      (goto-char (point-min))
+      (while (search-forward "#" nil t)
+        (replace-match ""))
+      (setq section-name (shu-trim (buffer-substring-no-properties (point-min) (point-max))))
+      (goto-char (point-min))
+      (while (re-search-forward shu-all-whitespace-regexp nil t)
+        (replace-match ""))
+      (downcase-region (point-min) (point-max))
+      (setq index-name (buffer-substring-no-properties (point-min) (point-max))))
+    (insert
+     (concat
+      " * [" section-name "]"
+      "(#" index-name ")"))
+    ))
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -1342,6 +1377,7 @@ shu- prefix removed."
   (defalias 'de-star 'shu-de-star)
   (defalias 'modified-buffers 'shu-modified-buffers)
   (defalias 'all-quit 'shu-all-quit)
+  (defalias 'md-toc 'shu-make-md-toc-entry)
   )
 
 ;;; shu-misc.el ends here

@@ -385,8 +385,7 @@ the second type.
 The return value of this function is a single cons cell in which the cdr points
 to the first list and the car points to the second list.
 If neither list is present, then the return value is nil."
-  (let ((something t)
-        (ret-val t)
+  (let ((ret-val t)
         (tlist token-list)
         (rlist)
         (nn)
