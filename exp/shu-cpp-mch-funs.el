@@ -381,7 +381,7 @@ that represent each using namespace directive that we will process."
         (setq ret-val (shu-match-get-start-end-pos rlist t))
         (setq spoint (car ret-val))
         (setq epoint (cdr ret-val))
-        (setq ns-code (buffer-substrig-no-properties spoint epoit))
+        (setq ns-code (buffer-substring-no-properties spoint epoint))
         (princ (concat "\n" ns-code "\n") log-buf)
         (setq np-rlists (cdr np-rlists))
         )
@@ -395,6 +395,47 @@ that represent each using namespace directive that we will process."
     (cons proc-classes proc-rlists)
     ))
 
+
+
+;;
+;;  shu-test-something-or-other
+;;
+(ert-deftest shu-test-something-or-other ()
+  (let (
+        (log-buf (get-buffer-create "**goo**"))
+       (data
+        (concat
+         "/*!\n"
+         " * \\file something_or_other.cpp\n"
+         " */\n"
+         "\n"
+         "#include <strng>\n"
+         "\n"
+         "    using namespace abcde;\n"
+         "    using namespace xyrzk;\n"
+         "    using nsmaepsce fred;\n"
+         "using abc::std::string;\n /* Hello */"
+         "// Hello\n"
+         ))
+       (class-list
+        (list
+         (cons "abcde"    (list
+                           "AClass1"
+                           "AClass2"
+                           ))
+         (cons "xyrzk"    (list
+                           "Xclass1"
+                           "Xclass2"
+                           ))
+         )
+        )
+       (token-list)
+       )
+    (with-temp-buffer
+      (insert data)
+      (something-or-other class-list log-buf)
+      )
+    ))
 
 
 
