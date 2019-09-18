@@ -525,11 +525,14 @@ whose cdr is the class name."
 ;;
 ;;  shu-match-get-start-end-pos
 ;;
-(defun shu-match-get-start-end-pos (rlist)
+(defun shu-match-get-start-end-pos (rlist &optional whole-lines)
   "Given an RLIST return the beginning and end positions.  The beginning position is
 the position of the first character of the first token.  The end position is the
 position of the last character of the last token.  These two are returned as a cons
-cell whose car is the beginning position and whose cdr is the end position."
+cell whose car is the beginning position and whose cdr is the end position.  If
+the optional WHOLE-LINES is true, the start position is that of the beginning of
+the line on which the start falls and the end position is that of the end of
+the line on which the end falls."
   (let ((token-info (car rlist))
         (ptoken-info)
         (spoint)
@@ -540,6 +543,12 @@ cell whose car is the beginning position and whose cdr is the end position."
       (setq rlist (cdr rlist))
       (when (not rlist)
         (setq epoint (shu-cpp-token-extract-epoint token-info))))
+    (when whole-lines
+      (save-excursion
+        (goto-char spoint)
+        (setq spoint (line-beginning-position))
+        (goto-char epoint)
+        (setq epoint (line-end-position))))
     (cons spoint epoint)
     ))
 

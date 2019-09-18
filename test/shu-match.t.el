@@ -2001,9 +2001,9 @@ using namespace statements."
 
 
 ;;
-;;  shu-test-shu-match-get-start-end-pos
+;;  shu-test-shu-match-get-start-end-pos-1
 ;;
-(ert-deftest shu-test-shu-match-get-start-end-pos ()
+(ert-deftest shu-test-shu-match-get-start-end-pos-1 ()
   (let ((data
          (concat
           "\n"
@@ -2041,6 +2041,53 @@ using namespace statements."
     (should (numberp epoint))
     (should (eq 2 spoint))
     (should (eq 33 epoint))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-match-get-start-end-pos-2
+;;
+(ert-deftest shu-test-shu-match-get-start-end-pos-2 ()
+  (let ((data
+         (concat
+          "\n /* Hello */\n"
+          "\n"
+          "    using namespace fred::andy::bob; /* Hello */\n"
+          "2345678901234567890123456789012345"
+          "// Hello\n"
+          ))
+        (token-list)
+        (ret-val)
+        (uns-list)
+        (rlist)
+        (ret-val)
+        (spoint)
+        (epoint))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq ret-val (shu-match-find-all-using-internal token-list))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq uns-list (car ret-val))
+      (should uns-list)
+      (should (listp uns-list))
+      (setq rlist (car uns-list))
+      (should rlist)
+      (should (listp rlist))
+      (setq ret-val (shu-match-get-start-end-pos rlist t)))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq spoint (car ret-val))
+    (setq epoint (cdr ret-val))
+    (should spoint)
+    (should (numberp spoint))
+    (should epoint)
+    (should (numberp epoint))
+    (should (eq 16 spoint))
+    (should (eq 64 epoint))
     ))
 
 
