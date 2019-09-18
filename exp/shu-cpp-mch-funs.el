@@ -306,6 +306,94 @@ that may follow the key word \"using\".")
 
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+;;
+;;  something-or-other
+;;
+(defun something-or-other (class-list log-buf &optional top-name)
+  "Doc string."
+  (let (
+        (token-list)
+        (ret-val)
+        (uns-list)
+        (un-list)
+        (something)
+        )
+    (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+    (setq ret-val (shu-match-find-all-using-internal token-list))
+    (if (not ret-val)
+        (progn
+          (message "%s" "No using namespace directives found")
+          )
+      (setq uns-list (car ret-val))
+      (setq un-list (cdr ret-val))
+      (when uns-list
+        (setq something (process-uns-list class-list uns-list log-buf top-name))
+        )
+
+      )
+    ))
+
+
+
+;;
+;;  process-uns-list
+;;
+(defun process-uns-list (class-list uns-list log-buf &optional top-name)
+  "Merge the UNS-LIST with the CLASS-LIST.  Return a cons-cell pointing to two lists.
+The first is the list of classes from the class list that have corresponding
+\"using namespace\" directives in the buffer.  The second is the lists of rlists
+that represent each using namespace directive that we will process."
+  (let (
+        (rlist)
+        (ns-name)
+        (ce)
+        (proc-classes)
+        (proc-rlists)
+        (np-rlists)
+        (ret-val)
+        (spoint)
+        (epoint)
+        (ns-code)
+        )
+    (while uns-list
+      (setq rlist (car uns-list))
+      (setq ns-name (shu-match-using-namespace-string rlist top-name))
+      (setq ce (assoc ns-name class-list))
+      (if (not ce)
+          (push rlist np-rlists)
+      (when (not (assoc ns-name proc-classes))
+        (push ce proc-classes)
+        (push rlist proc-rlists)
+        )
+      )
+      (setq uns-list (cdr uns-list))
+      )
+    (when np-rlists
+      (princ "The following using namespaces have no corresponding class list entry:\n" log-buf)
+      (setq np-rlists (nreverse np-rlists))
+      (while np-rlists
+        (setq rlist (car np-rlists))
+        (setq ret-val (shu-match-get-start-end-pos rlist t))
+        (setq spoint (car ret-val))
+        (setq epoint (cdr ret-val))
+        (setq ns-code (buffer-substrig-no-properties spoint epoit))
+        (princ (concat "\n" ns-code "\n") log-buf)
+        (setq np-rlists (cdr np-rlists))
+        )
+      )
+    (when proc-classes
+      (setq proc-classes (nreverse proc-classes))
+      )
+    (when proc-rlists
+      (setq proc-rlists (nreverse proc-rlists))
+      )
+    (cons proc-classes proc-rlists)
+    ))
 
 
 
