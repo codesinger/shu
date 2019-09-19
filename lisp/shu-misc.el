@@ -1372,7 +1372,7 @@ The returned string would be
      thisisanoverview"
   (let ((section-name (shu-make-md-section-name name))
         (index-name)
-        (no-index-chars "[()`]"))
+        (no-index-chars "[.,:;()`]"))
     (with-temp-buffer
       (insert section-name)
       (goto-char (point-min))

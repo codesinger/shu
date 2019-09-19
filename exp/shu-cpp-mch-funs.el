@@ -360,17 +360,21 @@ that represent each using namespace directive that we will process."
         (epoint)
         (ns-code)
         )
+    (princ "uns-list: " log-buf)(princ uns-list log-buf)(princ "\n" log-buf)
     (while uns-list
       (setq rlist (car uns-list))
+      (princ "rlist: " log-buf)(princ rlist log-buf)(princ "\n" log-buf)
       (setq ns-name (shu-match-using-namespace-string rlist top-name))
+      (princ (format "ns-name: '%s'\n" ns-name) log-buf)
       (setq ce (assoc ns-name class-list))
+      (princ "ce: " log-buf)(princ ce log-buf)(princ "\n" log-buf)
       (if (not ce)
           (push rlist np-rlists)
-      (when (not (assoc ns-name proc-classes))
-        (push ce proc-classes)
-        (push rlist proc-rlists)
+        (when (not (assoc ns-name proc-classes))
+          (push ce proc-classes)
+          (push rlist proc-rlists)
+          )
         )
-      )
       (setq uns-list (cdr uns-list))
       )
     (when np-rlists
@@ -388,9 +392,11 @@ that represent each using namespace directive that we will process."
       )
     (when proc-classes
       (setq proc-classes (nreverse proc-classes))
+      (princ "proc-classes: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
       )
     (when proc-rlists
       (setq proc-rlists (nreverse proc-rlists))
+      (princ "proc-rlists: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
       )
     (cons proc-classes proc-rlists)
     ))
@@ -413,7 +419,7 @@ that represent each using namespace directive that we will process."
          "\n"
          "    using namespace abcde;\n"
          "    using namespace xyrzk;\n"
-         "    using nsmaepsce fred;\n"
+         "    using namespace fred; /* Hello */\n"
          "using abc::std::string;\n /* Hello */"
          "// Hello\n"
          ))

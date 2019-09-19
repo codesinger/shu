@@ -570,4 +570,19 @@
     ))
 
 
+
+;;
+;;  shu-test-shu-make-md-index-name-4
+;;
+(ert-deftest shu-test-shu-make-md-index-name-4 ()
+  (let ((name "This is, an :Overviwew. `Mumble`")
+        (expected "thisisanoverviwewmumble")
+        (actual))
+    (setq actual (shu-make-md-index-name name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
 ;;; shu-misc.t.el ends here
