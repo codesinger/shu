@@ -416,3 +416,37 @@ Next steps
        If not found, then
        1. Add the rlist to a list of rlists that will not be processed
           np-rlists
+
+====================================
+
+New next steps
+
+ - Merge in the "using name" statements
+
+ - Loop through un-list
+
+ - Call shu-match-using-string to get both the nanespace and the class name
+   - Look up the namespace in the class list, adding it if not found
+   - Add the class name to the class list, if not already present
+
+     There are two ways to do this.  One is to add the name if it is not
+     already a (member) of the list.  Probably safer to just add the name and then
+     run all of the class list through delete-dups.  This protects from an input
+     class list that has duplicates.
+
+- Invert the class list
+
+  - Instead of an Alist in which a namespace maps to a list of class names, you want
+    a hash table in which a class name maps to its containing namespace.  If a
+    single class maps to more than one namespace, you cannot proceed.
+
+Once you have the inverted class list, you have only two steps left..
+
+  1. Erase the using namsepace statements (shu-erase-region) as well as the using
+     statements.
+
+  2. Go through the tokens backward.  Each time you find an unquoted token look it
+     up in the hash table.  If it is in the hash table, check to see if the
+     followig token (You are going backwards( is "::" (Remember to skip the
+     comments).  If it is not "::", goto-char of start of class name.  Insert the
+     namespace followed by "::"..

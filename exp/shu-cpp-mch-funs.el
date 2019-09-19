@@ -322,6 +322,8 @@ that may follow the key word \"using\".")
         (uns-list)
         (un-list)
         (something)
+        (proc-classes)
+        (proc-rlists)
         )
     (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
     (setq ret-val (shu-match-find-all-using-internal token-list))
@@ -333,8 +335,53 @@ that may follow the key word \"using\".")
       (setq un-list (cdr ret-val))
       (when uns-list
         (setq something (process-uns-list class-list uns-list log-buf top-name))
+        (if (not something)
+            (message "%s" "Failure")
+          (setq proc-classes (car something))
+          (setq proc-rlists (cdr something))
+
+            )
         )
 
+      )
+    ))
+
+
+
+;;
+;;  add-ns-rlists
+;;
+(defun add-ns-rlists (un-list proc-classes proc-rlists log-buf &optional top-name)
+  "UN-LIST is the list of rlists that represent the \"using name\" statements.
+PROC-CLASSES is the class list we will be using to do the processing.
+PROC-RLISTS is the set of rlists that represents the \"using namespace\"
+statements.  This function adds the\"using name\" directives, if any, to both
+PROC-CLASSES and PROC-RLISTS.  It returns a cons cell in which the car is the
+modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
+  (let (
+        (rlist)
+        (ret-val)
+        (ns-name)
+        (class-name)
+        (ce)
+        (x)
+        (cl)
+        )
+    (while un-list
+      (setq rlist (car un-list))
+      (setq ret-val (shu-match-using-string rlist top-name))
+      (setq ns-name (car ret-val))
+      (setq class-name (cdr ret-val))
+      (setq ce (assoc ns-name proc-classes))
+      (if (not ce)
+          (progn
+            (setq x (cons ns-name (list class-name)))
+            (push x proc-classes)
+            )
+        (setq cl (cdr ce))
+        (push class-name cl)
+          )
+      (setq un-list (cdr un-list))
       )
     ))
 
@@ -398,7 +445,11 @@ that represent each using namespace directive that we will process."
       (setq proc-rlists (nreverse proc-rlists))
       (princ "proc-rlists: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
       )
-    (cons proc-classes proc-rlists)
+    (if (and proc-classes proc-rlists)
+        (setq ret-val (cons proc-classes proc-rlists))
+      (setq ret-val nil)
+      )
+    ret-val
     ))
 
 
