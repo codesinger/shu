@@ -325,6 +325,7 @@ that may follow the key word \"using\".")
         (proc-classes)
         (proc-rlists)
         )
+    (princ "class-list: " log-buf)(princ class-list log-buf)(princ "\n" log-buf)
     (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
     (setq ret-val (shu-match-find-all-using-internal token-list))
     (if (not ret-val)
@@ -339,7 +340,11 @@ that may follow the key word \"using\".")
             (message "%s" "Failure")
           (setq proc-classes (car something))
           (setq proc-rlists (cdr something))
-
+          (setq something (add-ns-rlists un-list proc-classes proc-rlists log-buf top-name))
+          (setq proc-classes (car something))
+          (setq proc-rlists (cdr something))
+          (princ "proc-classes9: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
+          (princ "proc-rlists9: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
             )
         )
 
@@ -383,6 +388,7 @@ modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
           )
       (setq un-list (cdr un-list))
       )
+    (cons proc-classes proc-rlists)
     ))
 
 
@@ -391,10 +397,16 @@ modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
 ;;  process-uns-list
 ;;
 (defun process-uns-list (class-list uns-list log-buf &optional top-name)
-  "Merge the UNS-LIST with the CLASS-LIST.  Return a cons-cell pointing to two lists.
-The first is the list of classes from the class list that have corresponding
-\"using namespace\" directives in the buffer.  The second is the lists of rlists
-that represent each using namespace directive that we will process."
+
+  "Merge the UNS-LIST with the CLASS-LIST.  Return a cons-cell pointing to two
+lists.  The first is the list of classes from the class list that have
+corresponding \"using namespace\" directives in the buffer.  The second is the
+lists of rlists that represent each using namespace directive that we will
+process.
+The updated class list will be used to identify class names to be qualified and
+the namespaces with which to qualify them..  The rlists representing the \"using
+namespace\" statements will be used to remove the \"using namespace\" statements
+from the buffer."
   (let (
         (rlist)
         (ns-name)
@@ -470,6 +482,7 @@ that represent each using namespace directive that we will process."
          "\n"
          "    using namespace abcde;\n"
          "    using namespace xyrzk;\n"
+         "    using std::string;\n"
          "    using namespace fred; /* Hello */\n"
          "using abc::std::string;\n /* Hello */"
          "// Hello\n"
