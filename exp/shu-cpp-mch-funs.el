@@ -416,7 +416,13 @@ that may follow the key word \"using\".")
 ;;  make-class-hash-table
 ;;
 (defun make-class-hash-table (proc-classes log-buf)
-  "Doc string."
+  "PROC-CLASSES is the alist of all of the namespaces and classes that we will
+process, wth the naespace name being the kay and a list of class names under the
+namespace name as the value.  This function builds a hash table that inverts the
+alist.  Each entry in the hash table has a class name as the key with the name
+of the enclosing namespace as the value.
+If two class names map to the same enclosing namespace name, then there is an
+unresolvable ambiguity that terminates the operation."
   (interactive)
   (let (
         (pc proc-classes)
