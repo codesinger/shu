@@ -373,19 +373,25 @@ modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
         (cl)
         )
     (while un-list
+      (princ "un-list: " log-buf)(princ un-list log-buf)(princ "\n" log-buf)
       (setq rlist (car un-list))
+      (princ "rlist-un: " log-buf)(princ rlist log-buf)(princ "\n" log-buf)
+      (push rlist proc-rlists)
       (setq ret-val (shu-match-using-string rlist top-name))
       (setq ns-name (car ret-val))
       (setq class-name (cdr ret-val))
+      (princ (format "Looking for ns: '%s'\n" ns-name) log-buf)
       (setq ce (assoc ns-name proc-classes))
       (if (not ce)
           (progn
             (setq x (cons ns-name (list class-name)))
             (push x proc-classes)
+            (princ "Adding ns: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
             )
         (setq cl (cdr ce))
         (push class-name cl)
-          )
+        (princ "Adding cl: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
+            )
       (setq un-list (cdr un-list))
       )
     (cons proc-classes proc-rlists)
@@ -484,7 +490,7 @@ from the buffer."
          "    using namespace xyrzk;\n"
          "    using std::string;\n"
          "    using namespace fred; /* Hello */\n"
-         "using abc::std::string;\n /* Hello */"
+         "    using abc::std::string;\n /* Hello */"
          "// Hello\n"
          ))
        (class-list
