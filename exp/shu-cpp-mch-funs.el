@@ -352,6 +352,66 @@ that may follow the key word \"using\".")
     ))
 
 
+;;
+;;  remove-class-duplicates
+;;
+(defun remove-class-duplicates (proc-classes log-buf)
+  "Doc string."
+  (interactive)
+  (let (
+        (pc proc-classes)
+        (ce)
+        (cl)
+        )
+    (while pc
+      (setq ce (car pc))
+      (princ "cl1: " log-buf)(princ ce log-buf)(princ "\n" log-buf)
+      (setq cl (cdr ce))
+      (setq cl (delete-dups cl))
+      (setcdr ce cl)
+      (princ "cl2: " log-buf)(princ ce log-buf)(princ "\n" log-buf)
+      (setq pc (cdr pc))
+      )
+    proc-classes
+    ))
+
+
+
+;;
+;;  shu-test-remove-class-duplicates
+;;
+(ert-deftest shu-test-remove-class-duplicates ()
+  (let (
+        (gb (get-buffer-create "**goo**"))
+       (class-list
+        (list
+         (cons "abcde"    (list
+                           "AClass1"
+                           "AClass2"
+                           "AClass1"
+                           "AClass2"
+                           ))
+         (cons "xyrzk"    (list
+                           "Xclass1"
+                           "Xclass1"
+                           "Xclass2"
+                           ))
+         (cons "std "    (list
+                           "string"
+                           "string"
+                           "set"
+                           "set"
+                           "map"
+                           ))
+         )
+        )
+       (proc-class)
+        )
+    (setq proc-class (remove-class-duplicates class-list gb))
+    (princ "proc-class: " gb)(princ proc-class gb)(princ "\n" gb)
+    ))
+
+
 
 ;;
 ;;  add-ns-rlists
