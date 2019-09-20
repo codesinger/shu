@@ -412,6 +412,52 @@ that may follow the key word \"using\".")
     ))
 
 
+;;
+;;  make-class-hash-table
+;;
+(defun make-class-hash-table (proc-classes log-buf)
+  "Doc string."
+  (interactive)
+  (let (
+        (pc proc-classes)
+        (ht)
+        (count 0)
+        (ce)
+        (cl)
+        (ns-name)
+        (class-name)
+        (hv)
+        )
+    (while pc
+      (setq ce (car pc))
+      (setq cl (cdr ce))
+      (setq count (+ count (length cl)))
+      (setq pc (cdr pc))
+      )
+    (princ (format "Will have %d entries\n" count) log-buf)
+    (setq ht (make-hash-table :test 'string= :size count))
+    (setq pc proc-classes)
+    (while pc
+      (setq ce (car pc))
+      (setq ns-name (car ce))
+      (setq cl (cdr ce))
+      (while cl
+        (setq class-name (car cl))
+        (setq hv (gethash class-name ht))
+        (if hv
+            (progn
+              (princ (format "Duplicate namespace for class: %s\n" class-name) log-buf)
+              )
+          (puthash class-name ns-name ht)
+            )
+        (setq cl (cdr cl))
+        )
+      (setq pc (cdr pc))
+      )
+
+    ))
+
+
 
 ;;
 ;;  add-ns-rlists
