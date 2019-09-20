@@ -441,7 +441,7 @@ unresolvable ambiguity that terminates the operation."
       (setq pc (cdr pc))
       )
     (princ (format "Will have %d entries\n" count) log-buf)
-    (setq ht (make-hash-table :test 'string= :size count))
+    (setq ht (make-hash-table :test 'equal :size count))
     (setq pc proc-classes)
     (while pc
       (setq ce (car pc))
@@ -460,9 +460,69 @@ unresolvable ambiguity that terminates the operation."
         )
       (setq pc (cdr pc))
       )
-
+    (princ "ht: " log-buf)(princ ht log-buf)(princ "\n" log-buf)
+    ht
     ))
 
+
+;;
+;;  shu-test-make-class-hash-table
+;;
+(ert-deftest shu-test-make-class-hash-table ()
+  (let (
+        (gb (get-buffer-create "**goo**"))
+       (class-list
+        (list
+         (cons "abcde"    (list
+                           "AClass1"
+                           "AClass2"
+                           ))
+         (cons "xyrzk"    (list
+                           "Xclass1"
+                           "Xclass2"
+                           ))
+         (cons "std"    (list
+                           "string"
+                           "set"
+                           "map"
+                           ))
+         )
+        )
+       (ht)
+       (hv)
+       )
+    (setq ht (make-class-hash-table class-list gb))
+    (should ht)
+    (should (hash-table-p ht))
+    (setq hv (gethash "AClass1" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "abcde" hv))
+    (setq hv (gethash "AClass2" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "abcde" hv))
+    (setq hv (gethash "Xclass1" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "xyrzk" hv))
+    (setq hv (gethash "Xclass2" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "xyrzk" hv))
+    (setq hv (gethash "string" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "std" hv))
+    (setq hv (gethash "set" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "std" hv))
+    (setq hv (gethash "map" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "std" hv))
+    ))
 
 
 ;;
