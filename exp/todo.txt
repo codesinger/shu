@@ -440,6 +440,17 @@ New next steps
     a hash table in which a class name maps to its containing namespace.  If a
     single class maps to more than one namespace, you cannot proceed.
 
+
+========================
+
+New new next steps ...
+
+Remove proc-rlists from the token list
+
+  1. Sort proc-rlists with the key for each rlist being the spoint of its first
+     token-info.
+
+
 Once you have the inverted class list, you have only two steps left..
 
   1. Erase the using namsepace statements (shu-erase-region) as well as the using

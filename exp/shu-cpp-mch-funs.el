@@ -345,10 +345,32 @@ that may follow the key word \"using\".")
           (setq proc-rlists (cdr something))
           (princ "proc-classes9: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
           (princ "proc-rlists9: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
-            )
+          (setq proc-classes (remove-class-duplicates proc-classes log-buf))
+          )
         )
 
       )
+    ))
+
+
+
+
+;;
+;;  shu-match-remove-proc-rlists
+;;
+(defun shu-match-remove-proc-rlists (token-list proc-rlists)
+  "Doc string."
+  (let (
+        (sprl
+         (sort proc-rlists
+               (lambda(lhs rhs)
+                 (let ((lti (car lhs))
+                       (rti (car rhs)))
+                   (< (shu-cpp-token-extract-spoint lti) (shu-cpp-token-extract-spoint rti))))))
+
+        )
+
+
     ))
 
 
@@ -356,8 +378,24 @@ that may follow the key word \"using\".")
 ;;  remove-class-duplicates
 ;;
 (defun remove-class-duplicates (proc-classes log-buf)
-  "Doc string."
-  (interactive)
+  "PROC-CLASSES is the alist of classes that we will process.  The car of each
+item is the containing namespace.  The cdr of each item is the list of class
+names contained within the namespace.  The original class list may have had
+duplicate class names within a given namespace.  We may also have added class
+names to a given namespace from processing one or more \"using name\"
+statements.
+
+For example, if the lass list contained \"std . set map string\" and we also
+processed a \"using std::string\" statement, the code that processed that
+statement would have blindly added \"string\" to the list of classes in the
+namespace \"std\".  The list of classes for namespace \"std\" would then contain
+\"string set map string\".
+
+This function removes any duplicate class names within a given namespace.  This
+is necessary because we are about to invert the class list to produce a hash
+table in which the key is the class name and the value is the enclosing
+namespace name.  This operation will fail if a given namespace contains
+duplicate class names."
   (let (
         (pc proc-classes)
         (ce)
