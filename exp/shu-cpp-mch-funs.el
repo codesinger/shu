@@ -356,9 +356,124 @@ that may follow the key word \"using\".")
           (shu-match-erase-using proc-rlists log-buf)
           )
         )
-
       )
     ))
+
+
+
+;;
+;;  shu-match-find-unqualified-class-names
+;;
+(defun shu-match-find-unqualified-class-names (token-list proc-classes log-buf)
+  "Go through all of the tokens looking at any unquoted token that is in the hash
+table of unqualified class names.  When an instance of a class name is found,
+check to see it it is preceded by \"::\", \".\", or \"->\".  \"::\" indicates
+that it is probably qualified.  \".\" or \"->\" indicate that it is probably a
+function name.
+
+Check also to see if it is followed by \")\" or \"[\", which probably indicates
+that it is a variable name.
+
+Next, check to see if it is preceded by \"#include\".
+
+If it survives all of those checks, it is probably an unqualified class name, in
+which case its token-info is pushed onto a list.  The list is the return value
+of this function.  Since each token-info is pushed onto the list, the list is
+returned in reverse order.  i.e., the last token in the file is the first in the
+list.
+
+At this point it is possible to visit each token in the list, which is in
+reverse order in the file, look up each token, and insert in front of it its
+qualifying namespace."
+  (interactive)
+  (let (
+        (tlist token-list)
+        ;; This should be done by the caller of this function
+        ;; When the clist is returned, the code that actually inserts
+        ;; the qualifying namespaces will have to look up the class
+        ;; names again
+        (ht (shu-match-make-class-hash-table proc-classes log-buf))
+        (token-info)
+        (next-token-info)
+        (hv)
+        (n)
+        (last-token "")
+        (last-token-type 0)
+        (token "")
+        (token-type 0)
+        (next-token "")
+        (next-token-type 0)
+        (blocked)
+        (clist)
+        )
+    (while tlist
+      (setq token-info (car tlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (when (= token-type shu-cpp-token-type-uq)
+        (setq hv (gethash token ht))
+        (when hv
+          (if
+              (and
+               (= last-token-type shu-cpp-token-type-op)
+               (or
+                (string= last-token "::")
+                (string= last-token ".")
+                (string= last-token "->")
+                ))
+              (setq blocked t)
+            (setq n (shu-cpp-token-next-non-comment tlist))
+            (setq next-token-info (car n))
+            (setq next-token (shu-cpp-token-extract-token token-info))
+            (setq next-token-type (shu-cpp-token-extract-type token-info))
+            (if
+                (and
+                 (= next-token-type shu-cpp-token-type-op)
+                 (or
+                  (string= next-token "(")
+                  (string= next-token "[")
+                  ))
+                (setq blocked t)
+              (when (might-be-include token-info) ;; Function still to write
+                (setq blocked t)
+                )
+              )
+            )
+          (when (not blocked)
+            (push token-info clist)
+            )
+          (setq last-token token)
+          (setq last-token-type token-type)
+          (setq tlist (shu-cpp-token-next-non-comment tlist))
+          )
+        )
+      )
+    clist
+    ))
+
+
+
+;;
+;;  might-be-include
+;;
+(defun might-be-include (token-info)
+  "Go to the beginning of the line in front of the start point of the
+TOKEN-INFO.  Return true if the space between the beginning of the line and the
+start point of the TOKEN-INFO contains \"#include\"."
+  (let (
+        (spoint (shu-cpp-token-extract-spoint token-info))
+        (blocked)
+        )
+    (save-excursion
+      (goto-char spoint)
+      (beginning-of-line)
+      (when (re-search-forward "#\\s-*include" spoint t)
+        (setq blocked t)
+        )
+      )
+    blocked
+    ))
+
 
 
 
@@ -568,9 +683,9 @@ duplicate class names."
 
 
 ;;
-;;  make-class-hash-table
+;;  shu-match-make-class-hash-table
 ;;
-(defun make-class-hash-table (proc-classes log-buf)
+(defun shu-match-make-class-hash-table (proc-classes log-buf)
   "PROC-CLASSES is the alist of all of the namespaces and classes that we will
 process, wth the naespace name being the kay and a list of class names under the
 namespace name as the value.  This function builds a hash table that inverts the
@@ -621,9 +736,9 @@ unresolvable ambiguity that terminates the operation."
 
 
 ;;
-;;  shu-test-make-class-hash-table
+;;  shu-test-shu-match-make-class-hash-table
 ;;
-(ert-deftest shu-test-make-class-hash-table ()
+(ert-deftest shu-test-shu-match-make-class-hash-table ()
   (let (
         (gb (get-buffer-create "**goo**"))
        (class-list
@@ -646,7 +761,7 @@ unresolvable ambiguity that terminates the operation."
        (ht)
        (hv)
        )
-    (setq ht (make-class-hash-table class-list gb))
+    (setq ht (shu-match-make-class-hash-table class-list gb))
     (should ht)
     (should (hash-table-p ht))
     (setq hv (gethash "AClass1" ht))

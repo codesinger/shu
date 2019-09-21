@@ -472,3 +472,19 @@ Once you have the inverted class list, you have only two steps left..
      followig token (You are going backwards( is "::" (Remember to skip the
      comments).  If it is not "::", goto-char of start of class name.  Insert the
      namespace followed by "::"..
+
+
+============================================
+
+Final zinger
+
+ - In looking for class names to qualify, we need to consider not just whether the
+   name is prefixed by "::"
+
+   Prefix of "::" indicates qualified
+   Prefix of "." or "->" means probably function name
+   Followed by "(" means probably function name
+   Followed by "[" means probably variable name
+   If inside of an include statement, it is not a class name
+     Might actually have to go to the location in the buffer and scan
+     for "include" in the same line in front of the name.
