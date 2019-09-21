@@ -416,7 +416,7 @@ start position of each rlist."
         (if (= spoint r-spoint)
             (progn
               (setq looking-for-start nil)
-              (when (equal tlist token-list)
+              (when (equal (car tlist) (car token-list))
                 (setq first1 t)
                 )
               )
