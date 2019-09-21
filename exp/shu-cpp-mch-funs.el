@@ -405,8 +405,10 @@ start position of each rlist."
       (setq r-spoint (car ret-val))
       (setq r-epoint (cdr ret-val))
       (princ (format "r-spoint: %d, r-epoint: %d\n" r-spoint r-epoint) log-buf)
-      (setq lastp tlist)
-      (setq first1 t)
+      (princ "lastp: " log-buf)(princ (car lastp) log-buf)(princ "\n" log-buf)
+      (princ "tlist: " log-buf)(princ (car tlist) log-buf)(princ "\n" log-buf)
+;;;      (setq lastp tlist)
+;;;      (setq first1 t)
       (setq looking-for-start t)
       (while looking-for-start
         (setq token-info (car tlist))
@@ -422,6 +424,8 @@ start position of each rlist."
       ;; If first1 is true, head of list will be changed
       ;; tlist points to the start item (which might also be the end)
       (princ "\ntoken-info of start: " log-buf)(princ token-info log-buf)(princ "\n" log-buf)
+      (princ "\nlastp: " log-buf)(princ (car lastp) log-buf)(princ "\n" log-buf)
+      (princ "\ntoken-list: " log-buf)(princ token-list log-buf)(princ "\n" log-buf)
       (setq looking-for-end t)
       (while looking-for-end
         (setq token-info (car tlist))
@@ -429,19 +433,23 @@ start position of each rlist."
         (if (= epoint r-epoint)
             (progn
               (setq looking-for-end nil)
+              (princ "first1: " log-buf)(princ first1 log-buf)(princ "\n" log-buf)
+              (princ "\ntoken-list: " log-buf)(princ token-list log-buf)(princ "\n" log-buf)
+              (princ "\nlastp: " log-buf)(princ (car lastp) log-buf)(princ "\n" log-buf)
               (if first1
-                  (setq tlist (cdr tlist))
+                  (setq token-list (cdr tlist))
                 (setcdr lastp (cdr tlist))
+                (setq tlist (cdr tlist))
                 )
               )
           (setq tlist (cdr tlist))
           )
         )
       (princ "\ntoken-info of end: " log-buf)(princ token-info log-buf)(princ "\n" log-buf)
-      (princ "\ntlist: " log-buf)(princ tlist log-buf)(princ "\n" log-buf)
+      (princ "\ntoken-list: " log-buf)(princ token-list log-buf)(princ "\n" log-buf)
       (setq sprl (cdr sprl))
       )
-    (cons tlist sorted-proc)
+    (cons token-list sorted-proc)
     ))
 
 
