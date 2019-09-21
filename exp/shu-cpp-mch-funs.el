@@ -361,16 +361,63 @@ that may follow the key word \"using\".")
 (defun shu-match-remove-proc-rlists (token-list proc-rlists)
   "Doc string."
   (let (
+        (tlist token-list)
         (sprl
          (sort proc-rlists
                (lambda(lhs rhs)
                  (let ((lti (car lhs))
                        (rti (car rhs)))
                    (< (shu-cpp-token-extract-spoint lti) (shu-cpp-token-extract-spoint rti))))))
-
+        (rlist)
+        (ret-val)
+        (r-spoint)
+        (r-epoint)
+        (lastp)
+        (first1)
+        (looking-for-start)
+        (token-info)
+        (spoint)
+        (epoint)
+        (looking-for-end)
         )
-
-
+    (while (and sprl tlist)
+      (setq rlist (car sprl))
+      (setq ret-val (shu-match-get-start-end-pos rlist))
+      (setq r-spoint (car ret-val))
+      (setq r-epoint (cdr ret-val))
+      (setq lastp tlist)
+      (setq first1 t)
+      (setq looking-for-start t)
+      (while looking-for-start
+        (setq token-info (car tlist))
+        (setq spoint (shu-cpp-token-extract-spoint token-info))
+        (if (= spoint r-spoint)
+            (setq looking-for-start nil)
+          (setq lastp tlist)
+          (setq first1 nil)
+          (setq tlist (cdr tlist))
+          )
+        )
+      ;; lastp is the item whose cdr will be changed
+      ;; If first1 is true, head of list will be changed
+      ;; tlist points to the start item (which might also be the end)
+      (setq looking-for-end t)
+      (while looking-for-end
+        (setq token-info (car tlist))
+        (setq epoint (shu-cpp-token-extract-epoint token-info))
+        (if (= epoint r-epoint)
+            (progn
+              (setq looking-for-end nil)
+              (if first1
+                  (setq tlist (cdr tlist))
+                (setcdr lastp (cdr tlist))
+                )
+              )
+          (setq tlist (cdr tlist))
+          )
+        )
+      (setq sprl (cdr sprl))
+      )
     ))
 
 

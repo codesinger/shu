@@ -450,6 +450,17 @@ Remove proc-rlists from the token list
   1. Sort proc-rlists with the key for each rlist being the spoint of its first
      token-info.
 
+1. Move to first rlist
+
+loop
+
+1. Find the spoint and epoint of the current rlist
+2. Loop through the token list (always keeping a pointer to the prior token-info)
+   until you find the token-info whose spoint matches the rlist spoint.  This is the
+   first token-info to be removed from the list.
+3. Loop through the token list until you find the token-info whose epoint matches
+   the rlist epoint.  THis is the last one to be removed from the list.
+
 
 Once you have the inverted class list, you have only two steps left..
 
