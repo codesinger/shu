@@ -353,12 +353,45 @@ that may follow the key word \"using\".")
           (setq proc-rlists (cdr ret-val))
           (princ "\n\nproc-rlists2: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
           (princ "\n\ntoken-list2: " log-buf)(princ token-list log-buf)(princ "\n" log-buf)
+          (shu-match-erase-using proc-rlists log-buf)
           )
         )
 
       )
     ))
 
+
+
+;;
+;;  shu-match-erase-using
+;;
+(defun shu-match-erase-using (proc-rlists log-buf)
+  "PROC-RLISTS is the set of rlists we are processing that represent all of the
+\"using namespace\" and \"using name\" statements.  This function replaces all
+of those statements in the buffer with whitespace.  This is done in order to
+preserve the positions of all other items in the buffer."
+  (interactive)
+  (let (
+        (rlist)
+        (ret-val)
+        (spoint)
+        (epoint)
+        (region (buffer-substring-no-properties (point-min) (point-max)))
+        )
+    (princ (concat "\nREGION1:\n" region "\n") log-buf)
+    (save-excursion
+      (while proc-rlists
+        (setq rlist (car proc-rlists))
+        (setq ret-val (shu-match-get-start-end-pos rlist))
+        (setq spoint (car ret-val))
+        (setq epoint (cdr ret-val))
+        (shu-erase-region spoint (1+ epoint))
+        (setq proc-rlists (cdr proc-rlists))
+        )
+      )
+    (setq region (buffer-substring-no-properties (point-min) (point-max)))
+    (princ (concat "\nREGION2:\n" region "\n") log-buf)
+    ))
 
 
 
