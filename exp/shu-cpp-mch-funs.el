@@ -400,9 +400,11 @@ start position of each rlist."
     (princ "\nsprl: " log-buf)(princ sprl log-buf)(princ "\n" log-buf)
     (while (and sprl tlist)
       (setq rlist (car sprl))
+      (princ "\nrlist: " log-buf)(princ rlist log-buf)(princ "\n" log-buf)
       (setq ret-val (shu-match-get-start-end-pos rlist))
       (setq r-spoint (car ret-val))
       (setq r-epoint (cdr ret-val))
+      (princ (format "r-spoint: %d, r-epoint: %d\n" r-spoint r-epoint) log-buf)
       (setq lastp tlist)
       (setq first1 t)
       (setq looking-for-start t)
@@ -419,6 +421,7 @@ start position of each rlist."
       ;; lastp is the item whose cdr will be changed
       ;; If first1 is true, head of list will be changed
       ;; tlist points to the start item (which might also be the end)
+      (princ "\ntoken-info of start: " log-buf)(princ token-info log-buf)(princ "\n" log-buf)
       (setq looking-for-end t)
       (while looking-for-end
         (setq token-info (car tlist))
@@ -434,6 +437,8 @@ start position of each rlist."
           (setq tlist (cdr tlist))
           )
         )
+      (princ "\ntoken-info of end: " log-buf)(princ token-info log-buf)(princ "\n" log-buf)
+      (princ "\ntlist: " log-buf)(princ tlist log-buf)(princ "\n" log-buf)
       (setq sprl (cdr sprl))
       )
     (cons tlist sorted-proc)
