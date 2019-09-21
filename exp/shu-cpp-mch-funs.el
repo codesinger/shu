@@ -346,6 +346,8 @@ that may follow the key word \"using\".")
           (princ "proc-classes9: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
           (princ "proc-rlists9: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
           (setq proc-classes (remove-class-duplicates proc-classes log-buf))
+          (princ "\n\nproc-rlists: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
+          (princ "\n\ntoken-list: " log-buf)(princ token-list log-buf)(princ "\n" log-buf)
           )
         )
 
@@ -359,7 +361,15 @@ that may follow the key word \"using\".")
 ;;  shu-match-remove-proc-rlists
 ;;
 (defun shu-match-remove-proc-rlists (token-list proc-rlists)
-  "Doc string."
+  "TOKEN-LIST is the original token list.  PROC-RLISTS is the set of rlists that
+represents the set of statements we will be processing.  This function removes
+from TOKEN-LIST, all of the items that are contained in the rlists in
+PROC-RLISTS.  This is because we do not want a subsequent scan of the token list
+to include any of the items in the statements we are processing.
+
+The return value from this function is a cons cell whose car is the trimmed
+TOKEN-LIST and whose cdr is the sorted PROC-RLISTS, which has been sorted by the
+start position of each rlist."
   (let (
         (tlist token-list)
         (sprl
@@ -418,6 +428,7 @@ that may follow the key word \"using\".")
         )
       (setq sprl (cdr sprl))
       )
+    (cons tlist sprl)
     ))
 
 
