@@ -324,6 +324,8 @@ that may follow the key word \"using\".")
         (something)
         (proc-classes)
         (proc-rlists)
+        (class-ht)
+        (clist)
         )
     (princ "class-list: " log-buf)(princ class-list log-buf)(princ "\n" log-buf)
     (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
@@ -354,6 +356,11 @@ that may follow the key word \"using\".")
           (princ "\n\nproc-rlists2: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
           (princ "\n\ntoken-list2: " log-buf)(princ token-list log-buf)(princ "\n" log-buf)
           (shu-match-erase-using proc-rlists log-buf)
+          (setq class-ht (shu-match-make-class-hash-table proc-classes log-buf))
+          (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
+          (when clist
+            (shu-match-qualify-class-names class-ht clist log-buf)
+            )
           )
         )
       )
@@ -364,7 +371,7 @@ that may follow the key word \"using\".")
 ;;
 ;;  shu-match-find-unqualified-class-names
 ;;
-(defun shu-match-find-unqualified-class-names (token-list proc-classes log-buf)
+(defun shu-match-find-unqualified-class-names (class-ht token-list proc-classes log-buf)
   "Go through all of the tokens looking at any unquoted token that is in the hash
 table of unqualified class names.  When an instance of a class name is found,
 check to see it it is preceded by \"::\", \".\", or \"->\".  \"::\" indicates
@@ -388,11 +395,6 @@ qualifying namespace."
   (interactive)
   (let (
         (tlist token-list)
-        ;; This should be done by the caller of this function
-        ;; When the clist is returned, the code that actually inserts
-        ;; the qualifying namespaces will have to look up the class
-        ;; names again
-        (ht (shu-match-make-class-hash-table proc-classes log-buf))
         (token-info)
         (next-token-info)
         (hv)
@@ -411,7 +413,7 @@ qualifying namespace."
       (setq token (shu-cpp-token-extract-token token-info))
       (setq token-type (shu-cpp-token-extract-type token-info))
       (when (= token-type shu-cpp-token-type-uq)
-        (setq hv (gethash token ht))
+        (setq hv (gethash token class-ht))
         (when hv
           (if
               (and
@@ -423,19 +425,21 @@ qualifying namespace."
                 ))
               (setq blocked t)
             (setq n (shu-cpp-token-next-non-comment tlist))
-            (setq next-token-info (car n))
-            (setq next-token (shu-cpp-token-extract-token token-info))
-            (setq next-token-type (shu-cpp-token-extract-type token-info))
-            (if
-                (and
-                 (= next-token-type shu-cpp-token-type-op)
-                 (or
-                  (string= next-token "(")
-                  (string= next-token "[")
-                  ))
-                (setq blocked t)
-              (when (might-be-include token-info) ;; Function still to write
-                (setq blocked t)
+            (when n
+              (setq next-token-info (car n))
+              (setq next-token (shu-cpp-token-extract-token token-info))
+              (setq next-token-type (shu-cpp-token-extract-type token-info))
+              (if
+                  (and
+                   (= next-token-type shu-cpp-token-type-op)
+                   (or
+                    (string= next-token "(")
+                    (string= next-token "[")
+                    ))
+                  (setq blocked t)
+                (when (might-be-include token-info) ;; Function still to write
+                  (setq blocked t)
+                  )
                 )
               )
             )
@@ -450,6 +454,39 @@ qualifying namespace."
       )
     clist
     ))
+
+
+;;
+;;  shu-match-qualify-class-names
+;;
+(defun shu-match-qualify-class-names (class-ht clist log-buf)
+  "CLASS-HT is the hash table that maps a class name to its containing namespace
+name.  CLIST is the list of token-info, each of which represents an unqualified
+class name.  The list is in reverse order, which is important.  It means that
+one can add a qualification to one class name in the list without changing the
+location of any other class names, which are above the current one in the
+buffer.
+
+This function goes to the position of each unqualified class name, finds its
+containing namespace in the hash table, and inserts the containing namespace
+followed by \"::\" in front of the unqualified class name."
+  (let (
+        (token-info)
+        (token)
+        (spoint)
+        (hv)
+        )
+    (while clist
+      (setq token-info (car clist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq spoint (shu-cpp-token-extract-spoint token-info))
+      (goto-char spoint)
+      (setq hv (gethash token class-ht "????"))
+      (insert (concat hv "::"))
+      (setq clist (cdr clist))
+      )
+    ))
+
 
 
 
