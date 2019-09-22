@@ -1050,4 +1050,307 @@ from the buffer."
     ))
 
 
+
+
+
+;;
+;;  shu-match-make-class-hash-table-internal
+;;
+(defun shu-match-make-class-hash-table-internal (proc-classes log-buf &optional count-only)
+  (let (
+        (pc proc-classes)
+        (ht)
+        (count 0)
+        (ce)
+        (cl)
+        (ns-name)
+        (class-name)
+        (hv)
+        (dup-present)
+        (value)
+        )
+    (while pc
+      (setq ce (car pc))
+      (setq cl (cdr ce))
+      (setq count (+ count (length cl)))
+      (setq pc (cdr pc))
+      )
+    (princ (format "Will have %d entries\n" count) log-buf)
+    (princ "proc-classes: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
+    (setq ht (make-hash-table :test 'equal :size count))
+    (setq pc proc-classes)
+    (while pc
+      (setq ce (car pc))
+      (setq ns-name (car ce))
+      (setq cl (cdr ce))
+      (while cl
+        (setq class-name (car cl))
+        (setq hv (gethash class-name ht))
+        (if hv
+            (progn
+              (princ (format "Duplicate namespace for class: %s\n" class-name) log-buf)
+              (princ (format "Class '%s' is in both namespace '%s' and '%s'\n" class-name hv ns-name) log-buf)
+              (setq dup-present t)
+              )
+          (if count-only
+              (setq value 0)
+            (setq value ns-name)
+              )
+          (puthash class-name value ht)
+            )
+        (setq cl (cdr cl))
+        )
+      (setq pc (cdr pc))
+      )
+    (princ "ht: " log-buf)(princ ht log-buf)(princ "\n" log-buf)
+    (when dup-present
+      (setq ht nil)
+      )
+    ht
+    ))
+
+
+;;
+;;  shu-match-increment-hash-count
+;;
+(defun shu-match-increment-hash-count (count-hash class-name)
+  "Doc string."
+  (interactive)
+  (let (
+        (count)
+        (new-count)
+        )
+    (setq count (gethash class-name count-hash))
+    (when count
+      (setq new-count (1+ count))
+      (remhash class-name count-hash)
+      (puthash class-name new-count count-hash)
+      )
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-match-make-class-hash-table-internal-1
+;;
+(ert-deftest shu-test-shu-match-make-class-hash-table-internal-1 ()
+  (let (
+        (gb (get-buffer-create "**goo**"))
+       (class-list
+        (list
+         (cons "abcde"    (list
+                           "AClass1"
+                           "AClass2"
+                           ))
+         (cons "xyrzk"    (list
+                           "Xclass1"
+                           "Xclass2"
+                           ))
+         (cons "std"    (list
+                           "string"
+                           "set"
+                           "map"
+                           ))
+         )
+        )
+       (ht)
+       (hv)
+       )
+    (setq ht (shu-match-make-class-hash-table-internal class-list gb))
+    (should ht)
+    (should (hash-table-p ht))
+    (setq hv (gethash "AClass1" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "abcde" hv))
+    (setq hv (gethash "AClass2" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "abcde" hv))
+    (setq hv (gethash "Xclass1" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "xyrzk" hv))
+    (setq hv (gethash "Xclass2" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "xyrzk" hv))
+    (setq hv (gethash "string" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "std" hv))
+    (setq hv (gethash "set" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "std" hv))
+    (setq hv (gethash "map" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= "std" hv))
+    ))
+
+
+
+;;
+;;  shu-test-shu-match-make-class-hash-table-internal-2
+;;
+(ert-deftest shu-test-shu-match-make-class-hash-table-internal-2 ()
+  (let (
+        (gb (get-buffer-create "**goo**"))
+       (class-list
+        (list
+         (cons "abcde"    (list
+                           "AClass1"
+                           "AClass2"
+                           ))
+         (cons "xyrzk"    (list
+                           "Xclass1"
+                           "Xclass2"
+                           ))
+         (cons "std"    (list
+                           "string"
+                           "set"
+                           "map"
+                           ))
+         )
+        )
+       (ht)
+       (hv)
+       )
+    (setq ht (shu-match-make-class-hash-table-internal class-list gb t))
+    (should ht)
+    (should (hash-table-p ht))
+    (setq hv (gethash "AClass1" ht))
+    (should hv)
+    (should (numberp hv))
+    (should (= 0 hv))
+    (setq hv (gethash "AClass2" ht))
+    (should hv)
+    (should (numberp hv))
+    (should (= 0 hv))
+    (setq hv (gethash "Xclass1" ht))
+    (should hv)
+    (should (numberp hv))
+    (should (= 0 hv))
+    (setq hv (gethash "Xclass2" ht))
+    (should hv)
+    (should (numberp hv))
+    (should (= 0 hv))
+    (setq hv (gethash "string" ht))
+    (should hv)
+    (should (numberp hv))
+    (should (= 0 hv))
+    (setq hv (gethash "set" ht))
+    (should hv)
+    (should (numberp hv))
+    (should (= 0 hv))
+    (setq hv (gethash "map" ht))
+    (should hv)
+    (should (numberp hv))
+    (should (= 0 hv))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-match-make-class-hash-table-internal-3
+;;
+(ert-deftest shu-test-shu-match-make-class-hash-table-internal-3 ()
+  (let (
+        (gb (get-buffer-create "**goo**"))
+       (class-list
+        (list
+         (cons "abcde"    (list
+                           "AClass1"
+                           "Xclass1"
+                           "AClass2"
+                           ))
+         (cons "xyrzk"    (list
+                           "Xclass1"
+                           "set"
+                           "Xclass2"
+                           ))
+         (cons "std"    (list
+                           "string"
+                           "set"
+                           "map"
+                           ))
+         )
+        )
+       (ht)
+       (hv)
+       )
+    (setq ht (shu-match-make-class-hash-table-internal class-list gb))
+    (should (not ht))
+    ))
+
+
+
+;;
+;;  shu-test-shu-match-increment-hash-count-1
+;;
+(ert-deftest shu-test-shu-match-increment-hash-count-1 ()
+  (let (
+        (gb (get-buffer-create "**goo**"))
+       (class-list
+        (list
+         (cons "abcde"    (list
+                           "AClass1"
+                           "AClass2"
+                           ))
+         (cons "xyrzk"    (list
+                           "Xclass1"
+                           "Xclass2"
+                           ))
+         (cons "std"    (list
+                           "string"
+                           "set"
+                           "map"
+                           ))
+         )
+        )
+       (ht)
+       (class-name)
+       (count)
+       )
+    (setq ht (shu-match-make-class-hash-table-internal class-list gb t))
+    (should ht)
+    (should (hash-table-p ht))
+    (setq class-name "Xclass1")
+    (shu-match-increment-hash-count ht class-name)
+    (setq count (gethash class-name ht))
+    (should count)
+    (should (numberp count))
+    (should (= 1 count))
+    (shu-match-increment-hash-count ht class-name)
+    (setq count (gethash class-name ht))
+    (should count)
+    (should (numberp count))
+    (should (= 2 count))
+    (shu-match-increment-hash-count ht class-name)
+    (setq count (gethash class-name ht))
+    (should count)
+    (should (numberp count))
+    (should (= 3 count))
+    (setq class-name "string")
+    (shu-match-increment-hash-count ht class-name)
+    (setq count (gethash class-name ht))
+    (should count)
+    (should (numberp count))
+    (should (= 1 count))
+    (shu-match-increment-hash-count ht class-name)
+    (setq count (gethash class-name ht))
+    (should count)
+    (should (numberp count))
+    (should (= 2 count))
+    (shu-match-increment-hash-count ht class-name)
+    (setq count (gethash class-name ht))
+    (should count)
+    (should (numberp count))
+    (should (= 3 count))
+    ))
+
+
 ;;; shu-cpp-mch-funs.el ends here
