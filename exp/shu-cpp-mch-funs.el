@@ -1057,6 +1057,21 @@ from the buffer."
 ;;  shu-match-make-class-hash-table-internal
 ;;
 (defun shu-match-make-class-hash-table-internal (proc-classes log-buf &optional count-only)
+  "PROC-CLASSES is the alist of all of the namespaces and classes that we will
+process, with the namespace name being the key and a list of class names within the
+namespace name as the value.
+
+This function builds a hash table that inverts the
+alist.  Each entry in the hash table has a class name as the key with the name
+of the enclosing namespace as the value.
+If two class names map to the same enclosing namespace name, then there is an
+unresolvable ambiguity that must terminate the operation.  If that is the case,
+diagnostic messages are placed into the log buffer and a nil value is returned.
+
+If the optional COUNT-ONLY argument is true, then a hash table is built in which
+the class name is the key and the value is zero.  This is used to build a hash
+table that will track the number of times a class name has been qualified by
+calling the function shu-match-increment-hash-count to increment the count."
   (let (
         (pc proc-classes)
         (ht)
