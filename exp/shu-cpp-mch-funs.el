@@ -356,10 +356,12 @@ that may follow the key word \"using\".")
           (princ "\n\nproc-rlists2: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
           (princ "\n\ntoken-list2: " log-buf)(princ token-list log-buf)(princ "\n" log-buf)
           (shu-match-erase-using proc-rlists log-buf)
-          (setq class-ht (shu-match-make-class-hash-table proc-classes log-buf))
-          (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
-          (when clist
-            (shu-match-qualify-class-names class-ht clist log-buf)
+          (setq class-ht (shu-match-make-class-hash-table-internal proc-classes log-buf))
+          (when class-ht
+            (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
+            (when clist
+              (shu-match-qualify-class-names class-ht clist log-buf)
+              )
             )
           )
         )
@@ -716,120 +718,6 @@ duplicate class names."
         )
     (setq proc-class (remove-class-duplicates class-list gb))
     (princ "proc-class: " gb)(princ proc-class gb)(princ "\n" gb)
-    ))
-
-
-;;
-;;  shu-match-make-class-hash-table
-;;
-(defun shu-match-make-class-hash-table (proc-classes log-buf)
-  "PROC-CLASSES is the alist of all of the namespaces and classes that we will
-process, wth the naespace name being the kay and a list of class names under the
-namespace name as the value.  This function builds a hash table that inverts the
-alist.  Each entry in the hash table has a class name as the key with the name
-of the enclosing namespace as the value.
-If two class names map to the same enclosing namespace name, then there is an
-unresolvable ambiguity that terminates the operation."
-  (interactive)
-  (let (
-        (pc proc-classes)
-        (ht)
-        (count 0)
-        (ce)
-        (cl)
-        (ns-name)
-        (class-name)
-        (hv)
-        )
-    (while pc
-      (setq ce (car pc))
-      (setq cl (cdr ce))
-      (setq count (+ count (length cl)))
-      (setq pc (cdr pc))
-      )
-    (princ (format "Will have %d entries\n" count) log-buf)
-    (princ "proc-classes: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
-    (setq ht (make-hash-table :test 'equal :size count))
-    (setq pc proc-classes)
-    (while pc
-      (setq ce (car pc))
-      (setq ns-name (car ce))
-      (setq cl (cdr ce))
-      (while cl
-        (setq class-name (car cl))
-        (setq hv (gethash class-name ht))
-        (if hv
-            (progn
-              (princ (format "Duplicate namespace for class: %s\n" class-name) log-buf)
-              )
-          (puthash class-name ns-name ht)
-            )
-        (setq cl (cdr cl))
-        )
-      (setq pc (cdr pc))
-      )
-    (princ "ht: " log-buf)(princ ht log-buf)(princ "\n" log-buf)
-    ht
-    ))
-
-
-;;
-;;  shu-test-shu-match-make-class-hash-table
-;;
-(ert-deftest shu-test-shu-match-make-class-hash-table ()
-  (let (
-        (gb (get-buffer-create "**goo**"))
-       (class-list
-        (list
-         (cons "abcde"    (list
-                           "AClass1"
-                           "AClass2"
-                           ))
-         (cons "xyrzk"    (list
-                           "Xclass1"
-                           "Xclass2"
-                           ))
-         (cons "std"    (list
-                           "string"
-                           "set"
-                           "map"
-                           ))
-         )
-        )
-       (ht)
-       (hv)
-       )
-    (setq ht (shu-match-make-class-hash-table class-list gb))
-    (should ht)
-    (should (hash-table-p ht))
-    (setq hv (gethash "AClass1" ht))
-    (should hv)
-    (should (stringp hv))
-    (should (string= "abcde" hv))
-    (setq hv (gethash "AClass2" ht))
-    (should hv)
-    (should (stringp hv))
-    (should (string= "abcde" hv))
-    (setq hv (gethash "Xclass1" ht))
-    (should hv)
-    (should (stringp hv))
-    (should (string= "xyrzk" hv))
-    (setq hv (gethash "Xclass2" ht))
-    (should hv)
-    (should (stringp hv))
-    (should (string= "xyrzk" hv))
-    (setq hv (gethash "string" ht))
-    (should hv)
-    (should (stringp hv))
-    (should (string= "std" hv))
-    (setq hv (gethash "set" ht))
-    (should hv)
-    (should (stringp hv))
-    (should (string= "std" hv))
-    (setq hv (gethash "map" ht))
-    (should hv)
-    (should (stringp hv))
-    (should (string= "std" hv))
     ))
 
 
