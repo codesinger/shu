@@ -1261,24 +1261,14 @@ calling the function shu-match-increment-hash-count to increment the count."
 ;;
 (ert-deftest shu-test-shu-match-remove-proc-rlists-1 ()
   (let (
-        (log-buf (get-buffer-create "**moo**"))
+        (log-buf (get-buffer-create "**foo**"))
        (data
         (concat
-         "/*!\n"
-         " * \\file something_or_other.cpp\n"
-         " */\n"
-         "\n"
-         "#include <strng>\n"
          "\n"
          "    using namespace abcde;\n"
          "    x = x + 1;\n"
          "    using namespace xyrzk;\n"
          "    using std::string;\n"
-         "    using namespace fred; /* Hello */\n"
-         "    using abc::std::string;\n /* Hello */"
-         "    /* xxx */\n"
-         "    string      x;\n"
-         "    AClass1     z;\n"
          "    Xclass2     p;\n"
          "// Hello\n"
          ))
@@ -1294,23 +1284,46 @@ calling the function shu-match-increment-hash-count to increment the count."
                            ))
          )
         )
+       (top-name "WhammoCorp")
        (token-list)
-       (x)
+       (ret-val)
+       (token-list)
+       (proc-rlists)
+       (prl)
+       (rlist)
        )
     (with-temp-buffer
       (insert data)
-      (something-or-other class-list log-buf)
-      (setq x (buffer-substring-no-properties (point-min) (point-max)))
-      (princ (concat "\n\n\n" x "\n") log-buf)
+      (setq ret-val (shu-test-shu-setup-proc-rlists-1 class-list log-buf top-name))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq token-list (car ret-val))
+      (should token-list)
+      (should (listp token-list))
+      (setq proc-rlists (cdr ret-val))
+      (should proc-rlists)
+      (shu-cpp-tokenize-show-list-buffer token-list log-buf "\ntoken-list (setup):")
+      (setq prl proc-rlists)
+      (while prl
+        (setq rlist (car prl))
+        (shu-cpp-tokenize-show-list-buffer rlist log-buf "\nrlist (setup):")
+        (setq prl (cdr prl))
+        )
+      (setq ret-val (shu-match-remove-proc-rlists token-list proc-rlists log-buf))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq token-list (car ret-val))
+      (should token-list)
+      (should (listp token-list))
+      (shu-cpp-tokenize-show-list-buffer token-list log-buf "\ntoken-list (setup):")
       )
-
     ))
 
 
 ;;
-;;  shu-test-shu-setup-proc-rlists
+;;  shu-test-shu-setup-proc-rlists-1
 ;;
-(defun shu-test-shu-setup-proc-rlists (class-list log-buf &optional top-name)
+(defun shu-test-shu-setup-proc-rlists-1 (class-list log-buf &optional top-name)
   "Create from the current buffer, an instance of proc-classes and an instance
 of proc-rlist.  Return a cons cell in which the cdr is the instance of
 proc-classes and the car is the instance of proc-rlists.
@@ -1340,7 +1353,7 @@ be in place."
     (setq proc-classes (car something))
     (setq proc-rlists (cdr something))
     (setq proc-classes (remove-class-duplicates proc-classes log-buf))
-    (cons proc-classes proc-rlists)
+    (cons token-list proc-rlists)
     ))
 
 
