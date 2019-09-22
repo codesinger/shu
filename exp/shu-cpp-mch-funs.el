@@ -446,11 +446,11 @@ qualifying namespace."
           (when (not blocked)
             (push token-info clist)
             )
-          (setq last-token token)
-          (setq last-token-type token-type)
-          (setq tlist (shu-cpp-token-next-non-comment tlist))
           )
         )
+      (setq last-token token)
+      (setq last-token-type token-type)
+      (setq tlist (shu-cpp-token-next-non-comment tlist))
       )
     clist
     ))
@@ -748,6 +748,7 @@ unresolvable ambiguity that terminates the operation."
       (setq pc (cdr pc))
       )
     (princ (format "Will have %d entries\n" count) log-buf)
+    (princ "proc-classes: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
     (setq ht (make-hash-table :test 'equal :size count))
     (setq pc proc-classes)
     (while pc
@@ -951,10 +952,11 @@ from the buffer."
 
 
 
+
 ;;
-;;  shu-test-something-or-other
+;;  shu-test-something-or-other-1
 ;;
-(ert-deftest shu-test-something-or-other ()
+(ert-deftest shu-test-something-or-other-1 ()
   (let (
         (log-buf (get-buffer-create "**goo**"))
        (data
@@ -970,7 +972,7 @@ from the buffer."
          "    using namespace xyrzk;\n"
          "    using std::string;\n"
          "    using namespace fred; /* Hello */\n"
-         "    using abc::std::string;\n /* Hello */"
+         "    using abc::std::deque;\n /* Hello */"
          "// Hello\n"
          ))
        (class-list
@@ -993,6 +995,59 @@ from the buffer."
       )
     ))
 
+
+
+
+
+
+;;
+;;  shu-test-something-or-other-2
+;;
+(ert-deftest shu-test-something-or-other-2 ()
+  (let (
+        (log-buf (get-buffer-create "**moo**"))
+       (data
+        (concat
+         "/*!\n"
+         " * \\file something_or_other.cpp\n"
+         " */\n"
+         "\n"
+         "#include <strng>\n"
+         "\n"
+         "    using namespace abcde;\n"
+         "    x = x + 1;\n"
+         "    using namespace xyrzk;\n"
+         "    using std::string;\n"
+         "    using namespace fred; /* Hello */\n"
+         "    using abc::std::string;\n /* Hello */"
+         "    /* xxx */\n"
+         "    string      x;\n"
+         "    AClass1     z;\n"
+         "    Xclass2     p;\n"
+         "// Hello\n"
+         ))
+       (class-list
+        (list
+         (cons "abcde"    (list
+                           "AClass1"
+                           "AClass2"
+                           ))
+         (cons "xyrzk"    (list
+                           "Xclass1"
+                           "Xclass2"
+                           ))
+         )
+        )
+       (token-list)
+       (x)
+       )
+    (with-temp-buffer
+      (insert data)
+      (something-or-other class-list log-buf)
+      (setq x (buffer-substring-no-properties (point-min) (point-max)))
+      (princ (concat "\n\n\n" x "\n") log-buf)
+      )
+    ))
 
 
 ;;; shu-cpp-mch-funs.el ends here
