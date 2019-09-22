@@ -594,7 +594,6 @@ start position of each rlist."
       (princ (format "r-spoint: %d, r-epoint: %d\n" r-spoint r-epoint) log-buf)
       (princ "lastp: " log-buf)(princ (car lastp) log-buf)(princ "\n" log-buf)
       (princ "tlist: " log-buf)(princ (car tlist) log-buf)(princ "\n" log-buf)
-;;;      (setq lastp tlist)
       (setq first1 nil)
       (setq looking-for-start t)
       (while looking-for-start
@@ -1253,6 +1252,95 @@ calling the function shu-match-increment-hash-count to increment the count."
     (should count)
     (should (numberp count))
     (should (= 3 count))
+    ))
+
+
+
+;;
+;;  shu-test-shu-match-remove-proc-rlists-1
+;;
+(ert-deftest shu-test-shu-match-remove-proc-rlists-1 ()
+  (let (
+        (log-buf (get-buffer-create "**moo**"))
+       (data
+        (concat
+         "/*!\n"
+         " * \\file something_or_other.cpp\n"
+         " */\n"
+         "\n"
+         "#include <strng>\n"
+         "\n"
+         "    using namespace abcde;\n"
+         "    x = x + 1;\n"
+         "    using namespace xyrzk;\n"
+         "    using std::string;\n"
+         "    using namespace fred; /* Hello */\n"
+         "    using abc::std::string;\n /* Hello */"
+         "    /* xxx */\n"
+         "    string      x;\n"
+         "    AClass1     z;\n"
+         "    Xclass2     p;\n"
+         "// Hello\n"
+         ))
+       (class-list
+        (list
+         (cons "abcde"    (list
+                           "AClass1"
+                           "AClass2"
+                           ))
+         (cons "xyrzk"    (list
+                           "Xclass1"
+                           "Xclass2"
+                           ))
+         )
+        )
+       (token-list)
+       (x)
+       )
+    (with-temp-buffer
+      (insert data)
+      (something-or-other class-list log-buf)
+      (setq x (buffer-substring-no-properties (point-min) (point-max)))
+      (princ (concat "\n\n\n" x "\n") log-buf)
+      )
+
+    ))
+
+
+;;
+;;  shu-test-shu-setup-proc-rlists
+;;
+(defun shu-test-shu-setup-proc-rlists (class-list log-buf &optional top-name)
+  "Create from the current buffer, an instance of proc-classes and an instance
+of proc-rlist.  Return a cons cell in which the cdr is the instance of
+proc-classes and the car is the instance of proc-rlists.
+
+This is used to set up for a unit test that needs these two lists to
+be in place."
+  (let (
+        (token-list)
+        (ret-val)
+        (something)
+        (uns-list)
+        (un-list)
+        (proc-rlists)
+        (proc-classes)
+        )
+    (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+    (setq ret-val (shu-match-find-all-using-internal token-list))
+    (should ret-val)
+    (setq uns-list (car ret-val))
+    (setq un-list (cdr ret-val))
+    (should uns-list)
+    (setq something (process-uns-list class-list uns-list log-buf top-name))
+    (should something)
+    (setq proc-classes (car something))
+    (setq proc-rlists (cdr something))
+    (setq something (add-ns-rlists un-list proc-classes proc-rlists log-buf top-name))
+    (setq proc-classes (car something))
+    (setq proc-rlists (cdr something))
+    (setq proc-classes (remove-class-duplicates proc-classes log-buf))
+    (cons proc-classes proc-rlists)
     ))
 
 
