@@ -328,9 +328,6 @@ that may follow the key word \"using\".")
         (count-alist)
         (clist)
         )
-    (setq debug-on-error t)
-    (princ "debug-on-error: " log-buf)(princ debug-on-error log-buf)(princ "\n" log-buf)
-    (princ "class-list: " log-buf)(princ class-list log-buf)(princ "\n" log-buf)
     (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
     (setq ret-val (shu-match-find-all-using-internal token-list))
     (if (not ret-val)
@@ -348,16 +345,10 @@ that may follow the key word \"using\".")
           (setq something (shu-match-add-names-to-class-list un-list proc-classes proc-rlists log-buf top-name))
           (setq proc-classes (car something))
           (setq proc-rlists (cdr something))
-          (princ "proc-classes9: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
-          (princ "proc-rlists9: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
           (setq proc-classes (remove-class-duplicates proc-classes log-buf))
-          (princ "\n\nproc-rlists: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
-          (princ "\n\ntoken-list: " log-buf)(princ token-list log-buf)(princ "\n" log-buf)
           (setq ret-val (shu-match-remove-proc-rlists token-list proc-rlists log-buf))
           (setq token-list (car ret-val))
           (setq proc-rlists (cdr ret-val))
-          (princ "\n\nproc-rlists2: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
-          (princ "\n\ntoken-list2: " log-buf)(princ token-list log-buf)(princ "\n" log-buf)
           (shu-match-erase-using proc-rlists log-buf)
           (setq class-ht (shu-match-make-class-hash-table-internal proc-classes log-buf))
           (when class-ht
@@ -1076,7 +1067,7 @@ count by one."
 ;;
 (ert-deftest shu-test-remove-class-duplicates ()
   (let (
-        (gb (get-buffer-create "**goo**"))
+        (gb (get-buffer-create shu-unit-test-buffer))
         (class-list
          (list
           (cons "abcde"    (list
@@ -1090,19 +1081,41 @@ count by one."
                             "Xclass1"
                             "Xclass2"
                             ))
-          (cons "std "    (list
+          (cons "std"     (list
                            "string"
                            "string"
                            "set"
                            "set"
                            "map"
-                           ))
-          )
-         )
+                           ))))
         (proc-class)
+        (cp1)
+        (cp2)
+        (cp3)
+        (cl)
         )
     (setq proc-class (remove-class-duplicates class-list gb))
-    (princ "proc-class: " gb)(princ proc-class gb)(princ "\n" gb)
+    (setq cp1 (assoc "abcde" class-list))
+    (should cp1)
+    (should (consp cp1))
+    (setq cl (cdr cp1))
+    (should cl)
+    (should (listp cl))
+    (should (= 2 (length cl)))
+    (setq cp2 (assoc "xyrzk" class-list))
+    (should cp2)
+    (should (consp cp2))
+    (setq cl (cdr cp2))
+    (should cl)
+    (should (listp cl))
+    (should (= 2 (length cl)))
+    (setq cp3 (assoc "std" class-list))
+    (should cp3)
+    (should (consp cp3))
+    (setq cl (cdr cp3))
+    (should cl)
+    (should (listp cl))
+    (should (= 3 (length cl)))
     ))
 
 
