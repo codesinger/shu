@@ -830,8 +830,7 @@ of the enclosing namespace as the value.
 If two class names map to the same enclosing namespace name, then there is an
 unresolvable ambiguity that must terminate the operation.  If that is the case,
 diagnostic messages are placed into the log buffer and a nil value is returned."
-  (let (
-        (pc proc-classes)
+  (let ((pc proc-classes)
         (ht)
         (count 0)
         (ce)
@@ -839,16 +838,12 @@ diagnostic messages are placed into the log buffer and a nil value is returned."
         (ns-name)
         (class-name)
         (hv)
-        (dup-present)
-        )
+        (dup-present))
     (while pc
       (setq ce (car pc))
       (setq cl (cdr ce))
       (setq count (+ count (length cl)))
-      (setq pc (cdr pc))
-      )
-    (princ (format "Will have %d entries\n" count) log-buf)
-    (princ "proc-classes: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
+      (setq pc (cdr pc)))
     (setq ht (make-hash-table :test 'equal :size count))
     (setq pc proc-classes)
     (while pc
@@ -862,18 +857,12 @@ diagnostic messages are placed into the log buffer and a nil value is returned."
             (progn
               (princ (format "Duplicate namespace for class: %s\n" class-name) log-buf)
               (princ (format "Class '%s' is in both namespace '%s' and '%s'\n" class-name hv ns-name) log-buf)
-              (setq dup-present t)
-              )
-          (puthash class-name ns-name ht)
-          )
-        (setq cl (cdr cl))
-        )
-      (setq pc (cdr pc))
-      )
-    (princ "ht: " log-buf)(princ ht log-buf)(princ "\n" log-buf)
+              (setq dup-present t))
+          (puthash class-name ns-name ht))
+        (setq cl (cdr cl)))
+      (setq pc (cdr pc)))
     (when dup-present
-      (setq ht nil)
-      )
+      (setq ht nil))
     ht
     ))
 
@@ -1188,8 +1177,7 @@ count by one."
 ;;  shu-test-shu-match-make-count-alist-from-hash-1
 ;;
 (ert-deftest shu-test-shu-match-make-count-alist-from-hash-1 ()
-  (let (
-        (gb (get-buffer-create shu-unit-test-buffer))
+  (let ((gb (get-buffer-create shu-unit-test-buffer))
         (class-list
          (list
           (cons "abcde"    (list
@@ -1204,9 +1192,7 @@ count by one."
                           "string"
                           "set"
                           "map"
-                          ))
-          )
-         )
+                          ))))
         (ht)
         (av1)
         (av2)
@@ -1216,8 +1202,7 @@ count by one."
         (av6)
         (av7)
         (av8)
-        (count-alist)
-        )
+        (count-alist))
     (setq ht (shu-match-make-class-hash-table-internal class-list gb))
     (should ht)
     (should (hash-table-p ht))
@@ -1294,8 +1279,7 @@ count by one."
 ;;  shu-test-shu-match-make-class-hash-table-internal-1
 ;;
 (ert-deftest shu-test-shu-match-make-class-hash-table-internal-1 ()
-  (let (
-        (gb (get-buffer-create "**goo**"))
+  (let ((gb (get-buffer-create shu-unit-test-buffer))
         (class-list
          (list
           (cons "abcde"    (list
@@ -1310,12 +1294,9 @@ count by one."
                           "string"
                           "set"
                           "map"
-                          ))
-          )
-         )
+                          ))))
         (ht)
-        (hv)
-        )
+        (hv))
     (setq ht (shu-match-make-class-hash-table-internal class-list gb))
     (should ht)
     (should (hash-table-p ht))
@@ -1356,8 +1337,7 @@ count by one."
 ;;  shu-test-shu-match-make-class-hash-table-internal-3
 ;;
 (ert-deftest shu-test-shu-match-make-class-hash-table-internal-3 ()
-  (let (
-        (gb (get-buffer-create "**goo**"))
+  (let ((gb (get-buffer-create shu-unit-test-buffer))
         (class-list
          (list
           (cons "abcde"    (list
@@ -1374,12 +1354,9 @@ count by one."
                           "string"
                           "set"
                           "map"
-                          ))
-          )
-         )
+                          ))))
         (ht)
-        (hv)
-        )
+        (hv))
     (setq ht (shu-match-make-class-hash-table-internal class-list gb))
     (should (not ht))
     ))
