@@ -1078,6 +1078,143 @@ count by one."
       (something-or-other class-list log-buf)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual))
+      )
+    ))
+
+
+
+
+
+;;
+;;  shu-test-something-or-other-3
+;;
+(ert-deftest shu-test-something-or-other-3 ()
+  (let (
+        (log-buf (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "    using namespace abcde;\n"
+          "    x = x + 1;\n"
+          "    using namespace xyrzk;\n"
+          "    using namespace std;\n"
+          "    /* xxx */\n"
+          "    string      x;\n"
+          "    AClass1     z;\n"
+          "    Xclass2     p;\n"
+          "    deque       jj;\n"
+          "// Hello\n"
+          ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std"      (list
+                            "string"
+                            "deque"
+                            ))
+          )
+         )
+        (token-list)
+        (actual)
+        (expected
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "                          \n"
+          "    x = x + 1;\n"
+          "                          \n"
+          "                        \n"
+          "    /* xxx */\n"
+          "    std::string      x;\n"
+          "    abcde::AClass1     z;\n"
+          "    xyrzk::Xclass2     p;\n"
+          "    std::deque       jj;\n"
+          "// Hello\n"
+          ))
+        )
+    (with-temp-buffer
+      (insert data)
+      (something-or-other class-list log-buf)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual))
+      (princ (concat "\n\n\nsomething-or-other\n" actual) log-buf)
+      )
+    ))
+
+
+
+
+
+;;
+;;  shu-test-something-or-other-4
+;;
+(ert-deftest shu-test-something-or-other-4 ()
+  (let (
+        (log-buf (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "    using namespace std;\n"
+          "    using abcde::AClass1;\n"
+          "    using xyrzk::Xclass2;\n"
+          "    using std::string;\n"
+          "    using std::deque;\n"
+          "    x = x + 1;\n"
+          "    /* xxx */\n"
+          "    string      x;\n"
+          "    AClass1     z;\n"
+          "    Xclass2     p;\n"
+          "    deque       jj;\n"
+          "// Hello\n"
+          ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std"      (list
+                            "string"
+                            "deque"
+                            ))
+          )
+         )
+        (token-list)
+        (actual)
+        (expected
+         (concat
+          ))
+        )
+    (with-temp-buffer
+      (insert data)
+      (something-or-other class-list log-buf)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+;;;      (should (string= expected actual))
       (princ (concat "\n\n\nsomething-or-other\n" actual) log-buf)
       )
     ))
