@@ -2664,6 +2664,88 @@ using namespace statements."
 
 
 
+
+;;
+;;  shu-test-shu-match-internal-rmv-using-8
+;;
+(ert-deftest shu-test-shu-match-internal-rmv-using-8 ()
+  (let ((log-buf (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "#include <set>\n"
+          "\n"
+          "    using namespace abcde;\n"
+          "    x = x + 1;\n"
+          "    using namespace xyrzk;\n"
+          "    using namespace std;\n"
+          "    /* xxx */\n"
+          "    a->set();\n"
+          "    x.set();\n"
+          "    std::set    gg;\n"
+          "    x = set[i]\n"
+          "    string      x;\n"
+          "    AClass1     z;\n"
+          "    Xclass2     p;\n"
+          "    deque       jj;\n"
+          "// Hello\n"
+          ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std"      (list
+                            "string"
+                            "deque"
+                            "set"
+                            "map"
+                            ))))
+        (token-list)
+        (actual)
+        (expected
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "#include <set>\n"
+          "\n"
+          "                          \n"
+          "    x = x + 1;\n"
+          "                          \n"
+          "                        \n"
+          "    /* xxx */\n"
+          "    a->set();\n"
+          "    x.set();\n"
+          "    std::set    gg;\n"
+          "    x = set[i]\n"
+          "    std::string      x;\n"
+          "    abcde::AClass1     z;\n"
+          "    xyrzk::Xclass2     p;\n"
+          "    std::deque       jj;\n"
+          "// Hello\n"
+          )))
+    (with-temp-buffer
+      (insert data)
+      (shu-match-internal-rmv-using class-list log-buf)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    (princ (concat "\n\n\nSOMETHING:\n" actual "\n") log-buf)
+    ))
+
+
+
 ;;
 ;;  shu-test-remove-class-duplicates
 ;;
