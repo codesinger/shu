@@ -968,7 +968,7 @@ count by one."
 ;;
 (ert-deftest shu-test-something-or-other-1 ()
   (let (
-        (log-buf (get-buffer-create "**goo**"))
+        (log-buf (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
@@ -1015,11 +1015,11 @@ count by one."
 ;;
 (ert-deftest shu-test-something-or-other-2 ()
   (let (
-        (log-buf (get-buffer-create "**moo**"))
+        (log-buf (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
-          " * \\file something_or_other.cpp\n"
+          " * file something_or_other.cpp\n"
           " */\n"
           "\n"
           "#include <strng>\n"
@@ -1050,13 +1050,35 @@ count by one."
           )
          )
         (token-list)
-        (x)
+        (actual)
+        (expected
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "                          \n"
+          "    x = x + 1;\n"
+          "                          \n"
+          "                     \n"
+          "    using namespace fred; /* Hello */\n"
+          "                           \n"
+          " /* Hello */    /* xxx */\n"
+          "    abc::std::string      x;\n"
+          "    abcde::AClass1     z;\n"
+          "    xyrzk::Xclass2     p;\n"
+          "    std::deque       jj;\n"
+          "// Hello\n"
+          ))
         )
     (with-temp-buffer
       (insert data)
       (something-or-other class-list log-buf)
-      (setq x (buffer-substring-no-properties (point-min) (point-max)))
-      (princ (concat "\n\n\n" x "\n") log-buf)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual))
+      (princ (concat "\n\n\nsomething-or-other\n" actual) log-buf)
       )
     ))
 
@@ -1314,7 +1336,7 @@ count by one."
 ;;
 (ert-deftest shu-test-shu-match-remove-proc-rlists-1 ()
   (let (
-        (log-buf (get-buffer-create "**foo**"))
+        (log-buf (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "\n"
