@@ -46,7 +46,6 @@
 
 
 
-
 # Overview #
 
 
@@ -61,10 +60,11 @@ Version 1.2 was merged with the master branch on 6 January 2019.
 
 Version 1.3 was merged with the master branch on 12 January 2019.
 
-Version 1.4.0 was merged with the master branch on 2 February 2019.
+Version 1.4 was merged with the master branch on 2 February 2019.
 
-This is Version 1.5.0 of the Shu elisp repository, which was merged
-with the master branch on 18 August 2019.
+Version 1.5 was merged with the master branch on 18 August 2019.
+
+This is Version 1.5.6 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -2737,8 +2737,8 @@ This function returns true if such an ambiguity exists.
 
 
 
-#### shu-cpp-rmv-using ####
-shu-cpp-rmv-using *class-list* **&optional** *top-name*
+#### shu-cpp-rmv-using-old ####
+shu-cpp-rmv-using-old *class-list* **&optional** *top-name*
 [Function]
 
 Remove "using namespace" directives from a C++ file, adding the appropriate
@@ -6224,7 +6224,7 @@ about syntax errors in the file.
 # shu-match #
 
 
-Functions that use functions in shu-match.el
+Functions that use functions in shu-cpp-match.el
 
 
 ## List of functions by alias name ##
@@ -6235,7 +6235,7 @@ A list of aliases and associated function names.
 
 
 
-#### find-variables ####
+#### find-all-variables ####
 [Command]
  (Function: shu-match-find-variables)
 
@@ -6252,6 +6252,158 @@ List of functions and variable definitions in this package.
 
 
 
+#### remove-class-duplicates ####
+remove-class-duplicates *proc-classes* *log-buf*
+[Function]
+
+*proc-classes* is the alist of classes that we will process.  The car of each
+item is the containing namespace.  The cdr of each item is the list of class
+names contained within the namespace.  The original class list may have had
+duplicate class names within a given namespace.  We may also have added class
+names to a given namespace from processing one or more "using name"
+statements.
+
+For example, if the lass list contained "std . set map string" and we also
+processed a "using std::string" statement, the code that processed that
+statement would have blindly added "string" to the list of classes in the
+namespace "std".  The list of classes for namespace "std" would then contain
+"string set map string".
+
+This function removes any duplicate class names within a given namespace.  This
+is necessary because we are about to invert the class list to produce a hash
+table in which the key is the class name and the value is the enclosing
+namespace name.  This operation will fail if a given namespace contains
+duplicate class names.
+
+
+
+#### shu-cpp-match-colon-name ####
+[Constant]
+
+A repeating side list to match zero or more instances of {:: <name>}
+
+
+
+#### shu-cpp-match-many-using-list ####
+[Constant]
+
+These two lists match what may follow the key word "using".  The first list
+matches the key word "namespace" followed by any of the different name types
+that may follow "using namespace".  The second list matches any of the name
+forms that may following the key word "using" when it is not followed by the
+key word "namespace".
+
+
+
+#### shu-cpp-match-namespace-forms ####
+[Constant]
+
+;
+
+
+
+#### shu-cpp-match-namespace-list ####
+[Constant]
+
+namespace
+
+
+
+#### shu-cpp-match-namespace-list-single ####
+[Constant]
+
+namespace
+
+
+
+#### shu-cpp-match-using-forms ####
+[Constant]
+
+These two lists match the form of name that can follow a "using" directive
+that is not a "using namespace" directive.  This is either <name> or
+<name>::<name>>, <name>::<name>::<name>, etc.  The first list above matches
+<name> followed by semicolon..  The second list matches <name> followed
+by a looping side list for zero or more occurrences of "::" followed by <name>
+
+
+
+#### shu-cpp-match-using-list-single ####
+[Constant]
+
+This is a single list that is the top level list for matching anything
+that may follow the key word "using".
+
+
+
+#### shu-cpp-rmv-using ####
+shu-cpp-rmv-using *class-list* **&optional** *top-name*
+[Function]
+
+Remove "using namespace" directives from a C++ file, adding the appropriate
+namespace qualifier to all of the unqualified class names.  *class-list* is an
+a-list in which the car of each entry is a namespace and the cdr of each entry
+is a list of class names.  Here is an example of such an a-list:
+
+```
+     (list
+      (cons "std"    (list "set" "string" "vector"))
+      (cons "world"  (list "Hello" "Goodbye")))
+```
+
+*top-name*, if present is a higher level namespace.  Given a top level namespace
+of "WhammoCorp", then the following line:
+
+```
+     using namespace WhammoCorp::world;
+```
+
+would be interpreted as though it had been written:
+
+```
+     using namespace world;
+```
+
+
+
+#### shu-match-add-names-to-class-list ####
+shu-match-add-names-to-class-list *un-list* *proc-classes* *proc-rlists* *log-buf* **&optional** *top-name*
+[Function]
+
+*un-list* is the list of rlists that represent the "using name" statements.
+*proc-classes* is the class list we will be using to do the processing.
+*proc-rlists* is the set of rlists that represents the "using namespace"
+statements.  This function adds the"using name" directives, if any, to both
+*proc-classes* and *proc-rlists*.  It returns a cons cell in which the car is the
+modified *proc-classes* and the cdr is the modified PROC-RLISTS.
+
+
+
+#### shu-match-erase-using ####
+shu-match-erase-using *proc-rlists* *log-buf*
+[Command]
+
+*proc-rlists* is the set of rlists we are processing that represent all of the
+"using namespace" and "using name" statements.  This function replaces all
+of those statements in the buffer with whitespace.  This is done in order to
+preserve the positions of all other items in the buffer.
+
+
+
+#### shu-match-find-all-using-internal ####
+shu-match-find-all-using-internal *token-list*
+[Function]
+
+Given a token list, return two different lists.  The first is a list of all
+"using namespace" statements.  The second is a list of all "using"
+statements that are not "using namespace" statements.  "using namespace
+std;" is an example of the first type.  "using std::string" is an example of
+the second type.
+The return value of this function is a single cons cell in which the cdr points
+to the first list and the car points to the second list.
+If neither list is present, then the return value is nil.
+
+
+
 #### shu-match-find-semi-names ####
 shu-match-find-semi-names *token-list*
 [Function]
@@ -6262,14 +6414,169 @@ that holds a match and put it into the buffer "`**shu-vars**`",
 
 
 
+#### shu-match-find-unqualified-class-names ####
+shu-match-find-unqualified-class-names *class-ht* *token-list* *proc-classes* *log-buf*
+[Command]
+
+Go through all of the tokens looking at any unquoted token that is in the hash
+table of unqualified class names.  When an instance of a class name is found,
+check to see it it is preceded by "::", ".", or "->".  "::" indicates
+that it is probably qualified.  "." or "->" indicate that it is probably a
+function name.
+
+Check also to see if it is followed by ")" or "[", which probably indicates
+that it is a variable name.
+
+Next, check to see if it is preceded by "#include".
+
+If it survives all of those checks, it is probably an unqualified class name, in
+which case its token-info is pushed onto a list.  The list is the return value
+of this function.  Since each token-info is pushed onto the list, the list is
+returned in reverse order.  i.e., the last token in the file is the first in the
+list.
+
+At this point it is possible to visit each token in the list, which is in
+reverse order in the file, look up each token, and insert in front of it its
+qualifying namespace.
+
+
+
 #### shu-match-find-variables ####
 [Command]
- (Alias: find-variables)
+ (Alias: find-all-variables)
 
 Find what might be all of the variable declarations in a header file by doing
 a reverse tokenized scan looking for all occurrences of operator ";" followed
 by something that matches the regular expression for a C++ name.  Then take each
 line that matches and put it in the buffer "`**shu-vars**`".
+
+
+
+#### shu-match-get-start-end-pos ####
+shu-match-get-start-end-pos *rlist* **&optional** *whole-lines*
+[Function]
+
+Given an *rlist* return the beginning and end positions.  The beginning position is
+the position of the first character of the first token.  The end position is the
+position of the last character of the last token.  These two are returned as a cons
+cell whose car is the beginning position and whose cdr is the end position.  If
+the optional *whole-lines* is true, the start position is that of the beginning of
+the line on which the start falls and the end position is that of the end of
+the line on which the end falls.
+
+
+
+#### shu-match-increment-class-count ####
+shu-match-increment-class-count *alist* *class-name*
+[Command]
+
+*alist* is an alist whose key is a *class-name* and whose cdr is a count of the
+number of times that class name has been found.  This function increments the
+count by one.
+
+
+
+#### shu-match-internal-rmv-using ####
+shu-match-internal-rmv-using *class-list* *log-buf* **&optional** *top-name*
+[Function]
+
+Doc string.
+
+
+
+#### shu-match-make-class-hash-table-internal ####
+shu-match-make-class-hash-table-internal *proc-classes* *log-buf*
+[Function]
+
+*proc-classes* is the alist of all of the namespaces and classes that we will
+process, with the namespace name being the key and a list of class names within the
+namespace name as the value.
+
+This function builds a hash table that inverts the
+alist.  Each entry in the hash table has a class name as the key with the name
+of the enclosing namespace as the value.
+If two class names map to the same enclosing namespace name, then there is an
+unresolvable ambiguity that must terminate the operation.  If that is the case,
+diagnostic messages are placed into the log buffer and a nil value is returned.
+
+
+
+#### shu-match-make-count-alist-from-hash ####
+shu-match-make-count-alist-from-hash *class-ht*
+[Command]
+
+Doc string.
+
+
+
+#### shu-match-merge-namespaces-with-class-list ####
+shu-match-merge-namespaces-with-class-list *class-list* *uns-list* *log-buf* **&optional** *top-name*
+[Function]
+
+Merge the *uns-list* with the *class-list*.  Return a cons-cell pointing to two
+lists.  The first is the list of classes from the class list that have
+corresponding "using namespace" directives in the buffer.  The second is the
+lists of rlists that represent each using namespace directive that we will
+process.
+The updated class list will be used to identify class names to be qualified and
+the namespaces with which to qualify them..  The rlists representing the "using
+namespace" statements will be used to remove the "using namespace" statements
+from the buffer.
+
+
+
+#### shu-match-qualify-class-names ####
+shu-match-qualify-class-names *class-ht* *count-alist* *clist* *log-buf*
+[Function]
+
+*class-ht* is the hash table that maps a class name to its containing namespace
+name.  *count-alist* is the alist that counts the number of times each class
+name has been qualified by its enclosing namespace.  *clist* is the list of
+token-info, each of which represents an unqualified class name.  The list is in
+reverse order, which is important.  It means that one can add a qualification to
+one class name in the list without changing the location of any other class
+names, which are above the current one in the buffer.
+
+This function goes to the position of each unqualified class name, finds its
+containing namespace in the hash table, and inserts the containing namespace
+followed by "::" in front of the unqualified class name.
+
+After it inserts the qualifying namespace, it increments in *count-alist* the number
+of times that the class name was explicitly qualified.
+
+
+
+#### shu-match-remove-proc-rlists ####
+shu-match-remove-proc-rlists *token-list* *proc-rlists* *log-buf*
+[Function]
+
+*token-list* is the original token list.  *proc-rlists* is the set of rlists that
+represents the set of statements we will be processing.  This function removes
+from *token-list*, all of the items that are contained in the rlists in
+*proc-rlists*.  This is because we do not want a subsequent scan of the token list
+to include any of the items in the statements we are processing.
+
+The return value from this function is a cons cell whose car is the trimmed
+*token-list* and whose cdr is the sorted *proc-rlists*, which has been sorted by the
+start position of each rlist.
+
+
+
+#### shu-match-rmv-might-be-include ####
+shu-match-rmv-might-be-include *token-info*
+[Function]
+
+Go to the beginning of the line in front of the start point of the
+*token-info*.  Return true if the space between the beginning of the line and the
+start point of the *token-info* contains "#include".
+
+
+
+#### shu-match-rmv-show-class-count ####
+shu-match-rmv-show-class-count *count-alist* *class-ht* *log-buf*
+[Function]
+
+Put into the log buffer the count of class names that were qualified.
 
 
 
@@ -6279,6 +6586,30 @@ line that matches and put it in the buffer "`**shu-vars**`".
 Set the common alias names for the functions in shu-match,
 These are generally the same as the function names with the leading
 shu- prefix removed.
+
+
+
+#### shu-match-using-namespace-string ####
+shu-match-using-namespace-string *rlist* **&optional** *top-name*
+[Function]
+
+Given an *rlist* that contains a "using namespace" statement, return the string
+that is the fully qualified namespace name.  If the first part of the name is the
+optional *top-name*, it is omitted from the final result.
+
+
+
+#### shu-match-using-string ####
+shu-match-using-string *rlist* **&optional** *top-name*
+[Function]
+
+Given an *rlist* that contains a "using" statement (as opposed to "using
+namespace"), return two strings.  One is the class name.  The other is the
+fully qualified namespace name.  For example, if the statement is "using
+std::string," the fully qualified namespace name is "std" and the class name
+is "string".
+The two strings are returned in a cons cell whose car is the namespace name and
+whose cdr is the class name.
 
 # shu-misc #
 
@@ -6313,6 +6644,20 @@ Kill all dired buffers and all buffers that contain a file and are unmodified.
 It is not uncommon to have dozens of buffers open that are unrelated to the current task
 and this is a convenience function for closing many buffers that do not need to
 be open.
+
+
+
+#### buffer-number-lines ####
+[Command]
+ (Function: shu-buffer-number-lines)
+
+Create a buffer whose name is derived from the file name of the current
+buffer but with the string "-numbered" added to the name.  Thus "foo.cpp"
+would become "foo-numbered.cpp" Into this new buffer, copy the contents of the
+current file with each line prefixed with its line number.  This is designed for
+those times when you want to copy snippets of code with the line number in front
+of each line because you are commenting on code and want the person receiving
+the comments to sea the line number in front of each line.
 
 
 
@@ -6478,6 +6823,40 @@ inside of them without having to worry about which line contains the closing
 parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run *shu-tighten-lisp* to put the
 parentheses back where they belong.
+
+
+
+#### md-name ####
+[Command]
+ (Function: shu-make-md-name-entry)
+
+The latest item in the kill ring is assumed to be the text of a markdown
+section name.  This function creates from that section name, a markdown table of
+contents name that will identify the section in the table of contents.
+
+For example, if the kill ring contains "## This is the Overview", the table
+of contents name created and inserted at point will be:
+
+```
+        <a name=thisistheoverview></a>
+```
+
+
+
+#### md-toc ####
+[Command]
+ (Function: shu-make-md-toc-entry)
+
+The latest item in the kill ring is assumed to be the text of a markdown
+section name.  This function creates from that section name, a markdown table of
+contents entry and inserts that entry at point.
+
+For example, if the kill ring contains "## This is the Overview ##", the table
+of contents entry created and inserted at point will be
+
+```
+       * [This is the overview](#thisistheoverview)
+```
 
 
 
@@ -6665,6 +7044,20 @@ Kill all dired buffers and all buffers that contain a file and are unmodified.
 It is not uncommon to have dozens of buffers open that are unrelated to the current task
 and this is a convenience function for closing many buffers that do not need to
 be open.
+
+
+
+#### shu-buffer-number-lines ####
+[Command]
+ (Alias: buffer-number-lines)
+
+Create a buffer whose name is derived from the file name of the current
+buffer but with the string "-numbered" added to the name.  Thus "foo.cpp"
+would become "foo-numbered.cpp" Into this new buffer, copy the contents of the
+current file with each line prefixed with its line number.  This is designed for
+those times when you want to copy snippets of code with the line number in front
+of each line because you are commenting on code and want the person receiving
+the comments to sea the line number in front of each line.
 
 
 
@@ -6984,6 +7377,83 @@ inside of them without having to worry about which line contains the closing
 parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run *shu-tighten-lisp* to put the
 parentheses back where they belong.
+
+
+
+#### shu-make-md-index-name ####
+shu-make-md-index-name *name*
+[Function]
+
+The input is a string that is assumed to be a markdown section heading from
+a markdown table of contents.
+The return value is an all lower case string with any whitespace characters
+removed.
+For example, if the input string is
+
+```
+     This is an Overview
+```
+
+The returned string would be
+
+```
+     thisisanoverview
+```
+
+
+
+#### shu-make-md-name-entry ####
+[Command]
+ (Alias: md-name)
+
+The latest item in the kill ring is assumed to be the text of a markdown
+section name.  This function creates from that section name, a markdown table of
+contents name that will identify the section in the table of contents.
+
+For example, if the kill ring contains "## This is the Overview", the table
+of contents name created and inserted at point will be:
+
+```
+        <a name=thisistheoverview></a>
+```
+
+
+
+#### shu-make-md-section-name ####
+shu-make-md-section-name *section-name*
+[Function]
+
+The input
+ is a string that is assumed to be a markdown section heading.  The
+return value is a string with any leading and trailing "#" characters removed.
+For example, if the input string is
+
+```
+     ## This is an Overview ##
+```
+
+The returned string would be
+
+```
+     This is an Overview
+```
+
+
+
+#### shu-make-md-toc-entry ####
+[Command]
+ (Alias: md-toc)
+
+The latest item in the kill ring is assumed to be the text of a markdown
+section name.  This function creates from that section name, a markdown table of
+contents entry and inserts that entry at point.
+
+For example, if the kill ring contains "## This is the Overview ##", the table
+of contents entry created and inserted at point will be
+
+```
+       * [This is the overview](#thisistheoverview)
+```
 
 
 
@@ -7554,9 +8024,6 @@ within type.
 
 Associate a number with each type of variable
 
-
-# Index #
-
 * [acgen](#acgen)
 * [add-prefix](#add-prefix)
 * [all-quit](#all-quit)
@@ -7569,6 +8036,7 @@ Associate a number with each type of variable
 * [bde-sdecl](#bde-sdecl)
 * [bde-sgen](#bde-sgen)
 * [binclude](#binclude)
+* [buffer-number-lines](#buffer-number-lines)
 * [case-insensitive](#case-insensitive)
 * [case-sensitive](#case-sensitive)
 * [ccdecl](#ccdecl)
@@ -7605,7 +8073,7 @@ Associate a number with each type of variable
 * [drc](#drc)
 * [dup](#dup)
 * [eld](#eld)
-* [find-variables](#find-variables)
+* [find-all-variables](#find-all-variables)
 * [fixp](#fixp)
 * [fline](#fline)
 * [gd](#gd)
@@ -7639,6 +8107,8 @@ Associate a number with each type of variable
 * [list-short-names](#list-short-names)
 * [loosen-lisp](#loosen-lisp)
 * [make-c-project](#make-c-project)
+* [md-name](#md-name)
+* [md-toc](#md-toc)
 * [modified-buffers](#modified-buffers)
 * [new-c-class](#new-c-class)
 * [new-c-file](#new-c-file)
@@ -7657,6 +8127,7 @@ Associate a number with each type of variable
 * [qualify-bsl](#qualify-bsl)
 * [qualify-class](#qualify-class)
 * [qualify-std](#qualify-std)
+* [remove-class-duplicates](#remove-class-duplicates)
 * [remove-test-names](#remove-test-names)
 * [renew-c-project](#renew-c-project)
 * [reverse-comma-names](#reverse-comma-names)
@@ -7700,6 +8171,7 @@ Associate a number with each type of variable
 * [shu-bde-set-alias](#shu-bde-set-alias)
 * [shu-bde-sgen](#shu-bde-sgen)
 * [shu-binclude](#shu-binclude)
+* [shu-buffer-number-lines](#shu-buffer-number-lines)
 * [shu-capture-a-type-after](#shu-capture-a-type-after)
 * [shu-capture-a-type-arg](#shu-capture-a-type-arg)
 * [shu-capture-a-type-before](#shu-capture-a-type-before)
@@ -7884,6 +8356,7 @@ Associate a number with each type of variable
 * [shu-cpp-make-match-info](#shu-cpp-make-match-info)
 * [shu-cpp-make-match-side-list](#shu-cpp-make-match-side-list)
 * [shu-cpp-make-token-info](#shu-cpp-make-token-info)
+* [shu-cpp-match-colon-name](#shu-cpp-match-colon-name)
 * [shu-cpp-match-evaluate-side-list](#shu-cpp-match-evaluate-side-list)
 * [shu-cpp-match-extract-info](#shu-cpp-match-extract-info)
 * [shu-cpp-match-extract-op-code](#shu-cpp-match-extract-op-code)
@@ -7893,11 +8366,17 @@ Associate a number with each type of variable
 * [shu-cpp-match-extract-type](#shu-cpp-match-extract-type)
 * [shu-cpp-match-is-side-list](#shu-cpp-match-is-side-list)
 * [shu-cpp-match-many-list](#shu-cpp-match-many-list)
+* [shu-cpp-match-many-using-list](#shu-cpp-match-many-using-list)
+* [shu-cpp-match-namespace-forms](#shu-cpp-match-namespace-forms)
+* [shu-cpp-match-namespace-list-single](#shu-cpp-match-namespace-list-single)
+* [shu-cpp-match-namespace-list](#shu-cpp-match-namespace-list)
 * [shu-cpp-match-op-code-name](#shu-cpp-match-op-code-name)
 * [shu-cpp-match-or-list](#shu-cpp-match-or-list)
 * [shu-cpp-match-repeat-list](#shu-cpp-match-repeat-list)
 * [shu-cpp-match-repeat-sub-list](#shu-cpp-match-repeat-sub-list)
 * [shu-cpp-match-tokens](#shu-cpp-match-tokens)
+* [shu-cpp-match-using-forms](#shu-cpp-match-using-forms)
+* [shu-cpp-match-using-list-single](#shu-cpp-match-using-list-single)
 * [shu-cpp-member-prefix](#shu-cpp-member-prefix)
 * [shu-cpp-misc-set-alias](#shu-cpp-misc-set-alias)
 * [shu-cpp-name-list](#shu-cpp-name-list)
@@ -7927,6 +8406,7 @@ Associate a number with each type of variable
 * [shu-cpp-reverse-tokenize-region-for-command](#shu-cpp-reverse-tokenize-region-for-command)
 * [shu-cpp-reverse-tokenize-region](#shu-cpp-reverse-tokenize-region)
 * [shu-cpp-rmv-blocked](#shu-cpp-rmv-blocked)
+* [shu-cpp-rmv-using-old](#shu-cpp-rmv-using-old)
 * [shu-cpp-rmv-using](#shu-cpp-rmv-using)
 * [shu-cpp-search-match-tokens](#shu-cpp-search-match-tokens)
 * [shu-cpp-short-list](#shu-cpp-short-list)
@@ -8111,11 +8591,31 @@ Associate a number with each type of variable
 * [shu-local-replace](#shu-local-replace)
 * [shu-loosen-lisp](#shu-loosen-lisp)
 * [shu-make-c-project](#shu-make-c-project)
+* [shu-make-md-index-name](#shu-make-md-index-name)
+* [shu-make-md-name-entry](#shu-make-md-name-entry)
+* [shu-make-md-section-name](#shu-make-md-section-name)
+* [shu-make-md-toc-entry](#shu-make-md-toc-entry)
 * [shu-make-padded-line](#shu-make-padded-line)
 * [shu-make-xref](#shu-make-xref)
+* [shu-match-add-names-to-class-list](#shu-match-add-names-to-class-list)
+* [shu-match-erase-using](#shu-match-erase-using)
+* [shu-match-find-all-using-internal](#shu-match-find-all-using-internal)
 * [shu-match-find-semi-names](#shu-match-find-semi-names)
+* [shu-match-find-unqualified-class-names](#shu-match-find-unqualified-class-names)
 * [shu-match-find-variables](#shu-match-find-variables)
+* [shu-match-get-start-end-pos](#shu-match-get-start-end-pos)
+* [shu-match-increment-class-count](#shu-match-increment-class-count)
+* [shu-match-internal-rmv-using](#shu-match-internal-rmv-using)
+* [shu-match-make-class-hash-table-internal](#shu-match-make-class-hash-table-internal)
+* [shu-match-make-count-alist-from-hash](#shu-match-make-count-alist-from-hash)
+* [shu-match-merge-namespaces-with-class-list](#shu-match-merge-namespaces-with-class-list)
+* [shu-match-qualify-class-names](#shu-match-qualify-class-names)
+* [shu-match-remove-proc-rlists](#shu-match-remove-proc-rlists)
+* [shu-match-rmv-might-be-include](#shu-match-rmv-might-be-include)
+* [shu-match-rmv-show-class-count](#shu-match-rmv-show-class-count)
 * [shu-match-set-alias](#shu-match-set-alias)
+* [shu-match-using-namespace-string](#shu-match-using-namespace-string)
+* [shu-match-using-string](#shu-match-using-string)
 * [shu-minimum-leading-space](#shu-minimum-leading-space)
 * [shu-misc-set-alias](#shu-misc-set-alias)
 * [shu-modified-buffers](#shu-modified-buffers)
@@ -8236,7 +8736,6 @@ Associate a number with each type of variable
 * [winpath](#winpath)
 
 
-
 <!--
 LocalWords:  shu regexp scf cpp doxygen namepace bde num arg cp Bloomberg gen bb fn
 LocalWords:  cfile hfile tfile decl ifndef endif sdecl struct sgen foo doc elisp md
@@ -8256,5 +8755,7 @@ LocalWords:  DD mac CR nvplist org TODO expiry CANCELLED todo xref defs retval t
 LocalWords:  funcall myclass toc unescaped nvpair prob gtest gincl rmv qual xxx ret
 LocalWords:  WhammoCorp plist abcdef testfn eq binclude mumblefrotz sexp gitbuf ind
 LocalWords:  ginclude newfile fixp hitRatio getdef mumbleSomethingOther cciterate
-LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de
+LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de un
 -->
+LocalWords:  proc rlists ht unresolvable uns clist thisistheoverview
+LocalWords:  thisisanoverview

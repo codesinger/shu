@@ -111,7 +111,7 @@ that holds a match and put it into the buffer \"**shu-vars**\","
                              t shu-cpp-token-type-uq
                              (concat shu-cpp-name "+"))
    )
-  "A repeating side list to match zero or more intances of {:: <name>}")
+  "A repeating side list to match zero or more instances of {:: <name>}")
 
 
 
@@ -366,7 +366,7 @@ key word \"namespace\"." )
    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-many
                                  shu-cpp-match-many-using-list)
    )
-  "This is a sigle list that is the top level list for matching anything
+  "This is a single list that is the top level list for matching anything
 that may follow the key word \"using\".")
 
 
@@ -905,7 +905,7 @@ PROC-CLASSES is the class list we will be using to do the processing.
 PROC-RLISTS is the set of rlists that represents the \"using namespace\"
 statements.  This function adds the\"using name\" directives, if any, to both
 PROC-CLASSES and PROC-RLISTS.  It returns a cons cell in which the car is the
-modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
+modified PROC-CLASSES and the cdr is the modified PROC-RLISTS."
   (let ((rlist)
         (ret-val)
         (ns-name)

@@ -1109,7 +1109,7 @@ at point and continues to the end of the buffer."
 buffer but with the string \"-numbered\" added to the name.  Thus \"foo.cpp\"
 would become \"foo-numbered.cpp\" Into this new buffer, copy the contents of the
 current file with each line prefixed with its line number.  This is designed for
-those times when you want to copy snippets of code with the lne number in front
+those times when you want to copy snippets of code with the line number in front
 of each line because you are commenting on code and want the person receiving
 the comments to sea the line number in front of each line."
   (interactive)
@@ -1359,7 +1359,7 @@ of contents name created and inserted at point will be:
 ;;  shu-make-md-index-name
 ;;
 (defun shu-make-md-index-name (name)
-  "The inout is a string that is assumed to be a markdown seaction heading from
+  "The input is a string that is assumed to be a markdown section heading from
 a markdown table of contents.
 The return value is an all lower case string with any whitespace characters
 removed.
@@ -1392,7 +1392,7 @@ The returned string would be
 ;;  shu-make-md-section-name
 ;;
 (defun shu-make-md-section-name (section-name)
-  "The inout is a string that is assumed to be a markdown seaction heading.  The
+  "The input is a string that is assumed to be a markdown section heading.  The
 return value is a string with any leading and trailing \"#\" characters removed.
 For example, if the input string is
 
