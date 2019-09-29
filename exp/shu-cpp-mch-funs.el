@@ -943,28 +943,6 @@ count by one."
     ))
 
 
-;;
-;;  shu-test-shu-match-increment-class-count
-;;
-(ert-deftest shu-test-shu-match-increment-class-count ()
-  (let (
-        (count-alist
-         (list
-          (cons "set" 0)
-          (cons "map" 2)
-          (cons "string" 6)
-          (cons "Mumble" 1)))
-        )
-    (shu-match-increment-class-count count-alist "map")
-    (setq cp (assoc "map" count-alist))
-    (should cp)
-    (should (consp cp))
-    (setq count (cdr cp))
-    (should count)
-    (should (numberp count))
-    (should (= 3 count))
-    ))
-
 
 ;;
 ;;  shu-match-rmv-show-class-count
@@ -1006,6 +984,30 @@ count by one."
       )
     (setq psum (shu-fixed-format-num sum 0))
     (message "%s class names qualified.  See buffer %s" psum (buffer-name log-buf))
+    ))
+
+
+
+;;
+;;  shu-test-shu-match-increment-class-count
+;;
+(ert-deftest shu-test-shu-match-increment-class-count ()
+  (let (
+        (count-alist
+         (list
+          (cons "set" 0)
+          (cons "map" 2)
+          (cons "string" 6)
+          (cons "Mumble" 1)))
+        )
+    (shu-match-increment-class-count count-alist "map")
+    (setq cp (assoc "map" count-alist))
+    (should cp)
+    (should (consp cp))
+    (setq count (cdr cp))
+    (should count)
+    (should (numberp count))
+    (should (= 3 count))
     ))
 
 
