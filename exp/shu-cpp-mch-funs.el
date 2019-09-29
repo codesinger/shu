@@ -328,6 +328,8 @@ that may follow the key word \"using\".")
         (count-alist)
         (clist)
         )
+    (setq debug-on-error t)
+    (princ "debug-on-error: " log-buf)(princ debug-on-error log-buf)(princ "\n" log-buf)
     (princ "class-list: " log-buf)(princ class-list log-buf)(princ "\n" log-buf)
     (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
     (setq ret-val (shu-match-find-all-using-internal token-list))
@@ -692,42 +694,6 @@ duplicate class names."
     ))
 
 
-
-;;
-;;  shu-test-remove-class-duplicates
-;;
-(ert-deftest shu-test-remove-class-duplicates ()
-  (let (
-        (gb (get-buffer-create "**goo**"))
-        (class-list
-         (list
-          (cons "abcde"    (list
-                            "AClass1"
-                            "AClass2"
-                            "AClass1"
-                            "AClass2"
-                            ))
-          (cons "xyrzk"    (list
-                            "Xclass1"
-                            "Xclass1"
-                            "Xclass2"
-                            ))
-          (cons "std "    (list
-                           "string"
-                           "string"
-                           "set"
-                           "set"
-                           "map"
-                           ))
-          )
-         )
-        (proc-class)
-        )
-    (setq proc-class (remove-class-duplicates class-list gb))
-    (princ "proc-class: " gb)(princ proc-class gb)(princ "\n" gb)
-    ))
-
-
 ;;
 ;;  add-ns-rlists
 ;;
@@ -848,6 +814,184 @@ from the buffer."
 
 
 
+
+;;
+;;  shu-match-make-class-hash-table-internal
+;;
+(defun shu-match-make-class-hash-table-internal (proc-classes log-buf &optional count-only)
+  "PROC-CLASSES is the alist of all of the namespaces and classes that we will
+process, with the namespace name being the key and a list of class names within the
+namespace name as the value.
+
+This function builds a hash table that inverts the
+alist.  Each entry in the hash table has a class name as the key with the name
+of the enclosing namespace as the value.
+If two class names map to the same enclosing namespace name, then there is an
+unresolvable ambiguity that must terminate the operation.  If that is the case,
+diagnostic messages are placed into the log buffer and a nil value is returned.
+
+If the optional COUNT-ONLY argument is true, then a hash table is built in which
+the class name is the key and the value is zero.  This is used to build a hash
+table that will track the number of times a class name has been qualified by
+calling the function shu-match-increment-hash-count to increment the count."
+  (let (
+        (pc proc-classes)
+        (ht)
+        (count 0)
+        (ce)
+        (cl)
+        (ns-name)
+        (class-name)
+        (hv)
+        (dup-present)
+        (value)
+        )
+    (while pc
+      (setq ce (car pc))
+      (setq cl (cdr ce))
+      (setq count (+ count (length cl)))
+      (setq pc (cdr pc))
+      )
+    (princ (format "Will have %d entries\n" count) log-buf)
+    (princ "proc-classes: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
+    (setq ht (make-hash-table :test 'equal :size count))
+    (setq pc proc-classes)
+    (while pc
+      (setq ce (car pc))
+      (setq ns-name (car ce))
+      (setq cl (cdr ce))
+      (while cl
+        (setq class-name (car cl))
+        (setq hv (gethash class-name ht))
+        (if hv
+            (progn
+              (princ (format "Duplicate namespace for class: %s\n" class-name) log-buf)
+              (princ (format "Class '%s' is in both namespace '%s' and '%s'\n" class-name hv ns-name) log-buf)
+              (setq dup-present t)
+              )
+          (if count-only
+              (setq value 0)
+            (setq value ns-name)
+            )
+          (puthash class-name value ht)
+          )
+        (setq cl (cdr cl))
+        )
+      (setq pc (cdr pc))
+      )
+    (princ "ht: " log-buf)(princ ht log-buf)(princ "\n" log-buf)
+    (when dup-present
+      (setq ht nil)
+      )
+    ht
+    ))
+
+
+;;
+;;  shu-match-make-count-alist-from-hash
+;;
+(defun shu-match-make-count-alist-from-hash (class-ht)
+  "Doc string."
+  (interactive)
+  (let (
+        (count-alist)
+        )
+    (maphash (lambda (class-name ns-name)
+               (push (cons class-name 0) count-alist)
+               )
+             class-ht)
+    count-alist
+    ))
+
+
+;;
+;;  shu-match-increment-hash-count
+;;
+(defun shu-match-increment-hash-count (count-hash class-name)
+  "Doc string."
+  (interactive)
+  (let (
+        (count)
+        (new-count)
+        )
+    (setq count (gethash class-name count-hash))
+    (when count
+      (setq new-count (1+ count))
+      (remhash class-name count-hash)
+      (puthash class-name new-count count-hash)
+      )
+    ))
+
+
+
+;;
+;;  shu-match-increment-class-count
+;;
+(defun shu-match-increment-class-count (alist class-name)
+  "ALIST is an alist whose key is a CLASS-NAME and whose cdr is a count of the
+number of times that class name has been found.  This function increments the
+count by one."
+  (interactive)
+  (let (
+        (cv (assoc class-name alist))
+        (count)
+        )
+    (setq count (cdr cv))
+    (setq count (1+ count))
+    (setcdr cv count)
+    ))
+
+
+;;
+;;  shu-match-show-class-count
+;;
+(defun shu-match-show-class-count (count-alist class-ht log-buf)
+  "Put into the log buffer the count of class names that were qualified."
+  (let (
+        (cp)
+        (class-name)
+        (ns-name)
+        (count)
+        (full-name)
+        (clist)
+        (sum 0)
+        (pcount)
+        (psum)
+        )
+    (while count-alist
+      (setq cp (car count-alist))
+      (setq class-name (car cp))
+      (setq count (cdr cp))
+      (princ (format "%s: %d\n" class-name count) log-buf)
+      (setq ns-name (gethash class-name class-ht))
+      (setq full-name (concat ns-name "::" class-name))
+      (princ (concat full-name "\n") log-buf)
+      (push (cons full-name count) clist)
+      (setq count-alist (cdr count-alist))
+      )
+    (setq clist (sort clist
+                      (lambda(lhs rhs)
+                        (string< (car lhs) (car rhs))
+                        )))
+    (princ "clist: " log-buf)(princ clist log-buf)(princ "\n" log-buf)
+    (while clist
+      (setq cp (car clist))
+      (setq full-name (car cp))
+      (setq count (cdr cp))
+      (setq sum (+ sum count))
+      (setq pcount (shu-fixed-format-num count 15))
+      (princ (concat pcount ": " full-name "\n") log-buf)
+      (setq clist (cdr clist))
+      )
+    (setq psum (shu-fixed-format-num sum 0))
+    (message "%s class names qualified.  See buffer %s" psum (buffer-name log-buf))
+    ))
+
+
+
+
+
+
 ;;
 ;;  shu-test-something-or-other-1
 ;;
@@ -947,94 +1091,38 @@ from the buffer."
 
 
 
-
-
 ;;
-;;  shu-match-make-class-hash-table-internal
+;;  shu-test-remove-class-duplicates
 ;;
-(defun shu-match-make-class-hash-table-internal (proc-classes log-buf &optional count-only)
-  "PROC-CLASSES is the alist of all of the namespaces and classes that we will
-process, with the namespace name being the key and a list of class names within the
-namespace name as the value.
-
-This function builds a hash table that inverts the
-alist.  Each entry in the hash table has a class name as the key with the name
-of the enclosing namespace as the value.
-If two class names map to the same enclosing namespace name, then there is an
-unresolvable ambiguity that must terminate the operation.  If that is the case,
-diagnostic messages are placed into the log buffer and a nil value is returned.
-
-If the optional COUNT-ONLY argument is true, then a hash table is built in which
-the class name is the key and the value is zero.  This is used to build a hash
-table that will track the number of times a class name has been qualified by
-calling the function shu-match-increment-hash-count to increment the count."
+(ert-deftest shu-test-remove-class-duplicates ()
   (let (
-        (pc proc-classes)
-        (ht)
-        (count 0)
-        (ce)
-        (cl)
-        (ns-name)
-        (class-name)
-        (hv)
-        (dup-present)
-        (value)
-        )
-    (while pc
-      (setq ce (car pc))
-      (setq cl (cdr ce))
-      (setq count (+ count (length cl)))
-      (setq pc (cdr pc))
-      )
-    (princ (format "Will have %d entries\n" count) log-buf)
-    (princ "proc-classes: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
-    (setq ht (make-hash-table :test 'equal :size count))
-    (setq pc proc-classes)
-    (while pc
-      (setq ce (car pc))
-      (setq ns-name (car ce))
-      (setq cl (cdr ce))
-      (while cl
-        (setq class-name (car cl))
-        (setq hv (gethash class-name ht))
-        (if hv
-            (progn
-              (princ (format "Duplicate namespace for class: %s\n" class-name) log-buf)
-              (princ (format "Class '%s' is in both namespace '%s' and '%s'\n" class-name hv ns-name) log-buf)
-              (setq dup-present t)
-              )
-          (if count-only
-              (setq value 0)
-            (setq value ns-name)
-            )
-          (puthash class-name value ht)
+        (gb (get-buffer-create "**goo**"))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std "    (list
+                           "string"
+                           "string"
+                           "set"
+                           "set"
+                           "map"
+                           ))
           )
-        (setq cl (cdr cl))
+         )
+        (proc-class)
         )
-      (setq pc (cdr pc))
-      )
-    (princ "ht: " log-buf)(princ ht log-buf)(princ "\n" log-buf)
-    (when dup-present
-      (setq ht nil)
-      )
-    ht
-    ))
-
-
-;;
-;;  shu-match-make-count-alist-from-hash
-;;
-(defun shu-match-make-count-alist-from-hash (class-ht)
-  "Doc string."
-  (interactive)
-  (let (
-        (count-alist)
-        )
-    (maphash (lambda (class-name ns-name)
-               (push (cons class-name 0) count-alist)
-               )
-             class-ht)
-    count-alist
+    (setq proc-class (remove-class-duplicates class-list gb))
+    (princ "proc-class: " gb)(princ proc-class gb)(princ "\n" gb)
     ))
 
 
@@ -1141,87 +1229,6 @@ calling the function shu-match-increment-hash-count to increment the count."
     (should (= 0 (cdr av7)))
     (setq av8 (assoc "Wheeeeeeeee" count-alist))
     (should (not av8))
-    ))
-
-
-;;
-;;  shu-match-increment-hash-count
-;;
-(defun shu-match-increment-hash-count (count-hash class-name)
-  "Doc string."
-  (interactive)
-  (let (
-        (count)
-        (new-count)
-        )
-    (setq count (gethash class-name count-hash))
-    (when count
-      (setq new-count (1+ count))
-      (remhash class-name count-hash)
-      (puthash class-name new-count count-hash)
-      )
-    ))
-
-
-
-;;
-;;  shu-match-increment-class-count
-;;
-(defun shu-match-increment-class-count (alist class-name)
-  "ALIST is an alist whose key is a CLASS-NAME and whose cdr is a count of the
-number of times that class name has been found.  This function increments the
-count by one."
-  (interactive)
-  (let (
-        (cv (assoc class-name alist))
-        (count)
-        )
-    (setq count (cdr cv))
-    (setq count (1+ count))
-    (setcdr cv count)
-    ))
-
-
-;;
-;;  shu-match-show-class-count
-;;
-(defun shu-match-show-class-count (count-alist class-ht log-buf)
-  "Put into the log buffer the count of class names that were qualified."
-  (let (
-        (cp)
-        (class-name)
-        (ns-name)
-        (count)
-        (full-name)
-        (clist)
-        (sum 0)
-        (pcount)
-        (psum)
-        )
-    (while count-alist
-      (setq cp (car count-alist))
-      (setq class-name (car cp))
-      (setq count (cdr cp))
-      (setq ns-name (gethash class-name class-ht))
-      (setq full-name (concat ns-name "::" class-name))
-      (push (cons full-name count) clist)
-      (setq count-alist (cdr count-alist))
-      )
-    (setq clist (sort clist
-                      (lambda(lhs rhs)
-                        (string< (car lhs) (car rhs))
-                        )))
-    (while clist
-      (setq cp (car clist))
-      (setq full-name (car cp))
-      (setq count (cdr full-name))
-      (setq sum (+ sum count))
-      (setq pcount (shu-fixed-format-num count 15))
-      (princ (concat pcount ": " full-name "\n") log-buf)
-      (setq clist (cdr clist))
-      )
-    (setq psum (shu-fixed-format-num sum 0))
-    (message "%s class names qualified.  See buffer %s" psum (buffer-name log-buf))
     ))
 
 
