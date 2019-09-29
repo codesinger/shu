@@ -85,11 +85,11 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
-                               (concat shu-cpp-name "+"))
+                              (concat shu-cpp-name "+"))
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
+                              ";")
     )
 
 
@@ -97,15 +97,15 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               nil shu-cpp-token-type-op
-                               "::")
+                              "::")
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
-                               (concat shu-cpp-name "+"))
+                              (concat shu-cpp-name "+"))
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
+                              ";")
     )
 
 
@@ -116,11 +116,11 @@
                               (concat shu-cpp-name "+"))
 
     (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  shu-cpp-mch-colon-name)
+                                  shu-cpp-mch-colon-name)
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
+                              ";")
     )
    )
   )
@@ -227,11 +227,11 @@
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
-                               (concat shu-cpp-name "+"))
+                              (concat shu-cpp-name "+"))
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
+                              ";")
     )
 
 
@@ -242,11 +242,11 @@
                               (concat shu-cpp-name "+"))
 
     (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  shu-cpp-mch-colon-name)
+                                  shu-cpp-mch-colon-name)
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
+                              ";")
     )
    )
   "These two lists match the form of name that can follow a \"using\" directive
@@ -325,6 +325,7 @@ that may follow the key word \"using\".")
         (proc-classes)
         (proc-rlists)
         (class-ht)
+        (count-alist)
         (clist)
         )
     (princ "class-list: " log-buf)(princ class-list log-buf)(princ "\n" log-buf)
@@ -360,7 +361,8 @@ that may follow the key word \"using\".")
           (when class-ht
             (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
             (when clist
-              (shu-match-qualify-class-names class-ht clist log-buf)
+              (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
+              (shu-match-qualify-class-names class-ht count-alist clist log-buf)
               )
             )
           )
@@ -461,17 +463,21 @@ qualifying namespace."
 ;;
 ;;  shu-match-qualify-class-names
 ;;
-(defun shu-match-qualify-class-names (class-ht clist log-buf)
+(defun shu-match-qualify-class-names (class-ht count-alist clist log-buf)
   "CLASS-HT is the hash table that maps a class name to its containing namespace
-name.  CLIST is the list of token-info, each of which represents an unqualified
-class name.  The list is in reverse order, which is important.  It means that
-one can add a qualification to one class name in the list without changing the
-location of any other class names, which are above the current one in the
-buffer.
+name.  COUNT-ALIST is the alist that counts the number of times each class
+name has been qualified by its enclosing namespace.  CLIST is the list of
+token-info, each of which represents an unqualified class name.  The list is in
+reverse order, which is important.  It means that one can add a qualification to
+one class name in the list without changing the location of any other class
+names, which are above the current one in the buffer.
 
 This function goes to the position of each unqualified class name, finds its
 containing namespace in the hash table, and inserts the containing namespace
-followed by \"::\" in front of the unqualified class name."
+followed by \"::\" in front of the unqualified class name.
+
+After it inserts the qualifying namespace, it increments in COUNT-ALIST the number
+of times that the class name was explicitly qualified."
   (let (
         (token-info)
         (token)
@@ -485,8 +491,10 @@ followed by \"::\" in front of the unqualified class name."
       (goto-char spoint)
       (setq hv (gethash token class-ht "????"))
       (insert (concat hv "::"))
+      (shu-match-increment-class-count count-alist token)
       (setq clist (cdr clist))
       )
+    (shu-match-show-class-count count-alist class-ht log-buf)
     ))
 
 
@@ -691,29 +699,29 @@ duplicate class names."
 (ert-deftest shu-test-remove-class-duplicates ()
   (let (
         (gb (get-buffer-create "**goo**"))
-       (class-list
-        (list
-         (cons "abcde"    (list
-                           "AClass1"
-                           "AClass2"
-                           "AClass1"
-                           "AClass2"
-                           ))
-         (cons "xyrzk"    (list
-                           "Xclass1"
-                           "Xclass1"
-                           "Xclass2"
-                           ))
-         (cons "std "    (list
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std "    (list
                            "string"
                            "string"
                            "set"
                            "set"
                            "map"
                            ))
+          )
          )
-        )
-       (proc-class)
+        (proc-class)
         )
     (setq proc-class (remove-class-duplicates class-list gb))
     (princ "proc-class: " gb)(princ proc-class gb)(princ "\n" gb)
@@ -758,7 +766,7 @@ modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
         (setq cl (cdr ce))
         (push class-name cl)
         (princ "Adding cl: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
-            )
+        )
       (setq un-list (cdr un-list))
       )
     (cons proc-classes proc-rlists)
@@ -846,36 +854,36 @@ from the buffer."
 (ert-deftest shu-test-something-or-other-1 ()
   (let (
         (log-buf (get-buffer-create "**goo**"))
-       (data
-        (concat
-         "/*!\n"
-         " * \\file something_or_other.cpp\n"
-         " */\n"
-         "\n"
-         "#include <strng>\n"
-         "\n"
-         "    using namespace abcde;\n"
-         "    x = x + 1;\n"
-         "    using namespace xyrzk;\n"
-         "    using std::string;\n"
-         "    using namespace fred; /* Hello */\n"
-         "    using abc::std::deque;\n /* Hello */"
-         "// Hello\n"
-         ))
-       (class-list
-        (list
-         (cons "abcde"    (list
-                           "AClass1"
-                           "AClass2"
-                           ))
-         (cons "xyrzk"    (list
-                           "Xclass1"
-                           "Xclass2"
-                           ))
+        (data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "    using namespace abcde;\n"
+          "    x = x + 1;\n"
+          "    using namespace xyrzk;\n"
+          "    using std::string;\n"
+          "    using namespace fred; /* Hello */\n"
+          "    using abc::std::deque;\n /* Hello */"
+          "// Hello\n"
+          ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          )
          )
+        (token-list)
         )
-       (token-list)
-       )
     (with-temp-buffer
       (insert data)
       (something-or-other class-list log-buf)
@@ -893,41 +901,42 @@ from the buffer."
 (ert-deftest shu-test-something-or-other-2 ()
   (let (
         (log-buf (get-buffer-create "**moo**"))
-       (data
-        (concat
-         "/*!\n"
-         " * \\file something_or_other.cpp\n"
-         " */\n"
-         "\n"
-         "#include <strng>\n"
-         "\n"
-         "    using namespace abcde;\n"
-         "    x = x + 1;\n"
-         "    using namespace xyrzk;\n"
-         "    using std::string;\n"
-         "    using namespace fred; /* Hello */\n"
-         "    using abc::std::string;\n /* Hello */"
-         "    /* xxx */\n"
-         "    string      x;\n"
-         "    AClass1     z;\n"
-         "    Xclass2     p;\n"
-         "// Hello\n"
-         ))
-       (class-list
-        (list
-         (cons "abcde"    (list
-                           "AClass1"
-                           "AClass2"
-                           ))
-         (cons "xyrzk"    (list
-                           "Xclass1"
-                           "Xclass2"
-                           ))
+        (data
+         (concat
+          "/*!\n"
+          " * \\file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <strng>\n"
+          "\n"
+          "    using namespace abcde;\n"
+          "    x = x + 1;\n"
+          "    using namespace xyrzk;\n"
+          "    using std::deque;\n"
+          "    using namespace fred; /* Hello */\n"
+          "    using abc::std::string;\n /* Hello */"
+          "    /* xxx */\n"
+          "    string      x;\n"
+          "    AClass1     z;\n"
+          "    Xclass2     p;\n"
+          "    deque       jj;\n"
+          "// Hello\n"
+          ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          )
          )
+        (token-list)
+        (x)
         )
-       (token-list)
-       (x)
-       )
     (with-temp-buffer
       (insert data)
       (something-or-other class-list log-buf)
@@ -997,9 +1006,9 @@ calling the function shu-match-increment-hash-count to increment the count."
           (if count-only
               (setq value 0)
             (setq value ns-name)
-              )
-          (puthash class-name value ht)
             )
+          (puthash class-name value ht)
+          )
         (setq cl (cdr cl))
         )
       (setq pc (cdr pc))
@@ -1009,6 +1018,129 @@ calling the function shu-match-increment-hash-count to increment the count."
       (setq ht nil)
       )
     ht
+    ))
+
+
+;;
+;;  shu-match-make-count-alist-from-hash
+;;
+(defun shu-match-make-count-alist-from-hash (class-ht)
+  "Doc string."
+  (interactive)
+  (let (
+        (count-alist)
+        )
+    (maphash (lambda (class-name ns-name)
+               (push (cons class-name 0) count-alist)
+               )
+             class-ht)
+    count-alist
+    ))
+
+
+;;
+;;  shu-test-shu-match-make-count-alist-from-hash-1
+;;
+(ert-deftest shu-test-shu-match-make-count-alist-from-hash-1 ()
+  (let (
+        (gb (get-buffer-create shu-unit-test-buffer))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std"    (list
+                          "string"
+                          "set"
+                          "map"
+                          ))
+          )
+         )
+        (ht)
+        (av1)
+        (av2)
+        (av3)
+        (av4)
+        (av5)
+        (av6)
+        (av7)
+        (av8)
+        (count-alist)
+        )
+    (setq ht (shu-match-make-class-hash-table-internal class-list gb))
+    (should ht)
+    (should (hash-table-p ht))
+    (setq count-alist (shu-match-make-count-alist-from-hash ht))
+    (setq av1 (assoc "AClass1" count-alist))
+    (should av1)
+    (should (consp av1))
+    (should (car av1))
+    (should (stringp (car av1)))
+    (should (string= "AClass1" (car av1)))
+    (should (cdr av1))
+    (should (numberp (cdr av1)))
+    (should (= 0 (cdr av1)))
+    (setq av2 (assoc "AClass2" count-alist))
+    (should av2)
+    (should (consp av2))
+    (should (car av2))
+    (should (stringp (car av2)))
+    (should (string= "AClass2" (car av2)))
+    (should (cdr av2))
+    (should (numberp (cdr av2)))
+    (should (= 0 (cdr av2)))
+    (setq av3 (assoc "Xclass1" count-alist))
+    (should av3)
+    (should (consp av3))
+    (should (car av3))
+    (should (stringp (car av3)))
+    (should (string= "Xclass1" (car av3)))
+    (should (cdr av3))
+    (should (numberp (cdr av3)))
+    (should (= 0 (cdr av3)))
+    (setq av4(assoc "Xclass2" count-alist))
+    (should av4)
+    (should (consp av4))
+    (should (car av4))
+    (should (stringp (car av4)))
+    (should (string= "Xclass2" (car av4)))
+    (should (cdr av4))
+    (should (numberp (cdr av4)))
+    (should (= 0 (cdr av4)))
+    (setq av5 (assoc "string" count-alist))
+    (should av5)
+    (should (consp av5))
+    (should (car av5))
+    (should (stringp (car av5)))
+    (should (string= "string" (car av5)))
+    (should (cdr av5))
+    (should (numberp (cdr av5)))
+    (should (= 0 (cdr av5)))
+    (setq av6 (assoc "set" count-alist))
+    (should av6)
+    (should (consp av6))
+    (should (car av6))
+    (should (stringp (car av6)))
+    (should (string= "set" (car av6)))
+    (should (cdr av6))
+    (should (numberp (cdr av6)))
+    (should (= 0 (cdr av6)))
+    (setq av7 (assoc "map" count-alist))
+    (should av7)
+    (should (consp av7))
+    (should (car av7))
+    (should (stringp (car av7)))
+    (should (string= "map" (car av7)))
+    (should (cdr av7))
+    (should (numberp (cdr av7)))
+    (should (= 0 (cdr av7)))
+    (setq av8 (assoc "Wheeeeeeeee" count-alist))
+    (should (not av8))
     ))
 
 
@@ -1032,6 +1164,66 @@ calling the function shu-match-increment-hash-count to increment the count."
 
 
 
+;;
+;;  shu-match-increment-class-count
+;;
+(defun shu-match-increment-class-count (alist class-name)
+  "ALIST is an alist whose key is a CLASS-NAME and whose cdr is a count of the
+number of times that class name has been found.  This function increments the
+count by one."
+  (interactive)
+  (let (
+        (cv (assoc class-name alist))
+        (count)
+        )
+    (setq count (cdr cv))
+    (setq count (1+ count))
+    (setcdr cv count)
+    ))
+
+
+;;
+;;  shu-match-show-class-count
+;;
+(defun shu-match-show-class-count (count-alist class-ht log-buf)
+  "Put into the log buffer the count of class names that were qualified."
+  (let (
+        (cp)
+        (class-name)
+        (ns-name)
+        (count)
+        (full-name)
+        (clist)
+        (sum 0)
+        (pcount)
+        (psum)
+        )
+    (while count-alist
+      (setq cp (car count-alist))
+      (setq class-name (car cp))
+      (setq count (cdr cp))
+      (setq ns-name (gethash class-name class-ht))
+      (setq full-name (concat ns-name "::" class-name))
+      (push (cons full-name count) clist)
+      (setq count-alist (cdr count-alist))
+      )
+    (setq clist (sort clist
+                      (lambda(lhs rhs)
+                        (string< (car lhs) (car rhs))
+                        )))
+    (while clist
+      (setq cp (car clist))
+      (setq full-name (car cp))
+      (setq count (cdr full-name))
+      (setq sum (+ sum count))
+      (setq pcount (shu-fixed-format-num count 15))
+      (princ (concat pcount ": " full-name "\n") log-buf)
+      (setq clist (cdr clist))
+      )
+    (setq psum (shu-fixed-format-num sum 0))
+    (message "%s class names qualified.  See buffer %s" psum (buffer-name log-buf))
+    ))
+
 
 ;;
 ;;  shu-test-shu-match-make-class-hash-table-internal-1
@@ -1039,26 +1231,26 @@ calling the function shu-match-increment-hash-count to increment the count."
 (ert-deftest shu-test-shu-match-make-class-hash-table-internal-1 ()
   (let (
         (gb (get-buffer-create "**goo**"))
-       (class-list
-        (list
-         (cons "abcde"    (list
-                           "AClass1"
-                           "AClass2"
-                           ))
-         (cons "xyrzk"    (list
-                           "Xclass1"
-                           "Xclass2"
-                           ))
-         (cons "std"    (list
-                           "string"
-                           "set"
-                           "map"
-                           ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std"    (list
+                          "string"
+                          "set"
+                          "map"
+                          ))
+          )
          )
+        (ht)
+        (hv)
         )
-       (ht)
-       (hv)
-       )
     (setq ht (shu-match-make-class-hash-table-internal class-list gb))
     (should ht)
     (should (hash-table-p ht))
@@ -1100,26 +1292,26 @@ calling the function shu-match-increment-hash-count to increment the count."
 (ert-deftest shu-test-shu-match-make-class-hash-table-internal-2 ()
   (let (
         (gb (get-buffer-create "**goo**"))
-       (class-list
-        (list
-         (cons "abcde"    (list
-                           "AClass1"
-                           "AClass2"
-                           ))
-         (cons "xyrzk"    (list
-                           "Xclass1"
-                           "Xclass2"
-                           ))
-         (cons "std"    (list
-                           "string"
-                           "set"
-                           "map"
-                           ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std"    (list
+                          "string"
+                          "set"
+                          "map"
+                          ))
+          )
          )
+        (ht)
+        (hv)
         )
-       (ht)
-       (hv)
-       )
     (setq ht (shu-match-make-class-hash-table-internal class-list gb t))
     (should ht)
     (should (hash-table-p ht))
@@ -1162,28 +1354,28 @@ calling the function shu-match-increment-hash-count to increment the count."
 (ert-deftest shu-test-shu-match-make-class-hash-table-internal-3 ()
   (let (
         (gb (get-buffer-create "**goo**"))
-       (class-list
-        (list
-         (cons "abcde"    (list
-                           "AClass1"
-                           "Xclass1"
-                           "AClass2"
-                           ))
-         (cons "xyrzk"    (list
-                           "Xclass1"
-                           "set"
-                           "Xclass2"
-                           ))
-         (cons "std"    (list
-                           "string"
-                           "set"
-                           "map"
-                           ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "Xclass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "set"
+                            "Xclass2"
+                            ))
+          (cons "std"    (list
+                          "string"
+                          "set"
+                          "map"
+                          ))
+          )
          )
+        (ht)
+        (hv)
         )
-       (ht)
-       (hv)
-       )
     (setq ht (shu-match-make-class-hash-table-internal class-list gb))
     (should (not ht))
     ))
@@ -1196,27 +1388,27 @@ calling the function shu-match-increment-hash-count to increment the count."
 (ert-deftest shu-test-shu-match-increment-hash-count-1 ()
   (let (
         (gb (get-buffer-create "**goo**"))
-       (class-list
-        (list
-         (cons "abcde"    (list
-                           "AClass1"
-                           "AClass2"
-                           ))
-         (cons "xyrzk"    (list
-                           "Xclass1"
-                           "Xclass2"
-                           ))
-         (cons "std"    (list
-                           "string"
-                           "set"
-                           "map"
-                           ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std"    (list
+                          "string"
+                          "set"
+                          "map"
+                          ))
+          )
          )
+        (ht)
+        (class-name)
+        (count)
         )
-       (ht)
-       (class-name)
-       (count)
-       )
     (setq ht (shu-match-make-class-hash-table-internal class-list gb t))
     (should ht)
     (should (hash-table-p ht))
@@ -1262,36 +1454,36 @@ calling the function shu-match-increment-hash-count to increment the count."
 (ert-deftest shu-test-shu-match-remove-proc-rlists-1 ()
   (let (
         (log-buf (get-buffer-create "**foo**"))
-       (data
-        (concat
-         "\n"
-         "    using namespace abcde;\n"
-         "    x = x + 1;\n"
-         "    using namespace xyrzk;\n"
-         "    using std::string;\n"
-         "    Xclass2     p;\n"
-         "// Hello\n"
-         ))
-       (class-list
-        (list
-         (cons "abcde"    (list
-                           "AClass1"
-                           "AClass2"
-                           ))
-         (cons "xyrzk"    (list
-                           "Xclass1"
-                           "Xclass2"
-                           ))
+        (data
+         (concat
+          "\n"
+          "    using namespace abcde;\n"
+          "    x = x + 1;\n"
+          "    using namespace xyrzk;\n"
+          "    using std::string;\n"
+          "    Xclass2     p;\n"
+          "// Hello\n"
+          ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          )
          )
+        (top-name "WhammoCorp")
+        (token-list)
+        (ret-val)
+        (token-list)
+        (proc-rlists)
+        (prl)
+        (rlist)
         )
-       (top-name "WhammoCorp")
-       (token-list)
-       (ret-val)
-       (token-list)
-       (proc-rlists)
-       (prl)
-       (rlist)
-       )
     (with-temp-buffer
       (insert data)
       (setq ret-val (shu-test-shu-setup-proc-rlists-1 class-list log-buf top-name))
