@@ -399,8 +399,7 @@ At this point it is possible to visit each token in the list, which is in
 reverse order in the file, look up each token, and insert in front of it its
 qualifying namespace."
   (interactive)
-  (let (
-        (tlist token-list)
+  (let ((tlist token-list)
         (token-info)
         (next-token-info)
         (hv)
@@ -412,8 +411,7 @@ qualifying namespace."
         (next-token "")
         (next-token-type 0)
         (blocked)
-        (clist)
-        )
+        (clist))
     (while tlist
       (setq blocked nil)
       (setq token-info (car tlist))
@@ -444,21 +442,13 @@ qualifying namespace."
                     (string= next-token "[")
                     ))
                   (setq blocked t)
-                (when (might-be-include token-info)
-                  (setq blocked t)
-                  )
-                )
-              )
-            )
+                (when (shu-match-rmv-might-be-include token-info)
+                  (setq blocked t)))))
           (when (not blocked)
-            (push token-info clist)
-            )
-          )
-        )
+            (push token-info clist))))
       (setq last-token token)
       (setq last-token-type token-type)
-      (setq tlist (shu-cpp-token-next-non-comment tlist))
-      )
+      (setq tlist (shu-cpp-token-next-non-comment tlist)))
     clist
     ))
 
@@ -481,12 +471,10 @@ followed by \"::\" in front of the unqualified class name.
 
 After it inserts the qualifying namespace, it increments in COUNT-ALIST the number
 of times that the class name was explicitly qualified."
-  (let (
-        (token-info)
+  (let ((token-info)
         (token)
         (spoint)
-        (hv)
-        )
+        (hv))
     (while clist
       (setq token-info (car clist))
       (setq token (shu-cpp-token-extract-token token-info))
@@ -495,8 +483,7 @@ of times that the class name was explicitly qualified."
       (setq hv (gethash token class-ht "????"))
       (insert (concat hv "::"))
       (shu-match-increment-class-count count-alist token)
-      (setq clist (cdr clist))
-      )
+      (setq clist (cdr clist)))
     (shu-match-rmv-show-class-count count-alist class-ht log-buf)
     ))
 
@@ -504,23 +491,19 @@ of times that the class name was explicitly qualified."
 
 
 ;;
-;;  might-be-include
+;;  shu-match-rmv-might-be-include
 ;;
-(defun might-be-include (token-info)
+(defun shu-match-rmv-might-be-include (token-info)
   "Go to the beginning of the line in front of the start point of the
 TOKEN-INFO.  Return true if the space between the beginning of the line and the
 start point of the TOKEN-INFO contains \"#include\"."
-  (let (
-        (spoint (shu-cpp-token-extract-spoint token-info))
-        (blocked)
-        )
+  (let ((spoint (shu-cpp-token-extract-spoint token-info))
+        (blocked))
     (save-excursion
       (goto-char spoint)
       (beginning-of-line)
       (when (re-search-forward "#\\s-*include" spoint t)
-        (setq blocked t)
-        )
-      )
+        (setq blocked t)))
     blocked
     ))
 
@@ -536,14 +519,11 @@ start point of the TOKEN-INFO contains \"#include\"."
 of those statements in the buffer with whitespace.  This is done in order to
 preserve the positions of all other items in the buffer."
   (interactive)
-  (let (
-        (rlist)
+  (let ((rlist)
         (ret-val)
         (spoint)
         (epoint)
-        (region (buffer-substring-no-properties (point-min) (point-max)))
-        )
-    (princ (concat "\nREGION1:\n" region "\n") log-buf)
+        (region (buffer-substring-no-properties (point-min) (point-max))))
     (save-excursion
       (while proc-rlists
         (setq rlist (car proc-rlists))
@@ -551,11 +531,8 @@ preserve the positions of all other items in the buffer."
         (setq spoint (car ret-val))
         (setq epoint (cdr ret-val))
         (shu-erase-region spoint (1+ epoint))
-        (setq proc-rlists (cdr proc-rlists))
-        )
-      )
+        (setq proc-rlists (cdr proc-rlists))))
     (setq region (buffer-substring-no-properties (point-min) (point-max)))
-    (princ (concat "\nREGION2:\n" region "\n") log-buf)
     ))
 
 
@@ -573,8 +550,7 @@ to include any of the items in the statements we are processing.
 The return value from this function is a cons cell whose car is the trimmed
 TOKEN-LIST and whose cdr is the sorted PROC-RLISTS, which has been sorted by the
 start position of each rlist."
-  (let (
-        (tlist token-list)
+  (let ((tlist token-list)
         (sorted-proc
          (sort proc-rlists
                (lambda(lhs rhs)
@@ -592,8 +568,7 @@ start position of each rlist."
         (token-info)
         (spoint)
         (epoint)
-        (looking-for-end)
-        )
+        (looking-for-end))
     (setq sprl sorted-proc)
     (while (and sprl tlist)
       (setq rlist (car sprl))
@@ -609,14 +584,10 @@ start position of each rlist."
             (progn
               (setq looking-for-start nil)
               (when (equal (car tlist) (car token-list))
-                (setq first1 t)
-                )
-              )
+                (setq first1 t)))
           (setq lastp tlist)
           (setq first1 nil)
-          (setq tlist (cdr tlist))
-          )
-        )
+          (setq tlist (cdr tlist))))
       ;; lastp is the item whose cdr will be changed
       ;; If first1 is true, head of list will be changed
       ;; tlist points to the start item (which might also be the end)
@@ -630,14 +601,9 @@ start position of each rlist."
               (if first1
                   (setq token-list (cdr tlist))
                 (setcdr lastp (cdr tlist))
-                (setq tlist (cdr tlist))
-                )
-              )
-          (setq tlist (cdr tlist))
-          )
-        )
-      (setq sprl (cdr sprl))
-      )
+                (setq tlist (cdr tlist))))
+          (setq tlist (cdr tlist))))
+      (setq sprl (cdr sprl)))
     (cons token-list sorted-proc)
     ))
 
