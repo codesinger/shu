@@ -338,26 +338,29 @@ that may follow the key word \"using\".")
       (setq un-list (cdr ret-val))
       (when uns-list
         (setq something (shu-match-merge-namespaces-with-class-list class-list uns-list log-buf top-name))
-        (if (not something)
-            (message "%s" "Failure")
+        (when something
           (setq proc-classes (car something))
           (setq proc-rlists (cdr something))
-          (setq something (shu-match-add-names-to-class-list un-list proc-classes proc-rlists log-buf top-name))
-          (setq proc-classes (car something))
-          (setq proc-rlists (cdr something))
-          (setq proc-classes (remove-class-duplicates proc-classes log-buf))
-          (setq ret-val (shu-match-remove-proc-rlists token-list proc-rlists log-buf))
-          (setq token-list (car ret-val))
-          (setq proc-rlists (cdr ret-val))
-          (shu-match-erase-using proc-rlists log-buf)
-          (setq class-ht (shu-match-make-class-hash-table-internal proc-classes log-buf))
-          (when class-ht
-            (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
-            (when clist
-              (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
-              (shu-match-qualify-class-names class-ht count-alist clist log-buf)
-              )
-            )
+          (princ "proc-classes1: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
+          (princ "proc-rlists1: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
+          )
+        )
+      (setq something (shu-match-add-names-to-class-list un-list proc-classes proc-rlists log-buf top-name))
+      (setq proc-classes (car something))
+      (setq proc-rlists (cdr something))
+      (princ "proc-classes2: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
+      (princ "proc-rlists2: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
+      (setq proc-classes (remove-class-duplicates proc-classes log-buf))
+      (setq ret-val (shu-match-remove-proc-rlists token-list proc-rlists log-buf))
+      (setq token-list (car ret-val))
+      (setq proc-rlists (cdr ret-val))
+      (shu-match-erase-using proc-rlists log-buf)
+      (setq class-ht (shu-match-make-class-hash-table-internal proc-classes log-buf))
+      (when class-ht
+        (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
+        (when clist
+          (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
+          (shu-match-qualify-class-names class-ht count-alist clist log-buf)
           )
         )
       )
@@ -975,7 +978,7 @@ count by one."
           " * \\file something_or_other.cpp\n"
           " */\n"
           "\n"
-          "#include <strng>\n"
+          "#include <string>\n"
           "\n"
           "    using namespace abcde;\n"
           "    x = x + 1;\n"
@@ -1022,7 +1025,7 @@ count by one."
           " * file something_or_other.cpp\n"
           " */\n"
           "\n"
-          "#include <strng>\n"
+          "#include <string>\n"
           "\n"
           "    using namespace abcde;\n"
           "    x = x + 1;\n"
@@ -1057,7 +1060,7 @@ count by one."
           " * file something_or_other.cpp\n"
           " */\n"
           "\n"
-          "#include <strng>\n"
+          "#include <string>\n"
           "\n"
           "                          \n"
           "    x = x + 1;\n"
@@ -1097,7 +1100,7 @@ count by one."
           " * file something_or_other.cpp\n"
           " */\n"
           "\n"
-          "#include <strng>\n"
+          "#include <string>\n"
           "\n"
           "    using namespace abcde;\n"
           "    x = x + 1;\n"
@@ -1134,7 +1137,7 @@ count by one."
           " * file something_or_other.cpp\n"
           " */\n"
           "\n"
-          "#include <strng>\n"
+          "#include <string>\n"
           "\n"
           "                          \n"
           "    x = x + 1;\n"
@@ -1153,7 +1156,6 @@ count by one."
       (something-or-other class-list log-buf)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual))
-      (princ (concat "\n\n\nsomething-or-other\n" actual) log-buf)
       )
     ))
 
@@ -1173,9 +1175,8 @@ count by one."
           " * file something_or_other.cpp\n"
           " */\n"
           "\n"
-          "#include <strng>\n"
+          "#include <string>\n"
           "\n"
-          "    using namespace std;\n"
           "    using abcde::AClass1;\n"
           "    using xyrzk::Xclass2;\n"
           "    using std::string;\n"
