@@ -1895,9 +1895,9 @@ or right parenthesis or a left or right square bracket."
 
 
 ;;
-;;  shu-cpp-rmv-using
+;;  shu-cpp-rmv-using-old
 ;;
-(defun shu-cpp-rmv-using (class-list &optional top-name)
+(defun shu-cpp-rmv-using-old (class-list &optional top-name)
   "Remove \"using namespace\" directives from a C++ file, adding the appropriate
 namespace qualifier to all of the unqualified class names.  CLASS-LIST is an
 a-list in which the car of each entry is a namespace and the cdr of each entry

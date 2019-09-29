@@ -332,9 +332,7 @@ of \"WhammoCorp\", then the following line:
 would be interpreted as though it had been written:
 
      using namespace world;"
-  (let (
-        (log-buf (get-buffer-create "**shu-chgs**"))
-        )
+  (let ((log-buf (get-buffer-create "**shu-chgs**")))
     (shu-match-internal-rmv-using class-list log-buf top-name)
     ))
 
@@ -344,8 +342,7 @@ would be interpreted as though it had been written:
 ;;
 (defun shu-match-internal-rmv-using (class-list log-buf &optional top-name)
   "Doc string."
-  (let (
-        (token-list)
+  (let ((token-list)
         (ret-val)
         (uns-list)
         (un-list)
@@ -354,30 +351,22 @@ would be interpreted as though it had been written:
         (proc-rlists)
         (class-ht)
         (count-alist)
-        (clist)
-        )
+        (clist))
     (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
     (setq ret-val (shu-match-find-all-using-internal token-list))
     (if (not ret-val)
         (progn
-          (message "%s" "No using namespace directives found")
-          )
+          (message "%s" "No using namespace directives found"))
       (setq uns-list (car ret-val))
       (setq un-list (cdr ret-val))
       (when uns-list
         (setq something (shu-match-merge-namespaces-with-class-list class-list uns-list log-buf top-name))
         (when something
           (setq proc-classes (car something))
-          (setq proc-rlists (cdr something))
-          (princ "proc-classes1: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
-          (princ "proc-rlists1: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
-          )
-        )
+          (setq proc-rlists (cdr something))))
       (setq something (shu-match-add-names-to-class-list un-list proc-classes proc-rlists log-buf top-name))
       (setq proc-classes (car something))
       (setq proc-rlists (cdr something))
-      (princ "proc-classes2: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
-      (princ "proc-rlists2: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
       (setq proc-classes (remove-class-duplicates proc-classes log-buf))
       (setq ret-val (shu-match-remove-proc-rlists token-list proc-rlists log-buf))
       (setq token-list (car ret-val))
@@ -388,10 +377,7 @@ would be interpreted as though it had been written:
         (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
         (when clist
           (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
-          (shu-match-qualify-class-names class-ht count-alist clist log-buf)
-          )
-        )
-      )
+          (shu-match-qualify-class-names class-ht count-alist clist log-buf))))
     ))
 
 
@@ -652,18 +638,15 @@ is necessary because we are about to invert the class list to produce a hash
 table in which the key is the class name and the value is the enclosing
 namespace name.  This operation will fail if a given namespace contains
 duplicate class names."
-  (let (
-        (pc proc-classes)
+  (let ((pc proc-classes)
         (ce)
-        (cl)
-        )
+        (cl))
     (while pc
       (setq ce (car pc))
       (setq cl (cdr ce))
       (setq cl (delete-dups cl))
       (setcdr ce cl)
-      (setq pc (cdr pc))
-      )
+      (setq pc (cdr pc)))
     proc-classes
     ))
 
@@ -678,15 +661,13 @@ PROC-RLISTS is the set of rlists that represents the \"using namespace\"
 statements.  This function adds the\"using name\" directives, if any, to both
 PROC-CLASSES and PROC-RLISTS.  It returns a cons cell in which the car is the
 modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
-  (let (
-        (rlist)
+  (let ((rlist)
         (ret-val)
         (ns-name)
         (class-name)
         (ce)
         (x)
-        (cl)
-          )
+        (cl))
     (while un-list
       (setq rlist (car un-list))
       (push rlist proc-rlists)
@@ -697,14 +678,11 @@ modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
       (if (not ce)
           (progn
             (setq x (cons ns-name (list class-name)))
-            (push x proc-classes)
-            )
+            (push x proc-classes))
         (setq cl (cdr ce))
         (push class-name cl)
-        (setcdr ce cl)
-        )
-      (setq un-list (cdr un-list))
-      )
+        (setcdr ce cl))
+      (setq un-list (cdr un-list)))
     (cons proc-classes proc-rlists)
     ))
 
@@ -724,8 +702,7 @@ The updated class list will be used to identify class names to be qualified and
 the namespaces with which to qualify them..  The rlists representing the \"using
 namespace\" statements will be used to remove the \"using namespace\" statements
 from the buffer."
-  (let (
-        (rlist)
+  (let ((rlist)
         (ns-name)
         (ce)
         (proc-classes)
@@ -734,8 +711,7 @@ from the buffer."
         (ret-val)
         (spoint)
         (epoint)
-        (ns-code)
-          )
+        (ns-code))
     (while uns-list
       (setq rlist (car uns-list))
       (setq ns-name (shu-match-using-namespace-string rlist top-name))
@@ -744,11 +720,8 @@ from the buffer."
           (push rlist np-rlists)
         (when (not (assoc ns-name proc-classes))
           (push ce proc-classes)
-          (push rlist proc-rlists)
-          )
-        )
-      (setq uns-list (cdr uns-list))
-      )
+          (push rlist proc-rlists)))
+      (setq uns-list (cdr uns-list)))
     (when np-rlists
       (setq np-rlists (nreverse np-rlists))
       (while np-rlists
@@ -757,19 +730,14 @@ from the buffer."
         (setq spoint (car ret-val))
         (setq epoint (cdr ret-val))
         (setq ns-code (buffer-substring-no-properties spoint epoint))
-        (setq np-rlists (cdr np-rlists))
-        )
-      )
+        (setq np-rlists (cdr np-rlists))))
     (when proc-classes
-      (setq proc-classes (nreverse proc-classes))
-      )
+      (setq proc-classes (nreverse proc-classes)))
     (when proc-rlists
-      (setq proc-rlists (nreverse proc-rlists))
-      )
+      (setq proc-rlists (nreverse proc-rlists)))
     (if (and proc-classes proc-rlists)
         (setq ret-val (cons proc-classes proc-rlists))
-      (setq ret-val nil)
-      )
+      (setq ret-val nil))
     ret-val
     ))
 
@@ -1319,6 +1287,80 @@ count by one."
       (shu-match-internal-rmv-using class-list log-buf top-name)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-match-internal-rmv-using-6
+;;
+(ert-deftest shu-test-shu-match-internal-rmv-using-6 ()
+  (let ((log-buf (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "\n"
+          "    using WhammoCorp::abcde::AClass1;\n"
+          "    using xyrzk::Xclass2;\n"
+          "    using std::string;\n"
+          "    using std::deque;\n"
+          "    x = x + 1;\n"
+          "    /* xxx */\n"
+          "    string      x;\n"
+          "    AClass1     z;\n"
+          "    Xclass2     p;\n"
+          "    deque       jj;\n"
+          "// Hello\n"
+          ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std"      (list
+                            "string"
+                            "deque"
+                            ))))
+        (top-name "WhammoCorp")
+        (token-list)
+        (actual)
+        (expected
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "\n"
+          "                                     \n"
+          "                         \n"
+          "                      \n"
+          "                     \n"
+          "    x = x + 1;\n"
+          "    /* xxx */\n"
+          "    std::string      x;\n"
+          "    abcde::AClass1     z;\n"
+          "    xyrzk::Xclass2     p;\n"
+          "    std::deque       jj;\n"
+          "// Hello\n"
+          )))
+    (with-temp-buffer
+      (insert data)
+      (shu-match-internal-rmv-using class-list log-buf top-name)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual))
+      )
     ))
 
 
