@@ -415,6 +415,7 @@ qualifying namespace."
         (clist)
         )
     (while tlist
+      (setq blocked nil)
       (setq token-info (car tlist))
       (setq token (shu-cpp-token-extract-token token-info))
       (setq token-type (shu-cpp-token-extract-type token-info))
@@ -443,7 +444,7 @@ qualifying namespace."
                     (string= next-token "[")
                     ))
                   (setq blocked t)
-                (when (might-be-include token-info) ;; Function still to write
+                (when (might-be-include token-info)
                   (setq blocked t)
                   )
                 )
