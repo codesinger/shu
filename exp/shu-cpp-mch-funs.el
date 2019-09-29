@@ -497,7 +497,7 @@ of times that the class name was explicitly qualified."
       (shu-match-increment-class-count count-alist token)
       (setq clist (cdr clist))
       )
-    (shu-match-show-class-count count-alist class-ht log-buf)
+    (shu-match-rmv-show-class-count count-alist class-ht log-buf)
     ))
 
 
@@ -944,9 +944,32 @@ count by one."
 
 
 ;;
-;;  shu-match-show-class-count
+;;  shu-test-shu-match-increment-class-count
 ;;
-(defun shu-match-show-class-count (count-alist class-ht log-buf)
+(ert-deftest shu-test-shu-match-increment-class-count ()
+  (let (
+        (count-alist
+         (list
+          (cons "set" 0)
+          (cons "map" 2)
+          (cons "string" 6)
+          (cons "Mumble" 1)))
+        )
+    (shu-match-increment-class-count count-alist "map")
+    (setq cp (assoc "map" count-alist))
+    (should cp)
+    (should (consp cp))
+    (setq count (cdr cp))
+    (should count)
+    (should (numberp count))
+    (should (= 3 count))
+    ))
+
+
+;;
+;;  shu-match-rmv-show-class-count
+;;
+(defun shu-match-rmv-show-class-count (count-alist class-ht log-buf)
   "Put into the log buffer the count of class names that were qualified."
   (let (
         (cp)
@@ -963,10 +986,8 @@ count by one."
       (setq cp (car count-alist))
       (setq class-name (car cp))
       (setq count (cdr cp))
-      (princ (format "%s: %d\n" class-name count) log-buf)
       (setq ns-name (gethash class-name class-ht))
       (setq full-name (concat ns-name "::" class-name))
-      (princ (concat full-name "\n") log-buf)
       (push (cons full-name count) clist)
       (setq count-alist (cdr count-alist))
       )
@@ -974,7 +995,6 @@ count by one."
                       (lambda(lhs rhs)
                         (string< (car lhs) (car rhs))
                         )))
-    (princ "clist: " log-buf)(princ clist log-buf)(princ "\n" log-buf)
     (while clist
       (setq cp (car clist))
       (setq full-name (car cp))
@@ -989,6 +1009,34 @@ count by one."
     ))
 
 
+
+;;
+;;  shu-test-shu-match-rmv-show-class-count
+;;
+(ert-deftest shu-test-shu-match-rmv-show-class-count ()
+  (let ((count-alist
+         (list
+          (cons "set" 0)
+          (cons "map" 2)
+          (cons "string" 6)
+          (cons "Mumble" 1)))
+        (class-ht (make-hash-table :test 'equal :size 12))
+        (expected
+         (concat
+          "              1: abcde::Mumble\n"
+          "              2: std::map\n"
+          "              0: std::set\n"
+          "              6: std::string\n"))
+        (actual))
+    (puthash "set" "std" class-ht)
+    (puthash "string" "std" class-ht)
+    (puthash "map" "std" class-ht)
+    (puthash "Mumble" "abcde" class-ht)
+    (with-temp-buffer
+      (shu-match-rmv-show-class-count count-alist class-ht (current-buffer))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
 
 
 
