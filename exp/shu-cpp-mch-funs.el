@@ -819,7 +819,7 @@ from the buffer."
 ;;
 ;;  shu-match-make-class-hash-table-internal
 ;;
-(defun shu-match-make-class-hash-table-internal (proc-classes log-buf &optional count-only)
+(defun shu-match-make-class-hash-table-internal (proc-classes log-buf)
   "PROC-CLASSES is the alist of all of the namespaces and classes that we will
 process, with the namespace name being the key and a list of class names within the
 namespace name as the value.
@@ -829,12 +829,7 @@ alist.  Each entry in the hash table has a class name as the key with the name
 of the enclosing namespace as the value.
 If two class names map to the same enclosing namespace name, then there is an
 unresolvable ambiguity that must terminate the operation.  If that is the case,
-diagnostic messages are placed into the log buffer and a nil value is returned.
-
-If the optional COUNT-ONLY argument is true, then a hash table is built in which
-the class name is the key and the value is zero.  This is used to build a hash
-table that will track the number of times a class name has been qualified by
-calling the function shu-match-increment-hash-count to increment the count."
+diagnostic messages are placed into the log buffer and a nil value is returned."
   (let (
         (pc proc-classes)
         (ht)
@@ -845,7 +840,6 @@ calling the function shu-match-increment-hash-count to increment the count."
         (class-name)
         (hv)
         (dup-present)
-        (value)
         )
     (while pc
       (setq ce (car pc))
@@ -870,11 +864,7 @@ calling the function shu-match-increment-hash-count to increment the count."
               (princ (format "Class '%s' is in both namespace '%s' and '%s'\n" class-name hv ns-name) log-buf)
               (setq dup-present t)
               )
-          (if count-only
-              (setq value 0)
-            (setq value ns-name)
-            )
-          (puthash class-name value ht)
+          (puthash class-name ns-name ht)
           )
         (setq cl (cdr cl))
         )
@@ -894,33 +884,11 @@ calling the function shu-match-increment-hash-count to increment the count."
 (defun shu-match-make-count-alist-from-hash (class-ht)
   "Doc string."
   (interactive)
-  (let (
-        (count-alist)
-        )
+  (let ((count-alist))
     (maphash (lambda (class-name ns-name)
-               (push (cons class-name 0) count-alist)
-               )
+               (push (cons class-name 0) count-alist))
              class-ht)
     count-alist
-    ))
-
-
-;;
-;;  shu-match-increment-hash-count
-;;
-(defun shu-match-increment-hash-count (count-hash class-name)
-  "Doc string."
-  (interactive)
-  (let (
-        (count)
-        (new-count)
-        )
-    (setq count (gethash class-name count-hash))
-    (when count
-      (setq new-count (1+ count))
-      (remhash class-name count-hash)
-      (puthash class-name new-count count-hash)
-      )
     ))
 
 
@@ -933,10 +901,8 @@ calling the function shu-match-increment-hash-count to increment the count."
 number of times that class name has been found.  This function increments the
 count by one."
   (interactive)
-  (let (
-        (cv (assoc class-name alist))
-        (count)
-        )
+  (let ((cv (assoc class-name alist))
+        (count))
     (setq count (cdr cv))
     (setq count (1+ count))
     (setcdr cv count)
@@ -949,8 +915,7 @@ count by one."
 ;;
 (defun shu-match-rmv-show-class-count (count-alist class-ht log-buf)
   "Put into the log buffer the count of class names that were qualified."
-  (let (
-        (cp)
+  (let ((cp)
         (class-name)
         (ns-name)
         (count)
@@ -958,8 +923,7 @@ count by one."
         (clist)
         (sum 0)
         (pcount)
-        (psum)
-        )
+        (psum))
     (while count-alist
       (setq cp (car count-alist))
       (setq class-name (car cp))
@@ -967,8 +931,7 @@ count by one."
       (setq ns-name (gethash class-name class-ht))
       (setq full-name (concat ns-name "::" class-name))
       (push (cons full-name count) clist)
-      (setq count-alist (cdr count-alist))
-      )
+      (setq count-alist (cdr count-alist)))
     (setq clist (sort clist
                       (lambda(lhs rhs)
                         (string< (car lhs) (car rhs))
@@ -980,10 +943,56 @@ count by one."
       (setq sum (+ sum count))
       (setq pcount (shu-fixed-format-num count 15))
       (princ (concat pcount ": " full-name "\n") log-buf)
-      (setq clist (cdr clist))
-      )
+      (setq clist (cdr clist)))
     (setq psum (shu-fixed-format-num sum 0))
     (message "%s class names qualified.  See buffer %s" psum (buffer-name log-buf))
+    ))
+
+
+
+;;
+;;  shu-test-shu-match-make-count-alist-from-hash
+;;
+(ert-deftest shu-test-shu-match-make-count-alist-from-hash ()
+  (let ((class-ht (make-hash-table :test 'equal :size 12))
+        (count-alist)
+        (count)
+        (cp1)
+        (cp2)
+        (cp3)
+        (cp4)
+        (cp5))
+    (puthash "set" "std" class-ht)
+    (puthash "string" "std" class-ht)
+    (puthash "map" "std" class-ht)
+    (puthash "Mumble" "abcde" class-ht)
+    (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
+    (setq cp1 (assoc "set" count-alist))
+    (should cp1)
+    (should (consp cp1))
+    (setq count (cdr cp1))
+    (should (numberp count))
+    (should (= count 0))
+    (setq cp2 (assoc "string" count-alist))
+    (should cp2)
+    (should (consp cp2))
+    (setq count (cdr cp2))
+    (should (numberp count))
+    (should (= count 0))
+    (setq cp3 (assoc "map" count-alist))
+    (should cp3)
+    (should (consp cp3))
+    (setq count (cdr cp3))
+    (should (numberp count))
+    (should (= count 0))
+    (setq cp4 (assoc "Mumble" count-alist))
+    (should cp4)
+    (should (consp cp4))
+    (setq count (cdr cp4))
+    (should (numberp count))
+    (should (= count 0))
+    (setq cp5 (assoc "Wheeeee!" count-alist))
+    (should (not cp5))
     ))
 
 
@@ -992,14 +1001,12 @@ count by one."
 ;;  shu-test-shu-match-increment-class-count
 ;;
 (ert-deftest shu-test-shu-match-increment-class-count ()
-  (let (
-        (count-alist
+  (let ((count-alist
          (list
           (cons "set" 0)
           (cons "map" 2)
           (cons "string" 6)
-          (cons "Mumble" 1)))
-        )
+          (cons "Mumble" 1))))
     (shu-match-increment-class-count count-alist "map")
     (setq cp (assoc "map" count-alist))
     (should cp)
@@ -1344,67 +1351,6 @@ count by one."
 
 
 
-;;
-;;  shu-test-shu-match-make-class-hash-table-internal-2
-;;
-(ert-deftest shu-test-shu-match-make-class-hash-table-internal-2 ()
-  (let (
-        (gb (get-buffer-create "**goo**"))
-        (class-list
-         (list
-          (cons "abcde"    (list
-                            "AClass1"
-                            "AClass2"
-                            ))
-          (cons "xyrzk"    (list
-                            "Xclass1"
-                            "Xclass2"
-                            ))
-          (cons "std"    (list
-                          "string"
-                          "set"
-                          "map"
-                          ))
-          )
-         )
-        (ht)
-        (hv)
-        )
-    (setq ht (shu-match-make-class-hash-table-internal class-list gb t))
-    (should ht)
-    (should (hash-table-p ht))
-    (setq hv (gethash "AClass1" ht))
-    (should hv)
-    (should (numberp hv))
-    (should (= 0 hv))
-    (setq hv (gethash "AClass2" ht))
-    (should hv)
-    (should (numberp hv))
-    (should (= 0 hv))
-    (setq hv (gethash "Xclass1" ht))
-    (should hv)
-    (should (numberp hv))
-    (should (= 0 hv))
-    (setq hv (gethash "Xclass2" ht))
-    (should hv)
-    (should (numberp hv))
-    (should (= 0 hv))
-    (setq hv (gethash "string" ht))
-    (should hv)
-    (should (numberp hv))
-    (should (= 0 hv))
-    (setq hv (gethash "set" ht))
-    (should hv)
-    (should (numberp hv))
-    (should (= 0 hv))
-    (setq hv (gethash "map" ht))
-    (should hv)
-    (should (numberp hv))
-    (should (= 0 hv))
-    ))
-
-
-
 
 ;;
 ;;  shu-test-shu-match-make-class-hash-table-internal-3
@@ -1436,72 +1382,6 @@ count by one."
         )
     (setq ht (shu-match-make-class-hash-table-internal class-list gb))
     (should (not ht))
-    ))
-
-
-
-;;
-;;  shu-test-shu-match-increment-hash-count-1
-;;
-(ert-deftest shu-test-shu-match-increment-hash-count-1 ()
-  (let (
-        (gb (get-buffer-create "**goo**"))
-        (class-list
-         (list
-          (cons "abcde"    (list
-                            "AClass1"
-                            "AClass2"
-                            ))
-          (cons "xyrzk"    (list
-                            "Xclass1"
-                            "Xclass2"
-                            ))
-          (cons "std"    (list
-                          "string"
-                          "set"
-                          "map"
-                          ))
-          )
-         )
-        (ht)
-        (class-name)
-        (count)
-        )
-    (setq ht (shu-match-make-class-hash-table-internal class-list gb t))
-    (should ht)
-    (should (hash-table-p ht))
-    (setq class-name "Xclass1")
-    (shu-match-increment-hash-count ht class-name)
-    (setq count (gethash class-name ht))
-    (should count)
-    (should (numberp count))
-    (should (= 1 count))
-    (shu-match-increment-hash-count ht class-name)
-    (setq count (gethash class-name ht))
-    (should count)
-    (should (numberp count))
-    (should (= 2 count))
-    (shu-match-increment-hash-count ht class-name)
-    (setq count (gethash class-name ht))
-    (should count)
-    (should (numberp count))
-    (should (= 3 count))
-    (setq class-name "string")
-    (shu-match-increment-hash-count ht class-name)
-    (setq count (gethash class-name ht))
-    (should count)
-    (should (numberp count))
-    (should (= 1 count))
-    (shu-match-increment-hash-count ht class-name)
-    (setq count (gethash class-name ht))
-    (should count)
-    (should (numberp count))
-    (should (= 2 count))
-    (shu-match-increment-hash-count ht class-name)
-    (setq count (gethash class-name ht))
-    (should count)
-    (should (numberp count))
-    (should (= 3 count))
     ))
 
 
