@@ -340,12 +340,12 @@ that may follow the key word \"using\".")
       (setq uns-list (car ret-val))
       (setq un-list (cdr ret-val))
       (when uns-list
-        (setq something (process-uns-list class-list uns-list log-buf top-name))
+        (setq something (shu-match-merge-namespaces-with-class-list class-list uns-list log-buf top-name))
         (if (not something)
             (message "%s" "Failure")
           (setq proc-classes (car something))
           (setq proc-rlists (cdr something))
-          (setq something (add-ns-rlists un-list proc-classes proc-rlists log-buf top-name))
+          (setq something (shu-match-add-names-to-class-list un-list proc-classes proc-rlists log-buf top-name))
           (setq proc-classes (car something))
           (setq proc-rlists (cdr something))
           (princ "proc-classes9: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
@@ -696,26 +696,23 @@ duplicate class names."
 
 
 ;;
-;;  add-ns-rlists
+;;  shu-match-add-names-to-class-list
 ;;
-(defun add-ns-rlists (un-list proc-classes proc-rlists log-buf &optional top-name)
+(defun shu-match-add-names-to-class-list (un-list proc-classes proc-rlists log-buf &optional top-name)
   "UN-LIST is the list of rlists that represent the \"using name\" statements.
 PROC-CLASSES is the class list we will be using to do the processing.
 PROC-RLISTS is the set of rlists that represents the \"using namespace\"
 statements.  This function adds the\"using name\" directives, if any, to both
 PROC-CLASSES and PROC-RLISTS.  It returns a cons cell in which the car is the
 modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
-  (let (
-        (rlist)
+  (let ((rlist)
         (ret-val)
         (ns-name)
         (class-name)
         (ce)
         (x)
-        (cl)
-        )
+        (cl))
     (while un-list
-      (princ "un-list: " log-buf)(princ un-list log-buf)(princ "\n" log-buf)
       (setq rlist (car un-list))
       (princ "rlist-un: " log-buf)(princ rlist log-buf)(princ "\n" log-buf)
       (push rlist proc-rlists)
@@ -728,23 +725,20 @@ modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
           (progn
             (setq x (cons ns-name (list class-name)))
             (push x proc-classes)
-            (princ "Adding ns: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
-            )
+            (princ "Adding ns: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf))
         (setq cl (cdr ce))
         (push class-name cl)
-        (princ "Adding cl: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
-        )
-      (setq un-list (cdr un-list))
-      )
+        (princ "Adding cl: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf))
+      (setq un-list (cdr un-list)))
     (cons proc-classes proc-rlists)
     ))
 
 
 
 ;;
-;;  process-uns-list
+;;  shu-match-merge-namespaces-with-class-list
 ;;
-(defun process-uns-list (class-list uns-list log-buf &optional top-name)
+(defun shu-match-merge-namespaces-with-class-list (class-list uns-list log-buf &optional top-name)
 
   "Merge the UNS-LIST with the CLASS-LIST.  Return a cons-cell pointing to two
 lists.  The first is the list of classes from the class list that have
@@ -766,15 +760,11 @@ from the buffer."
         (spoint)
         (epoint)
         (ns-code)
-        )
-    (princ "uns-list: " log-buf)(princ uns-list log-buf)(princ "\n" log-buf)
+          )
     (while uns-list
       (setq rlist (car uns-list))
-      (princ "rlist: " log-buf)(princ rlist log-buf)(princ "\n" log-buf)
       (setq ns-name (shu-match-using-namespace-string rlist top-name))
-      (princ (format "ns-name: '%s'\n" ns-name) log-buf)
       (setq ce (assoc ns-name class-list))
-      (princ "ce: " log-buf)(princ ce log-buf)(princ "\n" log-buf)
       (if (not ce)
           (push rlist np-rlists)
         (when (not (assoc ns-name proc-classes))
@@ -785,7 +775,6 @@ from the buffer."
       (setq uns-list (cdr uns-list))
       )
     (when np-rlists
-      (princ "The following using namespaces have no corresponding class list entry:\n" log-buf)
       (setq np-rlists (nreverse np-rlists))
       (while np-rlists
         (setq rlist (car np-rlists))
@@ -793,17 +782,14 @@ from the buffer."
         (setq spoint (car ret-val))
         (setq epoint (cdr ret-val))
         (setq ns-code (buffer-substring-no-properties spoint epoint))
-        (princ (concat "\n" ns-code "\n") log-buf)
         (setq np-rlists (cdr np-rlists))
         )
       )
     (when proc-classes
       (setq proc-classes (nreverse proc-classes))
-      (princ "proc-classes: " log-buf)(princ proc-classes log-buf)(princ "\n" log-buf)
       )
     (when proc-rlists
       (setq proc-rlists (nreverse proc-rlists))
-      (princ "proc-rlists: " log-buf)(princ proc-rlists log-buf)(princ "\n" log-buf)
       )
     (if (and proc-classes proc-rlists)
         (setq ret-val (cons proc-classes proc-rlists))
@@ -1437,26 +1423,24 @@ proc-classes and the car is the instance of proc-rlists.
 
 This is used to set up for a unit test that needs these two lists to
 be in place."
-  (let (
-        (token-list)
+  (let ((token-list)
         (ret-val)
         (something)
         (uns-list)
         (un-list)
         (proc-rlists)
-        (proc-classes)
-        )
+        (proc-classes))
     (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
     (setq ret-val (shu-match-find-all-using-internal token-list))
     (should ret-val)
     (setq uns-list (car ret-val))
     (setq un-list (cdr ret-val))
     (should uns-list)
-    (setq something (process-uns-list class-list uns-list log-buf top-name))
+    (setq something (shu-match-merge-namespaces-with-class-list class-list uns-list log-buf top-name))
     (should something)
     (setq proc-classes (car something))
     (setq proc-rlists (cdr something))
-    (setq something (add-ns-rlists un-list proc-classes proc-rlists log-buf top-name))
+    (setq something (shu-match-add-names-to-class-list un-list proc-classes proc-rlists log-buf top-name))
     (setq proc-classes (car something))
     (setq proc-rlists (cdr something))
     (setq proc-classes (remove-class-duplicates proc-classes log-buf))
