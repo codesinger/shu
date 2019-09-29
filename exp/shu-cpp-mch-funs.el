@@ -312,9 +312,37 @@ that may follow the key word \"using\".")
 
 
 ;;
-;;  something-or-other
+;;  shu-cpp-rmv-using
 ;;
-(defun something-or-other (class-list log-buf &optional top-name)
+(defun shu-cpp-rmv-using (class-list &optional top-name)
+  "Remove \"using namespace\" directives from a C++ file, adding the appropriate
+namespace qualifier to all of the unqualified class names.  CLASS-LIST is an
+a-list in which the car of each entry is a namespace and the cdr of each entry
+is a list of class names.  Here is an example of such an a-list:
+
+     (list
+      (cons \"std\"    (list \"set\" \"string\" \"vector\"))
+      (cons \"world\"  (list \"Hello\" \"Goodbye\")))
+
+TOP-NAME, if present is a higher level namespace.  Given a top level namespace
+of \"WhammoCorp\", then the following line:
+
+     using namespace WhammoCorp::world;
+
+would be interpreted as though it had been written:
+
+     using namespace world;"
+  (let (
+        (log-buf (get-buffer-create "**shu-chgs**"))
+        )
+    (shu-match-internal-rmv-using class-list log-buf top-name)
+    ))
+
+
+;;
+;;  shu-match-internal-rmv-using
+;;
+(defun shu-match-internal-rmv-using (class-list log-buf &optional top-name)
   "Doc string."
   (let (
         (token-list)
@@ -650,13 +678,15 @@ PROC-RLISTS is the set of rlists that represents the \"using namespace\"
 statements.  This function adds the\"using name\" directives, if any, to both
 PROC-CLASSES and PROC-RLISTS.  It returns a cons cell in which the car is the
 modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
-  (let ((rlist)
+  (let (
+        (rlist)
         (ret-val)
         (ns-name)
         (class-name)
         (ce)
         (x)
-        (cl))
+        (cl)
+          )
     (while un-list
       (setq rlist (car un-list))
       (push rlist proc-rlists)
@@ -667,10 +697,14 @@ modified PROC-CLASSES and the cdr is the modified P{ROC-RLISTS."
       (if (not ce)
           (progn
             (setq x (cons ns-name (list class-name)))
-            (push x proc-classes))
+            (push x proc-classes)
+            )
         (setq cl (cdr ce))
-        (push class-name cl))
-      (setq un-list (cdr un-list)))
+        (push class-name cl)
+        (setcdr ce cl)
+        )
+      (setq un-list (cdr un-list))
+      )
     (cons proc-classes proc-rlists)
     ))
 
@@ -967,11 +1001,10 @@ count by one."
 
 
 ;;
-;;  shu-test-something-or-other-1
+;;  shu-test-shu-match-internal-rmv-using-1
 ;;
-(ert-deftest shu-test-something-or-other-1 ()
-  (let (
-        (log-buf (get-buffer-create shu-unit-test-buffer))
+(ert-deftest shu-test-shu-match-internal-rmv-using-1 ()
+  (let ((log-buf (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
@@ -997,15 +1030,11 @@ count by one."
           (cons "xyrzk"    (list
                             "Xclass1"
                             "Xclass2"
-                            ))
-          )
-         )
-        (token-list)
-        )
+                            ))))
+        (token-list))
     (with-temp-buffer
       (insert data)
-      (something-or-other class-list log-buf)
-      )
+      (shu-match-internal-rmv-using class-list log-buf))
     ))
 
 
@@ -1014,11 +1043,10 @@ count by one."
 
 
 ;;
-;;  shu-test-something-or-other-2
+;;  shu-test-shu-match-internal-rmv-using-2
 ;;
-(ert-deftest shu-test-something-or-other-2 ()
-  (let (
-        (log-buf (get-buffer-create shu-unit-test-buffer))
+(ert-deftest shu-test-shu-match-internal-rmv-using-2 ()
+  (let ((log-buf (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
@@ -1049,9 +1077,7 @@ count by one."
           (cons "xyrzk"    (list
                             "Xclass1"
                             "Xclass2"
-                            ))
-          )
-         )
+                            ))))
         (token-list)
         (actual)
         (expected
@@ -1074,14 +1100,12 @@ count by one."
           "    xyrzk::Xclass2     p;\n"
           "    std::deque       jj;\n"
           "// Hello\n"
-          ))
-        )
+          )))
     (with-temp-buffer
       (insert data)
-      (something-or-other class-list log-buf)
+      (shu-match-internal-rmv-using class-list log-buf)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-      (should (string= expected actual))
-      )
+      (should (string= expected actual)))
     ))
 
 
@@ -1089,11 +1113,10 @@ count by one."
 
 
 ;;
-;;  shu-test-something-or-other-3
+;;  shu-test-shu-match-internal-rmv-using-3
 ;;
-(ert-deftest shu-test-something-or-other-3 ()
-  (let (
-        (log-buf (get-buffer-create shu-unit-test-buffer))
+(ert-deftest shu-test-shu-match-internal-rmv-using-3 ()
+  (let ((log-buf (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
@@ -1126,9 +1149,7 @@ count by one."
           (cons "std"      (list
                             "string"
                             "deque"
-                            ))
-          )
-         )
+                            ))))
         (token-list)
         (actual)
         (expected
@@ -1149,14 +1170,12 @@ count by one."
           "    xyrzk::Xclass2     p;\n"
           "    std::deque       jj;\n"
           "// Hello\n"
-          ))
-        )
+          )))
     (with-temp-buffer
       (insert data)
-      (something-or-other class-list log-buf)
+      (shu-match-internal-rmv-using class-list log-buf)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-      (should (string= expected actual))
-      )
+      (should (string= expected actual)))
     ))
 
 
@@ -1164,11 +1183,10 @@ count by one."
 
 
 ;;
-;;  shu-test-something-or-other-4
+;;  shu-test-shu-match-internal-rmv-using-4
 ;;
-(ert-deftest shu-test-something-or-other-4 ()
-  (let (
-        (log-buf (get-buffer-create shu-unit-test-buffer))
+(ert-deftest shu-test-shu-match-internal-rmv-using-4 ()
+  (let ((log-buf (get-buffer-create shu-unit-test-buffer))
         (data
          (concat
           "/*!\n"
@@ -1202,22 +1220,105 @@ count by one."
           (cons "std"      (list
                             "string"
                             "deque"
-                            ))
-          )
-         )
+                            ))))
         (token-list)
         (actual)
         (expected
          (concat
-          ))
-        )
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "\n"
+          "                         \n"
+          "                         \n"
+          "                      \n"
+          "                     \n"
+          "    x = x + 1;\n"
+          "    /* xxx */\n"
+          "    std::string      x;\n"
+          "    abcde::AClass1     z;\n"
+          "    xyrzk::Xclass2     p;\n"
+          "    std::deque       jj;\n"
+          "// Hello\n"
+          )))
     (with-temp-buffer
       (insert data)
-      (something-or-other class-list log-buf)
+      (shu-match-internal-rmv-using class-list log-buf)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-;;;      (should (string= expected actual))
-      (princ (concat "\n\n\nsomething-or-other\n" actual) log-buf)
-      )
+      (should (string= expected actual)))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-match-internal-rmv-using-5
+;;
+(ert-deftest shu-test-shu-match-internal-rmv-using-5 ()
+  (let ((log-buf (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "\n"
+          "    using namespace abcde;\n"
+          "    x = x + 1;\n"
+          "    using namespace WhammoCorp::xyrzk;\n"
+          "    using namespace std;\n"
+          "    /* xxx */\n"
+          "    string      x;\n"
+          "    AClass1     z;\n"
+          "    Xclass2     p;\n"
+          "    deque       jj;\n"
+          "// Hello\n"
+          ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std"      (list
+                            "string"
+                            "deque"
+                            ))))
+        (top-name "WhammoCorp")
+        (token-list)
+        (actual)
+        (expected
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "\n"
+          "                          \n"
+          "    x = x + 1;\n"
+          "                                      \n"
+          "                        \n"
+          "    /* xxx */\n"
+          "    std::string      x;\n"
+          "    abcde::AClass1     z;\n"
+          "    xyrzk::Xclass2     p;\n"
+          "    std::deque       jj;\n"
+          "// Hello\n"
+          )))
+    (with-temp-buffer
+      (insert data)
+      (shu-match-internal-rmv-using class-list log-buf top-name)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
     ))
 
 
