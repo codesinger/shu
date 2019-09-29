@@ -762,8 +762,8 @@ qualifying namespace."
             (setq n (shu-cpp-token-next-non-comment tlist))
             (when n
               (setq next-token-info (car n))
-              (setq next-token (shu-cpp-token-extract-token token-info))
-              (setq next-token-type (shu-cpp-token-extract-type token-info))
+              (setq next-token (shu-cpp-token-extract-token next-token-info))
+              (setq next-token-type (shu-cpp-token-extract-type next-token-info))
               (if
                   (and
                    (= next-token-type shu-cpp-token-type-op)
