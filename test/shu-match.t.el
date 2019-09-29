@@ -2593,6 +2593,77 @@ using namespace statements."
 
 
 
+
+;;
+;;  shu-test-shu-match-internal-rmv-using-7
+;;
+(ert-deftest shu-test-shu-match-internal-rmv-using-7 ()
+  (let ((log-buf (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "\n"
+          "    using /* Hello */ \n"
+          "  namespace /* There */ abcde;\n"
+          "    x = x + 1;\n"
+          "    using namespace xyrzk;\n"
+          "    using /* Hello */ std /* There */ \n"
+          "   :: /* Bye */ deque;\n"
+          "    using namespace fred; /* Hello */\n"
+          "    using abc::std::string;\n /* Hello */"
+          "    /* xxx */\n"
+          "    string      x;\n"
+          "    AClass1     z;\n"
+          "    Xclass2     p;\n"
+          "    deque       jj;\n"
+          "// Hello\n"
+          ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))))
+        (token-list)
+        (actual)
+        (expected
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "\n"
+          "                                                     \n"
+          "    x = x + 1;\n"
+          "                          \n"
+          "                                                             \n"
+          "    using namespace fred; /* Hello */\n"
+          "                           \n"
+          " /* Hello */    /* xxx */\n"
+          "    abc::std::string      x;\n"
+          "    abcde::AClass1     z;\n"
+          "    xyrzk::Xclass2     p;\n"
+          "    std::deque       jj;\n"
+          "// Hello\n"
+          )))
+    (with-temp-buffer
+      (insert data)
+      (shu-match-internal-rmv-using class-list log-buf)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
 ;;
 ;;  shu-test-remove-class-duplicates
 ;;
