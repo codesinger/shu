@@ -704,7 +704,7 @@ change counts."
         (if clist
             (progn
               (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
-              (shu-match-qualify-class-names class-ht count-alist clist log-buf))
+              (shu-match-qualify-class-names class-ht count-alist clist np-rlists log-buf))
           (message "%s" "No unqualified class names found"))))
     ))
 
@@ -792,14 +792,17 @@ qualifying namespace."
 ;;
 ;;  shu-match-qualify-class-names
 ;;
-(defun shu-match-qualify-class-names (class-ht count-alist clist log-buf)
+(defun shu-match-qualify-class-names (class-ht count-alist clist np-rlists log-buf)
   "CLASS-HT is the hash table that maps a class name to its containing namespace
 name.  COUNT-ALIST is the alist that counts the number of times each class
 name has been qualified by its enclosing namespace.  CLIST is the list of
 token-info, each of which represents an unqualified class name.  The list is in
 reverse order, which is important.  It means that one can add a qualification to
 one class name in the list without changing the location of any other class
-names, which are above the current one in the buffer.
+names, which are above the current one in the buffer.  NP-RLISTS is a list of
+rlists, each of which represents a \"using namespace\" statement for which
+there is no corresponding entry in the class list.  There are the \"using
+namespace\" statements that we will not be processing..
 
 This function goes to the position of each unqualified class name, finds its
 containing namespace in the hash table, and inserts the containing namespace
