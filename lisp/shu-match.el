@@ -697,9 +697,11 @@ change counts."
       (setq class-ht (shu-match-make-class-hash-table-internal proc-classes log-buf))
       (when class-ht
         (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
-        (when clist
-          (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
-          (shu-match-qualify-class-names class-ht count-alist clist log-buf))))
+        (if clist
+            (progn
+              (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
+              (shu-match-qualify-class-names class-ht count-alist clist log-buf))
+          (message "%s" "No unqualified class names found"))))
     ))
 
 
@@ -1155,7 +1157,8 @@ count by one."
 ;;
 (defun shu-match-rmv-show-class-count (count-alist class-ht log-buf)
   "Put into the log buffer the count of class names that were qualified."
-  (let ((cp)
+  (let ((bfn (buffer-file-name))
+        (cp)
         (class-name)
         (ns-name)
         (count)
@@ -1164,6 +1167,8 @@ count by one."
         (sum 0)
         (pcount)
         (psum))
+    (when bfn
+      (princ (concat "\nStart rmv-using for file: " bfn "\n\n") log-buf))
     (while count-alist
       (setq cp (car count-alist))
       (setq class-name (car cp))

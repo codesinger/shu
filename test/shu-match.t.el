@@ -2741,6 +2741,69 @@ using namespace statements."
       (shu-match-internal-rmv-using class-list log-buf)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-match-internal-rmv-using-9
+;;
+(ert-deftest shu-test-shu-match-internal-rmv-using-9 ()
+  (let ((log-buf (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "#include <set>\n"
+          "\n"
+          "    using namespace abcde;\n"
+          "    x = x + 1;\n"
+          "    using namespace xyrzk;\n"
+          "    using namespace std;\n"
+          "// Hello\n"
+          ))
+        (class-list
+         (list
+          (cons "abcde"    (list
+                            "AClass1"
+                            "AClass2"
+                            ))
+          (cons "xyrzk"    (list
+                            "Xclass1"
+                            "Xclass2"
+                            ))
+          (cons "std"      (list
+                            "string"
+                            "deque"
+                            "set"
+                            "map"
+                            ))))
+        (token-list)
+        (actual)
+        (expected
+         (concat
+          "/*!\n"
+          " * file something_or_other.cpp\n"
+          " */\n"
+          "\n"
+          "#include <string>\n"
+          "#include <set>\n"
+          "\n"
+          "                          \n"
+          "    x = x + 1;\n"
+          "                          \n"
+          "                        \n"
+          "// Hello\n"
+          )))
+    (with-temp-buffer
+      (insert data)
+      (shu-match-internal-rmv-using class-list log-buf)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
     (princ (concat "\n\n\nSOMETHING:\n" actual "\n") log-buf)
     ))
 
