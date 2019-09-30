@@ -676,36 +676,37 @@ change counts."
         (class-ht)
         (count-alist)
         (clist))
-    (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-    (setq ret-val (shu-match-find-all-using-internal token-list))
-    (if (not ret-val)
-        (progn
-          (message "%s" "No using namespace directives found"))
-      (setq uns-list (car ret-val))
-      (setq un-list (cdr ret-val))
-      (when uns-list
-        (setq something (shu-match-merge-namespaces-with-class-list class-list uns-list log-buf top-name))
-        (when something
-          (setq np-rlists (cdr something))
-          (setq proc-val (car something))
-          (setq proc-classes (car proc-val))
-          (setq proc-rlists (cdr proc-val))))
-      (setq something (shu-match-add-names-to-class-list un-list proc-classes proc-rlists log-buf top-name))
-      (setq proc-classes (car something))
-      (setq proc-rlists (cdr something))
-      (setq proc-classes (remove-class-duplicates proc-classes log-buf))
-      (setq ret-val (shu-match-remove-proc-rlists token-list proc-rlists log-buf))
-      (setq token-list (car ret-val))
-      (setq proc-rlists (cdr ret-val))
-      (shu-match-erase-using proc-rlists log-buf)
-      (setq class-ht (shu-match-make-class-hash-table-internal proc-classes log-buf))
-      (when class-ht
-        (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
-        (if clist
-            (progn
-              (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
-              (shu-match-qualify-class-names class-ht count-alist clist np-rlists log-buf))
-          (message "%s" "No unqualified class names found"))))
+    (save-excursion
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq ret-val (shu-match-find-all-using-internal token-list))
+      (if (not ret-val)
+          (progn
+            (message "%s" "No using namespace directives found"))
+        (setq uns-list (car ret-val))
+        (setq un-list (cdr ret-val))
+        (when uns-list
+          (setq something (shu-match-merge-namespaces-with-class-list class-list uns-list log-buf top-name))
+          (when something
+            (setq np-rlists (cdr something))
+            (setq proc-val (car something))
+            (setq proc-classes (car proc-val))
+            (setq proc-rlists (cdr proc-val))))
+        (setq something (shu-match-add-names-to-class-list un-list proc-classes proc-rlists log-buf top-name))
+        (setq proc-classes (car something))
+        (setq proc-rlists (cdr something))
+        (setq proc-classes (remove-class-duplicates proc-classes log-buf))
+        (setq ret-val (shu-match-remove-proc-rlists token-list proc-rlists log-buf))
+        (setq token-list (car ret-val))
+        (setq proc-rlists (cdr ret-val))
+        (shu-match-erase-using proc-rlists log-buf)
+        (setq class-ht (shu-match-make-class-hash-table-internal proc-classes log-buf))
+        (when class-ht
+          (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
+          (if clist
+              (progn
+                (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
+                (shu-match-qualify-class-names class-ht count-alist clist np-rlists log-buf))
+            (message "%s" "No unqualified class names found")))))
     ))
 
 
