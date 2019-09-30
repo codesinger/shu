@@ -2178,17 +2178,19 @@ using namespace statements."
         (class-ht (make-hash-table :test 'equal :size 12))
         (expected
          (concat
+          "Count of qualified classes:\n"
           "              1: abcde::Mumble\n"
           "              2: std::map\n"
           "              0: std::set\n"
           "              6: std::string\n"))
-        (actual))
+        (actual)
+        (np-rlists))
     (puthash "set" "std" class-ht)
     (puthash "string" "std" class-ht)
     (puthash "map" "std" class-ht)
     (puthash "Mumble" "abcde" class-ht)
     (with-temp-buffer
-      (shu-match-rmv-show-class-count count-alist class-ht (current-buffer))
+      (shu-match-rmv-show-class-count count-alist class-ht np-rlists (current-buffer))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     ))

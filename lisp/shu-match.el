@@ -823,7 +823,7 @@ of times that the class name was explicitly qualified."
       (insert (concat hv "::"))
       (shu-match-increment-class-count count-alist token)
       (setq clist (cdr clist)))
-    (shu-match-rmv-show-class-count count-alist class-ht log-buf)
+    (shu-match-rmv-show-class-count count-alist class-ht np-rlists log-buf)
     ))
 
 
@@ -1087,8 +1087,7 @@ from the buffer."
         (proc-val)
         (ret-val)
         (spoint)
-        (epoint)
-        (ns-code))
+        (epoint))
     (while uns-list
       (setq rlist (car uns-list))
       (setq ns-name (shu-match-using-namespace-string rlist top-name))
@@ -1100,17 +1099,7 @@ from the buffer."
           (push rlist proc-rlists)))
       (setq uns-list (cdr uns-list)))
     (when np-rlists
-      (setq np-rlists (nreverse np-rlists))
-      (while np-rlists
-        (setq rlist (car np-rlists))
-        (setq ret-val (shu-match-get-start-end-pos rlist t))
-        (setq spoint (car ret-val))
-        (setq epoint (cdr ret-val))
-        (setq ns-code (buffer-substring-no-properties spoint epoint))
-        (setq np-rlists (cdr np-rlists))))
-    (when np-rlists
-      (setq np-rlists (nreverse np-rlists))
-      )
+      (setq np-rlists (nreverse np-rlists)))
     (when proc-classes
       (setq proc-classes (nreverse proc-classes)))
     (when proc-rlists
@@ -1212,7 +1201,7 @@ count by one."
 ;;
 ;;  shu-match-rmv-show-class-count
 ;;
-(defun shu-match-rmv-show-class-count (count-alist class-ht log-buf)
+(defun shu-match-rmv-show-class-count (count-alist class-ht np-rlists log-buf)
   "Put into the log buffer the count of class names that were qualified."
   (let ((bfn (buffer-file-name))
         (cp)
@@ -1223,9 +1212,32 @@ count by one."
         (clist)
         (sum 0)
         (pcount)
-        (psum))
+        (psum)
+        (np-stmt "")
+        (ns-code)
+        (lnum)
+        (plnum)
+        (ret-val)
+        (rlist)
+        (spoint)
+        (epoint))
     (when bfn
       (princ (concat "\nStart rmv-using for file: " bfn "\n\n") log-buf))
+    (when np-rlists
+      (setq np-stmt (format "%d namespaces not in class list. " (length np-rlists)))
+      (princ "The following using namespace statemnts have no corresponding class list entry:\n" log-buf)
+      (while np-rlists
+        (setq rlist (car np-rlists))
+        (setq ret-val (shu-match-get-start-end-pos rlist t))
+        (setq spoint (car ret-val))
+        (setq epoint (cdr ret-val))
+        (setq ns-code (buffer-substring-no-properties spoint epoint))
+        (setq lnum (line-number-at-pos spoint))
+        (setq plnum (shu-format-num lnum 6))
+        (princ (concat plnum ". " ns-code "\n") log-buf)
+        (setq np-rlists (cdr np-rlists)))
+      (princ "\n" log-buf))
+    (princ "Count of qualified classes:\n" log-buf)
     (while count-alist
       (setq cp (car count-alist))
       (setq class-name (car cp))
@@ -1247,7 +1259,7 @@ count by one."
       (princ (concat pcount ": " full-name "\n") log-buf)
       (setq clist (cdr clist)))
     (setq psum (shu-fixed-format-num sum 0))
-    (message "%s class names qualified.  See buffer %s" psum (buffer-name log-buf))
+    (message "%s%s class names qualified.  See buffer %s" np-stmt psum (buffer-name log-buf))
     ))
 
 
