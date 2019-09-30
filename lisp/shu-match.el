@@ -669,6 +669,8 @@ change counts."
         (uns-list)
         (un-list)
         (something)
+        (proc-val)
+        (np-rlists)
         (proc-classes)
         (proc-rlists)
         (class-ht)
@@ -684,8 +686,10 @@ change counts."
       (when uns-list
         (setq something (shu-match-merge-namespaces-with-class-list class-list uns-list log-buf top-name))
         (when something
-          (setq proc-classes (car something))
-          (setq proc-rlists (cdr something))))
+          (setq np-rlists (cdr something))
+          (setq proc-val (car something))
+          (setq proc-classes (car proc-val))
+          (setq proc-rlists (cdr proc-val))))
       (setq something (shu-match-add-names-to-class-list un-list proc-classes proc-rlists log-buf top-name))
       (setq proc-classes (car something))
       (setq proc-rlists (cdr something))
@@ -1015,6 +1019,51 @@ modified PROC-CLASSES and the cdr is the modified PROC-RLISTS."
 ;;
 ;;  shu-match-merge-namespaces-with-class-list
 ;;
+;;
+;;  This function returns three values:
+;;
+;;  1. np-rlists is a list of rlists, each of which holds a "using namespace"
+;;     statement for which no corresponging entry exsts in the class list.
+;;     These are the "using namespace" statements that we will not process.
+;;
+;;  2. proc-rlists is a list of rlists, each of which holds a "using namespace"
+;;     that has a corresponding entry in the class list.  These are the "using
+;;     namespace" statements that we will process.
+;;
+;;  3. proc-classes is the alist of all of the namespaces and classes that we
+;;     will process, with the namespace name being the key and a list of class
+;;     names within the namespace name as the value.
+;;
+;;  The structure of the return value is as follows:
+;;
+;;
+;;  ret-val (Single returned cons cell):
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> np-rlists
+;;        |
+;;        +-------------> proc-val
+;;
+;;
+;;
+;;  proc-val:
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> proc-rlists
+;;        |
+;;        +-------------> proc-classes
+;;
+;;
 (defun shu-match-merge-namespaces-with-class-list (class-list uns-list log-buf &optional top-name)
 
   "Merge the UNS-LIST with the CLASS-LIST.  Return a cons-cell pointing to two
@@ -1032,6 +1081,7 @@ from the buffer."
         (proc-classes)
         (proc-rlists)
         (np-rlists)
+        (proc-val)
         (ret-val)
         (spoint)
         (epoint)
@@ -1055,12 +1105,16 @@ from the buffer."
         (setq epoint (cdr ret-val))
         (setq ns-code (buffer-substring-no-properties spoint epoint))
         (setq np-rlists (cdr np-rlists))))
+    (when np-rlists
+      (setq np-rlists (nreverse np-rlists))
+      )
     (when proc-classes
       (setq proc-classes (nreverse proc-classes)))
     (when proc-rlists
       (setq proc-rlists (nreverse proc-rlists)))
-    (if (and proc-classes proc-rlists)
-        (setq ret-val (cons proc-classes proc-rlists))
+    (setq proc-val (cons proc-classes proc-rlists))
+    (setq ret-val (cons proc-val np-rlists))
+    (when (not (and proc-classes proc-rlists))
       (setq ret-val nil))
     ret-val
     ))
