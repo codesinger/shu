@@ -55,7 +55,7 @@
 ;;
 ;; If you try to match this set of three lists against the following string
 ;;
-;;       using namespace thing::Bob
+;;       using namespace thing::Bob;
 ;;
 ;; The three lists are evaluated as follows:
 ;;
@@ -68,7 +68,7 @@
 ;; The third list matches "using," "namespace," "thing," "::," "Bob," and ";".
 ;;
 ;; With one function call, you have found a reasonably complex pattern.  The
-;; tokens scanned to not include comments.  This means that the above example
+;; tokens scanned do not include comments.  This means that the above example
 ;; would have worked identically on a list of tokens derived from
 ;;
 ;;       using /* Hello */ namespace
