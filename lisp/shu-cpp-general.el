@@ -1897,6 +1897,8 @@ or right parenthesis or a left or right square bracket."
 ;;
 ;;  shu-cpp-rmv-using-old
 ;;
+;;  Deprecated:  See the new version of shu-cpp-rmv-using in shu-match.el
+;;
 (defun shu-cpp-rmv-using-old (class-list &optional top-name)
   "Remove \"using namespace\" directives from a C++ file, adding the appropriate
 namespace qualifier to all of the unqualified class names.  CLASS-LIST is an
@@ -1914,7 +1916,9 @@ of \"WhammoCorp\", then the following line:
 
 would be interpreted as though it had been written:
 
-     using namespace world;"
+     using namespace world;
+
+NB: This version is deprecated.  See the new version in shu-match.el"
   (let* ((gb-name "**shu-chgs**")
          (gb (get-buffer-create gb-name))
          (ct 0)

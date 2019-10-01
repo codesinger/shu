@@ -1487,7 +1487,7 @@ This is most likely the name of an include file and not the name of a class."
         (count 0))
     (with-temp-buffer
       (insert data)
-      (setq count (shu-cpp-rmv-using classes))
+      (setq count (shu-cpp-rmv-using-old classes))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     (should (= 4 count))
@@ -1525,7 +1525,7 @@ This is most likely the name of an include file and not the name of a class."
         (count 0))
     (with-temp-buffer
       (insert data)
-      (setq count (shu-cpp-rmv-using classes top-name))
+      (setq count (shu-cpp-rmv-using-old classes top-name))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     (should (= 4 count))
@@ -1571,7 +1571,7 @@ This is most likely the name of an include file and not the name of a class."
         (count 0))
     (with-temp-buffer
       (insert data)
-      (setq count (shu-cpp-rmv-using classes))
+      (setq count (shu-cpp-rmv-using-old classes))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     (should (= 6 count))
@@ -1619,7 +1619,7 @@ This is most likely the name of an include file and not the name of a class."
         (count 0))
     (with-temp-buffer
       (insert data)
-      (setq count (shu-cpp-rmv-using classes))
+      (setq count (shu-cpp-rmv-using-old classes))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     (should (= 6 count))
@@ -1652,7 +1652,7 @@ This is most likely the name of an include file and not the name of a class."
          (count 0))
     (with-temp-buffer
       (insert data)
-      (setq count (shu-cpp-rmv-using classes top-name))
+      (setq count (shu-cpp-rmv-using-old classes top-name))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     (should (= 0 count))
@@ -1701,7 +1701,7 @@ This is most likely the name of an include file and not the name of a class."
         (count 0))
     (with-temp-buffer
       (insert data)
-      (setq count (shu-cpp-rmv-using classes))
+      (setq count (shu-cpp-rmv-using-old classes))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     (should (= 6 count))
@@ -1751,7 +1751,7 @@ This is most likely the name of an include file and not the name of a class."
         (count 0))
     (with-temp-buffer
       (insert data)
-      (setq count (shu-cpp-rmv-using classes))
+      (setq count (shu-cpp-rmv-using-old classes))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (princ (concat "\nexpected:\n" expected "\n") gb)
       (princ (concat "\nactual:\n" actual "\n") gb)
@@ -1803,7 +1803,7 @@ This is most likely the name of an include file and not the name of a class."
     (setq debug-on-error t)
     (with-temp-buffer
       (insert data)
-      (setq count (shu-cpp-rmv-using classes))
+      (setq count (shu-cpp-rmv-using-old classes))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     (should (= 6 count))
@@ -1854,7 +1854,7 @@ This is most likely the name of an include file and not the name of a class."
         (count 0))
     (with-temp-buffer
       (insert data)
-      (setq count (shu-cpp-rmv-using classes))
+      (setq count (shu-cpp-rmv-using-old classes))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     (should (= 6 count))
