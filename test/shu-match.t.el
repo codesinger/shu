@@ -3163,10 +3163,12 @@ be in place."
 ;;  shu-test-shu-match-find-all-some-include-1
 ;;
 (ert-deftest shu-test-shu-match-find-all-some-include-1 ()
-  (let ((data
+  (let (
+        (data
          (concat
           "// Hello\n"
           "#include <thing.h>\n"
+          "#include <set>\n"
           "#include <set>\n"
           "#\n"
           "include\n"
@@ -3177,14 +3179,15 @@ be in place."
         (incl-list)
         (token-info)
         (token)
-        (token-type))
+        (token-type)
+          )
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
       (setq incl-list (shu-match-find-all-some-include token-list))
       (should incl-list)
       (should (listp incl-list))
-      (should (= 2 (length incl-list)))
+      (should (= 3 (length incl-list)))
       (setq token-info (car incl-list))
       (should token-info)
       (setq token (shu-cpp-token-extract-token token-info))
@@ -3203,7 +3206,18 @@ be in place."
       (should (stringp token))
       (should (numberp token-type))
       (should (string= "set" token))
-      (should (= shu-cpp-token-type-uq token-type)))
+      (should (= shu-cpp-token-type-uq token-type))
+      (setq incl-list (cdr incl-list))
+      (setq token-info (car incl-list))
+      (should token-info)
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should token)
+      (should (stringp token))
+      (should (numberp token-type))
+      (should (string= "set" token))
+      (should (= shu-cpp-token-type-uq token-type))
+      )
     ))
 
 
@@ -3229,6 +3243,137 @@ be in place."
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
       (setq incl-list (shu-match-find-all-some-include token-list))
       (should (not incl-list)))
+    ))
+
+
+
+
+
+
+;;
+;;  shu-test-shu-match-make-include-hash-table-1
+;;
+(ert-deftest shu-test-shu-match-make-include-hash-table-1 ()
+  (let ((gb (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "// Hello\n"
+          "#include <thing.h>\n"
+          "#include <set>\n"
+          "#include <set>\n"
+          "#include <string>\n"
+          "#\n"
+          "include\n"
+          "<map>\n"
+          "// Hello\n"
+          ))
+        (token-list)
+        (incl-list)
+        (token-info)
+        (token)
+        (token-type)
+        (class-ht)
+        (incl-ht)
+        (hv)
+        (spoint))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq incl-list (shu-match-find-all-some-include token-list))
+      (should incl-list)
+      (should (listp incl-list))
+      (should (= 4 (length incl-list)))
+      (setq class-ht (make-hash-table :test 'equal :size 5))
+      (puthash "set" "std" class-ht)
+      (puthash "map" "std" class-ht)
+      (setq incl-ht (shu-match-make-include-hash-table incl-list class-ht))
+      (should incl-ht)
+      (should (hash-table-p incl-ht))
+      (setq hv (gethash "set" incl-ht))
+      (princ "hv(set): " gb)(princ hv gb)(princ "\n" gb)
+      (should hv)
+      (should (listp hv))
+      (should (= 2 (length hv)))
+      (setq spoint (car hv))
+      (should spoint)
+      (should (numberp spoint))
+      (should (= 39 spoint))
+      (setq hv (cdr hv))
+      (should hv)
+      (setq spoint (car hv))
+      (should spoint)
+      (should (numberp spoint))
+      (should (= 54 spoint))
+      (setq hv (gethash "map" incl-ht))
+      (princ "hv(map): " gb)(princ hv gb)(princ "\n" gb)
+      (should hv)
+      (should (listp hv))
+      (should (= 1 (length hv)))
+      (setq spoint (car hv))
+      (should spoint)
+      (should (numberp spoint))
+      (should (= 88 spoint)))
+    ))
+
+
+
+
+
+
+;;
+;;  shu-test-shu-match-make-include-hash-table-2
+;;
+(ert-deftest shu-test-shu-match-make-include-hash-table-2 ()
+  (let ((gb (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          "// Hello\n"
+          "#include <thing.h>\n"
+          "#include <set>\n"
+          "#include <set>\n"
+          "#include <string>\n"
+          "#\n"
+          "include\n"
+          "<map>\n"
+          "// Hello\n"
+          ))
+        (token-list)
+        (incl-list)
+        (token-info)
+        (token)
+        (token-type)
+        (class-ht)
+        (incl-ht))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq incl-list (shu-match-find-all-some-include token-list))
+      (should incl-list)
+      (should (listp incl-list))
+      (should (= 4 (length incl-list)))
+      (setq class-ht (make-hash-table :test 'equal :size 5))
+      (puthash "deque" "std" class-ht)
+      (puthash "endl" "std" class-ht)
+      (setq incl-ht (shu-match-make-include-hash-table incl-list class-ht))
+      (should (not incl-ht)))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-match-make-include-hash-table-3
+;;
+(ert-deftest shu-test-shu-match-make-include-hash-table-3 ()
+  (let ((incl-list)
+        (class-ht)
+        (incl-ht))
+      (setq class-ht (make-hash-table :test 'equal :size 5))
+      (puthash "deque" "std" class-ht)
+      (puthash "endl" "std" class-ht)
+      (setq incl-ht (shu-match-make-include-hash-table incl-list class-ht))
+      (should (not incl-ht))
     ))
 
 

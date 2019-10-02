@@ -1332,6 +1332,61 @@ that are delimited by angle brackets and do not include a . in them."
 
 
 
+
+;;
+;;  shu-match-make-include-hash-table
+;;
+(defun shu-match-make-include-hash-table (incl-list class-ht)
+  "INCL-LIST is the list of token-info, each of which represents a name found in
+an include statement.  CLASS-HT is the hash table whose keys are the names of
+the classes that we will be searching for.
+
+For each name that appears in both INCL-LIST and CLASS-HT, create a new entry in
+a new hash table whose key is the name of the class that has been found in one
+or more include statements and whose value is a list of the spoints in which the
+class name has been found in one or more include statements.
+
+Whenever we find something that appears to be an unqualified class name, we can
+look in this hash table to see if this occurrence of the name is one that
+appears in an include statement and avoid adding a namespace qualifier if that
+is the case."
+  (let ((incl-alist)
+        (incl-ht)
+        (token-info)
+        (token)
+        (spoint)
+        (hv)
+        (ae)
+        (al)
+        (spoint-list))
+    (while incl-list
+      (setq token-info (car incl-list))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq hv (gethash token class-ht))
+      (when hv
+        (setq spoint (shu-cpp-token-extract-spoint token-info))
+        (setq ae (assoc token incl-alist))
+        (if ae
+            (progn
+              (setq al (cdr ae))
+              (push spoint al)
+              (setcdr ae al))
+          (setq ae (cons token (list spoint)))
+          (push ae incl-alist)))
+      (setq incl-list (cdr incl-list)))
+    (when incl-alist
+      (setq incl-ht (make-hash-table :test 'equal :size (length incl-alist)))
+      (while incl-alist
+        (setq ae (car incl-alist))
+        (setq token (car ae))
+        (setq spoint-list (cdr ae))
+        (puthash token spoint-list incl-ht)
+        (setq incl-alist (cdr incl-alist))))
+    incl-ht
+    ))
+
+
+
 ;;
 ;;  shu-match-set-alias
 ;;
