@@ -3159,4 +3159,78 @@ be in place."
 
 
 
+;;
+;;  shu-test-shu-match-find-all-some-include-1
+;;
+(ert-deftest shu-test-shu-match-find-all-some-include-1 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <thing.h>\n"
+          "#include <set>\n"
+          "#\n"
+          "include\n"
+          "<map>\n"
+          "// Hello\n"
+          ))
+        (token-list)
+        (incl-list)
+        (token-info)
+        (token)
+        (token-type))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq incl-list (shu-match-find-all-some-include token-list))
+      (should incl-list)
+      (should (listp incl-list))
+      (should (= 2 (length incl-list)))
+      (setq token-info (car incl-list))
+      (should token-info)
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should token)
+      (should (stringp token))
+      (should (numberp token-type))
+      (should (string= "map" token))
+      (should (= shu-cpp-token-type-uq token-type))
+      (setq incl-list (cdr incl-list))
+      (setq token-info (car incl-list))
+      (should token-info)
+      (setq token (shu-cpp-token-extract-token token-info))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (should token)
+      (should (stringp token))
+      (should (numberp token-type))
+      (should (string= "set" token))
+      (should (= shu-cpp-token-type-uq token-type)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-match-find-all-some-include-2
+;;
+(ert-deftest shu-test-shu-match-find-all-some-include-2 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <thing.h>\n"
+          "// #include <set>\n"
+          "// #\n"
+          "// include\n"
+          "// <map>\n"
+          "// Hello\n"
+          ))
+        (token-list)
+        (incl-list))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq incl-list (shu-match-find-all-some-include token-list))
+      (should (not incl-list)))
+    ))
+
+
+
 ;;; shu-match.t.el ends here

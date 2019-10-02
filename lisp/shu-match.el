@@ -1265,6 +1265,73 @@ count by one."
 
 
 
+
+;;
+;;  shu-cpp-match-some-include
+;;
+(defconst shu-cpp-match-some-include
+   (list  ;; #include < name >
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                              "#")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-uq
+                              "include")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                              "<")
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                              'shu-cpp-token-match-same-rx
+                              t shu-cpp-token-type-uq
+                              (concat shu-cpp-name "+"))
+    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                              'shu-cpp-token-match-same
+                              nil shu-cpp-token-type-op
+                              ">"))
+  "A list of match-info that matches \"#include <name>\".")
+
+
+
+
+
+
+;;
+;;  shu-match-find-all-some-include
+;;
+(defun shu-match-find-all-some-include (token-list)
+  "Given a token list, return a list of tokens that represent all of the simple
+names found in #include < name >, where \"name\" is a C++ name.  This search
+will neither find nor return a name with a . in it.  This is a limited search
+designed to find names that might be mistaken for class names to be qualified.
+
+For example, if we are removing the namespace \"std\", then one of the names we
+may wish to qualify is \"set\".  Buf if we encounter \"#include <set>\", we do
+not want to transform that into \"#include <std::set>\".
+
+Names of include files delimited by quotes will not be seen in the scan because
+those are inside strings.  So we only want to find names in include statements
+that are delimited by angle brackets and do not include a . in them."
+  (let ((ret-val t)
+        (tlist token-list)
+        (rlist)
+        (token-info)
+        (incl-list))
+    (while ret-val
+      (setq ret-val (shu-cpp-search-match-tokens rlist shu-cpp-match-some-include tlist))
+      (when ret-val
+        (setq tlist (car ret-val))
+        (setq rlist (cdr ret-val))
+        (setq token-info (car rlist))
+        (push token-info incl-list)
+        (setq rlist nil)))
+    incl-list
+    ))
+
+
+
 ;;
 ;;  shu-match-set-alias
 ;;
