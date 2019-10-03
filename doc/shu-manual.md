@@ -46,6 +46,7 @@
 
 
 
+
 # Overview #
 
 
@@ -64,7 +65,7 @@ Version 1.4 was merged with the master branch on 2 February 2019.
 
 Version 1.5 was merged with the master branch on 18 August 2019.
 
-This is Version 1.5.6 of the Shu elisp repository.
+This is Version 1.5.9 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -2765,6 +2766,8 @@ would be interpreted as though it had been written:
      using namespace world;
 ```
 
+NB: This version is deprecated.  See the new version in shu-match.el
+
 
 
 #### shu-cpp1-class ####
@@ -3385,7 +3388,7 @@ another list that matches "using namespace component::name";.
 If you try to match this set of three lists against the following string
 
 ```
-      using namespace thing::Bob
+      using namespace thing::Bob;
 ```
 
 The three lists are evaluated as follows:
@@ -3399,7 +3402,7 @@ an operator "::".
 The third list matches "using," "namespace," "thing," "::," "Bob," and ";".
 
 With one function call, you have found a reasonably complex pattern.  The
-tokens scanned to not include comments.  This means that the above example
+tokens scanned do not include comments.  This means that the above example
 would have worked identically on a list of tokens derived from
 
 ```
@@ -5216,6 +5219,9 @@ shu-cpp-reverse-tokenize-region.  The former returns a list of tokens with the
 first token in the list being the first token found.  The latter function
 returns the reverse of the former.
 
+The tokenized lists are used by the functions in shu-cpp-match.el and
+shu-match.el to find and retrieve patters in the token lists.
+
 
 ## List of functions by alias name ##
 
@@ -6316,6 +6322,13 @@ namespace
 
 
 
+#### shu-cpp-match-some-include ####
+[Constant]
+
+A list of match-info that matches "#include <name>".
+
+
+
 #### shu-cpp-match-using-forms ####
 [Constant]
 
@@ -6374,7 +6387,7 @@ shu-match-add-names-to-class-list *un-list* *proc-classes* *proc-rlists* *log-bu
 *proc-rlists* is the set of rlists that represents the "using namespace"
 statements.  This function adds the"using name" directives, if any, to both
 *proc-classes* and *proc-rlists*.  It returns a cons cell in which the car is the
-modified *proc-classes* and the cdr is the modified PROC-RLISTS.
+modified *proc-classes* and the cdr is the modified *proc-rlists*.
 
 
 
@@ -6386,6 +6399,62 @@ shu-match-erase-using *proc-rlists* *log-buf*
 "using namespace" and "using name" statements.  This function replaces all
 of those statements in the buffer with whitespace.  This is done in order to
 preserve the positions of all other items in the buffer.
+
+
+
+#### shu-match-fetch-include-hash-table ####
+shu-match-fetch-include-hash-table *token-list* *class-ht*
+[Function]
+
+*token-list* is the list of tokenized text from the buffer.  *class-ht* is the
+hash table that holds as its keys the names of all of the classes that we will
+process.
+
+This function finds all of the names in #include statements whose included file
+name matches a class name in *class-ht*.  It then builds and returns a new hash
+table in which the key is the name of an included file whose name matches a
+class name and whose value is a list of the spoints of the included file names.
+
+It is a list of spoints, as opposed to a single point, because an include
+statement with a given file name may appear several times.
+
+For example, in the following code:
+
+```
+      #include <set>
+      #include <map>
+      #
+       include
+            <set>
+
+      using namespace std;
+
+      set     x;
+      map     y;
+```
+
+the member variables x and y should be changed to std::set and std::map
+respectively, but none of the occurrences of set or map in the include
+statements should be changed.
+
+
+
+#### shu-match-find-all-some-include ####
+shu-match-find-all-some-include *token-list*
+[Function]
+
+Given a token list, return a list of tokens that represent all of the simple
+names found in #include < name >, where "name" is a C++ name.  This search
+will neither find nor return a name with a . in it.  This is a limited search
+designed to find names that might be mistaken for class names to be qualified.
+
+For example, if we are removing the namespace "std", then one of the names we
+may wish to qualify is "set".  Buf if we encounter "#include <set>", we do
+not want to transform that into "#include <std::set>".
+
+Names of include files delimited by quotes will not be seen in the scan because
+those are inside strings.  So we only want to find names in include statements
+that are delimited by angle brackets and do not include a . in them.
 
 
 
@@ -6415,29 +6484,37 @@ that holds a match and put it into the buffer "`**shu-vars**`",
 
 
 #### shu-match-find-unqualified-class-names ####
-shu-match-find-unqualified-class-names *class-ht* *token-list* *proc-classes* *log-buf*
+shu-match-find-unqualified-class-names *class-ht* *incl-ht* *token-list* *proc-classes* *log-buf*
 [Command]
 
-Go through all of the tokens looking at any unquoted token that is in the hash
-table of unqualified class names.  When an instance of a class name is found,
-check to see it it is preceded by "::", ".", or "->".  "::" indicates
-that it is probably qualified.  "." or "->" indicate that it is probably a
-function name.
+Go through all of the tokens looking at any unquoted token that is in the
+hash table of unqualified class names.  When an instance of a class name is
+found, check to see it it is preceded by "::", ".", or "->".  "::"
+indicates that it is probably qualified.  "." or "->" indicate that it is
+probably a function name.
 
 Check also to see if it is followed by ")" or "[", which probably indicates
 that it is a variable name.
 
-Next, check to see if it is preceded by "#include".
+Next, check to see if it is wrapped in an #include statement.
 
 If it survives all of those checks, it is probably an unqualified class name, in
-which case its token-info is pushed onto a list.  The list is the return value
-of this function.  Since each token-info is pushed onto the list, the list is
-returned in reverse order.  i.e., the last token in the file is the first in the
-list.
+which case its token-info is pushed onto a list.  The list is one of the values
+returned from this function.  Since each token-info is pushed onto the list, the
+list is returned in reverse order.  i.e., the last token in the file is the
+first in the list.
 
 At this point it is possible to visit each token in the list, which is in
 reverse order in the file, look up each token, and insert in front of it its
 qualifying namespace.
+
+The other return value from this function is the count of the number of unquoted
+tokens that were looked up in the hash table of all of the class names,
+*class-ht*..
+
+The actual return value from this function is a cons cell whose car is the
+symbol search count and whose cdr is the list of tokens that represent
+unqualified class names to be qualified.
 
 
 
@@ -6480,7 +6557,105 @@ count by one.
 shu-match-internal-rmv-using *class-list* *log-buf* **&optional** *top-name*
 [Function]
 
-Doc string.
+This is an overview of the entire process used to remove both the using
+namespace statements (e.g., "using namespace std;") and the using statements
+(e.g., "using std::string;").
+
+The input is a class list which is an alist in which the key for each entry is a
+namespace name and the value for each entry is a list of class names that are
+qualified by the namespace name.  This is an example of a class list:
+
+```
+     (list (cons "std" (list "set" "string" "vector")) (cons "world"
+      (list "Hello" "Goodbye")))
+```
+
+The first step is to tokenize the entire buffer and then use match functions to
+find each instance of "using namespace" and each occurrence of "using name".
+Each of these statements is represented by a list of token-info.
+
+If any "using namespace" statements are found, they are merged with the class
+list to form a new class list that contains only those namespaces for which a
+"using namespace" statement was found in the buffer.
+
+A separate list is kept of the "using namespace" statements that have no
+corresponding entries in the class list.  This is printed out later as a
+diagnostic message.
+
+The next step is to merge in the namespaces from the "using name" statements.
+Each "using name" statement contributes one namespace name and one class name.
+
+The original class list might have contained duplicate class name instances
+within a given namespace.  The merging in the of the "using name" statements
+may also have created duplicate class names within a namespace, so the next
+thing we do is remove any duplicate class names within a given namespace.  For
+example, if the input class list contained "std . string set map" and the
+buffer contains both "using namespace std;" and "using std::string;", the
+newly merged class list will contain the class name "string" twice under the
+namespace "std".
+
+Once we have the updated class list with duplicates removed, we create two new
+data structures.  One is a hash table in which the key is a class name and the
+value is the name of the namespace that qualifies that class name.  This will be
+used to determine if an unquoted token is an unqualified class name.  The other
+is an alist in which the key is a class name and the value is zero.  This will
+be used to count the replacement count for each class.
+
+In creating the hash table, we may discover that one class name maps to more
+than one namespace name.  If that happens there is an unresolvable ambiguity and
+the operation must cease.
+
+The next step is to remove from the token list (from the tokenized buffer), the
+lists of token-info that represent the "using namespace" and "using name"
+statements that we are processing.  This prevents any subsequent scan from
+seeing them again.
+
+Next, we erase the "using namespace" statements and "using name" statements
+from the buffer.  We do this by replacing the statements with an equivalent
+amount of whitespace, which preserves the positions of all of the other tokens
+in the buffer.
+
+Some of the class names in the class list may also appear in #include statements
+in the buffer.  For example, if we are trying to remove "using namespace
+std;", the buffer may well contain #include <set> or #include <map>.  These
+instances of set and map are file names.  They are not class names that should
+have the "std" qualifier added to them.
+
+To handle this case we build another hash table.  This one contains class names
+as its key.  It is the intersection of class names and names found in include
+statements.  The value of each entry in the hash table is the list of spoints
+that are the start point for each name within its include statement.  It is a
+list of spoints because the same name may appear in multiple #include
+statements.
+
+Then we go through the token list.  Whenever we encounter an unquoted token, we
+look it up in the hash table to see if this is a class name that we should
+qualify.  If the token exists in the hash table, we then look at its context to
+see if it really looks like a class name.
+
+IF the putative class name is preceded by any of "::", ".", or "->", then
+we assume that it is either a qualified class name or a function name.  There
+are other various checks that can be found in the function
+shu-match-find-unqualified-class-names.  One of the checks is to see if it
+matches an instance contained in an #include statement, which is done with the
+hash of include names described above.
+
+Each time we find an unqualified class name, we push its token-info onto a new
+list of class names that need to be qualified.  Note that we use push so the
+list is backwards with respect to buffer order.  The first item in the list is
+that last unqualified class name in the buffer.
+
+This means that we can use the list directly to add the namespace qualifier to
+each unqualified class name.  Since we are going through the buffer backwards,
+adding a qualifier to an unqualified class name does not change the position of
+any other unqualified class names in the buffer.
+
+While adding namespace qualifiers to all of the unqualified class names, we also
+accumulate a change count for each class name.
+
+When all of the unqualified class names have been qualified, we display the
+final change counts in a buffer and emit a message with the sum of all the
+change counts.
 
 
 
@@ -6509,6 +6684,26 @@ Doc string.
 
 
 
+#### shu-match-make-include-hash-table ####
+shu-match-make-include-hash-table *incl-list* *class-ht*
+[Function]
+
+*incl-list* is the list of token-info, each of which represents a name found in
+an include statement.  *class-ht* is the hash table whose keys are the names of
+the classes that we will be searching for.
+
+For each name that appears in both *incl-list* and *class-ht*, create a new entry in
+a new hash table whose key is the name of the class that has been found in one
+or more include statements and whose value is a list of the spoints in which the
+class name has been found in one or more include statements.
+
+Whenever we find something that appears to be an unqualified class name, we can
+look in this hash table to see if this occurrence of the name is one that
+appears in an include statement and avoid adding a namespace qualifier if that
+is the case.
+
+
+
 #### shu-match-merge-namespaces-with-class-list ####
 shu-match-merge-namespaces-with-class-list *class-list* *uns-list* *log-buf* **&optional** *top-name*
 [Function]
@@ -6526,7 +6721,7 @@ from the buffer.
 
 
 #### shu-match-qualify-class-names ####
-shu-match-qualify-class-names *class-ht* *count-alist* *clist* *log-buf*
+shu-match-qualify-class-names *class-ht* *count-alist* *clist* *np-rlists* *token-count* *symbol-count* *log-buf*
 [Function]
 
 *class-ht* is the hash table that maps a class name to its containing namespace
@@ -6535,7 +6730,10 @@ name has been qualified by its enclosing namespace.  *clist* is the list of
 token-info, each of which represents an unqualified class name.  The list is in
 reverse order, which is important.  It means that one can add a qualification to
 one class name in the list without changing the location of any other class
-names, which are above the current one in the buffer.
+names, which are above the current one in the buffer.  *np-rlists* is a list of
+rlists, each of which represents a "using namespace" statement for which
+there is no corresponding entry in the class list.  There are the "using
+namespace" statements that we will not be processing..
 
 This function goes to the position of each unqualified class name, finds its
 containing namespace in the hash table, and inserts the containing namespace
@@ -6563,17 +6761,25 @@ start position of each rlist.
 
 
 #### shu-match-rmv-might-be-include ####
-shu-match-rmv-might-be-include *token-info*
+shu-match-rmv-might-be-include *incl-ht* *token* *token-info*
 [Function]
 
-Go to the beginning of the line in front of the start point of the
-*token-info*.  Return true if the space between the beginning of the line and the
-start point of the *token-info* contains "#include".
+*incl-ht* is a hash table whose key is a name that was found in an include
+statement and whose value is a list of all of the spoints of all of the
+occurrences of the name in include statements.  It is a list because the same
+name may be included multiple times.
+
+If the current token matches one of the names in *incl-ht* and the spoint of the
+token is a member of the list of spoints in the entry in *incl-ht*, then the
+current name is enclosed in an include statement and should not have a namespace
+qualifier added to it.
+
+This function returns true if the name is wrapped in an include statement.
 
 
 
 #### shu-match-rmv-show-class-count ####
-shu-match-rmv-show-class-count *count-alist* *class-ht* *log-buf*
+shu-match-rmv-show-class-count *count-alist* *class-ht* *np-rlists* *ns-lines* *token-count* *symbol-count* *log-buf*
 [Function]
 
 Put into the log buffer the count of class names that were qualified.
@@ -7423,8 +7629,7 @@ of contents name created and inserted at point will be:
 shu-make-md-section-name *section-name*
 [Function]
 
-The input
- is a string that is assumed to be a markdown section heading.  The
+The input is a string that is assumed to be a markdown section heading.  The
 return value is a string with any leading and trailing "#" characters removed.
 For example, if the input string is
 
@@ -8024,6 +8229,8 @@ within type.
 
 Associate a number with each type of variable
 
+
+
 * [acgen](#acgen)
 * [add-prefix](#add-prefix)
 * [all-quit](#all-quit)
@@ -8374,6 +8581,7 @@ Associate a number with each type of variable
 * [shu-cpp-match-or-list](#shu-cpp-match-or-list)
 * [shu-cpp-match-repeat-list](#shu-cpp-match-repeat-list)
 * [shu-cpp-match-repeat-sub-list](#shu-cpp-match-repeat-sub-list)
+* [shu-cpp-match-some-include](#shu-cpp-match-some-include)
 * [shu-cpp-match-tokens](#shu-cpp-match-tokens)
 * [shu-cpp-match-using-forms](#shu-cpp-match-using-forms)
 * [shu-cpp-match-using-list-single](#shu-cpp-match-using-list-single)
@@ -8599,6 +8807,8 @@ Associate a number with each type of variable
 * [shu-make-xref](#shu-make-xref)
 * [shu-match-add-names-to-class-list](#shu-match-add-names-to-class-list)
 * [shu-match-erase-using](#shu-match-erase-using)
+* [shu-match-fetch-include-hash-table](#shu-match-fetch-include-hash-table)
+* [shu-match-find-all-some-include](#shu-match-find-all-some-include)
 * [shu-match-find-all-using-internal](#shu-match-find-all-using-internal)
 * [shu-match-find-semi-names](#shu-match-find-semi-names)
 * [shu-match-find-unqualified-class-names](#shu-match-find-unqualified-class-names)
@@ -8608,6 +8818,7 @@ Associate a number with each type of variable
 * [shu-match-internal-rmv-using](#shu-match-internal-rmv-using)
 * [shu-match-make-class-hash-table-internal](#shu-match-make-class-hash-table-internal)
 * [shu-match-make-count-alist-from-hash](#shu-match-make-count-alist-from-hash)
+* [shu-match-make-include-hash-table](#shu-match-make-include-hash-table)
 * [shu-match-merge-namespaces-with-class-list](#shu-match-merge-namespaces-with-class-list)
 * [shu-match-qualify-class-names](#shu-match-qualify-class-names)
 * [shu-match-remove-proc-rlists](#shu-match-remove-proc-rlists)
@@ -8736,6 +8947,7 @@ Associate a number with each type of variable
 * [winpath](#winpath)
 
 
+
 <!--
 LocalWords:  shu regexp scf cpp doxygen namepace bde num arg cp Bloomberg gen bb fn
 LocalWords:  cfile hfile tfile decl ifndef endif sdecl struct sgen foo doc elisp md
@@ -8756,6 +8968,6 @@ LocalWords:  funcall myclass toc unescaped nvpair prob gtest gincl rmv qual xxx 
 LocalWords:  WhammoCorp plist abcdef testfn eq binclude mumblefrotz sexp gitbuf ind
 LocalWords:  ginclude newfile fixp hitRatio getdef mumbleSomethingOther cciterate
 LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de un
-LocalWords:  proc rlists ht unresolvable uns clist thisistheoverview
-LocalWords:  thisisanoverview
+LocalWords:  proc rlists ht unresolvable uns clist thisistheoverview NB spoints np
+LocalWords:  thisisanoverview incl ns
 -->

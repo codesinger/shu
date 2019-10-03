@@ -33,7 +33,7 @@
 ;; first token in the list being the first token found.  The latter function
 ;; returns the reverse of the former.
 ;;
-;; The tokenized lists are lused by the functions in shu-cpp-match.el and
+;; The tokenized lists are used by the functions in shu-cpp-match.el and
 ;; shu-match.el to find and retrieve patters in the token lists.
 
 ;;; Code:
