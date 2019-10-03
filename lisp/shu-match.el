@@ -1267,6 +1267,49 @@ count by one."
 
 
 ;;
+;;  shu-match-fetch-include-hash-table
+;;
+(defun shu-match-fetch-include-hash-table (token-list class-ht)
+  "TOKEN-LIST is the list of tokenized text from the buffer.  CLASS-HT is the
+hash table that holds as its keys the names of all of the classes that we will
+process.
+
+This function finds all of the names in #include statements whose included file
+name matches a class name in CLASS-HT.  It then builds and returns a new hash
+table in which the key is the name of an included file whose name matches a
+class name and whose value is a list of the spoints of the included file names.
+
+It is a list of spoints, as opposed to a single point, because an include
+statement with a given file name may appear several times.
+
+For example, in the following code:
+
+      #include <set>
+      #include <map>
+      #
+       include
+            <set>
+
+      using namespace std;
+
+      set     x;
+      map     y;
+
+the member variables x and y should be changed to std::set and std::map
+respectively, but none of the occurrences of set or map in the include
+statements should be changed."
+  (let ((incl-list)
+        (incl-ht))
+    (setq incl-list (shu-match-find-all-some-include token-list))
+    (when incl-list
+      (setq incl-ht (shu-match-make-include-hash-table incl-list class-ht)))
+    incl-ht
+    ))
+
+
+
+
+;;
 ;;  shu-cpp-match-some-include
 ;;
 (defconst shu-cpp-match-some-include
