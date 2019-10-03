@@ -820,6 +820,7 @@ followed by \"::\" in front of the unqualified class name.
 After it inserts the qualifying namespace, it increments in COUNT-ALIST the number
 of times that the class name was explicitly qualified."
   (let (
+        (nprl np-rlists)
         (rlist)
         (ret-val)
         (spoint)
@@ -834,8 +835,8 @@ of times that the class name was explicitly qualified."
         (spoint)
         (hv)
         )
-    (while np-rlists
-      (setq rlist (car np-rlists))
+    (while nprl
+      (setq rlist (car nprl))
       (setq ret-val (shu-match-get-start-end-pos rlist t))
       (setq spoint (car ret-val))
       (setq epoint (cdr ret-val))
@@ -844,7 +845,7 @@ of times that the class name was explicitly qualified."
       (setq plnum (shu-format-num lnum 6))
       (setq ns-line (concat plnum ". " ns-code "\n"))
       (push ns-line ns-lines)
-      (setq np-rlists (cdr np-rlists))
+      (setq nprl (cdr nprl))
       )
     (setq ns-lines (nreverse ns-lines))
     (while clist
