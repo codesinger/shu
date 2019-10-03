@@ -2165,42 +2165,6 @@ using namespace statements."
 
 
 
-;;
-;;  shu-test-shu-match-rmv-show-class-count
-;;
-(ert-deftest shu-test-shu-match-rmv-show-class-count ()
-  (let ((count-alist
-         (list
-          (cons "set" 0)
-          (cons "map" 2)
-          (cons "string" 6)
-          (cons "Mumble" 1)))
-        (class-ht (make-hash-table :test 'equal :size 12))
-        (expected
-         (concat
-          "12,345 tokens generated, 2,118 symbols scanned.\n"
-          "Count of qualified classes:\n"
-          "              1: abcde::Mumble\n"
-          "              2: std::map\n"
-          "              0: std::set\n"
-          "              6: std::string\n"))
-        (actual)
-        (np-rlists)
-        (token-count 12345)
-        (symbol-count 2118)
-        )
-    (puthash "set" "std" class-ht)
-    (puthash "string" "std" class-ht)
-    (puthash "map" "std" class-ht)
-    (puthash "Mumble" "abcde" class-ht)
-    (with-temp-buffer
-      (shu-match-rmv-show-class-count count-alist class-ht np-rlists  token-count symbol-count (current-buffer))
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-      (should (string= expected actual)))
-    ))
-
-
-
 
 ;;
 ;;  shu-test-shu-match-internal-rmv-using-1
