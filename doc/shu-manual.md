@@ -8756,6 +8756,6 @@ LocalWords:  funcall myclass toc unescaped nvpair prob gtest gincl rmv qual xxx 
 LocalWords:  WhammoCorp plist abcdef testfn eq binclude mumblefrotz sexp gitbuf ind
 LocalWords:  ginclude newfile fixp hitRatio getdef mumbleSomethingOther cciterate
 LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de un
--->
 LocalWords:  proc rlists ht unresolvable uns clist thisistheoverview
 LocalWords:  thisisanoverview
+-->

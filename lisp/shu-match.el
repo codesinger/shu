@@ -605,6 +605,10 @@ If any \"using namespace\" statements are found, they are merged with the class
 list to form a new class list that contains only those namespaces for which a
 \"using namespace\" statement was found in the buffer.
 
+A separate list is kept of the \"using namespace\" statements that have no
+corresponding entries in the class list.  This is printed out later as a
+diagnostic message.
+
 The next step is to merge in the namespaces from the \"using name\" statements.
 Each \"using name\" statement contributes one namespace name and one class name.
 
@@ -638,6 +642,19 @@ from the buffer.  We do this by replacing the statements with an equivalent
 amount of whitespace, which preserves the positions of all of the other tokens
 in the buffer.
 
+Some of the class names in the class list may also appear in #include statements
+in the buffer.  For example, if we are trying to remove \"using namespace
+std;\", the buffer may well contain #include <set> or #include <map>.  These
+instances of set and map are file names.  They are not class names that should
+have the \"std\" qualifier added to them.
+
+To handle this case we build another hash table.  This one contains class names
+as its key.  It is the intersection of class names and names found in include
+statements.  The value of each entry in the hash table is the list of spoints
+that are the start point for each name within its include statement.  It is a
+list of spoints because the same name may appear in multiple #include
+statements.
+
 Then we go through the token list.  Whenever we encounter an unquoted token, we
 look it up in the hash table to see if this is a class name that we should
 qualify.  If the token exists in the hash table, we then look at its context to
@@ -646,7 +663,9 @@ see if it really looks like a class name.
 IF the putative class name is preceded by any of \"::\", \".\", or \"->\", then
 we assume that it is either a qualified class name or a function name.  There
 are other various checks that can be found in the function
-shu-match-find-unqualified-class-names.
+shu-match-find-unqualified-class-names.  One of the checks is to see if it
+matches an instance contained in an #include statement, which is done with the
+hash of include names described above.
 
 Each time we find an unqualified class name, we push its token-info onto a new
 list of class names that need to be qualified.  Note that we use push so the
@@ -721,26 +740,34 @@ change counts."
 ;;  shu-match-find-unqualified-class-names
 ;;
 (defun shu-match-find-unqualified-class-names (class-ht incl-ht token-list proc-classes log-buf)
-  "Go through all of the tokens looking at any unquoted token that is in the hash
-table of unqualified class names.  When an instance of a class name is found,
-check to see it it is preceded by \"::\", \".\", or \"->\".  \"::\" indicates
-that it is probably qualified.  \".\" or \"->\" indicate that it is probably a
-function name.
+  "Go through all of the tokens looking at any unquoted token that is in the
+hash table of unqualified class names.  When an instance of a class name is
+found, check to see it it is preceded by \"::\", \".\", or \"->\".  \"::\"
+indicates that it is probably qualified.  \".\" or \"->\" indicate that it is
+probably a function name.
 
 Check also to see if it is followed by \")\" or \"[\", which probably indicates
 that it is a variable name.
 
-Next, check to see if it is preceded by \"#include\".
+Next, check to see if it is wrapped in an #include statement.
 
 If it survives all of those checks, it is probably an unqualified class name, in
-which case its token-info is pushed onto a list.  The list is the return value
-of this function.  Since each token-info is pushed onto the list, the list is
-returned in reverse order.  i.e., the last token in the file is the first in the
-list.
+which case its token-info is pushed onto a list.  The list is one of the values
+returned from this function.  Since each token-info is pushed onto the list, the
+list is returned in reverse order.  i.e., the last token in the file is the
+first in the list.
 
 At this point it is possible to visit each token in the list, which is in
 reverse order in the file, look up each token, and insert in front of it its
-qualifying namespace."
+qualifying namespace.
+
+The other return value from this function is the count of the number of unquoted
+tokens that were looked up in the hash table of all of the class names,
+CLASS-HT..
+
+The actual return value from this function is a cons cell whose car is the
+symbol search count and whose cdr is the list of tokens that represent
+unqualified class names to be qualified."
   (interactive)
   (let ((tlist token-list)
         (token-info)
@@ -819,8 +846,7 @@ followed by \"::\" in front of the unqualified class name.
 
 After it inserts the qualifying namespace, it increments in COUNT-ALIST the number
 of times that the class name was explicitly qualified."
-  (let (
-        (nprl np-rlists)
+  (let ((nprl np-rlists)
         (rlist)
         (ret-val)
         (spoint)
@@ -833,8 +859,7 @@ of times that the class name was explicitly qualified."
         (token-info)
         (token)
         (spoint)
-        (hv)
-        )
+        (hv))
     (while nprl
       (setq rlist (car nprl))
       (setq ret-val (shu-match-get-start-end-pos rlist t))
@@ -845,8 +870,7 @@ of times that the class name was explicitly qualified."
       (setq plnum (shu-format-num lnum 6))
       (setq ns-line (concat plnum ". " ns-code "\n"))
       (push ns-line ns-lines)
-      (setq nprl (cdr nprl))
-      )
+      (setq nprl (cdr nprl)))
     (setq ns-lines (nreverse ns-lines))
     (while clist
       (setq token-info (car clist))
@@ -856,8 +880,7 @@ of times that the class name was explicitly qualified."
       (setq hv (gethash token class-ht "????"))
       (insert (concat hv "::"))
       (shu-match-increment-class-count count-alist token)
-      (setq clist (cdr clist))
-      )
+      (setq clist (cdr clist)))
     (shu-match-rmv-show-class-count count-alist class-ht np-rlists ns-lines token-count symbol-count log-buf)
     ))
 
@@ -868,9 +891,17 @@ of times that the class name was explicitly qualified."
 ;;  shu-match-rmv-might-be-include
 ;;
 (defun shu-match-rmv-might-be-include (incl-ht token token-info)
-  "Go to the beginning of the line in front of the start point of the
-TOKEN-INFO.  Return true if the space between the beginning of the line and the
-start point of the TOKEN-INFO contains \"#include\"."
+  "INCL-HT is a hash table whose key is a name that was found in an include
+statement and whose value is a list of all of the spoints of all of the
+occurrences of the name in include statements.  It is a list because the same
+name may be included multiple times.
+
+If the current token matches one of the names in INCL-HT and the spoint of the
+token is a member of the list of spoints in the entry in INCL-HT, then the
+current name is enclosed in an include statement and should not have a namespace
+qualifier added to it.
+
+This function returns true if the name is wrapped in an include statement."
   (let ((spoint (shu-cpp-token-extract-spoint token-info))
         (blocked)
         (spoint-list))
