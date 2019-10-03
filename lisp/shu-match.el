@@ -674,7 +674,10 @@ change counts."
         (proc-classes)
         (proc-rlists)
         (class-ht)
+        (incl-ht)
         (count-alist)
+        (ret-val)
+        (symbol-count)
         (clist))
     (save-excursion
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
@@ -701,11 +704,14 @@ change counts."
         (shu-match-erase-using proc-rlists log-buf)
         (setq class-ht (shu-match-make-class-hash-table-internal proc-classes log-buf))
         (when class-ht
-          (setq clist (shu-match-find-unqualified-class-names class-ht token-list proc-classes log-buf))
+          (setq incl-ht (shu-match-fetch-include-hash-table token-list class-ht))
+          (setq ret-val (shu-match-find-unqualified-class-names class-ht incl-ht token-list proc-classes log-buf))
+          (setq symbol-count (car ret-val))
+          (setq clist (cdr ret-val))
           (if clist
               (progn
                 (setq count-alist (shu-match-make-count-alist-from-hash class-ht))
-                (shu-match-qualify-class-names class-ht count-alist clist np-rlists log-buf))
+                (shu-match-qualify-class-names class-ht count-alist clist np-rlists (length token-list) symbol-count log-buf))
             (message "%s" "No unqualified class names found")))))
     ))
 
@@ -714,7 +720,7 @@ change counts."
 ;;
 ;;  shu-match-find-unqualified-class-names
 ;;
-(defun shu-match-find-unqualified-class-names (class-ht token-list proc-classes log-buf)
+(defun shu-match-find-unqualified-class-names (class-ht incl-ht token-list proc-classes log-buf)
   "Go through all of the tokens looking at any unquoted token that is in the hash
 table of unqualified class names.  When an instance of a class name is found,
 check to see it it is preceded by \"::\", \".\", or \"->\".  \"::\" indicates
@@ -748,6 +754,7 @@ qualifying namespace."
         (next-token "")
         (next-token-type 0)
         (blocked)
+        (symbol-count 0)
         (clist))
     (while tlist
       (setq blocked nil)
@@ -755,6 +762,7 @@ qualifying namespace."
       (setq token (shu-cpp-token-extract-token token-info))
       (setq token-type (shu-cpp-token-extract-type token-info))
       (when (= token-type shu-cpp-token-type-uq)
+        (setq symbol-count (1+ symbol-count))
         (setq hv (gethash token class-ht))
         (when hv
           (if
@@ -779,21 +787,21 @@ qualifying namespace."
                     (string= next-token "[")
                     ))
                   (setq blocked t)
-                (when (shu-match-rmv-might-be-include token-info)
+                (when (shu-match-rmv-might-be-include incl-ht token token-info)
                   (setq blocked t)))))
           (when (not blocked)
             (push token-info clist))))
       (setq last-token token)
       (setq last-token-type token-type)
       (setq tlist (shu-cpp-token-next-non-comment tlist)))
-    clist
+    (cons symbol-count clist)
     ))
 
 
 ;;
 ;;  shu-match-qualify-class-names
 ;;
-(defun shu-match-qualify-class-names (class-ht count-alist clist np-rlists log-buf)
+(defun shu-match-qualify-class-names (class-ht count-alist clist np-rlists token-count symbol-count log-buf)
   "CLASS-HT is the hash table that maps a class name to its containing namespace
 name.  COUNT-ALIST is the alist that counts the number of times each class
 name has been qualified by its enclosing namespace.  CLIST is the list of
@@ -824,7 +832,7 @@ of times that the class name was explicitly qualified."
       (insert (concat hv "::"))
       (shu-match-increment-class-count count-alist token)
       (setq clist (cdr clist)))
-    (shu-match-rmv-show-class-count count-alist class-ht np-rlists log-buf)
+    (shu-match-rmv-show-class-count count-alist class-ht np-rlists token-count symbol-count log-buf)
     ))
 
 
@@ -833,17 +841,18 @@ of times that the class name was explicitly qualified."
 ;;
 ;;  shu-match-rmv-might-be-include
 ;;
-(defun shu-match-rmv-might-be-include (token-info)
+(defun shu-match-rmv-might-be-include (incl-ht token token-info)
   "Go to the beginning of the line in front of the start point of the
 TOKEN-INFO.  Return true if the space between the beginning of the line and the
 start point of the TOKEN-INFO contains \"#include\"."
   (let ((spoint (shu-cpp-token-extract-spoint token-info))
-        (blocked))
-    (save-excursion
-      (goto-char spoint)
-      (beginning-of-line)
-      (when (re-search-forward "#\\s-*include" spoint t)
-        (setq blocked t)))
+        (blocked)
+        (spoint-list))
+    (when incl-ht
+      (setq spoint-list (gethash token incl-ht))
+      (when spoint-list
+        (when (member spoint spoint-list)
+          (setq blocked t))))
     blocked
     ))
 
@@ -1202,7 +1211,7 @@ count by one."
 ;;
 ;;  shu-match-rmv-show-class-count
 ;;
-(defun shu-match-rmv-show-class-count (count-alist class-ht np-rlists log-buf)
+(defun shu-match-rmv-show-class-count (count-alist class-ht np-rlists token-count symbol-count log-buf)
   "Put into the log buffer the count of class names that were qualified."
   (let ((bfn (buffer-file-name))
         (cp)
@@ -1238,6 +1247,8 @@ count by one."
         (princ (concat plnum ". " ns-code "\n") log-buf)
         (setq np-rlists (cdr np-rlists)))
       (princ "\n" log-buf))
+    (princ (format "%s tokens generated, %s symbols scanned.\n"
+                   (shu-fixed-format-num token-count 0) (shu-fixed-format-num symbol-count 0)) log-buf)
     (princ "Count of qualified classes:\n" log-buf)
     (while count-alist
       (setq cp (car count-alist))
