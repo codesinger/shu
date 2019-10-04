@@ -33,6 +33,63 @@
 ;; header file, SHU-HOTHER will switch to the header file.  SHU-COTHER will
 ;; switch back to the original C or C++ file.  SHU-TOTHER will switch to the
 ;; associated unit test file that ends in \"t.cpp.""
+;; This set of functions allows you to treat a set of files as a single project.
+;;
+;; You define a project by creating a project file.  A project file is simply a
+;; text file with one or more directory names in it.  You select the text in the
+;; file and invoke the command shu-make-c-project.  This searches the given
+;; directories for all of the header files and C and C++ files and remembers
+;; where these files are located.
+;;
+;; When you want to visit a file you start typing the first few characters of the
+;; file name.  You can use auto completion to complete the name.  Since
+;; shu-project knows where all of the files are located, you do not have to
+;; remember that.  Once you have typed in a complete file name, the file will be
+;; visited wherever it happens to reside.
+;;
+;; If you have two or more files with the same name in different directories, you
+;; will be presented with a menu and asked to select the file you have in mind.
+;;
+;; ### Creating a project file ###
+;;
+;; If you do not have a project file, shu-project gives you a convenient way to
+;; create one.  Go to the root directory of your project, open a new empty file
+;; (I usually call it project.txt), and invoke the command shu-make-c-project.
+;; It will prompt you for the root directory with a default being the current
+;; directory.  It will then find all of the directories at or below the root that
+;; contain code and it will place the directory names in the file.  Now you have
+;; your project file.
+;;
+;; ### File names within the project ###
+;;
+;; shu-project now knows where all of the file names reside so you do not have to
+;; remember that.  But it does more to simplify your life.  Many files in large
+;; projects start with a common prefix.  If you have a class called ThingLoader,
+;; it might be defined in a file called thingloader.h.  But in a large project,
+;; the full file name might be something like myproject_thingloader.h.
+;;
+;; As shu-project is creating the list of file names, it is also creating an
+;; index of short names with common prefixes stripped.  So if you want to visit
+;; myproject_thingloader.h, just type \"thing\" and hit tab to autocomplete.  If
+;; no other file starts with \"thing\", shu-project will autocomplete to
+;; \"thingloader\" and then look in its index to find myproject_thingloader.h.
+;;
+;; ### Visiting related files ###
+;;
+;; If you are in a .cpp file and you want to visit its associated .h file, issue
+;; the command shu-hother and you will be taken to the .h file even if it is in a
+;; different directory.  Similarly, you can visit the associated unit test file
+;; (t.cpp) with the command shu-tother to visit the unit test file.
+;;
+;; ### Visiting files based on error messages ###
+;;
+;; You compile a file and the compiler complains ...
+;;
+;;      ..\myproject_thingloader.cpp:190:6: error: Invalid type for ...
+;;
+;; Simply place the cursor under any part of the file name and type Ctl-x h.
+;; shu-project will take you to line 190, column 6 of myproject_thingloader.cpp.
+;;
 
 ;;; Code:
 
