@@ -354,7 +354,7 @@
        (have-include )
        (start-pos ))
     (when shu-cpp-use-bde-library
-      (setq std-name "bsl"))
+      (setq std-name shu-cpp-std-namespace))
     (setq class-name-pad (make-string (length class-name) ? ))
     (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
     (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
@@ -523,7 +523,7 @@
        (start-pos )
        (ipad (make-string shu-cpp-indent-length ? )))
     (when shu-cpp-use-bde-library
-      (setq std-name "bsl"))
+      (setq std-name shu-cpp-std-namespace))
     (setq class-name-pad (make-string (length class-name) ? ))
     (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
     (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
@@ -608,7 +608,7 @@
        (start-pos )
        (ipad (make-string shu-cpp-indent-length ? )))
     (when shu-cpp-use-bde-library
-      (setq std-name "bsl"))
+      (setq std-name shu-cpp-std-namespace))
     (setq class-name-pad (make-string (length class-name) ? ))
     (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
     (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
@@ -676,7 +676,7 @@
        (include-line )
        (ipad (make-string shu-cpp-indent-length ? )))
     (when shu-cpp-use-bde-library
-      (setq std-name "bsl"))
+      (setq std-name shu-cpp-std-namespace))
     (setq class-name-pad (make-string (length class-name) ? ))
     (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
     (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
@@ -764,7 +764,7 @@
        (header "INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS")
        (have-header))
     (when shu-cpp-use-bde-library
-      (setq std-name "bsl"))
+      (setq std-name shu-cpp-std-namespace))
     (save-excursion
       (save-restriction
         (widen)

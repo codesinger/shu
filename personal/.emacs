@@ -151,6 +151,7 @@
   (shu-set-default-global-namespace "BloombergLP")
   (setq shu-cpp-use-bde-library t)
   (setq shu-cpp-include-user-brackets t)
+  (setq shu-cpp-std-namespace "bsl")
   (slp-bb-set-comment-hooks))
 
 ;;

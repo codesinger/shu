@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.5.10
+;; Version: 1.5.11
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.5.10"
+(defconst shu-version "1.5.11"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Aug 18"
@@ -145,6 +145,13 @@ by angle brackets and an include of \"myclass.h\" would be written as
 (defcustom shu-cpp-default-allocator-name "m_allocator"
   "The name of the class member variable that holds the pointer to the allocator
 used by the class."
+  :type '(string)
+  :group 'shu-base)
+
+
+(defcustom shu-cpp-std-namespace "std"
+  "The name of the namespace for the C++ standard library.  Some users of the
+BDE open source Bloomberg libraries may prefer \"bsl\" instead."
   :type '(string)
   :group 'shu-base)
 

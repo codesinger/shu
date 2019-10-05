@@ -200,7 +200,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
   "Generate a skeleton BDE class declaration at point."
   (interactive "*sClass name?: ")
   (let
-      ((std-name "std")
+      ((std-name shu-cpp-std-namespace)
        (ostream-length (length "std::ostream  "))
        (ostream-class-length 0)
        (ostream-pad "")
@@ -215,7 +215,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
        (class-name-pad )
        (start-pos ))
     (when shu-cpp-use-bde-library
-      (setq std-name "bsl"))
+      (setq std-name shu-cpp-std-namespace))
     (setq class-name-pad (make-string (length class-name) ? ))
     (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
     (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
@@ -307,7 +307,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 (defun shu-bde-gen (class-name)
   "Generate a skeleton BDE class code generation at point."
   (interactive "*sClass name?: ")
-  (let ((std-name "std")
+  (let ((std-name shu-cpp-std-namespace)
         (ostream-length (length "std::ostream  "))
         (ostream-class-length 0)
         (ostream-pad "")
@@ -318,7 +318,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
         (class-name-pad )
         (start-pos ))
     (when shu-cpp-use-bde-library
-      (setq std-name "bsl"))
+      (setq std-name shu-cpp-std-namespace))
     (setq class-name-pad (make-string (length class-name) ? ))
     (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
     (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
