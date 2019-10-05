@@ -65,7 +65,7 @@ Version 1.4 was merged with the master branch on 2 February 2019.
 
 Version 1.5 was merged with the master branch on 18 August 2019.
 
-This is Version 1.5.9 of the Shu elisp repository.
+This is Version 1.5.11 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -276,6 +276,14 @@ A regular expression to match a variable name in a C or C++ program.
 [Constant]
 
 List of all characters that can be present in a C++ variable name.
+
+
+
+#### shu-cpp-std-namespace ####
+[Custom]
+
+The name of the namespace for the C++ standard library.  Some users of the
+BDE open source Bloomberg libraries may prefer "bsl" instead.
 
 
 
@@ -2179,6 +2187,70 @@ Place a skeleton Doxygen header definition at point.
 
 
 
+#### dciterate ####
+dciterate *type-name* *var-name-1* *var-name-2*
+[Command]
+ (Function: shu-dciterate)
+
+Insert the code to iterate through a pair of data structures of type
+*type-name*, whose first instance is identified by *var-name-1* and whose second
+instance is identified by *var-name-2*.
+
+The first prompt reads the type name, second and third prompts read the two
+variable names.
+
+The generated code sequence is as follows:
+
+```
+      for (std::pair<type-name::const_iterator,
+                     type-name::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+```
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+
+
+
+#### diterate ####
+diterate *type-name* *var-name-1* *var-name-2*
+[Command]
+ (Function: shu-diterate)
+
+Insert the code to iterate through a pair of data structures of type
+*type-name*, whose first instance is identified by *var-name-1* and whose second
+instance is identified by *var-name-2*.
+
+The first prompt reads the type name, second and third prompts read the two
+variable names.
+
+The generated code sequence is as follows:
+
+```
+      for (std::pair<type-name::iterator,
+                     type-name::iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+```
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+
+
+
 #### dox-brief ####
 [Command]
  (Function: shu-dox-brief)
@@ -2455,8 +2527,8 @@ shu-cciterate *type-name* *var-name*
 [Command]
 
 Insert the code to iterate through a data structure of type *type-name* whose
-instance is identified by *var-name*.  First prompt reads the variable name.
-Second prompt read the variable name.
+instance is identified by *var-name*.  First prompt reads the type name.  Second
+prompt read the variable name.
 
 The generated code sequence is as follows:
 
@@ -2467,7 +2539,7 @@ The generated code sequence is as follows:
       }
 ```
 
-The number of spaces to indent inside that braces is defined in the custom
+The number of spaces to indent inside the braces is defined in the custom
 variable shu-cpp-indent-length.
 
 
@@ -2509,8 +2581,8 @@ shu-citerate *type-name* *var-name*
 [Command]
 
 Insert the code to iterate through a data structure of type *type-name* whose
-instance is identified by *var-name*.  First prompt reads the variable name.
-Second prompt read the variable name.
+instance is identified by *var-name*.  First prompt reads the type name.  Second
+prompt read the variable name.
 
 The generated code sequence is as follows:
 
@@ -2521,7 +2593,7 @@ The generated code sequence is as follows:
       }
 ```
 
-The number of spaces to indent inside that braces is defined in the custom
+The number of spaces to indent inside the braces is defined in the custom
 variable shu-cpp-indent-length.
 
 
@@ -2912,6 +2984,70 @@ Place a skeleton Doxygen header definition at point.
 
 
 
+#### shu-dciterate ####
+shu-dciterate *type-name* *var-name-1* *var-name-2*
+[Command]
+ (Alias: dciterate)
+
+Insert the code to iterate through a pair of data structures of type
+*type-name*, whose first instance is identified by *var-name-1* and whose second
+instance is identified by *var-name-2*.
+
+The first prompt reads the type name, second and third prompts read the two
+variable names.
+
+The generated code sequence is as follows:
+
+```
+      for (std::pair<type-name::const_iterator,
+                     type-name::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+```
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+
+
+
+#### shu-diterate ####
+shu-diterate *type-name* *var-name-1* *var-name-2*
+[Command]
+ (Alias: diterate)
+
+Insert the code to iterate through a pair of data structures of type
+*type-name*, whose first instance is identified by *var-name-1* and whose second
+instance is identified by *var-name-2*.
+
+The first prompt reads the type name, second and third prompts read the two
+variable names.
+
+The generated code sequence is as follows:
+
+```
+      for (std::pair<type-name::iterator,
+                     type-name::iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+```
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+
+
+
 #### shu-dox-brief ####
 [Command]
  (Alias: dox-brief)
@@ -3036,7 +3172,7 @@ qualifier.
 
 #### shu-internal-citerate ####
 shu-internal-citerate *type-name* *var-name* **&optional** *const*
-[Command]
+[Function]
 
 Insert the code to iterate through a data structure of type *type-name* whose
 instance is identified by *var-name*.  First prompt reads the variable name.
@@ -3060,6 +3196,36 @@ shu-internal-cpp2-class *class-name*
 [Function]
 
 Place a skeleton class definition in the current buffer at point.
+
+
+
+#### shu-internal-double-citerate ####
+shu-internal-double-citerate *type-name* *var-name-1* *var-name-2* **&optional** *const*
+[Function]
+
+Insert the code to iterate through a pair of data structures of type
+*type-name*, whose first instance is identified by *var-name-1* and whose second
+instance is identified by *var-name-2*.
+
+The generated code sequence is as follows:
+
+```
+      for (std::pair<type-name::const_iterator,
+                     type-name::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+```
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+
+If optional *const* is true, a const iterator is generated.
 
 
 
@@ -4115,6 +4281,65 @@ If you are editing a C or C++ file and wish to switch to its associated
 header file, *shu-hother* will switch to the header file.  *shu-cother* will
 switch back to the original C or C++ file.  *shu-tother* will switch to the
 associated unit test file that ends in "t.cpp.""
+This set of functions allows you to treat a set of files as a single project.
+
+You define a project by creating a project file.  A project file is simply a
+text file with one or more directory names in it.  You select the text in the
+file and invoke the command shu-make-c-project.  This searches the given
+directories for all of the header files and C and C++ files and remembers
+where these files are located.
+
+When you want to visit a file you start typing the first few characters of the
+file name.  You can use auto completion to complete the name.  Since
+shu-project knows where all of the files are located, you do not have to
+remember that.  Once you have typed in a complete file name, the file will be
+visited wherever it happens to reside.
+
+If you have two or more files with the same name in different directories, you
+will be presented with a menu and asked to select the file you have in mind.
+
+### Creating a project file ###
+
+If you do not have a project file, shu-project gives you a convenient way to
+create one.  Go to the root directory of your project, open a new empty file
+(I usually call it project.txt), and invoke the command shu-make-c-project.
+It will prompt you for the root directory with a default being the current
+directory.  It will then find all of the directories at or below the root that
+contain code and it will place the directory names in the file.  Now you have
+your project file.
+
+### File names within the project ###
+
+shu-project now knows where all of the file names reside so you do not have to
+remember that.  But it does more to simplify your life.  Many files in large
+projects start with a common prefix.  If you have a class called ThingLoader,
+it might be defined in a file called thingloader.h.  But in a large project,
+the full file name might be something like myproject_thingloader.h.
+
+As shu-project is creating the list of file names, it is also creating an
+index of short names with common prefixes stripped.  So if you want to visit
+myproject_thingloader.h, just type "thing" and hit tab to autocomplete.  If
+no other file starts with "thing", shu-project will autocomplete to
+"thingloader" and then look in its index to find myproject_thingloader.h.
+
+### Visiting related files ###
+
+If you are in a .cpp file and you want to visit its associated .h file, issue
+the command shu-hother and you will be taken to the .h file even if it is in a
+different directory.  Similarly, you can visit the associated unit test file
+(t.cpp) with the command shu-tother to visit the unit test file.
+
+### Visiting files based on error messages ###
+
+You compile a file and the compiler complains ...
+
+```
+     ..\myproject_thingloader.cpp:190:6: error: Invalid type for ...
+```
+
+Simply place the cursor under any part of the file name and type Ctl-x h.
+shu-project will take you to line 190, column 6 of myproject_thingloader.cpp.
+
 
 
 ## List of functions by alias name ##
@@ -8230,7 +8455,6 @@ within type.
 Associate a number with each type of variable
 
 
-
 * [acgen](#acgen)
 * [add-prefix](#add-prefix)
 * [all-quit](#all-quit)
@@ -8270,8 +8494,10 @@ Associate a number with each type of variable
 * [dbx-malloc](#dbx-malloc)
 * [dcc](#dcc)
 * [dce](#dce)
+* [dciterate](#dciterate)
 * [de-star](#de-star)
 * [diff-commits](#diff-commits)
+* [diterate](#diterate)
 * [dox-brief](#dox-brief)
 * [dox-cbt](#dox-cbt)
 * [dox-cvt](#dox-cvt)
@@ -8619,6 +8845,7 @@ Associate a number with each type of variable
 * [shu-cpp-search-match-tokens](#shu-cpp-search-match-tokens)
 * [shu-cpp-short-list](#shu-cpp-short-list)
 * [shu-cpp-side-list-functions](#shu-cpp-side-list-functions)
+* [shu-cpp-std-namespace](#shu-cpp-std-namespace)
 * [shu-cpp-subdir-for-package](#shu-cpp-subdir-for-package)
 * [shu-cpp-target-file-column](#shu-cpp-target-file-column)
 * [shu-cpp-target-file-line](#shu-cpp-target-file-line)
@@ -8680,10 +8907,12 @@ Associate a number with each type of variable
 * [shu-dbx-summarize-malloc](#shu-dbx-summarize-malloc)
 * [shu-dcc](#shu-dcc)
 * [shu-dce](#shu-dce)
+* [shu-dciterate](#shu-dciterate)
 * [shu-de-star](#shu-de-star)
 * [shu-default-file-to-seek](#shu-default-file-to-seek)
 * [shu-dired-mode-name](#shu-dired-mode-name)
 * [shu-disabled-quit](#shu-disabled-quit)
+* [shu-diterate](#shu-diterate)
 * [shu-doc-internal-func-to-md](#shu-doc-internal-func-to-md)
 * [shu-doc-internal-to-md](#shu-doc-internal-to-md)
 * [shu-doc-sort-compare](#shu-doc-sort-compare)
@@ -8750,6 +8979,7 @@ Associate a number with each type of variable
 * [shu-interactive-qualify-class-name](#shu-interactive-qualify-class-name)
 * [shu-internal-citerate](#shu-internal-citerate)
 * [shu-internal-cpp2-class](#shu-internal-cpp2-class)
+* [shu-internal-double-citerate](#shu-internal-double-citerate)
 * [shu-internal-get-set](#shu-internal-get-set)
 * [shu-internal-list-c-project](#shu-internal-list-c-project)
 * [shu-internal-new-lisp](#shu-internal-new-lisp)
@@ -8969,5 +9199,6 @@ LocalWords:  WhammoCorp plist abcdef testfn eq binclude mumblefrotz sexp gitbuf 
 LocalWords:  ginclude newfile fixp hitRatio getdef mumbleSomethingOther cciterate
 LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de un
 LocalWords:  proc rlists ht unresolvable uns clist thisistheoverview NB spoints np
-LocalWords:  thisisanoverview incl ns
+LocalWords:  thisisanoverview incl ns dciterate diterate ThingLoader thingloader
+LocalWords:  myproject autocomplete Ctl
 -->

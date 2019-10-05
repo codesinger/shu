@@ -39,10 +39,11 @@ Version 1.2 was merged with the master branch on 6 January 2019.
 
 Version 1.3 was merged with the master branch on 12 January 2019.
 
-Version 1.4.0 was merged with the master branch on 2 February 2019.
+Version 1.4 was merged with the master branch on 2 February 2019.
 
-This is Version 1.5.0 of the Shu elisp repository, which was merged
-with the master branch on 18 August 2019.
+Version 1.5 was merged with the master branch on 18 August 2019.
+
+This is Version 1.5.11 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -306,6 +307,17 @@ A regular expression to match a variable name in a C or C++ program.
 
 \begin{doc-string}
 List of all characters that can be present in a C++ variable name.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-std-namespace }}
+\usebox{\funcname}
+\index{shu-cpp-std-namespace} \hfill [Custom]
+
+\begin{doc-string}
+The name of the namespace for the C++ standard library.  Some users of the
+BDE open source Bloomberg libraries may prefer ``bsl'' instead.
 \end{doc-string}
 
 \vspace{1em}
@@ -2684,6 +2696,74 @@ Place a skeleton Doxygen header definition at point.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{dciterate }}
+\usebox{\funcname}\emph{type-name} \emph{var-name-1} \emph{var-name-2}
+\index{dciterate} \hfill [Command]\\%
+ (Function: shu-dciterate)
+
+\begin{doc-string}
+Insert the code to iterate through a pair of data structures of type
+\emph{type-name}, whose first instance is identified by \emph{var-name-1} and whose second
+instance is identified by \emph{var-name-2}.
+
+The first prompt reads the type name, second and third prompts read the two
+variable names.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (std::pair<type-name::const_iterator,
+                     type-name::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() \&\& its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{diterate }}
+\usebox{\funcname}\emph{type-name} \emph{var-name-1} \emph{var-name-2}
+\index{diterate} \hfill [Command]\\%
+ (Function: shu-diterate)
+
+\begin{doc-string}
+Insert the code to iterate through a pair of data structures of type
+\emph{type-name}, whose first instance is identified by \emph{var-name-1} and whose second
+instance is identified by \emph{var-name-2}.
+
+The first prompt reads the type name, second and third prompts read the two
+variable names.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (std::pair<type-name::iterator,
+                     type-name::iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() \&\& its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{dox-brief }}
 \usebox{\funcname}
 \index{dox-brief} \hfill [Command]\\%
@@ -3031,8 +3111,8 @@ benefit of unit tests.
 
 \begin{doc-string}
 Insert the code to iterate through a data structure of type \emph{type-name} whose
-instance is identified by \emph{var-name}.  First prompt reads the variable name.
-Second prompt read the variable name.
+instance is identified by \emph{var-name}.  First prompt reads the type name.  Second
+prompt read the variable name.
 
 The generated code sequence is as follows:
 
@@ -3043,7 +3123,7 @@ The generated code sequence is as follows:
       }
 \end{verbatim}}
 
-The number of spaces to indent inside that braces is defined in the custom
+The number of spaces to indent inside the braces is defined in the custom
 variable shu-cpp-indent-length.
 \end{doc-string}
 
@@ -3099,8 +3179,8 @@ Insert an empty if statement.
 
 \begin{doc-string}
 Insert the code to iterate through a data structure of type \emph{type-name} whose
-instance is identified by \emph{var-name}.  First prompt reads the variable name.
-Second prompt read the variable name.
+instance is identified by \emph{var-name}.  First prompt reads the type name.  Second
+prompt read the variable name.
 
 The generated code sequence is as follows:
 
@@ -3111,7 +3191,7 @@ The generated code sequence is as follows:
       }
 \end{verbatim}}
 
-The number of spaces to indent inside that braces is defined in the custom
+The number of spaces to indent inside the braces is defined in the custom
 variable shu-cpp-indent-length.
 \end{doc-string}
 
@@ -3373,9 +3453,10 @@ This function returns true if such an ambiguity exists.
 
 \vspace{1em}
 \noindent
-\savebox{\funcname}{\noindent\texttt{shu-cpp-rmv-using }}
-\usebox{\funcname}\emph{class-list} \textbf{\&optional} \emph{top-name}
-\index{shu-cpp-rmv-using} \hfill [Function]
+\savebox{\funcname}{\noindent\texttt{shu-cpp-rmv-using-old }}
+\usebox{\funcname}\emph{class-list} \textbf{\&optional}
+\index{shu-cpp-rmv-using-old} \hfill [Function]
+\hspace*{\wd\funcname}
 
 \begin{doc-string}
 Remove ``using namespace'' directives from a C++ file, adding the appropriate
@@ -3401,6 +3482,8 @@ would be interpreted as though it had been written:
 \small{\begin{verbatim}
      using namespace world;
 \end{verbatim}}
+
+NB: This version is deprecated.  See the new version in shu-match.el
 \end{doc-string}
 
 \vspace{1em}
@@ -3572,6 +3655,74 @@ Place a skeleton Doxygen header definition at point.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-dciterate }}
+\usebox{\funcname}\emph{type-name} \emph{var-name-1} \emph{var-name-2}
+\index{shu-dciterate} \hfill [Command]\\%
+ (Alias: dciterate)
+
+\begin{doc-string}
+Insert the code to iterate through a pair of data structures of type
+\emph{type-name}, whose first instance is identified by \emph{var-name-1} and whose second
+instance is identified by \emph{var-name-2}.
+
+The first prompt reads the type name, second and third prompts read the two
+variable names.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (std::pair<type-name::const_iterator,
+                     type-name::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() \&\& its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-diterate }}
+\usebox{\funcname}\emph{type-name} \emph{var-name-1} \emph{var-name-2}
+\index{shu-diterate} \hfill [Command]\\%
+ (Alias: diterate)
+
+\begin{doc-string}
+Insert the code to iterate through a pair of data structures of type
+\emph{type-name}, whose first instance is identified by \emph{var-name-1} and whose second
+instance is identified by \emph{var-name-2}.
+
+The first prompt reads the type name, second and third prompts read the two
+variable names.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (std::pair<type-name::iterator,
+                     type-name::iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() \&\& its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-dox-brief }}
 \usebox{\funcname}
 \index{shu-dox-brief} \hfill [Command]\\%
@@ -3733,7 +3884,7 @@ qualifier.
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-internal-citerate }}
 \usebox{\funcname}\emph{type-name} \emph{var-name} \textbf{\&optional}
-\index{shu-internal-citerate} \hfill [Command]
+\index{shu-internal-citerate} \hfill [Function]
 \hspace*{\wd\funcname}
 
 \begin{doc-string}
@@ -3761,6 +3912,39 @@ If optional \emph{const} is true, a const iterator is generated.
 
 \begin{doc-string}
 Place a skeleton class definition in the current buffer at point.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-double-citerate }}
+\usebox{\funcname}\emph{type-name} \emph{var-name-1}
+\index{shu-internal-double-citerate} \hfill [Function]
+\hspace*{\wd\funcname}\textbf{\&optional} \emph{const}
+
+\begin{doc-string}
+Insert the code to iterate through a pair of data structures of type
+\emph{type-name}, whose first instance is identified by \emph{var-name-1} and whose second
+instance is identified by \emph{var-name-2}.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (std::pair<type-name::const_iterator,
+                     type-name::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() \&\& its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+
+If optional \emph{const} is true, a const iterator is generated.
 \end{doc-string}
 
 \vspace{1em}
@@ -4173,7 +4357,7 @@ another list that matches "using namespace component::name";.
 If you try to match this set of three lists against the following string
 
 \small{\begin{verbatim}
-      using namespace thing::Bob
+      using namespace thing::Bob;
 \end{verbatim}}
 
 The three lists are evaluated as follows:
@@ -4187,7 +4371,7 @@ an operator "::".
 The third list matches "using," "namespace," "thing," "::," "Bob," and ";".
 
 With one function call, you have found a reasonably complex pattern.  The
-tokens scanned to not include comments.  This means that the above example
+tokens scanned do not include comments.  This means that the above example
 would have worked identically on a list of tokens derived from
 
 \small{\begin{verbatim}
@@ -5045,6 +5229,65 @@ If you are editing a C or C++ file and wish to switch to its associated
 header file, \emph{shu-hother} will switch to the header file.  \emph{shu-cother} will
 switch back to the original C or C++ file.  \emph{shu-tother} will switch to the
 associated unit test file that ends in ``t.cpp.""
+This set of functions allows you to treat a set of files as a single project.
+
+You define a project by creating a project file.  A project file is simply a
+text file with one or more directory names in it.  You select the text in the
+file and invoke the command shu-make-c-project.  This searches the given
+directories for all of the header files and C and C++ files and remembers
+where these files are located.
+
+When you want to visit a file you start typing the first few characters of the
+file name.  You can use auto completion to complete the name.  Since
+shu-project knows where all of the files are located, you do not have to
+remember that.  Once you have typed in a complete file name, the file will be
+visited wherever it happens to reside.
+
+If you have two or more files with the same name in different directories, you
+will be presented with a menu and asked to select the file you have in mind.
+
+\subsubsection{Creating a project file}
+
+If you do not have a project file, shu-project gives you a convenient way to
+create one.  Go to the root directory of your project, open a new empty file
+(I usually call it project.txt), and invoke the command shu-make-c-project.
+It will prompt you for the root directory with a default being the current
+directory.  It will then find all of the directories at or below the root that
+contain code and it will place the directory names in the file.  Now you have
+your project file.
+
+\subsubsection{File names within the project}
+
+shu-project now knows where all of the file names reside so you do not have to
+remember that.  But it does more to simplify your life.  Many files in large
+projects start with a common prefix.  If you have a class called ThingLoader,
+it might be defined in a file called thingloader.h.  But in a large project,
+the full file name might be something like myproject\_thingloader.h.
+
+As shu-project is creating the list of file names, it is also creating an
+index of short names with common prefixes stripped.  So if you want to visit
+myproject\_thingloader.h, just type ``thing'' and hit tab to autocomplete.  If
+no other file starts with ``thing'', shu-project will autocomplete to
+``thingloader'' and then look in its index to find myproject\_thingloader.h.
+
+\subsubsection{Visiting related files}
+
+If you are in a .cpp file and you want to visit its associated .h file, issue
+the command shu-hother and you will be taken to the .h file even if it is in a
+different directory.  Similarly, you can visit the associated unit test file
+(t.cpp) with the command shu-tother to visit the unit test file.
+
+\subsubsection{Visiting files based on error messages}
+
+You compile a file and the compiler complains ...
+
+\small{\begin{verbatim}
+     ..\myproject_thingloader.cpp:190:6: error: Invalid type for ...
+\end{verbatim}}
+
+Simply place the cursor under any part of the file name and type Ctl-x h.
+shu-project will take you to line 190, column 6 of myproject\_thingloader.cpp.
+
 
 
 \subsection{List of functions by alias name}
@@ -6430,6 +6673,9 @@ shu-cpp-reverse-tokenize-region.  The former returns a list of tokens with the
 first token in the list being the first token found.  The latter function
 returns the reverse of the former.
 
+The tokenized lists are used by the functions in shu-cpp-match.el and
+shu-match.el to find and retrieve patters in the token lists.
+
 
 \subsection{List of functions by alias name}
 
@@ -7693,7 +7939,7 @@ about syntax errors in the file.
 \section{shu-match}
 
 
-Functions that use functions in shu-match.el
+Functions that use functions in shu-cpp-match.el
 
 
 \subsection{List of functions by alias name}
@@ -7704,9 +7950,9 @@ A list of aliases and associated function names.
 
 \vspace{1em}
 \noindent
-\savebox{\funcname}{\noindent\texttt{find-variables }}
+\savebox{\funcname}{\noindent\texttt{find-all-variables }}
 \usebox{\funcname}
-\index{find-variables} \hfill [Command]\\%
+\index{find-all-variables} \hfill [Command]\\%
  (Function: shu-match-find-variables)
 
 \begin{doc-string}
@@ -7724,6 +7970,263 @@ List of functions and variable definitions in this package.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{remove-class-duplicates }}
+\usebox{\funcname}\emph{proc-classes} \emph{log-buf}
+\index{remove-class-duplicates} \hfill [Function]
+
+\begin{doc-string}
+\emph{proc-classes} is the alist of classes that we will process.  The car of each
+item is the containing namespace.  The cdr of each item is the list of class
+names contained within the namespace.  The original class list may have had
+duplicate class names within a given namespace.  We may also have added class
+names to a given namespace from processing one or more ``using name''
+statements.
+
+For example, if the lass list contained ``std . set map string'' and we also
+processed a ``using std::string'' statement, the code that processed that
+statement would have blindly added ``string'' to the list of classes in the
+namespace ``std''.  The list of classes for namespace ``std'' would then contain
+``string set map string''.
+
+This function removes any duplicate class names within a given namespace.  This
+is necessary because we are about to invert the class list to produce a hash
+table in which the key is the class name and the value is the enclosing
+namespace name.  This operation will fail if a given namespace contains
+duplicate class names.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-colon-name }}
+\usebox{\funcname}
+\index{shu-cpp-match-colon-name} \hfill [Constant]
+
+\begin{doc-string}
+A repeating side list to match zero or more instances of \{:: $<$name$>$\}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-many-using-list }}
+\usebox{\funcname}
+\index{shu-cpp-match-many-using-list} \hfill [Constant]
+
+\begin{doc-string}
+These two lists match what may follow the key word ``using''.  The first list
+matches the key word ``namespace'' followed by any of the different name types
+that may follow ``using namespace''.  The second list matches any of the name
+forms that may following the key word ``using'' when it is not followed by the
+key word ``namespace''.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-namespace-forms }}
+\usebox{\funcname}
+\index{shu-cpp-match-namespace-forms} \hfill [Constant]
+
+\begin{doc-string}
+;
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-namespace-list }}
+\usebox{\funcname}
+\index{shu-cpp-match-namespace-list} \hfill [Constant]
+
+\begin{doc-string}
+namespace
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-namespace-list-single }}
+\usebox{\funcname}
+\index{shu-cpp-match-namespace-list-single} \hfill [Constant]
+
+\begin{doc-string}
+namespace
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-some-include }}
+\usebox{\funcname}
+\index{shu-cpp-match-some-include} \hfill [Constant]
+
+\begin{doc-string}
+A list of match-info that matches ``\#include $<$name$>$``.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-using-forms }}
+\usebox{\funcname}
+\index{shu-cpp-match-using-forms} \hfill [Constant]
+
+\begin{doc-string}
+These two lists match the form of name that can follow a ``using'' directive
+that is not a ``using namespace'' directive.  This is either $<$name$>$ or
+$<$name$>$::$<$name$>$$>$, $<$name$>$::$<$name$>$::$<$name$>$, etc.  The first list above matches
+$<$name$>$ followed by semicolon..  The second list matches $<$name$>$ followed
+by a looping side list for zero or more occurrences of ``::'' followed by $<$name$>$
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-using-list-single }}
+\usebox{\funcname}
+\index{shu-cpp-match-using-list-single} \hfill [Constant]
+
+\begin{doc-string}
+This is a single list that is the top level list for matching anything
+that may follow the key word ``using''.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-rmv-using }}
+\usebox{\funcname}\emph{class-list} \textbf{\&optional} \emph{top-name}
+\index{shu-cpp-rmv-using} \hfill [Function]
+
+\begin{doc-string}
+Remove ``using namespace'' directives from a C++ file, adding the appropriate
+namespace qualifier to all of the unqualified class names.  \emph{class-list} is an
+a-list in which the car of each entry is a namespace and the cdr of each entry
+is a list of class names.  Here is an example of such an a-list:
+
+\small{\begin{verbatim}
+     (list
+      (cons ``std''    (list ``set'' ``string'' ``vector''))
+      (cons ``world''  (list ``Hello'' ``Goodbye'')))
+\end{verbatim}}
+
+\emph{top-name}, if present is a higher level namespace.  Given a top level namespace
+of ``WhammoCorp'', then the following line:
+
+\small{\begin{verbatim}
+     using namespace WhammoCorp::world;
+\end{verbatim}}
+
+would be interpreted as though it had been written:
+
+\small{\begin{verbatim}
+     using namespace world;
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-add-names-to-class-list }}
+\usebox{\funcname}\emph{un-list}
+\index{shu-match-add-names-to-class-list} \hfill [Function]
+\hspace*{\wd\funcname}\emph{proc-rlists}
+\hspace*{\wd\funcname}\textbf{\&optional}
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+\emph{un-list} is the list of rlists that represent the ``using name'' statements.
+\emph{proc-classes} is the class list we will be using to do the processing.
+\emph{proc-rlists} is the set of rlists that represents the ``using namespace''
+statements.  This function adds the''using name'' directives, if any, to both
+\emph{proc-classes} and \emph{proc-rlists}.  It returns a cons cell in which the car is the
+modified \emph{proc-classes} and the cdr is the modified \emph{proc-rlists}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-erase-using }}
+\usebox{\funcname}\emph{proc-rlists} \emph{log-buf}
+\index{shu-match-erase-using} \hfill [Command]
+
+\begin{doc-string}
+\emph{proc-rlists} is the set of rlists we are processing that represent all of the
+``using namespace'' and ``using name'' statements.  This function replaces all
+of those statements in the buffer with whitespace.  This is done in order to
+preserve the positions of all other items in the buffer.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-fetch-include-hash-table }}
+\usebox{\funcname}\emph{token-list}
+\index{shu-match-fetch-include-hash-table} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+\emph{token-list} is the list of tokenized text from the buffer.  \emph{class-ht} is the
+hash table that holds as its keys the names of all of the classes that we will
+process.
+
+This function finds all of the names in \#include statements whose included file
+name matches a class name in \emph{class-ht}.  It then builds and returns a new hash
+table in which the key is the name of an included file whose name matches a
+class name and whose value is a list of the spoints of the included file names.
+
+It is a list of spoints, as opposed to a single point, because an include
+statement with a given file name may appear several times.
+
+For example, in the following code:
+
+\small{\begin{verbatim}
+      #include <set>
+      #include <map>
+      #
+       include
+            <set>
+
+      using namespace std;
+
+      set     x;
+      map     y;
+\end{verbatim}}
+
+the member variables x and y should be changed to std::set and std::map
+respectively, but none of the occurrences of set or map in the include
+statements should be changed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-find-all-some-include }}
+\usebox{\funcname}\emph{token-list}
+\index{shu-match-find-all-some-include} \hfill [Function]
+
+\begin{doc-string}
+Given a token list, return a list of tokens that represent all of the simple
+names found in \#include $<$ name $>$, where ``name'' is a C++ name.  This search
+will neither find nor return a name with a . in it.  This is a limited search
+designed to find names that might be mistaken for class names to be qualified.
+
+For example, if we are removing the namespace ``std'', then one of the names we
+may wish to qualify is ``set''.  Buf if we encounter ``\#include $<$set$>$``, we do
+not want to transform that into ``\#include $<$std::set$>$``.
+
+Names of include files delimited by quotes will not be seen in the scan because
+those are inside strings.  So we only want to find names in include statements
+that are delimited by angle brackets and do not include a . in them.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-find-all-using-internal }}
+\usebox{\funcname}\emph{token-list}
+\index{shu-match-find-all-using-internal} \hfill [Function]
+
+\begin{doc-string}
+Given a token list, return two different lists.  The first is a list of all
+``using namespace'' statements.  The second is a list of all ``using''
+statements that are not ``using namespace'' statements.  ``using namespace
+std;'' is an example of the first type.  ``using std::string'' is an example of
+the second type.
+The return value of this function is a single cons cell in which the cdr points
+to the first list and the car points to the second list.
+If neither list is present, then the return value is nil.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-match-find-semi-names }}
 \usebox{\funcname}\emph{token-list}
 \index{shu-match-find-semi-names} \hfill [Function]
@@ -7736,16 +8239,347 @@ that holds a match and put it into the buffer ``\emph\{**shu-vars**\}'',
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-find-unqualified-class-names }}
+\usebox{\funcname}\emph{class-ht}
+\index{shu-match-find-unqualified-class-names} \hfill [Command]
+\hspace*{\wd\funcname}\emph{token-list}
+\hspace*{\wd\funcname}\emph{log-buf}
+
+\begin{doc-string}
+Go through all of the tokens looking at any unquoted token that is in the
+hash table of unqualified class names.  When an instance of a class name is
+found, check to see it it is preceded by ``::'', ``.'', or ``-$>$``.  ``::''
+indicates that it is probably qualified.  ``.'' or ``-$>$`` indicate that it is
+probably a function name.
+
+Check also to see if it is followed by ``)'' or ``[``, which probably indicates
+that it is a variable name.
+
+Next, check to see if it is wrapped in an \#include statement.
+
+If it survives all of those checks, it is probably an unqualified class name, in
+which case its token-info is pushed onto a list.  The list is one of the values
+returned from this function.  Since each token-info is pushed onto the list, the
+list is returned in reverse order.  i.e., the last token in the file is the
+first in the list.
+
+At this point it is possible to visit each token in the list, which is in
+reverse order in the file, look up each token, and insert in front of it its
+qualifying namespace.
+
+The other return value from this function is the count of the number of unquoted
+tokens that were looked up in the hash table of all of the class names,
+\emph{class-ht}..
+
+The actual return value from this function is a cons cell whose car is the
+symbol search count and whose cdr is the list of tokens that represent
+unqualified class names to be qualified.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-match-find-variables }}
 \usebox{\funcname}
 \index{shu-match-find-variables} \hfill [Command]\\%
- (Alias: find-variables)
+ (Alias: find-all-variables)
 
 \begin{doc-string}
 Find what might be all of the variable declarations in a header file by doing
 a reverse tokenized scan looking for all occurrences of operator ``;'' followed
 by something that matches the regular expression for a C++ name.  Then take each
 line that matches and put it in the buffer ``\emph\{**shu-vars**\}''.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-get-start-end-pos }}
+\usebox{\funcname}\emph{rlist} \textbf{\&optional}
+\index{shu-match-get-start-end-pos} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Given an \emph{rlist} return the beginning and end positions.  The beginning position is
+the position of the first character of the first token.  The end position is the
+position of the last character of the last token.  These two are returned as a cons
+cell whose car is the beginning position and whose cdr is the end position.  If
+the optional \emph{whole-lines} is true, the start position is that of the beginning of
+the line on which the start falls and the end position is that of the end of
+the line on which the end falls.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-increment-class-count }}
+\usebox{\funcname}\emph{alist} \emph{class-name}
+\index{shu-match-increment-class-count} \hfill [Command]
+
+\begin{doc-string}
+\emph{alist} is an alist whose key is a \emph{class-name} and whose cdr is a count of the
+number of times that class name has been found.  This function increments the
+count by one.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-internal-rmv-using }}
+\usebox{\funcname}\emph{class-list} \emph{log-buf}
+\index{shu-match-internal-rmv-using} \hfill [Function]
+\hspace*{\wd\funcname}\emph{top-name}
+
+\begin{doc-string}
+This is an overview of the entire process used to remove both the using
+namespace statements (e.g., ``using namespace std;'') and the using statements
+(e.g., ``using std::string;'').
+
+The input is a class list which is an alist in which the key for each entry is a
+namespace name and the value for each entry is a list of class names that are
+qualified by the namespace name.  This is an example of a class list:
+
+\small{\begin{verbatim}
+     (list (cons ``std'' (list ``set'' ``string'' ``vector'')) (cons ``world''
+      (list ``Hello'' ``Goodbye'')))
+\end{verbatim}}
+
+The first step is to tokenize the entire buffer and then use match functions to
+find each instance of ``using namespace'' and each occurrence of ``using name''.
+Each of these statements is represented by a list of token-info.
+
+If any ``using namespace'' statements are found, they are merged with the class
+list to form a new class list that contains only those namespaces for which a
+``using namespace'' statement was found in the buffer.
+
+A separate list is kept of the ``using namespace'' statements that have no
+corresponding entries in the class list.  This is printed out later as a
+diagnostic message.
+
+The next step is to merge in the namespaces from the ``using name'' statements.
+Each ``using name'' statement contributes one namespace name and one class name.
+
+The original class list might have contained duplicate class name instances
+within a given namespace.  The merging in the of the ``using name'' statements
+may also have created duplicate class names within a namespace, so the next
+thing we do is remove any duplicate class names within a given namespace.  For
+example, if the input class list contained ``std . string set map'' and the
+buffer contains both ``using namespace std;'' and ``using std::string;'', the
+newly merged class list will contain the class name ``string'' twice under the
+namespace ``std''.
+
+Once we have the updated class list with duplicates removed, we create two new
+data structures.  One is a hash table in which the key is a class name and the
+value is the name of the namespace that qualifies that class name.  This will be
+used to determine if an unquoted token is an unqualified class name.  The other
+is an alist in which the key is a class name and the value is zero.  This will
+be used to count the replacement count for each class.
+
+In creating the hash table, we may discover that one class name maps to more
+than one namespace name.  If that happens there is an unresolvable ambiguity and
+the operation must cease.
+
+The next step is to remove from the token list (from the tokenized buffer), the
+lists of token-info that represent the ``using namespace'' and ``using name''
+statements that we are processing.  This prevents any subsequent scan from
+seeing them again.
+
+Next, we erase the ``using namespace'' statements and ``using name'' statements
+from the buffer.  We do this by replacing the statements with an equivalent
+amount of whitespace, which preserves the positions of all of the other tokens
+in the buffer.
+
+Some of the class names in the class list may also appear in \#include statements
+in the buffer.  For example, if we are trying to remove ``using namespace
+std;'', the buffer may well contain \#include $<$set$>$ or \#include $<$map$>$.  These
+instances of set and map are file names.  They are not class names that should
+have the ``std'' qualifier added to them.
+
+To handle this case we build another hash table.  This one contains class names
+as its key.  It is the intersection of class names and names found in include
+statements.  The value of each entry in the hash table is the list of spoints
+that are the start point for each name within its include statement.  It is a
+list of spoints because the same name may appear in multiple \#include
+statements.
+
+Then we go through the token list.  Whenever we encounter an unquoted token, we
+look it up in the hash table to see if this is a class name that we should
+qualify.  If the token exists in the hash table, we then look at its context to
+see if it really looks like a class name.
+
+IF the putative class name is preceded by any of ``::'', ``.'', or ``-$>$``, then
+we assume that it is either a qualified class name or a function name.  There
+are other various checks that can be found in the function
+shu-match-find-unqualified-class-names.  One of the checks is to see if it
+matches an instance contained in an \#include statement, which is done with the
+hash of include names described above.
+
+Each time we find an unqualified class name, we push its token-info onto a new
+list of class names that need to be qualified.  Note that we use push so the
+list is backwards with respect to buffer order.  The first item in the list is
+that last unqualified class name in the buffer.
+
+This means that we can use the list directly to add the namespace qualifier to
+each unqualified class name.  Since we are going through the buffer backwards,
+adding a qualifier to an unqualified class name does not change the position of
+any other unqualified class names in the buffer.
+
+While adding namespace qualifiers to all of the unqualified class names, we also
+accumulate a change count for each class name.
+
+When all of the unqualified class names have been qualified, we display the
+final change counts in a buffer and emit a message with the sum of all the
+change counts.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-make-class-hash-table-internal }}
+\usebox{\funcname}\emph{proc-classes}
+\index{shu-match-make-class-hash-table-internal} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+\emph{proc-classes} is the alist of all of the namespaces and classes that we will
+process, with the namespace name being the key and a list of class names within the
+namespace name as the value.
+
+This function builds a hash table that inverts the
+alist.  Each entry in the hash table has a class name as the key with the name
+of the enclosing namespace as the value.
+If two class names map to the same enclosing namespace name, then there is an
+unresolvable ambiguity that must terminate the operation.  If that is the case,
+diagnostic messages are placed into the log buffer and a nil value is returned.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-make-count-alist-from-hash }}
+\usebox{\funcname}\emph{class-ht}
+\index{shu-match-make-count-alist-from-hash} \hfill [Command]
+
+\begin{doc-string}
+Doc string.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-make-include-hash-table }}
+\usebox{\funcname}\emph{incl-list}
+\index{shu-match-make-include-hash-table} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+\emph{incl-list} is the list of token-info, each of which represents a name found in
+an include statement.  \emph{class-ht} is the hash table whose keys are the names of
+the classes that we will be searching for.
+
+For each name that appears in both \emph{incl-list} and \emph{class-ht}, create a new entry in
+a new hash table whose key is the name of the class that has been found in one
+or more include statements and whose value is a list of the spoints in which the
+class name has been found in one or more include statements.
+
+Whenever we find something that appears to be an unqualified class name, we can
+look in this hash table to see if this occurrence of the name is one that
+appears in an include statement and avoid adding a namespace qualifier if that
+is the case.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-merge-namespaces-with-class-list }}
+\usebox{\funcname}\emph{class-list}
+\index{shu-match-merge-namespaces-with-class-list} \hfill [Function]
+\hspace*{\wd\funcname}\emph{log-buf}
+\hspace*{\wd\funcname}\emph{top-name}
+
+\begin{doc-string}
+Merge the \emph{uns-list} with the \emph{class-list}.  Return a cons-cell pointing to two
+lists.  The first is the list of classes from the class list that have
+corresponding ``using namespace'' directives in the buffer.  The second is the
+lists of rlists that represent each using namespace directive that we will
+process.
+The updated class list will be used to identify class names to be qualified and
+the namespaces with which to qualify them..  The rlists representing the ``using
+namespace'' statements will be used to remove the ``using namespace'' statements
+from the buffer.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-qualify-class-names }}
+\usebox{\funcname}\emph{class-ht} \emph{count-alist}
+\index{shu-match-qualify-class-names} \hfill [Function]
+\hspace*{\wd\funcname}\emph{np-rlists}
+\hspace*{\wd\funcname}\emph{symbol-count} \emph{log-buf}
+
+\begin{doc-string}
+\emph{class-ht} is the hash table that maps a class name to its containing namespace
+name.  \emph{count-alist} is the alist that counts the number of times each class
+name has been qualified by its enclosing namespace.  \emph{clist} is the list of
+token-info, each of which represents an unqualified class name.  The list is in
+reverse order, which is important.  It means that one can add a qualification to
+one class name in the list without changing the location of any other class
+names, which are above the current one in the buffer.  \emph{np-rlists} is a list of
+rlists, each of which represents a ``using namespace'' statement for which
+there is no corresponding entry in the class list.  There are the ``using
+namespace'' statements that we will not be processing..
+
+This function goes to the position of each unqualified class name, finds its
+containing namespace in the hash table, and inserts the containing namespace
+followed by ``::'' in front of the unqualified class name.
+
+After it inserts the qualifying namespace, it increments in \emph{count-alist} the number
+of times that the class name was explicitly qualified.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-remove-proc-rlists }}
+\usebox{\funcname}\emph{token-list}
+\index{shu-match-remove-proc-rlists} \hfill [Function]
+\hspace*{\wd\funcname}\emph{log-buf}
+
+\begin{doc-string}
+\emph{token-list} is the original token list.  \emph{proc-rlists} is the set of rlists that
+represents the set of statements we will be processing.  This function removes
+from \emph{token-list}, all of the items that are contained in the rlists in
+\emph{proc-rlists}.  This is because we do not want a subsequent scan of the token list
+to include any of the items in the statements we are processing.
+
+The return value from this function is a cons cell whose car is the trimmed
+\emph{token-list} and whose cdr is the sorted \emph{proc-rlists}, which has been sorted by the
+start position of each rlist.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-rmv-might-be-include }}
+\usebox{\funcname}\emph{incl-ht} \emph{token}
+\index{shu-match-rmv-might-be-include} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+\emph{incl-ht} is a hash table whose key is a name that was found in an include
+statement and whose value is a list of all of the spoints of all of the
+occurrences of the name in include statements.  It is a list because the same
+name may be included multiple times.
+
+If the current token matches one of the names in \emph{incl-ht} and the spoint of the
+token is a member of the list of spoints in the entry in \emph{incl-ht}, then the
+current name is enclosed in an include statement and should not have a namespace
+qualifier added to it.
+
+This function returns true if the name is wrapped in an include statement.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-rmv-show-class-count }}
+\usebox{\funcname}\emph{count-alist}
+\index{shu-match-rmv-show-class-count} \hfill [Function]
+\hspace*{\wd\funcname}\emph{np-rlists} \emph{ns-lines}
+\hspace*{\wd\funcname}\emph{symbol-count}
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Put into the log buffer the count of class names that were qualified.
 \end{doc-string}
 
 \vspace{1em}
@@ -7758,6 +8592,35 @@ line that matches and put it in the buffer ``\emph\{**shu-vars**\}''.
 Set the common alias names for the functions in shu-match,
 These are generally the same as the function names with the leading
 shu- prefix removed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-using-namespace-string }}
+\usebox{\funcname}\emph{rlist} \textbf{\&optional}
+\index{shu-match-using-namespace-string} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Given an \emph{rlist} that contains a ``using namespace'' statement, return the string
+that is the fully qualified namespace name.  If the first part of the name is the
+optional \emph{top-name}, it is omitted from the final result.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-using-string }}
+\usebox{\funcname}\emph{rlist} \textbf{\&optional} \emph{top-name}
+\index{shu-match-using-string} \hfill [Function]
+
+\begin{doc-string}
+Given an \emph{rlist} that contains a ``using'' statement (as opposed to ``using
+namespace''), return two strings.  One is the class name.  The other is the
+fully qualified namespace name.  For example, if the statement is ``using
+std::string,'' the fully qualified namespace name is ``std'' and the class name
+is ``string''.
+The two strings are returned in a cons cell whose car is the namespace name and
+whose cdr is the class name.
 \end{doc-string}
 
 \eject
@@ -7798,6 +8661,23 @@ Kill all dired buffers and all buffers that contain a file and are unmodified.
 It is not uncommon to have dozens of buffers open that are unrelated to the current task
 and this is a convenience function for closing many buffers that do not need to
 be open.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{buffer-number-lines }}
+\usebox{\funcname}
+\index{buffer-number-lines} \hfill [Command]\\%
+ (Function: shu-buffer-number-lines)
+
+\begin{doc-string}
+Create a buffer whose name is derived from the file name of the current
+buffer but with the string ``-numbered'' added to the name.  Thus ``foo.cpp''
+would become ``foo-numbered.cpp'' Into this new buffer, copy the contents of the
+current file with each line prefixed with its line number.  This is designed for
+those times when you want to copy snippets of code with the line number in front
+of each line because you are commenting on code and want the person receiving
+the comments to sea the line number in front of each line.
 \end{doc-string}
 
 \vspace{1em}
@@ -8007,6 +8887,46 @@ inside of them without having to worry about which line contains the closing
 parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run \emph{shu-tighten-lisp} to put the
 parentheses back where they belong.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{md-name }}
+\usebox{\funcname}
+\index{md-name} \hfill [Command]\\%
+ (Function: shu-make-md-name-entry)
+
+\begin{doc-string}
+The latest item in the kill ring is assumed to be the text of a markdown
+section name.  This function creates from that section name, a markdown table of
+contents name that will identify the section in the table of contents.
+
+For example, if the kill ring contains ``\#\# This is the Overview'', the table
+of contents name created and inserted at point will be:
+
+\small{\begin{verbatim}
+        <a name=thisistheoverview></a>
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{md-toc }}
+\usebox{\funcname}
+\index{md-toc} \hfill [Command]\\%
+ (Function: shu-make-md-toc-entry)
+
+\begin{doc-string}
+The latest item in the kill ring is assumed to be the text of a markdown
+section name.  This function creates from that section name, a markdown table of
+contents entry and inserts that entry at point.
+
+For example, if the kill ring contains ``\#\# This is the Overview \#\#'', the table
+of contents entry created and inserted at point will be
+
+\small{\begin{verbatim}
+       * [This is the overview](#thisistheoverview)
+\end{verbatim}}
 \end{doc-string}
 
 \vspace{1em}
@@ -8240,6 +9160,23 @@ Kill all dired buffers and all buffers that contain a file and are unmodified.
 It is not uncommon to have dozens of buffers open that are unrelated to the current task
 and this is a convenience function for closing many buffers that do not need to
 be open.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-buffer-number-lines }}
+\usebox{\funcname}
+\index{shu-buffer-number-lines} \hfill [Command]\\%
+ (Alias: buffer-number-lines)
+
+\begin{doc-string}
+Create a buffer whose name is derived from the file name of the current
+buffer but with the string ``-numbered'' added to the name.  Thus ``foo.cpp''
+would become ``foo-numbered.cpp'' Into this new buffer, copy the contents of the
+current file with each line prefixed with its line number.  This is designed for
+those times when you want to copy snippets of code with the line number in front
+of each line because you are commenting on code and want the person receiving
+the comments to sea the line number in front of each line.
 \end{doc-string}
 
 \vspace{1em}
@@ -8639,6 +9576,92 @@ inside of them without having to worry about which line contains the closing
 parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run \emph{shu-tighten-lisp} to put the
 parentheses back where they belong.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-make-md-index-name }}
+\usebox{\funcname}\emph{name}
+\index{shu-make-md-index-name} \hfill [Function]
+
+\begin{doc-string}
+The input is a string that is assumed to be a markdown section heading from
+a markdown table of contents.
+The return value is an all lower case string with any whitespace characters
+removed.
+For example, if the input string is
+
+\small{\begin{verbatim}
+     This is an Overview
+\end{verbatim}}
+
+The returned string would be
+
+\small{\begin{verbatim}
+     thisisanoverview
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-make-md-name-entry }}
+\usebox{\funcname}
+\index{shu-make-md-name-entry} \hfill [Command]\\%
+ (Alias: md-name)
+
+\begin{doc-string}
+The latest item in the kill ring is assumed to be the text of a markdown
+section name.  This function creates from that section name, a markdown table of
+contents name that will identify the section in the table of contents.
+
+For example, if the kill ring contains ``\#\# This is the Overview'', the table
+of contents name created and inserted at point will be:
+
+\small{\begin{verbatim}
+        <a name=thisistheoverview></a>
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-make-md-section-name }}
+\usebox{\funcname}\emph{section-name}
+\index{shu-make-md-section-name} \hfill [Function]
+
+\begin{doc-string}
+The input is a string that is assumed to be a markdown section heading.  The
+return value is a string with any leading and trailing ``\#'' characters removed.
+For example, if the input string is
+
+\small{\begin{verbatim}
+     ## This is an Overview ##
+\end{verbatim}}
+
+The returned string would be
+
+\small{\begin{verbatim}
+     This is an Overview
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-make-md-toc-entry }}
+\usebox{\funcname}
+\index{shu-make-md-toc-entry} \hfill [Command]\\%
+ (Alias: md-toc)
+
+\begin{doc-string}
+The latest item in the kill ring is assumed to be the text of a markdown
+section name.  This function creates from that section name, a markdown table of
+contents entry and inserts that entry at point.
+
+For example, if the kill ring contains ``\#\# This is the Overview \#\#'', the table
+of contents entry created and inserted at point will be
+
+\small{\begin{verbatim}
+       * [This is the overview](#thisistheoverview)
+\end{verbatim}}
 \end{doc-string}
 
 \vspace{1em}
