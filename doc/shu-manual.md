@@ -3707,6 +3707,77 @@ here for more examples of the power of match lists.
 
 
 
+Here is an example taken from shu-match.el.  This match list is used to find
+all forms of the using statement, including
+
+```
+     using namespace name;
+     using namespace ::name;
+     using namespace name::name;
+     using name;
+     using name::name;
+```
+
+The actual data structures that define this match list are found in
+shu-match.el in the constant shu-cpp-match-using-list-single, which is used by
+the function shu-match-find-all-using-internal, which returns all statements
+in the above form with one pass through the token list.
+
+
+
+
+
+
+```
+                                                           using
+                                                             |
+                                                             |
+                                 +---------------------------+----------------------+
+                                 |                                                  |
+                                 |                                                  |
+                                 V                                                  |
+                             namespace                                              |
+                                 |                                                  |
+                                 |                                                  |
+       +-------------------------+-------------------------+                        |
+       |                         |                         |                        |
+       |                         |                         |                        |
+       V                         V                         V                        |
+     <name>                     ::                       <name>                     |
+       |                         |                         |                        |
+       |                         |                         |                        |
+       |                         V                         V                        |
+       |                       <name>           loop of :: followed by <name>       |
+       |                         |                         |                        |
+       |                         |                         |                        |
+       V                         V                         V                        |
+       ;                         ;                         ;                        |
+                                                                                    |
+                                                                                    |
+                                                                                    |
+                                                                                    |
+                                                                                    |
+                                                     +------------------------------+
+                                                     |
+                                                     |
+                                    +----------------+---------------+
+                                    |                                |
+                                    |                                |
+                                    V                                V
+                                  <name>                           <name>
+                                    |                                |
+                                    |                                |
+                                    |                                V
+                                    |                     loop of :: followed by <name>
+                                    |                                |
+                                    |                                |
+                                    V                                V
+                                    ;                                ;
+
+
+```
+
+
 ## List of functions and variables ##
 
 List of functions and variable definitions in this package.
@@ -8453,6 +8524,8 @@ within type.
 [Constant]
 
 Associate a number with each type of variable
+
+
 
 
 * [acgen](#acgen)
