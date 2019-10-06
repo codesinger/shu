@@ -1776,7 +1776,7 @@ variable shu-cpp-indent-length.
 The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace."
   (interactive "*sType name?: \nsFirst variable name?:  \nsSecond variable name?: ")
-  (shu-internal-double-citerate type-name var-name-1 var-name-2)
+  (shu-internal-double-citerate type-name type-name var-name-1 var-name-2)
     )
 
 
@@ -1809,7 +1809,73 @@ variable shu-cpp-indent-length.
 The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace."
   (interactive "*sType name?: \nsFirst variable name?:  \nsSecond variable name?: ")
-  (shu-internal-double-citerate type-name var-name-1 var-name-2 t)
+  (shu-internal-double-citerate type-name type-name var-name-1 var-name-2 t)
+    )
+
+
+
+
+;;
+;;  shu-titerate
+;;
+(defun shu-titerate (type-name-1 type-name-2 var-name-1 var-name-2)
+  "Insert the code to iterate through a pair of data structures of types
+TYPE-NAME-1 and TYPE-NAME-2, whose first instance is identified by VAR-NAME-1
+and whose second instance is identified by VAR-NAME-2.
+
+The first two prompt reads the two type names, third and fourth prompts read the
+two variable names.
+
+The generated code sequence is as follows:
+
+      for (std::pair<type-name-1::iterator,
+                     type-name-2::iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace."
+  (interactive "*sFirst type name?: \nsSecond type name?: \nsFirst variable name?:  \nsSecond variable name?: ")
+  (shu-internal-double-citerate type-name-1 type-name-2 var-name-1 var-name-2)
+    )
+
+
+
+
+;;
+;;  shu-tciterate
+;;
+(defun shu-tciterate (type-name-1 type-name-2 var-name-1 var-name-2)
+  "Insert the code to iterate through a pair of data structures of types
+TYPE-NAME-1 and TYPE-NAME-2, whose first instance is identified by VAR-NAME-1
+and whose second instance is identified by VAR-NAME-2.
+
+The first two prompt reads the two type names, third and fourth prompts read the
+two variable names.
+
+The generated code sequence is as follows:
+
+      for (std::pair<type-name-1::const_iterator,
+                     type-name-2::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace."
+  (interactive "*sFirst type name?: \nsSecond type name?: \nsFirst variable name?:  \nsSecond variable name?: ")
+  (shu-internal-double-citerate type-name-1 type-name-2 var-name-1 var-name-2 t)
     )
 
 
@@ -1817,15 +1883,15 @@ variable shu-cpp-std-namespace."
 ;;
 ;;  shu-internal-double-citerate
 ;;
-(defun shu-internal-double-citerate (type-name var-name-1 var-name-2 &optional const)
-  "Insert the code to iterate through a pair of data structures of type
-TYPE-NAME, whose first instance is identified by VAR-NAME-1 and whose second
-instance is identified by VAR-NAME-2.
+(defun shu-internal-double-citerate (type-name-1 type-name-2 var-name-1 var-name-2 &optional const)
+  "Insert the code to iterate through a pair of data structures of types
+TYPE-NAME-1 and TYPE-NAME-2, whose first instance is identified by VAR-NAME-1
+and whose second instance is identified by VAR-NAME-2.
 
 The generated code sequence is as follows:
 
-      for (std::pair<type-name::const_iterator,
-                     type-name::const_iterator>
+      for (std::pair<type-name-1::const_iterator,
+                     type-name-2::const_iterator>
                its(var-name-1.begin(), var-name-2.begin());
            its.first != var-name-1.end() && its.second != var-name-2.end();
            ++its.first, ++its.second)
@@ -1851,9 +1917,9 @@ If optional CONST is true, a const iterator is generated."
     (setq pad (make-string pad-count ? ))
     (insert
      (concat
-      "for (" pair-name "<" type-name "::" const-qual "iterator,\n"
+      "for (" pair-name "<" type-name-1 "::" const-qual "iterator,\n"
       pad
-      "               "  type-name "::" const-qual "iterator>\n"
+      "               "  type-name-2 "::" const-qual "iterator>\n"
       pad
       "         its(" var-name-1 ".begin(), " var-name-2 ".begin());\n"
       pad
@@ -2952,6 +3018,8 @@ shu- prefix removed."
   (defalias `cciterate `shu-cciterate)
   (defalias 'diterate 'shu-diterate)
   (defalias 'dciterate 'shu-dciterate)
+  (defalias 'titerate 'shu-titerate)
+  (defalias 'tciterate 'shu-tciterate)
   (defalias 'ck 'shu-cpp-check-streaming-op)
   (defalias 'set-default-namespace 'shu-set-default-namespace)
   (defalias 'qualify-class 'shu-interactive-qualify-class-name)

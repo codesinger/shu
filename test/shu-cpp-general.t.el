@@ -2297,4 +2297,184 @@ This is most likely the name of an include file and not the name of a class."
       (should (not ret-val)))
     ))
 
+
+
+
+;;
+;;  shu-test-shu-citerate
+;;
+(ert-deftest shu-test-shu-citerate ()
+  (let* ((type-name "std::vector<Thing *>")
+         (var-name "things")
+         (pad "    ")
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           "    for (std::vector<Thing *>::iterator it = things.begin();\n"
+           "         it != things.end(); ++it)\n"
+           "    {\n"
+           "    " ipad "\n"
+           "    }\n"
+           ))
+         (actual))
+    (with-temp-buffer
+      (insert pad)
+      (shu-citerate type-name var-name)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cciterate
+;;
+(ert-deftest shu-test-shu-cciterate ()
+  (let* ((type-name "std::vector<Thing *>")
+         (var-name "things")
+         (pad "    ")
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           "    for (std::vector<Thing *>::const_iterator it = things.begin();\n"
+           "         it != things.end(); ++it)\n"
+           "    {\n"
+           "    " ipad "\n"
+           "    }\n"
+           ))
+         (actual))
+    (with-temp-buffer
+      (insert pad)
+      (shu-cciterate type-name var-name)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-diterate
+;;
+(ert-deftest shu-test-shu-diterate ()
+  (let* ((type-name "std::vector<Thing *>")
+         (var-name-1 "lhs")
+         (var-name-2 "rhs")
+         (pad "    ")
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           "    for (std::pair<std::vector<Thing *>::iterator,\n"
+           "                   std::vector<Thing *>::iterator>\n"
+           "             its(lhs.begin(), rhs.begin());\n"
+           "         its.first != lhs.end() && its.second != rhs.end();\n"
+           "         ++its.first, ++its.second)\n"
+           "    {\n"
+           "    " ipad "\n"
+           "    }\n"
+           ))
+         (actual))
+    (with-temp-buffer
+      (insert pad)
+      (shu-diterate type-name var-name-1 var-name-2)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-dciterate
+;;
+(ert-deftest shu-test-shu-dciterate ()
+  (let* ((type-name "std::vector<Thing *>")
+         (var-name-1 "lhs")
+         (var-name-2 "rhs")
+         (pad "    ")
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           "    for (std::pair<std::vector<Thing *>::const_iterator,\n"
+           "                   std::vector<Thing *>::const_iterator>\n"
+           "             its(lhs.begin(), rhs.begin());\n"
+           "         its.first != lhs.end() && its.second != rhs.end();\n"
+           "         ++its.first, ++its.second)\n"
+           "    {\n"
+           "    " ipad "\n"
+           "    }\n"
+           ))
+         (actual))
+    (with-temp-buffer
+      (insert pad)
+      (shu-dciterate type-name var-name-1 var-name-2)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-titerate
+;;
+(ert-deftest shu-test-shu-titerate ()
+  (let* ((type-name-1 "std::set<Thing *>")
+         (type-name-2 "std::vector<ThingBob *>")
+         (var-name-1 "things")
+         (var-name-2 "bobs")
+         (pad "    ")
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           "    for (std::pair<std::set<Thing *>::iterator,\n"
+           "                   std::vector<ThingBob *>::iterator>\n"
+           "             its(things.begin(), bobs.begin());\n"
+           "         its.first != things.end() && its.second != bobs.end();\n"
+           "         ++its.first, ++its.second)\n"
+           "    {\n"
+           "    " ipad "\n"
+           "    }\n"
+           ))
+         (actual))
+    (with-temp-buffer
+      (insert pad)
+      (shu-titerate type-name-1 type-name-2 var-name-1 var-name-2)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-tciterate
+;;
+(ert-deftest shu-test-shu-tciterate ()
+  (let* ((type-name-1 "std::set<Thing *>")
+         (type-name-2 "std::vector<ThingBob *>")
+         (var-name-1 "things")
+         (var-name-2 "bobs")
+         (pad "    ")
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           "    for (std::pair<std::set<Thing *>::const_iterator,\n"
+           "                   std::vector<ThingBob *>::const_iterator>\n"
+           "             its(things.begin(), bobs.begin());\n"
+           "         its.first != things.end() && its.second != bobs.end();\n"
+           "         ++its.first, ++its.second)\n"
+           "    {\n"
+           "    " ipad "\n"
+           "    }\n"
+           ))
+         (actual))
+    (with-temp-buffer
+      (insert pad)
+      (shu-tciterate type-name-1 type-name-2 var-name-1 var-name-2)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
 ;;; shu-cpp-general.t.el ends here
