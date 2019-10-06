@@ -2363,9 +2363,10 @@ This is most likely the name of an include file and not the name of a class."
          (var-name-2 "rhs")
          (pad "    ")
          (ipad (make-string shu-cpp-indent-length ? ))
+         (pair-name (concat shu-cpp-std-namespace "::pair"))
          (expected
           (concat
-           "    for (std::pair<std::vector<Thing *>::iterator,\n"
+           "    for (" pair-name "<std::vector<Thing *>::iterator,\n"
            "                   std::vector<Thing *>::iterator>\n"
            "             its(lhs.begin(), rhs.begin());\n"
            "         its.first != lhs.end() && its.second != rhs.end();\n"
@@ -2394,9 +2395,10 @@ This is most likely the name of an include file and not the name of a class."
          (var-name-2 "rhs")
          (pad "    ")
          (ipad (make-string shu-cpp-indent-length ? ))
+         (pair-name (concat shu-cpp-std-namespace "::pair"))
          (expected
           (concat
-           "    for (std::pair<std::vector<Thing *>::const_iterator,\n"
+           "    for (" pair-name "<std::vector<Thing *>::const_iterator,\n"
            "                   std::vector<Thing *>::const_iterator>\n"
            "             its(lhs.begin(), rhs.begin());\n"
            "         its.first != lhs.end() && its.second != rhs.end();\n"
@@ -2426,9 +2428,10 @@ This is most likely the name of an include file and not the name of a class."
          (var-name-2 "bobs")
          (pad "    ")
          (ipad (make-string shu-cpp-indent-length ? ))
+         (pair-name (concat shu-cpp-std-namespace "::pair"))
          (expected
           (concat
-           "    for (std::pair<std::set<Thing *>::iterator,\n"
+           "    for (" pair-name "<std::set<Thing *>::iterator,\n"
            "                   std::vector<ThingBob *>::iterator>\n"
            "             its(things.begin(), bobs.begin());\n"
            "         its.first != things.end() && its.second != bobs.end();\n"
@@ -2458,9 +2461,10 @@ This is most likely the name of an include file and not the name of a class."
          (var-name-2 "bobs")
          (pad "    ")
          (ipad (make-string shu-cpp-indent-length ? ))
+         (pair-name (concat shu-cpp-std-namespace "::pair"))
          (expected
           (concat
-           "    for (std::pair<std::set<Thing *>::const_iterator,\n"
+           "    for (" pair-name "<std::set<Thing *>::const_iterator,\n"
            "                   std::vector<ThingBob *>::const_iterator>\n"
            "             its(things.begin(), bobs.begin());\n"
            "         its.first != things.end() && its.second != bobs.end();\n"
@@ -2476,5 +2480,9 @@ This is most likely the name of an include file and not the name of a class."
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     ))
+
+
+
+
 
 ;;; shu-cpp-general.t.el ends here
