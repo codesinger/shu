@@ -47,6 +47,7 @@
 
 
 
+
 # Overview #
 
 
@@ -65,7 +66,7 @@ Version 1.4 was merged with the master branch on 2 February 2019.
 
 Version 1.5 was merged with the master branch on 18 August 2019.
 
-This is Version 1.5.11 of the Shu elisp repository.
+This is Version 1.5.12 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -2449,6 +2450,70 @@ Set the local namespace for C++ classes.
 
 
 
+#### tciterate ####
+tciterate *type-name-1* *type-name-2* *var-name-1* *var-name-2*
+[Command]
+ (Function: shu-tciterate)
+
+Insert the code to iterate through a pair of data structures of types
+*type-name-1* and *type-name-2*, whose first instance is identified by *var-name-1*
+and whose second instance is identified by *var-name-2*.
+
+The first two prompt reads the two type names, third and fourth prompts read the
+two variable names.
+
+The generated code sequence is as follows:
+
+```
+      for (std::pair<type-name-1::const_iterator,
+                     type-name-2::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+```
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+
+
+
+#### titerate ####
+titerate *type-name-1* *type-name-2* *var-name-1* *var-name-2*
+[Command]
+ (Function: shu-titerate)
+
+Insert the code to iterate through a pair of data structures of types
+*type-name-1* and *type-name-2*, whose first instance is identified by *var-name-1*
+and whose second instance is identified by *var-name-2*.
+
+The first two prompt reads the two type names, third and fourth prompts read the
+two variable names.
+
+The generated code sequence is as follows:
+
+```
+      for (std::pair<type-name-1::iterator,
+                     type-name-2::iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+```
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+
+
+
 #### to-snake ####
 [Command]
  (Function: shu-to-snake)
@@ -3200,18 +3265,18 @@ Place a skeleton class definition in the current buffer at point.
 
 
 #### shu-internal-double-citerate ####
-shu-internal-double-citerate *type-name* *var-name-1* *var-name-2* **&optional** *const*
+shu-internal-double-citerate *type-name-1* *type-name-2* *var-name-1* *var-name-2* **&optional** *const*
 [Function]
 
-Insert the code to iterate through a pair of data structures of type
-*type-name*, whose first instance is identified by *var-name-1* and whose second
-instance is identified by *var-name-2*.
+Insert the code to iterate through a pair of data structures of types
+*type-name-1* and *type-name-2*, whose first instance is identified by *var-name-1*
+and whose second instance is identified by *var-name-2*.
 
 The generated code sequence is as follows:
 
 ```
-      for (std::pair<type-name::const_iterator,
-                     type-name::const_iterator>
+      for (std::pair<type-name-1::const_iterator,
+                     type-name-2::const_iterator>
                its(var-name-1.begin(), var-name-2.begin());
            its.first != var-name-1.end() && its.second != var-name-2.end();
            ++its.first, ++its.second)
@@ -3499,6 +3564,70 @@ that is in the current buffer.  This version of the function creates the name of
 the .h file from the name of the file in the current buffer.  This is in contrast
 with the function shu-hother which finds the corresponding .h file from the list
 of files in the current project.
+
+
+
+#### shu-tciterate ####
+shu-tciterate *type-name-1* *type-name-2* *var-name-1* *var-name-2*
+[Command]
+ (Alias: tciterate)
+
+Insert the code to iterate through a pair of data structures of types
+*type-name-1* and *type-name-2*, whose first instance is identified by *var-name-1*
+and whose second instance is identified by *var-name-2*.
+
+The first two prompt reads the two type names, third and fourth prompts read the
+two variable names.
+
+The generated code sequence is as follows:
+
+```
+      for (std::pair<type-name-1::const_iterator,
+                     type-name-2::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+```
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+
+
+
+#### shu-titerate ####
+shu-titerate *type-name-1* *type-name-2* *var-name-1* *var-name-2*
+[Command]
+ (Alias: titerate)
+
+Insert the code to iterate through a pair of data structures of types
+*type-name-1* and *type-name-2*, whose first instance is identified by *var-name-1*
+and whose second instance is identified by *var-name-2*.
+
+The first two prompt reads the two type names, third and fourth prompts read the
+two variable names.
+
+The generated code sequence is as follows:
+
+```
+      for (std::pair<type-name-1::iterator,
+                     type-name-2::iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() && its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+```
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
 
 
 
@@ -8526,8 +8655,6 @@ within type.
 Associate a number with each type of variable
 
 
-
-
 * [acgen](#acgen)
 * [add-prefix](#add-prefix)
 * [all-quit](#all-quit)
@@ -9212,9 +9339,11 @@ Associate a number with each type of variable
 * [shu-shift-single-line](#shu-shift-single-line)
 * [shu-simple-hother-file](#shu-simple-hother-file)
 * [shu-split-range-string](#shu-split-range-string)
+* [shu-tciterate](#shu-tciterate)
 * [shu-the-column-at](#shu-the-column-at)
 * [shu-the-line-at](#shu-the-line-at)
 * [shu-tighten-lisp](#shu-tighten-lisp)
+* [shu-titerate](#shu-titerate)
 * [shu-to-snake](#shu-to-snake)
 * [shu-tother](#shu-tother)
 * [shu-trim-file-hook](#shu-trim-file-hook)
@@ -9242,7 +9371,9 @@ Associate a number with each type of variable
 * [shu-xref-lisp-name](#shu-xref-lisp-name)
 * [shu-xref-type-compare](#shu-xref-type-compare)
 * [shu-xref-var-types](#shu-xref-var-types)
+* [tciterate](#tciterate)
 * [tighten-lisp](#tighten-lisp)
+* [titerate](#titerate)
 * [to-snake](#to-snake)
 * [tother](#tother)
 * [trim-trailing-blanks](#trim-trailing-blanks)
@@ -9273,5 +9404,5 @@ LocalWords:  ginclude newfile fixp hitRatio getdef mumbleSomethingOther cciterat
 LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de un
 LocalWords:  proc rlists ht unresolvable uns clist thisistheoverview NB spoints np
 LocalWords:  thisisanoverview incl ns dciterate diterate ThingLoader thingloader
-LocalWords:  myproject autocomplete Ctl
+LocalWords:  myproject autocomplete Ctl tciterate titerate
 -->

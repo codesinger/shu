@@ -42,7 +42,7 @@ Version 1.4 was merged with the master branch on 2 February 2019.
 
 Version 1.5 was merged with the master branch on 18 August 2019.
 
-This is Version 1.5.11 of the Shu elisp repository.
+This is Version 1.5.12 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -3015,6 +3015,76 @@ Set the local namespace for C++ classes.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{tciterate }}
+\usebox{\funcname}\emph{type-name-1} \emph{type-name-2} \emph{var-name-1}
+\index{tciterate} \hfill [Command]
+\hspace*{\wd\funcname}\\%
+ (Function: shu-tciterate)
+
+\begin{doc-string}
+Insert the code to iterate through a pair of data structures of types
+\emph{type-name-1} and \emph{type-name-2}, whose first instance is identified by \emph{var-name-1}
+and whose second instance is identified by \emph{var-name-2}.
+
+The first two prompt reads the two type names, third and fourth prompts read the
+two variable names.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (std::pair<type-name-1::const_iterator,
+                     type-name-2::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() \&\& its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{titerate }}
+\usebox{\funcname}\emph{type-name-1} \emph{type-name-2} \emph{var-name-1}
+\index{titerate} \hfill [Command]
+\hspace*{\wd\funcname}\\%
+ (Function: shu-titerate)
+
+\begin{doc-string}
+Insert the code to iterate through a pair of data structures of types
+\emph{type-name-1} and \emph{type-name-2}, whose first instance is identified by \emph{var-name-1}
+and whose second instance is identified by \emph{var-name-2}.
+
+The first two prompt reads the two type names, third and fourth prompts read the
+two variable names.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (std::pair<type-name-1::iterator,
+                     type-name-2::iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() \&\& its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{to-snake }}
 \usebox{\funcname}
 \index{to-snake} \hfill [Command]\\%
@@ -3916,20 +3986,21 @@ Place a skeleton class definition in the current buffer at point.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-internal-double-citerate }}
-\usebox{\funcname}\emph{type-name} \emph{var-name-1}
+\usebox{\funcname}\emph{type-name-1}
 \index{shu-internal-double-citerate} \hfill [Function]
-\hspace*{\wd\funcname}\textbf{\&optional} \emph{const}
+\hspace*{\wd\funcname}\emph{var-name-1} \emph{var-name-2}
+\hspace*{\wd\funcname}\emph{const}
 
 \begin{doc-string}
-Insert the code to iterate through a pair of data structures of type
-\emph{type-name}, whose first instance is identified by \emph{var-name-1} and whose second
-instance is identified by \emph{var-name-2}.
+Insert the code to iterate through a pair of data structures of types
+\emph{type-name-1} and \emph{type-name-2}, whose first instance is identified by \emph{var-name-1}
+and whose second instance is identified by \emph{var-name-2}.
 
 The generated code sequence is as follows:
 
 \small{\begin{verbatim}
-      for (std::pair<type-name::const_iterator,
-                     type-name::const_iterator>
+      for (std::pair<type-name-1::const_iterator,
+                     type-name-2::const_iterator>
                its(var-name-1.begin(), var-name-2.begin());
            its.first != var-name-1.end() \&\& its.second != var-name-2.end();
            ++its.first, ++its.second)
@@ -4293,6 +4364,76 @@ that is in the current buffer.  This version of the function creates the name of
 the .h file from the name of the file in the current buffer.  This is in contrast
 with the function shu-hother which finds the corresponding .h file from the list
 of files in the current project.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-tciterate }}
+\usebox{\funcname}\emph{type-name-1} \emph{type-name-2} \emph{var-name-1}
+\index{shu-tciterate} \hfill [Command]
+\hspace*{\wd\funcname}\\%
+ (Alias: tciterate)
+
+\begin{doc-string}
+Insert the code to iterate through a pair of data structures of types
+\emph{type-name-1} and \emph{type-name-2}, whose first instance is identified by \emph{var-name-1}
+and whose second instance is identified by \emph{var-name-2}.
+
+The first two prompt reads the two type names, third and fourth prompts read the
+two variable names.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (std::pair<type-name-1::const_iterator,
+                     type-name-2::const_iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() \&\& its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-titerate }}
+\usebox{\funcname}\emph{type-name-1} \emph{type-name-2} \emph{var-name-1}
+\index{shu-titerate} \hfill [Command]
+\hspace*{\wd\funcname}\\%
+ (Alias: titerate)
+
+\begin{doc-string}
+Insert the code to iterate through a pair of data structures of types
+\emph{type-name-1} and \emph{type-name-2}, whose first instance is identified by \emph{var-name-1}
+and whose second instance is identified by \emph{var-name-2}.
+
+The first two prompt reads the two type names, third and fourth prompts read the
+two variable names.
+
+The generated code sequence is as follows:
+
+\small{\begin{verbatim}
+      for (std::pair<type-name-1::iterator,
+                     type-name-2::iterator>
+               its(var-name-1.begin(), var-name-2.begin());
+           its.first != var-name-1.end() \&\& its.second != var-name-2.end();
+           ++its.first, ++its.second)
+      {
+      }
+\end{verbatim}}
+
+The number of spaces to indent inside the braces is defined in the custom
+variable shu-cpp-indent-length.
+
+The name of the namespace used for the standard library is defined in the custom
+variable shu-cpp-std-namespace.
 \end{doc-string}
 
 \vspace{1em}
