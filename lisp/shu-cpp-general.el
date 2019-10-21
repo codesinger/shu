@@ -2605,62 +2605,6 @@ count of class names changed."
 
 
 ;;
-;;  shu-dbx-summarize-malloc-old
-;;
-(defun shu-dbx-summarize-malloc-old ()
-  "Go through the output of a dbx malloc dump and generate a summary.  dbx is
-the AIX debugger.  It has a malloc command that goes through the heap and prints
-one line for every allocated buffer.  Here is a sample of some of its output:
-
-         ADDRESS         SIZE HEAP    ALLOCATOR
-      0x30635678          680    0     YORKTOWN
-      0x30635928          680    0     YORKTOWN
-      0x30635bd8          680    0    HEAPCACHE
-      0x30635bcf          680    0     YORKTOWN
-
-YORKTOWN is the name of the default allocator on AIX.  This function goes
-through the malloc output and gets the number and sizes of all buffers
-allocated.  This tells you how many buffers were allocated, the total number of
-bytes allocated, and the total number of buffers allocated by size.  The output
-is placed in a separate buffer called **shu-aix-malloc**."
-  (interactive)
-  (let ((gb (get-buffer-create "**shu-aix-malloc**"))
-;;;        (rs   "0x\\([a-f0-9]+\\)\\s-+\\([0-9]+\\)\\s-+[0-9]+\\s-+YORKTOWN")
-        (rs   "0x\\([a-f0-9]+\\)\\s-+\\([0-9]+\\)\\s-+[0-9]+\\s-+[A-Z]+")
-        (address 0)
-        (size 0)
-        (sizes)
-        (count 0)
-        (x)
-        (z)
-        (buf-count 0))
-    (goto-char (point-min))
-    (while (re-search-forward rs nil t)
-      (setq address (match-string 1))
-      (setq size (match-string 2))
-      (setq size (string-to-number size))
-      (if (not sizes)
-          (setq sizes (list (cons size 1)))
-        (setq x (assoc size sizes))
-        (if x
-            (progn
-              (setq count (cdr x))
-              (setq count (1+ count))
-              (setcdr x count))
-          (setq count 1)
-          (setq x (cons size count))
-          (setq sizes (cons x sizes)))))
-    (setq sizes (sort sizes (lambda(lhs rhs) (< (car lhs) (car rhs)))))
-    (shu-aix-show-malloc-list sizes gb)
-    (setq sizes (sort sizes (lambda(lhs rhs) (< (cdr lhs) (cdr rhs)))))
-    (shu-aix-show-malloc-list sizes gb)
-    (setq sizes (sort sizes (lambda(lhs rhs) (< (* (car lhs) (cdr lhs))(* (car rhs) (cdr rhs))))))
-    (shu-aix-show-malloc-list sizes gb)
-    ))
-
-
-
-;;
 ;;  shu-dbx-summarize-malloc
 ;;
 (defun shu-dbx-summarize-malloc ()
@@ -2681,7 +2625,7 @@ bytes allocated, and the total number of buffers allocated by size.  The output
 is placed in a separate buffer called **shu-aix-malloc**."
   (interactive)
   (let ((gb (get-buffer-create "**shu-aix-malloc**"))
-        (rs   "0x\\([a-f0-9]+\\)\\s-+\\([0-9]+\\)\\s-+[0-9]+\\s-+[A-Z]+")
+        (rs   "0x\\([a-f0-9]+\\)\\s-+\\([0-9]+\\)\\s-+[0-9]+\\s-+\\([A-Z]+\\)")
         (address 0)
         (size 0)
         (sizes)
@@ -2689,19 +2633,28 @@ is placed in a separate buffer called **shu-aix-malloc**."
         (x)
         (z)
         (buf-count 0)
+        (allocator)
         (line-no 0)
         (pline)
-        (ht (make-hash-table :test 'equal :size 50000)))
+        (ht (make-hash-table :test 'equal :size 5000))
+        (aht (make-hash-table :test 'equal :size 50)))
+    (setq debug-on-error t)
     (goto-char (point-min))
     (while (re-search-forward rs nil t)
       (setq address (match-string 1))
       (setq size (match-string 2))
+      (setq allocator (match-string 3))
       (setq size (string-to-number size))
       (setq count (gethash size ht))
       (if count
           (setq count (1+ count))
         (setq count 1))
       (puthash size count ht)
+      (setq count (gethash allocator aht))
+      (if count
+          (setq count (1+ count))
+        (setq count 1))
+      (puthash allocator count aht)
       (setq line-no (1+ line-no))
       (when (= 0 (% line-no 500000))
         (setq pline (shu-group-number line-no))
@@ -2715,6 +2668,49 @@ is placed in a separate buffer called **shu-aix-malloc**."
     (shu-aix-show-malloc-list sizes gb)
     (setq sizes (sort sizes (lambda(lhs rhs) (< (* (car lhs) (cdr lhs))(* (car rhs) (cdr rhs))))))
     (shu-aix-show-malloc-list sizes gb)
+    (setq sizes nil)
+    (maphash (lambda (allocator count)
+               (push (cons allocator count) sizes)) aht)
+    (setq sizes (sort sizes (lambda(lhs rhs) (string< (car lhs) (car rhs)))))
+    (shu-aix-show-allocators sizes gb)
+    ))
+
+
+
+;;
+;;  shu-aix-show-allocators
+;;
+(defun shu-aix-show-allocators (sizes gb)
+  "SIZES is an alist whose car is an allocator name and whose cdr is the number of
+allocations attributed to that allocator.  For each allocator, display in the
+buffer GB, the name of the allocator and its counts"
+  (let ((sz sizes)
+        (cp)
+        (max-len 0)
+        (allocator)
+        (count)
+        (pcount)
+        (pad)
+        (pad-len))
+    (princ "\n\nAllocation counts by allocator:\n" gb)
+    (while sz
+      (setq cp (car sz))
+      (setq allocator (car cp))
+      (when (> (length allocator) max-len)
+        (setq max-len (length allocator)))
+      (setq sz (cdr sz)))
+    (setq sz sizes)
+    (while sz
+      (setq cp (car sz))
+      (setq allocator (car cp))
+      (setq count (cdr cp))
+      (setq pad "")
+      (when (< (length allocator) max-len)
+        (setq pad-len (- max-len (length allocator)))
+        (setq pad (make-string pad-len ? )))
+      (setq pcount (shu-fixed-format-num count 14))
+      (princ (concat allocator ":" pad pcount "\n") gb)
+      (setq sz (cdr sz)))
     ))
 
 
