@@ -2624,7 +2624,8 @@ bytes allocated, and the total number of buffers allocated by size.  The output
 is placed in a separate buffer called **shu-aix-malloc**."
   (interactive)
   (let ((gb (get-buffer-create "**shu-aix-malloc**"))
-        (rs   "0x\\([a-f0-9]+\\)\\s-+\\([0-9]+\\)\\s-+[0-9]+\\s-+YORKTOWN")
+;;;        (rs   "0x\\([a-f0-9]+\\)\\s-+\\([0-9]+\\)\\s-+[0-9]+\\s-+YORKTOWN")
+        (rs   "0x\\([a-f0-9]+\\)\\s-+\\([0-9]+\\)\\s-+[0-9]+\\s-+[A-Z]+")
         (address 0)
         (size 0)
         (sizes)
