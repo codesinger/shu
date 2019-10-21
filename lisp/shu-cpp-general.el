@@ -2605,9 +2605,9 @@ count of class names changed."
 
 
 ;;
-;;  shu-dbx-summarize-malloc
+;;  shu-dbx-summarize-malloc-old
 ;;
-(defun shu-dbx-summarize-malloc ()
+(defun shu-dbx-summarize-malloc-old ()
   "Go through the output of a dbx malloc dump and generate a summary.  dbx is
 the AIX debugger.  It has a malloc command that goes through the heap and prints
 one line for every allocated buffer.  Here is a sample of some of its output:
@@ -2615,7 +2615,8 @@ one line for every allocated buffer.  Here is a sample of some of its output:
          ADDRESS         SIZE HEAP    ALLOCATOR
       0x30635678          680    0     YORKTOWN
       0x30635928          680    0     YORKTOWN
-      0x30635bd8          680    0     YORKTOWN
+      0x30635bd8          680    0    HEAPCACHE
+      0x30635bcf          680    0     YORKTOWN
 
 YORKTOWN is the name of the default allocator on AIX.  This function goes
 through the malloc output and gets the number and sizes of all buffers
@@ -2649,6 +2650,59 @@ is placed in a separate buffer called **shu-aix-malloc**."
           (setq count 1)
           (setq x (cons size count))
           (setq sizes (cons x sizes)))))
+    (setq sizes (sort sizes (lambda(lhs rhs) (< (car lhs) (car rhs)))))
+    (shu-aix-show-malloc-list sizes gb)
+    (setq sizes (sort sizes (lambda(lhs rhs) (< (cdr lhs) (cdr rhs)))))
+    (shu-aix-show-malloc-list sizes gb)
+    (setq sizes (sort sizes (lambda(lhs rhs) (< (* (car lhs) (cdr lhs))(* (car rhs) (cdr rhs))))))
+    (shu-aix-show-malloc-list sizes gb)
+    ))
+
+
+
+;;
+;;  shu-dbx-summarize-malloc
+;;
+(defun shu-dbx-summarize-malloc ()
+  "Go through the output of a dbx malloc dump and generate a summary.  dbx is
+the AIX debugger.  It has a malloc command that goes through the heap and prints
+one line for every allocated buffer.  Here is a sample of some of its output:
+
+         ADDRESS         SIZE HEAP    ALLOCATOR
+      0x30635678          680    0     YORKTOWN
+      0x30635928          680    0     YORKTOWN
+      0x30635bd8          680    0    HEAPCACHE
+      0x30635bcf          680    0     YORKTOWN
+
+YORKTOWN is the name of the default allocator on AIX.  This function goes
+through the malloc output and gets the number and sizes of all buffers
+allocated.  This tells you how many buffers were allocated, the total number of
+bytes allocated, and the total number of buffers allocated by size.  The output
+is placed in a separate buffer called **shu-aix-malloc**."
+  (interactive)
+  (let ((gb (get-buffer-create "**shu-aix-malloc**"))
+        (rs   "0x\\([a-f0-9]+\\)\\s-+\\([0-9]+\\)\\s-+[0-9]+\\s-+[A-Z]+")
+        (address 0)
+        (size 0)
+        (sizes)
+        (count 0)
+        (x)
+        (z)
+        (buf-count 0)
+        (ht (make-hash-table :test 'equal :size 50000)))
+    (goto-char (point-min))
+    (while (re-search-forward rs nil t)
+      (setq address (match-string 1))
+      (setq size (match-string 2))
+      (setq size (string-to-number size))
+      (setq count (gethash size ht))
+      (if count
+          (setq count (1+ count))
+        (setq count 1))
+      (puthash size count ht))
+    (setq sizes nil)
+    (maphash (lambda (size count)
+               (push (cons size count) sizes)) ht)
     (setq sizes (sort sizes (lambda(lhs rhs) (< (car lhs) (car rhs)))))
     (shu-aix-show-malloc-list sizes gb)
     (setq sizes (sort sizes (lambda(lhs rhs) (< (cdr lhs) (cdr rhs)))))
