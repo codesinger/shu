@@ -79,7 +79,21 @@
 ;;
 ;;(setq default-frame-alist '((width . 115) (height . 66) (tool-bar-lines . 0) (menu-bar-lines . 0)))
 ;;(setq default-frame-alist '((fullscreen . fullheight) (width . 115) (tool-bar-lines . 0) (menu-bar-lines . 0)))
-(setq default-frame-alist '((fullscreen . fullheight) (tool-bar-lines . 0) (menu-bar-lines . 0) (width . 115)))
+;;(setq default-frame-alist '((fullscreen . fullheight) (tool-bar-lines . 0) (menu-bar-lines . 0) (width . 115)))
+
+;;
+;;  shu-set-frame-size-full-height
+;;
+(defun shu-set-frame-size-full-height ()
+  "Set to full screen height"
+  (let* ((hpx (- (x-display-pixel-height) (* 2 (frame-char-height))))
+        (hpl (/ hpx (frame-char-height))))
+    (when (display-graphic-p)
+      (setq default-frame-alist '((tool-bar-lines . 0) (menu-bar-lines . 0) (width . 115)))
+      (add-to-list 'default-frame-alist (cons 'height hpl)))
+    ))
+(shu-set-frame-size-full-height)
+
 ;(set-frame-parameter nil 'width '115)
 ;;
 ;;'(fullscreen . fullheight))
