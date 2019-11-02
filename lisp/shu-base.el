@@ -264,30 +264,33 @@ is used in place of the position of point."
   (let ((xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
         ;; of a line or a quote not preceded by \
         (start-pos)
+        (spoint)
         (bol (line-beginning-position))
         (eol (line-end-position)))
     (save-excursion
       (when pos
         (goto-char pos))
+      (setq spoint (1+ (point)))
       ;; Search backwards for either a quote at beginning of line or a quote
       ;; not preceded by \.  If we find the quote not at the beginning of the
       ;; line, we are positioned one character before it.  If we find the quote
       ;; at the beginning of the line, we are sitting on top of it.
-      (if (looking-at "\"")
-          (setq start-pos nil)
-        (when (re-search-backward xquote bol t)
-          (when (not (and
-                      (= (point) bol)
-                      (looking-at "\"")))
-            (forward-char 1))
-          (forward-char 1)
-          (setq start-pos (point)) ;; This is where string text starts
-          (if (looking-at "\"")
-              (setq start-pos nil)
-            (when (not (re-search-forward xquote eol t))
-                (setq start-pos nil))))))
+      (when (re-search-backward xquote bol t)
+        (when (not (and
+                    (= (point) bol)
+                    (looking-at "\"")))
+          (forward-char 1))
+        (forward-char 1)
+        (setq start-pos (point)) ;; This is where string text starts
+        (if (not (re-search-forward xquote eol t))
+            (setq start-pos nil)
+          (when (or
+                 (= start-pos (point))
+                 (= spoint (point)))
+            (setq start-pos nil)))))
     start-pos
     ))
+
 
 
 ;;

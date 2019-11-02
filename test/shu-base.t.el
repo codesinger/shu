@@ -309,7 +309,152 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
       (insert "   \"A\"")
       (setq p1 (shu-point-in-string 5))
       (should (= 5 p1)))
-))
+    ))
+
+
+
+;;
+;;  shu-test-shu-point-in-string-5
+;;
+(ert-deftest shu-test-shu-point-in-string-5 ()
+  (let (
+        (data "   \"This is some: \\\"ABCDEF\\\"\"")
+        (actual)
+        (x)
+        (p)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (goto-char 16)
+      (goto-char (point-min))
+      (search-forward "DEF" nil t)
+      (forward-char 1)
+      (setq x (shu-point-in-string))
+      (should x)
+      (should (numberp x))
+      (should (= 5 x))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-shu-point-in-string-6
+;;
+(ert-deftest shu-test-shu-point-in-string-6 ()
+  (let (
+        (data "   \"This is some: \\\"ABCDEF\"")
+        (actual)
+        (x)
+        (p)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (goto-char 16)
+      (goto-char (point-min))
+      (search-forward "DEF" nil t)
+      (setq x (shu-point-in-string))
+      (should (not x))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-shu-point-in-string-7
+;;
+(ert-deftest shu-test-shu-point-in-string-7 ()
+  (let (
+        (data "   \"This is some: \\\"ABCDEF\\\"\"")
+        (actual)
+        (x)
+        (p)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (goto-char 5)
+      (goto-char (point-min))
+      (search-forward "DEF" nil t)
+      (forward-char 1)
+      (setq x (shu-point-in-string))
+      (should x)
+      (should (numberp x))
+      (should (= 5 x))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-shu-point-in-string-8
+;;
+(ert-deftest shu-test-shu-point-in-string-8 ()
+  (let (
+        (data "   \"This is some: \\\"ABCDEF\"")
+        (actual)
+        (x)
+        (p)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (goto-char 4)
+      (goto-char (point-min))
+      (search-forward "DEF" nil t)
+      (setq x (shu-point-in-string))
+      (should (not x))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-shu-point-in-string-9
+;;
+(ert-deftest shu-test-shu-point-in-string-9 ()
+  (let (
+        (data "   \"\\\"\"")
+        (actual)
+        (x)
+        (p)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (goto-char 5)
+      (goto-char (point-min))
+      (search-forward "DEF" nil t)
+      (setq x (shu-point-in-string))
+      (should (not x))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-shu-point-in-string-10
+;;
+(ert-deftest shu-test-shu-point-in-string-10 ()
+  (let (
+        (data "\"\\\"\"")
+        (actual)
+        (x)
+        (p)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (goto-char 2)
+      (goto-char (point-min))
+      (search-forward "DEF" nil t)
+      (setq x (shu-point-in-string))
+      (should (not x))
+      )
+    ))
+
 
 ;;
 ;;  shu-test-shu-remove-trailing-whitespace-1
