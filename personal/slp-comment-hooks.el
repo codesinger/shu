@@ -1,3 +1,37 @@
+;;; slp-comment-hooks.el --- Peersonal comment hooks for use with the Shu project
+;;
+;; Copyright (C) 2016 Stewart L. Palmer
+;;
+;; Package: shu-base
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;; This is free software: you can redistribute it and/or modify it
+;; under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This software is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; There is a copy of the Gnu General Public license in the file
+;; LICENSE in this repository.  You should also have received a copy
+;; of the GNU General Public License along with GNU Emacs.  If not,
+;; see <http://www.gnu.org/licenses/>.
+;;
+
+;;; Commentary:
+
+;; Collection of comment hooks for use with shu functions that generate
+;; C++ code.  This is part of my personal customization and is not part of
+;; the shu elisp project.
+
+;;; Code:
+
+
 
 ;;
 ;; slp-comment-hooks.el
@@ -67,3 +101,6 @@
   (add-hook 'shu-bde-gen-cfile-copyright-hook 'slp-gen-hcfile-copyright)
   (add-hook 'shu-bde-gen-tfile-copyright-hook 'slp-gen-tfile-copyright)
   )
+
+
+;;; slp-comment-hooks.el ends here
