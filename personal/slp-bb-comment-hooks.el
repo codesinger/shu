@@ -35,9 +35,8 @@
 ;;
 ;; slp-comment-hooks.el
 ;;
-;; Hooks that defie comment blocks in generated code
+;; Hooks that define comment blocks in generated code
 ;;
-;; Author: Stewart Palmer (spalmer62@bloomberg.net)
 
 
 (defun slp-bb-gen-file-id ()
