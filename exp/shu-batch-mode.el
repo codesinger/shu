@@ -44,6 +44,8 @@ searches in the local \"~/emacs\" directory."
         (conditional-libs
          (list
           "rmv-using.elc"
+          "slp-comment-hooks.elc"
+          "slp-bb-comment-hooks.elc"
           ))
         (ln)
         (no-error nil)

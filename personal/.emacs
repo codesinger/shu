@@ -126,6 +126,8 @@
 (load-file "~/emacs/shu-keyring.elc")
 (load-file "~/emacs/shu-capture-doc.elc")
 (load-file "~/emacs/shu-xref.elc")
+(load-file "~/emacs/slp-comment-hooks.elc")
+(load-file "~/emacs/slp-bb-comment-hooks.elc")
 (when (file-readable-p "~/emacs/trust.elc")
   (load-file "~/emacs/trust.elc"))
 
