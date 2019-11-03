@@ -1,0 +1,7 @@
+#!/bin/ksh
+export SHU_EMACS_LOAD_PATH=/Users/slp/emacs
+export SHU_CLASS_NAME=MumbleFrotzen
+export SHU_AUTHOR="Stewart Palmer (spalmer62@bloomberg.net)"
+export SHU_NAMESPACE="s_fxcomp"
+export SHU_FILE_PREFIX="s_fxcomp_"
+emacs -batch -l ${SHU_EMACS_LOAD_PATH}/shu-batch-mode.elc --eval "(shu-generate-component)"

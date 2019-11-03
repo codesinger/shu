@@ -1,2 +1,3 @@
 #!/bin/ksh -x
-emacs -batch -l shu-batch-mode.elc -f hello
+export SHU_EMACS_LOAD_PATH=/Users/slp/emacs
+emacs -batch -l ${SHU_EMACS_LOAD_PATH}/shu-batch-mode.elc -f hello

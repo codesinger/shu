@@ -30,7 +30,6 @@
 ;;; Code:
 
 
-
 ;;
 ;;  shu-batch-init
 ;;
@@ -69,6 +68,8 @@ searches in the local \"~/emacs\" directory."
     ))
 
 
+
+
 ;;
 ;;  hello
 ;;
@@ -80,6 +81,22 @@ searches in the local \"~/emacs\" directory."
     (shu-batch-init)
     (message "%s" "Hello")
     (message "%s" shu-cpp-operators-three)
+    ))
+
+
+;;
+;;  shu-generate-component
+;;
+(defun shu-generate-component ()
+  "Doc string."
+  (let (
+        (class-name (getenv "SHU_CLASS_NAME"))
+        (author (getenv "SHU_AUTHOR"))
+        (namespace (getenv "SHU_NAMESPACE"))
+        (file-prefix (getenv "SHU_FILE_PREFIX"))
+        )
+    (shu-batch-init)
+    (shu-internal-gen-bde-component class-name author namespace file-prefix)
     ))
 
 

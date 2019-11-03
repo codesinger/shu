@@ -33,6 +33,8 @@
 
 (provide 'shu-bde)
 (require 'shu-base)
+(require 'shu-cpp-misc)
+
 
 (defcustom shu-bde-gen-file-identifier-hook nil
   "Generate the text that constitutes a source file identifier, if any."
@@ -456,21 +458,31 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 
 
 
-
-
 ;;
 ;;  shu-gen-bde-component
 ;;
 (defun shu-gen-bde-component (class-name)
   "Generate the three files for a new component: .cpp, .h, and .t.cpp"
   (interactive "sClass name?: ")
+  (let ((author shu-cpp-author)
+         (namespace shu-cpp-default-namespace)
+         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix "")))
+    (shu-internal-gen-bde-component class-name author namespace file-prefix)
+    ))
+
+
+
+
+
+;;
+;;  shu-internal-gen-bde-component
+;;
+(defun shu-internal-gen-bde-component (class-name author namespace file-prefix)
+  "Generate the three files for a new component: .cpp, .h, and .t.cpp"
   (let* ((gitbuf (get-buffer-create "**git-add**"))
          (debug-on-error t)
-         (author shu-cpp-author)
-         (namespace shu-cpp-default-namespace)
          (base-class-name (downcase class-name))
 ;;         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix (concat namespace "_")))
-         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix ""))
          (base-name (concat file-prefix base-class-name))
          (hfile-name (concat base-name ".h"))
          (cfile-name (concat base-name ".cpp"))
@@ -639,7 +651,8 @@ the buffer GITBUF."
          (outer-namespace)
          (outer-close "}  // close enterprise namespace\n")
          (left-include-delim "\"")
-         (right-include-delim "\""))
+         (right-include-delim "\"")
+         (cgen-point))
     (when shu-cpp-include-user-brackets
       (setq left-include-delim "<")
       (setq right-include-delim ">"))
@@ -672,7 +685,13 @@ the buffer GITBUF."
       outer-namespace
       inner-namespace
       "\n"
-      "\n"
+      "\n"))
+    (save-excursion
+      (beginning-of-line)
+      (setq cgen-point (point))
+)
+    (insert
+     (concat
       "\n"
       "\n"
       inner-close-namespace
@@ -683,6 +702,8 @@ the buffer GITBUF."
      (concat
       (run-hooks 'shu-bde-gen-cfile-copyright-hook)
       "// ----------------------------- END-OF-FILE ---------------------------------\n"))
+    (goto-char cgen-point)
+    (shu-cpp-acgen class-name)
     ))
 
 

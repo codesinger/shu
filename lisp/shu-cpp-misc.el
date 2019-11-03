@@ -400,7 +400,7 @@
     (when use-allocator
       (insert
        (concat
-        ipad "bslma::Allocator                 *d_allocator;\n"
+        ipad "bslma::Allocator                 *" shu-cpp-default-allocator-name ";\n"
         )))
     (insert
      (concat
@@ -454,6 +454,7 @@
        (concat
         "\n"
         ipad "// NOT IMPLEMENTED\n"
+        ipad "\n"
         ipad "/*!\n"
         ipad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
         ipad " *\n"
@@ -485,7 +486,11 @@
       " */\n"
       std-name "::ostream &operator<<(\n"
       "    " std-name "::ostream" ostream-pad "  &os,\n"
-      "    const " class-name ostream-class-pad "  &cn);\n"))
+      "    const " class-name ostream-class-pad "  &cn);\n"
+      "\n"
+      "\n"
+      ))
+    (shu-cpp-hcgen class-name)
     (when use-allocator
       (save-excursion
         (save-restriction
@@ -553,7 +558,7 @@
            (concat
             "bslma::Allocator    *allocator)\n"
             ":\n"
-            "d_allocator(bslma::Default::allocator(allocator))\n")))
+            shu-cpp-default-allocator-name "(bslma::Default::allocator(allocator))\n")))
       (insert ")\n"))
     (setq start-pos (save-excursion (forward-line -1) (end-of-line) (forward-char -1) (point)))
     (insert
@@ -700,7 +705,7 @@
     (insert (concat
              "    bslma::Allocator    *allocator)\n"
              ":\n"
-             "d_allocator(bslma::Default::allocator(allocator))\n"))
+             shu-cpp-default-allocator-name "(bslma::Default::allocator(allocator))\n"))
     (insert
      (concat
       "{\n"))
