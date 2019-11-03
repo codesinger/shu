@@ -190,6 +190,70 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 ;;
+;;  shu-test-shu-delete-last-char-if-1
+;;
+(ert-deftest shu-test-shu-delete-last-char-if-1 ()
+  (let* ((xx "abcdef")
+         (data (concat xx "/"))
+         (expected xx)
+         (actual))
+    (setq actual (shu-delete-last-char-if data "/"))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-delete-last-char-if-2
+;;
+(ert-deftest shu-test-shu-delete-last-char-if-2 ()
+  (let* ((xx "abcdef")
+         (data xx)
+         (expected xx)
+         (actual))
+    (setq actual (shu-delete-last-char-if data "/"))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-delete-last-char-if-3
+;;
+(ert-deftest shu-test-shu-delete-last-char-if-3 ()
+  (let* ((xx "")
+         (data (concat xx "/"))
+         (expected xx)
+         (actual))
+    (setq actual (shu-delete-last-char-if data "/"))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-delete-last-char-if-4
+;;
+(ert-deftest shu-test-shu-delete-last-char-if-4 ()
+  (let* ((xx "")
+         (data xx)
+         (expected xx)
+         (actual))
+    (setq actual (shu-delete-last-char-if data "/"))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-point-in-string-1
 ;;
 (ert-deftest shu-test-shu-point-in-string-1 ()

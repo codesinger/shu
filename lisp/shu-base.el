@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.5.16
+;; Version: 1.5.17
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.5.16"
+(defconst shu-version "1.5.17"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Aug 18"
@@ -228,6 +228,7 @@ a comment.")
 order in which they should be loaded.")
 
 
+
 ;;
 ;;  shu-the-line-at
 ;;
@@ -266,6 +267,24 @@ do a paste."
   (with-temp-buffer
     (insert string)
     (kill-ring-save (point-min) (point-max))))
+
+
+
+;;
+;;  shu-delete-last-char-if
+;;
+(defun shu-delete-last-char-if (input test-char)
+  "Return the string INPUT with the last character removed if the last character
+is equal to the string TEST-CHAR.  If the last character is not equal to the
+string TEST-CHAR, return the input string unmodified."
+  (let ((last-char)
+        (new-string input))
+    (when (> (length input) 0)
+      (setq last-char (substring input (1- (length input))))
+      (when (string= last-char test-char)
+        (setq new-string (substring input 0 (1- (length input))))))
+    new-string
+    ))
 
 
 

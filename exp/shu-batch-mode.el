@@ -31,6 +31,51 @@
 
 
 ;;
+;;  try
+;;
+(defun try ()
+  "Doc string."
+  (interactive)
+  (let (
+        (xx "abcdef/")
+        (new-string)
+        )
+    (setq new-string (shu-delete-last-char-if xx "/"))
+    (message "'%s'" new-string)
+    ))
+
+
+
+;;
+;;  shu-load-library-files
+;;
+(defun shu-load-library-files (path-to-libs)
+  "Load all of the library files listed in SHU-LIBRARY-FILES using the path
+PATH-TO-LIBS.  Return true if all of the files were successfully loaded."
+  (let (
+        (libs shu-library-files)
+        (lib)
+        (ln)
+        (no-error nil)
+        (no-message t)
+        (no-suffix t)
+        (loaded)
+        (did-load t)
+        )
+    (while libs
+      (setq lib (car libs))
+      (setq ln (concat path-to-libs "/" lib))
+      (setq loaded (load ln no-error no-message no-suffix))
+      (when (not loaded)
+        (setq did-load nil)
+        )
+      (setq libs (cdr libs))
+      )
+    did-load
+    ))
+
+
+;;
 ;;  shu-batch-init
 ;;
 (defun shu-batch-init ()
