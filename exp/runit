@@ -1,0 +1,2 @@
+#!/bin/ksh -x
+emacs -batch -l shu-batch-mode.elc -f hello
