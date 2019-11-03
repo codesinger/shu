@@ -112,6 +112,7 @@ files."
       (message "%s" "SHU_GLOBAL_NAMESPACE is not set."))
     (when (not file-prefix)
       (setq file-prefix (concat namespace "_")))
+    (setq shu-cpp-default-global-namespace global-namespace)
     (shu-internal-gen-bde-component class-name author namespace file-prefix)
     ))
 
