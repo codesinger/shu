@@ -230,6 +230,62 @@ order in which they should be loaded.")
 
 
 ;;
+;;  shu-load-library-files
+;;
+(defun shu-load-library-files (path-to-libs)
+  "Load all of the library files listed in SHU-LIBRARY-FILES using the path
+PATH-TO-LIBS.  Return true if all of the files were successfully loaded."
+  (let ((libs shu-library-files)
+        (lib-path (shu-delete-last-char-if path-to-libs "/"))
+        (lib)
+        (ln)
+        (no-error nil)
+        (no-message t)
+        (no-suffix t)
+        (loaded)
+        (did-load t))
+    (while libs
+      (setq lib (car libs))
+      (setq ln (concat lib-path "/" lib))
+      (setq loaded (load ln no-error no-message no-suffix))
+      (when (not loaded)
+        (setq did-load nil))
+      (setq libs (cdr libs)))
+    did-load
+    ))
+
+
+
+;;
+;;  shu-conditional-load-library-files
+;;
+(defun shu-conditional-load-library-files (path-to-libs libs)
+  "Conditionally Load all of the library files listed in in the list LIBS using
+the path PATH-TO-LIBS.  A file in the list is loaded only if FILE-READABLE-P
+returns true for that file.  Return true if all readable files were loaded.
+Return false if any readable file failed to load."
+  (let ((lib-path (shu-delete-last-char-if path-to-libs "/"))
+        (lib)
+        (ln)
+        (no-error nil)
+        (no-message t)
+        (no-suffix t)
+        (loaded)
+        (did-load t))
+    (while libs
+      (setq lib (car libs))
+      (setq ln (concat lib-path "/" lib))
+      (when (file-readable-p ln)
+        (setq loaded (load ln no-error no-message no-suffix))
+        (when (not loaded)
+          (setq did-load nil)))
+      (setq libs (cdr libs)))
+    did-load
+    ))
+
+
+
+;;
 ;;  shu-the-line-at
 ;;
 (defun shu-the-line-at (arg)

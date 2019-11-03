@@ -30,50 +30,6 @@
 ;;; Code:
 
 
-;;
-;;  try
-;;
-(defun try ()
-  "Doc string."
-  (interactive)
-  (let (
-        (xx "abcdef/")
-        (new-string)
-        )
-    (setq new-string (shu-delete-last-char-if xx "/"))
-    (message "'%s'" new-string)
-    ))
-
-
-
-;;
-;;  shu-load-library-files
-;;
-(defun shu-load-library-files (path-to-libs)
-  "Load all of the library files listed in SHU-LIBRARY-FILES using the path
-PATH-TO-LIBS.  Return true if all of the files were successfully loaded."
-  (let (
-        (libs shu-library-files)
-        (lib)
-        (ln)
-        (no-error nil)
-        (no-message t)
-        (no-suffix t)
-        (loaded)
-        (did-load t)
-        )
-    (while libs
-      (setq lib (car libs))
-      (setq ln (concat path-to-libs "/" lib))
-      (setq loaded (load ln no-error no-message no-suffix))
-      (when (not loaded)
-        (setq did-load nil)
-        )
-      (setq libs (cdr libs))
-      )
-    did-load
-    ))
-
 
 ;;
 ;;  shu-batch-init
@@ -85,49 +41,28 @@ functions in the path specified by the environment variable
 \"SHU_EMACS_LOAD_PATH\".  If that environment variable does not exist, then it
 searches in the local \"~/emacs\" directory."
   (let ((path-to-libs (getenv "SHU_EMACS_LOAD_PATH"))
-        (shu-libs
-         (list
-          "shu-base.elc"
-          ))
-        (shu-conditional-libs
+        (base-lib "shu-base.elc")
+        (conditional-libs
          (list
           "rmv-using.elc"
           ))
-        (libs)
-        (lib)
         (ln)
         (no-error nil)
         (no-message t)
         (no-suffix t)
         (loaded)
+        (did-load)
         (load-errors))
     (when (not path-to-libs)
       (setq path-to-libs "~/emacs"))
-    (setq libs shu-libs)
-    (while libs
-      (setq lib (car libs))
-      (setq ln (concat path-to-libs "/" lib))
-      (setq loaded (load ln no-error no-message no-suffix))
-      (when (not loaded)
-        (setq load-errors t))
-      (setq libs (cdr libs)))
-    (setq libs shu-library-files)
-    (while libs
-      (setq lib (car libs))
-      (setq ln (concat path-to-libs "/" lib))
-      (setq loaded (load ln no-error no-message no-suffix))
-      (when (not loaded)
-        (setq load-errors t))
-      (setq libs (cdr libs)))
-    (setq libs shu-conditional-libs)
-    (while libs
-      (setq lib (car libs))
-      (setq ln (concat path-to-libs "/" lib))
-      (when (file-readable-p ln)
-        (setq loaded (load ln no-error no-message no-suffix))
-        (when (not loaded)
-          (setq load-errors t)))
-      (setq libs (cdr libs)))
+    (setq ln (concat path-to-libs "/" base-lib))
+    (setq loaded (load ln no-error no-message no-suffix))
+    (if (not loaded)
+        (setq load-errors t)
+      (setq did-load (shu-load-library-files path-to-libs))
+      (setq load-errors (not did-load))
+      (setq did-load (shu-conditional-load-library-files path-to-libs conditional-libs))
+      (setq load-errors (not did-load)))
     (when load-errors
       (message "%s" "Quitting due to load errors")
       (kill-emacs))
