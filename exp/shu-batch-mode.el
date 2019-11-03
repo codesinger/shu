@@ -98,6 +98,7 @@ searches in the local \"~/emacs\" directory."
         (file-prefix (getenv "SHU_FILE_PREFIX"))
         )
     (shu-batch-init)
+    (slp-bb-set-comment-hooks)
     (shu-internal-gen-bde-component class-name author namespace file-prefix)
     ))
 
