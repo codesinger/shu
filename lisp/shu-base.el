@@ -210,6 +210,24 @@ a comment.")
 (defconst shu-global-buffer-name "**shu-global-operations**"
   "The name of the buffer into which shu-global-operation places its output.")
 
+(defconst shu-library-files
+  (list
+   "shu-misc.elc"
+   "shu-cpp-token.elc"
+   "shu-cpp-general.elc"
+   "shu-cpp-misc.elc"
+   "shu-cpp-match.elc"
+   "shu-match.elc"
+   "shu-bde.elc"
+   "shu-bde-cpp.elc"
+   "shu-cpp-project.elc"
+   "shu-nvplist.elc"
+   "slp-comment-hooks.elc"
+   "slp-bb-comment-hooks.elc")
+  "A list of all of the library files that comprise the Shu elisp package in the
+order in which they should be loaded.")
+
+
 ;;
 ;;  shu-the-line-at
 ;;

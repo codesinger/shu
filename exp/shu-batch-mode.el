@@ -39,23 +39,10 @@ Shu elisp functions to be used in batch mode.  This function searches for the
 functions in the path specified by the environment variable
 \"SHU_EMACS_LOAD_PATH\".  If that environment variable does not exist, then it
 searches in the local \"~/emacs\" directory."
-  (let (
-        (path-to-libs (getenv "SHU_EMACS_LOAD_PATH"))
+  (let ((path-to-libs (getenv "SHU_EMACS_LOAD_PATH"))
         (shu-libs
          (list
           "shu-base.elc"
-          "shu-misc.elc"
-          "shu-cpp-token.elc"
-          "shu-cpp-general.elc"
-          "shu-cpp-misc.elc"
-          "shu-cpp-match.elc"
-          "shu-match.elc"
-          "shu-bde.elc"
-          "shu-bde-cpp.elc"
-          "shu-cpp-project.elc"
-          "shu-nvplist.elc"
-          "slp-comment-hooks.elc"
-          "slp-bb-comment-hooks.elc"
           ))
         (shu-conditional-libs
          (list
@@ -68,21 +55,25 @@ searches in the local \"~/emacs\" directory."
         (no-message t)
         (no-suffix t)
         (loaded)
-        (load-errors)
-        )
+        (load-errors))
     (when (not path-to-libs)
-      (setq path-to-libs "~/emacs")
-      )
+      (setq path-to-libs "~/emacs"))
     (setq libs shu-libs)
     (while libs
       (setq lib (car libs))
       (setq ln (concat path-to-libs "/" lib))
       (setq loaded (load ln no-error no-message no-suffix))
       (when (not loaded)
-        (setq load-errors t)
-        )
-      (setq libs (cdr libs))
-      )
+        (setq load-errors t))
+      (setq libs (cdr libs)))
+    (setq libs shu-library-files)
+    (while libs
+      (setq lib (car libs))
+      (setq ln (concat path-to-libs "/" lib))
+      (setq loaded (load ln no-error no-message no-suffix))
+      (when (not loaded)
+        (setq load-errors t))
+      (setq libs (cdr libs)))
     (setq libs shu-conditional-libs)
     (while libs
       (setq lib (car libs))
@@ -90,15 +81,11 @@ searches in the local \"~/emacs\" directory."
       (when (file-readable-p ln)
         (setq loaded (load ln no-error no-message no-suffix))
         (when (not loaded)
-          (setq load-errors t)
-          )
-        )
-      (setq libs (cdr libs))
-      )
+          (setq load-errors t)))
+      (setq libs (cdr libs)))
     (when load-errors
       (message "%s" "Quitting due to load errors")
-      (kill-emacs)
-      )
+      (kill-emacs))
     ))
 
 
@@ -112,6 +99,7 @@ searches in the local \"~/emacs\" directory."
         )
     (shu-batch-init)
     (message "%s" "Hello")
+    (message "%s" shu-cpp-operators-three)
     ))
 
 
