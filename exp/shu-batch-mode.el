@@ -34,7 +34,11 @@
 ;;  shu-batch-init
 ;;
 (defun shu-batch-init ()
-  "Doc string."
+  "Load all of the .elc files from the Shu elisp package.  This is used to allow
+Shu elisp functions to be used in batch mode.  This function searches for the
+functions in the path specified by the environment variable
+\"SHU_EMACS_LOAD_PATH\".  If that environment variable does not exist, then it
+searches in the local \"~/emacs\" directory."
   (let (
         (path-to-libs (getenv "SHU_EMACS_LOAD_PATH"))
         (shu-libs
@@ -60,6 +64,11 @@
         (libs)
         (lib)
         (ln)
+        (no-error nil)
+        (no-message t)
+        (no-suffix t)
+        (loaded)
+        (load-errors)
         )
     (when (not path-to-libs)
       (setq path-to-libs "~/emacs")
@@ -68,7 +77,10 @@
     (while libs
       (setq lib (car libs))
       (setq ln (concat path-to-libs "/" lib))
-      (load-file ln)
+      (setq loaded (load ln no-error no-message no-suffix))
+      (when (not loaded)
+        (setq load-errors t)
+        )
       (setq libs (cdr libs))
       )
     (setq libs shu-conditional-libs)
@@ -76,9 +88,16 @@
       (setq lib (car libs))
       (setq ln (concat path-to-libs "/" lib))
       (when (file-readable-p ln)
-        (load-file ln)
+        (setq loaded (load ln no-error no-message no-suffix))
+        (when (not loaded)
+          (setq load-errors t)
+          )
         )
       (setq libs (cdr libs))
+      )
+    (when load-errors
+      (message "%s" "Quitting due to load errors")
+      (kill-emacs)
       )
     ))
 
