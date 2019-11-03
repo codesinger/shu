@@ -565,6 +565,7 @@ function and its associated doc string and convert it to LaTex.")
   (list
    "shu-overview.el"
    "shu-base.el"
+   "shu-batch-mode.el"
    "shu-bde-cpp.el"
    "shu-bde.el"
    "shu-capture-doc.el"

@@ -25,6 +25,11 @@
 ;;; Commentary:
 
 ;; A startup script for running the Shu elisp package in batch mode
+;;
+;; The function shu-batch-init loads all of the Shu elisp libraries.
+;; Other functions in this file invoke various fuctions in the Shu
+;; elisp libraries and are set up such that they can be invoked from
+;; the --eval comment line option of emacs running in batch.
 
 
 ;;; Code:
@@ -45,8 +50,7 @@ searches in the local \"~/emacs\" directory."
          (list
           "rmv-using.elc"
           "slp-comment-hooks.elc"
-          "slp-bb-comment-hooks.elc"
-          ))
+          "slp-bb-comment-hooks.elc"))
         (ln)
         (no-error nil)
         (no-message t)
@@ -73,30 +77,28 @@ searches in the local \"~/emacs\" directory."
 
 
 ;;
-;;  hello
+;;  shu-batch-hello
 ;;
-(defun hello ()
-  "Doc string."
+(defun shu-batch-hello ()
+  "A test function for batch mode."
   (interactive)
-  (let (
-        )
     (shu-batch-init)
     (message "%s" "Hello")
     (message "%s" shu-cpp-operators-three)
-    ))
+    )
 
 
 ;;
 ;;  shu-generate-component
 ;;
 (defun shu-generate-component ()
-  "Doc string."
-  (let (
-        (class-name (getenv "SHU_CLASS_NAME"))
+  "Fetch the arguments from enf=vironment variables and then call
+SHU-INTERNAL-GEN-BDE-COMPONENT to generate a set of three BDE component
+files."
+  (let ((class-name (getenv "SHU_CLASS_NAME"))
         (author (getenv "SHU_AUTHOR"))
         (namespace (getenv "SHU_NAMESPACE"))
-        (file-prefix (getenv "SHU_FILE_PREFIX"))
-        )
+        (file-prefix (getenv "SHU_FILE_PREFIX")))
     (shu-batch-init)
     (slp-bb-set-comment-hooks)
     (shu-internal-gen-bde-component class-name author namespace file-prefix)
