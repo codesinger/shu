@@ -54,17 +54,9 @@
   (insert
    (concat
       "\n"
-      "#ifndef INCLUDED_BSLALG_TYPETRAITS\n"
-      "#include <bslalg_typetraits.h>\n"
-      "#endif\n"
-      "\n"
-      "#ifndef INCLUDED_BSL_IOSTREAM\n"
       "#include <bsl_iostream.h>\n"
-      "#endif\n"
-      "\n"
-      "#ifndef INCLUDED_BSLMA_ALLOCATOR\n"
       "#include <bslma_allocator.h>\n"
-      "#endif\n"
+      "#include <bslmf_nestedtraitdeclaration.h>\n"
       ))
   )
 
