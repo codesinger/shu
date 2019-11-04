@@ -1298,7 +1298,9 @@ only modified buffers that hold the contents of a file."
   "Kill all dired buffers and all buffers that contain a file and are unmodified.
 It is not uncommon to have dozens of buffers open that are unrelated to the current task
 and this is a convenience function for closing many buffers that do not need to
-be open."
+be open.
+If the function SHU-CLEAR-C-PROJECT is defined, it is called to clear the current
+project."
   (interactive)
   (let ((gb (get-buffer-create "*shu-killed-buffers*"))
         (buf-list (buffer-list))
@@ -1323,6 +1325,8 @@ be open."
       (princ (concat "Killing " buf-name " (" mode-name ")\n") gb)
       (kill-buffer buf)
       (setq mod-list (cdr mod-list)))
+    (when (fboundp 'shu-clear-c-project)
+      (shu-clear-c-project))
     ))
 
 
