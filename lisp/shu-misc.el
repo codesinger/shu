@@ -1054,6 +1054,20 @@ return git error message."
 
 
 
+
+;;
+;;  shu-git-insert-origin-branch
+;;
+(defun shu-git-insert-origin-branch ()
+  "Insert at point the name of the current branch in a git repository preceded by the
+word \"origin\"..  This can be used as part of git push or pull."
+  (interactive)
+  (let ((branch (shu-git-find-branch)))
+    (insert (concat "origin " branch))
+    ))
+
+
+
 ;;
 ;;  shu-conditional-find-file
 ;;
@@ -1481,6 +1495,7 @@ shu- prefix removed."
   (defalias 'diff-commits 'shu-git-diff-commits)
   (defalias 'show-brach 'shu-git-show-branch)
   (defalias 'insb 'shu-git-insert-branch)
+  (defalias 'inso 'shu-git-insert-origin-branch)
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
   (defalias 'number-lines 'shu-number-lines)
