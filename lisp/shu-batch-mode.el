@@ -71,6 +71,7 @@ searches in the local \"~/emacs\" directory."
     (when load-errors
       (message "%s" "Quitting due to load errors")
       (kill-emacs))
+    (message "emacs: %s, Shu: %s" emacs-version shu-version)
     ))
 
 
