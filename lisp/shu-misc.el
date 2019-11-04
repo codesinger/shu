@@ -1006,12 +1006,50 @@ return git error message."
 ;;
 (defun shu-git-find-branch ()
   "Return the name of the current branch in a git repository."
-  (interactive)
   (let ((branch))
     (with-temp-buffer
       (call-process "git" nil (current-buffer) nil "rev-parse" "--abbrev-ref" "HEAD")
       (setq branch (buffer-substring-no-properties (point-min) (1- (point-max)))))
     branch
+    ))
+
+
+
+
+;;
+;;  shu-git-show-branch
+;;
+(defun shu-git-show-branch ()
+  "Display the name of the current branch in a git repository."
+  (interactive)
+  (let ((branch (shu-git-find-branch)))
+    (message "%s" branch)
+    ))
+
+
+
+
+;;
+;;  shu-git-branch-to-kill-ring
+;;
+(defun shu-git-branch-to-kill-ring ()
+  "Put the name of the current branch in a git repository into the kill ring."
+  (interactive)
+  (let ((branch (shu-git-find-branch)))
+    (shu-kill-new branch)
+    ))
+
+
+
+
+;;
+;;  shu-git-insert-branch
+;;
+(defun shu-git-insert-branch ()
+  "Insert at point the name of the current branch in a git repository"
+  (interactive)
+  (let ((branch (shu-git-find-branch)))
+    (insert branch)
     ))
 
 
@@ -1440,8 +1478,9 @@ shu- prefix removed."
   (defalias 'comma-names-to-letter 'shu-comma-names-to-letter)
   (defalias 'remove-test-names 'shu-remove-test-names)
   (defalias 'number-commits 'shu-git-number-commits)
-  (defalias 'git-branch 'shu-git-find-branch)
   (defalias 'diff-commits 'shu-git-diff-commits)
+  (defalias 'shu-git-show-branch 'show-branch)
+  (defalias 'shu-git-insert-branch 'insb)
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
   (defalias 'number-lines 'shu-number-lines)
