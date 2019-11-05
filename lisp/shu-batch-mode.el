@@ -83,10 +83,41 @@ searches in the local \"~/emacs\" directory."
 (defun shu-batch-hello ()
   "A test function for batch mode."
   (interactive)
+  (let (
+        (log-buf nil)
+        )
     (shu-batch-init)
     (message "%s" "Hello")
     (message "%s" shu-cpp-operators-three)
-    )
+    (princ "princ output\n" log-buf)
+    ))
+
+
+;;
+;;  shu-batch-rmv-using
+;;
+(defun shu-batch-rmv-using ()
+  "Call rmv-using in batch mode."
+  (let ((class-path (getenv "SHU_RMV_USING_PATH"))
+        (file-name (getenv "SHU_RMV_USING_FILE"))
+        (class-load-path)
+        (class-load-name)
+        (top-name "BloombergLP")
+        (log-buf nil))
+    (if (not class-path)
+        (message "%s" "SHU_RMV_USING_PATH environment variable not set.")
+      (if (not (file-readable-p file-name))
+          (message "Cannot file file: %s" file-name)
+        (shu-batch-init)
+        (setq class-load-path (shu-delete-last-char-if class-path "/"))
+        (setq class-load-name (concat class-load-path "/rmv-using.el"))
+        (load-file class-load-name)
+        (find-file file-name)
+        (if buffer-read-only
+            (message "File %s is read only." file-name)
+          (shu-match-internal-rmv-using slp-fx-class-list log-buf top-name))))
+    ))
+
 
 
 ;;
