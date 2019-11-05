@@ -46,8 +46,9 @@ line that matches and put it in the buffer \"**shu-vars**\"."
   (interactive)
   (let ((token-list)
         (ret-val))
-    (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
-    (setq ret-val (shu-match-find-semi-names token-list))
+    (save-excursion
+      (setq token-list (shu-cpp-reverse-tokenize-region-for-command (point-min) (point-max)))
+      (setq ret-val (shu-match-find-semi-names token-list)))
     ))
 
 
@@ -81,7 +82,9 @@ that holds a match and put it into the buffer \"**shu-vars**\","
         (bol)
         (eol)
         (line-no)
-        (line))
+        (line)
+        (count 0)
+        (pcount))
     (setq ret-val (shu-cpp-all-search-match-tokens rlist find-name-list tlist))
     (setq tlist (car ret-val))
     (setq rlist (cdr ret-val))
@@ -94,7 +97,12 @@ that holds a match and put it into the buffer \"**shu-vars**\","
       (setq line-no (shu-format-num (line-number-at-pos) 5))
       (setq line (buffer-substring-no-properties bol eol))
       (princ (concat line-no ". " line "\n") gb)
+      (setq count (1+ count))
       (setq rlist (cdr rlist)))
+    (if (= count 0)
+        (message "%s" "No names found.")
+      (setq pcount (shu-group-number count))
+      (message "%s lines added to %s" pcount (buffer-name gb)))
     ))
 
 
