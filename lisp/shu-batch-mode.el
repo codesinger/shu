@@ -24,7 +24,11 @@
 
 ;;; Commentary:
 
-;; A startup script for running the Shu elisp package in batch mode
+;; A startup script and other functions for running the Shu elisp package
+;; in batch mode.  Some of the functions in this package have been
+;; enabled to run as stand alone shell scripts.  This allows these
+;; functions to be used by non-emacs users and in automated build
+;; work flows.
 ;;
 ;; The function shu-batch-init loads all of the Shu elisp libraries.
 ;; Other functions in this file invoke various fuctions in the Shu
