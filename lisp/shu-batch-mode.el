@@ -2,7 +2,7 @@
 ;;
 ;; Copyright (C) 2019 Stewart L. Palmer
 ;;
-;; Package: shu-cpp-mch-funs
+;; Package: shu-batch-mode
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
