@@ -97,7 +97,7 @@ searches in the local \"~/emacs\" directory."
     ))
 
 
-(defconst slp-fx-class-list
+(defconst shu-local-class-list
   (list
    (cons "bsl"
          (list
@@ -150,7 +150,7 @@ searches in the local \"~/emacs\" directory."
                "stringstream"
                "vector"))
    )
-  "List of FX namespaces and their associated classes")
+  "List of standard namespaces and their associated classes")
 
 
 
@@ -176,7 +176,7 @@ searches in the local \"~/emacs\" directory."
         (find-file file-name)
         (if buffer-read-only
             (message "File %s is read only." file-name)
-          (shu-match-internal-rmv-using slp-fx-class-list log-buf top-name)
+          (shu-match-internal-rmv-using shu-local-class-list log-buf top-name)
           (when (buffer-modified-p)
             (basic-save-buffer)))))
     ))
@@ -187,7 +187,7 @@ searches in the local \"~/emacs\" directory."
 ;;  shu-generate-component
 ;;
 (defun shu-generate-component ()
-  "Fetch the arguments from enf=vironment variables and then call
+  "Fetch the arguments from environment variables and then call
 SHU-INTERNAL-GEN-BDE-COMPONENT to generate a set of three BDE component
 files."
   (let ((class-name (getenv "SHU_CLASS_NAME"))
