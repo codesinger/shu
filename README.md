@@ -1,6 +1,6 @@
 ![Shu](https://raw.github.com/codesinger/shu/master/doc/shu-2011-l.png)
 *Shu Swamp, Charles T. Church Nature Preserve, Mill Neck, NY*
-# Shu #
+# Shu emacs lisp package #
 My personal Emacs configuration and useful lisp functions.
 
 This repository is an ongoing project.  A colleague once asked me if I could let him
