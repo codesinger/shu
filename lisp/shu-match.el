@@ -1331,7 +1331,10 @@ count by one."
       (setq clist (cdr clist))
       )
     (setq psum (shu-fixed-format-num sum 0))
-    (message "%s%s class names qualified.  See buffer %s" np-stmt psum (buffer-name log-buf))
+    (if (and log-buf (bufferp log-buf))
+        (message "%s%s class names qualified.  See buffer %s" np-stmt psum (buffer-name log-buf))
+      (message "%s%s class names qualified." np-stmt psum )
+        )
     ))
 
 

@@ -93,6 +93,63 @@ searches in the local \"~/emacs\" directory."
     ))
 
 
+(defconst slp-fx-class-list
+  (list
+   (cons "bsl"
+         (list
+               "boolalpha"
+               "cout"
+               "dec"
+               "endl"
+               "exception"
+               "fixed"
+               "hex"
+               "ifstream"
+               "ios_base"
+               "map"
+               "noboolalpha"
+               "ostream"
+               "ostringstream"
+               "pair"
+               "runtime_error"
+               "set"
+               "setfill"
+               "setprecision"
+               "setw"
+               "sort"
+               "string"
+               "stringstream"
+               "vector"))
+   (cons "std"
+         (list
+               "boolalpha"
+               "cout"
+               "dec"
+               "endl"
+               "exception"
+               "fixed"
+               "hex"
+               "ifstream"
+               "ios_base"
+               "map"
+               "noboolalpha"
+               "ostream"
+               "ostringstream"
+               "pair"
+               "runtime_error"
+               "set"
+               "setfill"
+               "setprecision"
+               "setw"
+               "sort"
+               "string"
+               "stringstream"
+               "vector"))
+   )
+  "List of FX namespaces and their associated classes")
+
+
+
 ;;
 ;;  shu-batch-rmv-using
 ;;
@@ -115,7 +172,9 @@ searches in the local \"~/emacs\" directory."
         (find-file file-name)
         (if buffer-read-only
             (message "File %s is read only." file-name)
-          (shu-match-internal-rmv-using slp-fx-class-list log-buf top-name))))
+          (shu-match-internal-rmv-using slp-fx-class-list log-buf top-name)
+          (when (buffer-modified-p)
+            (basic-save-buffer)))))
     ))
 
 

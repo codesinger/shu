@@ -1,0 +1,5 @@
+#!/bin/ksh -x
+export SHU_EMACS_LOAD_PATH=/Users/slp/emacs
+export SHU_RMV_USING_PATH=/Users/slp/emacs
+export SHU_RMV_USING_FILE=$1
+emacs -batch -l ${SHU_EMACS_LOAD_PATH}/shu-batch-mode.elc -f shu-batch-rmv-using
