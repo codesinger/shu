@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.5.24
+;; Version: 1.5.25
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.5.24"
+(defconst shu-version "1.5.25"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Aug 18"
@@ -691,6 +691,43 @@ results in the following output being returned:
         (setcdr item values)
         (setq nl (cdr nl))))
     new-list
+    ))
+
+
+
+
+;;
+;;  shu-split-new-lines
+;;
+(defun shu-split-new-lines (data)
+  "Split a string at new line ('\n') boundaries.  The new line characters are
+removed and a list of strings is returned.  If the input line is an empty
+string, a list containing one empty string is returned.  If the line contains a
+trailing new line character, that trailing new line character is discarded
+without generating a new, empty line in the output.
+
+For example, the input string \"Hello\nThere\n\" will return exctly the same
+output list as the input string \"Hello\nThere\".
+
+As another example, the input string \"Hi\nHow are you?\n\" returns a list of
+two strings, which are \"Hi\" and \"How are you?\"."
+  (let* ((count 0)
+         (linend (regexp-opt (list "\n")))
+         (lines (split-string data linend))
+         (line)
+         (nlines (length lines))
+         (new-lines)
+         (empty ""))
+    (if (= 0 (length data))
+          (push empty new-lines)
+      (while lines
+        (setq count (1+ count))
+        (setq line (car lines))
+        (when (not (and (= count nlines) (= 0 (length line))))
+          (push (concat line) new-lines))
+        (setq lines (cdr lines)))
+      (setq new-lines (nreverse new-lines)))
+    new-lines
     ))
 
 

@@ -1,3 +1,4 @@
+
 ;;; shu-batch-mode.el --- Shu project code for dealing wth C++ in Emacs
 ;;
 ;; Copyright (C) 2019 Stewart L. Palmer
@@ -31,7 +32,7 @@
 ;; work flows.
 ;;
 ;; The function shu-batch-init loads all of the Shu elisp libraries.
-;; Other functions in this file invoke various fuctions in the Shu
+;; Other functions in this file invoke various functions in the Shu
 ;; elisp libraries and are set up such that they can be invoked from
 ;; the --eval comment line option of emacs running in batch.
 

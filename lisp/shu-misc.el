@@ -1497,7 +1497,7 @@ shu- prefix removed."
   (defalias 'remove-test-names 'shu-remove-test-names)
   (defalias 'number-commits 'shu-git-number-commits)
   (defalias 'diff-commits 'shu-git-diff-commits)
-  (defalias 'show-brach 'shu-git-show-branch)
+  (defalias 'show-branch 'shu-git-show-branch)
   (defalias 'insb 'shu-git-insert-branch)
   (defalias 'inso 'shu-git-insert-origin-branch)
   (defalias 'case-sensitive 'shu-case-sensitive)

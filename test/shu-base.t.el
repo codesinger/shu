@@ -1152,4 +1152,333 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     ))
 
 
+
+
+;;
+;;  shu-test-split-new-lines-1
+;;
+(ert-deftest shu-test-split-new-lines-1 ()
+  (let ((data
+         (concat
+          "Now is the time\n"
+          "Fot all good men\n"
+          "To come to the aid\n"
+          "Of the party.\n"
+          ))
+        (expected
+         (concat
+          "Now is the time"
+          "Fot all good men"
+          "To come to the aid"
+          "Of the party."
+          ))
+        (lines)
+        (count 0)
+        (line)
+        (actual "")
+        (ll))
+    (setq lines (shu-split-new-lines data))
+    (should lines)
+    (should (listp lines))
+    (should (= 4 (length lines)))
+    (setq ll lines)
+    (while ll
+      (setq count (1+ count))
+      (setq line (car ll))
+      (setq actual (concat actual line))
+      (setq ll (cdr ll)))
+    (should (stringp actual))
+    (should (= (length actual) (length expected)))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-split-new-lines-2
+;;
+(ert-deftest shu-test-split-new-lines-2 ()
+  (let ((data
+         (concat
+          "Now is the time\n"
+          "Fot all good men\n"
+          "\n"
+          "To come to the aid\n"
+          "Of the party.\n"
+          ))
+        (expected
+         (concat
+          "Now is the time"
+          "Fot all good men"
+          ""
+          "To come to the aid"
+          "Of the party."
+          ))
+        (lines)
+        (count 0)
+        (line)
+        (actual "")
+        (ll))
+    (setq lines (shu-split-new-lines data))
+    (should lines)
+    (should (listp lines))
+    (should (= 5 (length lines)))
+    (setq ll lines)
+    (while ll
+      (setq count (1+ count))
+      (setq line (car ll))
+      (setq actual (concat actual line))
+      (setq ll (cdr ll)))
+    (should (stringp actual))
+    (should (= (length actual) (length expected)))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-split-new-lines-3
+;;
+(ert-deftest shu-test-split-new-lines-3 ()
+  (let ((data
+         (concat
+          "\n"
+          "  \n"
+          ))
+        (expected
+         (concat
+          ""
+          "  "
+          ))
+        (lines)
+        (count 0)
+        (line)
+        (actual "")
+        (ll))
+    (setq lines (shu-split-new-lines data))
+    (should lines)
+    (should (listp lines))
+    (should (= 2 (length lines)))
+    (setq ll lines)
+    (while ll
+      (setq count (1+ count))
+      (setq line (car ll))
+      (setq actual (concat actual line))
+      (setq ll (cdr ll)))
+    (should (stringp actual))
+    (should (= (length actual) (length expected)))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-split-new-lines-4
+;;
+(ert-deftest shu-test-split-new-lines-4 ()
+  (let ((data
+         (concat
+          "Hello\n"
+          ))
+        (expected
+         (concat
+          "Hello"
+          ))
+        (lines)
+        (count 0)
+        (line)
+        (actual "")
+        (ll))
+    (setq lines (shu-split-new-lines data))
+    (should lines)
+    (should (listp lines))
+    (should (= 1 (length lines)))
+    (setq ll lines)
+    (while ll
+      (setq count (1+ count))
+      (setq line (car ll))
+      (setq actual (concat actual line))
+      (setq ll (cdr ll)))
+    (should (stringp actual))
+    (should (= (length actual) (length expected)))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-split-new-lines-5
+;;
+(ert-deftest shu-test-split-new-lines-5 ()
+  (let ((data
+         (concat
+          "Hello"
+          ))
+        (expected
+         (concat
+          "Hello"
+          ))
+        (lines)
+        (count 0)
+        (line)
+        (actual "")
+        (ll))
+    (setq lines (shu-split-new-lines data))
+    (should lines)
+    (should (listp lines))
+    (should (= 1 (length lines)))
+    (setq ll lines)
+    (while ll
+      (setq count (1+ count))
+      (setq line (car ll))
+      (setq actual (concat actual line))
+      (setq ll (cdr ll)))
+    (should (stringp actual))
+    (should (= (length actual) (length expected)))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-split-new-lines-6
+;;
+(ert-deftest shu-test-split-new-lines-6 ()
+  (let (
+        (data
+         (concat
+          " "
+          ))
+        (expected
+         (concat
+          " "
+          ))
+        (lines)
+        (count 0)
+        (line)
+        (actual "")
+        (ll)
+        )
+    (setq lines (shu-split-new-lines data))
+    (should lines)
+    (should (listp lines))
+    (should (= 1 (length lines)))
+    (setq ll lines)
+    (while ll
+      (setq count (1+ count))
+      (setq line (car ll))
+      (setq actual (concat actual line))
+      (setq ll (cdr ll))
+      )
+    (should (stringp actual))
+    (should (= (length actual) (length expected)))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-split-new-lines-7
+;;
+(ert-deftest shu-test-split-new-lines-7 ()
+  (let (
+        (data
+         (concat
+          ""
+          ))
+        (expected
+         (concat
+          ""
+          ))
+        (lines)
+        (count 0)
+        (line)
+        (actual "")
+        (ll)
+        )
+    (setq lines (shu-split-new-lines data))
+    (should lines)
+    (should (listp lines))
+    (should (= 1 (length lines)))
+    (setq ll lines)
+    (while ll
+      (setq count (1+ count))
+      (setq line (car ll))
+      (setq actual (concat actual line))
+      (setq ll (cdr ll))
+      )
+    (should (stringp actual))
+    (should (= (length actual) (length expected)))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-split-new-lines-8
+;;
+(ert-deftest shu-test-split-new-lines-8 ()
+  (let (
+        (data1
+         (concat
+          "Hello\n"
+          "There\n"
+          ))
+        (data2
+         (concat
+          "Hello\n"
+          "There"
+          ))
+        (expected
+         (concat
+          "Hello"
+          "There"
+          ))
+        (lines)
+        (count 0)
+        (line)
+        (actual "")
+        (ll)
+        )
+    (setq lines (shu-split-new-lines data1))
+    (should lines)
+    (should (listp lines))
+    (should (= 2 (length lines)))
+    (setq ll lines)
+    (while ll
+      (setq count (1+ count))
+      (setq line (car ll))
+      (setq actual (concat actual line))
+      (setq ll (cdr ll))
+      )
+    (should (stringp actual))
+    (should (= (length actual) (length expected)))
+    (should (string= expected actual))
+    ;;;
+    (setq count 0)
+    (setq actual "")
+    (setq lines (shu-split-new-lines data2))
+    (should lines)
+    (should (listp lines))
+    (should (= 2 (length lines)))
+    (setq ll lines)
+    (while ll
+      (setq count (1+ count))
+      (setq line (car ll))
+      (setq actual (concat actual line))
+      (setq ll (cdr ll))
+      )
+    (should (stringp actual))
+    (should (= (length actual) (length expected)))
+    (should (string= expected actual))
+    ))
+
+
 ;;; shu-base.t.el ends here
