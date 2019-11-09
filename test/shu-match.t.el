@@ -3464,4 +3464,118 @@ be in place."
 
 
 
+
+;;
+;;  shu-test-shu-match-find-all-using-internal-1
+;;
+(ert-deftest shu-test-shu-match-find-all-using-internal-1 ()
+  (let ((gb (get-buffer-create "**boo**"))
+        (data
+         (concat
+          "#include <map>\n"
+          "/* Seomething */\n"
+          "  using namespace abc;\n"
+          "  using std::string;\n"
+          "  using namespace bob;\n"
+          " /*  Something */\n"
+          ))
+        (uns-exlist
+         (list
+          (list
+           (cons shu-cpp-token-type-kw "using")
+           (cons shu-cpp-token-type-kw "namespace")
+           (cons shu-cpp-token-type-uq "abc")
+           (cons shu-cpp-token-type-op  ";"))
+          (list
+           (cons shu-cpp-token-type-kw "using")
+           (cons shu-cpp-token-type-kw "namespace")
+           (cons shu-cpp-token-type-uq "bob")
+           (cons shu-cpp-token-type-op  ";"))))
+        (token-list)
+        (ret-val)
+        (uns-list)
+        (un-list)
+        (rlist)
+        (un-exlist
+         (list
+          (list
+           (cons shu-cpp-token-type-kw "using")
+           (cons shu-cpp-token-type-uq "std")
+           (cons shu-cpp-token-type-uq "string")
+           (cons shu-cpp-token-type-op ";"))))
+        (token-list)
+        (ret-val)
+        (uns-list)
+        (un-list)
+        (rlist))
+    (setq debug-on-error t)
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq ret-val (shu-match-find-all-using-internal token-list))
+      (princ "\nret-val:\n" gb)(princ ret-val gb)(princ "\n" gb)
+      (should ret-val)
+      (should (consp ret-val))
+      (setq uns-list (car ret-val))
+      (setq un-list (cdr ret-val))
+      (princ "\nuns-list:\n" gb)(princ uns-list gb)(princ "\n" gb)
+      (princ "\nun-list:\n" gb)(princ un-list gb)(princ "\n" gb)
+      (should uns-list)
+      (should (listp uns-list))
+      (should (= 2 (length uns-list)))
+      (should un-list)
+      (should (listp un-list))
+      (should (= 1 (length un-list)))
+      (shu-test-compare-rlists uns-list uns-exlist)
+      (shu-test-compare-rlists un-list un-exlist))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-compare-rlists
+;;
+(defun shu-test-compare-rlists (rlists xlists)
+  "Doc string."
+  (let ((rlist)
+        (xlist)
+        (token-info)
+        (token)
+        (token-type)
+        (xcons)
+        (xtoken)
+        (xtoken-type))
+    (should (= (length rlists) (length xlists)))
+    (while (and rlists xlists)
+      (setq rlist (car rlists))
+      (setq xlist (car xlists))
+      (should (= (length rlist) (length xlist)))
+      (while (and rlist xlist)
+        (setq token-info (car rlist))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (setq token-type (shu-cpp-token-extract-type token-info))
+        (should token)
+        (should (stringp token))
+        (should token-type)
+        (should (numberp token-type))
+        (setq xcons (car xlist))
+        (should xcons)
+        (setq xtoken-type (car xcons))
+        (should xtoken-type)
+        (should (numberp xtoken-type))
+        (setq xtoken (cdr xcons))
+        (should xtoken)
+        (should (stringp xtoken))
+        (should (= xtoken-type token-type))
+        (should (string= xtoken token))
+        (setq rlist (cdr rlist))
+        (setq xlist (cdr xlist)))
+      (setq rlists (cdr rlists))
+      (setq xlists (cdr xlists)))
+    ))
+
+
+
 ;;; shu-match.t.el ends here
