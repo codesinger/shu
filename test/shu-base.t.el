@@ -1481,4 +1481,48 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     ))
 
 
+
+
+
+;;
+;;  shu-test-split-new-lines-8
+;;
+(ert-deftest shu-test-split-new-lines-8 ()
+  (let ((data
+         (concat
+          "Now is the time,"
+          "Fot all good men,"
+          "To come to the aid,"
+          "Of the party.,"
+          ))
+        (expected
+         (concat
+          "Now is the time"
+          "Fot all good men"
+          "To come to the aid"
+          "Of the party."
+          ))
+        (separator (regexp-opt (list ",")))
+        (lines)
+        (count 0)
+        (line)
+        (actual "")
+        (ll))
+    (setq lines (shu-split-new-lines data separator))
+    (should lines)
+    (should (listp lines))
+    (should (= 4 (length lines)))
+    (setq ll lines)
+    (while ll
+      (setq count (1+ count))
+      (setq line (car ll))
+      (setq actual (concat actual line))
+      (setq ll (cdr ll)))
+    (should (stringp actual))
+    (should (= (length actual) (length expected)))
+    (should (string= expected actual))
+    ))
+
+
+
 ;;; shu-base.t.el ends here
