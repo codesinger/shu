@@ -430,6 +430,33 @@ If neither list is present, then the return value is nil."
 
 
 ;;
+;;  shu-match-find-any-using-internal
+;;
+(defun shu-match-find-any-using-internal (token-list)
+  "Given a token list, return a list of all \"using namespace\" statements and
+all \"using\" statements that are not \"using namespace\" statements.  \"using
+namespace std;\" is an example of the first type.  \"using std::string\" is an
+example of the second type.  This is used to find out whether or not a file of
+code contains any such statements and to identify them."
+  (let ((ret-val t)
+        (tlist token-list)
+        (rlist)
+        (rlists))
+    (while ret-val
+      (setq ret-val (shu-cpp-search-match-tokens rlist shu-cpp-match-using-list-single tlist))
+      (when ret-val
+        (setq tlist (car ret-val))
+        (setq rlist (cdr ret-val))
+        (setq rlist (nreverse rlist))
+        (push rlist rlists)
+        (setq rlist nil)))
+    (setq rlists (nreverse rlists))
+    rlists
+    ))
+
+
+
+;;
 ;;  shu-match-using-namespace-string
 ;;
 (defun shu-match-using-namespace-string (rlist &optional top-name)

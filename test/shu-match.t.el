@@ -3503,11 +3503,7 @@ be in place."
            (cons shu-cpp-token-type-uq "std")
            (cons shu-cpp-token-type-uq "string")
            (cons shu-cpp-token-type-op ";"))))
-        (token-list)
-        (ret-val)
-        (uns-list)
-        (un-list)
-        (rlist))
+        )
     (setq debug-on-error t)
     (with-temp-buffer
       (insert data)
@@ -3535,10 +3531,118 @@ be in place."
 
 
 ;;
+;;  shu-test-shu-match-find-any-using-internal-1
+;;
+(ert-deftest shu-test-shu-match-find-any-using-internal-1 ()
+  (let ((gb (get-buffer-create "**boo**"))
+        (data
+         (concat
+          "#include <map>\n"
+          "/* Seomething */\n"
+          "  using namespace abc;\n"
+          "  using std::string;\n"
+          "  using namespace bob;\n"
+          " /*  Something */\n"
+          ))
+        (uns-exlist
+         (list
+          (list
+           (cons shu-cpp-token-type-kw "using")
+           (cons shu-cpp-token-type-kw "namespace")
+           (cons shu-cpp-token-type-uq "abc")
+           (cons shu-cpp-token-type-op  ";"))
+          (list
+           (cons shu-cpp-token-type-kw "using")
+           (cons shu-cpp-token-type-uq "std")
+           (cons shu-cpp-token-type-uq "string")
+           (cons shu-cpp-token-type-op ";"))
+          (list
+           (cons shu-cpp-token-type-kw "using")
+           (cons shu-cpp-token-type-kw "namespace")
+           (cons shu-cpp-token-type-uq "bob")
+           (cons shu-cpp-token-type-op  ";"))))
+        (token-list)
+        (rlists)
+        (un-list)
+        (rlist)
+        (token-list)
+        (ret-val)
+        (un-list)
+        (rlist))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq rlists (shu-match-find-any-using-internal token-list))
+      (should rlists)
+      (should (listp rlists))
+      (shu-test-shu-show-rlists rlists gb)
+      (shu-test-compare-rlists rlists uns-exlist))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-match-find-any-using-internal-2
+;;
+(ert-deftest shu-test-shu-match-find-any-using-internal-2 ()
+  (let ((gb (get-buffer-create "**boo**"))
+        (data
+         (concat
+          "Whan that Aprille with his shoures soote\n"
+          "The droghte of Marche hath perced to the roote,\n"
+          "And bathed every veyne in swich licour,\n"
+          "Of which vertu engendred is the flour;\n"
+          "Whan Zephirus eek with his swete breeth\n"
+          "Inspired hath in every holt and heeth\n"
+          "The tendre croppes, and the yonge sonne\n"
+          "Hath in the Ram his halfe cours y-ronne,\n"
+          "And smale fowles maken melodye,\n"
+          "That slepen al the night with open ye,\n"
+          "(So priketh hem nature in hir corages:\n"
+          "Than longen folk to goon on pilgrimages,\n"
+          ))
+        (token-list)
+        (rlists))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq rlists (shu-match-find-any-using-internal token-list))
+      (should (not rlists)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-show-rlists
+;;
+(defun shu-test-shu-show-rlists (rlists log-buf)
+  "RLISTS is a list of rlist.  Go through RLISTS, extrscting each rlist,
+and displaying its contents in LOG-BUF.  This is useful for debugging
+unit tests taht use SHU-TEST-COMPARE-RLISTS to compare the output of
+a matching function."
+  (interactive)
+  (let ((rlist))
+    (while rlists
+      (setq rlist (car rlists))
+      (should rlist)
+      (should (listp rlist))
+      (shu-cpp-tokenize-show-list-buffer rlist log-buf "\nrlists:")
+      (setq rlists (cdr rlists)))
+    ))
+
+
+
+
+
+;;
 ;;  shu-test-compare-rlists
 ;;
 (defun shu-test-compare-rlists (rlists xlists)
-  "Doc string."
+  "RLISTS is a list of rlists produced by a matching function.  XLISTS
+is the expected set of rlist.  Go through both comparing the two, and failing
+the test if there is any mis-match."
   (let ((rlist)
         (xlist)
         (token-info)
