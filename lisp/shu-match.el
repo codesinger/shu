@@ -59,35 +59,61 @@ line that matches and put it in the buffer \"**shu-vars**\"."
 ;;
 (defun shu-match-find-semi-names (token-list)
   "With a match list that is a semi-colon followed by the regular expression for
-a C++ name, do a reverse tokenized match for all occurrences, then take each line
-that holds a match and put it into the buffer \"**shu-vars**\","
-  (let ((find-name-list
-         (list  ;; semicolon followed by name
-          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
-                                    'shu-cpp-token-match-same
-                                    nil shu-cpp-token-type-op
-                                    ";")
-          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
-                                    'shu-cpp-token-match-same-rx
-                                    t shu-cpp-token-type-uq
-                                    (concat shu-cpp-name "+"))))
-        (tlist token-list)
+a C++ name, do a reverse tokenized match for all occurrences, then take each
+line that holds a match and put it into the buffer \"**shu-vars**\.
+
+This version (11 Nov 2019) adds one more check.  If the token immediately in
+front of the semi-colon is \"}\", then we assume this is the last line of code
+in an inline function, in which case it is not a variable declaration.  This
+helps to weed out some of the extraneous ones but not all of them."
+  (let ((tlist token-list)
         (rlist)
-        (ret-val)
-        (pret-val)
-        (something t)
         (gb (get-buffer-create "**shu-vars**"))
         (token-info)
+        (ntoken-info)
+        (ptoken-info)
+        (token)
+        (token-type)
+        (ptoken)
+        (ptoken-type)
         (spoint)
         (bol)
         (eol)
         (line-no)
         (line)
         (count 0)
-        (pcount))
-    (setq ret-val (shu-cpp-all-search-match-tokens rlist find-name-list tlist))
-    (setq tlist (car ret-val))
-    (setq rlist (cdr ret-val))
+        (pcount)
+        (name-rx (concat shu-cpp-name "+"))
+        (save-token))
+    (while tlist
+      (setq ptoken-info token-info)
+      (setq token-info (car tlist))
+      (setq token-type (shu-cpp-token-extract-type token-info))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (when (and
+             (= token-type shu-cpp-token-type-op)
+             (string= token ";")
+             (setq tlist (cdr tlist))
+             (when tlist
+               (setq ntoken-info (car tlist))
+               (setq token-type (shu-cpp-token-extract-type ntoken-info))
+               (setq token (shu-cpp-token-extract-token ntoken-info))
+               (when
+                   (and
+                    (= token-type shu-cpp-token-type-uq)
+                    (string-match name-rx token))
+                 (setq save-token t)
+                 (when ptoken-info
+                   (setq ptoken-type (shu-cpp-token-extract-type ptoken-info))
+                   (setq ptoken (shu-cpp-token-extract-token ptoken-info))
+                   (when
+                       (and
+                        (= ptoken-type shu-cpp-token-type-op)
+                        (string= ptoken "}"))
+                     (setq save-token nil)))
+                 (when save-token
+                   (push ntoken-info rlist))))))
+      (setq tlist (shu-cpp-token-next-non-comment tlist)))
     (while rlist
       (setq token-info (car rlist))
       (setq spoint (shu-cpp-token-extract-spoint token-info))
