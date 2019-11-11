@@ -699,7 +699,7 @@ results in the following output being returned:
 ;;
 ;;  shu-split-new-lines
 ;;
-1(defun shu-split-new-lines (data &optional separator)
+(defun shu-split-new-lines (data &optional separator)
   "Split a string into a list of strings.  If the optional SEPARATOR is present,
 it is used as a regular expression that represents the line separator and it is
 not retained in each split line.  If SEPARATOR is not present, the separator is

@@ -28,6 +28,7 @@
 
 * [Overview](#Overview)
 * [shu-base](#shu-base)
+* [shu-batch-mode](#shu-batch-mode)
 * [shu-bde-cpp](#shu-bde-cpp)
 * [shu-bde](#shu-bde)
 * [shu-capture-doc](#shu-capture-doc)
@@ -43,7 +44,6 @@
 * [shu-org-extensions](#shu-org-extensions)
 * [shu-xref](#shu-xref)
 * [Index](#Index)
-
 
 
 
@@ -66,7 +66,7 @@ Version 1.4 was merged with the master branch on 2 February 2019.
 
 Version 1.5 was merged with the master branch on 18 August 2019.
 
-This is Version 1.5.13 of the Shu elisp repository.
+This is Version 1.5.26 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -176,6 +176,17 @@ will include the brackets as characters to be skipped.
 
 The regular expression that defines the delimiter used to start
 a comment.
+
+
+
+#### shu-conditional-load-library-files ####
+shu-conditional-load-library-files *path-to-libs* *libs*
+[Function]
+
+Conditionally Load all of the library files listed in in the list *libs* using
+the path *path-to-libs*.  A file in the list is loaded only if FILE-READABLE-P
+returns true for that file.  Return true if all readable files were loaded.
+Return false if any readable file failed to load.
 
 
 
@@ -309,6 +320,16 @@ Date of the most recent merge with the master branch.
 
 
 
+#### shu-delete-last-char-if ####
+shu-delete-last-char-if *input* *test-char*
+[Function]
+
+Return the string *input* with the last character removed if the last character
+is equal to the string *test-char*.  If the last character is not equal to the
+string *test-char*, return the input string unmodified.
+
+
+
 #### shu-end-of-string ####
 shu-end-of-string *string-term*
 [Function]
@@ -429,11 +450,28 @@ here.
 
 
 
+#### shu-library-files ####
+[Constant]
+
+A list of all of the library files that comprise the Shu elisp package in the
+order in which they should be loaded.
+
+
+
 #### shu-line-and-column-at ####
 shu-line-and-column-at *arg*
 [Function]
 
 Return the line number and column number of the point passed in as an argument.
+
+
+
+#### shu-load-library-files ####
+shu-load-library-files *path-to-libs*
+[Function]
+
+Load all of the library files listed in *shu-library-files* using the path
+*path-to-libs*.  Return true if all of the files were successfully loaded.
 
 
 
@@ -497,6 +535,28 @@ shu-remove-trailing-all-whitespace *input-string*
 
 Return a copy of *input-string* with all trailing whitespace removed.  All control
 characters are considered whitespace.
+
+
+
+#### shu-split-new-lines ####
+shu-split-new-lines *data* **&optional** *separator*
+[Function]
+
+Split a string into a list of strings.  If the optional *separator* is present,
+it is used as a regular expression that represents the line separator and it is
+not retained in each split line.  If *separator* is not present, the separator is
+the newline (\n) character.  The separator expressions are removed from the
+input string and a list of separated strings is returned.
+
+If the input line is an empty string, a list containing one empty string is
+returned.  If the line contains a trailing new line character, that trailing new
+line character is discarded without generating a new, empty line in the output.
+
+For example, the input string "Hello\nThere\n" will return exactly the same
+output list as the input string "Hello\nThere".
+
+As another example, the input string "Hi\nHow are you?\n" returns a list of
+two strings, which are "Hi" and "How are you?".
 
 
 
@@ -571,6 +631,68 @@ The name of the buffer into which unit tests place their output and debug trace.
 [Constant]
 
 The version number of the Shu elisp package.
+
+# shu-batch-mode #
+
+
+A startup script and other functions for running the Shu elisp package
+in batch mode.  Some of the functions in this package have been
+enabled to run as stand alone shell scripts.  This allows these
+functions to be used by non-emacs users and in automated build
+work flows.
+
+The function shu-batch-init loads all of the Shu elisp libraries.
+Other functions in this file invoke various functions in the Shu
+elisp libraries and are set up such that they can be invoked from
+the --eval comment line option of emacs running in batch.
+
+
+## List of functions and variables ##
+
+List of functions and variable definitions in this package.
+
+
+
+
+
+#### shu-batch-hello ####
+[Command]
+
+A test function for batch mode.
+
+
+
+#### shu-batch-init ####
+[Function]
+
+Load all of the .elc files from the Shu elisp package.  This is used to allow
+Shu elisp functions to be used in batch mode.  This function searches for the
+functions in the path specified by the environment variable
+"SHU_EMACS_LOAD_PATH".  If that environment variable does not exist, then it
+searches in the local "~/emacs" directory.
+
+
+
+#### shu-batch-rmv-using ####
+[Function]
+
+Call rmv-using in batch mode.
+
+
+
+#### shu-generate-component ####
+[Function]
+
+Fetch the arguments from environment variables and then call
+*shu-internal-gen-bde-component* to generate a set of three BDE component
+files.
+
+
+
+#### shu-local-class-list ####
+[Constant]
+
+List of standard namespaces and their associated classes
 
 # shu-bde-cpp #
 
@@ -931,6 +1053,14 @@ shu-generate-git-add *filename* *gitbuf*
 
 Do a "git add" of *filename* and show the result of the operation in
 the buffer *gitbuf*.
+
+
+
+#### shu-internal-gen-bde-component ####
+shu-internal-gen-bde-component *class-name* *author* *namespace* *file-prefix*
+[Function]
+
+Generate the three files for a new component: .cpp, .h, and .t.cpp
 
 # shu-capture-doc #
 
@@ -2161,7 +2291,8 @@ one line for every allocated buffer.  Here is a sample of some of its output:
          ADDRESS         SIZE HEAP    ALLOCATOR
       0x30635678          680    0     YORKTOWN
       0x30635928          680    0     YORKTOWN
-      0x30635bd8          680    0     YORKTOWN
+      0x30635bd8          680    0    HEAPCACHE
+      0x30635bcf          680    0     YORKTOWN
 ```
 
 YORKTOWN is the name of the default allocator on AIX.  This function goes
@@ -2537,6 +2668,16 @@ shu-add-cpp-base-types *ntypes*
 Add one or more data types to the list of C++ native data types defined in shu-cpp-base-types
 in shu-cpp-general.el.  Argument may be a single type in a string or a list of strings.
 This modifies shu-cpp-base-types.
+
+
+
+#### shu-aix-show-allocators ####
+shu-aix-show-allocators *sizes* *gb*
+[Function]
+
+*sizes* is an alist whose car is an allocator name and whose cdr is the number of
+allocations attributed to that allocator.  For each allocator, display in the
+buffer *gb*, the name of the allocator and its counts
 
 
 
@@ -3022,7 +3163,8 @@ one line for every allocated buffer.  Here is a sample of some of its output:
          ADDRESS         SIZE HEAP    ALLOCATOR
       0x30635678          680    0     YORKTOWN
       0x30635928          680    0     YORKTOWN
-      0x30635bd8          680    0     YORKTOWN
+      0x30635bd8          680    0    HEAPCACHE
+      0x30635bcf          680    0     YORKTOWN
 ```
 
 YORKTOWN is the name of the default allocator on AIX.  This function goes
@@ -6898,13 +7040,30 @@ If neither list is present, then the return value is nil.
 
 
 
+#### shu-match-find-any-using-internal ####
+shu-match-find-any-using-internal *token-list*
+[Function]
+
+Given a token list, return a list of all "using namespace" statements and
+all "using" statements that are not "using namespace" statements.  "using
+namespace std;" is an example of the first type.  "using std::string" is an
+example of the second type.  This is used to find out whether or not a file of
+code contains any such statements and to identify them.
+
+
+
 #### shu-match-find-semi-names ####
 shu-match-find-semi-names *token-list*
 [Function]
 
 With a match list that is a semi-colon followed by the regular expression for
-a C++ name, do a reverse tokenized match for all occurrences, then take each line
-that holds a match and put it into the buffer "`**shu-vars**`",
+a C++ name, do a reverse tokenized match for all occurrences, then take each
+line that holds a match and put it into the buffer "`**shu-vars**\.`
+
+This version (11 Nov 2019) adds one more check.  If the token immediately in
+front of the semi-colon is "}", then we assume this is the last line of code
+in an inline function, in which case it is not a variable declaration.  This
+helps to weed out some of the extraneous ones but not all of them.
 
 
 
@@ -7275,6 +7434,8 @@ Kill all dired buffers and all buffers that contain a file and are unmodified.
 It is not uncommon to have dozens of buffers open that are unrelated to the current task
 and this is a convenience function for closing many buffers that do not need to
 be open.
+If the function *shu-clear-c-project* is defined, it is called to clear the current
+project.
 
 
 
@@ -7428,19 +7589,28 @@ While in a file buffer, put the name of the current file into the kill ring.
 
 
 
-#### git-branch ####
-[Command]
- (Function: shu-git-find-branch)
-
-Return the name of the current branch in a git repository.
-
-
-
 #### gquote ####
 [Command]
  (Function: shu-gquote)
 
 Insert a LaTeX quote environment and position the cursor for typing the quote.
+
+
+
+#### insb ####
+[Command]
+ (Function: shu-git-insert-branch)
+
+Insert at point the name of the current branch in a git repository
+
+
+
+#### inso ####
+[Command]
+ (Function: shu-git-insert-origin-branch)
+
+Insert at point the name of the current branch in a git repository preceded by the
+word "origin"..  This can be used as part of git push or pull.
 
 
 
@@ -7623,6 +7793,14 @@ Set the end of line delimiter to be the Unix standard (LF).
 
 
 
+#### show-branch ####
+[Command]
+ (Function: shu-git-show-branch)
+
+Display the name of the current branch in a git repository.
+
+
+
 #### tighten-lisp ####
 [Command]
  (Function: shu-tighten-lisp)
@@ -7675,6 +7853,8 @@ Kill all dired buffers and all buffers that contain a file and are unmodified.
 It is not uncommon to have dozens of buffers open that are unrelated to the current task
 and this is a convenience function for closing many buffers that do not need to
 be open.
+If the function *shu-clear-c-project* is defined, it is called to clear the current
+project.
 
 
 
@@ -7900,6 +8080,13 @@ return git error message.
 
 
 
+#### shu-git-branch-to-kill-ring ####
+[Command]
+
+Put the name of the current branch in a git repository into the kill ring.
+
+
+
 #### shu-git-diff-commits ####
 shu-git-diff-commits *commit-range*
 [Command]
@@ -7925,8 +8112,7 @@ is put into the kill ring:
 
 
 #### shu-git-find-branch ####
-[Command]
- (Alias: git-branch)
+[Function]
 
 Return the name of the current branch in a git repository.
 
@@ -7938,6 +8124,23 @@ shu-git-find-short-hash *hash*
 
 Return the git short hash for the *hash* supplied as an argument.  Return nil
 if the given *hash* is not a valid git revision.
+
+
+
+#### shu-git-insert-branch ####
+[Command]
+ (Alias: insb)
+
+Insert at point the name of the current branch in a git repository
+
+
+
+#### shu-git-insert-origin-branch ####
+[Command]
+ (Alias: inso)
+
+Insert at point the name of the current branch in a git repository preceded by the
+word "origin"..  This can be used as part of git push or pull.
 
 
 
@@ -7958,6 +8161,14 @@ documentation for *shu-git-diff-commits* for further information.
 This function counts as a commit any instance of "commit" that starts at the
 beginning of a line and is followed by some white space and a forty character
 hexadecimal number.  Returns the count of the number of commits found.
+
+
+
+#### shu-git-show-branch ####
+[Command]
+ (Alias: show-branch)
+
+Display the name of the current branch in a git repository.
 
 
 
@@ -8655,6 +8866,8 @@ within type.
 Associate a number with each type of variable
 
 
+# Index #
+
 * [acgen](#acgen)
 * [add-prefix](#add-prefix)
 * [all-quit](#all-quit)
@@ -8721,10 +8934,11 @@ Associate a number with each type of variable
 * [gfl](#gfl)
 * [gfn](#gfn)
 * [ginclude](#ginclude)
-* [git-branch](#git-branch)
 * [gquote](#gquote)
 * [hcgen](#hcgen)
 * [hother](#hother)
+* [insb](#insb)
+* [inso](#inso)
 * [kracct](#kracct)
 * [krfn](#krfn)
 * [krid](#krid)
@@ -8771,6 +8985,7 @@ Associate a number with each type of variable
 * [set-dos-eol](#set-dos-eol)
 * [set-prefix](#set-prefix)
 * [set-unix-eol](#set-unix-eol)
+* [show-branch](#show-branch)
 * [shu-add-cpp-base-types](#shu-add-cpp-base-types)
 * [shu-add-cpp-c-extensions](#shu-add-cpp-c-extensions)
 * [shu-add-cpp-h-extensions](#shu-add-cpp-h-extensions)
@@ -8778,6 +8993,7 @@ Associate a number with each type of variable
 * [shu-add-prefix](#shu-add-prefix)
 * [shu-add-to-alist](#shu-add-to-alist)
 * [shu-add-to-alist](#shu-add-to-alist)
+* [shu-aix-show-allocators](#shu-aix-show-allocators)
 * [shu-aix-show-malloc-list](#shu-aix-show-malloc-list)
 * [shu-all-commits](#shu-all-commits)
 * [shu-all-quit](#shu-all-quit)
@@ -8786,6 +9002,9 @@ Associate a number with each type of variable
 * [shu-all-whitespace-regexp](#shu-all-whitespace-regexp)
 * [shu-attr-name](#shu-attr-name)
 * [shu-author](#shu-author)
+* [shu-batch-hello](#shu-batch-hello)
+* [shu-batch-init](#shu-batch-init)
+* [shu-batch-rmv-using](#shu-batch-rmv-using)
 * [shu-bb-cpp-set-alias](#shu-bb-cpp-set-alias)
 * [shu-bde-add-guard](#shu-bde-add-guard)
 * [shu-bde-all-guard](#shu-bde-all-guard)
@@ -8918,6 +9137,7 @@ Associate a number with each type of variable
 * [shu-comment-start-pattern](#shu-comment-start-pattern)
 * [shu-completion-is-directory](#shu-completion-is-directory)
 * [shu-conditional-find-file](#shu-conditional-find-file)
+* [shu-conditional-load-library-files](#shu-conditional-load-library-files)
 * [shu-cother](#shu-cother)
 * [shu-count-c-project](#shu-count-c-project)
 * [shu-count-in-cpp-directory](#shu-count-in-cpp-directory)
@@ -9110,6 +9330,7 @@ Associate a number with each type of variable
 * [shu-dciterate](#shu-dciterate)
 * [shu-de-star](#shu-de-star)
 * [shu-default-file-to-seek](#shu-default-file-to-seek)
+* [shu-delete-last-char-if](#shu-delete-last-char-if)
 * [shu-dired-mode-name](#shu-dired-mode-name)
 * [shu-disabled-quit](#shu-disabled-quit)
 * [shu-diterate](#shu-diterate)
@@ -9149,6 +9370,7 @@ Associate a number with each type of variable
 * [shu-generate-bde-hfile](#shu-generate-bde-hfile)
 * [shu-generate-bde-tfile](#shu-generate-bde-tfile)
 * [shu-generate-cfile](#shu-generate-cfile)
+* [shu-generate-component](#shu-generate-component)
 * [shu-generate-git-add](#shu-generate-git-add)
 * [shu-generate-hfile](#shu-generate-hfile)
 * [shu-generate-tfile](#shu-generate-tfile)
@@ -9166,10 +9388,14 @@ Associate a number with each type of variable
 * [shu-gfn](#shu-gfn)
 * [shu-ginclude](#shu-ginclude)
 * [shu-git-add-file](#shu-git-add-file)
+* [shu-git-branch-to-kill-ring](#shu-git-branch-to-kill-ring)
 * [shu-git-diff-commits](#shu-git-diff-commits)
 * [shu-git-find-branch](#shu-git-find-branch)
 * [shu-git-find-short-hash](#shu-git-find-short-hash)
+* [shu-git-insert-branch](#shu-git-insert-branch)
+* [shu-git-insert-origin-branch](#shu-git-insert-origin-branch)
 * [shu-git-number-commits](#shu-git-number-commits)
+* [shu-git-show-branch](#shu-git-show-branch)
 * [shu-global-buffer-name](#shu-global-buffer-name)
 * [shu-global-operation](#shu-global-operation)
 * [shu-goto-line](#shu-goto-line)
@@ -9180,6 +9406,7 @@ Associate a number with each type of variable
 * [shu-internal-citerate](#shu-internal-citerate)
 * [shu-internal-cpp2-class](#shu-internal-cpp2-class)
 * [shu-internal-double-citerate](#shu-internal-double-citerate)
+* [shu-internal-gen-bde-component](#shu-internal-gen-bde-component)
 * [shu-internal-get-set](#shu-internal-get-set)
 * [shu-internal-list-c-project](#shu-internal-list-c-project)
 * [shu-internal-new-lisp](#shu-internal-new-lisp)
@@ -9221,11 +9448,14 @@ Associate a number with each type of variable
 * [shu-kill-new](#shu-kill-new)
 * [shu-last-commit](#shu-last-commit)
 * [shu-lc-comment](#shu-lc-comment)
+* [shu-library-files](#shu-library-files)
 * [shu-line-and-column-at](#shu-line-and-column-at)
 * [shu-list-c-directories](#shu-list-c-directories)
 * [shu-list-c-prefixes](#shu-list-c-prefixes)
 * [shu-list-c-project](#shu-list-c-project)
 * [shu-list-in-cpp-directory](#shu-list-in-cpp-directory)
+* [shu-load-library-files](#shu-load-library-files)
+* [shu-local-class-list](#shu-local-class-list)
 * [shu-local-replace](#shu-local-replace)
 * [shu-loosen-lisp](#shu-loosen-lisp)
 * [shu-make-c-project](#shu-make-c-project)
@@ -9240,6 +9470,7 @@ Associate a number with each type of variable
 * [shu-match-fetch-include-hash-table](#shu-match-fetch-include-hash-table)
 * [shu-match-find-all-some-include](#shu-match-find-all-some-include)
 * [shu-match-find-all-using-internal](#shu-match-find-all-using-internal)
+* [shu-match-find-any-using-internal](#shu-match-find-any-using-internal)
 * [shu-match-find-semi-names](#shu-match-find-semi-names)
 * [shu-match-find-unqualified-class-names](#shu-match-find-unqualified-class-names)
 * [shu-match-find-variables](#shu-match-find-variables)
@@ -9338,6 +9569,7 @@ Associate a number with each type of variable
 * [shu-shift-region-of-text](#shu-shift-region-of-text)
 * [shu-shift-single-line](#shu-shift-single-line)
 * [shu-simple-hother-file](#shu-simple-hother-file)
+* [shu-split-new-lines](#shu-split-new-lines)
 * [shu-split-range-string](#shu-split-range-string)
 * [shu-tciterate](#shu-tciterate)
 * [shu-the-column-at](#shu-the-column-at)
@@ -9381,7 +9613,6 @@ Associate a number with each type of variable
 * [winpath](#winpath)
 
 
-
 <!--
 LocalWords:  shu regexp scf cpp doxygen namepace bde num arg cp Bloomberg gen bb fn
 LocalWords:  cfile hfile tfile decl ifndef endif sdecl struct sgen foo doc elisp md
@@ -9404,5 +9635,6 @@ LocalWords:  ginclude newfile fixp hitRatio getdef mumbleSomethingOther cciterat
 LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de un
 LocalWords:  proc rlists ht unresolvable uns clist thisistheoverview NB spoints np
 LocalWords:  thisisanoverview incl ns dciterate diterate ThingLoader thingloader
-LocalWords:  myproject autocomplete Ctl tciterate titerate
+LocalWords:  myproject autocomplete Ctl tciterate titerate libs nThere nHow init
+LocalWords:  elc HEAPCACHE Nov inline insb inso
 -->
