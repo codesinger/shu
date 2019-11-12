@@ -456,6 +456,32 @@ If neither list is present, then the return value is nil."
 
 
 ;;
+;;  shu-match-line-code
+;;
+(defun shu-match-line-code (stmt spos)
+  "STMT is a string of text taken from the buffer.  SPOS is the start position
+of the string of text.  This function splits the lines of text into saparate
+lines, each one prefixed with the line number where it appears in the file.
+
+For example, if the string of test is \"Hello.\" and it starts at line 392 of
+the file, this function will return \"   392. Hello.\" with a newline appended
+to the end of the line."
+  (let ((line-no (line-number-at-pos spos t))
+        (slist (shu-split-new-lines stmt))
+        (lcode "")
+        (line)(pline))
+    (while slist
+      (setq line (car slist))
+      (setq pline (shu-format-num line-no 6))
+      (setq lcode (concat pline ". " line "\n"))
+      (setq line-no (1+ line-no))
+      (setq slist (cdr slist)))
+    lcode
+    ))
+
+
+
+;;
 ;;  shu-match-find-any-using-internal
 ;;
 (defun shu-match-find-any-using-internal (token-list)

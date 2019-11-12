@@ -3614,6 +3614,55 @@ be in place."
 
 
 
+
+
+;;
+;;  shu-test-shu-match-show-code-1
+;;
+(ert-deftest shu-test-shu-match-show-code-1 ()
+  (let ((data
+         (concat
+          "#include <map>\n"
+          "/* Seomething */\n"
+          "  using namespace abc;\n"
+          "  using std::string;\n"
+          "  using namespace bob;\n"
+          " /*  Something */\n"
+          ))
+        (whole-lines t)
+        (token-list)
+        (rlists)
+        (rlist)
+        (token-list)
+        (ret-val)
+        (rlist)
+        (start-end)
+        (spos)
+        (epos)
+        (stmt)
+        (actual)
+        (expected "     3.   using namespace abc;\n"))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq rlists (shu-match-find-any-using-internal token-list))
+      (should rlists)
+      (should (listp rlists))
+      (setq rlist (car rlists))
+      (should rlist)
+      (should (listp rlist))
+      (setq start-end (shu-match-get-start-end-pos rlist whole-lines))
+      (setq spos (car start-end))
+      (setq epos (cdr start-end))
+      (setq stmt (buffer-substring-no-properties spos epos))
+      (setq actual (shu-match-line-code stmt spos))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
 ;;
 ;;  shu-test-shu-show-rlists
 ;;
