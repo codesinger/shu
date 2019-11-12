@@ -473,7 +473,7 @@ to the end of the line."
     (while slist
       (setq line (car slist))
       (setq pline (shu-format-num line-no 6))
-      (setq lcode (concat pline ". " line "\n"))
+      (setq lcode (concat lcode pline ". " line "\n"))
       (setq line-no (1+ line-no))
       (setq slist (cdr slist)))
     lcode

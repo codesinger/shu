@@ -3617,9 +3617,9 @@ be in place."
 
 
 ;;
-;;  shu-test-shu-match-show-code-1
+;;  shu-test-shu-match-line-code-1
 ;;
-(ert-deftest shu-test-shu-match-show-code-1 ()
+(ert-deftest shu-test-shu-match-line-code-1 ()
   (let ((data
          (concat
           "#include <map>\n"
@@ -3660,6 +3660,63 @@ be in place."
       (should (stringp actual))
       (should (string= expected actual)))
     ))
+
+
+
+
+
+;;
+;;  shu-test-shu-match-line-code-2
+;;
+(ert-deftest shu-test-shu-match-line-code-2 ()
+  (let ((data
+         (concat
+          "#include <map>\n"
+          "/* Seomething */\n"
+          "  using  /*Wheee! */\n"
+          "    namespace  // Hello!\n"
+          "        abc;\n"
+          "  using std::string;\n"
+          "  using namespace bob;\n"
+          " /*  Something */\n"
+          ))
+        (whole-lines t)
+        (token-list)
+        (rlists)
+        (rlist)
+        (token-list)
+        (ret-val)
+        (rlist)
+        (start-end)
+        (spos)
+        (epos)
+        (stmt)
+        (actual)
+        (expected
+         (concat
+          "     3.   using  /*Wheee! */\n"
+          "     4.     namespace  // Hello!\n"
+          "     5.         abc;\n"
+          )))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (setq rlists (shu-match-find-any-using-internal token-list))
+      (should rlists)
+      (should (listp rlists))
+      (setq rlist (car rlists))
+      (should rlist)
+      (should (listp rlist))
+      (setq start-end (shu-match-get-start-end-pos rlist whole-lines))
+      (setq spos (car start-end))
+      (setq epos (cdr start-end))
+      (setq stmt (buffer-substring-no-properties spos epos))
+      (setq actual (shu-match-line-code stmt spos))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
 
 
 
