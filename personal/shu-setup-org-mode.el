@@ -45,6 +45,7 @@ I work and play.  It is not part of the Shu elisp package."
         (gb (get-buffer-create "**shu-org-setup**"))
         (enable-org-mode nil)
         )
+    (princ "Trace of the Shu orge mode setup\n\n" gb)
     (if (shu-system-type-is-mac-osx)
         (progn
           (princ "On Mac OSX\n" gb)
