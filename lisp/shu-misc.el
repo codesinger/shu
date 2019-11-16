@@ -1068,6 +1068,34 @@ word \"origin\"..  This can be used as part of git push or pull."
 
 
 
+
+;;
+;;  shu-git-insert-push-origin-branch
+;;
+(defun shu-git-insert-push-origin-branch ()
+  "Insert at point the name the git command to push the current branch out
+to origin."
+  (interactive)
+  (let ((branch (shu-git-find-branch)))
+    (insert (concat "git push origin " branch))
+    ))
+
+
+
+
+;;
+;;  shu-git-insert-pull-origin-branch
+;;
+(defun shu-git-insert-pull-origin-branch ()
+  "Insert at point the name the git command to pull the current branch out
+to origin."
+  (interactive)
+  (let ((branch (shu-git-find-branch)))
+    (insert (concat "git pull origin " branch))
+    ))
+
+
+
 ;;
 ;;  shu-conditional-find-file
 ;;
@@ -1537,6 +1565,8 @@ shu- prefix removed."
   (defalias 'show-branch 'shu-git-show-branch)
   (defalias 'insb 'shu-git-insert-branch)
   (defalias 'inso 'shu-git-insert-origin-branch)
+  (defalias 'gpl 'shu-git-insert-pull-origin-branch)
+  (defalias 'gps 'shu-git-insert-push-origin-branch)
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
   (defalias 'number-lines 'shu-number-lines)
