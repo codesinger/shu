@@ -292,15 +292,6 @@ of every visited file.  Makes a useful history of all files visited."
 ; (1+ (current-column)
 
 ;;
-;; gorg - Visit the main org file
-;;
-(defun gorg ()
-  (interactive)
-  "Visit the main org file (~/data/org/home.org)"
-  (find-file "~/data/org/home.org")
-)
-
-;;
 ;; ghist - Visit the two history directories
 ;;
 (defun ghist ()

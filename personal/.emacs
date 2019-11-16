@@ -83,6 +83,12 @@
 ;;;  (load-file (concat slp-org-location "/lisp/org-agenda.elc"))
 ;;;  )
 (require 'org)
+(defvar shu-org-home nil
+  "Home directory of the org data files.")
+
+(defvar shu-org-home-file nil
+  "Main aganda org data file.")
+
 
 (tool-bar-mode 0)
 
@@ -190,6 +196,7 @@
 (shu-cpp-misc-set-alias)
 (shu-keyring-set-alias)
 (shu-match-set-alias)
+(shu-org-extensions-set-alias)
 
 (defalias 'sc 'shu-shift-region-of-text)
 (defalias 'sli 'shu-shift-line)
