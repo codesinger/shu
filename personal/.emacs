@@ -24,19 +24,66 @@
 ;; It is not part of the shu package
 
 
+;;
+;;  shu-system-type-is-unix
+;;
+(defun shu-system-type-is-unix ()
+  "Return true if we are running on some sort of Unix operating system."
+  (let ((type
+         (if (or
+              (eq system-type 'aix)
+              (eq system-type 'berkeley-unix)
+              (eq system-type 'gnu/kfreebsd)
+              (eq system-type 'gnu/linux)
+              (eq system-type 'hpux)
+              (eq system-type 'usg-unix-v))
+             t
+           nil)))
+    type
+    ))
+
+
+;;
+;;  shu-system-type-is-mac-osx
+;;
+(defun shu-system-type-is-mac-osx ()
+  "Return true if we are running on a Max OSX operating system."
+  (let ((type
+         (if (eq system-type 'darwin)
+             t
+           nil)))
+    type
+    ))
+
+
+;;
+;;  shu-system-type-is-windows
+;;
+(defun shu-system-type-is-windows ()
+  "Return true if we are running on a Windows operating system."
+  (let ((type
+         (if (eq system-type 'windows-nt)
+             t
+           nil)))
+    type
+    ))
+
+
 (setq home (getenv "HOME"))
   (setq load-path
         (append (list (concat home "/emacs"))
           (append load-path))
   )
 
-(setq slp-org-location "~/emacs/org-7.8.09")
-(when (file-readable-p (concat slp-org-location "/lisp/org-install.el"))
-  (setq load-path (cons (concat slp-org-location "/lisp/") load-path))
-  (setq load-path (cons (concat slp-org-location "/contrib/lisp/") load-path))
-  (load-file (concat slp-org-location "/lisp/org.elc"))
-  (load-file (concat slp-org-location "/lisp/org-agenda.elc"))
-)
+;;;(setq slp-org-location "~/emacs/org-7.8.09")
+;;;(when (file-readable-p (concat slp-org-location "/lisp/org-install.el"))
+;;;  (setq load-path (cons (concat slp-org-location "/lisp/") load-path))
+;;;  (setq load-path (cons (concat slp-org-location "/contrib/lisp/") load-path))
+;;;  (load-file (concat slp-org-location "/lisp/org.elc"))
+;;;  (load-file (concat slp-org-location "/lisp/org-agenda.elc"))
+;;;  )
+(require 'org)
+
 (tool-bar-mode 0)
 
 ;;;
@@ -102,7 +149,7 @@
 (setq shell-popd-regexp "po")
 ;
 ; Set ispell
-(if (eq system-type 'darwin)
+(if (shu-system-type-is-mac-osx)
   (setq ispell-program-name "/opt/local/bin/ispell")   ;; For Mac OS X
   (setq ispell-program-name "/opt/swt/bin/aspell"))    ;; For all others
 
@@ -126,8 +173,6 @@
 (load-file "~/emacs/shu-keyring.elc")
 (load-file "~/emacs/shu-capture-doc.elc")
 (load-file "~/emacs/shu-xref.elc")
-(load-file "~/emacs/slp-comment-hooks.elc")
-(load-file "~/emacs/slp-bb-comment-hooks.elc")
 (when (file-readable-p "~/emacs/trust.elc")
   (load-file "~/emacs/trust.elc"))
 
@@ -148,7 +193,7 @@
 (defalias 'sli 'shu-shift-line)
 (defalias 'quit 'shu-quit)
 
-(if (eq system-type 'darwin)
+(if (shu-system-type-is-mac-osx)
     (progn
       (shu-set-author "Stewart L. Palmer (stewart@stewartpalmer.com)")
       (slp-set-comment-hooks))
@@ -175,7 +220,7 @@
 ;; Set the common prefix for member variables in a C++ class
 (setq shu-cpp-member-prefix "d_")
 
-(when (not (eq system-type 'darwin))
+(when (not (shu-system-type-is-mac-osx))
   (setq s-standard-indent 4)
   (setq s-undent-on-close nil))
 
@@ -222,59 +267,13 @@
 (add-hook 'before-save-hook 'shu-trim-file-hook)
 (add-hook 'find-file-hook 'slp-record-visited-file)
 
-(setq shu-org-home "~/data/org")
-(when (file-readable-p (concat shu-org-home "/home.org"))
-  (require 'org-install)
-  ;; Allow links from org files to Apple Mail messages
-  (add-to-list 'org-modules 'org-mac-message)
-  (add-to-list 'org-modules 'org-habit)
-  (setq org-mac-mail-account "mail.stewartpalmer.com")
-  ;; Alias to insert link to currently selected Apple Mail message
-  (defalias 'imail 'org-mac-message-insert-selected)
-  (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
-  (define-key global-map "\C-cl" 'org-store-link)
-  (define-key global-map "\C-ca" 'org-agenda)
-  (setq org-log-done t)
-  (setq org-agenda-files (concat shu-org-home "/files.txt"))
-  (setq org-directory shu-org-home)
-  (setq org-default-notes-file (concat org-directory "/notes.org"))
-  (global-set-key "\C-c\C-c" 'org-capture)
+(defvar shu-org-mode-is-set nil
+  "set to true if org mode has been set up")
 
-  (setq org-todo-keywords
-          '((sequence "TODO(t!)" "WAITING(w@)" "|" "CANCELLED(c!)" "DONE(d!)")))
-  ;; These are the keywords that represent the " notdone" state in the above list
-  (setq shu-org-todo-keywords
-          (list "TODO" "WAITING"))
-  ;; These are the keywords that represent the "done" state in the above list
-  ;; Used to identify "stuck" projects, which are ones which are not done
-  (setq shu-org-done-keywords
-          (list "CANCELLED" "DONE"))
-
-  ;; Parent cannot be marked DONE until all children are DONE
-  (setq org-enforce-todo-dependencies t)
-
-  (setq org-outline-path-complete-in-steps t)
-  (setq org-refile-use-outline-path 'file)
-  (setq org-refile-targets '((org-agenda-files . (:level . 2))))
-
-  (setq org-agenda-start-with-follow-mode t)
-
-  ;; Stuck projects are those that are not marked DONE and have neither
-  ;;  deadline nor scheduled time
-  (setq org-stuck-projects (list (shu-org-done-projects-string) nil nil "SCHEDULED:\\|DEADLINE:"))
-
-  ;; Number of elapsed days before a closed TODO item is automatically archived.
-  (setq shu-org-archive-expiry-days 7)
-  (setq safe-local-variable-values (quote ((after-save-hook archive-done-tasks))))
-  (defalias 'archive-done-tasks 'shu-org-archive-done-tasks)
-
-  (setq org-mobile-use-encryption t)
-  (setq org-mobile-encryption-password "Mrs67GreenGenes")
-  (setq org-mobile-directory "~/Dropbox/MobileOrg")
-  (setq org-mobile-inbox-for-pull (concat org-directory "/" "from-mobile.org"))
-  (setq org-mobile-force-id-on-agenda-items nil)
-)
-
+(when (file-readable-p "~/emacs/shu-setup-org-mode.elc")
+  (load-file "~/emacs/shu-setup-org-mode.elc")
+  (when (fboundp 'shu-setup-org-mode)
+    (shu-setup-org-mode)))
 
 (put 'narrow-to-region 'disabled nil)
 
@@ -291,11 +290,11 @@
 (setq mouse-yank-at-point t)  ; Mouse yank is at point instead of at click position
 
 ;; Set larger font when not on OS X
-(when (not (eq system-type 'darwin))
+(when (not (shu-system-type-is-mac-osx))
   (set-face-attribute 'default nil :height 95)
   (set-face-attribute 'region nil :background "khaki"))
 
-(when (not (eq system-type 'darwin))
+(when (not (shu-system-type-is-mac-osx))
   (setq x-gtk-use-system-tooltips nil))
 
 ;;
@@ -360,7 +359,7 @@ text))
 
 (setq shu-git-path "C:/Program Files/Git/usr/bin/sh.exe")
 (setq shu-git-windows-shell-file (concat shu-git-path "/sh.exe"))
-(when (and (eq system-type 'windows-nt) (file-readable-p shu-git-windows-shell-file))
+(when (and (shu-system-type-is-windows) (file-readable-p shu-git-windows-shell-file))
   (setq explicit-shell-file-name shu-git-windows-shell-file)
   ;; shell.el forms a variable name from the shell name.  In this case the shell
   ;; name sans-directory is sh.exe.  So the variable name is explicit-sh.exe-args.

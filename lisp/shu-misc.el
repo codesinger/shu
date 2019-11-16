@@ -1467,6 +1467,43 @@ The returned string would be
 
 
 ;;
+;;  shu-os-name
+;;
+(defun shu-os-name ()
+  "Return a string with the name of the type of the host operating system."
+  (let ((name
+         (if (and
+              (fboundp 'shu-system-type-is-mac-osx)
+              (shu-system-type-is-mac-osx))
+             "Mac OSX"
+           (if (and
+                (fboundp 'shu-system-type-is-unix)
+                (shu-system-type-is-unix))
+               "Unix"
+             (if (and
+                  (fboundp 'shu-system-type-is-windows)
+                  (shu-system-type-is-windows))
+                 "Windows"
+               "Unknown")))))
+    name
+    ))
+
+
+
+;;
+;;  shu-show-os-name
+;;
+(defun shu-show-os-name ()
+  "Display the name of the host operating system type.  This is a sanity check
+function for the various functions defined in .emacs to determine the type of
+the host operating system."
+  (interactive)
+    (message "%s" (shu-os-name))
+    )
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -1510,6 +1547,7 @@ shu- prefix removed."
   (defalias 'all-quit 'shu-all-quit)
   (defalias 'md-toc 'shu-make-md-toc-entry)
   (defalias 'md-name 'shu-make-md-name-entry)
+  (defalias 'os-name 'shu-show-os-name)
   )
 
 ;;; shu-misc.el ends here
