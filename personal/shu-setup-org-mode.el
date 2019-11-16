@@ -42,13 +42,14 @@
 I work and play.  It is not part of the Shu elisp package."
   (interactive)
   (let (
-        (gb (get-buffer-create "**shu-org**"))
+        (gb (get-buffer-create "**shu-org-setup**"))
         (enable-org-mode nil)
         )
     (if (shu-system-type-is-mac-osx)
         (progn
           (princ "On Mac OSX\n" gb)
           (setq shu-org-home "~/data/org")
+          (princ (concat "Looking for: \"" shu-org-home "/home.org" "\"\n") gb)
           (when (file-readable-p (concat shu-org-home "/home.org"))
             (princ (concat "Found file: " shu-org-home "/home.org" "\n") gb)
             (setq enable-org-mode t)
@@ -63,7 +64,8 @@ I work and play.  It is not part of the Shu elisp package."
       (when (shu-system-type-is-unix)
         (progn
           (princ "On Unix\n" gb)
-          (setq shu-org-home "~/mbig/2019-11-16-work")
+          (setq shu-org-home "~/mbig/2019-11-16-work/work")
+          (princ (concat "Looking for: \"" shu-org-home "/work.org" "\"\n") gb)
           (when (file-readable-p (concat shu-org-home "/work.org"))
             (princ (concat "Found file: " shu-org-home "/work.org" "\n") gb)
             (setq enable-org-mode t)
