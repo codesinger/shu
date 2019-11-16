@@ -47,11 +47,11 @@
    (cons "1.3"   "6b2f890394d200303b114f49aa3d1e9880b1feab")
    (cons "1.4"   "479a129fedba8a7f95d60b38de3383ab22575389")
    (cons "1.5"   "821beb4ace51edbae436f7ac1da67873cc5925c2")
-   (cons "1.6"   "UNKNOWN")
+   (cons "1.6"   "dcfe32ef84a3d4ca54b0ac43e754249f1e21f35e")
    (cons "1.7"   "UNKNOWN"))
   "A list of all commits by version starting with version 1.2")
 
-(defconst shu-last-commit "821beb4ace51edbae436f7ac1da67873cc5925c2"
+(defconst shu-last-commit "dcfe32ef84a3d4ca54b0ac43e754249f1e21f35e"
   "The git SHA-1 of the most recent commit.  This cannot be the SHA-1 hash of
 the last commit because that is not known until after the commit happens.  Just
 before the merge with master, a commit is done.  Its SHA-1 hash is copied into
