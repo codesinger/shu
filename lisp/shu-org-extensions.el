@@ -299,19 +299,14 @@ than shu-org-archive-expiry-days days ago."
 (defun shu-goto-home-org-file ()
   "Visit the org home file."
   (interactive)
-  (let (
-        )
     (if shu-org-mode-is-set
         (if shu-org-home-file
             (if (file-readable-p shu-org-home-file)
                 (find-file shu-org-home-file)
-              (message "%s is not readable" shu-org-home-file)
-                )
-          (message "%s" "shu-org-home-file variable has not been set")
-          )
-      (message "%s" "org mode has not been set (shu-org-mode-is-set is nil)")
-      )
-    ))
+              (message "%s is not readable" shu-org-home-file))
+          (message "%s" "shu-org-home-file variable has not been set"))
+      (message "%s" "org mode has not been set (shu-org-mode-is-set is nil)"))
+    )
 
 
 

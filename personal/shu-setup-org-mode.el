@@ -41,10 +41,8 @@
   "This is a function that sets up org mode in the various environments in which
 I work and play.  It is not part of the Shu elisp package."
   (interactive)
-  (let (
-        (gb (get-buffer-create "**shu-org-setup**"))
-        (enable-org-mode nil)
-        )
+  (let ((gb (get-buffer-create "**shu-org-setup**"))
+        (enable-org-mode nil))
     (princ "Trace of the Shu org mode setup\n\n" gb)
     (if (shu-system-type-is-mac-osx)
         (progn
@@ -60,9 +58,7 @@ I work and play.  It is not part of the Shu elisp package."
             (add-to-list 'org-modules 'org-habit)
             (setq org-mac-mail-account "mail.stewartpalmer.com")
             ;; Alias to insert link to currently selected Apple Mail message
-            (defalias 'imail 'org-mac-message-insert-selected)
-            )
-          )
+            (defalias 'imail 'org-mac-message-insert-selected)))
       (when (shu-system-type-is-unix)
         (progn
           (princ "On Unix\n" gb)
@@ -71,14 +67,9 @@ I work and play.  It is not part of the Shu elisp package."
           (princ (concat "Looking for: \"" shu-org-home-file "\"\n") gb)
           (when (file-readable-p shu-org-home-file)
             (princ (concat "Found file: \"" shu-org-home-file "\"\n") gb)
-            (setq enable-org-mode t)
-            )
-          )
-        )
-      )
+            (setq enable-org-mode t)))))
     (when (not enable-org-mode)
-      (princ "enable-org-mode is false\n" gb)
-      )
+      (princ "enable-org-mode is false\n" gb))
     (when enable-org-mode
       (princ "enable-org-mode is true\n" gb)
       (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
@@ -123,8 +114,7 @@ I work and play.  It is not part of the Shu elisp package."
       (setq org-mobile-directory "~/Dropbox/MobileOrg")
       (setq org-mobile-inbox-for-pull (concat org-directory "/" "from-mobile.org"))
       (setq org-mobile-force-id-on-agenda-items nil)
-      (setq shu-org-mode-is-set t)
-      )
+      (setq shu-org-mode-is-set t))
     ))
 
 
