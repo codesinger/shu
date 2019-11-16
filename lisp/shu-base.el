@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.5.31
+;; Version: 1.5.32
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.5.31"
+(defconst shu-version "1.5.32"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Aug 18"
@@ -703,17 +703,19 @@ results in the following output being returned:
   "Split a string into a list of strings.  If the optional SEPARATOR is present,
 it is used as a regular expression that represents the line separator and it is
 not retained in each split line.  If SEPARATOR is not present, the separator is
-the newline (\n) character.  The separator expressions are removed from the
+the newline character.  The separator expressions are removed from the
 input string and a list of separated strings is returned.
 
 If the input line is an empty string, a list containing one empty string is
 returned.  If the line contains a trailing new line character, that trailing new
 line character is discarded without generating a new, empty line in the output.
 
-For example, the input string \"Hello\nThere\n\" will return exactly the same
-output list as the input string \"Hello\nThere\".
+In the following examples SEPARATOR has been set to a comma.
 
-As another example, the input string \"Hi\nHow are you?\n\" returns a list of
+For example, the input string \"Hello,There,\" will return exactly the same
+output list as the input string \"Hello,There\".
+
+As another example, the input string \"Hi,How are you?,\" returns a list of
 two strings, which are \"Hi\" and \"How are you?\"."
   (let* ((count 0)
          (sep-exp (if separator separator (regexp-opt (list "\n"))))

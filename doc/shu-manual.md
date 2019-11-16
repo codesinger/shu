@@ -47,7 +47,6 @@
 
 
 
-
 # Overview #
 
 
@@ -66,7 +65,7 @@ Version 1.4 was merged with the master branch on 2 February 2019.
 
 Version 1.5 was merged with the master branch on 18 August 2019.
 
-This is Version 1.5.26 of the Shu elisp repository.
+This is Version 1.5.32 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -545,17 +544,19 @@ shu-split-new-lines *data* **&optional** *separator*
 Split a string into a list of strings.  If the optional *separator* is present,
 it is used as a regular expression that represents the line separator and it is
 not retained in each split line.  If *separator* is not present, the separator is
-the newline (\n) character.  The separator expressions are removed from the
+the newline character.  The separator expressions are removed from the
 input string and a list of separated strings is returned.
 
 If the input line is an empty string, a list containing one empty string is
 returned.  If the line contains a trailing new line character, that trailing new
 line character is discarded without generating a new, empty line in the output.
 
-For example, the input string "Hello\nThere\n" will return exactly the same
-output list as the input string "Hello\nThere".
+In the following examples *separator* has been set to a comma.
 
-As another example, the input string "Hi\nHow are you?\n" returns a list of
+For example, the input string "Hello,There," will return exactly the same
+output list as the input string "Hello,There".
+
+As another example, the input string "Hi,How are you?," returns a list of
 two strings, which are "Hi" and "How are you?".
 
 
@@ -7243,6 +7244,20 @@ change counts.
 
 
 
+#### shu-match-line-code ####
+shu-match-line-code *stmt* *spos*
+[Function]
+
+*stmt* is a string of text taken from the buffer.  *spos* is the start position
+of the string of text.  This function splits the lines of text into separate
+lines, each one prefixed with the line number where it appears in the file.
+
+For example, if the string of test is "Hello." and it starts at line 392 of
+the file, this function will return "   392. Hello." with a newline appended
+to the end of the line.
+
+
+
 #### shu-match-make-class-hash-table-internal ####
 shu-match-make-class-hash-table-internal *proc-classes* *log-buf*
 [Function]
@@ -7589,6 +7604,24 @@ While in a file buffer, put the name of the current file into the kill ring.
 
 
 
+#### gpl ####
+[Command]
+ (Function: shu-git-insert-pull-origin-branch)
+
+Insert at point the name the git command to pull the current branch out
+to origin.
+
+
+
+#### gps ####
+[Command]
+ (Function: shu-git-insert-push-origin-branch)
+
+Insert at point the name the git command to push the current branch out
+to origin.
+
+
+
 #### gquote ####
 [Command]
  (Function: shu-gquote)
@@ -7756,6 +7789,16 @@ at point and continues to the end of the buffer.
  (Function: shu-of)
 
 While in dired, open the current file (Mac OS X only)
+
+
+
+#### os-name ####
+[Command]
+ (Function: shu-show-os-name)
+
+Display the name of the host operating system type.  This is a sanity check
+function for the various functions defined in .emacs to determine the type of
+the host operating system.
 
 
 
@@ -8144,6 +8187,24 @@ word "origin"..  This can be used as part of git push or pull.
 
 
 
+#### shu-git-insert-pull-origin-branch ####
+[Command]
+ (Alias: gpl)
+
+Insert at point the name the git command to pull the current branch out
+to origin.
+
+
+
+#### shu-git-insert-push-origin-branch ####
+[Command]
+ (Alias: gps)
+
+Insert at point the name the git command to push the current branch out
+to origin.
+
+
+
 #### shu-git-number-commits ####
 [Command]
  (Alias: number-commits)
@@ -8395,6 +8456,13 @@ While in dired, open the current file (Mac OS X only)
 
 
 
+#### shu-os-name ####
+[Function]
+
+Return a string with the name of the type of the host operating system.
+
+
+
 #### shu-put-line-near-top ####
 [Command]
 
@@ -8497,6 +8565,16 @@ Shift a line of text left or right by *count* positions.  Shift right
 if *count* is positive, left if *count* is negative.  Shifting left only
 eliminates whitespace.  If there is a non-whitespace character in column
 5, then shift by -10 will only shift left 4.
+
+
+
+#### shu-show-os-name ####
+[Command]
+ (Alias: os-name)
+
+Display the name of the host operating system type.  This is a sanity check
+function for the various functions defined in .emacs to determine the type of
+the host operating system.
 
 
 
@@ -8659,11 +8737,33 @@ ago and moves it to an archive file by invoking org-archive-subtree
 on it.
 
 
+## List of functions by alias name ##
+
+A list of aliases and associated function names.
+
+
+
+
+
+#### gorg ####
+[Command]
+ (Function: shu-goto-home-org-file)
+
+Visit the org home file.
+
 ## List of functions and variables ##
 
 List of functions and variable definitions in this package.
 
 
+
+
+
+#### shu-goto-home-org-file ####
+[Command]
+ (Alias: gorg)
+
+Visit the org home file.
 
 
 
@@ -8685,7 +8785,7 @@ Number of elapsed days before a closed TODO item is automatically archived.
 #### shu-org-date-match-regexp ####
 [Function]
 
-Return a regexp string that matches an org date of the form 2012-04-01 Tue 13:18.
+Return a regexp string that matches an org date of the form 2014-04-01 Tue 13:18.
 
 
 
@@ -8704,6 +8804,15 @@ words that represent a DONE item.  These are the words defined in org-done-keywo
 If the two keywords that mean finished item are DONE and CANCELLED, then this function will
 return the string: TODO={.+}/-CANCELLED-DONE.  This is intended to be used in the definition
 of the variable "org-stuck-projects".
+
+
+
+#### shu-org-extensions-set-alias ####
+[Function]
+
+Set the common alias names for the functions in shu-misc.
+These are generally the same as the function names with the leading
+shu- prefix removed.
 
 
 
@@ -8865,7 +8974,6 @@ within type.
 
 Associate a number with each type of variable
 
-
 # Index #
 
 * [acgen](#acgen)
@@ -8934,6 +9042,9 @@ Associate a number with each type of variable
 * [gfl](#gfl)
 * [gfn](#gfn)
 * [ginclude](#ginclude)
+* [gorg](#gorg)
+* [gpl](#gpl)
+* [gps](#gps)
 * [gquote](#gquote)
 * [hcgen](#hcgen)
 * [hother](#hother)
@@ -8969,6 +9080,7 @@ Associate a number with each type of variable
 * [number-lines](#number-lines)
 * [of](#of)
 * [operators](#operators)
+* [os-name](#os-name)
 * [other](#other)
 * [parse-region](#parse-region)
 * [qualify-bsl](#qualify-bsl)
@@ -9394,10 +9506,13 @@ Associate a number with each type of variable
 * [shu-git-find-short-hash](#shu-git-find-short-hash)
 * [shu-git-insert-branch](#shu-git-insert-branch)
 * [shu-git-insert-origin-branch](#shu-git-insert-origin-branch)
+* [shu-git-insert-pull-origin-branch](#shu-git-insert-pull-origin-branch)
+* [shu-git-insert-push-origin-branch](#shu-git-insert-push-origin-branch)
 * [shu-git-number-commits](#shu-git-number-commits)
 * [shu-git-show-branch](#shu-git-show-branch)
 * [shu-global-buffer-name](#shu-global-buffer-name)
 * [shu-global-operation](#shu-global-operation)
+* [shu-goto-home-org-file](#shu-goto-home-org-file)
 * [shu-goto-line](#shu-goto-line)
 * [shu-gquote](#shu-gquote)
 * [shu-group-number](#shu-group-number)
@@ -9477,6 +9592,7 @@ Associate a number with each type of variable
 * [shu-match-get-start-end-pos](#shu-match-get-start-end-pos)
 * [shu-match-increment-class-count](#shu-match-increment-class-count)
 * [shu-match-internal-rmv-using](#shu-match-internal-rmv-using)
+* [shu-match-line-code](#shu-match-line-code)
 * [shu-match-make-class-hash-table-internal](#shu-match-make-class-hash-table-internal)
 * [shu-match-make-count-alist-from-hash](#shu-match-make-count-alist-from-hash)
 * [shu-match-make-include-hash-table](#shu-match-make-include-hash-table)
@@ -9522,9 +9638,11 @@ Associate a number with each type of variable
 * [shu-org-date-match-regexp](#shu-org-date-match-regexp)
 * [shu-org-done-keywords](#shu-org-done-keywords)
 * [shu-org-done-projects-string](#shu-org-done-projects-string)
+* [shu-org-extensions-set-alias](#shu-org-extensions-set-alias)
 * [shu-org-home](#shu-org-home)
 * [shu-org-state-regexp](#shu-org-state-regexp)
 * [shu-org-todo-keywords](#shu-org-todo-keywords)
+* [shu-os-name](#shu-os-name)
 * [shu-other](#shu-other)
 * [shu-point-at-sexp](#shu-point-at-sexp)
 * [shu-point-in-string](#shu-point-in-string)
@@ -9568,6 +9686,7 @@ Associate a number with each type of variable
 * [shu-shift-line](#shu-shift-line)
 * [shu-shift-region-of-text](#shu-shift-region-of-text)
 * [shu-shift-single-line](#shu-shift-single-line)
+* [shu-show-os-name](#shu-show-os-name)
 * [shu-simple-hother-file](#shu-simple-hother-file)
 * [shu-split-new-lines](#shu-split-new-lines)
 * [shu-split-range-string](#shu-split-range-string)
@@ -9613,6 +9732,10 @@ Associate a number with each type of variable
 * [winpath](#winpath)
 
 
+
+
+
+
 <!--
 LocalWords:  shu regexp scf cpp doxygen namepace bde num arg cp Bloomberg gen bb fn
 LocalWords:  cfile hfile tfile decl ifndef endif sdecl struct sgen foo doc elisp md
@@ -9634,7 +9757,7 @@ LocalWords:  WhammoCorp plist abcdef testfn eq binclude mumblefrotz sexp gitbuf 
 LocalWords:  ginclude newfile fixp hitRatio getdef mumbleSomethingOther cciterate
 LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de un
 LocalWords:  proc rlists ht unresolvable uns clist thisistheoverview NB spoints np
-LocalWords:  thisisanoverview incl ns dciterate diterate ThingLoader thingloader
+LocalWords:  thisisanoverview incl ns dciterate diterate ThingLoader thingloader os
 LocalWords:  myproject autocomplete Ctl tciterate titerate libs nThere nHow init
-LocalWords:  elc HEAPCACHE Nov inline insb inso
+LocalWords:  elc HEAPCACHE Nov inline insb inso stmt spos gpl gps gorg
 -->

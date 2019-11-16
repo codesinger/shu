@@ -42,7 +42,7 @@ Version 1.4 was merged with the master branch on 2 February 2019.
 
 Version 1.5 was merged with the master branch on 18 August 2019.
 
-This is Version 1.5.13 of the Shu elisp repository.
+This is Version 1.5.32 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -172,6 +172,20 @@ will include the brackets as characters to be skipped.
 \begin{doc-string}
 The regular expression that defines the delimiter used to start
 a comment.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-conditional-load-library-files }}
+\usebox{\funcname}\emph{path-to-libs}
+\index{shu-conditional-load-library-files} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Conditionally Load all of the library files listed in in the list \emph{libs} using
+the path \emph{path-to-libs}.  A file in the list is loaded only if FILE-READABLE-P
+returns true for that file.  Return true if all readable files were loaded.
+Return false if any readable file failed to load.
 \end{doc-string}
 
 \vspace{1em}
@@ -351,6 +365,18 @@ Date of the most recent merge with the master branch.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-delete-last-char-if }}
+\usebox{\funcname}\emph{input} \emph{test-char}
+\index{shu-delete-last-char-if} \hfill [Function]
+
+\begin{doc-string}
+Return the string \emph{input} with the last character removed if the last character
+is equal to the string \emph{test-char}.  If the last character is not equal to the
+string \emph{test-char}, return the input string unmodified.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-end-of-string }}
 \usebox{\funcname}\emph{string-term}
 \index{shu-end-of-string} \hfill [Function]
@@ -491,12 +517,34 @@ here.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-library-files }}
+\usebox{\funcname}
+\index{shu-library-files} \hfill [Constant]
+
+\begin{doc-string}
+A list of all of the library files that comprise the Shu elisp package in the
+order in which they should be loaded.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-line-and-column-at }}
 \usebox{\funcname}\emph{arg}
 \index{shu-line-and-column-at} \hfill [Function]
 
 \begin{doc-string}
 Return the line number and column number of the point passed in as an argument.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-load-library-files }}
+\usebox{\funcname}\emph{path-to-libs}
+\index{shu-load-library-files} \hfill [Function]
+
+\begin{doc-string}
+Load all of the library files listed in \emph{shu-library-files} using the path
+\emph{path-to-libs}.  Return true if all of the files were successfully loaded.
 \end{doc-string}
 
 \vspace{1em}
@@ -575,6 +623,32 @@ is used in place of the position of point.
 \begin{doc-string}
 Return a copy of \emph{input-string} with all trailing whitespace removed.  All control
 characters are considered whitespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-split-new-lines }}
+\usebox{\funcname}\emph{data} \textbf{\&optional} \emph{separator}
+\index{shu-split-new-lines} \hfill [Function]
+
+\begin{doc-string}
+Split a string into a list of strings.  If the optional \emph{separator} is present,
+it is used as a regular expression that represents the line separator and it is
+not retained in each split line.  If \emph{separator} is not present, the separator is
+the newline character.  The separator expressions are removed from the
+input string and a list of separated strings is returned.
+
+If the input line is an empty string, a list containing one empty string is
+returned.  If the line contains a trailing new line character, that trailing new
+line character is discarded without generating a new, empty line in the output.
+
+In the following examples \emph{separator} has been set to a comma.
+
+For example, the input string ``Hello,There,'' will return exactly the same
+output list as the input string ``Hello,There''.
+
+As another example, the input string ``Hi,How are you?,'' returns a list of
+two strings, which are ``Hi'' and ``How are you?''.
 \end{doc-string}
 
 \vspace{1em}
@@ -671,6 +745,84 @@ The name of the buffer into which unit tests place their output and debug trace.
 
 \begin{doc-string}
 The version number of the Shu elisp package.
+\end{doc-string}
+
+\eject
+\section{shu-batch-mode}
+
+
+A startup script and other functions for running the Shu elisp package
+in batch mode.  Some of the functions in this package have been
+enabled to run as stand alone shell scripts.  This allows these
+functions to be used by non-emacs users and in automated build
+work flows.
+
+The function shu-batch-init loads all of the Shu elisp libraries.
+Other functions in this file invoke various functions in the Shu
+elisp libraries and are set up such that they can be invoked from
+the --eval comment line option of emacs running in batch.
+
+
+\subsection{List of functions and variables}
+
+List of functions and variable definitions in this package.
+
+
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-batch-hello }}
+\usebox{\funcname}
+\index{shu-batch-hello} \hfill [Command]
+
+\begin{doc-string}
+A test function for batch mode.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-batch-init }}
+\usebox{\funcname}
+\index{shu-batch-init} \hfill [Function]
+
+\begin{doc-string}
+Load all of the .elc files from the Shu elisp package.  This is used to allow
+Shu elisp functions to be used in batch mode.  This function searches for the
+functions in the path specified by the environment variable
+``SHU\_EMACS\_LOAD\_PATH''.  If that environment variable does not exist, then it
+searches in the local ``~/emacs'' directory.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-batch-rmv-using }}
+\usebox{\funcname}
+\index{shu-batch-rmv-using} \hfill [Function]
+
+\begin{doc-string}
+Call rmv-using in batch mode.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-generate-component }}
+\usebox{\funcname}
+\index{shu-generate-component} \hfill [Function]
+
+\begin{doc-string}
+Fetch the arguments from environment variables and then call
+\emph{shu-internal-gen-bde-component} to generate a set of three BDE component
+files.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-local-class-list }}
+\usebox{\funcname}
+\index{shu-local-class-list} \hfill [Constant]
+
+\begin{doc-string}
+List of standard namespaces and their associated classes
 \end{doc-string}
 
 \eject
@@ -1114,6 +1266,17 @@ Generate a skeleton t.cpp file
 \begin{doc-string}
 Do a ``git add'' of \emph{filename} and show the result of the operation in
 the buffer \emph{gitbuf}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-gen-bde-component }}
+\usebox{\funcname}\emph{class-name} \emph{author}
+\index{shu-internal-gen-bde-component} \hfill [Function]
+\hspace*{\wd\funcname}\emph{file-prefix}
+
+\begin{doc-string}
+Generate the three files for a new component: .cpp, .h, and .t.cpp
 \end{doc-string}
 
 \eject
@@ -2661,7 +2824,8 @@ one line for every allocated buffer.  Here is a sample of some of its output:
          ADDRESS         SIZE HEAP    ALLOCATOR
       0x30635678          680    0     YORKTOWN
       0x30635928          680    0     YORKTOWN
-      0x30635bd8          680    0     YORKTOWN
+      0x30635bd8          680    0    HEAPCACHE
+      0x30635bcf          680    0     YORKTOWN
 \end{verbatim}}
 
 YORKTOWN is the name of the default allocator on AIX.  This function goes
@@ -3112,6 +3276,18 @@ List of functions and variable definitions in this package.
 Add one or more data types to the list of C++ native data types defined in shu-cpp-base-types
 in shu-cpp-general.el.  Argument may be a single type in a string or a list of strings.
 This modifies shu-cpp-base-types.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-aix-show-allocators }}
+\usebox{\funcname}\emph{sizes} \emph{gb}
+\index{shu-aix-show-allocators} \hfill [Function]
+
+\begin{doc-string}
+\emph{sizes} is an alist whose car is an allocator name and whose cdr is the number of
+allocations attributed to that allocator.  For each allocator, display in the
+buffer \emph{gb}, the name of the allocator and its counts
 \end{doc-string}
 
 \vspace{1em}
@@ -3690,7 +3866,8 @@ one line for every allocated buffer.  Here is a sample of some of its output:
          ADDRESS         SIZE HEAP    ALLOCATOR
       0x30635678          680    0     YORKTOWN
       0x30635928          680    0     YORKTOWN
-      0x30635bd8          680    0     YORKTOWN
+      0x30635bd8          680    0    HEAPCACHE
+      0x30635bcf          680    0     YORKTOWN
 \end{verbatim}}
 
 YORKTOWN is the name of the default allocator on AIX.  This function goes
@@ -8438,14 +8615,33 @@ If neither list is present, then the return value is nil.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-find-any-using-internal }}
+\usebox{\funcname}\emph{token-list}
+\index{shu-match-find-any-using-internal} \hfill [Function]
+
+\begin{doc-string}
+Given a token list, return a list of all ``using namespace'' statements and
+all ``using'' statements that are not ``using namespace'' statements.  ``using
+namespace std;'' is an example of the first type.  ``using std::string'' is an
+example of the second type.  This is used to find out whether or not a file of
+code contains any such statements and to identify them.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-match-find-semi-names }}
 \usebox{\funcname}\emph{token-list}
 \index{shu-match-find-semi-names} \hfill [Function]
 
 \begin{doc-string}
 With a match list that is a semi-colon followed by the regular expression for
-a C++ name, do a reverse tokenized match for all occurrences, then take each line
-that holds a match and put it into the buffer ``\emph\{**shu-vars**\}'',
+a C++ name, do a reverse tokenized match for all occurrences, then take each
+line that holds a match and put it into the buffer ``\emph\{**shu-vars**\.\}
+
+This version (11 Nov 2019) adds one more check.  If the token immediately in
+front of the semi-colon is ``\}'', then we assume this is the last line of code
+in an inline function, in which case it is not a variable declaration.  This
+helps to weed out some of the extraneous ones but not all of them.
 \end{doc-string}
 
 \vspace{1em}
@@ -8637,6 +8833,22 @@ accumulate a change count for each class name.
 When all of the unqualified class names have been qualified, we display the
 final change counts in a buffer and emit a message with the sum of all the
 change counts.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-match-line-code }}
+\usebox{\funcname}\emph{stmt} \emph{spos}
+\index{shu-match-line-code} \hfill [Function]
+
+\begin{doc-string}
+\emph{stmt} is a string of text taken from the buffer.  \emph{spos} is the start position
+of the string of text.  This function splits the lines of text into separate
+lines, each one prefixed with the line number where it appears in the file.
+
+For example, if the string of test is ``Hello.'' and it starts at line 392 of
+the file, this function will return ``   392. Hello.'' with a newline appended
+to the end of the line.
 \end{doc-string}
 
 \vspace{1em}
@@ -8872,6 +9084,8 @@ Kill all dired buffers and all buffers that contain a file and are unmodified.
 It is not uncommon to have dozens of buffers open that are unrelated to the current task
 and this is a convenience function for closing many buffers that do not need to
 be open.
+If the function \emph{shu-clear-c-project} is defined, it is called to clear the current
+project.
 \end{doc-string}
 
 \vspace{1em}
@@ -9064,13 +9278,26 @@ While in a file buffer, put the name of the current file into the kill ring.
 
 \vspace{1em}
 \noindent
-\savebox{\funcname}{\noindent\texttt{git-branch }}
+\savebox{\funcname}{\noindent\texttt{gpl }}
 \usebox{\funcname}
-\index{git-branch} \hfill [Command]\\%
- (Function: shu-git-find-branch)
+\index{gpl} \hfill [Command]\\%
+ (Function: shu-git-insert-pull-origin-branch)
 
 \begin{doc-string}
-Return the name of the current branch in a git repository.
+Insert at point the name the git command to pull the current branch out
+to origin.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{gps }}
+\usebox{\funcname}
+\index{gps} \hfill [Command]\\%
+ (Function: shu-git-insert-push-origin-branch)
+
+\begin{doc-string}
+Insert at point the name the git command to push the current branch out
+to origin.
 \end{doc-string}
 
 \vspace{1em}
@@ -9082,6 +9309,29 @@ Return the name of the current branch in a git repository.
 
 \begin{doc-string}
 Insert a LaTeX quote environment and position the cursor for typing the quote.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{insb }}
+\usebox{\funcname}
+\index{insb} \hfill [Command]\\%
+ (Function: shu-git-insert-branch)
+
+\begin{doc-string}
+Insert at point the name of the current branch in a git repository
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{inso }}
+\usebox{\funcname}
+\index{inso} \hfill [Command]\\%
+ (Function: shu-git-insert-origin-branch)
+
+\begin{doc-string}
+Insert at point the name of the current branch in a git repository preceded by the
+word ``origin''..  This can be used as part of git push or pull.
 \end{doc-string}
 
 \vspace{1em}
@@ -9261,6 +9511,19 @@ While in dired, open the current file (Mac OS X only)
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{os-name }}
+\usebox{\funcname}
+\index{os-name} \hfill [Command]\\%
+ (Function: shu-show-os-name)
+
+\begin{doc-string}
+Display the name of the host operating system type.  This is a sanity check
+function for the various functions defined in .emacs to determine the type of
+the host operating system.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{remove-test-names }}
 \usebox{\funcname}
 \index{remove-test-names} \hfill [Command]\\%
@@ -9303,6 +9566,17 @@ Set the end of line delimiter to be the DOS standard (CRLF).
 
 \begin{doc-string}
 Set the end of line delimiter to be the Unix standard (LF).
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{show-branch }}
+\usebox{\funcname}
+\index{show-branch} \hfill [Command]\\%
+ (Function: shu-git-show-branch)
+
+\begin{doc-string}
+Display the name of the current branch in a git repository.
 \end{doc-string}
 
 \vspace{1em}
@@ -9371,6 +9645,8 @@ Kill all dired buffers and all buffers that contain a file and are unmodified.
 It is not uncommon to have dozens of buffers open that are unrelated to the current task
 and this is a convenience function for closing many buffers that do not need to
 be open.
+If the function \emph{shu-clear-c-project} is defined, it is called to clear the current
+project.
 \end{doc-string}
 
 \vspace{1em}
@@ -9656,6 +9932,16 @@ return git error message.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-branch-to-kill-ring }}
+\usebox{\funcname}
+\index{shu-git-branch-to-kill-ring} \hfill [Command]
+
+\begin{doc-string}
+Put the name of the current branch in a git repository into the kill ring.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-git-diff-commits }}
 \usebox{\funcname}\emph{commit-range}
 \index{shu-git-diff-commits} \hfill [Command]\\%
@@ -9684,8 +9970,7 @@ is put into the kill ring:
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-git-find-branch }}
 \usebox{\funcname}
-\index{shu-git-find-branch} \hfill [Command]\\%
- (Alias: git-branch)
+\index{shu-git-find-branch} \hfill [Function]
 
 \begin{doc-string}
 Return the name of the current branch in a git repository.
@@ -9700,6 +9985,53 @@ Return the name of the current branch in a git repository.
 \begin{doc-string}
 Return the git short hash for the \emph{hash} supplied as an argument.  Return nil
 if the given \emph{hash} is not a valid git revision.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-insert-branch }}
+\usebox{\funcname}
+\index{shu-git-insert-branch} \hfill [Command]\\%
+ (Alias: insb)
+
+\begin{doc-string}
+Insert at point the name of the current branch in a git repository
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-insert-origin-branch }}
+\usebox{\funcname}
+\index{shu-git-insert-origin-branch} \hfill [Command]\\%
+ (Alias: inso)
+
+\begin{doc-string}
+Insert at point the name of the current branch in a git repository preceded by the
+word ``origin''..  This can be used as part of git push or pull.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-insert-pull-origin-branch }}
+\usebox{\funcname}
+\index{shu-git-insert-pull-origin-branch} \hfill [Command]\\%
+ (Alias: gpl)
+
+\begin{doc-string}
+Insert at point the name the git command to pull the current branch out
+to origin.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-insert-push-origin-branch }}
+\usebox{\funcname}
+\index{shu-git-insert-push-origin-branch} \hfill [Command]\\%
+ (Alias: gps)
+
+\begin{doc-string}
+Insert at point the name the git command to push the current branch out
+to origin.
 \end{doc-string}
 
 \vspace{1em}
@@ -9723,6 +10055,17 @@ documentation for \emph{shu-git-diff-commits} for further information.
 This function counts as a commit any instance of ``commit'' that starts at the
 beginning of a line and is followed by some white space and a forty character
 hexadecimal number.  Returns the count of the number of commits found.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-show-branch }}
+\usebox{\funcname}
+\index{shu-git-show-branch} \hfill [Command]\\%
+ (Alias: show-branch)
+
+\begin{doc-string}
+Display the name of the current branch in a git repository.
 \end{doc-string}
 
 \vspace{1em}
@@ -9997,6 +10340,16 @@ While in dired, open the current file (Mac OS X only)
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-os-name }}
+\usebox{\funcname}
+\index{shu-os-name} \hfill [Function]
+
+\begin{doc-string}
+Return a string with the name of the type of the host operating system.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-put-line-near-top }}
 \usebox{\funcname}
 \index{shu-put-line-near-top} \hfill [Command]
@@ -10130,6 +10483,19 @@ Shift a line of text left or right by \emph{count} positions.  Shift right
 if \emph{count} is positive, left if \emph{count} is negative.  Shifting left only
 eliminates whitespace.  If there is a non-whitespace character in column
 5, then shift by -10 will only shift left 4.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-show-os-name }}
+\usebox{\funcname}
+\index{shu-show-os-name} \hfill [Command]\\%
+ (Alias: os-name)
+
+\begin{doc-string}
+Display the name of the host operating system type.  This is a sanity check
+function for the various functions defined in .emacs to determine the type of
+the host operating system.
 \end{doc-string}
 
 \vspace{1em}
@@ -10326,11 +10692,39 @@ ago and moves it to an archive file by invoking org-archive-subtree
 on it.
 
 
+\subsection{List of functions by alias name}
+
+A list of aliases and associated function names.
+
+
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{gorg }}
+\usebox{\funcname}
+\index{gorg} \hfill [Command]\\%
+ (Function: shu-goto-home-org-file)
+
+\begin{doc-string}
+Visit the org home file.
+\end{doc-string}
+
 \subsection{List of functions and variables}
 
 List of functions and variable definitions in this package.
 
 
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-goto-home-org-file }}
+\usebox{\funcname}
+\index{shu-goto-home-org-file} \hfill [Command]\\%
+ (Alias: gorg)
+
+\begin{doc-string}
+Visit the org home file.
+\end{doc-string}
 
 \vspace{1em}
 \noindent
@@ -10360,7 +10754,7 @@ Number of elapsed days before a closed TODO item is automatically archived.
 \index{shu-org-date-match-regexp} \hfill [Function]
 
 \begin{doc-string}
-Return a regexp string that matches an org date of the form 2012-04-01 Tue 13:18.
+Return a regexp string that matches an org date of the form 2014-04-01 Tue 13:18.
 \end{doc-string}
 
 \vspace{1em}
@@ -10385,6 +10779,18 @@ words that represent a DONE item.  These are the words defined in org-done-keywo
 If the two keywords that mean finished item are DONE and CANCELLED, then this function will
 return the string: TODO=\{.+\}/-CANCELLED-DONE.  This is intended to be used in the definition
 of the variable ``org-stuck-projects''.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-org-extensions-set-alias }}
+\usebox{\funcname}
+\index{shu-org-extensions-set-alias} \hfill [Function]
+
+\begin{doc-string}
+Set the common alias names for the functions in shu-misc.
+These are generally the same as the function names with the leading
+shu- prefix removed.
 \end{doc-string}
 
 \vspace{1em}

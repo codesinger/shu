@@ -460,7 +460,7 @@ If neither list is present, then the return value is nil."
 ;;
 (defun shu-match-line-code (stmt spos)
   "STMT is a string of text taken from the buffer.  SPOS is the start position
-of the string of text.  This function splits the lines of text into saparate
+of the string of text.  This function splits the lines of text into separate
 lines, each one prefixed with the line number where it appears in the file.
 
 For example, if the string of test is \"Hello.\" and it starts at line 392 of
