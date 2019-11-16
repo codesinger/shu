@@ -40,7 +40,9 @@
 ;;
 ;; Version 1.5 was merged with the master branch on 18 August 2019.
 ;;
-;; This is Version 1.5.32 of the Shu elisp repository.
+;; Version 1.6 was merged with the master branch on 16 November 2019.
+;;
+;; This is Version 1.6.0 of the Shu elisp repository.
 ;;
 ;; What this document lacks lacks are detailed scenarios and work flows.  The
 ;; reader might well say that this is an interesting collection of parts, and
