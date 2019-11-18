@@ -1096,6 +1096,19 @@ to origin."
 
 
 
+
+;;
+;;  shu-git-insert-git-commit
+;;
+(defun shu-git-insert-git-commit ()
+  "Insert at point the name the git command to commit with the commentary held
+in a file called \"why.txt\"."
+  (interactive)
+    (insert "git commit -F why.txt")
+    )
+
+
+
 ;;
 ;;  shu-conditional-find-file
 ;;
@@ -1567,6 +1580,7 @@ shu- prefix removed."
   (defalias 'inso 'shu-git-insert-origin-branch)
   (defalias 'gpl 'shu-git-insert-pull-origin-branch)
   (defalias 'gps 'shu-git-insert-push-origin-branch)
+  (defalias `gcm `shu-git-insert-git-commit)
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
   (defalias 'number-lines 'shu-number-lines)
