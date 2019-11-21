@@ -1551,11 +1551,15 @@ the host operating system."
   "Return the machine name.  Prior to emacs 25.1, this was held in the variable
 system-name.  As of enacs 25.1, system-name is now a function.  Return nil if
 system-name is neither a function nor a variable."
-  (let ((sys-name))
-    (if (fboundp system-name)
+  (let (
+        (sys-name)
+          )
+    (if (fboundp 'system-name)
         (setq sys-name (system-name))
-      (when (boundp system-name)
-        (setq sys-name system-name)))
+      (when (boundp 'system-name)
+        (setq sys-name system-name)
+        )
+      )
     sys-name
     ))
 
@@ -1594,6 +1598,7 @@ name is not available for some reason."
 (defun shu-kill-system-name ()
   "Place the sytem name (machine name) in the message area."
   (interactive)
+  (setq debug-on-error t)
     (shu-kill-new (shu-system-name-string))
     )
 
