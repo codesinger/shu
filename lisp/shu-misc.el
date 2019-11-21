@@ -1545,6 +1545,62 @@ the host operating system."
 
 
 ;;
+;;  shu-system-name
+;;
+(defun shu-system-name ()
+  "Return the machine name.  Prior to emacs 25.1, this was held in the variable
+system-name.  As of enacs 25.1, system-name is now a function.  Return nil if
+system-name is neither a function nor a variable."
+  (let ((sys-name))
+    (if (fboundp system-name)
+        (setq sys-name (system-name))
+      (when (boundp system-name)
+        (setq sys-name system-name)))
+    sys-name
+    ))
+
+
+
+;;
+;;  shu-system-name-string
+;;
+(defun shu-system-name-string ()
+  "Return the machine name.  Prior to emacs 25.1, this was held in the variable
+system-name.  As of enacs 25.1, system-name is now a function.  Unlike
+SHU-SYSTEM-NAME, this function always returns a string, even if the machine
+name is not available for some reason."
+  (let ((sys-name (shu-system-name)))
+    (when (not sys-name)
+      (setq sys-name "??????"))
+    sys-name
+    ))
+
+
+
+;;
+;;  shu-show-system-name
+;;
+(defun shu-show-system-name ()
+  "Place the sytem name (machine name) in the message area."
+  (interactive)
+    (message "%s" (shu-system-name-string))
+    )
+
+
+
+;;
+;;  shu-kill-system-name
+;;
+(defun shu-kill-system-name ()
+  "Place the sytem name (machine name) in the message area."
+  (interactive)
+    (shu-kill-new (shu-system-name-string))
+    )
+
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -1592,6 +1648,8 @@ shu- prefix removed."
   (defalias 'md-toc 'shu-make-md-toc-entry)
   (defalias 'md-name 'shu-make-md-name-entry)
   (defalias 'os-name 'shu-show-os-name)
+  (defalias 'show-system-name 'shu-show-system-name)
+  (defalias 'kill-system-name 'shu-kill-system-name)
   )
 
 ;;; shu-misc.el ends here
