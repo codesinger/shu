@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.3
+;; Version: 1.6.4
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.3"
+(defconst shu-version "1.6.4"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Aug 18"
@@ -529,19 +529,23 @@ characters are considered whitespace."
 ;;  shu-minimum-leading-space
 ;;
 (defun shu-minimum-leading-space (arg &optional white-space)
-  "Find the amount of white space in front of point and return either that
-count or ARG, whichever is smaller.  Used by functions that wish to
-safely delete ARG characters of white space from the current position
-without deleting any characters that are not white space.
-An optional second argument is a string that defines what is meant
-by white space.  The default definition is SHU-ALL-WHITESPACE-REGEXP."
+  "Find the amount of white space in front of point on the same line and return
+either that count or ARG, whichever is smaller.  Used by functions that wish to
+safely delete ARG characters of white space from the current position without
+deleting any characters that are not white space.  An optional second argument,
+WHITE-SPACE, is a string that defines what is meant by white space.  The default
+definition is SHU-ALL-WHITESPACE-REGEXP."
   (let ((bos (point))
         (bspace (or shu-all-whitespace-regexp-scf white-space))
+        (bol (line-beginning-position))
+        (eol (line-end-position))
+        (llen)
         (wspace 0))
+    (setq llen (- eol bol))
     (save-excursion
       (skip-chars-forward bspace)
       (setq wspace (- (point) bos))
-      (min wspace arg))
+      (min wspace llen arg))
     ))
 
 

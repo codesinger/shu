@@ -916,6 +916,34 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     ))
 
 
+
+;;
+;;  shu-test-shu-minimum-leading-space-4
+;;
+(ert-deftest shu-test-shu-minimum-leading-space-4 ()
+  (let* ((data
+          (concat
+           " \t  Now is the time ...\n"
+           "\n"
+           "\n"
+           "   for all good men ...\n"
+           ))
+         (expected 0)
+         (want 4)
+         (actual)
+         (pos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (search-forward "...")
+      (forward-char 1)
+      (setq pos (point))
+      (setq actual (shu-minimum-leading-space want))
+      (should (= expected actual))
+      (should (= pos (point))))
+    ))
+
+
 ;;
 ;;  shu-test-shu-end-of-string-1
 ;;
