@@ -188,6 +188,7 @@ from the buffer the returned string."
 (defun get-phrase (line-limit)
   "Doc string."
   (let (
+        (gb (get-buffer-create "**boo**"))
         (ss (concat shu-all-whitespace-regexp "+"))
         (sn (concat shu-not-all-whitespace-regexp "+"))
         (something t)
@@ -195,28 +196,53 @@ from the buffer the returned string."
         (lpoint)
         (rpoint)
         (xpoint)
+        (zpoint)
         (part)
+        (lpoint-s)
         )
     (goto-char (point-min))
+    (princ (format "\n\nget-phrase: line-limit: %d\n" line-limit )gb)
+    (princ (format "   buffer: [%s]\n" (buffer-substring-no-properties (point-min) (point-max))) gb)
     (while something
       (setq tpoint (re-search-forward ss nil t))
       (if (not tpoint)
           (progn
             (setq part (get-hunk line-limit))
+            (princ (concat "part1: [" part "]\n") gb)
             (setq something nil)
             )
+        (princ (format "tpoint: %d\n" tpoint) gb)
         (when (> tpoint line-limit)
-          (setq rpoint (re-search-backward sn nil t))
-          (if (not rpoint)
+          (setq tpoint (1- tpoint))
+          (if (= tpoint line-limit)
               (progn
                 (setq part (get-hunk line-limit))
-                (setq something nil)
+                (princ (concat "part2: [" part "]\n") gb)
                 )
-            (setq xpoint (local-nil-max lpoint rpoint))
-            (if (> xpoint line-limit)
-                (setq part (get-hunk line-limit))
-              (setq part (get-hunk xpoint))
+            (setq rpoint (re-search-backward sn nil t))
+            (if (not rpoint)
+                (progn
+                  (setq part (get-hunk line-limit))
+                  (princ (concat "part3: [" part "]\n") gb)
+                  (setq something nil)
+                  )
+              (princ (format "rpoint: %d\n" rpoint) gb)
+              (if lpoint
+                  (setq lpoint-s (number-to-string lpoint))
+                (setq lpoint-s "nil")
                 )
+              (princ (format "lpoint: %s\n" lpoint-s) gb)
+              (setq xpoint (local-nil-max lpoint rpoint))
+              (princ (format "xpoint: %d\n" xpoint) gb)
+              (if (> xpoint line-limit)
+                  (progn
+                    (setq part (get-hunk line-limit))
+                    (princ (concat "part4: [" part "]\n") gb)
+                    )
+                (setq part (get-hunk xpoint))
+                (princ (concat "part5: [" part "]\n") gb)
+                )
+              )
             )
           (setq something nil)
           )
@@ -505,6 +531,71 @@ return the maximum of the two."
 
 ;;; "Now is the time for all good men"
 
+
+
+
+;;
+;;  get-phrase-2
+;;
+(defun get-phrase-2 (line-limit)
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (ss (concat shu-all-whitespace-regexp "+"))
+        (sn (concat shu-not-all-whitespace-regexp "+"))
+        (something t)
+        (tpoint)
+        (lpoint)
+        (rpoint)
+        (xpoint)
+        (zpoint)
+        (part)
+        (lpoint-s)
+        )
+    (goto-char (point-min))
+    (princ (format "\n\nget-phrase: line-limit: %d\n" line-limit )gb)
+    (princ (format "   buffer: [%s]\n" (buffer-substring-no-properties (point-min) (point-max))) gb)
+    (while something
+      (setq tpoint (re-search-forward ss nil t))
+      (if (not tpoint)
+          (progn
+            (setq part (get-hunk line-limit))
+            (princ (concat "part1: [" part "]\n") gb)
+            (setq something nil)
+            )
+        (princ (format "tpoint: %d\n" tpoint) gb)
+        (when (> tpoint line-limit)
+          (setq rpoint (re-search-backward sn nil t))
+          (if (not rpoint)
+              (progn
+                (setq part (get-hunk line-limit))
+                (princ (concat "part2: [" part "]\n") gb)
+                (setq something nil)
+                )
+            (princ (format "rpoint: %d\n" rpoint) gb)
+            (if lpoint
+                (setq lpoint-s (number-to-string lpoint))
+              (setq lpoint-s "nil")
+                )
+            (princ (format "lpoint: %s\n" lpoint-s) gb)
+            (setq xpoint (local-nil-max lpoint rpoint))
+            (princ (format "xpoint: %d\n" xpoint) gb)
+            (if (> xpoint line-limit)
+                (progn
+                  (setq part (get-hunk line-limit))
+                  (princ (concat "part3: [" part "]\n") gb)
+                  )
+              (setq part (get-hunk xpoint))
+              (princ (concat "part4: [" part "]\n") gb)
+                )
+            )
+          (setq something nil)
+          )
+        )
+      (setq lpoint tpoint)
+      )
+    part
+    ))
 
 
 ;;; shu-new.el ends here
