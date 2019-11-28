@@ -232,10 +232,70 @@ from the buffer the returned string."
 ;;  shu-test-get-phrase-1
 ;;
 (ert-deftest shu-test-get-phrase-1 ()
-  (let (
-        (data "1234567890abcdefghijkl")
+  (let ((data "1234567890abcdefghijkl")
         ;;;    1234567890
         (expected "123456789")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (get-phrase 9))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-get-phrase-2
+;;
+(ert-deftest shu-test-get-phrase-2 ()
+  (let (
+        (data "1234567890abc  defghijkl")
+        ;;;    1234567890
+        (expected "123456789")
+        (actual)
+    )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (get-phrase 9))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-get-phrase-3
+;;
+(ert-deftest shu-test-get-phrase-3()
+  (let (
+        (data "nownowist he time to")
+        ;;;    1234567890
+        (expected "nownowist")
+        (actual)
+    )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (get-phrase 9))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-get-phrase-4
+;;
+(ert-deftest shu-test-get-phrase-4()
+  (let (
+        (data "nownowis the time to")
+        ;;;    1234567890
+        (expected "nownowis ")
         (actual)
     )
     (with-temp-buffer
@@ -353,13 +413,14 @@ return the maximum of the two."
 
 
 ;;
-;;  test-get-hunk-1
+;;  shu-test-get-hunk-1
 ;;
-(ert-deftest test-get-hunk-1 ()
+(ert-deftest shu-test-get-hunk-1 ()
   (let ((data "1234567890abcdefghijklmno")
         (part)
         (expected-part "12345678")
-        (expected-rest "90abcdefghijklmno"))
+        (expected-rest "90abcdefghijklmno")
+        (actual-rest))
     (with-temp-buffer
       (insert data)
       (setq part (get-hunk 8))
@@ -375,13 +436,14 @@ return the maximum of the two."
 
 
 ;;
-;;  test-get-hunk-2
+;;  shu-test-get-hunk-2
 ;;
-(ert-deftest test-get-hunk-2 ()
+(ert-deftest shu-test-get-hunk-2 ()
   (let ((data "12345678")
         (part)
         (expected-part "12345678")
-        (expected-rest ""))
+        (expected-rest "")
+        (actual-rest))
     (with-temp-buffer
       (insert data)
       (setq part (get-hunk 8))
@@ -397,13 +459,14 @@ return the maximum of the two."
 
 
 ;;
-;;  test-get-hunk-3
+;;  shu-test-get-hunk-3
 ;;
-(ert-deftest test-get-hunk-3 ()
+(ert-deftest shu-test-get-hunk-3 ()
   (let ((data "12345678")
         (part)
         (expected-part "12345678")
-        (expected-rest ""))
+        (expected-rest "")
+        (actual-rest))
     (with-temp-buffer
       (insert data)
       (setq part (get-hunk 9))
@@ -419,13 +482,14 @@ return the maximum of the two."
 
 
 ;;
-;;  test-get-hunk-4
+;;  shu-test-get-hunk-4
 ;;
-(ert-deftest test-get-hunk-4 ()
+(ert-deftest shu-test-get-hunk-4 ()
   (let ((data "12345678")
         (part)
         (expected-part "12345678")
-        (expected-rest ""))
+        (expected-rest "")
+        (actual-rest))
     (with-temp-buffer
       (insert data)
       (setq part (get-hunk 10))
