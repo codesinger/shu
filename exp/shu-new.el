@@ -164,29 +164,22 @@
     ))
 
 
-
-;;
-;;  get-hunk
-;;
-(defun get-hunk (line-limit)
-  "Retrn a string that consists of the first LINE-LIMIT characters in the
-current buffer.  If LINE-LIMIT is larger than the buffer size, return a
-string that is the entire contents of the buffer.  Before returning, delete
-from the buffer the returned string."
-  (let* ((spoint (point-min))
-        (xpoint (+ line-limit spoint))
-        (epoint (if (< (point-max) xpoint) (point-max) xpoint))
-        (part (buffer-substring-no-properties spoint epoint)))
-    (delete-region spoint epoint)
-    part
-    ))
-
-
 ;;
 ;;  get-phrase
 ;;
 (defun get-phrase (line-limit)
-  "Doc string."
+  "Remove from the front of the current buffer and return the longest possible
+string of whitespace separated things whose length does not exceed line-limit.
+If there is at least one whitespace character before LINE-LIMIT, the string will
+end with one or more whitespace characters.  i.e., the string will end on a word
+boundary if that is possible.
+
+Words will not be split unless there is no whitespace character before
+LINE-LIMIT characters have been scanned, in which case a string of exactly
+LINE-LIMIT length will be removed and returned.
+
+This function is used to split a string of words into a set of smaller strings
+such that words are not split."
   (let (
         (gb (get-buffer-create "**boo**"))
         (ss (concat shu-all-whitespace-regexp "+"))
@@ -230,7 +223,7 @@ from the buffer the returned string."
             (princ (format "lpoint: %s\n" lpoint-s) gb)
             (if (< rpoint line-limit)
                 (progn
-                  (setq part (get-hunk rpoint))
+                  (setq part (get-hunk line-limit))
                   (princ (concat "part3: [" part "]\n") gb)
                   )
               (if lpoint
@@ -248,6 +241,24 @@ from the buffer the returned string."
         )
       (setq lpoint tpoint)
       )
+    part
+    ))
+
+
+
+;;
+;;  get-hunk
+;;
+(defun get-hunk (line-limit)
+  "Retrn a string that consists of the first LINE-LIMIT characters in the
+current buffer.  If LINE-LIMIT is larger than the buffer size, return a
+string that is the entire contents of the buffer.  Before returning, delete
+from the buffer the returned string."
+  (let* ((spoint (point-min))
+        (xpoint (+ line-limit spoint))
+        (epoint (if (< (point-max) xpoint) (point-max) xpoint))
+        (part (buffer-substring-no-properties spoint epoint)))
+    (delete-region spoint epoint)
     part
     ))
 
@@ -422,7 +433,7 @@ from the buffer the returned string."
   (let (
         (data "Now is the     time    for all")
         ;;;    1234567890123456788012345
-        (expected "Now is the     time  ")
+        (expected "Now is the     time   ")
         (actual)
     )
     (with-temp-buffer
