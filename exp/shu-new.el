@@ -150,18 +150,45 @@
 (defun spl-buffer (line-limit)
   "Doc string."
   (let (
-        (ss (concat shu-all-whitespace-regexp "+"))
-        (sn (concat shu-not-all-whitespace-regexp "+"))
         (something t)
-        (pt 0)
-        (tpoint)
+        (line)
+        (lines)
         )
     (while something
-      (goto-char (point-min))
-      (setq tpoint (re-search-forward ss nil t))
+      (setq line (get-phrase line-limit))
+      (if (string= line "")
+          (setq something nil)
+        (push line lines)
+          )
+      )
+    (setq lines (nreverse lines))
+    lines
+    ))
+
+
+
+;;
+;;  shu-test-spl-buffer-1
+;;
+(ert-deftest shu-test-spl-buffer-1 ()
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (data "Now is the time for all good men to come to the aid of the party within these holy portals revenge remains unknown and to all erring mortals, their way by love is shown to all mankind.")
+        (lines)
+        (line)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq lines (spl-buffer 26))
+      )
+    (while lines
+      (setq line (car lines))
+      (princ (concat line "\n") gb)
+      (setq lines (cdr lines))
       )
 
     ))
+
 
 
 ;;
@@ -426,6 +453,9 @@ from the buffer the returned string."
       (should (string= expected actual))
       )
     ))
+
+
+
 ;;
 ;;  shu-test-get-phrase-9
 ;;
@@ -434,6 +464,69 @@ from the buffer the returned string."
         (data "Now is the     time    for all")
         ;;;    1234567890123456788012345
         (expected "Now is the     time   ")
+        (actual)
+    )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (get-phrase 22))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-get-phrase-10
+;;
+(ert-deftest shu-test-get-phrase-10()
+  (let (
+        (data "")
+        ;;;    1234567890123456788012345
+        (expected "")
+        (actual)
+    )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (get-phrase 22))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-get-phrase-11
+;;
+(ert-deftest shu-test-get-phrase-11()
+  (let (
+        (data " ")
+        ;;;    1234567890123456788012345
+        (expected " ")
+        (actual)
+    )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (get-phrase 22))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-get-phrase-12
+;;
+(ert-deftest shu-test-get-phrase-12()
+  (let (
+        (data "     ")
+        ;;;    1234567890123456788012345
+        (expected "     ")
         (actual)
     )
     (with-temp-buffer
