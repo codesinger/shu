@@ -113,6 +113,11 @@ this point is assumed to be a block comment."
   :type '(number)
   :group 'shu-base)
 
+(defcustom shu-cpp-line-end 80
+  "Standard end point (right hand margin) for a line of code."
+  :type '(number)
+  :group 'shu-base)
+
 (defcustom shu-cpp-author "Your name goes here"
   "The string to place in the doxygen author tag."
   :type '(string)

@@ -1380,8 +1380,8 @@ project."
   "Replace everything in the region between START and END with blanks.  This is
 exactly like delete-region except that the deleted text is replaced with spaces.
 As with delete-region, the end point is not included in the delete.  It erases
-everything up but not including the end point.  The order of START and END does
-not matter."
+everything up to but not including the end point.  The order of START and END
+does not matter."
   (let ((spoint start)
         (epoint end)
         (len 0)
