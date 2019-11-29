@@ -183,7 +183,32 @@
       )
     (while lines
       (setq line (car lines))
-      (princ (concat line "\n") gb)
+      (princ (concat "[" line "]\n") gb)
+      (setq lines (cdr lines))
+      )
+
+    ))
+
+
+
+
+;;
+;;  shu-test-spl-buffer-2
+;;
+(ert-deftest shu-test-spl-buffer-2 ()
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (data "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus faucibus dictum venenatis. Nunc lobortis, nibh sed consequat vulputate, magna neque tincidunt lacus, non rutrum turpis libero quis orci. Curabitur eu pulvinar tellus, ut consectetur orci. In in nibh ornare, malesuada elit sed, tincidunt elit. Nullam eu mollis mi. Nullam congue fermentum nulla quis bibendum. Morbi ac orci viverra justo pharetra mollis vitae a sem. Phasellus suscipit rhoncus urna, eget facilisis justo pellentesque id. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. In orci magna, maximus sit amet magna sit amet, varius ullamcorper dolor. Donec et orci purus. Aliquam non neque ligula. In accumsan, magna quis auctor ultricies, metus lorem aliquam erat, eget aliquam massa elit eu elit. Sed facilisis, quam at facilisis dapibus, libero ante efficitur risus, sit amet posuere nulla metus ac mauris.")
+        (lines)
+        (line)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq lines (spl-buffer 26))
+      )
+    (while lines
+      (setq line (car lines))
+      (princ (concat "[" line "]\n") gb)
       (setq lines (cdr lines))
       )
 
@@ -226,7 +251,12 @@ such that words are not split."
     (while something
       (setq tpoint (re-search-forward ss nil t))
       (if (not tpoint)
-          (progn
+          (if lpoint
+              (progn
+                (setq part (get-hunk lpoint))
+                (princ (concat "part0: [" part "]\n") gb)
+                (setq something nil)
+                )
             (setq part (get-hunk line-limit))
             (princ (concat "part1: [" part "]\n") gb)
             (setq something nil)
