@@ -524,6 +524,27 @@ from the buffer the returned string."
 ;;
 (ert-deftest shu-test-get-phrase-12()
   (let (
+        (data "love is shown to all mankind.")
+        ;;;    1234567890123456788012345
+        (expected "love is shown to all ")
+        (actual)
+    )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (get-phrase 26))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-get-phrase-13
+;;
+(ert-deftest shu-test-get-phrase-13()
+  (let (
         (data "     ")
         ;;;    1234567890123456788012345
         (expected "     ")
