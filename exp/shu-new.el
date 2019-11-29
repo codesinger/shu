@@ -232,72 +232,38 @@ LINE-LIMIT length will be removed and returned.
 
 This function is used to split a string of words into a set of smaller strings
 such that words are not split."
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (ss (concat shu-all-whitespace-regexp "+"))
+  (let ((ss (concat shu-all-whitespace-regexp "+"))
         (sn (concat shu-not-all-whitespace-regexp "+"))
         (something t)
         (tpoint)
         (lpoint)
         (rpoint)
-        (xpoint)
-        (zpoint)
-        (part)
-        (lpoint-s)
-        )
+        (epoint)
+        (part))
     (goto-char (point-min))
-    (princ (format "\n\nget-phrase: line-limit: %d\n" line-limit )gb)
-    (princ (format "   buffer: [%s]\n" (buffer-substring-no-properties (point-min) (point-max))) gb)
     (while something
       (setq tpoint (re-search-forward ss nil t))
       (if (not tpoint)
-          (if lpoint
-              (progn
-                (setq part (get-hunk lpoint))
-                (princ (concat "part0: [" part "]\n") gb)
-                (setq something nil)
-                )
-            (setq part (get-hunk line-limit))
-            (princ (concat "part1: [" part "]\n") gb)
-            (setq something nil)
-            )
+          (progn
+            (if lpoint
+                (setq epoint lpoint)
+              (setq epoint line-limit))
+            (setq part (get-hunk epoint))
+            (setq something nil))
         (setq tpoint (1- tpoint))
-        (princ (format "tpoint: %d\n" tpoint) gb)
         (when (> tpoint line-limit)
           (setq rpoint (re-search-backward sn nil t))
           (if (not rpoint)
-              (progn
-                (setq part (get-hunk line-limit))
-                (princ (concat "part2: [" part "]\n") gb)
-                (setq something nil)
-                )
+              (setq epoint line-limit)
             (setq rpoint (1+ rpoint))
-            (princ (format "rpoint: %d\n" rpoint) gb)
-            (if lpoint
-                (setq lpoint-s (number-to-string lpoint))
-              (setq lpoint-s "nil")
-              )
-            (princ (format "lpoint: %s\n" lpoint-s) gb)
             (if (< rpoint line-limit)
-                (progn
-                  (setq part (get-hunk line-limit))
-                  (princ (concat "part3: [" part "]\n") gb)
-                  )
+                (setq epoint line-limit)
               (if lpoint
-                  (progn
-                    (setq part (get-hunk lpoint))
-                    (princ (concat "part4: [" part "]\n") gb)
-                    )
-                (setq part (get-hunk line-limit))
-                (princ (concat "part5: [" part "]\n") gb)
-                )
-              )
-            )
-          (setq something nil)
-          )
-        )
-      (setq lpoint tpoint)
-      )
+                  (setq epoint lpoint)
+                (setq epoint line-limit))))
+          (setq part (get-hunk epoint))
+          (setq something nil)))
+      (setq lpoint tpoint))
     part
     ))
 
@@ -587,212 +553,6 @@ from the buffer the returned string."
       (should (stringp actual))
       (should (string= expected actual))
       )
-    ))
-
-
-
-;;
-;;  local-nil-max
-;;
-(defun local-nil-max (x y)
-  "Return the maximum of two objects, one of which may be nil.  If one
-of X or Y is nil, return the other as the maximum.  If neither are nil,
-return the maximum of the two."
-  (let (
-        (maximum)
-        )
-    (if (not x)
-        (setq maximum y)
-      (if (not y)
-          (setq maximum x)
-        (setq maximum (max x y))
-          )
-        )
-    ))
-
-
-
-;;
-;;  local-nil-min
-;;
-(defun local-nil-min (x y)
-  "Return the minimum of two objects, one of which may be nil.  If one
-of X or Y is nil, return the other as the minimum.  If neither are nil,
-return the minimum of the two."
-  (let (
-        (minimum)
-        )
-    (if (not x)
-        (setq minimum y)
-      (if (not y)
-          (setq minimum x)
-        (setq minimum (min x y))
-          )
-        )
-    ))
-
-
-
-;;
-;;  shu-test-local-nil-max-1
-;;
-(ert-deftest shu-test-local-nil-max-1 ()
-  (let ((x)
-        (y 5)
-        (expected 5)
-        (actual))
-    (setq actual (local-nil-max x y))
-    (should actual)
-    (should (numberp actual))
-    (should (= expected actual))
-    ))
-
-
-
-;;
-;;  shu-test-local-nil-max-2
-;;
-(ert-deftest shu-test-local-nil-max-2 ()
-  (let (
-        (x 5)
-        (y)
-        (expected 5)
-        (actual)
-        )
-    (setq actual (local-nil-max x y))
-    (should actual)
-    (should (numberp actual))
-    (should (= expected actual))
-    ))
-
-
-
-;;
-;;  shu-test-local-nil-max-3
-;;
-(ert-deftest shu-test-local-nil-max-3 ()
-  (let ((x 5)
-        (y 3)
-        (expected 5)
-        (actual))
-    (setq actual (local-nil-max x y))
-    (should actual)
-    (should (numberp actual))
-    (should (= expected actual))
-    ))
-
-
-
-;;
-;;  shu-test-local-nil-max-4
-;;
-(ert-deftest shu-test-local-nil-max-4 ()
-  (let ((x 3)
-        (y 5)
-        (expected 5)
-        (actual))
-    (setq actual (local-nil-max x y))
-    (should actual)
-    (should (numberp actual))
-    (should (= expected actual))
-    ))
-
-
-
-;;
-;;  shu-test-local-nil-max-5
-;;
-(ert-deftest shu-test-local-nil-max-5 ()
-  (let ((x 5)
-        (y 5)
-        (expected 5)
-        (actual))
-    (setq actual (local-nil-max x y))
-    (should actual)
-    (should (numberp actual))
-    (should (= expected actual))
-    ))
-
-
-
-;;
-;;  shu-test-local-nil-min-1
-;;
-(ert-deftest shu-test-local-nil-min-1 ()
-  (let ((x)
-        (y 5)
-        (expected 5)
-        (actual))
-    (setq actual (local-nil-min x y))
-    (should actual)
-    (should (numberp actual))
-    (should (= expected actual))
-    ))
-
-
-
-;;
-;;  shu-test-local-nil-min-2
-;;
-(ert-deftest shu-test-local-nil-min-2 ()
-  (let (
-        (x 5)
-        (y)
-        (expected 5)
-        (actual)
-        )
-    (setq actual (local-nil-min x y))
-    (should actual)
-    (should (numberp actual))
-    (should (= expected actual))
-    ))
-
-
-
-;;
-;;  shu-test-local-nil-min-3
-;;
-(ert-deftest shu-test-local-nil-min-3 ()
-  (let ((x 5)
-        (y 3)
-        (expected 3)
-        (actual))
-    (setq actual (local-nil-min x y))
-    (should actual)
-    (should (numberp actual))
-    (should (= expected actual))
-    ))
-
-
-
-;;
-;;  shu-test-local-nil-min-4
-;;
-(ert-deftest shu-test-local-nil-min-4 ()
-  (let ((x 3)
-        (y 5)
-        (expected 3)
-        (actual))
-    (setq actual (local-nil-min x y))
-    (should actual)
-    (should (numberp actual))
-    (should (= expected actual))
-    ))
-
-
-
-;;
-;;  shu-test-local-nil-min-5
-;;
-(ert-deftest shu-test-local-nil-min-5 ()
-  (let ((x 5)
-        (y 5)
-        (expected 5)
-        (actual))
-    (setq actual (local-nil-min x y))
-    (should actual)
-    (should (numberp actual))
-    (should (= expected actual))
     ))
 
 
@@ -1096,5 +856,299 @@ return the minimum of the two."
     part
     ))
 
+
+
+
+;;
+;;  get-phrase-6
+;;
+(defun get-phrase-6 (line-limit)
+  "Remove from the front of the current buffer and return the longest possible
+string of whitespace separated things whose length does not exceed line-limit.
+If there is at least one whitespace character before LINE-LIMIT, the string will
+end with one or more whitespace characters.  i.e., the string will end on a word
+boundary if that is possible.
+
+Words will not be split unless there is no whitespace character before
+LINE-LIMIT characters have been scanned, in which case a string of exactly
+LINE-LIMIT length will be removed and returned.
+
+This function is used to split a string of words into a set of smaller strings
+such that words are not split."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (ss (concat shu-all-whitespace-regexp "+"))
+        (sn (concat shu-not-all-whitespace-regexp "+"))
+        (something t)
+        (tpoint)
+        (lpoint)
+        (rpoint)
+        (xpoint)
+        (zpoint)
+        (part)
+        (lpoint-s)
+        )
+    (goto-char (point-min))
+    (princ (format "\n\nget-phrase: line-limit: %d\n" line-limit )gb)
+    (princ (format "   buffer: [%s]\n" (buffer-substring-no-properties (point-min) (point-max))) gb)
+    (while something
+      (setq tpoint (re-search-forward ss nil t))
+      (if (not tpoint)
+          (if lpoint
+              (progn
+                (setq part (get-hunk lpoint))
+                (princ (concat "part0: [" part "]\n") gb)
+                (setq something nil)
+                )
+            (setq part (get-hunk line-limit))
+            (princ (concat "part1: [" part "]\n") gb)
+            (setq something nil)
+            )
+        (setq tpoint (1- tpoint))
+        (princ (format "tpoint: %d\n" tpoint) gb)
+        (when (> tpoint line-limit)
+          (setq rpoint (re-search-backward sn nil t))
+          (if (not rpoint)
+              (progn
+                (setq part (get-hunk line-limit))
+                (princ (concat "part2: [" part "]\n") gb)
+                (setq something nil)
+                )
+            (setq rpoint (1+ rpoint))
+            (princ (format "rpoint: %d\n" rpoint) gb)
+            (if lpoint
+                (setq lpoint-s (number-to-string lpoint))
+              (setq lpoint-s "nil")
+              )
+            (princ (format "lpoint: %s\n" lpoint-s) gb)
+            (if (< rpoint line-limit)
+                (progn
+                  (setq part (get-hunk line-limit))
+                  (princ (concat "part3: [" part "]\n") gb)
+                  )
+              (if lpoint
+                  (progn
+                    (setq part (get-hunk lpoint))
+                    (princ (concat "part4: [" part "]\n") gb)
+                    )
+                (setq part (get-hunk line-limit))
+                (princ (concat "part5: [" part "]\n") gb)
+                )
+              )
+            )
+          (setq something nil)
+          )
+        )
+      (setq lpoint tpoint)
+      )
+    part
+    ))
+
+
+
+
+;;
+;;  local-nil-max
+;;
+(defun local-nil-max (x y)
+  "Return the maximum of two objects, one of which may be nil.  If one
+of X or Y is nil, return the other as the maximum.  If neither are nil,
+return the maximum of the two."
+  (let (
+        (maximum)
+        )
+    (if (not x)
+        (setq maximum y)
+      (if (not y)
+          (setq maximum x)
+        (setq maximum (max x y))
+          )
+        )
+    ))
+
+
+
+;;
+;;  local-nil-min
+;;
+(defun local-nil-min (x y)
+  "Return the minimum of two objects, one of which may be nil.  If one
+of X or Y is nil, return the other as the minimum.  If neither are nil,
+return the minimum of the two."
+  (let (
+        (minimum)
+        )
+    (if (not x)
+        (setq minimum y)
+      (if (not y)
+          (setq minimum x)
+        (setq minimum (min x y))
+          )
+        )
+    ))
+
+
+
+;;
+;;  shu-test-local-nil-max-1
+;;
+(ert-deftest shu-test-local-nil-max-1 ()
+  (let ((x)
+        (y 5)
+        (expected 5)
+        (actual))
+    (setq actual (local-nil-max x y))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-local-nil-max-2
+;;
+(ert-deftest shu-test-local-nil-max-2 ()
+  (let (
+        (x 5)
+        (y)
+        (expected 5)
+        (actual)
+        )
+    (setq actual (local-nil-max x y))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-local-nil-max-3
+;;
+(ert-deftest shu-test-local-nil-max-3 ()
+  (let ((x 5)
+        (y 3)
+        (expected 5)
+        (actual))
+    (setq actual (local-nil-max x y))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-local-nil-max-4
+;;
+(ert-deftest shu-test-local-nil-max-4 ()
+  (let ((x 3)
+        (y 5)
+        (expected 5)
+        (actual))
+    (setq actual (local-nil-max x y))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-local-nil-max-5
+;;
+(ert-deftest shu-test-local-nil-max-5 ()
+  (let ((x 5)
+        (y 5)
+        (expected 5)
+        (actual))
+    (setq actual (local-nil-max x y))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-local-nil-min-1
+;;
+(ert-deftest shu-test-local-nil-min-1 ()
+  (let ((x)
+        (y 5)
+        (expected 5)
+        (actual))
+    (setq actual (local-nil-min x y))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-local-nil-min-2
+;;
+(ert-deftest shu-test-local-nil-min-2 ()
+  (let (
+        (x 5)
+        (y)
+        (expected 5)
+        (actual)
+        )
+    (setq actual (local-nil-min x y))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-local-nil-min-3
+;;
+(ert-deftest shu-test-local-nil-min-3 ()
+  (let ((x 5)
+        (y 3)
+        (expected 3)
+        (actual))
+    (setq actual (local-nil-min x y))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-local-nil-min-4
+;;
+(ert-deftest shu-test-local-nil-min-4 ()
+  (let ((x 3)
+        (y 5)
+        (expected 3)
+        (actual))
+    (setq actual (local-nil-min x y))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-local-nil-min-5
+;;
+(ert-deftest shu-test-local-nil-min-5 ()
+  (let ((x 5)
+        (y 5)
+        (expected 5)
+        (actual))
+    (setq actual (local-nil-min x y))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
 
 ;;; shu-new.el ends here
