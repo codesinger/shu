@@ -1604,6 +1604,165 @@ name is not available for some reason."
 
 
 
+;;
+;;  shu-misc-split-string
+;;
+(defun shu-misc-split-string (input line-limit &optional fixed-width)
+  "Split a string into multiple strings and return a list of the strings.  If
+FIXED-WIDTH is true, then each returned string is LINE-LIMIT characters in
+length, except for the last, which may be shorter.  If FIXED-WIDTH is absent or
+nil, then each returned string is split on a word boundary and no string exceeds
+LINE-LIMIT characters in length."
+  (let ((lines))
+    (with-temp-buffer
+      (insert input)
+      (setq lines (shu-misc-split-buffer line-limit fixed-width)))
+    lines
+    ))
+
+
+
+;;
+;;  shu-misc-split-buffer
+;;
+(defun shu-misc-split-buffer (line-limit &optional fixed-width)
+  "Split an entire buffer into multiple strings and return a list of the
+strings.  If FIXED-WIDTH is true, then each returned string is LINE-LIMIT
+characters in length, except for the last, which may be shorter.  If FIXED-WIDTH
+is absent or nil, then each returned string is split on a word boundary and no
+string exceeds LINE-LIMIT characters in length."
+  (let ((lines))
+    (if fixed-width
+        (setq lines (shu-misc-split-chunk-buffer line-limit))
+      (setq lines (shu-misc-split-phrase-buffer line-limit)))
+    ))
+
+
+
+;;
+;;  shu-misc-split-phrase-buffer
+;;
+(defun shu-misc-split-phrase-buffer (line-limit)
+  "Split an entire buffer into multiple strings and return a list of the
+strings.  Each returned string is split on a word boundary and no string exceeds
+LINE-LIMIT characters in length."
+    (shu-misc-internal-split-buffer line-limit 'shu-misc-get-phrase)
+    )
+
+
+
+;;
+;;  shu-misc-split-chunk-buffer
+;;
+(defun shu-misc-split-chunk-buffer (line-limit)
+  "Split an entire buffer into multiple strings and return a list of the
+strings.  Each returned string is LINE-LIMIT characters in length, except for
+the last one, which may be shorter."
+    (shu-misc-internal-split-buffer line-limit 'shu-misc-get-chunk)
+    )
+
+
+
+;;
+;;  shu-misc-internal-split-buffer
+;;
+(defun shu-misc-internal-split-buffer (line-limit get-function)
+  "Split an entire buffer into multiple strings and return a list of the
+strings.  GET-FUNCTION is the function to call to fetch each new string.
+GET-FUNCTION is set to either SHU-MISC-GET-CHUNK or SHU-MISC-GET-PHRASE.
+
+SHU-MISC-GET-CHUNK returns each string as a fixed length string of LINE-LIMIT
+characters, except for the last one, which may be shorter.
+
+SHU-MISC-GET-PHRASE returns the longest possible string that ends on a word
+boundary and whose length is less than or equal to LINE-LIMIT."
+  (let ((something t)
+        (line)
+        (lines))
+    (while something
+      (setq line (funcall get-function line-limit))
+      (if (string= line "")
+          (setq something nil)
+        (push line lines)))
+    (setq lines (nreverse lines))
+    lines
+    ))
+
+
+
+
+;;
+;;  shu-misc-get-phrase
+;;
+(defun shu-misc-get-phrase (line-limit)
+  "Remove from the front of the current buffer and return the longest possible
+string of whitespace separated things whose length does not exceed line-limit.
+If there is at least one whitespace character before LINE-LIMIT, the string will
+end with one or more whitespace characters.  i.e., the string will end on a word
+boundary if that is possible.
+
+Words will not be split unless there is no whitespace character before
+LINE-LIMIT characters have been scanned, in which case a string of exactly
+LINE-LIMIT length will be removed and returned.
+
+This function is used to split a string of words into a set of smaller strings
+such that words are not split."
+  (let ((ss (concat shu-all-whitespace-regexp "+"))
+        (sn (concat shu-not-all-whitespace-regexp "+"))
+        (something t)
+        (tpoint)
+        (lpoint)
+        (rpoint)
+        (epoint)
+        (part))
+    (goto-char (point-min))
+    (while something
+      (setq tpoint (re-search-forward ss nil t))
+      (if (not tpoint)
+          (progn
+            (if lpoint
+                (setq epoint lpoint)
+              (setq epoint line-limit))
+            (setq part (shu-misc-get-chunk epoint))
+            (setq something nil))
+        (setq tpoint (1- tpoint))
+        (when (> tpoint line-limit)
+          (setq rpoint (re-search-backward sn nil t))
+          (if (not rpoint)
+              (setq epoint line-limit)
+            (setq rpoint (1+ rpoint))
+            (if (< rpoint line-limit)
+                (setq epoint line-limit)
+              (if lpoint
+                  (setq epoint lpoint)
+                (setq epoint line-limit))))
+          (setq part (shu-misc-get-chunk epoint))
+          (setq something nil)))
+      (setq lpoint tpoint))
+    part
+    ))
+
+
+
+
+;;
+;;  shu-misc-get-chunk
+;;
+(defun shu-misc-get-chunk (line-limit)
+  "Return a string that consists of the first LINE-LIMIT characters in the
+current buffer.  If LINE-LIMIT is larger than the buffer size, return a
+string that is the entire contents of the buffer.  Before returning, delete
+from the buffer the returned string."
+  (let* ((spoint (point-min))
+         (xpoint (+ line-limit spoint))
+         (epoint (if (< (point-max) xpoint) (point-max) xpoint))
+         (part (buffer-substring-no-properties spoint epoint)))
+    (delete-region spoint epoint)
+    part
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias

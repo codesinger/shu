@@ -585,4 +585,356 @@
     ))
 
 
+
+
+
+;;
+;;  shu-test-shu-misc-split-buffer-1
+;;
+(ert-deftest shu-test-shu-misc-split-buffer-1 ()
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (data "Now is the time for all good men to come to the aid of the party within these holy portals revenge remains unknown and to all erring mortals, their way by love is shown to all mankind.")
+        (lines)
+        (line)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq lines (shu-misc-split-buffer 26))
+      )
+    (while lines
+      (setq line (car lines))
+      (princ (concat "[" line "]\n") gb)
+      (setq lines (cdr lines))
+      )
+
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-1
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-1 ()
+  (let ((data "1234567890abcdefghijkl")
+        ;;;    1234567890
+        (expected "123456789")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 9))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-2
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-2 ()
+  (let ((data "1234567890abc  defghijkl")
+        ;;;    1234567890
+        (expected "123456789")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 9))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-3
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-3()
+  (let ((data "nownowist he time to")
+        ;;;    1234567890
+        (expected "nownowist")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 9))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-4
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-4()
+  (let ((data "nownowis the time to")
+        ;;;    1234567890
+        (expected "nownowis ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 9))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-5
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-5()
+  (let ((data "Now is the time for all")
+        ;;;    1234567890
+        (expected "Now is ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 9))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-6
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-6()
+  (let ((data "Now is the time for all")
+        ;;;    1234567890123
+        (expected "Now is the ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 13))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-7
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-7()
+  (let ((data "Now is the    time for all")
+        ;;;    123456789012345678
+        (expected "Now is the    ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 16))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-8
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-8()
+  (let ((data "Now is the     time for all")
+        ;;;    123456789012345678
+        (expected "Now is the     ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 16))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-9
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-9()
+  (let ((data "Now is the     time    for all")
+        ;;;    1234567890123456788012345
+        (expected "Now is the     time   ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 22))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-10
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-10()
+  (let ((data "")
+        ;;;    1234567890123456788012345
+        (expected "")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 22))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-11
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-11()
+  (let ((data " ")
+        ;;;    1234567890123456788012345
+        (expected " ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 22))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-12
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-12()
+  (let ((data "love is shown to all mankind.")
+        ;;;    1234567890123456788012345
+        (expected "love is shown to all ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 26))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-phrase-13
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-13()
+  (let ((data "     ")
+        ;;;    1234567890123456788012345
+        (expected "     ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 22))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-chunk-1
+;;
+(ert-deftest shu-test-shu-misc-get-chunk-1 ()
+  (let ((data "1234567890abcdefghijklmno")
+        (part)
+        (expected-part "12345678")
+        (expected-rest "90abcdefghijklmno")
+        (actual-rest))
+    (with-temp-buffer
+      (insert data)
+      (setq part (shu-misc-get-chunk 8))
+      (should part)
+      (should (stringp part))
+      (should (string= expected-part part))
+      (setq actual-rest (buffer-substring-no-properties (point-min) (point-max)))
+      (should actual-rest)
+      (should (stringp actual-rest))
+      (should (string= expected-rest actual-rest)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-chunk-2
+;;
+(ert-deftest shu-test-shu-misc-get-chunk-2 ()
+  (let ((data "12345678")
+        (part)
+        (expected-part "12345678")
+        (expected-rest "")
+        (actual-rest))
+    (with-temp-buffer
+      (insert data)
+      (setq part (shu-misc-get-chunk 8))
+      (should part)
+      (should (stringp part))
+      (should (string= expected-part part))
+      (setq actual-rest (buffer-substring-no-properties (point-min) (point-max)))
+      (should actual-rest)
+      (should (stringp actual-rest))
+      (should (string= expected-rest actual-rest)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-chunk-3
+;;
+(ert-deftest shu-test-shu-misc-get-chunk-3 ()
+  (let ((data "12345678")
+        (part)
+        (expected-part "12345678")
+        (expected-rest "")
+        (actual-rest))
+    (with-temp-buffer
+      (insert data)
+      (setq part (shu-misc-get-chunk 9))
+      (should part)
+      (should (stringp part))
+      (should (string= expected-part part))
+      (setq actual-rest (buffer-substring-no-properties (point-min) (point-max)))
+      (should actual-rest)
+      (should (stringp actual-rest))
+      (should (string= expected-rest actual-rest)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-get-chunk-4
+;;
+(ert-deftest shu-test-shu-misc-get-chunk-4 ()
+  (let ((data "12345678")
+        (part)
+        (expected-part "12345678")
+        (expected-rest "")
+        (actual-rest))
+    (with-temp-buffer
+      (insert data)
+      (setq part (shu-misc-get-chunk 10))
+      (should part)
+      (should (stringp part))
+      (should (string= expected-part part))
+      (setq actual-rest (buffer-substring-no-properties (point-min) (point-max)))
+      (should actual-rest)
+      (should (stringp actual-rest))
+      (should (string= expected-rest actual-rest)))
+    ))
+
 ;;; shu-misc.t.el ends here
