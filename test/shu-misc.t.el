@@ -586,6 +586,91 @@
 
 
 
+;;
+;;  shu-test-shu-misc-split-string-1
+;;
+(ert-deftest shu-test-shu-misc-split-string-1 ()
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (data "Now is the time for all good men to come to the aid of the party within these holy portals revenge remains unknown and to all erring mortals, their way by love is shown to all mankind.")
+        (lines)
+        (line)
+        (fixed-width t)
+        (line-limit 26)
+        (expected
+         (list
+          "Now is the time for all go"
+          "od men to come to the aid "
+          "of the party within these "
+          "holy portals revenge remai"
+          "ns unknown and to all erri"
+          "ng mortals, their way by l"
+          "ove is shown to all mankin"
+          "d."))
+        (expected-line)
+        (actual-line)
+        )
+    (setq lines (shu-misc-split-string data line-limit fixed-width))
+    (should lines)
+    (should (listp lines))
+    (should (= (length expected) (length lines)))
+    (princ "\n\nshu-test-shu-misc-split-string-1:\n" gb)
+    (while (and lines expected)
+      (setq expected-line (car expected))
+      (setq actual-line (car lines))
+      (should actual-line)
+      (should (stringp actual-line))
+      (should (string= expected-line actual-line))
+      (setq lines (cdr lines))
+      (setq expected (cdr expected))
+      )
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-misc-split-string-2
+;;
+(ert-deftest shu-test-shu-misc-split-string-2 ()
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (data "Now is the time for all good men to come to the aid of the party within these holy portals revenge remains unknown and to all erring mortals, their way by love is shown to all mankind.")
+        (lines)
+        (line)
+        (fixed-width nil)
+        (line-limit 26)
+        (expected
+         (list
+          "Now is the time for all "
+          "good men to come to the "
+          "aid of the party within "
+          "these holy portals "
+          "revenge remains unknown "
+          "and to all erring "
+          "mortals, their way by "
+          "love is shown to all "
+          "mankind."))
+        (expected-line)
+        (actual-line)
+        )
+    (setq lines (shu-misc-split-string data line-limit fixed-width))
+    (should lines)
+    (should (listp lines))
+    (should (= (length expected) (length lines)))
+    (princ "\n\nshu-test-shu-misc-split-string-1:\n" gb)
+    (while (and lines expected)
+      (setq expected-line (car expected))
+      (setq actual-line (car lines))
+      (should actual-line)
+      (should (stringp actual-line))
+      (should (string= expected-line actual-line))
+      (setq lines (cdr lines))
+      (setq expected (cdr expected))
+      )
+    ))
+
+
 
 
 ;;
