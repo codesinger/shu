@@ -590,9 +590,7 @@
 ;;  shu-test-shu-misc-split-string-1
 ;;
 (ert-deftest shu-test-shu-misc-split-string-1 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (data "Now is the time for all good men to come to the aid of the party within these holy portals revenge remains unknown and to all erring mortals, their way by love is shown to all mankind.")
+  (let ((data "Now is the time for all good men to come to the aid of the party within these holy portals revenge remains unknown and to all erring mortals, their way by love is shown to all mankind.")
         (lines)
         (line)
         (fixed-width t)
@@ -608,13 +606,11 @@
           "ove is shown to all mankin"
           "d."))
         (expected-line)
-        (actual-line)
-        )
+        (actual-line))
     (setq lines (shu-misc-split-string data line-limit fixed-width))
     (should lines)
     (should (listp lines))
     (should (= (length expected) (length lines)))
-    (princ "\n\nshu-test-shu-misc-split-string-1:\n" gb)
     (while (and lines expected)
       (setq expected-line (car expected))
       (setq actual-line (car lines))
@@ -622,8 +618,7 @@
       (should (stringp actual-line))
       (should (string= expected-line actual-line))
       (setq lines (cdr lines))
-      (setq expected (cdr expected))
-      )
+      (setq expected (cdr expected)))
     ))
 
 
@@ -633,9 +628,7 @@
 ;;  shu-test-shu-misc-split-string-2
 ;;
 (ert-deftest shu-test-shu-misc-split-string-2 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (data "Now is the time for all good men to come to the aid of the party within these holy portals revenge remains unknown and to all erring mortals, their way by love is shown to all mankind.")
+  (let ((data "Now is the time for all good men to come to the aid of the party within these holy portals revenge remains unknown and to all erring mortals, their way by love is shown to all mankind.")
         (lines)
         (line)
         (fixed-width nil)
@@ -652,13 +645,11 @@
           "love is shown to all "
           "mankind."))
         (expected-line)
-        (actual-line)
-        )
+        (actual-line))
     (setq lines (shu-misc-split-string data line-limit fixed-width))
     (should lines)
     (should (listp lines))
     (should (= (length expected) (length lines)))
-    (princ "\n\nshu-test-shu-misc-split-string-1:\n" gb)
     (while (and lines expected)
       (setq expected-line (car expected))
       (setq actual-line (car lines))
@@ -666,33 +657,158 @@
       (should (stringp actual-line))
       (should (string= expected-line actual-line))
       (setq lines (cdr lines))
-      (setq expected (cdr expected))
-      )
+      (setq expected (cdr expected)))
     ))
 
 
 
-
 ;;
-;;  shu-test-shu-misc-split-buffer-1
+;;  shu-test-shu-misc-split-string-3
 ;;
-(ert-deftest shu-test-shu-misc-split-buffer-1 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (data "Now is the time for all good men to come to the aid of the party within these holy portals revenge remains unknown and to all erring mortals, their way by love is shown to all mankind.")
+(ert-deftest shu-test-shu-misc-split-string-3 ()
+  (let ((data
+         (concat
+          "Whan that Aprille with his shoures soote "
+          "The droghte of Marche hath perced to the roote, "
+          "And bathed every veyne in swich licour, "
+          "Of which vertu engendred is the flour; "
+          "Whan Zephirus eek with his swete breeth "
+          "Inspired hath in every holt and heeth "
+          "The tendre croppes, and the yonge sonne "
+          "Hath in the Ram his halfe cours y-ronne, "
+          "And smale fowles maken melodye, "
+          "That slepen al the night with open ye, "
+          "(So priketh hem nature in hir corages: "
+          "Than longen folk to goon on pilgrimages,"))
         (lines)
         (line)
-        )
-    (with-temp-buffer
-      (insert data)
-      (setq lines (shu-misc-split-buffer 26))
-      )
-    (while lines
-      (setq line (car lines))
-      (princ (concat "[" line "]\n") gb)
+        (fixed-width nil)
+        (line-limit 26)
+        (expected
+         (list
+          "Whan that Aprille with "
+          "his shoures soote The "
+          "droghte of Marche hath "
+          "perced to the roote, And "
+          "bathed every veyne in "
+          "swich licour, Of which "
+          "vertu engendred is the "
+          "flour; Whan Zephirus eek "
+          "with his swete breeth "
+          "Inspired hath in every "
+          "holt and heeth The tendre "
+          "croppes, and the yonge "
+          "sonne Hath in the Ram his "
+          "halfe cours y-ronne, And "
+          "smale fowles maken "
+          "melodye, That slepen al "
+          "the night with open ye, "
+          "(So priketh hem nature in "
+          "hir corages: Than longen "
+          "folk to goon on "
+          "pilgrimages,"))
+        (expected-line)
+        (actual-line))
+    (setq lines (shu-misc-split-string data line-limit fixed-width))
+    (should lines)
+    (should (listp lines))
+    (should (= (length expected) (length lines)))
+    (while (and lines expected)
+      (setq expected-line (car expected))
+      (setq actual-line (car lines))
+      (should actual-line)
+      (should (stringp actual-line))
+      (should (string= expected-line actual-line))
       (setq lines (cdr lines))
-      )
+      (setq expected (cdr expected)))
+    ))
 
+
+
+;;
+;;  shu-test-shu-misc-split-string-4
+;;
+(ert-deftest shu-test-shu-misc-split-string-4 ()
+  (let ((data
+         (concat
+          "Whan that Aprille with his shoures soote "
+          "The droghte of Marche hath perced to the roote, "
+          "And bathed every veyne in swich licour, "
+          "Of which vertu engendred is the flour; "
+          "Whan Zephirus eek with his swete breeth "
+          "Inspired hath in every holt and heeth "
+          "The tendre croppes, and the yonge sonne "
+          "Hath in the Ram his halfe cours y-ronne, "
+          "And smale fowles maken melodye, "
+          "That slepen al the night with open ye, "
+          "(So priketh hem nature in hir corages: "
+          "Than longen folk to goon on pilgrimages,"
+          ))
+        (lines)
+        (line)
+        (fixed-width nil)
+        (line-limit 13)
+        (expected
+         (list
+          "Whan that "
+          "Aprille with "
+          "his shoures "
+          "soote The "
+          "droghte of "
+          "Marche hath "
+          "perced to "
+          "the roote, "
+          "And bathed "
+          "every veyne "
+          "in swich "
+          "licour, Of "
+          "which vertu "
+          "engendred is "
+          "the flour; "
+          "Whan "
+          "Zephirus eek "
+          "with his "
+          "swete breeth "
+          "Inspired "
+          "hath in "
+          "every holt "
+          "and heeth "
+          "The tendre "
+          "croppes, and "
+          "the yonge "
+          "sonne Hath "
+          "in the Ram "
+          "his halfe "
+          "cours "
+          "y-ronne, And "
+          "smale fowles "
+          "maken "
+          "melodye, "
+          "That slepen "
+          "al the night "
+          "with open "
+          "ye, (So "
+          "priketh hem "
+          "nature in "
+          "hir corages: "
+          "Than longen "
+          "folk to goon "
+          "on "
+          "pilgrimages,"))
+        (expected-line)
+        (actual-line))
+    (setq lines (shu-misc-split-string data line-limit fixed-width))
+    (should lines)
+    (should (listp lines))
+    (should (= (length expected) (length lines)))
+    (while (and lines expected)
+      (setq expected-line (car expected))
+      (setq actual-line (car lines))
+      (should actual-line)
+      (should (stringp actual-line))
+      (should (string= expected-line actual-line))
+      (setq lines (cdr lines))
+      (setq expected (cdr expected)))
     ))
 
 
