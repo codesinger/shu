@@ -31,7 +31,6 @@
 ;;; Code:
 
 
-
 ;;
 ;;  csp
 ;;
@@ -50,7 +49,7 @@
         (bpad "")
         (pad)
         (npad "")
-        (line-limit)
+        (line-limit 10)
         (original)
         (fixed-width prefix)
         (lines)
@@ -72,7 +71,6 @@
         (setq bpad (make-string pad-count ? ))
         )
       (setq pad (concat "\"\n" bpad "\""))
-      (setq line-limit 10)
       (when (< pad-count shu-cpp-line-end)
         (setq line-limit (- shu-cpp-line-end pad-count 1))
         (when (< line-limit 10)
