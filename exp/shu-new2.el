@@ -101,7 +101,11 @@
 
     ))
 
-                           ;;; "This is a string of some sort within these holy portals, revenge remains unknown and to all erring mortals, their way by love is shown and something else."
+                           ;;; "This is a string of some sort within these "
+                               "holy portals, revenge remains unknown and to "
+                               "all erring mortals, their way by love is shown "
+                               "and something "
+                               "else."
 
 
 ;;; shu-new2.el ends here

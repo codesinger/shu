@@ -1049,6 +1049,24 @@
 
 
 ;;
+;;  shu-test-shu-misc-get-phrase-14
+;;
+(ert-deftest shu-test-shu-misc-get-phrase-14()
+  (let ((data "and something else.")
+        ;;;    1234567890123456788012345
+        (expected "and something else.")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-misc-get-phrase 47))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-misc-get-chunk-1
 ;;
 (ert-deftest shu-test-shu-misc-get-chunk-1 ()
