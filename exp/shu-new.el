@@ -31,6 +31,84 @@
 ;;; Code:
 
 
+
+;;
+;;  csp
+;;
+(defun csp (prefix)
+  "Doc string."
+  (interactive "*P")
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (xquote "[^\\]\"") ;; quote not preceded by escape
+        (tstart (shu-point-in-string))
+        (tend)
+        (p)
+        (m)
+        (cc)
+        (pad-count 0)
+        (bpad "")
+        (pad)
+        (npad "")
+        (line-limit)
+        (original)
+        (fixed-width prefix)
+        (lines)
+        (line)
+        (nl "")
+        )
+    ;; String to be removed is (tstart - 1) to tend (includes the quotes
+    ;; String to be split and re-inserted is from tstart to (tend - 1 (Not
+    ;; including the quotes
+    (if (not tstart)
+        (progn
+          (ding)
+          (message "%s" "Not in string")
+          )
+      (goto-char tstart)
+      (setq cc (current-column))
+      (when (> cc 0)
+        (setq pad-count (1- cc))
+        (setq bpad (make-string pad-count ? ))
+        )
+      (setq pad (concat "\"\n" bpad "\""))
+      (setq line-limit 10)
+      (when (< pad-count shu-cpp-line-end)
+        (setq line-limit (- shu-cpp-line-end pad-count 1))
+        (when (< line-limit 10)
+          (setq line-limit 10)
+          )
+        )
+      (setq line-limit (1- line-limit))
+      (princ (format "shu-cpp-line-end: %d, pad-count: %d, line-limit: %d\n" shu-cpp-line-end pad-count line-limit) gb)
+      (setq tend (re-search-forward xquote nil t))
+      (if (not tend)
+          (message "%s" "No string end")
+        (setq m (buffer-substring-no-properties tstart (1- tend)))
+        (setq m (concat "[" m "]"))
+        (message "%s" m)
+        (princ (concat "[" pad "]\n") gb)
+        (setq original (buffer-substring-no-properties tstart (1- tend)))
+        (princ (concat "[" original "]\n") gb)
+        (setq lines (shu-misc-split-string original line-limit fixed-width))
+        (goto-char (1- tstart))
+        (delete-region (1- tstart) tend)
+        (while lines
+          (setq line (car lines))
+          (insert (concat nl npad "\"" line "\""))
+          (setq nl "\n")
+          (setq npad bpad)
+          (setq lines (cdr lines))
+          )
+
+        )
+      )
+
+    ))
+
+                           ;;; "This is a string of some sort within these holy portals, revenge remains unknown and to all erring mortals, their way by love is shown and something else."
+
+
 ;;
 ;;  ggg
 ;;
