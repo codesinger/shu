@@ -75,14 +75,19 @@
           (append load-path))
   )
 
-;;;(setq slp-org-location "~/emacs/org-7.8.09")
-;;;(when (file-readable-p (concat slp-org-location "/lisp/org-install.el"))
-;;;  (setq load-path (cons (concat slp-org-location "/lisp/") load-path))
-;;;  (setq load-path (cons (concat slp-org-location "/contrib/lisp/") load-path))
-;;;  (load-file (concat slp-org-location "/lisp/org.elc"))
-;;;  (load-file (concat slp-org-location "/lisp/org-agenda.elc"))
-;;;  )
-(require 'org)
+(if (shu-system-type-is-mac-osx)
+    (progn
+      (setq slp-org-location "~/emacs/org-7.8.09")
+      (when (file-readable-p (concat slp-org-location "/lisp/org-install.el"))
+        (setq load-path (cons (concat slp-org-location "/lisp/") load-path))
+        (setq load-path (cons (concat slp-org-location "/contrib/lisp/") load-path))
+        (load-file (concat slp-org-location "/lisp/org.elc"))
+        (load-file (concat slp-org-location "/lisp/org-agenda.elc"))
+        )
+      )
+  (require 'org)
+  )
+
 (defvar shu-org-home nil
   "Home directory of the org data files.")
 
