@@ -1658,7 +1658,7 @@ LINE-LIMIT characters in length."
   "Split an entire buffer into multiple strings and return a list of the
 strings.  Each returned string is LINE-LIMIT characters in length, except for
 the last one, which may be shorter."
-    (shu-misc-internal-split-buffer line-limit 'shu-misc-get-chunk)
+    (shu-misc-internal-split-buffer line-limit 'shu-misc-get-chunk escape)
     )
 
 
@@ -1666,7 +1666,7 @@ the last one, which may be shorter."
 ;;
 ;;  shu-misc-internal-split-buffer
 ;;
-(defun shu-misc-internal-split-buffer (line-limit get-function)
+(defun shu-misc-internal-split-buffer (line-limit get-function &optional escape)
   "Split an entire buffer into multiple strings and return a list of the
 strings.  GET-FUNCTION is the function to call to fetch each new string.
 GET-FUNCTION is set to either SHU-MISC-GET-CHUNK or SHU-MISC-GET-PHRASE.
@@ -1680,7 +1680,7 @@ boundary and whose length is less than or equal to LINE-LIMIT."
         (line)
         (lines))
     (while something
-      (setq line (funcall get-function line-limit))
+      (setq line (funcall get-function line-limit escape))
       (if (string= line "")
           (setq something nil)
         (push line lines)))
@@ -1748,15 +1748,30 @@ such that words are not split."
 ;;
 ;;  shu-misc-get-chunk
 ;;
-(defun shu-misc-get-chunk (line-limit)
+(defun shu-misc-get-chunk (line-limit &optional escape)
   "Return a string that consists of the first LINE-LIMIT characters in the
 current buffer.  If LINE-LIMIT is larger than the buffer size, return a
 string that is the entire contents of the buffer.  Before returning, delete
 from the buffer the returned string."
-  (let* ((spoint (point-min))
+  (let* ((gb (get-buffer-create "**foo**"))
+         (spoint (point-min))
          (xpoint (+ line-limit spoint))
          (epoint (if (< (point-max) xpoint) (point-max) xpoint))
-         (part (buffer-substring-no-properties spoint epoint)))
+         (last-char)
+         (part)
+         (esc (if escape "t" "nil")))
+    (princ (format "\nest: %s, line-limit: %d, (point-max: %d, spoint: %d, epoint %d\n" esc line-limit (point-max) spoint epoint) gb)
+;;    (goto-char (1- epoint))
+    (when (and (> (point-max) 3) (> line-limit 3))
+      (setq last-char (buffer-substring-no-properties (1- epoint) epoint))
+      (princ (format "last-char1: %s\n" last-char) gb)
+      (when (and escape (string= last-char "\\"))
+        (setq epoint (1- epoint))
+        (setq last-char (buffer-substring-no-properties (1- epoint) epoint))
+        (princ (format "last-char2: %s\n" last-char) gb)
+        (when (string= last-char "\\")
+          (setq epoint (1- epoint)))))
+    (setq part (buffer-substring-no-properties spoint epoint))
     (delete-region spoint epoint)
     part
     ))

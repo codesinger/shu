@@ -1156,4 +1156,50 @@
       (should (string= expected-rest actual-rest)))
     ))
 
+
+
+;;
+;;  shu-test-shu-misc-get-chunk-5
+;;
+(ert-deftest shu-test-shu-misc-get-chunk-5 ()
+  (let ((gb (get-buffer-create "**foo**"))
+        (data "\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t")
+        (part)
+        (expected-part "\\t\\t\\t\\t\\t")
+        (expected-rest "")
+        (actual-rest)
+        (escape t))
+    (with-temp-buffer
+      (insert data)
+      (setq part (shu-misc-get-chunk 10 escape))
+      (should part)
+      (should (stringp part))
+      (princ (concat "\npart:\n [" part "]") gb)
+      (should (string= expected-part part)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-misc-get-chunk-6
+;;
+(ert-deftest shu-test-shu-misc-get-chunk-6 ()
+  (let ((gb (get-buffer-create "**foo**"))
+        (data "\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t")
+        (part)
+        (expected-part "\\t\\t\\t\\t")
+        (expected-rest "")
+        (actual-rest)
+        (escape t))
+    (with-temp-buffer
+      (insert data)
+      (setq part (shu-misc-get-chunk 9 escape))
+      (should part)
+      (should (stringp part))
+      (princ (concat "\npart2:\n [" part "]") gb)
+      (should (string= expected-part part)))
+    ))
+
+
 ;;; shu-misc.t.el ends here

@@ -35,7 +35,27 @@
 ;;  shu-csplit
 ;;
 (defun shu-csplit (prefix)
-  "Doc string."
+  "Split a C++ string into multiple strings in order to keep the line length
+below a certain minimum length..  The line length used is defined by the custom
+variable SHU-CPP-LINE-END.
+
+For example, you may copy a very long line of text into a section of code as
+follows:
+
+     static const std::string x(\"This is a very long line of text that looks as though it will go on forever.\");
+
+To be polite to future code readers, you want to split this into multiple lines.
+This can be a bit cumbersome if the text is very long.  This function splits the
+text at a somewhat arbitrary boundary so that it can be read by others whose
+text editors do not show code much beyond column 80 or so.  This is an example
+of the above line after csplit was invoked:
+
+     static const std::string x(\"This is a very long line of text that looks \"
+                                \"as though it will go on forever.\");
+
+This function normally splits lines on a word boundary.  If any prefix argument
+is present, the split will be composed of fixed length lines with no respect to
+word boundaries."
   (interactive "*P")
   (shu-internal-csplit prefix)
   )
@@ -45,9 +65,8 @@
 ;;  shu-internal-csplit
 ;;
 (defun shu-internal-csplit (&optional fixed-width)
-  "Doc string."
-  (let (
-        (xquote "[^\\]\"") ;; quote not preceded by escape
+  "This is the internal implementation of SHU-CSPLIT."
+  (let ((xquote "[^\\]\"") ;; quote not preceded by escape
         (tstart (shu-point-in-string))
         (tend)
         (cc)
@@ -59,32 +78,26 @@
         (escape)
         (lines)
         (line)
-        (nl "")
-        )
+        (nl ""))
     (if (not tstart)
         (progn
           (ding)
-          (message "%s" "Not in string")
-          )
+          (message "%s" "Not in string"))
       (goto-char tstart)
       (setq cc (current-column))
       (when (> cc 0)
         (setq pad-count (1- cc))
-        (setq bpad (make-string pad-count ? ))
-        )
+        (setq bpad (make-string pad-count ? )))
       (when (< pad-count shu-cpp-line-end)
         (setq line-limit (- shu-cpp-line-end pad-count 1))
         (when (< line-limit 10)
-          (setq line-limit 10)
-          )
-        )
+          (setq line-limit 10)))
       (setq line-limit (1- line-limit))
       (setq tend (re-search-forward xquote nil t))
       (if (not tend)
           (progn
             (ding)
-            (message "%s" "No string end")
-            )
+            (message "%s" "No string end"))
         (setq original (buffer-substring-no-properties tstart (1- tend)))
         (when fixed-width
           (setq escape t))
@@ -96,11 +109,7 @@
           (insert (concat nl npad "\"" line "\""))
           (setq nl "\n")
           (setq npad bpad)
-          (setq lines (cdr lines))
-          )
-        )
-      )
-
+          (setq lines (cdr lines)))))
     ))
 
 
@@ -117,8 +126,8 @@ may have been split into smaller substrings in order to avoid long lines.
 
 Assume you have the sample string that is shown in SHU-CSPLIT
 
-     static const std::string x(\"This is a very long line of text that look\"
-                                \"s as though it will go on forever.\");
+     static const std::string x(\"This is a very long line of text that looks \"
+                                \"as though it will go on forever.\");
 
 You wish to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
@@ -128,10 +137,10 @@ with the contents of the string in the kill ring, and then split it up into
 shorter lines as in the following example.  The string in the kill ring may have
 opening and closing quotes or not.
 
-     static const std::string x(\"This is a very long line of text that look\"
-                                \"s as though it will go on forever and prob\"
-                                \"ably already has done so or is threatening\"
-                                \" to do so.\");
+     static const std::string x(\"This is a very long line of text that looks \"
+                                \"as though it will go on forever and probably \"
+                                \"already has done so or is threatening to do \"
+                                \"so.\");
 
 This is especially useful if you have a a string constant in a unit test and you
 have modified the code that creates the string.  gtest will complain that the
@@ -148,35 +157,7 @@ string, place the cursor in the old string, and replace it with the new."
 ;;  shu-internal-creplace
 ;;
 (defun shu-internal-creplace (&optional fixed-width)
-  "This function will replace the C++ string in which point is placed with the
-C++ string in the kill ring.  The C++ string in the kill ring is expected to be
-a single string with or without quotes.  The C++ string in which point is placed
-may have been split into smaller substrings in order to avoid long lines.
-
-Assume you have the sample string that is shown in SHU-CSPLIT
-
-     static const std::string x(\"This is a very long line of text that look\"
-                                \"s as though it will go on forever.\");
-
-You wish to replace it with a slightly different line of text, perhaps something
-that came from the output of a program.  Copy the new string into the kill ring.
-Then put the cursor into any part of any line of the string to be replaced
-and invoke this function.  This function will remove the old string, replace it
-with the contents of the string in the kill ring, and then split it up into
-shorter lines as in the following example.  The string in the kill ring may have
-opening and closing quotes or not.
-
-     static const std::string x(\"This is a very long line of text that look\"
-                                \"s as though it will go on forever and prob\"
-                                \"ably already has done so or is threatening\"
-                                \" to do so.\");
-
-This is especially useful if you have a a string constant in a unit test and you
-have modified the code that creates the string.  gtest will complain that the
-expected string did not match the actual string.  If the actual string is
-correct, copy it into the kill ring, go into your unit test, find the old
-string, place the cursor in the old string, and replace it with the new."
-  (interactive)
+  "This is the internal implementation of SHU-CREPLACE."
   (let
       ((xquote "[^\\]\"") ;; quote not preceded by escape
        (start-quote-present)  ;; True if start quote in kill ring
@@ -289,15 +270,13 @@ boundary and whose length is less than or equal to LINE-LIMIT."
 current buffer.  If LINE-LIMIT is larger than the buffer size, return a
 string that is the entire contents of the buffer.  Before returning, delete
 from the buffer the returned string."
-  (let* (
-         (gb (get-buffer-create "**foo**"))
+  (let* ((gb (get-buffer-create "**foo**"))
          (spoint (point-min))
          (xpoint (+ line-limit spoint))
          (epoint (if (< (point-max) xpoint) (point-max) xpoint))
          (last-char)
          (part)
-         (esc (if escape "t" "nil"))
-         )
+         (esc (if escape "t" "nil")))
     (princ (format "\nest: %s, line-limit: %d, (point-max: %d, spoint: %d, epoint %d\n" esc line-limit (point-max) spoint epoint) gb)
 ;;    (goto-char (1- epoint))
     (when (and (> (point-max) 3) (> line-limit 3))
@@ -308,10 +287,7 @@ from the buffer the returned string."
         (setq last-char (buffer-substring-no-properties (1- epoint) epoint))
         (princ (format "last-char2: %s\n" last-char) gb)
         (when (string= last-char "\\")
-          (setq epoint (1- epoint))
-          )
-        )
-      )
+          (setq epoint (1- epoint)))))
     (setq part (buffer-substring-no-properties spoint epoint))
     (delete-region spoint epoint)
     part
@@ -970,7 +946,71 @@ from the buffer the returned string."
         (insert replace1)
         (copy-region-as-kill (point-min) (point-max)))
       (goto-char 626)          ;; Go to five lines from the bottom
-      (shu-internal-creplace t)           ;; Replace with contents of kill ring
+      (shu-creplace t)           ;; Replace with contents of kill ring
+      ;; Buffer must hold the expected result
+      (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected-replace1 actual-replace)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-creplace-6
+;;
+(ert-deftest shu-test-shu-creplace-6 ()
+  (let ((actual-split)
+        (actual-replace)
+        (original1
+         (concat
+          "\"Ut porta, quam eget tempor aliquet, lectus elit pulvinar dolor, sit amet d\"\n"
+          "\"ignissim est massa ut arcu. Donec est dolor, ultricies eu cursus id, imper\"\n"
+          "\"diet aliquam dui. Pellentesque ut blandit quam. Nunc dictum tempus enim no\"\n"
+          "\"n elementum. Phasellus scelerisque purus sapien, quis congue ipsum ultrice\"\n"
+          "\"s ut. Sed vel nibh ornare, sodales mi sed, pretium ex. Integer convallis, \"\n"
+          "\"quam vulputate tempus volutpat, dui odio tincidunt nisi, et tincidunt nunc\"\n"
+          "\" lectus id velit. Donec volutpat mi non laoreet scelerisque. Sed id leo si\"\n"
+          "\"t amet mauris hendrerit ullamcorper. Curabitur fermentum libero vel ullamc\"\n"
+          "\"orper feugiat. Nunc et hendrerit nulla, nec condimentum urna. Nullam et co\"\n"
+          "\"ndimentum nisl, id semper ante. Vivamus eu tempor erat, sed tincidunt mi. \"\n"
+          "\"Phasellus et massa viverra sapien bibendum tempor eget a enim. Duis varius\"\n"
+          "\", dolor in ultrices posuere, lorem enim tincidunt enim, at iaculis libero \"\n"
+          "\"eros id felis. Sed et justo mattis dolor porttitor fermentum id ut lorem.\""))
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (expected-replace1
+         (concat
+          "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto \"\n"
+          "\"lacinia lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida \"\n"
+          "\"interdum et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. \"\n"
+          "\"Etiam eget enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut \"\n"
+          "\"semper. Nuncfinibus lorem at elit varius, volutpat semper arcuinterdum. \"\n"
+          "\"Quisque egestas tristique velit vel varius. In nisinulla, mollis quis mauris \"\n"
+          "\"sit amet, dictum molestiejusto. Curabitur feugiat eu mi at consectetur. Sed \"\n"
+          "\"ultrices massavel turpis pulvinar tristique. Etiam aliquam vulputate \"\n"
+          "\"magna,vitae commodo leo dictum at. Donec aliquam purus tortor, sit \"\n"
+          "\"ametvulputate orci facilisis at.\"")))
+    ;; Do a shu-creplace of a split string with a long, unquoted string
+  (setq shu-cpp-line-end 80)
+    (with-temp-buffer
+      (insert original1)
+      (goto-char (point-min))  ;; Sitting on top of open quote
+      (with-temp-buffer        ;; Put a different string in the kill ring
+        (insert replace1)
+        (copy-region-as-kill (point-min) (point-max)))
+      (goto-char 626)          ;; Go to five lines from the bottom
+      (shu-internal-creplace)           ;; Replace with contents of kill ring
       ;; Buffer must hold the expected result
       (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected-replace1 actual-replace)))

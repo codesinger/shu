@@ -1283,9 +1283,10 @@ and set functions will be placed in the buffer *get-set*."
 ;;
 ;;  shu-csplit
 ;;
-(defun shu-csplit ()
+(defun shu-csplit (prefix)
   "Split a C++ string into multiple strings in order to keep the line length
-below a certain minimum length, currently hard coded to column 76.
+below a certain minimum length..  The line length used is defined by the custom
+variable SHU-CPP-LINE-END.
 
 For example, you may copy a very long line of text into a section of code as
 follows:
@@ -1298,34 +1299,66 @@ text at a somewhat arbitrary boundary so that it can be read by others whose
 text editors do not show code much beyond column 80 or so.  This is an example
 of the above line after csplit was invoked:
 
-     static const std::string x(\"This is a very long line of text that look\"
-                                \"s as though it will go on forever.\");"
-  (interactive)
+     static const std::string x(\"This is a very long line of text that looks \"
+                                \"as though it will go on forever.\");
+
+This function normally splits lines on a word boundary.  If any prefix argument
+is present, the split will be composed of fixed length lines with no respect to
+word boundaries."
+  (interactive "*P")
+  (shu-internal-csplit prefix)
+  )
+
+
+;;
+;;  shu-internal-csplit
+;;
+(defun shu-internal-csplit (&optional fixed-width)
+  "This is the internal implementation of SHU-CSPLIT."
   (let ((xquote "[^\\]\"") ;; quote not preceded by escape
-        (pad-count )
-        (pad )
-        (tstart )
-        (previous-char )
-        (line-min 76)
-        (debug-on-error t))
-    ;; Ensure that we are positioned between two non-escaped quotes
-    (setq tstart (shu-point-in-string))
+        (tstart (shu-point-in-string))
+        (tend)
+        (cc)
+        (pad-count 0)
+        (bpad "")
+        (npad "")
+        (line-limit 10)
+        (original)
+        (escape)
+        (lines)
+        (line)
+        (nl ""))
     (if (not tstart)
         (progn
           (ding)
-          (message "%s" "Not in a string."))
-      ;; We appear to be inside a string
+          (message "%s" "Not in string"))
       (goto-char tstart)
-      (setq pad-count (1- (current-column))) ;; Build pad string
-      (setq pad (concat "\"\n" (make-string pad-count ? ) "\""))
-      (while (not (looking-at xquote))
-        (setq previous-char (buffer-substring-no-properties (point) (1+ (point))))
-        (forward-char 1)
-        (when (>= (1+ (current-column)) line-min)
-          (when (string= previous-char "\\")
-            (forward-char -1))
-          (insert pad)))
-      (forward-char 2))
+      (setq cc (current-column))
+      (when (> cc 0)
+        (setq pad-count (1- cc))
+        (setq bpad (make-string pad-count ? )))
+      (when (< pad-count shu-cpp-line-end)
+        (setq line-limit (- shu-cpp-line-end pad-count 1))
+        (when (< line-limit 10)
+          (setq line-limit 10)))
+      (setq line-limit (1- line-limit))
+      (setq tend (re-search-forward xquote nil t))
+      (if (not tend)
+          (progn
+            (ding)
+            (message "%s" "No string end"))
+        (setq original (buffer-substring-no-properties tstart (1- tend)))
+        (when fixed-width
+          (setq escape t))
+        (setq lines (shu-misc-split-string original line-limit fixed-width escape))
+        (goto-char (1- tstart))
+        (delete-region (1- tstart) tend)
+        (while lines
+          (setq line (car lines))
+          (insert (concat nl npad "\"" line "\""))
+          (setq nl "\n")
+          (setq npad bpad)
+          (setq lines (cdr lines)))))
     ))
 
 
@@ -1403,7 +1436,7 @@ in any of the strings and invoke this function."
 ;;
 ;;  shu-creplace
 ;;
-(defun shu-creplace ()
+(defun shu-creplace (prefix)
   "This function will replace the C++ string in which point is placed with the
 C++ string in the kill ring.  The C++ string in the kill ring is expected to be
 a single string with or without quotes.  The C++ string in which point is placed
@@ -1411,8 +1444,8 @@ may have been split into smaller substrings in order to avoid long lines.
 
 Assume you have the sample string that is shown in SHU-CSPLIT
 
-     static const std::string x(\"This is a very long line of text that look\"
-                                \"s as though it will go on forever.\");
+     static const std::string x(\"This is a very long line of text that looks \"
+                                \"as though it will go on forever.\");
 
 You wish to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
@@ -1422,17 +1455,27 @@ with the contents of the string in the kill ring, and then split it up into
 shorter lines as in the following example.  The string in the kill ring may have
 opening and closing quotes or not.
 
-     static const std::string x(\"This is a very long line of text that look\"
-                                \"s as though it will go on forever and prob\"
-                                \"ably already has done so or is threatening\"
-                                \" to do so.\");
+     static const std::string x(\"This is a very long line of text that looks \"
+                                \"as though it will go on forever and probably \"
+                                \"already has done so or is threatening to do \"
+                                \"so.\");
 
 This is especially useful if you have a a string constant in a unit test and you
 have modified the code that creates the string.  gtest will complain that the
 expected string did not match the actual string.  If the actual string is
 correct, copy it into the kill ring, go into your unit test, find the old
 string, place the cursor in the old string, and replace it with the new."
-  (interactive)
+  (interactive "*P")
+  (shu-internal-creplace prefix)
+)
+
+
+
+;;
+;;  shu-internal-creplace
+;;
+(defun shu-internal-creplace (&optional fixed-width)
+  "This is the internal implementation of SHU-CREPLACE."
   (let
       ((xquote "[^\\]\"") ;; quote not preceded by escape
        (start-quote-present)  ;; True if start quote in kill ring
@@ -1488,7 +1531,7 @@ string, place the cursor in the old string, and replace it with the new."
           (delete-char del-count)
           (save-excursion (yank))
           (when have-quotes (forward-char 1))
-          (shu-csplit))))
+          (shu-internal-csplit fixed-width))))
     ))
 
 
