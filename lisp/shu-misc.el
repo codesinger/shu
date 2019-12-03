@@ -1753,22 +1753,18 @@ such that words are not split."
 current buffer.  If LINE-LIMIT is larger than the buffer size, return a
 string that is the entire contents of the buffer.  Before returning, delete
 from the buffer the returned string."
-  (let* ((gb (get-buffer-create "**foo**"))
-         (spoint (point-min))
+  (let* ((spoint (point-min))
          (xpoint (+ line-limit spoint))
          (epoint (if (< (point-max) xpoint) (point-max) xpoint))
          (last-char)
          (part)
          (esc (if escape "t" "nil")))
-    (princ (format "\nest: %s, line-limit: %d, (point-max: %d, spoint: %d, epoint %d\n" esc line-limit (point-max) spoint epoint) gb)
 ;;    (goto-char (1- epoint))
     (when (and (> (point-max) 3) (> line-limit 3))
       (setq last-char (buffer-substring-no-properties (1- epoint) epoint))
-      (princ (format "last-char1: %s\n" last-char) gb)
       (when (and escape (string= last-char "\\"))
         (setq epoint (1- epoint))
         (setq last-char (buffer-substring-no-properties (1- epoint) epoint))
-        (princ (format "last-char2: %s\n" last-char) gb)
         (when (string= last-char "\\")
           (setq epoint (1- epoint)))))
     (setq part (buffer-substring-no-properties spoint epoint))

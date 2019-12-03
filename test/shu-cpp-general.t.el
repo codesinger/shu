@@ -85,7 +85,6 @@
 ;;
 (ert-deftest shu-test-shu-csplit-1 ()
   (let (
-        (gb (get-buffer-create "**foo**"))
         (actual-split)
         (actual-unsplit)
         )
@@ -179,8 +178,7 @@
 ;;  shu-test-shu-csplit-4
 ;;
 (ert-deftest shu-test-shu-csplit-4 ()
-  (let (
-        (gb (get-buffer-create "**foo**"))
+  (let ((gb (get-buffer-create "**foo**"))
         (actual-split)
         (actual-unsplit)
         (base2
@@ -195,8 +193,7 @@
          (concat
           "      \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
           "      \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
-          "      \"\\t\\t\\t\\t\""))
-        )
+          "      \"\\t\\t\\t\\t\"")))
 
     ;; Split a long string full of tab characters
     ;; Make sure there is no split between a "\" and a "t" in the "\t" sequence
@@ -211,8 +208,6 @@
       (should (= 179 (point))) ;; Point should be here
       (setq actual-split (buffer-substring-no-properties 1 179))
       (should (string= expected-split3 actual-split))
-      (princ (concat "\n\nactual-split:\n" actual-split) gb)
-      (princ (concat "\n\nexpected-split3:\n" expected-split3) gb)
       (goto-char 30)           ;; Go inside of top string
       (shu-cunsplit)           ;; Unsplit should restore to the original form
       (setq actual-unsplit (buffer-substring-no-properties 7 (+ 7 (length base2))))
@@ -225,9 +220,7 @@
 ;;  shu-test-shu-csplit-4a
 ;;
 (ert-deftest shu-test-shu-csplit-4a ()
-  (let (
-        (gb (get-buffer-create "**foo**"))
-        (actual-split)
+  (let ((actual-split)
         (actual-unsplit)
         (base2
          (concat
@@ -250,8 +243,7 @@
           "       \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
           "       \"\\t\\t\\t\\t\\t\\t\""))
         (z)
-
-        )
+)
 
     ;; Split a long string full of tab characters
     ;; Make sure there is no split between a "\" and a "t" in the "\t" sequence
@@ -259,7 +251,6 @@
     (with-temp-buffer
       (insert (concat "       " base2))
       (setq z (buffer-substring-no-properties (point-min) (point-max)))
-      (princ (concat "\nbase2:\n["  z "]\n") gb)
       (goto-char (point-min))  ;; Sitting in front of string
       (shu-internal-csplit)             ;; Try to split
       (should (= 1 (point)))   ;; Nothing should have happened
@@ -267,14 +258,11 @@
       (shu-internal-csplit t)           ;; Now try to split
       (should (= 182 (point))) ;; Point should be here
       (setq actual-split (buffer-substring-no-properties 1 182))
-      (princ (concat "\n\nactual-split:\n" actual-split) gb)
-      (princ (concat "\n\nexpected-split3a:\n" expected-split3) gb)
       (should (string= expected-split3 actual-split))
       (goto-char 30)           ;; Go inside of top string
       (shu-cunsplit)           ;; Unsplit should restore to the original form
       (setq actual-unsplit (buffer-substring-no-properties 8 (+ 8 (length base2))))
 ;;      (setq actual-unsplit (buffer-substring-no-properties (point-min) (point-max)))
-      (princ (concat "\nbase2a:\n["  actual-unsplit "]\n") gb)
       (should (string= base2 actual-unsplit)))
     ))
 
@@ -285,8 +273,7 @@
 ;;  shu-test-shu-csplit-5
 ;;
 (ert-deftest shu-test-shu-csplit-5 ()
-  (let (
-        (actual-split)
+  (let ((actual-split)
         (actual-unsplit)
         (fail-case-unexpected
          (concat
@@ -309,16 +296,14 @@
           "        EXPECT_EQ(expected, actual);\n"
           "        std::string x(\"unexpected stuff\");\n"
           "\n"
-          "\n"))
-        )
+          "\n")))
     (with-temp-buffer
       (insert fail-case-unexpected)
       (goto-char (point-min))
       (search-forward "Lorem" nil t)
       (shu-cunsplit)
       (setq actual-split (buffer-substring-no-properties (point-min) (point-max)))
-      (should (string= fail-case-unexpected-after-split actual-split))
-      )
+      (should (string= fail-case-unexpected-after-split actual-split)))
     ))
 
 
@@ -327,9 +312,7 @@
 ;;  shu-test-shu-csplit-6
 ;;
 (ert-deftest shu-test-shu-csplit-6 ()
-  (let (
-        (gb (get-buffer-create "**foo**"))
-        (actual-split)
+  (let ((actual-split)
         (actual-unsplit)
         (base2
          (concat
@@ -356,8 +339,7 @@
           "      \"melodye, That slepen al the night with open ye, (So priketh hem nature \"\n"
           "      \"in hir corages: Than longen folk to goon on pilgrimages,\""
           ))
-        (z)
-        )
+        (z))
 
     ;; Split a long string full of tab characters
     ;; Make sure there is no split between a "\" and a "t" in the "\t" sequence
@@ -365,7 +347,6 @@
     (with-temp-buffer
       (insert (concat "      " base2))
       (setq z (buffer-substring-no-properties (point-min) (point-max)))
-      (princ (concat "\nz:\n" z "\n") gb)
       (goto-char (point-min))  ;; Sitting in front of string
       (shu-internal-csplit)    ;; Try to split
       (should (= 1 (point)))   ;; Nothing should have happened
@@ -375,14 +356,11 @@
       (shu-internal-csplit)    ;; Now try to split
     ;;  (should (= 179 (point))) ;; Point should be here
       (setq actual-split (buffer-substring-no-properties (point-min) (point-max)))
-      (princ (concat "\n\nactual-split:\n" actual-split) gb)
-      (princ (concat "\n\nexpected-split4:\n" expected-split4) gb)
       (should (string= expected-split4 actual-split))
       (goto-char 30)           ;; Go inside of top string
       (shu-cunsplit)           ;; Unsplit should restore to the original form
       (setq actual-unsplit (buffer-substring-no-properties 7 (+ 7 (length base2))))
-      (should (string= base2 actual-unsplit))
-      )
+      (should (string= base2 actual-unsplit)))
     ))
 
 
@@ -2215,9 +2193,7 @@ This is most likely the name of an include file and not the name of a class."
 ;;  shu-test-shu-cpp-rmv-using-7
 ;;
 (ert-deftest shu-test-shu-cpp-rmv-using-7 ()
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (data
+  (let ((data
          (concat
           "#include <something.h>\n"
           "using namespace std;\n"
@@ -2255,8 +2231,6 @@ This is most likely the name of an include file and not the name of a class."
       (insert data)
       (setq count (shu-cpp-rmv-using-old classes))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-      (princ (concat "\nexpected:\n" expected "\n") gb)
-      (princ (concat "\nactual:\n" actual "\n") gb)
       (should (string= expected actual)))
     (should (= 6 count))
     ))
