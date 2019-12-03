@@ -1607,7 +1607,7 @@ name is not available for some reason."
 ;;
 ;;  shu-misc-split-string
 ;;
-(defun shu-misc-split-string (input line-limit &optional fixed-width)
+(defun shu-misc-split-string (input line-limit &optional fixed-width escape)
   "Split a string into multiple strings and return a list of the strings.  If
 FIXED-WIDTH is true, then each returned string is LINE-LIMIT characters in
 length, except for the last, which may be shorter.  If FIXED-WIDTH is absent or
@@ -1616,7 +1616,7 @@ LINE-LIMIT characters in length."
   (let ((lines))
     (with-temp-buffer
       (insert input)
-      (setq lines (shu-misc-split-buffer line-limit fixed-width)))
+      (setq lines (shu-misc-split-buffer line-limit fixed-width escape)))
     lines
     ))
 
@@ -1625,7 +1625,7 @@ LINE-LIMIT characters in length."
 ;;
 ;;  shu-misc-split-buffer
 ;;
-(defun shu-misc-split-buffer (line-limit &optional fixed-width)
+(defun shu-misc-split-buffer (line-limit &optional fixed-width escape)
   "Split an entire buffer into multiple strings and return a list of the
 strings.  If FIXED-WIDTH is true, then each returned string is LINE-LIMIT
 characters in length, except for the last, which may be shorter.  If FIXED-WIDTH
@@ -1633,7 +1633,7 @@ is absent or nil, then each returned string is split on a word boundary and no
 string exceeds LINE-LIMIT characters in length."
   (let ((lines))
     (if fixed-width
-        (setq lines (shu-misc-split-chunk-buffer line-limit))
+        (setq lines (shu-misc-split-chunk-buffer line-limit escape))
       (setq lines (shu-misc-split-phrase-buffer line-limit)))
     ))
 
@@ -1654,7 +1654,7 @@ LINE-LIMIT characters in length."
 ;;
 ;;  shu-misc-split-chunk-buffer
 ;;
-(defun shu-misc-split-chunk-buffer (line-limit)
+(defun shu-misc-split-chunk-buffer (line-limit &optional escape)
   "Split an entire buffer into multiple strings and return a list of the
 strings.  Each returned string is LINE-LIMIT characters in length, except for
 the last one, which may be shorter."
@@ -1694,7 +1694,7 @@ boundary and whose length is less than or equal to LINE-LIMIT."
 ;;
 ;;  shu-misc-get-phrase
 ;;
-(defun shu-misc-get-phrase (line-limit)
+(defun shu-misc-get-phrase (line-limit &optional escape)
   "Remove from the front of the current buffer and return the longest possible
 string of whitespace separated things whose length does not exceed line-limit.
 If there is at least one whitespace character before LINE-LIMIT, the string will
@@ -1707,17 +1707,14 @@ LINE-LIMIT length will be removed and returned.
 
 This function is used to split a string of words into a set of smaller strings
 such that words are not split."
-  (let (
-        (gb (get-buffer-create "**foo**"))
-        (ss (concat shu-all-whitespace-regexp "+"))
+  (let ((ss (concat shu-all-whitespace-regexp "+"))
         (sn (concat shu-not-all-whitespace-regexp "+"))
         (something t)
         (tpoint)
         (lpoint)
         (rpoint)
         (epoint)
-        (part)
-          )
+        (part))
     (goto-char (point-min))
     (while something
       (setq tpoint (re-search-forward ss nil t))
@@ -1725,36 +1722,23 @@ such that words are not split."
           (progn
             (if (and lpoint (> (point-max) line-limit))
                 (setq epoint lpoint)
-              (setq epoint line-limit)
-              )
-            (princ (format "epoint1: %d\n" epoint) gb)
+              (setq epoint line-limit))
             (setq part (shu-misc-get-chunk epoint))
-            (princ (concat "part1: [" part "]\n") gb)
             (setq something nil))
         (setq tpoint (1- tpoint))
-        (princ (format "line-limit: %d, tpoint1: %d\n" line-limit tpoint) gb)
         (when (> tpoint line-limit)
           (setq rpoint (re-search-backward sn nil t))
           (if (not rpoint)
               (setq epoint line-limit)
             (setq rpoint (1+ rpoint))
-            (princ (format "rpoint: %d\n" rpoint) gb)
             (if (< rpoint line-limit)
                 (setq epoint line-limit)
               (if lpoint
                   (setq epoint lpoint)
-                (setq epoint line-limit)
-                )
-              )
-            )
-          (princ (format "epoint2: %d\n" epoint) gb)
+                (setq epoint line-limit))))
           (setq part (shu-misc-get-chunk epoint))
-          (princ (concat "part2: [" part "]\n") gb)
-          (setq something nil)
-          )
-        )
-      (setq lpoint tpoint)
-      )
+          (setq something nil)))
+      (setq lpoint tpoint))
     part
     ))
 

@@ -103,6 +103,138 @@
 
     ))
 
+
+
+
+;;
+;;  shu-creplace
+;;
+(defun shu-creplace (prefix)
+  "This function will replace the C++ string in which point is placed with the
+C++ string in the kill ring.  The C++ string in the kill ring is expected to be
+a single string with or without quotes.  The C++ string in which point is placed
+may have been split into smaller substrings in order to avoid long lines.
+
+Assume you have the sample string that is shown in SHU-CSPLIT
+
+     static const std::string x(\"This is a very long line of text that look\"
+                                \"s as though it will go on forever.\");
+
+You wish to replace it with a slightly different line of text, perhaps something
+that came from the output of a program.  Copy the new string into the kill ring.
+Then put the cursor into any part of any line of the string to be replaced
+and invoke this function.  This function will remove the old string, replace it
+with the contents of the string in the kill ring, and then split it up into
+shorter lines as in the following example.  The string in the kill ring may have
+opening and closing quotes or not.
+
+     static const std::string x(\"This is a very long line of text that look\"
+                                \"s as though it will go on forever and prob\"
+                                \"ably already has done so or is threatening\"
+                                \" to do so.\");
+
+This is especially useful if you have a a string constant in a unit test and you
+have modified the code that creates the string.  gtest will complain that the
+expected string did not match the actual string.  If the actual string is
+correct, copy it into the kill ring, go into your unit test, find the old
+string, place the cursor in the old string, and replace it with the new."
+  (interactive "*P")
+  (shu-internal-creplace prefix)
+)
+
+
+
+;;
+;;  shu-internal-creplace
+;;
+(defun shu-internal-creplace (&optional fixed-width)
+  "This function will replace the C++ string in which point is placed with the
+C++ string in the kill ring.  The C++ string in the kill ring is expected to be
+a single string with or without quotes.  The C++ string in which point is placed
+may have been split into smaller substrings in order to avoid long lines.
+
+Assume you have the sample string that is shown in SHU-CSPLIT
+
+     static const std::string x(\"This is a very long line of text that look\"
+                                \"s as though it will go on forever.\");
+
+You wish to replace it with a slightly different line of text, perhaps something
+that came from the output of a program.  Copy the new string into the kill ring.
+Then put the cursor into any part of any line of the string to be replaced
+and invoke this function.  This function will remove the old string, replace it
+with the contents of the string in the kill ring, and then split it up into
+shorter lines as in the following example.  The string in the kill ring may have
+opening and closing quotes or not.
+
+     static const std::string x(\"This is a very long line of text that look\"
+                                \"s as though it will go on forever and prob\"
+                                \"ably already has done so or is threatening\"
+                                \" to do so.\");
+
+This is especially useful if you have a a string constant in a unit test and you
+have modified the code that creates the string.  gtest will complain that the
+expected string did not match the actual string.  If the actual string is
+correct, copy it into the kill ring, go into your unit test, find the old
+string, place the cursor in the old string, and replace it with the new."
+  (interactive)
+  (let
+      ((xquote "[^\\]\"") ;; quote not preceded by escape
+       (start-quote-present)  ;; True if start quote in kill ring
+       (end-quote-present)    ;; True if end quote in kill ring
+       (have-quotes)          ;; True if kill ring string is quoted
+       (unbalanced-quotes)    ;; True if kill ring quotes unbalanced
+       (tstart)               ;; Start pos of quoted text in buffer
+       (sos )                 ;; Start of string
+       (eos )                 ;; End of string
+       (del-count ))          ;; Count of chars we deleted in buffer
+    (if (not kill-ring)
+        (progn
+          (ding)
+          (message "%s" "Kill ring is empty"))
+      ;;
+      (with-temp-buffer
+        (yank)
+        (goto-char (point-min))
+        (setq start-quote-present (looking-at "\""))
+        (goto-char (1- (point-max)))
+        (setq end-quote-present (looking-at "\"")))
+      (when (or start-quote-present end-quote-present)
+        ;; Have either start or end quote in kill ring
+        (setq have-quotes t)
+        (when (or (not start-quote-present) (not end-quote-present))
+          ;; Missing either start or end quote in kill ring
+          (setq unbalanced-quotes t)
+          (when start-quote-present
+            (ding)
+            (message "%s" "String in kill-ring has quote at start but not at end"))
+          (when end-quote-present
+            (ding)
+            (message "%s" "String in kill-ring has quote at end but not at start"))))
+      (when (not unbalanced-quotes)
+        ;; Find start of string in buffer
+        (setq tstart (shu-point-in-string))
+        (if (not tstart)
+            ;; Point not positioned in a string in the buffer
+            (progn
+              (ding)
+              (message "%s" "Not in string"))
+          ;;
+          (goto-char tstart) ; Position just after the quote
+          (save-excursion  (shu-cunsplit)) ; Make it all one big string
+          (setq sos (shu-point-in-string))
+          (when have-quotes (setq sos (1- sos))) ;; Delete existing quote
+          (re-search-forward xquote nil t)
+          (forward-char -1) ;; Now sitting on top of closing quote
+          (setq eos (point))
+          (setq del-count (- eos sos))
+          (when have-quotes (setq del-count (1+ del-count)))
+          (goto-char sos)
+          (delete-char del-count)
+          (save-excursion (yank))
+          (when have-quotes (forward-char 1))
+          (shu-internal-csplit fixed-width))))
+    ))
+
                            ;;; "This is a string of some sort within these holy portals, revenge remains unknown and to all erring mortals, their way by love is shown and something else."
 
 
@@ -561,6 +693,287 @@ from the buffer the returned string."
       (setq actual-unsplit (buffer-substring-no-properties 7 (+ 7 (length base2))))
       (should (string= base2 actual-unsplit))
       )
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-creplace-1
+;;
+(ert-deftest shu-test-shu-creplace-1 ()
+  (let (
+    (actual-split)
+    (actual-replace)
+    (replace1
+      (concat
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+        "finibus lorem at elit varius, volutpat semper arcu"
+        "interdum. Quisque egestas tristique velit vel varius. In nisi"
+        "nulla, mollis quis mauris sit amet, dictum molestie"
+        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+        "vulputate orci facilisis at."))
+    (expected-replace1
+      (concat
+       "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
+       "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
+       "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
+       "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
+       "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
+       "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
+       "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
+       "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
+       "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\""))
+    )
+    ;; Do a shu-creplace of a split string with a long, unquoted string
+    (setq shu-cpp-line-end 80)
+  (with-temp-buffer
+      (insert shu-test-cpp-general-base-string)
+      (goto-char (point-min))  ;; Sitting on top of open quote
+      (shu-internal-csplit t)             ;; Try to split
+      (should (= 1 (point)))   ;; Nothing should have happened
+      (forward-char 1)         ;; Move inside the quote
+      (shu-internal-csplit t)             ;; Try to split again
+      (should (= 215 (point))) ;; Point should be here
+      (setq actual-split (buffer-substring-no-properties 1 215))
+      (should (string= shu-test-cpp-general-expected-split1 actual-split))
+      (with-temp-buffer        ;; Put a different string in the kill ring
+          (insert replace1)
+          (copy-region-as-kill (point-min) (point-max)))
+      (goto-char 30)           ;; Go to first line of split string
+      (shu-internal-creplace t)           ;; Replace with contents of kill ring
+      ;; Buffer must hold the expected result
+      (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected-replace1 actual-replace)))
+))
+
+
+
+;;
+;;  shu-test-shu-creplace-2
+;;
+(ert-deftest shu-test-shu-creplace-2 ()
+  (let (
+    (actual-split)
+    (actual-replace)
+    (replace1
+      (concat
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+        "finibus lorem at elit varius, volutpat semper arcu"
+        "interdum. Quisque egestas tristique velit vel varius. In nisi"
+        "nulla, mollis quis mauris sit amet, dictum molestie"
+        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+        "vulputate orci facilisis at."))
+    (replace2)
+    (expected-replace1
+      (concat
+       "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
+       "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
+       "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
+       "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
+       "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
+       "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
+       "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
+       "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
+       "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\""))
+    )
+  ;; Do a shu-creplace with a quoted string in the kill ring
+  (setq replace2 (concat "\"" replace1 "\""))
+  (setq shu-cpp-line-end 80)
+  (with-temp-buffer
+      (insert shu-test-cpp-general-base-string)
+      (goto-char (point-min))  ;; Sitting on top of open quote
+      (shu-internal-csplit t)             ;; Try to split
+      (should (= 1 (point)))   ;; Nothing should have happened
+      (forward-char 1)         ;; Move inside the quote
+      (shu-internal-csplit t)             ;; Try to split again
+      (should (= 215 (point))) ;; Point should be here
+      (setq actual-split (buffer-substring-no-properties 1 215))
+      (should (string= shu-test-cpp-general-expected-split1 actual-split))
+      (with-temp-buffer        ;; Put a different, quoted string in the kill ring
+          (insert replace2)    ;; in the kill ring
+          (copy-region-as-kill (point-min) (point-max)))
+      (goto-char 10)
+      (shu-internal-creplace t)
+      (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected-replace1 actual-replace)))
+))
+
+
+
+;;
+;;  shu-test-shu-creplace-3
+;;
+(ert-deftest shu-test-shu-creplace-3 ()
+  (let (
+    (actual-split)
+    (actual-replace)
+    (replace1
+      (concat
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+        "finibus lorem at elit varius, volutpat semper arcu"
+        "interdum. Quisque egestas tristique velit vel varius. In nisi"
+        "nulla, mollis quis mauris sit amet, dictum molestie"
+        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+        "vulputate orci facilisis at."))
+    (replace2)
+    )
+  ;; Do a shu-creplace with a string in the kill ring that has a quote
+  ;; at the beginning but not the end
+  (setq replace2 (concat "\"" replace1))
+  (setq shu-cpp-line-end 80)
+  (with-temp-buffer
+      (insert shu-test-cpp-general-base-string)
+      (goto-char (point-min))  ;; Sitting on top of open quote
+      (shu-internal-csplit t)             ;; Try to split
+      (should (= 1 (point)))   ;; Nothing should have happened
+      (forward-char 1)         ;; Move inside the quote
+      (shu-internal-csplit t)             ;; Try to split again
+      (should (= 215 (point))) ;; Point should be here
+      (setq actual-split (buffer-substring-no-properties 1 215))
+      (should (string= shu-test-cpp-general-expected-split1 actual-split))
+      (with-temp-buffer        ;; Put a quote in the kill ring that
+          (insert replace2)    ;; has a quote at beginning but not end
+          (copy-region-as-kill (point-min) (point-max)))
+      (goto-char 10)           ;; Go to first line of string in buffer
+      (shu-internal-creplace t)           ;; Try to do a replace
+      (should (= 10 (point)))  ;; Nothing should have happened
+      (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
+      ;; Buffer should remain unchanged
+      (should (string= shu-test-cpp-general-expected-split1 actual-replace)))
+))
+
+
+
+;;
+;;  shu-test-shu-creplace-4
+;;
+(ert-deftest shu-test-shu-creplace-4 ()
+  (let (
+    (actual-split)
+    (actual-replace)
+    (replace1
+      (concat
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+        "finibus lorem at elit varius, volutpat semper arcu"
+        "interdum. Quisque egestas tristique velit vel varius. In nisi"
+        "nulla, mollis quis mauris sit amet, dictum molestie"
+        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+        "vulputate orci facilisis at."))
+    (replace2)
+    )
+  ;; Do a shu-creplace with a string in the kill ring that has a quote
+  ;; at the end but not the beginning
+  (setq replace2 (concat  replace1 "\""))
+  (setq shu-cpp-line-end 80)
+  (with-temp-buffer
+      (insert shu-test-cpp-general-base-string)
+      (goto-char (point-min))  ;; Sitting on top of open quote
+      (shu-internal-csplit t)             ;; Try to split
+      (should (= 1 (point)))   ;; Nothing should have happened
+      (forward-char 1)         ;; Move inside the quote
+      (shu-internal-csplit t)             ;; Try to split again
+      (should (= 215 (point))) ;; Point should be here
+      (setq actual-split (buffer-substring-no-properties 1 215))
+      (should (string= shu-test-cpp-general-expected-split1 actual-split))
+      (with-temp-buffer        ;; Put a quote in the kill ring that
+          (insert replace2)    ;; has a quote at beginning but not end
+          (copy-region-as-kill (point-min) (point-max)))
+      (goto-char 10)           ;; Go to first line of string in buffer
+      (shu-internal-creplace t)           ;; Try to do a replace
+      (should (= 10 (point)))  ;; Nothing should have happened
+      (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
+      ;; Buffer should remain unchanged
+      (should (string= shu-test-cpp-general-expected-split1 actual-replace)))
+
+))
+
+
+
+;;
+;;  shu-test-shu-creplace-5
+;;
+(ert-deftest shu-test-shu-creplace-5 ()
+  (let ((actual-split)
+        (actual-replace)
+        (original1
+         (concat
+          "\"Ut porta, quam eget tempor aliquet, lectus elit pulvinar dolor, sit amet d\"\n"
+          "\"ignissim est massa ut arcu. Donec est dolor, ultricies eu cursus id, imper\"\n"
+          "\"diet aliquam dui. Pellentesque ut blandit quam. Nunc dictum tempus enim no\"\n"
+          "\"n elementum. Phasellus scelerisque purus sapien, quis congue ipsum ultrice\"\n"
+          "\"s ut. Sed vel nibh ornare, sodales mi sed, pretium ex. Integer convallis, \"\n"
+          "\"quam vulputate tempus volutpat, dui odio tincidunt nisi, et tincidunt nunc\"\n"
+          "\" lectus id velit. Donec volutpat mi non laoreet scelerisque. Sed id leo si\"\n"
+          "\"t amet mauris hendrerit ullamcorper. Curabitur fermentum libero vel ullamc\"\n"
+          "\"orper feugiat. Nunc et hendrerit nulla, nec condimentum urna. Nullam et co\"\n"
+          "\"ndimentum nisl, id semper ante. Vivamus eu tempor erat, sed tincidunt mi. \"\n"
+          "\"Phasellus et massa viverra sapien bibendum tempor eget a enim. Duis varius\"\n"
+          "\", dolor in ultrices posuere, lorem enim tincidunt enim, at iaculis libero \"\n"
+          "\"eros id felis. Sed et justo mattis dolor porttitor fermentum id ut lorem.\""))
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (expected-replace1
+         (concat
+          "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
+          "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
+          "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
+          "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
+          "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
+          "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
+          "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
+          "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
+          "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\"")))
+    ;; Do a shu-creplace of a split string with a long, unquoted string
+  (setq shu-cpp-line-end 80)
+    (with-temp-buffer
+      (insert original1)
+      (goto-char (point-min))  ;; Sitting on top of open quote
+      (with-temp-buffer        ;; Put a different string in the kill ring
+        (insert replace1)
+        (copy-region-as-kill (point-min) (point-max)))
+      (goto-char 626)          ;; Go to five lines from the bottom
+      (shu-internal-creplace t)           ;; Replace with contents of kill ring
+      ;; Buffer must hold the expected result
+      (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected-replace1 actual-replace)))
     ))
 
 
