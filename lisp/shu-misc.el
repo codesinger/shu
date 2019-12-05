@@ -1776,6 +1776,65 @@ from the buffer the returned string."
 
 
 ;;
+;;  shu-obfuscate-region
+;;
+(defun shu-obfuscate-region (start end)
+  "Obfusczte a region of text by replacing wvery alphabetic character in the
+region wth the next letter of the alphabet, staring with 'a'. For example, of
+the region contains
+
+  Now is the time for all good men to come to the aid of the Party 10 times.
+
+Then the obfuscated text would be:
+
+  Aob cs dhe fige hoi jlk lomd neo po qore so thu viw xf yhz Aabtc 10 dieef.
+
+This is useful if you want to capture some text for later testing and
+manipulation that might contain confidential or prlprietary information.  This
+is an encoding that cannot be reversed."
+  (interactive "*r")
+  (let ((current-char ?z)
+        (new-char)
+        (case-fold-search nil))
+    (goto-char start)
+    (while (/= (point) end)
+      (if (looking-at "[a-z]")
+          (progn
+            (setq current-char (shu-next-char-in-seq current-char))
+            (delete-char 1)
+            (insert-char current-char))
+        (when (looking-at "[A-Z]")
+          (setq current-char (shu-next-char-in-seq current-char))
+          (delete-char 1)
+          (setq new-char (upcase current-char))
+          (insert-char new-char)))
+      (forward-char 1))
+    ))
+
+
+;;
+;;  shu-next-char-in-seq
+;;
+(defun shu-next-char-in-seq (current-char)
+  "CURRENT-CHAR is a character in the range a-z.  This function returns the next
+character, where next is the next character in the alphabet unless CURRENT-CHAR
+is 'z', in which case the next character returned is 'a'."
+  (let ((next-char)
+        (case-fold-search nil))
+    (cond
+     ((char-equal current-char ?z)
+      (setq next-char ?a))
+     ((char-equal current-char ?Z)
+      (setq next-char ?A))
+     (t
+      (setq next-char (1+ current-char))))
+    next-char
+    ))
+
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -1825,6 +1884,7 @@ shu- prefix removed."
   (defalias 'os-name 'shu-show-os-name)
   (defalias 'show-system-name 'shu-show-system-name)
   (defalias 'kill-system-name 'shu-kill-system-name)
+  (defalias 'obfuscate-region 'shu-obfuscate-region)
   )
 
 ;;; shu-misc.el ends here
