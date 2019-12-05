@@ -1202,4 +1202,24 @@
     ))
 
 
+
+;;
+;;  shu-test-=shu-obfuscate-region-1
+;;
+(ert-deftest shu-test-=shu-obfuscate-region-1 ()
+  (let ((data
+         "Now is the time for all good men to come to the aid of the Party 10 times.")
+        (expected
+         "Abc de fgh ijkl mno pqr stuv wxy za bcde fg hij klm no pqr Stuvw 10 xyzab.")
+        (actual))
+    (with-temp-buffer
+     (insert data)
+     (shu-obfuscate-region (point-min) (point-max))
+     (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+     (should actual)
+     (should (stringp actual))
+     (should (string= expected actual)))
+    ))
+
+
 ;;; shu-misc.t.el ends here

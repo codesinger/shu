@@ -1104,8 +1104,8 @@ to origin."
   "Insert at point the name the git command to commit with the commentary held
 in a file called \"why.txt\"."
   (interactive)
-    (insert "git commit -F why.txt")
-    )
+  (insert "git commit -F why.txt")
+  )
 
 
 
@@ -1498,13 +1498,13 @@ For example, if the input string is
 The returned string would be
 
      This is an Overview"
-    (with-temp-buffer
-      (insert section-name)
-      (goto-char (point-min))
-      (while (search-forward "#" nil t)
-        (replace-match ""))
-      (setq section-name (shu-trim (buffer-substring-no-properties (point-min) (point-max)))))
-    section-name)
+  (with-temp-buffer
+    (insert section-name)
+    (goto-char (point-min))
+    (while (search-forward "#" nil t)
+      (replace-match ""))
+    (setq section-name (shu-trim (buffer-substring-no-properties (point-min) (point-max)))))
+  section-name)
 
 
 ;;
@@ -1539,8 +1539,8 @@ The returned string would be
 function for the various functions defined in .emacs to determine the type of
 the host operating system."
   (interactive)
-    (message "%s" (shu-os-name))
-    )
+  (message "%s" (shu-os-name))
+  )
 
 
 
@@ -1553,7 +1553,7 @@ system-name.  As of enacs 25.1, system-name is now a function.  Return nil if
 system-name is neither a function nor a variable."
   (let (
         (sys-name)
-          )
+        )
     (if (fboundp 'system-name)
         (setq sys-name (system-name))
       (when (boundp 'system-name)
@@ -1587,8 +1587,8 @@ name is not available for some reason."
 (defun shu-show-system-name ()
   "Place the sytem name (machine name) in the message area."
   (interactive)
-    (message "%s" (shu-system-name-string))
-    )
+  (message "%s" (shu-system-name-string))
+  )
 
 
 
@@ -1599,8 +1599,8 @@ name is not available for some reason."
   "Place the sytem name (machine name) in the message area."
   (interactive)
   (setq debug-on-error t)
-    (shu-kill-new (shu-system-name-string))
-    )
+  (shu-kill-new (shu-system-name-string))
+  )
 
 
 
@@ -1646,8 +1646,8 @@ string exceeds LINE-LIMIT characters in length."
   "Split an entire buffer into multiple strings and return a list of the
 strings.  Each returned string is split on a word boundary and no string exceeds
 LINE-LIMIT characters in length."
-    (shu-misc-internal-split-buffer line-limit 'shu-misc-get-phrase)
-    )
+  (shu-misc-internal-split-buffer line-limit 'shu-misc-get-phrase)
+  )
 
 
 
@@ -1658,8 +1658,8 @@ LINE-LIMIT characters in length."
   "Split an entire buffer into multiple strings and return a list of the
 strings.  Each returned string is LINE-LIMIT characters in length, except for
 the last one, which may be shorter."
-    (shu-misc-internal-split-buffer line-limit 'shu-misc-get-chunk escape)
-    )
+  (shu-misc-internal-split-buffer line-limit 'shu-misc-get-chunk escape)
+  )
 
 
 
@@ -1759,7 +1759,7 @@ from the buffer the returned string."
          (last-char)
          (part)
          (esc (if escape "t" "nil")))
-;;    (goto-char (1- epoint))
+    ;;    (goto-char (1- epoint))
     (when (and (> (point-max) 3) (> line-limit 3))
       (setq last-char (buffer-substring-no-properties (1- epoint) epoint))
       (when (and escape (string= last-char "\\"))
@@ -1787,7 +1787,7 @@ the region contains
 
 Then the obfuscated text would be:
 
-  Aob cs dhe fige hoi jlk lomd neo po qore so thu viw xf yhz Aabtc 10 dieef.
+  Abc de fgh ijkl mno pqr stuv wxy za bcde fg hij klm no pqr Stuvw 10 xyzab.
 
 This is useful if you want to capture some text for later testing and
 manipulation that might contain confidential or prlprietary information.  This
@@ -1795,30 +1795,37 @@ is an encoding that cannot be reversed."
   (interactive "*r")
   (let ((current-char ?z)
         (new-char)
-        (case-fold-search nil))
+        (case-fold-search nil)
+        (advance))
     (goto-char start)
     (while (/= (point) end)
+      (setq advance nil)
       (if (looking-at "[a-z]")
           (progn
             (setq current-char (shu-next-char-in-seq current-char))
             (delete-char 1)
             (insert-char current-char))
-        (when (looking-at "[A-Z]")
-          (setq current-char (shu-next-char-in-seq current-char))
-          (delete-char 1)
-          (setq new-char (upcase current-char))
-          (insert-char new-char)))
-      (forward-char 1))
+        (if (looking-at "[A-Z]")
+            (progn
+              (setq current-char (shu-next-char-in-seq current-char))
+              (delete-char 1)
+              (setq new-char (upcase current-char))
+              (insert-char new-char))
+          (setq advance t)))
+      (when advance
+        (forward-char 1)))
     ))
+
 
 
 ;;
 ;;  shu-next-char-in-seq
 ;;
 (defun shu-next-char-in-seq (current-char)
-  "CURRENT-CHAR is a character in the range a-z.  This function returns the next
-character, where next is the next character in the alphabet unless CURRENT-CHAR
-is 'z', in which case the next character returned is 'a'."
+  "CURRENT-CHAR is a character in the range a-z (or A-Z).  This function returns
+the next character, where next is the next character in the alphabet unless
+CURRENT-CHAR is 'z', in which case the next character returned is 'a'.  If
+CURRENT-CHAR is 'Z', then the next character returned is 'A'."
   (let ((next-char)
         (case-fold-search nil))
     (cond
