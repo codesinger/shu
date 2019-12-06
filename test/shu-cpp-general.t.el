@@ -818,9 +818,9 @@
 
 
 ;;
-;;  shu-test-shu-cunsplit-6
+;;  shu-test-shu-cunsplit-7
 ;;
-(ert-deftest shu-test-shu-cunsplit-6 ()
+(ert-deftest shu-test-shu-cunsplit-7 ()
   "Doc string."
   (let ((data "\"Now is the \"\n\"time for all \"\n\"good men \"\n\"to come to the aid \"\n\"of the party\"\n")
         (expected "\"Now is the time for all good men to come to the aid of the party\"\n")
@@ -836,9 +836,9 @@
 
 
 ;;
-;;  shu-test-shu-cunsplit-7
+;;  shu-test-shu-cunsplit-8
 ;;
-(ert-deftest shu-test-shu-cunsplit-7 ()
+(ert-deftest shu-test-shu-cunsplit-8 ()
   "Doc string."
   (let ((data "\"Now is the \"\n\"time for all \"\n\"good men \"\n\"to come to the aid \"\n\"of the party\"\n")
         (expected "\"Now is the time for all good men to come to the aid of the party\"\n")
@@ -849,6 +849,47 @@
       (shu-cunsplit)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cunsplit-9
+;;
+(ert-deftest shu-test-shu-cunsplit-9 ()
+  (let (
+
+        (gb (get-buffer-create "**moo**"))
+        (data
+         (concat
+        "const std::string  expected(\"[../abcdef_ghijklmnopqrstu.vwx:...] <yzaBc\"\n"
+        "                            \"::HijklmNopqrstuvwxyZab': Cdefgh: \"123456\"\n"
+        "                            \"\\\".  Ijk lm nopqr stu 'vwxyza::BcdefgHijkl\"\n"
+        "                            \"mnopqrsTuv': Wxyzab: \"654321\" cdefghi jk\"\n"
+        "                            \"lmno pq rst uvwx yzabcdefghij Kl.\");"))
+        (expected
+        "const std::string  expected(\"[../abcdef_ghijklmnopqrstu.vwx:...] <yzaBc::HijklmNopqrstuvwxyZab': Cdefgh: \"123456\".  Ijk lm nopqr stu 'vwxyza::BcdefgHijklmnopqrsTuv': Wxyzab: \"654321\" cdefghi jlmno pq rst uvwx yzabcdefghij Kl.\");"
+         )
+        (actual)
+        )
+
+
+
+  (princ (concat "]\ndata:\n[" data "]\n") gb)
+  (princ (concat "]\nexpected:\n[" expected "]\n") gb)
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (search-forward "expected" nil t)
+      (forward-char 9)
+      (shu-cunsplit)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (princ (concat "]\nactual:\n[" actual "]\n") gb)
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual))
+      )
+
     ))
 
 
