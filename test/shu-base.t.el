@@ -1013,6 +1013,44 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 ;;
+;;  shu-test-shu-end-of-dq-string-1
+;;
+(ert-deftest shu-test-shu-end-of-dq-string-1 ()
+  (let ((p1)
+        (expected 5)
+        (pos))
+    (with-temp-buffer
+      (insert "\"As\"")
+      (goto-char 2)
+      (setq pos (point))
+      (setq p1 (shu-end-of-dq-string))
+      (should (= expected (point)))
+      (should (= expected p1)))
+    ))
+
+
+;;
+;;  shu-test-shu-end-of-dq-string-2
+;;
+(ert-deftest shu-test-shu-end-of-dq-string-2 ()
+  (let ((data
+         "  \".\\\" something else\"")
+        (p1)
+        (pos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (search-forward "." nil t)
+      (setq pos (point))
+      (setq p1 (shu-end-of-dq-string))
+      (should p1)
+      (should (numberp p1))
+      (should (= 23 p1)))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-add-to-alist-1
 ;;
 (ert-deftest shu-test-shu-add-to-alist-1 ()

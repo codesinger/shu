@@ -857,26 +857,21 @@
 ;;  shu-test-shu-cunsplit-9
 ;;
 (ert-deftest shu-test-shu-cunsplit-9 ()
-  (let (
-
-        (gb (get-buffer-create "**moo**"))
-        (data
+  (let ((data
          (concat
-        "const std::string  expected(\"[../abcdef_ghijklmnopqrstu.vwx:...] <yzaBc\"\n"
-        "                            \"::HijklmNopqrstuvwxyZab': Cdefgh: \"123456\"\n"
-        "                            \"\\\".  Ijk lm nopqr stu 'vwxyza::BcdefgHijkl\"\n"
-        "                            \"mnopqrsTuv': Wxyzab: \"654321\" cdefghi jk\"\n"
-        "                            \"lmno pq rst uvwx yzabcdefghij Kl.\");"))
+          "const std::string  expected(\"[../abcdef_ghijklmnopqrstu.vwx:...] <yzaBc\"\n"
+          "                            \"::HijklmNopqrstuvwxyZab': Cdefgh: \\\"123456\\\"\"\n"
+          "                            \"\\\".  Ijk lm nopqr stu 'vwxyza::BcdefgHijkl\"\n"
+          "                            \"mnopqrsTuv': Wxyzab: \\\"654321\\\" cdefghi jk\"\n"
+          "                            \"lmno pq rst uvwx yzabcdefghij Kl.\");"))
         (expected
-        "const std::string  expected(\"[../abcdef_ghijklmnopqrstu.vwx:...] <yzaBc::HijklmNopqrstuvwxyZab': Cdefgh: \"123456\".  Ijk lm nopqr stu 'vwxyza::BcdefgHijklmnopqrsTuv': Wxyzab: \"654321\" cdefghi jlmno pq rst uvwx yzabcdefghij Kl.\");"
-         )
-        (actual)
-        )
-
-
-
-  (princ (concat "]\ndata:\n[" data "]\n") gb)
-  (princ (concat "]\nexpected:\n[" expected "]\n") gb)
+         (concat
+          "const std::string  expected(\"[../abcdef_ghijklmnopqrstu.vwx:...] "
+          "<yzaBc::HijklmNopqrstuvwxyZab': Cdefgh: \\\"123456\\\"\\\".  Ijk "
+          "lm nopqr stu 'vwxyza::BcdefgHijklmnopqrsTuv': Wxyzab: \\\"654321\\\" "
+          "cdefghi jklmno pq rst uvwx yzabcdefghij Kl.\");"
+          ))
+        (actual))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -884,12 +879,9 @@
       (forward-char 9)
       (shu-cunsplit)
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-      (princ (concat "]\nactual:\n[" actual "]\n") gb)
       (should actual)
       (should (stringp actual))
-      (should (string= expected actual))
-      )
-
+      (should (string= expected actual)))
     ))
 
 

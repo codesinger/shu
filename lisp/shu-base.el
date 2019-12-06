@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.7
+;; Version: 1.6.8
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.7"
+(defconst shu-version "1.6.8"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -483,6 +483,29 @@ functions depend on this frankly strange behavior."
           (forward-char 2))))
     epoint
     ))
+
+
+
+
+;;
+;;  shu-end-of-dq-string
+;;
+(defun shu-end-of-dq-string ()
+  "Return the point that represents the end of the current quoted string in the
+buffer.  The quote character is the double quote character (\").  Escaped quotes
+are skipped.  If the current string is not terminated by a ;doubloe quote
+character, nil is returned.  If the current string is terminated by a double
+quote character, the position following the quote is returned and point is set
+to that position."
+  (let ((nequote "[^\\]\\\"")  ;; Non-escaped quote
+        (epoint))
+    (save-excursion
+      (setq epoint (re-search-forward nequote nil t)))
+    (when epoint
+      (goto-char epoint))
+    epoint
+    ))
+
 
 
 ;;

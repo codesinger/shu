@@ -1379,7 +1379,8 @@ in any of the strings and invoke this function."
         (bos)       ;; Beginning of first string
         (cend)      ;; End of current string
         (del-count) ;; Number of characters to delete
-        (pbegin))   ;; Beginning of previous string
+        (pbegin)
+        )   ;; Beginning of previous string
     (if (not x)
         (progn
           (ding)
@@ -1387,7 +1388,7 @@ in any of the strings and invoke this function."
       ;;; Search forward for last string in the group
       (setq going t)
       (while going
-        (setq x (shu-end-of-string "\""))
+        (setq x (shu-end-of-dq-string))
         (if (not x)
             (setq going nil)
           (setq eos (- x 2))
