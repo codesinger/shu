@@ -674,21 +674,21 @@ Return true if a class name was found an an include generated.  This is for the
 benefit of unit tests."
   (interactive)
   (let* ((bol (line-beginning-position))
-        (eol (line-end-position))
-        (target-list (append shu-cpp-name-list (list ":")))
-        (target-char (regexp-opt target-list nil))
-        (target-name
-         (concat
-          "\\(" shu-cpp-name "+\\)"
-          "::"
-          "\\(" shu-cpp-name "+\\)"))
-        (namespace)
-        (class-name)
-        (file-name)
-        (include-name)
-        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
-        (right-delim (if shu-cpp-include-user-brackets ">" "\""))
-        (got-it))
+         (eol (line-end-position))
+         (target-list (append shu-cpp-name-list (list ":")))
+         (target-char (regexp-opt target-list nil))
+         (target-name
+          (concat
+           "\\(" shu-cpp-name "+\\)"
+           "::"
+           "\\(" shu-cpp-name "+\\)"))
+         (namespace)
+         (class-name)
+         (file-name)
+         (include-name)
+         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+         (right-delim (if shu-cpp-include-user-brackets ">" "\""))
+         (got-it))
     (save-excursion
       (if (not (looking-at target-char)) ;; Looking at a legal class name character
           (message "%s" "Not a properly formed class name")
@@ -728,11 +728,11 @@ is delimited by left and right angle brackets."
   (let ((name  (file-name-nondirectory (buffer-file-name)))
         (ext)
         (left-delim (if shu-cpp-include-user-brackets
-                   "<"
-                 "\""))
+                        "<"
+                      "\""))
         (right-delim (if shu-cpp-include-user-brackets
-                   ">"
-                   "\""))
+                         ">"
+                       "\""))
         (incl))
     (if (not name)
         (ding)
@@ -741,10 +741,10 @@ is delimited by left and right angle brackets."
           (progn
             (ding)
             (message "%s" "THIS IS NOT A HEADER FILE"))
-      (setq incl (concat "#include "
-                         left-delim name right-delim "\n"))
-      (shu-kill-new incl)
-      (message "%s" incl)))
+        (setq incl (concat "#include "
+                           left-delim name right-delim "\n"))
+        (shu-kill-new incl)
+        (message "%s" incl)))
     ))
 
 
@@ -1468,7 +1468,7 @@ correct, copy it into the kill ring, go into your unit test, find the old
 string, place the cursor in the old string, and replace it with the new."
   (interactive "*P")
   (shu-internal-creplace prefix)
-)
+  )
 
 
 
@@ -1725,7 +1725,7 @@ The number of spaces to indent inside the braces is defined in the custom
 variable shu-cpp-indent-length."
   (interactive "*sType name?: \nsVariable name?: ")
   (shu-internal-citerate type-name var-name)
-    )
+  )
 
 
 
@@ -1748,7 +1748,7 @@ The number of spaces to indent inside the braces is defined in the custom
 variable shu-cpp-indent-length."
   (interactive "*sType name?: \nsVariable name?: ")
   (shu-internal-citerate type-name var-name t)
-    )
+  )
 
 
 
@@ -1821,7 +1821,7 @@ The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace."
   (interactive "*sType name?: \nsFirst variable name?:  \nsSecond variable name?: ")
   (shu-internal-double-citerate type-name type-name var-name-1 var-name-2)
-    )
+  )
 
 
 
@@ -1854,7 +1854,7 @@ The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace."
   (interactive "*sType name?: \nsFirst variable name?:  \nsSecond variable name?: ")
   (shu-internal-double-citerate type-name type-name var-name-1 var-name-2 t)
-    )
+  )
 
 
 
@@ -1887,7 +1887,7 @@ The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace."
   (interactive "*sFirst type name?: \nsSecond type name?: \nsFirst variable name?:  \nsSecond variable name?: ")
   (shu-internal-double-citerate type-name-1 type-name-2 var-name-1 var-name-2)
-    )
+  )
 
 
 
@@ -1920,7 +1920,7 @@ The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace."
   (interactive "*sFirst type name?: \nsSecond type name?: \nsFirst variable name?:  \nsSecond variable name?: ")
   (shu-internal-double-citerate type-name-1 type-name-2 var-name-1 var-name-2 t)
-    )
+  )
 
 
 
@@ -1975,7 +1975,7 @@ If optional CONST is true, a const iterator is generated."
     (setq rpoint (point))
     (insert
      (concat "\n"
-      pad "}\n"))
+             pad "}\n"))
     (goto-char rpoint)
     ))
 
@@ -2388,8 +2388,8 @@ instances of the class name found inside a comment are replaced."
   "This is the replacement function for SHU-REPLACE-CLASS-NAME.  It is called
 with the NEW-NAME to replace the class NAME.  It calls replace-match to replace
 NAME with NEW-NAME."
-    (replace-match new-name t t)
-    )
+  (replace-match new-name t t)
+  )
 
 
 
@@ -3077,12 +3077,12 @@ For example, \"mumbleSomethingOther\" becomes \"mumble_something_other\"."
           (ding)
           (message "%s" "Not sitting on a variable name"))
       (save-excursion
-      (setq start-pos (car pos))
-      (setq end-pos (cdr pos))
-      (goto-char start-pos)
-      (while (re-search-forward "\\([A-Z]\\)" end-pos t)
-        (replace-match (concat "_" (downcase (match-string 1))) t t)
-        (setq end-pos (1+ end-pos)))))
+        (setq start-pos (car pos))
+        (setq end-pos (cdr pos))
+        (goto-char start-pos)
+        (while (re-search-forward "\\([A-Z]\\)" end-pos t)
+          (replace-match (concat "_" (downcase (match-string 1))) t t)
+          (setq end-pos (1+ end-pos)))))
     ))
 
 

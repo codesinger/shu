@@ -758,7 +758,7 @@ two strings, which are \"Hi\" and \"How are you?\"."
          (new-lines)
          (empty ""))
     (if (= 0 (length data))
-          (push empty new-lines)
+        (push empty new-lines)
       (while lines
         (setq count (1+ count))
         (setq line (car lines))
@@ -792,9 +792,9 @@ two strings, which are \"Hi\" and \"How are you?\"."
 (defun shu-trim-file-hook ()
   "Run as a before-save-hook to trim trailing whitespace from the end of lines and
 to trim blank lines from the end of a file if SHU-TRIM-FILE is true."
-    (when shu-trim-file
-      (delete-trailing-whitespace))
-    )
+  (when shu-trim-file
+    (delete-trailing-whitespace))
+  )
 
 
 ;;; shu-base.el ends here
