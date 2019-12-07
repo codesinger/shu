@@ -82,6 +82,7 @@ I work and play.  It is not part of the Shu elisp package."
         (progn
           (princ "On Unix\n" gb)
           (setq shu-org-home "~/mbig/2019-11-16-work/work")
+          (setq shu-org-home-name "work.org")
           (setq shu-org-home-file (concat shu-org-home "/" shu-org-home-name))
           (princ (concat "Looking for: \"" shu-org-home-file "\"\n") gb)
           (when (file-readable-p shu-org-home-file)
