@@ -278,11 +278,11 @@ than shu-org-archive-expiry-days days ago."
                 (progn
                   (with-current-buffer archive-buffer
                     (save-buffer)
-                    (append-to-file (concat "Saved file: " shu-org-home-archive-buffer "\n")
+                    (append-to-file (concat "\n  Saved file: " shu-org-home-archive-buffer "\n")
                                     nil ofile)))
-                (append-to-file (concat "File: " shu-org-home-archive-buffer " does not need saving.\n")
+                (append-to-file (concat "\n  File: " shu-org-home-archive-buffer " does not need saving.\n")
                                 nil ofile)))
-              (append-to-file (concat "File: " shu-org-home-archive-buffer " not found.\n")
+              (append-to-file (concat "\n  File: " shu-org-home-archive-buffer " not found.\n")
                              nil ofile))
             (when (or (> archive-count 0) (> error-count 0))
               (cond
