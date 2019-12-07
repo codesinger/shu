@@ -194,6 +194,7 @@ than shu-org-archive-expiry-days days ago."
        (end-msg )
        (end-msg-a )
        (end-msg-b )
+       (archive-buffer)
        (buffer-changed  nil))
 
     (when (eq major-mode 'org-mode)
@@ -269,7 +270,20 @@ than shu-org-archive-expiry-days days ago."
                               nil ofile)))
 
           (when buffer-changed
-            (save-buffer)
+            (basic-save-buffer)
+            (setq archive-buffer (get-buffer shu-org-home-archive-buffer))
+            (if archive-buffer
+              (progn
+              (if (buffer-modified-p archive-buffer)
+                (progn
+                  (with-current-buffer archive-buffer
+                    (basic-save-buffer)
+                    (append-to-file (concat "Saved file: " shu-org-home-archive-buffer "\n")
+                                    nil ofile)))
+                (append-to-file (concat "File: " shu-org-home-archive-buffer " does not need saving.\n")
+                                nil ofile)))
+              (append-to-file (concat "File: " shu-org-home-archive-buffer " not found.\n")
+                             nil ofile))
             (when (or (> archive-count 0) (> error-count 0))
               (cond
                ((= error-count 0)
@@ -299,14 +313,14 @@ than shu-org-archive-expiry-days days ago."
 (defun shu-goto-home-org-file ()
   "Visit the org home file."
   (interactive)
-    (if shu-org-mode-is-set
-        (if shu-org-home-file
-            (if (file-readable-p shu-org-home-file)
-                (find-file shu-org-home-file)
-              (message "%s is not readable" shu-org-home-file))
-          (message "%s" "shu-org-home-file variable has not been set"))
-      (message "%s" "org mode has not been set (shu-org-mode-is-set is nil)"))
-    )
+  (if shu-org-mode-is-set
+      (if shu-org-home-file
+          (if (file-readable-p shu-org-home-file)
+              (find-file shu-org-home-file)
+            (message "%s is not readable" shu-org-home-file))
+        (message "%s" "shu-org-home-file variable has not been set"))
+    (message "%s" "org mode has not been set (shu-org-mode-is-set is nil)"))
+  )
 
 
 
