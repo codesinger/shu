@@ -228,7 +228,7 @@ For example
     emacs --batch -l shu-batch-mode.elc -f shu-batch-test-args hello world how are you
 
 produces the following output:
-
+    There are 5 arguments
     arg: 0: \"hello\"
     arg: 1: \"world\"
     arg: 2: \"how\"
@@ -236,6 +236,7 @@ produces the following output:
     arg: 4: \"you\""
   (let ((i 0)
         (arg))
+    (princ (format "There are %d arguments\n" (length command-line-args-left)))
     (while command-line-args-left
       (setq arg (pop command-line-args-left))
       (princ (format "arg: %d: \"%s\"\n" i arg))
