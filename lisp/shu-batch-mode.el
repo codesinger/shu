@@ -214,4 +214,34 @@ files."
     ))
 
 
+
+
+;;
+;;  shu-batch-test-args
+;;
+(defun shu-batch-test-args ()
+  "A script to use in batch mode to demonstrate how to fetch command line arguments.
+
+When run from a batch script as the function that is the target of the \"-f\" option.
+For example
+
+    emacs --batch -l shu-batch-mode.elc -f shu-batch-test-args hello world how are you
+
+produces the following output:
+
+    arg: 0: \"hello\"
+    arg: 1: \"world\"
+    arg: 2: \"how\"
+    arg: 3: \"are\"
+    arg: 4: \"you\""
+  (let ((i 0)
+        (arg))
+    (while command-line-args-left
+      (setq arg (pop command-line-args-left))
+      (princ (format "arg: %d: \"%s\"\n" i arg))
+      (setq i (1+ i)))
+    ))
+
+
+
 ;;; shu-batch-mode.el ends here
