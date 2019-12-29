@@ -1073,11 +1073,16 @@ word \"origin\"..  This can be used as part of git push or pull."
 ;;  shu-git-insert-push-origin-branch
 ;;
 (defun shu-git-insert-push-origin-branch ()
-  "Insert at point the name the git command to push the current branch out
-to origin."
+  "Insert at point the git command to push the current branch out to origin.
+If the current branch is \"master\", you are prompted to see if you want to
+proceed.  This is to prevent an accidental push to master."
   (interactive)
-  (let ((branch (shu-git-find-branch)))
-    (insert (concat "git push origin " branch))
+  (let ((branch (shu-git-find-branch))
+        (insert-push t))
+    (when (string= branch "master")
+      (setq insert-push (yes-or-no-p "Really push to master branch? ")))
+    (when insert-push
+      (insert (concat "git push origin " branch)))
     ))
 
 
@@ -1087,8 +1092,8 @@ to origin."
 ;;  shu-git-insert-pull-origin-branch
 ;;
 (defun shu-git-insert-pull-origin-branch ()
-  "Insert at point the name the git command to pull the current branch out
-to origin."
+  "Insert at point the name the git command to pull the current branch from
+origin."
   (interactive)
   (let ((branch (shu-git-find-branch)))
     (insert (concat "git pull origin " branch))
