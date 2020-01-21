@@ -19,7 +19,7 @@
 ;; of the GNU General Public License along with GNU Emacs.  If not,
 ;; see <http://www.gnu.org/licenses/>.
 
-;; This is my oersonal .emacs file.
+;; This is my personal .emacs file.
 ;;
 ;; It is not part of the shu package
 
