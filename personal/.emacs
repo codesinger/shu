@@ -1,6 +1,6 @@
 ;;; .emacs - My personal .emacs file
 ;;
-;; Copyright (C) 201D85 Stewart L. Palmer
+;; Copyright (C) 2015 Stewart L. Palmer
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -371,7 +371,7 @@ text))
     text))
 )
 
-(setq shu-git-path "C:/Program Files/Git/usr/bin/sh.exe")
+(setq shu-git-path "C:/Program Files/Git/usr/bin")
 (setq shu-git-windows-shell-file (concat shu-git-path "/sh.exe"))
 (when (and (shu-system-type-is-windows) (file-readable-p shu-git-windows-shell-file))
   (setq explicit-shell-file-name shu-git-windows-shell-file)
