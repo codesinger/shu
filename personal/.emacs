@@ -144,8 +144,9 @@
 ;;
 (defun shu-set-frame-size-full-height ()
   "Set to full screen height"
-  (let* ((hpx (- (x-display-pixel-height) (* 2 (frame-char-height))))
-        (hpl (/ hpx (frame-char-height))))
+  (let* ((lost-lines (if (not (shu-system-type-is-windows)) 2 5))
+         (hpx (- (x-display-pixel-height) (* lost-lines (frame-char-height))))
+         (hpl (/ hpx (frame-char-height))))
     (when (display-graphic-p)
       (setq default-frame-alist '((tool-bar-lines . 0) (menu-bar-lines . 0) (width . 115)))
       (add-to-list 'default-frame-alist (cons 'height hpl)))
