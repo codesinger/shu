@@ -1845,6 +1845,48 @@ CURRENT-CHAR is 'Z', then the next character returned is 'A'."
 
 
 
+;;
+;;  shu-reverse2
+;;
+(defun shu-reverse2 ()
+  "When positioned in front of a pair of pareenthesis that contains a pair of
+expressions separated by a comma, reverse the positions of the two expressions.
+The first becomes the second and the second becomes the first.
+i.e.,
+      foo(mumble, bar);
+becomes
+      foo(bar, mumble);"
+  (interactive)
+  (let ((eol (line-end-position))
+        (rxnc "\\([^,]+\\),\\s-*")
+        (spos)
+        (epos)
+        (arg1)
+        (arg2))
+    (save-excursion
+    (if (not (search-forward "(" nil t))
+        (progn
+          (ding)
+          (message "%s" "No opening parenthesis on this line"))
+      (setq spos (point))
+      (backward-char 1)
+      (forward-sexp)
+      (backward-char 1)
+      (setq epos (point))
+      (goto-char spos)
+      (if (not (re-search-forward rxnc eol t))
+          (progn
+            (ding)
+            (message "%s" "No first expression found inside parenthesis"))
+        (setq arg1 (match-string 1))
+        (setq arg2 (buffer-substring-no-properties (point) epos))
+        (delete-region (point) epos)
+        (insert arg1)
+        (replace-match arg2 t t nil 1))))
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias
