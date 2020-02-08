@@ -317,12 +317,18 @@ template parameter \"int\"")
 ;;
 (defmacro shu-cpp-token-extract-info (token-info token token-type spoint epoint error-message)
   "Extract the information out of a token-info"
-  (let ((tinfo (make-symbol "info"))
+  (let (
+        (tinfo (make-symbol "info"))
         (text-info (make-symbol "ext-info"))
-        (tpoint-pair (make-symbol "point-pair")))
-    `(let ((,tinfo)
+        (tpoint-pair (make-symbol "point-pair"))
+        (tinfo-pair (make-symbol "info-pair"))
+        )
+    `(let (
+           (,tinfo)
            (,text-info)
-           (,tpoint-pair))
+           (,tpoint-pair)
+           (,tinfo-pair)
+           )
        (setq ,tinfo (car ,token-info))
        (setq ,token (cdr ,token-info))
        (setq ,token-type (car ,tinfo))
@@ -330,7 +336,11 @@ template parameter \"int\"")
        (setq ,error-message (car ,text-info))
        (setq ,tpoint-pair (cdr ,text-info))
        (setq ,spoint (car ,tpoint-pair))
-       (setq ,epoint (cdr ,tpoint-pair)))
+       (setq ,epoint (cdr ,tpoint-pair))
+       (setq ,tinfo-pair (car ,text-info))
+       (setq ,error-message (car ,tinfo-pair))
+;;;       (setq ,nesting-level (cdr ,tinfo-pair))
+       )
     ))
 
 
@@ -896,11 +906,15 @@ line.  If it starts with /*, skip to terminating */.  If there is no terminating
 ;;
 (defun shu-cpp-make-token-info (token token-type spoint epoint &optional error-message)
   "Pack the supplied arguments into a TOKEN-INFO and return the TOKEN-INFO."
-  (cons
-   (cons token-type
-         (cons error-message
-               (cons spoint epoint))) token)
-  )
+  (let (
+        (nesting-level 0)
+        )
+    (cons
+     (cons token-type
+           (cons
+            (cons error-message nesting-level)
+            (cons spoint epoint))) token)
+    ))
 
 
 ;;
@@ -1326,14 +1340,15 @@ of reverse parsed code have the same suffix."
 (defun shu-cpp-token-show-token-info-buffer (token-info gb &optional title)
   "Show the data returned by one of the functions in this file that scans for tokens."
   (let
-      (
-       (info)
+      ((info)
        (token-type)
        (token-type-name)
        (ext-info)
        (error-message)
        (emsg "")
        (point-pair)
+       (info-pair)
+       (nesting-level)
        (spoint)
        (epoint)
        (token)
@@ -1364,7 +1379,6 @@ of reverse parsed code have the same suffix."
                   (if (not (consp ext-info))
                       (progn (princ "shu-cpp-token-show-token-info, ext-info not cons: " gb)
                              (princ ext-info gb) (princ "\n" gb))
-                    (setq error-message (car ext-info))
                     (setq point-pair (cdr ext-info))
                     (if (not point-pair)
                         (princ "shu-cpp-token-show-token-info, point-pair is nil\n" gb)
@@ -1379,12 +1393,18 @@ of reverse parsed code have the same suffix."
                           (if (not (numberp epoint))
                               (progn (princ "shu-cpp-token-show-token-info, epoint not number: " gb)
                                      (princ epoint gb) (princ "\n" gb))
-                            (when error-message
-                              (setq emsg (concat ", Error = \"" error-message "\".")))
-                            (setq token (cdr token-info))
-                            (when token
-                              (setq tok token))
-                            (princ (format "%d : %d = [%s](%d (%s))%s\n" spoint epoint tok token-type token-type-name emsg) gb)))))))))))))
+                            (setq info-pair (car ext-info))
+                            (if (not (consp info-pair))
+                                (progn (princ "shu-cpp-token-show-token-info, info-pair not cons: " gb)
+                                       (princ info-pair gb)(princ "\n" gb))
+                              (setq error-message (car info-pair))
+                              (setq nesting-level (cdr info-pair))
+                              (when error-message
+                                (setq emsg (concat ", Error = \"" error-message "\".")))
+                              (setq token (cdr token-info))
+                              (when token
+                                (setq tok token))
+                              (princ (format "%d : %d = [%s](%d (%s))%s\n" spoint epoint tok token-type token-type-name emsg) gb))))))))))))))
     ))
 
 
