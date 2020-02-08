@@ -393,6 +393,36 @@ template parameter \"int\"")
 
 
 ;;
+;;  shu-cpp-token-extract-nesting-level
+;;
+(defsubst shu-cpp-token-extract-nesting-level (token-info)
+  "Return the nesting level from an instance of token-info."
+  (let ((info)
+        (ext-info)
+        (info-pair))
+    (setq info (car token-info))
+    (setq ext-info (cdr info))
+    (setq info-pair (car ext-info))
+    (cdr info-pair)
+    ))
+
+
+;;
+;;  shu-cpp-token-set-nesting-level
+;;
+(defsubst shu-cpp-token-set-nesting-level (token-info nesting-level)
+  "Set the nesting level in an instance of token-info."
+  (let ((info)
+        (ext-info)
+        (info-pair))
+    (setq info (car token-info))
+    (setq ext-info (cdr info))
+    (setq info-pair (car ext-info))
+    (setcdr info-pair nesting-level)
+    ))
+
+
+;;
 ;;  shu-cpp-token-is-comment
 ;;
 (defsubst shu-cpp-token-is-comment (token-info)
@@ -1404,7 +1434,7 @@ of reverse parsed code have the same suffix."
                               (setq token (cdr token-info))
                               (when token
                                 (setq tok token))
-                              (princ (format "%d : %d = [%s](%d (%s))%s\n" spoint epoint tok token-type token-type-name emsg) gb))))))))))))))
+                              (princ (format "%d : %d = [%s](%d (%s)){%d}%s\n" spoint epoint tok token-type token-type-name nesting-level emsg) gb))))))))))))))
     ))
 
 

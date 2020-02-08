@@ -1622,6 +1622,7 @@ me anything.  It is printed on test failure to identify the test that failed."
        (emsg "")
        (point-pair)
        (info-pair)
+       (nesting-level)
        (spoint)
        (epoint)
        (token)
@@ -1657,7 +1658,6 @@ me anything.  It is printed on test failure to identify the test that failed."
                         (if (not (consp ext-info))
                             (progn (princ "shu-test-check-shu-cpp-get-token, ext-info not cons: " gb)
                                    (princ ext-info gb) (princ "\n" gb))
-;;;                          (setq error-message (car ext-info))
                           (setq point-pair (cdr ext-info))
                           (if (not point-pair)
                               (princ "shu-test-check-shu-cpp-get-token, point-pair is nil\n" gb)
@@ -1683,6 +1683,7 @@ me anything.  It is printed on test failure to identify the test that failed."
                                             (progn (princ "shu-test-check-shu-cpp-get-token, info-pair not cons: " gb)
                                                    (princ info-pair gb) (princ "\n" gb))
                                           (setq error-message (car info-pair))
+                                          (setq nesting-level (cdr info-pair))
                                           (if (and xerror-message (not error-message))
                                               (princ (concat "Expected error-message = [" xerror-message "].  Actual error-message nil") gb)
                                             (if (and error-message (not (stringp error-message)))
@@ -2207,6 +2208,28 @@ me anything.  It is printed on test failure to identify the test that failed."
       (setq nkw (concat kw "something-or-other"))
       (should (not (gethash nkw ht)))
       (setq kl (cdr kl)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-token-set-nesting-level
+;;
+(ert-deftest shu-test-shu-cpp-token-set-nesting-level ()
+  (let ((token-info)
+        (token "TOKEN")
+        (token-type shu-cpp-token-type-qt)
+        (spoint 123)
+        (epoint 456)
+        (error-message "Hi there")
+        (nesting-level 12)
+        (xnesting-level))
+    (setq token-info (shu-cpp-make-token-info token token-type spoint epoint error-message))
+    (shu-cpp-token-set-nesting-level token-info nesting-level)
+    (setq xnesting-level (shu-cpp-token-extract-nesting-level token-info))
+    (should xnesting-level)
+    (should (numberp xnesting-level))
+    (should (= nesting-level nesting-level))
     ))
 
 
