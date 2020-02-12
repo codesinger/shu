@@ -1324,7 +1324,8 @@ diagnostic messages are placed into the log buffer and a nil value is returned."
 ;;  shu-match-make-count-alist-from-hash
 ;;
 (defun shu-match-make-count-alist-from-hash (class-ht)
-  "Doc string."
+  "Create an alist in which the key is a class name and the value is zero.  This alist
+will be used to generate a count of number of items changed per class name."
   (interactive)
   (let ((count-alist))
     (maphash (lambda (class-name ns-name)
