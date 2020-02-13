@@ -872,6 +872,8 @@ unqualified class names to be qualified."
         (symbol-count 0)
         (clist)
         (spoint)
+        (last-spoint)
+        (next-spoint)
           )
     (while tlist
       (setq token-info (car tlist))
@@ -892,7 +894,11 @@ unqualified class names to be qualified."
       (when (= token-type shu-cpp-token-type-uq)
         (setq symbol-count (1+ symbol-count))
         (setq hv (gethash token class-ht))
+        (when (not hv)
+          (princ "    Not in class hash table\n" log-buf)
+          )
         (when hv
+          (princ "    Not in class hash table\n" log-buf)
           (if
               (and
                (= last-token-type shu-cpp-token-type-op)
@@ -901,12 +907,16 @@ unqualified class names to be qualified."
                 (string= last-token ".")
                 (string= last-token "->")
                 ))
-              (setq blocked t)
+              (progn
+                (setq blocked t)
+                (princ (format "    Blocked 1, last-token %s, last-spoint: %d\n" last-token last-spoint) log-buf)
+                )
             (setq n (shu-cpp-token-next-non-comment tlist))
             (when n
               (setq next-token-info (car n))
               (setq next-token (shu-cpp-token-extract-token next-token-info))
               (setq next-token-type (shu-cpp-token-extract-type next-token-info))
+              (setq next-spoint (shu-cpp-token-extract-spoint next-token-info))
               (if
                   (and
                    (= next-token-type shu-cpp-token-type-op)
@@ -914,20 +924,26 @@ unqualified class names to be qualified."
                     (string= next-token "(")
                     (string= next-token "[")
                     ))
-                  (setq blocked t)
+                  (progn
+                    (setq blocked t)
+                    (princ (format "    Blocked 2, next-token %s, next-spoint: %d\n" next-token next-spoint) log-buf)
+                    )
                 (when (shu-match-rmv-might-be-include incl-ht token token-info)
+                  (princ "    Blocked 3\n" log-buf)
                   (setq blocked t)
                   )
                 )
               )
             )
           (when (not blocked)
+            (princ "    Not blocked\n" log-buf)
             (push token-info clist)
             )
           )
         )
       (setq last-token token)
       (setq last-token-type token-type)
+      (setq last-spoint spoint)
       (setq tlist (shu-cpp-token-next-non-comment tlist))
       )
     (cons symbol-count clist)
