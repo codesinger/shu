@@ -883,6 +883,7 @@ unqualified class names to be qualified."
       (setq tlist (cdr tlist))
       )
     (princ "\n\nNOW START FINDING\n\n" log-buf)
+    (setq tlist token-list)
 
     (while tlist
       (setq blocked nil)
@@ -898,7 +899,7 @@ unqualified class names to be qualified."
           (princ "    Not in class hash table\n" log-buf)
           )
         (when hv
-          (princ "    Not in class hash table\n" log-buf)
+          (princ "    In class hash table\n" log-buf)
           (if
               (and
                (= last-token-type shu-cpp-token-type-op)
@@ -920,8 +921,7 @@ unqualified class names to be qualified."
               (if
                   (and
                    (= next-token-type shu-cpp-token-type-op)
-                   (or
-                    (string= next-token "(")
+                   (or ;;; FIXME
                     (string= next-token "[")
                     ))
                   (progn
