@@ -182,11 +182,11 @@ helps to weed out some of the extraneous ones but not all of them."
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
-                               (concat shu-cpp-name "+"))
+                              (concat shu-cpp-name "+"))
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
+                              ";")
     )
 
 
@@ -194,15 +194,15 @@ helps to weed out some of the extraneous ones but not all of them."
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               nil shu-cpp-token-type-op
-                               "::")
+                              "::")
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
-                               (concat shu-cpp-name "+"))
+                              (concat shu-cpp-name "+"))
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
+                              ";")
     )
 
 
@@ -213,11 +213,11 @@ helps to weed out some of the extraneous ones but not all of them."
                               (concat shu-cpp-name "+"))
 
     (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  shu-cpp-match-colon-name)
+                                  shu-cpp-match-colon-name)
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
+                              ";")
     )
    )
   )
@@ -327,11 +327,11 @@ helps to weed out some of the extraneous ones but not all of them."
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
                               'shu-cpp-token-match-same-rx
                               t shu-cpp-token-type-uq
-                               (concat shu-cpp-name "+"))
+                              (concat shu-cpp-name "+"))
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
+                              ";")
     )
 
 
@@ -342,11 +342,11 @@ helps to weed out some of the extraneous ones but not all of them."
                               (concat shu-cpp-name "+"))
 
     (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
-                                                  shu-cpp-match-colon-name)
+                                  shu-cpp-match-colon-name)
     (shu-cpp-make-match-info  shu-cpp-token-match-type-same
                               'shu-cpp-token-match-same
                               t shu-cpp-token-type-op
-                               ";")
+                              ";")
     )
    )
   "These two lists match the form of name that can follow a \"using\" directive
@@ -575,8 +575,8 @@ whose cdr is the class name."
       (setq token-type (shu-cpp-token-extract-type token-info))
       (setq token (shu-cpp-token-extract-token token-info))
       (when (and
-           (eq token-type shu-cpp-token-type-op)
-           (string= token ";"))
+             (eq token-type shu-cpp-token-type-op)
+             (string= token ";"))
         (setq cx (1- count))
         (setq class-name ptoken))
       (setq ptoken token)
@@ -874,32 +874,33 @@ unqualified class names to be qualified."
         (spoint)
         (last-spoint)
         (next-spoint)
-          )
-    (while tlist
-      (setq token-info (car tlist))
-      (setq token (shu-cpp-token-extract-token token-info))
-      (setq spoint (shu-cpp-token-extract-spoint token-info))
-      (princ (format "token: %s, spoint: %d\n" token spoint) log-buf)
-      (setq tlist (cdr tlist))
-      )
-    (princ "\n\nNOW START FINDING\n\n" log-buf)
-    (setq tlist token-list)
-
+        (debug-trace nil)) ;;; Set to t to enable trace
+    (when debug-trace
+      (while tlist
+        (setq token-info (car tlist))
+        (setq token (shu-cpp-token-extract-token token-info))
+        (setq spoint (shu-cpp-token-extract-spoint token-info))
+        (princ (format "token: %s, spoint: %d\n" token spoint) log-buf)
+        (setq tlist (cdr tlist)))
+      (princ "\n\nNOW START FINDING\n\n" log-buf)
+      (setq tlist token-list))
     (while tlist
       (setq blocked nil)
       (setq token-info (car tlist))
       (setq token (shu-cpp-token-extract-token token-info))
       (setq token-type (shu-cpp-token-extract-type token-info))
       (setq spoint (shu-cpp-token-extract-spoint token-info))
-      (princ (format "token: %s, spoint: %d\n" token spoint) log-buf)
+      (when debug-trace
+        (princ (format "token: %s, spoint: %d\n" token spoint) log-buf))
       (when (= token-type shu-cpp-token-type-uq)
         (setq symbol-count (1+ symbol-count))
         (setq hv (gethash token class-ht))
-        (when (not hv)
-          (princ "    Not in class hash table\n" log-buf)
-          )
+        (when debug-trace
+          (when (not hv)
+            (princ "    Not in class hash table\n" log-buf)))
         (when hv
-          (princ "    In class hash table\n" log-buf)
+          (when debug-trace
+            (princ "    In class hash table\n" log-buf))
           (if
               (and
                (= last-token-type shu-cpp-token-type-op)
@@ -910,8 +911,8 @@ unqualified class names to be qualified."
                 ))
               (progn
                 (setq blocked t)
-                (princ (format "    Blocked 1, last-token %s, last-spoint: %d\n" last-token last-spoint) log-buf)
-                )
+                (when debug-trace
+                  (princ (format "    Blocked 1, last-token %s, last-spoint: %d\n" last-token last-spoint) log-buf)))
             (setq n (shu-cpp-token-next-non-comment tlist))
             (when n
               (setq next-token-info (car n))
@@ -922,30 +923,23 @@ unqualified class names to be qualified."
                   (and
                    (= next-token-type shu-cpp-token-type-op)
                    (or ;;; FIXME
-                    (string= next-token "[")
-                    ))
+                    (string= next-token "[")))
                   (progn
                     (setq blocked t)
-                    (princ (format "    Blocked 2, next-token %s, next-spoint: %d\n" next-token next-spoint) log-buf)
-                    )
+                    (when debug-trace
+                      (princ (format "    Blocked 2, next-token %s, next-spoint: %d\n" next-token next-spoint) log-buf)))
                 (when (shu-match-rmv-might-be-include incl-ht token token-info)
-                  (princ "    Blocked 3\n" log-buf)
-                  (setq blocked t)
-                  )
-                )
-              )
-            )
+                  (when debug-trace
+                    (princ "    Blocked 3\n" log-buf))
+                  (setq blocked t)))))
           (when (not blocked)
-            (princ "    Not blocked\n" log-buf)
-            (push token-info clist)
-            )
-          )
-        )
+            (when debug-trace
+              (princ "    Not blocked\n" log-buf))
+            (push token-info clist))))
       (setq last-token token)
       (setq last-token-type token-type)
       (setq last-spoint spoint)
-      (setq tlist (shu-cpp-token-next-non-comment tlist))
-      )
+      (setq tlist (shu-cpp-token-next-non-comment tlist)))
     (cons symbol-count clist)
     ))
 
@@ -1409,7 +1403,7 @@ count by one."
         (psum)
         (np-stmt "")
         (ns-line)
-          )
+        )
     (when bfn
       (princ (concat "\nStart rmv-using for file: " bfn "\n\n") log-buf)
       )
@@ -1452,7 +1446,7 @@ count by one."
     (if (and log-buf (bufferp log-buf))
         (message "%s%s class names qualified.  See buffer %s" np-stmt psum (buffer-name log-buf))
       (message "%s%s class names qualified." np-stmt psum )
-        )
+      )
     ))
 
 
@@ -1505,27 +1499,27 @@ statements should be changed."
 ;;  shu-cpp-match-some-include
 ;;
 (defconst shu-cpp-match-some-include
-   (list  ;; #include < name >
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
-                              'shu-cpp-token-match-same
-                              nil shu-cpp-token-type-op
-                              "#")
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
-                              'shu-cpp-token-match-same
-                              nil shu-cpp-token-type-uq
-                              "include")
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
-                              'shu-cpp-token-match-same
-                              nil shu-cpp-token-type-op
-                              "<")
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
-                              'shu-cpp-token-match-same-rx
-                              t shu-cpp-token-type-uq
-                              (concat shu-cpp-name "+"))
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same
-                              'shu-cpp-token-match-same
-                              nil shu-cpp-token-type-op
-                              ">"))
+  (list  ;; #include < name >
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             nil shu-cpp-token-type-op
+                             "#")
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             nil shu-cpp-token-type-uq
+                             "include")
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             nil shu-cpp-token-type-op
+                             "<")
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                             'shu-cpp-token-match-same-rx
+                             t shu-cpp-token-type-uq
+                             (concat shu-cpp-name "+"))
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             nil shu-cpp-token-type-op
+                             ">"))
   "A list of match-info that matches \"#include <name>\".")
 
 
