@@ -357,6 +357,85 @@ point is placed where the the first line of code in the loop belongs."
 
 
 ;;
+;;  shu-misc-rx-functions
+;;
+(defconst shu-misc-rx-functions
+  (concat
+   "("
+   "\\s-*"
+   "\\(defun"
+   "\\|defsubst"
+   "\\|defmacro"
+   "\\|ert-deftest"
+   "\\|defvar"
+   "\\|defconst"
+   ")"
+   "\\)")
+  "Rregular expression to find the beginning of a function, macro, etc.")
+
+
+
+;;
+;;  shu-misc-rx-conditionals
+;;
+(defconst shu-misc-rx-conditionals
+  (concat
+   "("
+   "\\s-*"
+   "\\(if"
+   "\\|save-excursion"
+   "\\|save-match-data"
+   "\\|save-restriction"
+   "\\|unless"
+   "\\|when"
+   "\\|while"
+   "\\|with-temp-buffer"
+   "\\)")
+  "Rregular expression to find the beginning of a function that is a conditional.")
+
+
+
+;;
+;;  shu-misc-rx-lets
+;;
+(defconst shu-misc-rx-lets
+  (concat
+          "("
+          "\\s-*"
+          "\\(if"
+          "\\|let"
+          "\\|let\\*"
+          "\\)")
+  "Rregular expression to find the beginning of a let soecial form.")
+
+
+
+;;
+;;  shu--get-containing-function
+;;
+(defun shu-get-containing-functino ()
+  "Search backiwards from the current point to find the beginning of the enclosing
+function, macro, etc.  If such a beginning is found, return a cons cell whose car
+is the point that defines the point at the beginning of the function and whose cdr
+defines the point at the end of the function.  If not inside a function, macro, etc.,
+return nil"
+  (let ((ret-val)
+        (bof)
+        (eof))
+    (save-excursion
+      (if (not (re-search-backward shu-misc-rx-functions nil t))
+          (progn
+            (ding)
+            (message "%s" "Not inside a macro or function"))
+        (setq bof (match-beginning 0))
+        (setq eof (shu-point-at-sexp bof))
+        (setq ret-val (cons bof eof))))
+    ret-val
+    ))
+
+
+
+;;
 ;;  shu-tighten-lisp
 ;;
 (defun shu-tighten-lisp ()
@@ -415,40 +494,10 @@ parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run SHU-TIGHTEN-LISP to put the
 parentheses back where they belong."
   (interactive)
-  (let ((bof)
+  (let ((gb (get-buffer-create "**boo**"))
+        (ret-val)
+        (bof)
         (eof)
-        (ssfun
-         (concat
-          "("
-          "\\s-*"
-          "\\(defun"
-          "\\|defsubst"
-          "\\|defmacro"
-          "\\|ert-deftest"
-          "\\|defvar"
-          "\\|defconst"
-          ")"
-          "\\)"))
-        (ss (concat
-             "("
-             "\\s-*"
-             "\\(if"
-             "\\|save-excursion"
-             "\\|save-match-data"
-             "\\|save-restriction"
-             "\\|unless"
-             "\\|when"
-             "\\|while"
-             "\\|with-temp-buffer"
-             "\\)"))
-        (sslet
-         (concat
-          "("
-          "\\s-*"
-          "\\(if"
-          "\\|let"
-          "\\|let\\*"
-          "\\)"))
         (doing t)
         (p)
         (pad)
@@ -456,17 +505,17 @@ parentheses back where they belong."
         (start-col)
         (let-begin))
     (save-excursion
-      (if (not (re-search-backward ssfun nil t))
-          (progn
-            (ding)
-            (message "%s" "Not inside a macro or function"))
-        (setq bof (match-beginning 0))
-        (setq eof (shu-point-at-sexp bof))
+      (setq ret-val (shu-get-containing-functino))
+      (when ret-val
+        (setq bof (car ret-val))
+        (setq eof (cdr ret-val))
+        (princ (format "bof: %d, eof: %d\n" bof eof) gb)
         ;; Handle all containing functions other than "let"
         (goto-char bof)
         (while doing
-          (if (not (re-search-forward ss eof t))
+          (if (not (re-search-forward shu-misc-rx-conditionals eof t))
               (setq doing nil)
+            (princ (format "FounE_d: %s at %d\n" (match-string 0) (point)) gb)
             (setq p (1- (point)))
             (goto-char (match-beginning 0))
             (setq start-col (current-column))
@@ -480,7 +529,7 @@ parentheses back where they belong."
             (goto-char p)))
         ;; Handle "let" and "let*"
         (goto-char bof)
-        (while (re-search-forward sslet eof t)
+        (while (re-search-forward shu-misc-rx-lets eof t)
           (when (re-search-forward "(\\s-*(" eof t)
             (setq let-begin (match-beginning 0))
             (backward-char 1)

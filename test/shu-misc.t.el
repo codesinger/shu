@@ -310,6 +310,95 @@
 
 
 ;;
+;;  shu-test-shu-get-containing-function-1
+;;
+(ert-deftest shu-test-shu-get-containing-function-1 ()
+  (let (
+        (data
+         (concat
+          "(defun foo ()\n"
+          "  \"Doc string.\"\n"
+          "  (let ((ret-val)\n"
+          "        (bof)\n"
+          "        (eof))\n"
+          "    (save-excursion\n"
+          "      (if (not (re-search-backward shu-misc-rx-functions nil t))\n"
+          "          (progn\n"
+          "            (ding)\n"
+          "            (message \"%s\" \"Not inside a macro or function\"))\n"
+          "        (setq bof (match-beginning 0))\n"
+          "        (setq eof (shu-point-at-sexp bof))\n"
+          "        (setq ret-val (cons bof eof))))\n"
+          "    ret-val\n"
+          "    ))\n"))
+        (ret-val)
+        (bof)
+        (eof)
+        (expected-bof 1)
+        (expected-eof 400)
+        (gb (get-buffer-create "**boo**")))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "save-excur" nil t))
+      (beginning-of-line)
+       (setq ret-val (shu-get-containing-functino))
+       (should ret-val)
+       (should (consp ret-val))
+       (setq bof (car ret-val))
+       (setq eof (cdr ret-val))
+       (should bof)
+       (should (numberp bof))
+       (should eof)
+       (should (numberp eof))
+       (should (< bof eof))
+       (should (= expected-bof bof))
+       (should (= expected-eof eof))
+       (princ (format "bof: %d, eof: %d\n" bof eof) gb))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-containing-functino-2
+;;
+(ert-deftest shu-test-shu-get-containing-functino-2 ()
+  (let (
+        (data
+         (concat
+          "(dezun foo ()\n"
+          "  \"Doc string.\"\n"
+          "  (let ((ret-val)\n"
+          "        (bof)\n"
+          "        (eof))\n"
+          "    (save-excursion\n"
+          "      (if (not (re-search-backward shu-misc-rx-functions nil t))\n"
+          "          (progn\n"
+          "            (ding)\n"
+          "            (message \"%s\" \"Not inside a macro or function\"))\n"
+          "        (setq bof (match-beginning 0))\n"
+          "        (setq eof (shu-point-at-sexp bof))\n"
+          "        (setq ret-val (cons bof eof))))\n"
+          "    ret-val\n"
+          "    ))\n"))
+        (ret-val)
+        (bof)
+        (eof)
+        (expected-bof 1)
+        (expected-eof 400)
+        (gb (get-buffer-create "**boo**")))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "save-excur" nil t))
+      (beginning-of-line)
+       (setq ret-val (shu-get-containing-functino))
+       (should (not ret-val)))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-tighten-lisp
 ;;
 (ert-deftest shu-test-shu-tighten-lisp ()
