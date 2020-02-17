@@ -411,7 +411,7 @@ point is placed where the the first line of code in the loop belongs."
 
 
 ;;
-;;  shu--get-containing-function
+;;  shu-get-containing-function
 ;;
 (defun shu-get-containing-functino ()
   "Search backiwards from the current point to find the beginning of the enclosing
