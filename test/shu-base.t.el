@@ -1591,4 +1591,38 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 
+;;
+;;  shu-test-shu-starts-with-1
+;;
+(ert-deftest shu-test-shu-starts-with-1 ()
+  (let ((data "     )   \n")
+        (isit))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 4)
+      (setq isit (shu-starts-with ")"))
+      (should isit)
+      (should (numberp isit))
+      (should (= 6 isit))
+      (should (= 4 (point)))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-shu-starts-with-2
+;;
+(ert-deftest shu-test-shu-starts-with-2 ()
+  (let ((data "     (   \n")
+        (isit))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 4)
+      (setq isit (shu-starts-with ")"))
+      (should (not isit)))
+    ))
+
+
+
 ;;; shu-base.t.el ends here

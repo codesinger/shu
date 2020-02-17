@@ -776,13 +776,31 @@ two strings, which are \"Hi\" and \"How are you?\"."
 ;;
 (defsubst shu-point-at-sexp (sos)
   "Return the point of the sexp that matches the point at SOS."
-  (interactive)
   (let ((eos))
     (save-excursion
       (goto-char sos)
       (forward-sexp)
       (setq eos (point)))
     eos
+    ))
+
+
+
+;;
+;;  shu-starts-with
+;;
+(defun shu-starts-with (regexp)
+  "If the first non-whitespace on the current line matches REGEXP, return the position
+of the beginning of the mqtched REGEXP.  If the first non-whitespace does not match
+REGEXP, return nil."
+  (let ((isit))
+    (save-excursion
+      (goto-char (line-beginning-position))
+      (when (re-search-forward shu-not-all-whitespace-regexp (line-end-position) t)
+        (backward-char 1)
+        (when (looking-at regexp)
+          (setq isit (point)))))
+    isit
     ))
 
 
