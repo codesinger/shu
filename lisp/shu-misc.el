@@ -402,10 +402,12 @@ point is placed where the the first line of code in the loop belongs."
   (concat
           "("
           "\\s-*"
-          "\\(if"
-          "\\|let"
+          "\\(let"
           "\\|let\\*"
-          "\\)")
+          "\\)"
+          shu-all-whitespace-regexp "*"
+          "\\((\\)"
+          )
   "Rregular expression to find the beginning of a let soecial form.")
 
 
@@ -443,42 +445,92 @@ return nil"
 Look for any single right parenthesis that is on its own line and move it up to
 the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
   (interactive)
-  (let ((ssfun
-         (concat
-          "("
-          "\\s-*"
-          "\\(defun\\|defsubst\\|defmacro\\|ert-deftest\\|defvar\\|defconst\\)"))
+  (let ((gb (get-buffer-create "**boo**"))
+        (ret-val)
         (bof)
         (eof)
-        (ss "\\s-+)$")
-        (ss2 "\\s-+($")
-        (bob)
-        (eob)
-        (del-count))
+        (doing t)
+        (p)
+        (start-pos)
+        (end-pos)
+        (length)
+        (pad)
+        (pad-length)
+        (start-col)
+        (let-begin)
+        (sp)
+        (xx (concat shu-all-whitespace-regexp "*" ")"))
+        (zz (concat shu-all-whitespace-regexp "*" "(")))
     (save-excursion
-      (if (not (re-search-backward ssfun nil t))
-          (progn
-            (ding)
-            (message "%s" "Not inside a macro or function"))
-        (setq bof (match-beginning 0))
-        (setq eof (shu-point-at-sexp bof))
+      (setq ret-val (shu-get-containing-functino))
+      (when ret-val
+        (setq bof (car ret-val))
+        (setq eof (cdr ret-val))
+        (princ (format "bof: %d, eof: %d\n" bof eof) gb)
+        ;; Handle all containing functions other than "let"
         (goto-char bof)
-        (while (re-search-forward ss eof t)
-          (setq eob (1- (point)))
-          (forward-line -1)
-          (end-of-line)
-          (setq bob (point))
-          (delete-region bob eob)
-          (setq eof (shu-point-at-sexp bof)))
+        (while doing
+          (if (not (re-search-forward shu-misc-rx-conditionals eof t))
+              (setq doing nil)
+            (setq p (1- (point)))
+            (princ (format "Found(x): %s at %d\n" (match-string 0) (point)) gb)
+            (when (search-backward "(" nil t)
+              (setq eof (shu-tighten-hanging-paren eof))
+              (goto-char p))))
+        ;; Handle "let" and "let*"
         (goto-char bof)
-        (while (re-search-forward ss2 eof t)
-          (setq bob (point))
-          (forward-line 1)
-          (when (re-search-forward "^\\s-+(")
-            (setq eob (1- (point)))
-            (delete-region bob eob)
-            (setq del-count (1+ (- eob bob)))
-            (setq eof (- eof del-count))))))
+        (while (re-search-forward shu-misc-rx-lets eof t)
+          (princ (format "Found(1): %s at %d and %s at %d\n" (match-string 1) (match-beginning 1) (match-string 2) (match-beginning 2)) gb)
+          (setq start-pos (point))
+          (backward-char 1)
+          (setq eof (shu-tighten-hanging-paren eof))
+          (goto-char start-pos)
+          (when (re-search-forward zz eof t)
+            (setq end-pos (1- (point)))
+            (setq length (- end-pos start-pos))
+            (when (> length 0)
+              (delete-region start-pos end-pos)
+              (setq eof (- eof length)))))))
+    ))
+
+
+
+
+;;
+;;  shu-tighten-hanging-paren
+;;
+(defun shu-tighten-hanging-paren (eof)
+  "Call this function while point is on a left parenthesis.  This function will
+find the matching right parenthesis.  If the matching right parenthesis is on a line
+by itself and a previous line ends in another right parenthesis, the line and
+dangling right parenthesis will be moved up to the end of the line that also ends
+in a right parenthesis.  This is an internal part of the function SHU-TIGHTEN-LISP.
+EOF is the point at which the current function on which we are operating ends.
+This function removes some text from the current function.  It adjusts EOF appropriately
+and reeturns thee new value to the caller.."
+  (interactive)
+  (let ((gb (get-buffer-create "**boo**"))
+        (sp)
+        (end-pos)
+        (start-pos)
+        (xx (concat shu-all-whitespace-regexp "*" ")"))
+        (p)
+        (length))
+    (forward-sexp)
+    (backward-char 1)
+    (princ (format "sexp at %d\n" (point)) gb)
+    (setq sp (shu-starts-with ")"))
+    (when sp
+      (princ "Starts with )\n" gb)
+      (setq end-pos sp)
+      (princ (format "end-pos: %d\n" end-pos) gb)
+      (when (re-search-backward xx p t)
+        (setq start-pos (1+ (point)))
+        (setq length (- end-pos start-pos))
+        (princ (format "start-pos: %d, end-pos: %d, length: %d\n" start-pos end-pos length) gb)
+        (delete-region start-pos end-pos)
+        (setq eof (- eof length))))
+    eof
     ))
 
 
@@ -530,10 +582,9 @@ parentheses back where they belong."
         ;; Handle "let" and "let*"
         (goto-char bof)
         (while (re-search-forward shu-misc-rx-lets eof t)
-          (when (re-search-forward "(\\s-*(" eof t)
             (setq let-begin (match-beginning 0))
-            (backward-char 1)
             (setq p (point))
+            (princ (format "p: %d\n" p ) gb)
             (setq start-col (current-column))
             (setq pad-length start-col)
             (setq pad (concat "\n" (make-string pad-length ? )))
@@ -546,7 +597,7 @@ parentheses back where they belong."
               (setq pad-length (+ start-col 2))
               (setq pad (concat "\n" (make-string pad-length ? )))
               (insert pad)
-              (setq eof (+ eof (length pad))))))))
+              (setq eof (+ eof (length pad)))))))
     ))
 
 
