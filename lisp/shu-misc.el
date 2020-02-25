@@ -445,8 +445,7 @@ return nil"
 Look for any single right parenthesis that is on its own line and move it up to
 the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
   (interactive)
-  (let ((gb (get-buffer-create "**boo**"))
-        (ret-val)
+  (let ((ret-val)
         (bof)
         (eof)
         (doing t)
@@ -466,21 +465,18 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
       (when ret-val
         (setq bof (car ret-val))
         (setq eof (cdr ret-val))
-        (princ (format "bof: %d, eof: %d\n" bof eof) gb)
         ;; Handle all containing functions other than "let"
         (goto-char bof)
         (while doing
           (if (not (re-search-forward shu-misc-rx-conditionals eof t))
               (setq doing nil)
             (setq p (1- (point)))
-            (princ (format "Found(x): %s at %d\n" (match-string 0) (point)) gb)
             (when (search-backward "(" nil t)
               (setq eof (shu-tighten-hanging-paren eof))
               (goto-char p))))
         ;; Handle "let" and "let*"
         (goto-char bof)
         (while (re-search-forward shu-misc-rx-lets eof t)
-          (princ (format "Found(1): %s at %d and %s at %d\n" (match-string 1) (match-beginning 1) (match-string 2) (match-beginning 2)) gb)
           (setq start-pos (point))
           (backward-char 1)
           (setq eof (shu-tighten-hanging-paren eof))
@@ -509,8 +505,7 @@ EOF is the point at which the current function on which we are operating ends.
 This function removes some text from the current function.  It adjusts EOF appropriately
 and reeturns thee new value to the caller.."
   (interactive)
-  (let ((gb (get-buffer-create "**boo**"))
-        (sp)
+  (let ((sp)
         (end-pos)
         (start-pos)
         (xx (concat shu-all-whitespace-regexp "*" ")"))
@@ -518,16 +513,12 @@ and reeturns thee new value to the caller.."
         (length))
     (forward-sexp)
     (backward-char 1)
-    (princ (format "sexp at %d\n" (point)) gb)
     (setq sp (shu-starts-with ")"))
     (when sp
-      (princ "Starts with )\n" gb)
       (setq end-pos sp)
-      (princ (format "end-pos: %d\n" end-pos) gb)
       (when (re-search-backward xx p t)
         (setq start-pos (1+ (point)))
         (setq length (- end-pos start-pos))
-        (princ (format "start-pos: %d, end-pos: %d, length: %d\n" start-pos end-pos length) gb)
         (delete-region start-pos end-pos)
         (setq eof (- eof length))))
     eof
@@ -546,8 +537,7 @@ parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run SHU-TIGHTEN-LISP to put the
 parentheses back where they belong."
   (interactive)
-  (let ((gb (get-buffer-create "**boo**"))
-        (ret-val)
+  (let ((ret-val)
         (bof)
         (eof)
         (doing t)
@@ -561,13 +551,11 @@ parentheses back where they belong."
       (when ret-val
         (setq bof (car ret-val))
         (setq eof (cdr ret-val))
-        (princ (format "bof: %d, eof: %d\n" bof eof) gb)
         ;; Handle all containing functions other than "let"
         (goto-char bof)
         (while doing
           (if (not (re-search-forward shu-misc-rx-conditionals eof t))
               (setq doing nil)
-            (princ (format "FounE_d: %s at %d\n" (match-string 0) (point)) gb)
             (setq p (1- (point)))
             (goto-char (match-beginning 0))
             (setq start-col (current-column))
@@ -584,7 +572,6 @@ parentheses back where they belong."
         (while (re-search-forward shu-misc-rx-lets eof t)
             (setq let-begin (match-beginning 0))
             (setq p (point))
-            (princ (format "p: %d\n" p ) gb)
             (setq start-col (current-column))
             (setq pad-length start-col)
             (setq pad (concat "\n" (make-string pad-length ? )))
