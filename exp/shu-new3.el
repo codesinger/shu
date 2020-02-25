@@ -411,12 +411,15 @@ parentheses back where they belong."
 ;;
 ;;  fix1
 ;;
-(defun fix1 ()
+(defun fix1 (eof)
   "Call this function while point is on a left parenthesis.  This function will
 find the matching right parenthesis.  If the matching right parenthesis is on a line
 by itself and a previous line ends in another right parenthesis, the line and
 dangling right parenthesis will be moved up to the end of the line that also ends
-in a right parenthesis.  This is an internal part of the function SHU-TIGHTEN-LISP."
+in a right parenthesis.  This is an internal part of the function SHU-TIGHTEN-LISP.
+EOF is the point at which the current function on which we are operating ends.
+This function removes some text from the current function.  It adjusts EOF appropriately
+and reeturns thee new value to the caller.."
   (interactive)
   (let (
         (gb (get-buffer-create "**boo**"))
@@ -424,7 +427,6 @@ in a right parenthesis.  This is an internal part of the function SHU-TIGHTEN-LI
         (end-pos)
         (start-pos)
         (xx (concat shu-all-whitespace-regexp "*" ")"))
-        (eof (point-max))
         (p)
         )
     (forward-sexp)
@@ -443,7 +445,7 @@ in a right parenthesis.  This is an internal part of the function SHU-TIGHTEN-LI
         (setq eof (- eof length))
         )
       )
-
+    eof
     ))
 
 
