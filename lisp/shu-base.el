@@ -815,4 +815,23 @@ to trim blank lines from the end of a file if SHU-TRIM-FILE is true."
   )
 
 
+
+;;
+;;  shu-line-number-at-pos
+;;
+(defun shu-line-number-at-pos (&optional pos absolute)
+  "line-number-at-pos in simple.el takes two arguments as of emacs 26.  This
+allows the two argument version to run on older versions of emacs.  If
+ABSOLUTE is specified, widen the buffer, then call the one argument version
+of line-number-at-pos, which is supported in amacs 24 and 25, and perhaps
+others."
+  (let ((p))
+    (save-restriction
+      (when absolute
+        (widen))
+      (setq p (line-number-at-pos pos)))
+    p
+    ))
+
+
 ;;; shu-base.el ends here

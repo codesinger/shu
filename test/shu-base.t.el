@@ -1625,4 +1625,98 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 
+
+;;
+;;  shu-test-shu-line-number-at-pos-1
+;;
+(ert-deftest shu-test-shu-line-number-at-pos-1 ()
+  (let ((p)
+    (data
+     (concat
+      "Line 1\n"
+      "Line 2\n"
+      "Line 3\n"
+      "Line 4\n"
+      "Line 5\n"
+      "Line 6\n"
+      "Line 7\n"
+      "Line 8\n"
+      "Line 9\n"
+      "Line 10\n")))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "Line 4" nil t))
+      (setq p (shu-line-number-at-pos))
+      (should p)
+      (should (numberp p))
+      (should (= 4 p)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-line-number-at-pos-2
+;;
+(ert-deftest shu-test-shu-line-number-at-pos-2 ()
+  (let ((p)
+    (data
+     (concat
+      "Line 1\n"
+      "Line 2\n"
+      "Line 3\n"
+      "Line 4\n"
+      "Line 5\n"
+      "Line 6\n"
+      "Line 7\n"
+      "Line 8\n"
+      "Line 9\n"
+      "Line 10\n")))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "Line 4" nil t))
+      (beginning-of-line)
+      (narrow-to-region (point) (point-max))
+      (setq p (shu-line-number-at-pos))
+      (should p)
+      (should (numberp p))
+      (should (= 1 p)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-line-number-at-pos-3
+;;
+(ert-deftest shu-test-shu-line-number-at-pos-3 ()
+  (let ((p)
+    (data
+     (concat
+      "Line 1\n"
+      "Line 2\n"
+      "Line 3\n"
+      "Line 4\n"
+      "Line 5\n"
+      "Line 6\n"
+      "Line 7\n"
+      "Line 8\n"
+      "Line 9\n"
+      "Line 10\n")))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "Line 4" nil t))
+      (beginning-of-line)
+      (narrow-to-region (point) (point-max))
+      (setq p (shu-line-number-at-pos (point) t))
+      (should p)
+      (should (numberp p))
+      (should (= 4 p)))
+    ))
+
+
+
 ;;; shu-base.t.el ends here

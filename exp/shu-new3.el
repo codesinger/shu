@@ -141,7 +141,7 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
             (setq p (1- (point)))
             (princ (format "Found(x): %s at %d\n" (match-string 0) (point)) gb)
             (when (search-backward "(" nil t)
-              (setq eof (fix1 eof))
+              (setq eof (shu-tighten-hanging-paren eof))
               (goto-char p)
               )
             )
@@ -152,7 +152,7 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
           (princ (format "Found(1): %s at %d and %s at %d\n" (match-string 1) (match-beginning 1) (match-string 2) (match-beginning 2)) gb)
           (setq start-pos (point))
           (backward-char 1)
-          (setq eof (fix1 eof))
+          (setq eof (shu-tighten-hanging-paren eof))
           (goto-char start-pos)
           (when (re-search-forward zz eof t)
             (setq end-pos (1- (point)))
@@ -386,9 +386,9 @@ parentheses back where they belong."
 ;; TODO pass in the value of eof as an input parameter and have this
 ;;      function return the updatedd value of eof.
 ;;
-;;  fix1
+;;  shu-tighten-hanging-paren
 ;;
-(defun fix1 (eof)
+(defun shu-tighten-hanging-paren (eof)
   "Call this function while point is on a left parenthesis.  This function will
 find the matching right parenthesis.  If the matching right parenthesis is on a line
 by itself and a previous line ends in another right parenthesis, the line and
@@ -447,7 +447,7 @@ and reeturns thee new value to the caller.."
           (princ (format "Found(1): %s at %d and %s at %d\n" (match-string 1) (match-beginning 1) (match-string 2) (match-beginning 2)) gb)
           (setq start-pos (point))
           (backward-char 1)
-          (setq eof (fix1 eof))
+          (setq eof (shu-tighten-hanging-paren eof))
           (goto-char start-pos)
           (when (re-search-forward zz eof t)
             (setq end-pos (1- (point)))
