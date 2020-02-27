@@ -120,7 +120,7 @@ helps to weed out some of the extraneous ones but not all of them."
       (goto-char spoint)
       (setq bol (line-beginning-position))
       (setq eol (line-end-position))
-      (setq line-no (shu-format-num (line-number-at-pos) 5))
+      (setq line-no (shu-format-num (shu-line-number-at-pos) 5))
       (setq line (buffer-substring-no-properties bol eol))
       (princ (concat line-no ". " line "\n") gb)
       (setq count (1+ count))
@@ -466,7 +466,7 @@ lines, each one prefixed with the line number where it appears in the file.
 For example, if the string of test is \"Hello.\" and it starts at line 392 of
 the file, this function will return \"   392. Hello.\" with a newline appended
 to the end of the line."
-  (let ((line-no (line-number-at-pos spos t))
+  (let ((line-no (shu-line-number-at-pos spos t))
         (slist (shu-split-new-lines stmt))
         (lcode "")
         (line)(pline))
@@ -985,7 +985,7 @@ of times that the class name was explicitly qualified."
       (setq spoint (car ret-val))
       (setq epoint (cdr ret-val))
       (setq ns-code (buffer-substring-no-properties spoint epoint))
-      (setq lnum (line-number-at-pos spoint))
+      (setq lnum (shu-line-number-at-pos spoint))
       (setq plnum (shu-format-num lnum 6))
       (setq ns-line (concat plnum ". " ns-code "\n"))
       (push ns-line ns-lines)
