@@ -1233,6 +1233,7 @@ about extracted file prefixes."
         (np 0)
         (item)
         (prefix)
+        (prefix-name)
         (count)
         (pad-length)
         (pad))
@@ -1260,10 +1261,13 @@ about extracted file prefixes."
         (while pl
           (setq item (car pl))
           (setq prefix (car item))
+          (if (= (length prefix) 0)
+              (setq prefix-name "**none**")
+            (setq prefix-name prefix))
           (setq count (cdr item))
           (setq pad "")
-          (when (< (length prefix) max-prefix)
-            (setq pad-length (- max-prefix (length prefix)))
+          (when (< (length prefix-name) max-prefix)
+            (setq pad-length (- max-prefix (length prefix-name)))
             (setq pad (make-string pad-length ? )))
           (insert
            (concat
@@ -1507,7 +1511,7 @@ which the tags file is to be built."
 If not defined, return the string \"**unknown**\".  Some older versions of emacs
 do not support real-this-command."
   (if (version< emacs-version "24.3.1") "**unknown**" (symbol-name real-this-command))
-    )
+  )
 
 
 
@@ -1820,8 +1824,7 @@ list of short names.
 
 Return is a cons cell whose car is the prefix list and whose cdr is the short
 name list."
-  (let (
-        (kl (copy-tree key-list))
+  (let ((kl (copy-tree key-list))
         (file-name)
         (full-name-list)
         (ps)
