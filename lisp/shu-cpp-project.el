@@ -1271,7 +1271,7 @@ about extracted file prefixes."
             (setq pad (make-string pad-length ? )))
           (insert
            (concat
-            prefix pad (shu-fixed-format-num count 11) "\n"))
+            prefix-name pad (shu-fixed-format-num count 11) "\n"))
           (setq pl (cdr pl)))))
     ))
 
