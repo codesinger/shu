@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.17
+;; Version: 1.6.18
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.17"
+(defconst shu-version "1.6.18"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -832,6 +832,26 @@ others."
       (setq p (line-number-at-pos pos)))
     p
     ))
+
+
+;;
+;;  shu-replace-string
+;;
+(defun shu-replace-string (original replacement &optional fixedcase literal)
+  "Go to the top of the current buffer and use SEARCH-FORWARD to find all
+instances of ORIGINAL, replacing each instance with REPLACEMENT.  The optional
+arguments FIXEDCASE and LITERAL are passed through to the REPLACE-MATCH
+function.  Return the count of the number of instnces that were replaced,
+if any."
+  (let ((count 0))
+    (goto-char (point-min))
+    (while (search-forward original nil t)
+      (replace-match replacement fixedcase literal)
+      (setq count (1+ count)))
+    count
+    ))
+
+
 
 
 ;;; shu-base.el ends here

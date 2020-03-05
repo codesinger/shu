@@ -1719,4 +1719,26 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 
+
+;;
+;;  shu-test-shu-replace-string-1
+;;
+(ert-deftest shu-test-shu-replace-string-1 ()
+  (let ((data
+         (concat
+          "Whan that Aprille with his shoures soote\n"
+          "The droghte of Marche hath perced to the roote,\n"))
+        (expected
+         (concat
+          "Whan that may with his shoures soote\n"
+          "The droghte of Marche hath perced to the roote,\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-replace-string "Aprille" "may" t t)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
 ;;; shu-base.t.el ends here
