@@ -841,7 +841,7 @@ others."
   "Go to the top of the current buffer and use SEARCH-FORWARD to find all
 instances of ORIGINAL, replacing each instance with REPLACEMENT.  The optional
 arguments FIXEDCASE and LITERAL are passed through to the REPLACE-MATCH
-function.  Return the count of the number of instnces that were replaced,
+function.  Return the count of the number of instances that were replaced,
 if any."
   (let ((count 0))
     (goto-char (point-min))

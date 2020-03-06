@@ -281,6 +281,45 @@
 
 
 
+;;
+;;  shu-test-shu-find-line-and-file-1
+;;
+(ert-deftest shu-test-shu-find-line-and-file-1 ()
+  (let ((gb (get-buffer-create "**boo**"))
+        (data " filename.cpp:122:14 \n")
+        (ret-val)
+        (x))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 8)
+      (setq ret-val (shu-find-line-and-file))
+      (should ret-val)
+      (should (listp ret-val))
+      (should (= 3 (length ret-val)))
+      (setq x (car ret-val))
+      (should x)
+      (should (stringp x))
+      (should (string= "filename.cpp" x))
+      (setq ret-val (cdr ret-val))
+      (should ret-val)
+      (should (listp ret-val))
+      (should (= 2 (length ret-val)))
+      (setq x (car ret-val))
+      (should x)
+      (should (numberp x))
+      (should (= 122 x))
+      (setq ret-val (cdr ret-val))
+      (should ret-val)
+      (should (listp ret-val))
+      (should (= 1 (length ret-val)))
+      (setq x (car ret-val))
+      (should x)
+      (should (numberp x))
+      (should (= 14 x)))
+    ))
+
+
+
 
 ;;
 ;;  shu-test-shu-cpp-project-collapse-list-1
