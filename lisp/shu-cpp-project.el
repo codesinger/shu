@@ -633,9 +633,51 @@ file typed in the completion buffer."
 
 
 
+;;
+;;  shu-vf
+;;
+(defun shu-vf ()
+  "If point is on something that looks like a file name, visit the file.  If the
+file name is followed by a colon and a number, the number is interpreted as a
+line number within the file and point is moved to the beginning of that line.
+If the line number is followed by a colon and another number, then the second
+number is interpreted as a column number and point is moved to that column
+number."
+  (interactive)
+  (let ((gb (get-buffer-create "**boo**"))
+        (ret)
+        (x)
+        (file)
+        (line)
+        (column))
+    (setq debug-on-error t)
+    (setq ret (shu-possible-cpp-file-name-new t t))
+    (princ ret gb)(princ "\n" gb)
+    (if (not ret)
+        (progn
+          (ding)
+          (message "%s" "No file name found."))
+      (setq file (car ret))
+      (princ "file: '" gb)(princ file gb)(princ "'\n" gb)
+      (setq ret (cdr ret))
+      (when ret
+        (setq line (car ret))
+        (setq ret (cdr ret))
+        (when ret
+          (setq column (car ret))))
+      (find-file file)
+      (when line
+        (goto-char (point-min))
+        (forward-line (1- line))
+        (when column
+          (move-to-column (1- column)))))
+    ))
+
+
+
 
 ;;
-;;  shu-vh - Visit a c or h file in a project
+;;  shu-internal-visit-project-file
 ;;
 ;;    Note: At some point there seemed to be a bug in
 ;;          completing-read.  Even when require-match is t
@@ -830,10 +872,11 @@ anywhere on the word \"line\".  This is used pick up file positions of the form:
     ))
 
 
+
 ;;
 ;;  shu-possible-cpp-file-name
 ;;
-(defun shu-possible-cpp-file-name (&optional include-directory)
+(defun shu-possible-cpp-file-name (&optional include-directory any-extension)
   "Return a list containing a possible file name with a possible line number
 and a possible column number.  If the thing on point does not resemble a file
 name, return nil.  If it looks like a file name, save it and call
@@ -843,10 +886,16 @@ a file name, a list of length two if there is a file name and line number, a
 list of length three if there is a file name, line number, and column number.
 If the optional argument INCLUDE-DIRECTORY is true, the file name may include
 the forward slash character, which means that the returned file name may also
-include directory names."
-  (let* ((local-file-name (if include-directory shu-cpp-file-directory-name shu-cpp-file-name))
+include directory names.  Normally, this function only looks for code files,
+but if the optional argument ANY-EXTENSION is true, then a file name with any
+extension will be returned."
+  (let* ((local-file-name (if include-directory
+                              shu-cpp-file-directory-name
+                            shu-cpp-file-name))
          (target-extensions (regexp-opt shu-cpp-extensions t))
-         (target-name (concat local-file-name "*\\." target-extensions))
+         (target-name (if any-extension
+                          (concat local-file-name "+")
+                        (concat local-file-name "*\\." target-extensions)))
          (target-char local-file-name)
          (numbers "[0-9]+")
          (bol (line-beginning-position))
@@ -874,6 +923,7 @@ include directory names."
         (setq ret-list (cons file-name line-col))))
     ret-list
     ))
+
 
 
 ;;
@@ -2008,6 +2058,7 @@ shu- prefix removed."
   (defalias 'list-completing-names 'shu-cpp-list-completing-names)
   (defalias 'list-c-directories 'shu-list-c-directories)
   (defalias 'which-c-project 'shu-which-c-project)
+  (defalias 'vf 'shu-vf)
   (defalias 'other 'shu-other)
   (defalias 'cother 'shu-cother)
   (defalias 'hother 'shu-hother)

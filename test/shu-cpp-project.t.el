@@ -283,6 +283,36 @@
 ))
 
 
+;;
+;;  shu-test-possible-cpp-file-name-13
+;;
+(ert-deftest shu-test-possible-cpp-file-name-13 ()
+  (let* ((result)
+         (file "/aaaaaa/bb/cc/dd/ee/ff/brumble.txt")
+         (line 1234)
+         (column 52)
+         (target
+          (concat
+           "Hi!\n" file ":"
+           (number-to-string line) ":"
+           (number-to-string column) ":"
+           "\nthere"))
+         (colc))
+    (with-temp-buffer
+      (insert target)
+      (goto-char (point-min))
+      (forward-char 6)
+      (setq result (shu-possible-cpp-file-name t t))
+      (should result)
+      (should (listp result))
+      (should (= 3 (length result)))
+      (should (string= file (car result)))
+      (should (= line (cadr result)))
+      (setq colc (cddr result))
+      (should (= column (car colc))))
+    ))
+
+
 
 ;;
 ;;  shu-test-shu-get-line-column-of-file-1
