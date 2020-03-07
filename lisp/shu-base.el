@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.18
+;; Version: 1.6.19
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.18"
+(defconst shu-version "1.6.19"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -77,14 +77,24 @@ here.")
   "A regular expression to match a character not valid in a variable name
 in a C or C++ program.")
 
+(defconst shu-cpp-file-name-list
+  (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
+        "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
+        "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M"
+        "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
+        "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+        "_" "$" "." "-")
+  "List of all characters that can be present in a C++ file name.")
+
 (defconst shu-cpp-file-name (regexp-opt
-                             (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
-                                   "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
-                                   "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M"
-                                   "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
-                                   "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
-                                   "_" "$" "." "-") nil)
+                             shu-cpp-file-name-list nil)
   "A regular expression to match the name of a C or C++ file in the file system.")
+
+(defconst shu-cpp-file-directory-name (regexp-opt
+                             (append shu-cpp-file-name-list (list "/")) nil)
+  "A regular expression to match the name of a C or C++ file in the file system
+including directory names.  This is the same regular expression as
+SHU-CPP-FILE-NAME-LIST with a \"/\" included.")
 
 
 (defgroup shu-base nil

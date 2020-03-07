@@ -38,6 +38,8 @@
       (goto-char (point-min))
       (forward-char 2)
       (setq result (shu-possible-cpp-file-name))
+      (should result)
+      (should (listp result))
       (should (= 1 (length result)))
       (should (string= file (car result))))
 ))
@@ -55,6 +57,8 @@
       (goto-char (point-min))
       (forward-char 6)
       (setq result (shu-possible-cpp-file-name))
+      (should result)
+      (should (listp result))
       (should (= 1 (length result)))
       (should (string= file (car result))))
 ))
@@ -75,6 +79,8 @@
       (goto-char (point-min))
       (forward-char 6)
       (setq result (shu-possible-cpp-file-name))
+      (should result)
+      (should (listp result))
       (should (= 2 (length result)))
       (should (string= file (car result)))
       (should (= line (cadr result))))
@@ -101,6 +107,8 @@
       (goto-char (point-min))
       (forward-char 6)
       (setq result (shu-possible-cpp-file-name))
+      (should result)
+      (should (listp result))
       (should (= 3 (length result)))
       (should (string= file (car result)))
       (should (= line (cadr result)))
@@ -139,6 +147,136 @@
       (goto-char (point-min))
       (forward-char 10)
       (setq result (shu-possible-cpp-file-name))
+      (should result)
+      (should (listp result))
+      (should (= 2 (length result)))
+      (should (string= file (car result)))
+      (should (= line (cadr result))))
+))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-7
+;;
+(ert-deftest shu-test-possible-cpp-file-name-7 ()
+  (let ((result)
+        (file "/aa/bb/cc/brumble.cpp"))
+  (with-temp-buffer
+      (insert file)
+      (goto-char (point-min))
+      (forward-char 2)
+      (setq result (shu-possible-cpp-file-name t))
+      (should result)
+      (should (listp result))
+      (should (= 1 (length result)))
+      (should (string= file (car result))))
+))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-8
+;;
+(ert-deftest shu-test-possible-cpp-file-name-8 ()
+  (let* ((result)
+        (file "aa/bb/cc/brumble.cpp")
+        (target (concat "Hi!\n" file "\nthere")))
+  (with-temp-buffer
+      (insert target)
+      (goto-char (point-min))
+      (forward-char 6)
+      (setq result (shu-possible-cpp-file-name t))
+      (should result)
+      (should (listp result))
+      (should (= 1 (length result)))
+      (should (string= file (car result))))
+))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-9
+;;
+(ert-deftest shu-test-possible-cpp-file-name-9 ()
+  (let* ((result)
+        (file "aa/bb/cc/brumble.cpp")
+        (line 1234)
+        (target (concat "Hi!\n" file ":"
+                        (number-to-string line)
+                        "\nthere")))
+  (with-temp-buffer
+      (insert target)
+      (goto-char (point-min))
+      (forward-char 6)
+      (setq result (shu-possible-cpp-file-name t))
+      (should result)
+      (should (listp result))
+      (should (= 2 (length result)))
+      (should (string= file (car result)))
+      (should (= line (cadr result))))
+))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-10
+;;
+(ert-deftest shu-test-possible-cpp-file-name-10 ()
+  (let* ((result)
+         (file "/aaaaaa/bb/cc/dd/ee/ff/brumble.cpp")
+         (line 1234)
+         (column 52)
+         (target
+          (concat
+           "Hi!\n" file ":"
+           (number-to-string line) ":"
+           (number-to-string column) ":"
+           "\nthere"))
+         (colc))
+    (with-temp-buffer
+      (insert target)
+      (goto-char (point-min))
+      (forward-char 6)
+      (setq result (shu-possible-cpp-file-name t))
+      (should result)
+      (should (listp result))
+      (should (= 3 (length result)))
+      (should (string= file (car result)))
+      (should (= line (cadr result)))
+      (setq colc (cddr result))
+      (should (= column (car colc))))
+    ))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-11
+;;
+(ert-deftest shu-test-possible-cpp-file-name-11 ()
+  (let ((result)
+        (file "/aa/bb/cc/brumble.chasm"))
+  (with-temp-buffer
+      (insert file)
+      (goto-char (point-min))
+      (forward-char 2)
+      (setq result (shu-possible-cpp-file-name t))
+      (should (not result)))
+))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-12
+;;
+(ert-deftest shu-test-possible-cpp-file-name-12 ()
+  (let* ((result)
+        (file "aa/bb/cc/dddddd/eeeeee/brumble.cpp")
+        (line 4231)
+        (target (concat "[file = " file "] "
+                        "[line = " (number-to-string line) "] "
+                        "\nthere")))
+  (with-temp-buffer
+      (insert target)
+      (goto-char (point-min))
+      (forward-char 10)
+      (setq result (shu-possible-cpp-file-name t))
+      (should result)
+      (should (listp result))
       (should (= 2 (length result)))
       (should (string= file (car result)))
       (should (= line (cadr result))))

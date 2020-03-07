@@ -833,20 +833,24 @@ anywhere on the word \"line\".  This is used pick up file positions of the form:
 ;;
 ;;  shu-possible-cpp-file-name
 ;;
-(defun shu-possible-cpp-file-name ()
+(defun shu-possible-cpp-file-name (&optional include-directory)
   "Return a list containing a possible file name with a possible line number
 and a possible column number.  If the thing on point does not resemble a file
 name, return nil.  If it looks like a file name, save it and call
 shu-get-line-column-of-file to perhaps harvest a line number and column number
 within the file.  The return result is a list of length one if there is only
 a file name, a list of length two if there is a file name and line number, a
-list of length three if there is a file name, line number, and column number."
-  (let* ((target-extensions (regexp-opt shu-cpp-extensions t))
-         (target-name (concat shu-cpp-file-name "*\\." target-extensions))
-         (target-char shu-cpp-file-name)
+list of length three if there is a file name, line number, and column number.
+If the optional argument INCLUDE-DIRECTORY is true, the file name may include
+the forward slash character, which means that the returned file name may also
+include directory names."
+  (let* ((local-file-name (if include-directory shu-cpp-file-directory-name shu-cpp-file-name))
+         (target-extensions (regexp-opt shu-cpp-extensions t))
+         (target-name (concat local-file-name "*\\." target-extensions))
+         (target-char local-file-name)
          (numbers "[0-9]+")
-         (bol (save-excursion (beginning-of-line) (point)))
-         (eol (save-excursion (end-of-line) (point)))
+         (bol (line-beginning-position))
+         (eol (line-end-position))
          (file-name )     ;; This will contain the name or nil
          (line-number )   ;; Line number or nil
          (column-number ) ;; Column number or nil
