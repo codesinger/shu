@@ -651,7 +651,7 @@ number."
         (line)
         (column))
     (setq debug-on-error t)
-    (setq ret (shu-possible-cpp-file-name-new t t))
+    (setq ret (shu-possible-cpp-file-name t t))
     (princ ret gb)(princ "\n" gb)
     (if (not ret)
         (progn
