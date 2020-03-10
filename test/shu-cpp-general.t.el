@@ -2992,6 +2992,90 @@ This is most likely the name of an include file and not the name of a class."
 
 
 
+;;
+;;  shu-test-shu-to-camel-1
+;;
+(ert-deftest shu-test-shu-to-camel-1 ()
+  (let ((data "mumble_something_other")
+        (expected "mumbleSomethingOther")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 4)
+      (shu-to-camel)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+;;
+;;  shu-test-shu-to-camel-2
+;;
+(ert-deftest shu-test-shu-to-camel-2 ()
+  (let ((data "   mumble_something_other   ")
+        (expected "   mumbleSomethingOther   ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "mumble" nil t))
+      (shu-to-camel)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+;;
+;;  shu-test-shu-to-camel-3
+;;
+(ert-deftest shu-test-shu-to-camel-3 ()
+  (let ((data "   boo__hoo   ")
+        (expected "   booHoo   ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "boo" nil t))
+      (shu-to-camel)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+;;
+;;  shu-test-shu-to-camel-4
+;;
+(ert-deftest shu-test-shu-to-camel-4 ()
+  (let ((data "   boo_hoo_   ")
+        (expected "   booHoo   ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "boo" nil t))
+      (shu-to-camel)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+;;
+;;  shu-test-shu-to-camel-5
+;;
+(ert-deftest shu-test-shu-to-camel-5 ()
+  (let ((data "   _boo_hoo_   ")
+        (expected "   BooHoo   ")
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward "boo" nil t))
+      (shu-to-camel)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
 
 
 ;;; shu-cpp-general.t.el ends here

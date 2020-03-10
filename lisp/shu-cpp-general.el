@@ -3089,6 +3089,50 @@ For example, \"mumbleSomethingOther\" becomes \"mumble_something_other\"."
 
 
 ;;
+;;  shu-to-camel
+;;
+(defun shu-to-camel ()
+  "Convert the variable name at point from snake case to camel case.
+
+For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
+  (interactive)
+  (let ((gb (get-buffer-create "**boo**"))
+        (pos (shu-cpp-get-variable-name-position))
+        (start-pos)
+        (end-pos)
+        (looking)
+        (i)
+        (c)
+        (case-fold-search nil))
+    (if (not pos)
+        (progn
+          (ding)
+          (message "%s" "Not sitting on a variable name"))
+      (save-excursion
+        (setq start-pos (car pos))
+        (setq end-pos (cdr pos))
+        (goto-char start-pos)
+        (while (< (point) end-pos)
+          (setq c (buffer-substring-no-properties (point) (1+ (point))))
+          (princ (concat "c: '" c "'\n") gb)
+          (if (string= c "_")
+              (progn
+            (setq looking t)
+            (delete-region (point) (1+ (point)))
+            (setq end-pos (1- end-pos)))
+            (when looking
+              (setq c (upcase c))
+              (delete-region (point) (1+ (point)))
+              (insert c)
+              (setq looking nil)))
+          (when (not looking)
+            (forward-char 1)))))
+    ))
+
+
+
+
+;;
 ;;  shu-cpp-general-set-alias
 ;;
 (defun shu-cpp-general-set-alias ()
@@ -3140,6 +3184,7 @@ shu- prefix removed."
   (defalias 'fixp 'shu-cpp-fix-prototype)
   (defalias 'getdef 'shu-cpp-find-h-definition)
   (defalias 'to-snake 'shu-to-snake)
+  (defalias 'to-camel 'shu-to-camel)
   )
 
 ;;; shu-cpp-general.el ends here

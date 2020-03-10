@@ -145,9 +145,4 @@ I work and play.  It is not part of the Shu elisp package."
     ))
 
 
-;;; shu-misc.el ends here
-
-
-;;; shu-system-type-is-unix
-
-;;; ~/mbig/2019-11-16-work
+;;; shu-setup-org-mode.el ends here
