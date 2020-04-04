@@ -2063,7 +2063,7 @@ shu- prefix removed."
   (defalias 'show-system-name 'shu-show-system-name)
   (defalias 'kill-system-name 'shu-kill-system-name)
   (defalias 'obfuscate-region 'shu-obfuscate-region)
-  (defalias 'saf 'shu-adapt-frame)
+  (defalias 'af 'shu-adapt-frame)
   )
 
 ;;; shu-misc.el ends here
