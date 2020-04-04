@@ -1976,6 +1976,41 @@ becomes
 
 
 
+;;
+;;  shu-adapt-frame
+;;
+(defun shu-adapt-frame ()
+  "Adapt the current frame to the current display by stretching the frame to the
+full height of the display and putting the top of the frame at the top of the
+display.
+This function makes some assumptions about the display geometry based on the
+current operating system.  It assumes that Windows loses five lines for top and
+bottom toolbars.  Mac OS X loses three lines for the top tool bar.  Unix loses
+two lines for something.  These numbers should, at some point be customizable."
+  (interactive)
+  (let* ((lost-lines
+          (if (shu-system-type-is-windows)
+              5
+            (if (shu-system-type-is-mac-osx)
+                3
+              (if (shu-system-type-is-unix)
+                  2
+                2))))
+         (top-y 0)
+         (hpx (- (x-display-pixel-height) (* lost-lines (frame-char-height))))
+         (hpl (/ hpx (frame-char-height)))
+         (fp)
+         (x)
+         (y))
+    (setq fp (frame-position))
+    (setq x (car fp))
+    (setq y (cdr fp))
+    (set-frame-height (selected-frame) hpl)
+    (set-frame-position (selected-frame) x top-y)
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias
@@ -2028,6 +2063,7 @@ shu- prefix removed."
   (defalias 'show-system-name 'shu-show-system-name)
   (defalias 'kill-system-name 'shu-kill-system-name)
   (defalias 'obfuscate-region 'shu-obfuscate-region)
+  (defalias 'saf 'shu-adapt-frame)
   )
 
 ;;; shu-misc.el ends here

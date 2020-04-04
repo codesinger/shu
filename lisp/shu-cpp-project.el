@@ -105,7 +105,10 @@ as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions."
   "A list of file extensions for all of the H file types we want to find.  This is defined
 as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-h-extensions")
 
-(defconst shu-cpp-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions)
+(defconst shu-py-extensions (list "py")
+  "A list of file extensions for Python projects")
+
+(defconst shu-project-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions)
   "A list of file extensions for all of the file types we want to find.  This is defined
 as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions or
 shu-add-cpp-h-extensions.")
@@ -145,7 +148,7 @@ names as well.")
 
 (defvar shu-cpp-found-extensions (list)
   "This is a list of all of the file extensions found in the current project.  While
-shu-cpp-extensions contains all of the extensions that we look for.  This variable
+shu-project-extensions contains all of the extensions that we look for.  This variable
 contains those that we actually found in building the current project.")
 
 (defvar shu-cpp-project-time nil
@@ -280,14 +283,14 @@ a project file and point is not sitting on something that resembles a file name.
 (defun shu-add-cpp-c-extensions (xtns)
   "Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
-This modifies both shu-cpp-c-extensions and shu-cpp-extensions."
+This modifies both shu-cpp-c-extensions and shu-project-extensions."
   (let (
         (nx xtns)
         )
     (when (not (listp nx))
       (setq nx (list nx)))
     (setq shu-cpp-c-extensions (append shu-cpp-c-extensions nx))
-    (setq shu-cpp-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions))
+    (setq shu-project-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions))
     ))
 
 ;;
@@ -296,15 +299,26 @@ This modifies both shu-cpp-c-extensions and shu-cpp-extensions."
 (defun shu-add-cpp-h-extensions (xtns)
   "Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
-This modifies both shu-cpp-h-extensions and shu-cpp-extensions."
+This modifies both shu-cpp-h-extensions and shu-project-extensions."
   (let (
         (nx xtns)
         )
     (when (not (listp nx))
       (setq nx (list nx)))
     (setq shu-cpp-h-extensions (append shu-cpp-h-extensions nx))
-    (setq shu-cpp-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions))
+    (setq shu-project-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions))
     ))
+
+
+;;
+;;  shu-make-p-project
+;;
+(defun shu-make-p-project (proj-root)
+  "Create a Python project that is analogous to a c project."
+  (interactive "DRoot?: ")
+  (setq shu-project-extensions shu-py-extensions)
+  (shu-sub-make-c-project proj-root)
+    )
 
 
 ;;
@@ -316,6 +330,18 @@ Starts at the specified root directory and searches all subdirectories for
 any that contain c or h files.  It then inserts all of the directory names
 into the current file at point."
   (interactive "DRoot?: ")
+  (shu-sub-make-c-project proj-root)
+    )
+
+
+;;
+;;  shu-sub-make-c-project
+;;
+(defun shu-sub-make-c-project (proj-root)
+  "Create a project file of all directories containing c or h files.
+Starts at the specified root directory and searches all subdirectories for
+any that contain c or h files.  It then inserts all of the directory names
+into the current file at point."
   (let ((level     1)
         (dtop)
         (tlist)
@@ -360,7 +386,7 @@ source code."
               (setq dir-list (cons cname dir-list))))
         (when (not got-interest)
           (setq extension (file-name-extension sname))
-          (when (member extension shu-cpp-extensions)
+          (when (member extension shu-project-extensions)
             (setq got-interest t))))
       (setq tlist (cdr tlist)))
     (when got-interest
@@ -370,6 +396,25 @@ source code."
       (shu-cpp-project-subdirs dname (1+ level))
       (setq dir-list (cdr dir-list)))
     ))
+
+
+
+;;
+;;  shu-set-p-project
+;;
+(defun shu-set-p-project (start end)
+  "Mark a region in a file that contains one subdirectory name per line.  Then
+invoke set-c-project and it will find and remember all of the c and h files in
+those subdirectories.  You may then subsequently visit any of those files by
+invoking M-x vh which will allow you to type in the file name only (with auto
+completion) and will then visit the file in the appropriate subdirectory.  If
+this function is called interactively, it clears the project name that was
+established by either SHU-SETUP-PROJECT-AND-TAGS of SHU-VISIT-PROJECT-AND-TAGS."
+  (interactive "r")
+  (setq shu-project-extensions shu-py-extensions)
+  (setq shu-cpp-project-name nil)
+  (shu-internal-set-c-project start end)
+  )
 
 
 
@@ -572,7 +617,7 @@ name \"/u/foo/bar/thing.c\"."
        (xtn-name )
        (item nil)
        (key-list nil)
-       (target-extensions (regexp-opt shu-cpp-extensions t))
+       (target-extensions (regexp-opt shu-project-extensions t))
        (target-name (concat "[^.]\\." target-extensions "$"))
        (directory-list (directory-files directory-name t target-name)))
     (while directory-list
@@ -808,7 +853,7 @@ with one entry.  If file name and line number, a list with two entries.  If file
 name, line number, and column number, a list with three entries."
   (let*
       ((case-fold-search t)           ;; Searches ignore case
-       (target-extensions (regexp-opt shu-cpp-extensions t))
+       (target-extensions (regexp-opt shu-project-extensions t))
        (target-name (concat shu-cpp-file-name "*\\." target-extensions))
        (target-char shu-cpp-file-name)
        (target-line-file (concat "line\\s-+\\([0-9]+\\)\\s-+\\(?:in\\|of\\)*\\s-+" "\\(" target-name "\\)"))
@@ -892,7 +937,7 @@ extension will be returned."
   (let* ((local-file-name (if include-directory
                               shu-cpp-file-directory-name
                             shu-cpp-file-name))
-         (target-extensions (regexp-opt shu-cpp-extensions t))
+         (target-extensions (regexp-opt shu-project-extensions t))
          (target-name (if any-extension
                           (concat local-file-name "+")
                         (concat local-file-name "*\\." target-extensions)))
@@ -1195,7 +1240,7 @@ temporary buffer *shu-project-count*"
 the message in the minibuffer and passing the totals back to the caller."
   (let*
       ((full-name "")
-       (target-extensions (regexp-opt shu-cpp-extensions t))
+       (target-extensions (regexp-opt shu-project-extensions t))
        (target-name (concat "[^.]\\." target-extensions "$"))
        (directory-list (directory-files directory-name t target-name))
        (xf)
@@ -1444,14 +1489,14 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
   "Insert into the current buffer the names of all of the code files in a directory."
   (let*
       ((full-name "")
-       (target-extensions (regexp-opt shu-cpp-extensions t))
+       (target-extensions (regexp-opt shu-project-extensions t))
        (target-name (concat "[^.]\\." target-extensions "$"))
        (directory-list (directory-files directory-name t target-name))
        (extension))
     (while directory-list
       (setq full-name (car directory-list))
       (setq extension (file-name-extension full-name))
-      (when (member extension shu-cpp-extensions)
+      (when (member extension shu-project-extensions)
         (insert (concat full-name "\n")))
       (setq directory-list (cdr directory-list)))
     ))
@@ -2046,7 +2091,9 @@ shu- prefix removed."
   (defalias 'set-prefix 'shu-set-prefix)
   (defalias 'set-dir-prefix 'shu-set-dir-prefix)
   (defalias 'clear-prefix 'shu-clear-prefix)
+  (defalias 'make-p-project 'shu-make-p-project)
   (defalias 'make-c-project 'shu-make-c-project)
+  (defalias 'set-p-project 'shu-set-p-project)
   (defalias 'set-c-project 'shu-set-c-project)
   (defalias 'renew-c-project 'shu-renew-c-project)
   (defalias 'clear-c-project 'shu-clear-c-project)
