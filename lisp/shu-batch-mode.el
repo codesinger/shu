@@ -244,6 +244,7 @@ files."
       (message "author: %s" author)
       (setq shu-cpp-default-global-namespace global-namespace)
       (setq shu-cpp-use-bde-library t)
+      (setq shu-cpp-include-user-brackets t)
       (shu-internal-gen-bde-component class-name author namespace file-prefix))
     ))
 
