@@ -203,6 +203,8 @@
       "\n"
       "#include <" hfile-name ">\n"
       "\n"
+      "#include <bslma_default.h>\n"
+      "\n"
       "\n"
       "\n"
       "namespace BloombergLP {\n"
