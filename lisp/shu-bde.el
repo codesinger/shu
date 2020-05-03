@@ -675,11 +675,14 @@ the buffer GITBUF."
       " * \\author " author "\n"
       " */\n"
       "\n"
-      "#include "left-include-delim hfile-name right-include-delim "\n"
+      "#include " left-include-delim hfile-name right-include-delim "\n"
       "\n"))
     (run-hooks 'shu-bde-gen-file-identifier-hook)
     (insert
      (concat
+      "\n"
+      "#include " left-include-delim "bslma_default.h" right-include-delim "\n"
+      "\n"
       "\n"
       "\n"
       outer-namespace
