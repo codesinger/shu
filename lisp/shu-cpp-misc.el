@@ -390,8 +390,6 @@
     (insert
      (concat
       "Description of " class-name "\n"
-      " *\n"
-      " * ingroup \n"
       " */\n"
       "class " class-name "\n"
       "{\n"

@@ -185,9 +185,9 @@ searches in the local \"~/emacs\" directory."
 
 
 ;;
-;;  shu-generate-component
+;;  shu-old-generate-component
 ;;
-(defun shu-generate-component ()
+(defun shu-old-generate-component ()
   "Fetch the arguments from environment variables and then call
 SHU-INTERNAL-GEN-BDE-COMPONENT to generate a set of three BDE component
 files."
@@ -211,6 +211,40 @@ files."
     (setq shu-cpp-default-global-namespace global-namespace)
     (setq shu-cpp-use-bde-library t)
     (shu-internal-gen-bde-component class-name author namespace file-prefix)
+    ))
+
+
+
+;;
+;;  shu-generate-component
+;;
+(defun shu-generate-component ()
+  "Fetch the arguments from environment variables and then call
+SHU-INTERNAL-GEN-BDE-COMPONENT to generate a set of three BDE component
+files."
+  (let ((global-namespace)
+        (namespace)
+        (class-name)
+        (author)
+        (file-prefix)
+        (nargs (length command-line-args-left)))
+    (shu-batch-init)
+    (slp-bb-set-comment-hooks)
+    (if (/= nargs 4)
+        (progn
+          (message "%s" "Require 4 args: global-namespace namespace class-name author"))
+      (setq global-namespace (pop command-line-args-left))
+      (setq namespace (pop command-line-args-left))
+      (setq class-name (pop command-line-args-left))
+      (setq author (pop command-line-args-left))
+      (setq file-prefix (concat namespace "_"))
+      (message "global-namespace: %s" global-namespace)
+      (message "namespace: %s" namespace)
+      (message "class-name: %s" class-name)
+      (message "author: %s" author)
+      (setq shu-cpp-default-global-namespace global-namespace)
+      (setq shu-cpp-use-bde-library t)
+      (shu-internal-gen-bde-component class-name author namespace file-prefix))
     ))
 
 
