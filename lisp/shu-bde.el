@@ -681,7 +681,7 @@ the buffer GITBUF."
     (insert
      (concat
       "\n"
-      "#include " left-include-delim "bslma_default.h" right-include-delim "\n"
+      "#include <bslma_default.h>\n"
       "\n"
       "\n"
       "\n"
