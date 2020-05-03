@@ -56,6 +56,7 @@
       "\n"
       "#include <bsl_iostream.h>\n"
       "#include <bslma_allocator.h>\n"
+      "#include <bslma_usesbslmaallocator.h>\n"
       "#include <bslmf_nestedtraitdeclaration.h>\n"
       ))
   )
