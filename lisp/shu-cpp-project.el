@@ -284,9 +284,7 @@ a project file and point is not sitting on something that resembles a file name.
   "Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
 This modifies both shu-cpp-c-extensions and shu-project-extensions."
-  (let (
-        (nx xtns)
-        )
+  (let ((nx xtns))
     (when (not (listp nx))
       (setq nx (list nx)))
     (setq shu-cpp-c-extensions (append shu-cpp-c-extensions nx))
@@ -300,9 +298,7 @@ This modifies both shu-cpp-c-extensions and shu-project-extensions."
   "Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
 This modifies both shu-cpp-h-extensions and shu-project-extensions."
-  (let (
-        (nx xtns)
-        )
+  (let ((nx xtns))
     (when (not (listp nx))
       (setq nx (list nx)))
     (setq shu-cpp-h-extensions (append shu-cpp-h-extensions nx))
@@ -318,7 +314,7 @@ This modifies both shu-cpp-h-extensions and shu-project-extensions."
   (interactive "DRoot?: ")
   (setq shu-project-extensions shu-py-extensions)
   (shu-sub-make-c-project proj-root)
-    )
+  )
 
 
 ;;
@@ -331,7 +327,7 @@ any that contain c or h files.  It then inserts all of the directory names
 into the current file at point."
   (interactive "DRoot?: ")
   (shu-sub-make-c-project proj-root)
-    )
+  )
 
 
 ;;
@@ -487,8 +483,7 @@ appropriate subdirectory."
         (ps)
         (short-keys)
         (all-keys)
-        (plist)
-        )
+        (plist))
     (setq shu-project-user-class-count 0)
     (setq shu-project-file-list nil)
     (setq tlist shu-cpp-project-list)
@@ -528,8 +523,7 @@ appropriate subdirectory."
         (setq shu-cpp-short-list (shu-cpp-project-collapse-list short-keys))
         (setq all-keys (append key-list short-keys))
         (setq shu-cpp-completing-list (shu-cpp-project-collapse-list all-keys))
-        (shu-cpp-finish-project))
-      )
+        (shu-cpp-finish-project)))
     ))
 
 
@@ -555,8 +549,7 @@ is wanted."
         (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
         (plist)
         (file-name)
-        (full-name-list)
-        )
+        (full-name-list))
     (setq counts (shu-cpp-project-get-list-counts shu-cpp-class-list))
     (setq c-count (car counts))
     (setq counts (cdr counts))
@@ -571,8 +564,7 @@ is wanted."
       (princ (concat file-name ":\n      ") shu-cpp-buffer)
       (princ full-name-list shu-cpp-buffer)
       (princ "\n" shu-cpp-buffer)
-      (setq plist (cdr plist))
-      )
+      (setq plist (cdr plist)))
     (when (> dup-count 1)
       (setq name-name "names")
       (setq occur-name "occur"))
@@ -591,8 +583,7 @@ is wanted."
   "Called with point at the beginning of the line.  Take the whole line as the
 name of a directory, look into the directory, and create an alist of all of the
 files in the directory as described in shu-cpp-subdir-for-package."
-  (let
-      ((key-list))
+  (let ((key-list))
     (setq key-list (shu-cpp-subdir-for-package dir-name))
     key-list
     ))
@@ -1673,8 +1664,7 @@ creates a new tags table."
                                            &optional search-target replace)
   "Invoke a function on every file in the project.
 documentation is the string to put in the buffer to describe the operation."
-  (let (
-        (gbuf      (get-buffer-create shu-global-buffer-name))
+  (let ((gbuf      (get-buffer-create shu-global-buffer-name))
         (spoint)
         (tlist     shu-project-file-list)
         (file)
@@ -1685,8 +1675,7 @@ documentation is the string to put in the buffer to describe the operation."
         (sstring)
         (estring)
         (fcount 0)
-        (ccount 0)
-        )
+        (ccount 0))
     (save-excursion
       (setq spoint (with-current-buffer gbuf (point)))
       (setq sstring (format-time-string "on %a, %e %b %Y at %k:%M:%S" stime))
@@ -1710,17 +1699,89 @@ documentation is the string to put in the buffer to describe the operation."
         (when (not fbuf)  ; We created the file buffer
           (kill-buffer file-buf))
         (setq fcount (1+ fcount))
-        (setq tlist (cdr tlist))
-        )
+        (setq tlist (cdr tlist)))
       (setq etime (current-time))
       (setq estring (format-time-string "on %a, %e %b %Y at %k:%M:%S" etime))
       (print (concat "***end " documentation " at " estring "\n") gbuf)
-      (princ (format "%d files changed of %d files scanned.\n" ccount fcount) gbuf)
-      )
+      (princ (format "%d files changed of %d files scanned.\n" ccount fcount) gbuf))
     (switch-to-buffer gbuf)
     (goto-char spoint)
-    )
-  )
+    ))
+
+
+
+
+;;
+;;  shu-global-search-replace
+;;
+(defun shu-global-search-replace (file argument1 argument2)
+  "This function is called once for each file in the project.  The first
+argument is the file name.  The second argument is a list holding lists of
+search and replace operations.  Each search and replace operation is defined by
+a list of arguments as follows:
+
+     1. A boolean value, t means case sensitive search, nil means ignore case
+     2. The function to call to do the search.  This must be
+        'search-forward, 're-search-forward, or any function with the same
+        signature and behavior.
+     3. The string that is the target of the search
+     4. The string the is to replace the target whenever found
+     5. An optional second argument to be passed to replace-match
+     6. An optional third argument to be passed to replace-match
+
+For example
+
+     (list
+       (list t 'search-forward \"Mumble\" \"Bumble\")
+       (list nil 'search-forward \"howdy\" \"doody\"))
+
+is a list that defines two search and replace operations.  Both operations use
+the search-forward function.  The first is a case sensitive search and replace to
+replace all instances of \"Mumble\" with \"Bumble\".  The second is a case
+insensitive search and replace to replace all instances of \"howdy\" with \"doody\".
+
+These operations may be performed on every file in the project as follows:
+
+     (setq ops
+       (list
+         (list t 'search-forward \"Mumble\" \"Bumble\")
+         (list nil 'search-forward \"howdy\" \"doody\")))
+     (setq doc \"Description of change\")
+     (shu-global-operation doc 'shu-global-search-replace ops)"
+  (let ((gb (get-buffer-create shu-global-buffer-name))
+        (rlist)
+        (tlist)
+        (case-sensitive)
+        (search-function)
+        (target)
+        (replacment)
+        (rm1)
+        (rm2)
+        (debug-on-error t))
+    (princ (concat "\n    IN: " file "\n") gb)
+    (setq tlist argument1)
+    (save-excursion
+      (save-restriction
+        (widen)
+        (while tlist
+          (setq rlist (car tlist))
+          (setq case-sensitive (pop rlist))
+          (setq search-function (pop rlist))
+          (setq target (pop rlist))
+          (setq replacment (pop rlist))
+          (when (cdr rlist)
+            (setq rm1 (pop rlist)))
+          (when (cdr rlist)
+            (setq rm2 (pop rlist)))
+          (goto-char (point-min))
+          (setq case-fold-search (not case-sensitive))
+          (while (funcall search-function target nil t)
+            (princ (concat file ":" (number-to-string (line-number-at-pos (match-beginning 0) t))
+                           ":\nFound \"" (match-string 0) "\"\n") gb)
+            (princ (concat "Replacing with: \"" replacment "\"\n") gb)
+            (replace-match replacment rm1 rm2))
+          (setq tlist (cdr tlist)))))
+    ))
 
 
 ;;
