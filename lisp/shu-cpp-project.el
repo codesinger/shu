@@ -1727,7 +1727,9 @@ a list of arguments as follows:
      3. The string that is the target of the search
      4. The string the is to replace the target whenever found
      5. An optional second argument to be passed to replace-match
+        The default value is t
      6. An optional third argument to be passed to replace-match
+        The default value is t
 
 For example
 
@@ -1755,8 +1757,8 @@ These operations may be performed on every file in the project as follows:
         (search-function)
         (target)
         (replacment)
-        (rm1)
-        (rm2)
+        (rm1 t)
+        (rm2 t)
         (debug-on-error t))
     (princ (concat "\n    IN: " file "\n") gb)
     (setq tlist argument1)
