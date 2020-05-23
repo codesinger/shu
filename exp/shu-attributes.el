@@ -147,6 +147,32 @@
 
 
 
+;;
+;;  shu-cpp-print-attr-info
+;;
+(defun shu-cpp-print-attr-info (attr-info buf)
+  "Print the contents of ATTR-INFO into the buffer BUF"
+  (interactive)
+  (let (
+        (name)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (nullable)
+        )
+    (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
+    (princ (concat "name: [" name "], type: [" data-type "], nullable: " (shu-bool-to-string nullable)
+                   ", full-type: [" full-data-type "]\n") buf)
+    (when comment
+      (princ (concat "    [" comment "]\n") buf)
+      )
+
+
+    ))
+
+
+
+
 
 ;;
 ;;  shu-cpp-make-nullable
@@ -179,7 +205,7 @@
         (name)
         (comment)
         (nullable)
-
+        (attr-info)
         )
     (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
       (setq eol (line-end-position))
@@ -187,25 +213,26 @@
         (setq line (shu-trim (buffer-substring-no-properties (point) eol)))
         (princ (concat "\n\nline: [" line "]\n") gb)
         (when (> (length line) 1)
-        (if (string= (substring line 0 2) "//")
-            (progn
-              (setq comment (shu-trim (substring line 2)))
-              (princ (concat "comment: [" comment "]\n") gb)
+          (setq comment nil)
+          (if (string= (substring line 0 2) "//")
+              (progn
+                (setq comment (shu-trim (substring line 2)))
+                (princ (concat "comment: [" comment "]\n") gb)
+                )
+            (setq x (split-string line nil t))
+            (setq data-type (car x))
+            (setq x (cdr x))
+            (setq name (car x))
+            (setq nullable nil)
+            (setq full-data-type data-type)
+            (when (cdr x)
+              (setq nullable t)
+              (setq full-data-type (shu-cpp-make-nullable data-type))
               )
-          (setq x (split-string line nil t))
-          (setq data-type (car x))
-          (setq x (cdr x))
-          (setq name (car x))
-          (setq nullable nil)
-          (setq full-data-type data-type)
-          (when (cdr x)
-            (setq nullable t)
-            (setq full-data-type (shu-cpp-make-nullable data-type))
             )
-          (princ (concat "name: [" name "], type: [" data-type "], nullable: " (shu-bool-to-string nullable)
-                         ", full-type: [" full-data-type "]\n") gb)
+          (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment nullable))
+          (shu-cpp-print-attr-info attr-info gb)
           )
-        )
         )
       (setq line-diff (forward-line 1))
       )
