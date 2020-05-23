@@ -206,6 +206,7 @@
         (comment)
         (nullable)
         (attr-info)
+        (attributes)
         )
     (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
       (setq eol (line-end-position))
@@ -231,6 +232,7 @@
             )
           (when name
             (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment nullable))
+            (push attr-info attributes)
             (shu-cpp-print-attr-info attr-info gb)
           (setq comment nil)
           (setq name nil)
@@ -240,6 +242,14 @@
       (setq line-diff (forward-line 1))
       )
     (setq line-diff (forward-line 1))
+    (setq attributes (nreverse attributes))
+    (princ  "\n\nAttributes:\n" gb)
+    (while attributes
+      (setq attr-info (car attributes))
+      (shu-cpp-print-attr-info attr-info gb)
+      (setq attributes (cdr attributes))
+      )
+
 
     ))
 
