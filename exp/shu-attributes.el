@@ -104,6 +104,8 @@
 ;;
 ;;
 ;;
+
+
 ;;
 ;;
 ;;  shu-cpp-extract-attr-info
@@ -131,6 +133,15 @@
        )
     ))
 
+
+
+;;
+;;  shu-cpp-extract-attr-info-name
+;;
+(defsubst shu-cpp-extract-attr-info-name (attr-info)
+  "Return the name from the ATTR-INFO"
+  (car attr-info)
+  )
 
 
 ;;
@@ -184,6 +195,20 @@
 
 
 
+;;
+;;  shu-cpp-attributes-name-compare
+;;
+(defun shu-cpp-attributes-name-compare (lhs-attr-info rhs-attr-info)
+  "Compare the names from LHS-ATTR-INFO and RHS-ATTR-INFO.  Return true if the left hand
+name is less than the right hand name."
+  (let (
+        (lhs-name (shu-cpp-extract-attr-info-name lhs-attr-info))
+        (rhs-name (shu-cpp-extract-attr-info-name rhs-attr-info))
+        )
+    (string< lhs-name rhs-name)
+    ))
+
+
 
 
 ;;
@@ -234,8 +259,8 @@
             (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment nullable))
             (push attr-info attributes)
             (shu-cpp-print-attr-info attr-info gb)
-          (setq comment nil)
-          (setq name nil)
+            (setq comment nil)
+            (setq name nil)
             )
           )
         )
@@ -266,6 +291,8 @@
     (goto-char (point-max))
     (insert "\n\n")
     (shu-cpp-attributes-gen-decl attributes)
+    (shu-cpp-attributes-gen-getter-has-decl attributes)
+    (shu-cpp-attributes-gen-getter-decl attributes)
     ))
 
 
@@ -304,11 +331,12 @@
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
       (insert "\n")
-      (when comment)
-      (insert (concat ipad "//! " comment " (" (number-to-string attr-num) ")\n"))
-      (setq pad-count 0)
-      (when (< (length full-data-type) max-type-len)
-        (setq pad-count (- max-type-len (length full-data-type)))
+      (when comment
+        (insert (concat ipad "//! " comment " (" (number-to-string attr-num) ")\n"))
+        (setq pad-count 0)
+        (when (< (length full-data-type) max-type-len)
+          (setq pad-count (- max-type-len (length full-data-type)))
+          )
         )
       (setq pad-count (+ pad-count 3))
       (setq pad (make-string pad-count ? ))
@@ -316,10 +344,97 @@
       (setq attr-num (1+ attr-num))
       (setq attrs (cdr attrs))
       )
-
-
-
     ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-getter-has-decl
+;;
+(defun shu-cpp-attributes-gen-getter-has-decl (attributes)
+  "Doc string."
+  (let (
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (uname)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (nullable)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        )
+    (setq attrs (sort attrs 'shu-cpp-attributes-name-compare))
+    (insert (concat "\n\n" ipad "// ACCESSORS\n"))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
+      (when nullable
+        (insert "\n")
+        (when comment
+          (insert
+           (concat "\n"
+                   ipad "/*!\n"
+                   ipad " * Return true if " name " exists\n"
+                   ipad " */\n"))
+          )
+        (setq uname (capitalize name))
+        (insert (concat ipad "bool has" uname "() const;"))
+        )
+      (setq attrs (cdr attrs))
+      )
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-getter-decl
+;;
+(defun shu-cpp-attributes-gen-getter-decl (attributes)
+  "Doc string."
+  (let (
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (uname)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (nullable)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        )
+    (setq attrs (sort attrs 'shu-cpp-attributes-name-compare))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
+
+        (insert "\n")
+        (when comment
+          (insert
+           (concat "\n"
+                   ipad "/*!\n"
+                   ipad " * Return " comment "\n"
+                   ipad " */\n"))
+          )
+        (setq uname (capitalize name))
+        (insert (concat ipad data-type " " name"() const;"))
+
+      (setq attrs (cdr attrs))
+      )
+    ))
+
+
+;;    /*!
+;;     * \brief Return a const reference to the deletion time
+;;     */
 
 ;;
 ;;    bdlt::Datetime                    m_deleteTime;
@@ -402,6 +517,28 @@
     (should (not xcomment))
 
     (should (not xnullable))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-make-attr-info-name
+;;
+(ert-deftest shu-test-shu-cpp-make-attr-info-name ()
+  (let (
+        (name "frederick")
+        (data-type "std::string")
+        (full-data-type "std::optional<std::string>")
+        (comment "This is a comment")
+        (nullable t)
+        (attr-info)
+        (xname)
+        )
+    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment nullable))
+    (setq xname (shu-cpp-extract-attr-info-name attr-info))
+    (should xname)
+    (should (stringp xname))
+    (should (string= name xname))
     ))
 
 
