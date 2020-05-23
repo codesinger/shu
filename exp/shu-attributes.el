@@ -349,6 +349,7 @@ name is less than the right hand name."
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
+        (sorted-attributes)
         )
     (princ  "\n\nAttributes:\n" gb)
     (while attrs
@@ -358,9 +359,15 @@ name is less than the right hand name."
       )
     (goto-char (point-max))
     (insert "\n\n")
+    (princ (format "(length attributes 1: %d\n" (length attributes)) gb)
     (shu-cpp-attributes-gen-decl attributes)
-    (shu-cpp-attributes-gen-getter-has-decl attributes)
-    (shu-cpp-attributes-gen-getter-decl attributes)
+    (setq sorted-attributes (copy-tree attributes))
+    (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
+    (princ (format "(length sorted-attributes 2: %d\n" (length sorted-attributes)) gb)
+    (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
+    (princ (format "(length sorted-attributes 3: %d\n" (length sorted-attributes)) gb)
+    (shu-cpp-attributes-gen-getter-decl sorted-attributes)
+    (princ (format "(length sorted-attributes 14 %d\n" (length sorted-attributes)) gb)
     ))
 
 
@@ -423,6 +430,7 @@ name is less than the right hand name."
 (defun shu-cpp-attributes-gen-getter-has-decl (attributes)
   "Doc string."
   (let (
+        (gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -438,10 +446,14 @@ name is less than the right hand name."
         (pad)
         (member-prefix "m_")
         )
-    (setq attrs (sort attrs 'shu-cpp-attributes-name-compare))
+    (princ (format "(length attrs 1A: %d\n" (length attrs)) gb)
+      (princ (format "(length attrs A1A: %d\n" (length attributes)) gb)
+    (princ (format "(length attrs 2A: %d\n" (length attrs)) gb)
+      (princ (format "(length attrs A3A: %d\n" (length attributes)) gb)
     (insert (concat "\n\n" ipad "// ACCESSORS\n"))
     (while attrs
       (setq attr-info (car attrs))
+      (princ (format "(length attrs A4A: %d\n" (length attributes)) gb)
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable)
       (when nullable
         (insert "\n")
@@ -455,8 +467,11 @@ name is less than the right hand name."
         (setq uname (shu-upcase-first-letter name))
         (insert (concat ipad "bool has" uname "() const;"))
         )
+      (princ (format "(length attrs A5A: %d\n" (length attributes)) gb)
       (setq attrs (cdr attrs))
       )
+    (princ (format "(length attrs A6A: %d\n" (length attributes)) gb)
+2
     ))
 
 
@@ -467,6 +482,7 @@ name is less than the right hand name."
 (defun shu-cpp-attributes-gen-getter-decl (attributes)
   "Doc string."
   (let (
+        (gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -482,11 +498,12 @@ name is less than the right hand name."
         (pad)
         (member-prefix "m_")
         )
-    (setq attrs (sort attrs 'shu-cpp-attributes-name-compare))
+    (princ (format "(length attrs 1: %d\n" (length attrs)) gb)
+    (princ (format "(length attrs 2: %d\n" (length attrs)) gb)
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable)
-
+      (princ (concat "name: " name "\n") gb)
         (insert "\n")
         (when comment
           (insert
