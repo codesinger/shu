@@ -243,15 +243,87 @@
       )
     (setq line-diff (forward-line 1))
     (setq attributes (nreverse attributes))
+    (shu-cpp-attributes-gen attributes)
+    ))
+
+
+;;
+;;  shu-cpp-attributes-gen
+;;
+(defun shu-cpp-attributes-gen (attributes)
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (attrs attributes)
+        (attr-info)
+        )
     (princ  "\n\nAttributes:\n" gb)
-    (while attributes
-      (setq attr-info (car attributes))
+    (while attrs
+      (setq attr-info (car attrs))
       (shu-cpp-print-attr-info attr-info gb)
-      (setq attributes (cdr attributes))
+      (setq attrs (cdr attrs))
+      )
+    (goto-char (point-max))
+    (insert "\n\n")
+    (shu-cpp-attributes-gen-decl attributes)
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-decl
+;;
+(defun shu-cpp-attributes-gen-decl (attributes)
+  "Doc string."
+  (let (
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (nullable)
+        (max-type-len 31)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        )
+    (insert (concat "\n\n" ipad "// DATA\n"))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
+      (when (> (length full-data-type) max-type-len)
+        (setq max-type-len (length full-data-type))
+        )
+      (setq attrs (cdr attrs))
+      )
+    (setq attrs attributes)
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
+      (insert "\n")
+      (when comment)
+      (insert (concat ipad "//! " comment " (" (number-to-string attr-num) ")\n"))
+      (setq pad-count 0)
+      (when (< (length full-data-type) max-type-len)
+        (setq pad-count (- max-type-len (length full-data-type)))
+        )
+      (setq pad-count (+ pad-count 3))
+      (setq pad (make-string pad-count ? ))
+      (insert (concat ipad full-data-type pad member-prefix name ";\n"))
+      (setq attr-num (1+ attr-num))
+      (setq attrs (cdr attrs))
       )
 
 
+
     ))
+
+;;
+;;    bdlt::Datetime                    m_deleteTime;
+;;    1234567890123456789012345678901
 
 
 
