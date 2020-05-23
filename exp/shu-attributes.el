@@ -106,21 +106,32 @@
 ;;
 
 
+
+(defconst shu-cpp-attributes-nullable   1
+  "Value that indicates that an attribute is nullable")
+
+
+(defconst shu-cpp-attributes-reference  2
+  "Value that indicates that an attribute is accessed by reference")
+
+
 ;;
 ;;
 ;;  shu-cpp-extract-attr-info
 ;;
-(defmacro shu-cpp-extract-attr-info (attr-info name data-type full-data-type comment nullable)
+(defmacro shu-cpp-extract-attr-info (attr-info name data-type full-data-type comment reference nullable)
   "Extract the information out of an attr-info"
   (let (
         (tattr-ext (make-symbol "attr-ext"))
         (tattr-other (make-symbol "attr-other"))
         (tattr-cmt (make-symbol "attr-cmt"))
+        (tflags (make-symbol "flags"))
         )
     `(let (
            (,tattr-ext)
            (,tattr-other)
            (,tattr-cmt)
+           (,tflags)
            )
        (setq ,name (car ,attr-info))
        (setq ,tattr-ext (cdr ,attr-info))
@@ -129,7 +140,15 @@
        (setq ,data-type (car ,tattr-other))
        (setq ,tattr-cmt (cdr ,tattr-other))
        (setq ,comment (car ,tattr-cmt))
-       (setq ,nullable (cdr ,tattr-cmt))
+       (setq ,tflags (cdr ,tattr-cmt))
+       (if (= (logand ,tflags shu-cpp-attributes-reference) shu-cpp-attributes-reference)
+           (setq ,reference t)
+         (setq ,reference nil)
+         )
+       (if (= (logand ,tflags shu-cpp-attributes-nullable) shu-cpp-attributes-nullable)
+           (setq ,nullable t)
+         (setq ,nullable nil)
+         )
        )
     ))
 
@@ -147,14 +166,22 @@
 ;;
 ;;  shu-cpp-make-attr-info
 ;;
-(defun shu-cpp-make-attr-info (name data-type full-data-type &optional comment nullable)
+(defun shu-cpp-make-attr-info (name data-type full-data-type &optional comment reference nullable)
   "Return an attr-info created from the given arguments"
-  (setq debug-on-error t)
+  (let (
+        (flags 0)
+        )
+    (when reference
+      (setq flags shu-cpp-attributes-reference)
+      )
+    (when nullable
+      (setq flags (logior flags shu-cpp-attributes-nullable))
+      )
   (cons name
         (cons full-data-type
               (cons data-type
-                    (cons comment nullable))))
-  )
+                    (cons comment flags))))
+  ))
 
 
 
@@ -169,10 +196,12 @@
         (data-type)
         (full-data-type)
         (comment)
+        (reference)
         (nullable)
         )
-    (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
-    (princ (concat "name: [" name "], type: [" data-type "], nullable: " (shu-bool-to-string nullable)
+    (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable)
+    (princ (concat "name: [" name "], type: [" data-type "], ref: " (shu-bool-to-string nullable)
+                   "], nullable: " (shu-bool-to-string nullable)
                    ", full-type: [" full-data-type "]\n") buf)
     (when comment
       (princ (concat "    [" comment "]\n") buf)
@@ -309,6 +338,7 @@ name is less than the right hand name."
         (data-type)
         (full-data-type)
         (comment)
+        (reference)
         (nullable)
         (max-type-len 31)
         (ipad (make-string shu-cpp-indent-length ? ))
@@ -320,7 +350,7 @@ name is less than the right hand name."
     (insert (concat "\n\n" ipad "// DATA\n"))
     (while attrs
       (setq attr-info (car attrs))
-      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable)
       (when (> (length full-data-type) max-type-len)
         (setq max-type-len (length full-data-type))
         )
@@ -329,7 +359,7 @@ name is less than the right hand name."
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
-      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable)
       (insert "\n")
       (when comment
         (insert (concat ipad "//! " comment " (" (number-to-string attr-num) ")\n"))
@@ -361,6 +391,7 @@ name is less than the right hand name."
         (data-type)
         (full-data-type)
         (comment)
+        (reference)
         (nullable)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
@@ -372,7 +403,7 @@ name is less than the right hand name."
     (insert (concat "\n\n" ipad "// ACCESSORS\n"))
     (while attrs
       (setq attr-info (car attrs))
-      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable)
       (when nullable
         (insert "\n")
         (when comment
@@ -404,6 +435,7 @@ name is less than the right hand name."
         (data-type)
         (full-data-type)
         (comment)
+        (reference)
         (nullable)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
@@ -414,7 +446,7 @@ name is less than the right hand name."
     (setq attrs (sort attrs 'shu-cpp-attributes-name-compare))
     (while attrs
       (setq attr-info (car attrs))
-      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment nullable)
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable)
 
         (insert "\n")
         (when comment
@@ -452,15 +484,17 @@ name is less than the right hand name."
         (full-data-type "std::optional<std::string>")
         (comment "This is a comment")
         (nullable t)
+        (reference t)
         (attr-info)
         (xname)
         (xdata-type)
         (xfull-data-type)
         (xcomment)
         (xnullable)
+        (xreference)
         )
-    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment nullable))
-    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment xnullable)
+    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment reference nullable))
+    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment xreference xnullable)
     (should xname)
     (should (stringp xname))
     (should (string= name xname))
@@ -477,16 +511,105 @@ name is less than the right hand name."
     (should (stringp xcomment))
     (should (string= comment xcomment))
 
+    (should xreference)
+
     (should xnullable)
     ))
-
 
 
 
 ;;
 ;;  shu-test-shu-cpp-make-attr-info-2
 ;;
-(ert-deftest shu-test-shu-cpp-make-attr-info-2 ()
+(ert-deftest shu-test-shu-cpp-make-attr-info-2()
+  (let (
+        (name "fred")
+        (data-type "std::string")
+        (full-data-type "std::optional<std::string>")
+        (comment "This is a comment")
+        (reference nil)
+        (nullable t)
+        (attr-info)
+        (xname)
+        (xdata-type)
+        (xfull-data-type)
+        (xcomment)
+        (xnullable)
+        (xreference)
+        )
+    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment reference nullable))
+    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment xreference xnullable)
+
+    (should (not xreference))
+
+    (should xnullable)
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-make-attr-info-3
+;;
+(ert-deftest shu-test-shu-cpp-make-attr-info-3()
+  (let (
+        (name "fred")
+        (data-type "std::string")
+        (full-data-type "std::optional<std::string>")
+        (comment "This is a comment")
+        (reference t)
+        (nullable nil)
+        (attr-info)
+        (xname)
+        (xdata-type)
+        (xfull-data-type)
+        (xcomment)
+        (xnullable)
+        (xreference)
+        )
+    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment reference nullable))
+    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment xreference xnullable)
+
+    (should xreference)
+
+    (should (not xnullable))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-make-attr-info-4
+;;
+(ert-deftest shu-test-shu-cpp-make-attr-info-4()
+  (let (
+        (name "fred")
+        (data-type "std::string")
+        (full-data-type "std::optional<std::string>")
+        (comment "This is a comment")
+        (reference nil)
+        (nullable nil)
+        (attr-info)
+        (xname)
+        (xdata-type)
+        (xfull-data-type)
+        (xcomment)
+        (xnullable)
+        (xreference)
+        )
+    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment reference nullable))
+    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment xreference xnullable)
+
+    (should (not xreference))
+
+    (should (not xnullable))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-make-attr-info-5
+;;
+(ert-deftest shu-test-shu-cpp-make-attr-info-5 ()
   (let (
         (name "fred")
         (data-type "std::string")
@@ -498,10 +621,11 @@ name is less than the right hand name."
         (xdata-type)
         (xfull-data-type)
         (xcomment)
+        (xreference)
         (xnullable)
         )
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type))
-    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment xnullable)
+    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment xreference xnullable)
     (should xname)
     (should (stringp xname))
     (should (string= name xname))
@@ -517,6 +641,8 @@ name is less than the right hand name."
     (should (not xcomment))
 
     (should (not xnullable))
+
+    (should (not xreference))
     ))
 
 
