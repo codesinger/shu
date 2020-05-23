@@ -446,14 +446,9 @@ name is less than the right hand name."
         (pad)
         (member-prefix "m_")
         )
-    (princ (format "(length attrs 1A: %d\n" (length attrs)) gb)
-      (princ (format "(length attrs A1A: %d\n" (length attributes)) gb)
-    (princ (format "(length attrs 2A: %d\n" (length attrs)) gb)
-      (princ (format "(length attrs A3A: %d\n" (length attributes)) gb)
     (insert (concat "\n\n" ipad "// ACCESSORS\n"))
     (while attrs
       (setq attr-info (car attrs))
-      (princ (format "(length attrs A4A: %d\n" (length attributes)) gb)
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable)
       (when nullable
         (insert "\n")
@@ -465,13 +460,11 @@ name is less than the right hand name."
                    ipad " */\n"))
           )
         (setq uname (shu-upcase-first-letter name))
-        (insert (concat ipad "bool has" uname "() const;"))
+        (insert (concat ipad "bool has" uname "() const;\n"))
         )
-      (princ (format "(length attrs A5A: %d\n" (length attributes)) gb)
       (setq attrs (cdr attrs))
       )
-    (princ (format "(length attrs A6A: %d\n" (length attributes)) gb)
-2
+
     ))
 
 
@@ -498,12 +491,9 @@ name is less than the right hand name."
         (pad)
         (member-prefix "m_")
         )
-    (princ (format "(length attrs 1: %d\n" (length attrs)) gb)
-    (princ (format "(length attrs 2: %d\n" (length attrs)) gb)
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable)
-      (princ (concat "name: " name "\n") gb)
         (insert "\n")
         (when comment
           (insert
@@ -530,7 +520,6 @@ name is less than the right hand name."
           (insert "&")
           )
         (insert (concat name  "() const;\n"))
-
       (setq attrs (cdr attrs))
       )
     ))
