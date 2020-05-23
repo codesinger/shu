@@ -179,8 +179,8 @@
 ;;
 (defun shu-cpp-make-nullable (data-type)
   "Render a data type nullable"
-    (concat "bdlb::NullableValue<" data-type ">")
-    )
+  (concat "bdlb::NullableValue<" data-type ">")
+  )
 
 
 
@@ -213,7 +213,6 @@
         (setq line (shu-trim (buffer-substring-no-properties (point) eol)))
         (princ (concat "\n\nline: [" line "]\n") gb)
         (when (> (length line) 1)
-          (setq comment nil)
           (if (string= (substring line 0 2) "//")
               (progn
                 (setq comment (shu-trim (substring line 2)))
@@ -230,8 +229,12 @@
               (setq full-data-type (shu-cpp-make-nullable data-type))
               )
             )
-          (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment nullable))
-          (shu-cpp-print-attr-info attr-info gb)
+          (when name
+            (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment nullable))
+            (shu-cpp-print-attr-info attr-info gb)
+          (setq comment nil)
+          (setq name nil)
+            )
           )
         )
       (setq line-diff (forward-line 1))
