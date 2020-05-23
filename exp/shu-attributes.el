@@ -239,6 +239,34 @@ name is less than the right hand name."
 
 
 
+;;
+;;  shu-upcase-first-letter
+;;
+(defun shu-upcase-first-letter (string)
+  "Doc string."
+  (let (
+        (first-letter (substring string 0 1))
+        (remainder (substring string 1))
+        )
+    (concat (upcase first-letter) remainder)
+    ))
+
+
+
+;;
+;;  shu-downcase-first-letter
+;;
+(defun shu-downcase-first-letter (string)
+  "Doc string."
+  (let (
+        (first-letter (substring string 0 1))
+        (remainder (substring string 1))
+        )
+    (concat (downcase first-letter) remainder)
+    ))
+
+
+
 
 ;;
 ;;  zzx
@@ -258,9 +286,11 @@ name is less than the right hand name."
         (full-data-type)
         (name)
         (comment)
+        (reference)
         (nullable)
         (attr-info)
         (attributes)
+        (z)
         )
     (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
       (setq eol (line-end-position))
@@ -279,13 +309,22 @@ name is less than the right hand name."
             (setq name (car x))
             (setq nullable nil)
             (setq full-data-type data-type)
+            (setq reference nil)
+            (setq x (cdr x))
+            (when x
+              (setq z (car x))
+              (princ "z: [" gb)(princ z gb)(princ "]\n" gb)
+              (when (string=  z "&")
+                (setq reference t)
+                )
+              )
             (when (cdr x)
               (setq nullable t)
               (setq full-data-type (shu-cpp-make-nullable data-type))
               )
             )
           (when name
-            (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment nullable))
+            (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment reference nullable))
             (push attr-info attributes)
             (shu-cpp-print-attr-info attr-info gb)
             (setq comment nil)
@@ -413,7 +452,7 @@ name is less than the right hand name."
                    ipad " * Return true if " name " exists\n"
                    ipad " */\n"))
           )
-        (setq uname (capitalize name))
+        (setq uname (shu-upcase-first-letter name))
         (insert (concat ipad "bool has" uname "() const;"))
         )
       (setq attrs (cdr attrs))
@@ -453,11 +492,27 @@ name is less than the right hand name."
           (insert
            (concat "\n"
                    ipad "/*!\n"
-                   ipad " * Return " comment "\n"
-                   ipad " */\n"))
+                   ipad " * Return " (shu-downcase-first-letter comment) "\n"))
+          (when nullable
+            (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
+            (insert
+             (concat
+              ipad " *\n"
+              ipad " * Behavior is undefined if " name " does not exist\n"
+              ipad " * (" uname " returns false)\n"
+              ))
+            )
+          (insert (concat ipad " */\n"))
           )
-        (setq uname (capitalize name))
-        (insert (concat ipad data-type " " name"() const;"))
+        (insert ipad)
+        (when reference
+          (insert "const ")
+          )
+        (insert (concat data-type " "))
+        (when reference
+          (insert "&")
+          )
+        (insert (concat name  "() const;\n"))
 
       (setq attrs (cdr attrs))
       )
@@ -656,17 +711,53 @@ name is less than the right hand name."
         (data-type "std::string")
         (full-data-type "std::optional<std::string>")
         (comment "This is a comment")
+        (reference)
         (nullable t)
         (attr-info)
         (xname)
         )
-    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment nullable))
+    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment reference nullable))
     (setq xname (shu-cpp-extract-attr-info-name attr-info))
     (should xname)
     (should (stringp xname))
     (should (string= name xname))
     ))
 
+
+
+
+;;
+;;  shu-test-shu-upcase-first-letter-1
+;;
+(ert-deftest shu-test-shu-upcase-first-letter-1 ()
+  (let (
+        (phrase "Now is the time")
+        (expected "now is the time")
+        (actual)
+        )
+    (setq actual (shu-upcase-first-letter phrase))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-downcase-first-letter-1
+;;
+(ert-deftest shu-test-shu-downcase-first-letter-1 ()
+  (let (
+        (phrase "Now is the time")
+        (expected "now is the time")
+        (actual)
+        )
+    (setq actual (shu-downcase-first-letter phrase))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
 
 
 ;;; shu-attributes.el ends here
