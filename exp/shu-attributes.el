@@ -403,6 +403,7 @@ name is less than the right hand name."
     (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
     (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
     (shu-cpp-attributes-gen-ctor-gen class-name attributes)
+    (shu-cpp-attributes-gen-reset-gen class-name attributes)
     ))
 
 
@@ -712,10 +713,7 @@ name is less than the right hand name."
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
-      (insert
-       (concat
-        member-prefix name "("
-        ))
+      (insert (concat member-prefix name "("))
       (when (string= full-data-type "bsl::string")
         (insert "allocator")
         )
@@ -735,13 +733,93 @@ name is less than the right hand name."
     ))
 
 
-;;    /*!
-;;     * \brief Return a const reference to the deletion time
-;;     */
 
 ;;
-;;    bdlt::Datetime                    m_deleteTime;
-;;    1234567890123456789012345678901
+;;  shu-cpp-attributes-gen-reset-gen
+;;
+(defun shu-cpp-attributes-gen-reset-gen (class-name attributes)
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (uname)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        (have-date)
+        (have-interval)
+        )
+    (insert
+     (concat
+      "\n\n"
+      "// MANIPULATORS\n\n"
+      class-name "::reset()\n"
+      "{\n"
+      ))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
+      (if (string= full-data-type "bdlt::Datetime")
+          (setq have-date t)
+        (when (string= full-data-type "bdlt::DatetimeInterval")
+          (setq have-interval t)
+          )
+        )
+      (setq attrs (cdr attrs))
+      )
+    (if have-interval
+        (progn
+          (insert (concat ipad "bdlt::DatetimeInterval  defaultInterval;\n"))
+          (when have-date
+            (insert (concat ipad "bdlt::Datetime          defaultTime;\n"))
+            )
+          )
+      (when have-date
+        (insert (concat ipad "bdlt::Datetime   defaultTime;\n"))
+        )
+      )
+    (setq attrs attributes)
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
+      (insert (concat ipad member-prefix name))
+      (if nullable
+          (insert ".reset()")
+        (if (string= full-data-type "bsl::string")
+            (insert ".clear()")
+          (if (string= full-data-type "bdlt::Datetime")
+              (insert " = defaultTime")
+            (if (string= full-data-type "bdlt::DatetimeInterval")
+                (insert " = defaultTime")
+              (if (string= full-data-type "int")
+                  (insert " = 0")
+                (when (string= full-data-type "double")
+                  (insert " = 0.0")
+                    )
+                  )
+              )
+            )
+          )
+        )
+      (insert ";\n")
+      (setq attrs (cdr attrs))
+      )
+    (insert "}\n")
+    ))
+
+
 
 
 
