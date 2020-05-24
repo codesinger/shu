@@ -402,6 +402,7 @@ name is less than the right hand name."
     (shu-cpp-attributes-gen-getter-decl sorted-attributes)
     (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
     (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
+    (shu-cpp-attributes-gen-ctor-gen class-name attributes)
     ))
 
 
@@ -672,6 +673,65 @@ name is less than the right hand name."
         ))
       (setq attrs (cdr attrs))
       )
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-ctor-gen
+;;
+(defun shu-cpp-attributes-gen-ctor-gen (class-name attributes)
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (uname)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        )
+    (insert
+     (concat
+      "\n\n"
+      "// CREATORS\n\n"
+      class-name "::" class-name "(\n"
+      ipad "bslma::Allocator    *allocator)\n"
+      ":\n"
+      ))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
+      (insert
+       (concat
+        member-prefix name "("
+        ))
+      (when (string= full-data-type "bsl::string")
+        (insert "allocator")
+        )
+      (insert ")")
+      (when (cdr attrs)
+        (insert ",")
+        )
+      (insert "\n")
+      (setq attrs (cdr attrs))
+      )
+    (insert
+     (concat
+      "{\n"
+      ipad "reset();\n"
+      "}\n"
+      ))
     ))
 
 
