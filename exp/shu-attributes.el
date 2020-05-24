@@ -309,6 +309,7 @@ name is less than the right hand name."
         (eol)
         (line)
         (x)
+        (class-name)
         (data-type)
         (full-data-type)
         (name)
@@ -335,22 +336,25 @@ name is less than the right hand name."
             (setq column-name (car x))
             (setq x (cdr x))
             (setq data-type (car x))
-            (setq x (cdr x))
-            (setq name (car x))
-            (setq nullable nil)
-            (setq full-data-type data-type)
-            (setq reference nil)
-            (setq x (cdr x))
-            (when x
-              (setq z (car x))
-              (princ "z: [" gb)(princ z gb)(princ "]\n" gb)
-              (when (string=  z "&")
-                (setq reference t)
+            (if (string= column-name "class")
+                (setq class-name data-type)
+              (setq x (cdr x))
+              (setq name (car x))
+              (setq nullable nil)
+              (setq full-data-type data-type)
+              (setq reference nil)
+              (setq x (cdr x))
+              (when x
+                (setq z (car x))
+                (princ "z: [" gb)(princ z gb)(princ "]\n" gb)
+                (when (string=  z "&")
+                  (setq reference t)
+                  )
                 )
-              )
-            (when (cdr x)
-              (setq nullable t)
-              (setq full-data-type (shu-cpp-make-nullable data-type))
+              (when (cdr x)
+                (setq nullable t)
+                (setq full-data-type (shu-cpp-make-nullable data-type))
+                )
               )
             )
           (when name
@@ -360,20 +364,22 @@ name is less than the right hand name."
             (setq comment nil)
             (setq name nil)
             )
+
           )
         )
       (setq line-diff (forward-line 1))
       )
     (setq line-diff (forward-line 1))
     (setq attributes (nreverse attributes))
-    (shu-cpp-attributes-gen attributes)
+    (princ "class-name: " gb)(princ class-name gb) (princ "\n" gb)
+    (shu-cpp-attributes-gen class-name attributes)
     ))
 
 
 ;;
 ;;  shu-cpp-attributes-gen
 ;;
-(defun shu-cpp-attributes-gen (attributes)
+(defun shu-cpp-attributes-gen (class-name attributes)
   "Doc string."
   (let (
         (gb (get-buffer-create "**boo**"))
@@ -389,15 +395,11 @@ name is less than the right hand name."
       )
     (goto-char (point-max))
     (insert "\n\n")
-    (princ (format "(length attributes 1: %d\n" (length attributes)) gb)
     (shu-cpp-attributes-gen-decl attributes)
     (setq sorted-attributes (copy-tree attributes))
     (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
-    (princ (format "(length sorted-attributes 2: %d\n" (length sorted-attributes)) gb)
     (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
-    (princ (format "(length sorted-attributes 3: %d\n" (length sorted-attributes)) gb)
     (shu-cpp-attributes-gen-getter-decl sorted-attributes)
-    (princ (format "(length sorted-attributes 14 %d\n" (length sorted-attributes)) gb)
     ))
 
 
@@ -527,32 +529,32 @@ name is less than the right hand name."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable column-name)
-        (insert "\n")
-        (when comment
+      (insert "\n")
+      (when comment
+        (insert
+         (concat "\n"
+                 ipad "/*!\n"
+                 ipad " * Return " (shu-downcase-first-letter comment) "\n"))
+        (when nullable
+          (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
           (insert
-           (concat "\n"
-                   ipad "/*!\n"
-                   ipad " * Return " (shu-downcase-first-letter comment) "\n"))
-          (when nullable
-            (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
-            (insert
-             (concat
-              ipad " *\n"
-              ipad " * Behavior is undefined if " name " does not exist\n"
-              ipad " * (" uname " returns false)\n"
-              ))
-            )
-          (insert (concat ipad " */\n"))
+           (concat
+            ipad " *\n"
+            ipad " * Behavior is undefined if " name " does not exist\n"
+            ipad " * (" uname " returns false)\n"
+            ))
           )
-        (insert ipad)
-        (when reference
-          (insert "const ")
-          )
-        (insert (concat data-type " "))
-        (when reference
-          (insert "&")
-          )
-        (insert (concat name  "() const;\n"))
+        (insert (concat ipad " */\n"))
+        )
+      (insert ipad)
+      (when reference
+        (insert "const ")
+        )
+      (insert (concat data-type " "))
+      (when reference
+        (insert "&")
+        )
+      (insert (concat name  "() const;\n"))
       (setq attrs (cdr attrs))
       )
     ))
