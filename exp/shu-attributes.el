@@ -1132,6 +1132,23 @@ name is less than the right hand name."
             (setq attr-info (car attrs))
             (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                        reference nullable column-name)
+            (setq attr-info (car attrs))
+            (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                       reference nullable column-name)
+            (when nullable
+              (insert (concat lpad "( ( !lhs." uname " ) ||\n"))
+              (setq lpad (concat ipad ipad ipad ipad " "))
+              (insert
+               (concat
+                lpad "  (  lhs." uname  " &&\n"
+                lpad "    (lhs." name "() == rhs." name "() ) ) )"
+                ))
+              (if (not (string= name last-nullable-name))
+                  (insert (concat " &&"))
+                (insert " )")
+                )
+              (insert "\n")
+              )
             (setq attrs (cdr attrs))
             )
           )
@@ -1210,13 +1227,13 @@ name is less than the right hand name."
         (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                    reference nullable column-name)
         (when nullable
-        (insert (concat lpad "( ( !lhs." uname " ) ||\n"))
-        (setq lpad (concat ipad ipad ipad ipad " "))
-        (insert
-         (concat
-          lpad "  (  lhs." uname  " &&\n"
-          lpad "    (lhs." name "() == rhs." name "() ) ) )"
-          ))
+          (insert (concat lpad "( ( !lhs." uname " ) ||\n"))
+          (setq lpad (concat ipad ipad ipad ipad " "))
+          (insert
+           (concat
+            lpad "  (  lhs." uname  " &&\n"
+            lpad "    (lhs." name "() == rhs." name "() ) ) )"
+            ))
           (if (not (string= name last-nullable-name))
               (insert (concat " &&"))
             (insert " )")
@@ -1225,7 +1242,6 @@ name is less than the right hand name."
           )
         (setq attrs (cdr attrs))
         )
-      )
       (insert
        (concat
         ipad ipad ipad "{\n"
@@ -1236,7 +1252,8 @@ name is less than the right hand name."
         "\n"
         ipad "return isSame;\n"
         "}\n"
-      ))
+        ))
+      )
 
     (insert
      (concat
