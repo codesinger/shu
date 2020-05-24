@@ -400,6 +400,7 @@ name is less than the right hand name."
     (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
     (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
     (shu-cpp-attributes-gen-getter-decl sorted-attributes)
+    (shu-cpp-attributes-gen-bind-values-gen class-name attributes)
     (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
     (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
     (shu-cpp-attributes-gen-ctor-gen class-name attributes)
@@ -507,6 +508,78 @@ name is less than the right hand name."
       (setq attrs (cdr attrs))
       )
 
+    ))
+
+
+
+
+;;
+;;  shu-cpp-attributes-gen-bind-values-gen
+;;
+(defun shu-cpp-attributes-gen-bind-values-gen (class-name attributes)
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (uname)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        (have-date)
+        (have-interval)
+        )
+    (insert
+     (concat
+      "\n\n"
+      class-name "::bindValues)\n"
+      ipad "fxpricingdb::Binder   &binder)\n"
+      "{\n"
+      ))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
+
+      (if (not nullable)
+          (insert (concat ipad  "binder.bind"))
+        (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
+        (insert
+         (concat
+          ipad  "if ( !" uname " )\n"
+          ipad ipad "binder.bindNull(\"@\" + "  column-name ", __FILE__, __LINE__)\n"
+          ipad  "else\n"
+          ipad ipad "binder.bind"
+          ))
+        )
+        (if (string= data-type "bsl::string")
+            (insert "Text")
+          (if (string= data-type "bdlt::Datetime")
+              (insert "Datetime")
+            (if (string= data-type "bdlt::DatetimeInterval")
+                (insert "Int")
+              (if (string= data-type "int")
+                  (insert "Int")
+                (when (string= data-type "double")
+                  (insert "Double")
+                    )
+                  )
+              )
+            )
+          )
+        (insert (concat "(\"@\" + " column-name ", " name "(), __FILE__, __LINE__);\n"))
+      (setq attrs (cdr attrs))
+      )
+    (insert "}\n")
     ))
 
 
