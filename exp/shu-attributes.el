@@ -389,6 +389,7 @@ snippets will be inserted into the same file."
     (shu-cpp-attributes-gen-setter-decl)
     (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
     (shu-cpp-attributes-gen-getter-decl sorted-attributes)
+    (shu-cpp-attributes-gen-operator-equal-decl class-name)
     (shu-cpp-attributes-gen-bind-values-gen class-name attributes)
     (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
     (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
@@ -979,6 +980,37 @@ values from an instance of bcem_Aggregate."
       "}\n"))
     ))
 
+
+
+
+;;
+;;  shu-cpp-attributes-gen-operator-equal-gen
+;;
+(defun shu-cpp-attributes-gen-operator-equal-decl (class-name)
+  "Generate the declaration for operator==()"
+    (insert
+     (concat
+      "\n"
+      "\n"
+      "// FREE OPERATORS\n"
+      "\n"
+      "\n"
+      "/*!\n"
+      " * Return true if all attributes of `lhs` and `rhs` have the same value\n"
+      " */\n"
+      "bool operator==(\n"
+      "    const " class-name "   &lhs,\n"
+      "    const " class-name "   &rhs);\n"
+      "\n"
+      "\n"
+      "/*!\n"
+      " * Return true if any attributes of `lhs` and `rhs` have different values\n"
+      " *\n"
+      "bool operator!=(\n"
+      "    const " class-name "   &lhs,\n"
+      "    const " class-name "   &rhs);\n"
+      ))
+    )
 
 
 
