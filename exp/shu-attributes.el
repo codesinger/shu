@@ -404,6 +404,7 @@ name is less than the right hand name."
     (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
     (shu-cpp-attributes-gen-ctor-gen class-name attributes)
     (shu-cpp-attributes-gen-reset-gen class-name attributes)
+    (shu-cpp-attributes-gen-set-values-gen class-name attributes)
     ))
 
 
@@ -817,6 +818,113 @@ name is less than the right hand name."
       (setq attrs (cdr attrs))
       )
     (insert "}\n")
+    ))
+
+
+
+
+;;
+;;  shu-cpp-attributes-gen-set-values-gen
+;;
+(defun shu-cpp-attributes-gen-set-values-gen (class-name attributes)
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (uname)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        (have-date)
+        (have-interval)
+        )
+    (insert
+     (concat
+      "\n\n"
+      class-name "::setValues)\n"
+      ipad "const bsl::string       &databaseName,\n"
+      ipad "const bcem_Aggregate    &data)\n"
+      "{\n"
+      ipad "BALL_LOG_SET_CATEGORY(__func__);\n"
+      ipad "reset();\n"
+      ipad "const bsl::string  why(\n"
+      ipad "    \"This is caused by a query definition mis-match between this \"\n"
+      ipad "    \"program and the definition of the table \"\n"
+      ipad "    \"in database '\" + databaseName + \"'.\");\n"
+      ipad "int fetchCount(0);\n"
+      ipad "int missingCount(0);\n"
+      ipad "const bsl::string  tableName(\"cross_outer_row join virtual\");\n"
+      ))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
+      (insert
+       (concat
+        ipad "const bcem_Aggregate &" name " = data[" column-name "];\n"
+        ipad "if ( !" name ".isNul2() )\n"
+        ipad "{\n"
+        ipad ipad member-prefix name
+        ))
+      (if nullable
+          (insert ".makeValue(")
+        (insert " = ")
+        )
+      (insert (concat name ".as"))
+        (if (string= data-type "bsl::string")
+            (insert "String()")
+          (if (string= data-type "bdlt::Datetime")
+              (insert "DatetimeTz().utcDatetime()")
+            (if (string= data-type "bdlt::DatetimeInterval")
+                (insert "Int()")
+              (if (string= data-type "int")
+                  (insert "Int()")
+                (when (string= data-type "double")
+                  (insert "Double()")
+                    )
+                  )
+              )
+            )
+          )
+        (when nullable
+          (insert ")")
+          )
+      (insert
+       (concat
+        ";\n"
+        ipad ipad "fetchCount++;\n"
+        ipad "}\n"
+        ipad "else\n"
+        ipad "{\n"
+        ipad ipad "BALL_LOG_ERROR << \"No data found for input column '\"\n"
+        ipad ipad "               << " column-name " << \"'. \" << why;\n"
+        ipad ipad "missingCount++;\n"
+        ipad "}\n"
+      ))
+      (setq attrs (cdr attrs))
+      )
+    (insert
+     (concat
+      ipad "if (missingCount)\n"
+      ipad "{\n"
+      ipad ipad "BALL_LOG_ERROR << \"Assertion failure will follow. \" << why;\n"
+      ipad ipad "const int schema_mis_match_between_this_program_and_the_table_see_log_file(0);\n"
+      ipad ipad "BSLS_ASSERT_OPT(schema_mis_match_between_this_program_and_the_table_see_log_file);\n"
+      ipad "}\n"
+      ipad "\n"
+      ipad "return fetchCount;\n"
+      "}\n"
+      ))
     ))
 
 
