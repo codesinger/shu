@@ -141,20 +141,16 @@
 (defmacro shu-cpp-extract-attr-info (attr-info name data-type full-data-type
                                                comment reference nullable column-name)
   "Extract the information out of an attr-info"
-  (let (
-        (tattr-ext (make-symbol "attr-ext"))
+  (let ((tattr-ext (make-symbol "attr-ext"))
         (tattr-other (make-symbol "attr-other"))
         (tattr-cmt (make-symbol "attr-cmt"))
         (tattr-col (make-symbol "attr-col"))
-        (tflags (make-symbol "flags"))
-        )
-    `(let (
-           (,tattr-ext)
+        (tflags (make-symbol "flags")))
+    `(let ((,tattr-ext)
            (,tattr-other)
            (,tattr-cmt)
            (,tattr-col)
-           (,tflags)
-           )
+           (,tflags))
        (setq ,name (car ,attr-info))
        (setq ,tattr-ext (cdr ,attr-info))
        (setq ,full-data-type (car ,tattr-ext))
@@ -166,14 +162,11 @@
        (setq ,tflags (car ,tattr-col))
        (if (= (logand ,tflags shu-cpp-attributes-reference) shu-cpp-attributes-reference)
            (setq ,reference t)
-         (setq ,reference nil)
-         )
+         (setq ,reference nil))
        (if (= (logand ,tflags shu-cpp-attributes-nullable) shu-cpp-attributes-nullable)
            (setq ,nullable t)
-         (setq ,nullable nil)
-         )
-       (setq ,column-name (cdr ,tattr-col))
-       )
+         (setq ,nullable nil))
+       (setq ,column-name (cdr ,tattr-col)))
     ))
 
 
@@ -193,15 +186,11 @@
 (defun shu-cpp-make-attr-info (name data-type full-data-type &optional comment
                                     reference nullable column-name)
   "Return an attr-info created from the given arguments"
-  (let (
-        (flags 0)
-        )
+  (let ((flags 0))
     (when reference
-      (setq flags shu-cpp-attributes-reference)
-      )
+      (setq flags shu-cpp-attributes-reference))
     (when nullable
-      (setq flags (logior flags shu-cpp-attributes-nullable))
-      )
+      (setq flags (logior flags shu-cpp-attributes-nullable)))
     (cons name
           (cons full-data-type
                 (cons data-type
@@ -217,22 +206,19 @@
 (defun shu-cpp-print-attr-info (attr-info buf)
   "Print the contents of ATTR-INFO into the buffer BUF"
   (interactive)
-  (let (
-        (name)
+  (let ((name)
         (data-type)
         (full-data-type)
         (comment)
         (reference)
         (nullable)
-        (column-name)
-        )
+        (column-name))
     (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable column-name)
     (princ (concat "name: [" name "], type: [" data-type "], ref: " (shu-bool-to-string nullable)
                    "], nullable: " (shu-bool-to-string nullable)
                    ", full-type: [" full-data-type "]\n") buf)
     (when comment
-      (princ (concat "    [" comment "]\n") buf)
-      )
+      (princ (concat "    [" comment "]\n") buf))
 
 
     ))
@@ -257,10 +243,8 @@
 (defun shu-cpp-attributes-name-compare (lhs-attr-info rhs-attr-info)
   "Compare the names from LHS-ATTR-INFO and RHS-ATTR-INFO.  Return true if the left hand
 name is less than the right hand name."
-  (let (
-        (lhs-name (shu-cpp-extract-attr-info-name lhs-attr-info))
-        (rhs-name (shu-cpp-extract-attr-info-name rhs-attr-info))
-        )
+  (let ((lhs-name (shu-cpp-extract-attr-info-name lhs-attr-info))
+        (rhs-name (shu-cpp-extract-attr-info-name rhs-attr-info)))
     (string< lhs-name rhs-name)
     ))
 
@@ -272,10 +256,8 @@ name is less than the right hand name."
 (defun shu-upcase-first-letter (string)
   "Return the given string with the first character of the string converted
 to upper case"
-  (let (
-        (first-letter (substring string 0 1))
-        (remainder (substring string 1))
-        )
+  (let ((first-letter (substring string 0 1))
+        (remainder (substring string 1)))
     (concat (upcase first-letter) remainder)
     ))
 
@@ -287,10 +269,8 @@ to upper case"
 (defun shu-downcase-first-letter (string)
   "Return the given string with the first character of the string converted
 to lower case"
-  (let (
-        (first-letter (substring string 0 1))
-        (remainder (substring string 1))
-        )
+  (let ((first-letter (substring string 0 1))
+        (remainder (substring string 1)))
     (concat (downcase first-letter) remainder)
     ))
 
@@ -323,8 +303,7 @@ Each column is has x attributes all on a single line
 
 Mark the lines to be scanned and then invoke this function.  The generated code
 snippets will be inserted into the same file."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (sline (shu-the-line-at start))
         (eline (shu-the-line-at end))
         (line-diff 0)
@@ -341,8 +320,7 @@ snippets will be inserted into the same file."
         (column-name)
         (attr-info)
         (attributes)
-        (z)
-        )
+        (z))
     (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
       (setq eol (line-end-position))
       (when (> eol (point))
@@ -352,8 +330,7 @@ snippets will be inserted into the same file."
           (if (string= (substring line 0 2) "//")
               (progn
                 (setq comment (shu-trim (substring line 2)))
-                (princ (concat "comment: [" comment "]\n") gb)
-                )
+                (princ (concat "comment: [" comment "]\n") gb))
             (setq x (split-string line nil t))
             (setq column-name (car x))
             (setq x (cdr x))
@@ -370,27 +347,17 @@ snippets will be inserted into the same file."
                 (setq z (car x))
                 (princ "z: [" gb)(princ z gb)(princ "]\n" gb)
                 (when (string=  z "&")
-                  (setq reference t)
-                  )
-                )
+                  (setq reference t)))
               (when (cdr x)
                 (setq nullable t)
-                (setq full-data-type (shu-cpp-make-nullable data-type))
-                )
-              )
-            )
+                (setq full-data-type (shu-cpp-make-nullable data-type)))))
           (when name
             (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment reference nullable column-name))
             (push attr-info attributes)
             (shu-cpp-print-attr-info attr-info gb)
             (setq comment nil)
-            (setq name nil)
-            )
-
-          )
-        )
-      (setq line-diff (forward-line 1))
-      )
+            (setq name nil))))
+      (setq line-diff (forward-line 1)))
     (setq line-diff (forward-line 1))
     (setq attributes (nreverse attributes))
     (princ "class-name: " gb)(princ class-name gb) (princ "\n" gb)
@@ -398,23 +365,22 @@ snippets will be inserted into the same file."
     ))
 
 
+
+
 ;;
 ;;  shu-cpp-attributes-gen
 ;;
 (defun shu-cpp-attributes-gen (class-name attributes)
   "Generate all of the code snippets."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
-        (sorted-attributes)
-        )
+        (sorted-attributes))
     (princ  "\n\nAttributes:\n" gb)
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-print-attr-info attr-info gb)
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     (goto-char (point-max))
     (insert "\n\n")
     (shu-cpp-attributes-gen-decl attributes)
@@ -439,8 +405,7 @@ snippets will be inserted into the same file."
 ;;
 (defun shu-cpp-attributes-gen-decl (attributes)
   "Generate the declaration of the member variables."
-  (let (
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (data-type)
@@ -454,18 +419,15 @@ snippets will be inserted into the same file."
         (attr-num 1)
         (pad-count 0)
         (pad)
-        (member-prefix "m_")
-        )
+        (member-prefix "m_"))
     (insert (concat "\n\n" ipad "// DATA\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
       (when (> (length full-data-type) max-type-len)
-        (setq max-type-len (length full-data-type))
-        )
-      (setq attrs (cdr attrs))
-      )
+        (setq max-type-len (length full-data-type)))
+      (setq attrs (cdr attrs)))
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
@@ -476,15 +438,12 @@ snippets will be inserted into the same file."
         (insert (concat ipad "//! " comment " (" (number-to-string attr-num) ")\n"))
         (setq pad-count 0)
         (when (< (length full-data-type) max-type-len)
-          (setq pad-count (- max-type-len (length full-data-type)))
-          )
-        )
+          (setq pad-count (- max-type-len (length full-data-type)))))
       (setq pad-count (+ pad-count 3))
       (setq pad (make-string pad-count ? ))
       (insert (concat ipad full-data-type pad member-prefix name ";\n"))
       (setq attr-num (1+ attr-num))
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     ))
 
 
@@ -495,8 +454,7 @@ snippets will be inserted into the same file."
 (defun shu-cpp-attributes-gen-getter-has-decl (attributes)
   "Generate the declaration of the functions that indicate presence or absence
 of nullable values."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -511,8 +469,7 @@ of nullable values."
         (attr-num 1)
         (pad-count 0)
         (pad)
-        (member-prefix "m_")
-        )
+        (member-prefix "m_"))
     (insert
      (concat
       "\n\n" ipad "// ACCESSORS\n\n"
@@ -533,14 +490,10 @@ of nullable values."
            (concat "\n"
                    ipad "/*!\n"
                    ipad " * Return true if " name " exists\n"
-                   ipad " */\n"))
-          )
+                   ipad " */\n")))
         (setq uname (shu-upcase-first-letter name))
-        (insert (concat ipad "bool has" uname "() const;\n"))
-        )
-      (setq attrs (cdr attrs))
-      )
-
+        (insert (concat ipad "bool has" uname "() const;\n")))
+      (setq attrs (cdr attrs)))
     ))
 
 
@@ -551,8 +504,7 @@ of nullable values."
 ;;
 (defun shu-cpp-attributes-gen-bind-values-gen (class-name attributes)
   "Generate the code that binds all of the values to their column names."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -569,8 +521,7 @@ of nullable values."
         (pad)
         (member-prefix "m_")
         (have-date)
-        (have-interval)
-        )
+        (have-interval))
     (insert
      (concat
       "\n\n"
@@ -583,7 +534,6 @@ of nullable values."
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
-
       (if (not nullable)
           (insert (concat ipad  "binder.bind"))
         (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
@@ -593,8 +543,7 @@ of nullable values."
           ipad ipad "binder.bindNull(\"@\" + "  column-name ", __FILE__, __LINE__)\n"
           ipad  "else\n"
           ipad ipad "binder.bind"
-          ))
-        )
+          )))
       (if (string= data-type "bsl::string")
           (insert "Text")
         (if (string= data-type "bdlt::Datetime")
@@ -604,15 +553,9 @@ of nullable values."
             (if (string= data-type "int")
                 (insert "Int")
               (when (string= data-type "double")
-                (insert "Double")
-                )
-              )
-            )
-          )
-        )
+                (insert "Double"))))))
       (insert (concat "(\"@\" + " column-name ", " name "(), __FILE__, __LINE__);\n"))
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     (insert "}\n")
     ))
 
@@ -624,8 +567,7 @@ of nullable values."
 (defun shu-cpp-attributes-gen-getter-has-gen (class-name attributes)
   "Generate the code for the functions that indicate the presence or absence
 of values for individual nullable columns."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -640,8 +582,7 @@ of values for individual nullable columns."
         (attr-num 1)
         (pad-count 0)
         (pad)
-        (member-prefix "m_")
-        )
+        (member-prefix "m_"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -655,11 +596,8 @@ of values for individual nullable columns."
           "{\n"
           ipad "return ( !(" member-prefix name ".isNull()) );\n"
           "}\n"
-          ))
-        )
-      (setq attrs (cdr attrs))
-      )
-
+          )))
+      (setq attrs (cdr attrs)))
     ))
 
 
@@ -669,10 +607,8 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-setter-decl ()
   "Generate the declarations for the two manipulator functions."
-  (let (
-        (gb (get-buffer-create "**boo**"))
-        (ipad (make-string shu-cpp-indent-length ? ))
-        )
+  (let ((gb (get-buffer-create "**boo**"))
+        (ipad (make-string shu-cpp-indent-length ? )))
     (insert
      (concat
       "\n\n"
@@ -717,8 +653,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-getter-decl (attributes)
   "Generate the declarations for the functions that return attribute values."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -733,8 +668,7 @@ of values for individual nullable columns."
         (attr-num 1)
         (pad-count 0)
         (pad)
-        (member-prefix "m_")
-        )
+        (member-prefix "m_"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -751,22 +685,16 @@ of values for individual nullable columns."
            (concat
             ipad " *\n"
             ipad " * Behavior is undefined if " name " does not exist\n"
-            ipad " * (" uname " returns false)\n"
-            ))
-          )
-        (insert (concat ipad " */\n"))
-        )
+            ipad " * (" uname " returns false)\n")))
+        (insert (concat ipad " */\n")))
       (insert ipad)
       (when reference
-        (insert "const ")
-        )
+        (insert "const "))
       (insert (concat data-type " "))
       (when reference
-        (insert "&")
-        )
+        (insert "&"))
       (insert (concat name  "() const;\n"))
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     ))
 
 
@@ -776,8 +704,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-getter-gen (class-name attributes)
   "Generate the code for the functions that return attribute values."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -792,20 +719,17 @@ of values for individual nullable columns."
         (attr-num 1)
         (pad-count 0)
         (pad)
-        (member-prefix "m_")
-        )
+        (member-prefix "m_"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
       (insert "\n\n")
       (when reference
-        (insert "const ")
-        )
+        (insert "const "))
       (insert (concat data-type " "))
       (when reference
-        (insert "&")
-        )
+        (insert "&"))
       (insert
        (concat
         class-name "::" name  "() const\n"
@@ -814,22 +738,17 @@ of values for individual nullable columns."
         (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
         (insert
          (concat
-          ipad "BSLS_ASSERT_OPT(" uname ");\n\n"
-          ))
-        )
+          ipad "BSLS_ASSERT_OPT(" uname ");\n\n")))
       (insert
        (concat
         ipad "return " member-prefix name))
       (when nullable
-        (insert ".value()")
-        )
+        (insert ".value()"))
       (insert
        (concat
         ";\n"
-        "}\n"
-        ))
-      (setq attrs (cdr attrs))
-      )
+        "}\n"))
+      (setq attrs (cdr attrs)))
     ))
 
 
@@ -839,8 +758,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-ctor-gen (class-name attributes)
   "Generate the code for the constructor."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -855,37 +773,31 @@ of values for individual nullable columns."
         (attr-num 1)
         (pad-count 0)
         (pad)
-        (member-prefix "m_")
-        )
+        (member-prefix "m_"))
     (insert
      (concat
       "\n\n"
       "// CREATORS\n\n"
       class-name "::" class-name "(\n"
       ipad "bslma::Allocator    *allocator)\n"
-      ":\n"
-      ))
+      ":\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
       (insert (concat member-prefix name "("))
       (when (string= full-data-type "bsl::string")
-        (insert "allocator")
-        )
+        (insert "allocator"))
       (insert ")")
       (when (cdr attrs)
-        (insert ",")
-        )
+        (insert ","))
       (insert "\n")
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     (insert
      (concat
       "{\n"
       ipad "reset();\n"
-      "}\n"
-      ))
+      "}\n"))
     ))
 
 
@@ -895,8 +807,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-reset-gen (class-name attributes)
   "Generate the code for the reset function"
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -913,15 +824,13 @@ of values for individual nullable columns."
         (pad)
         (member-prefix "m_")
         (have-date)
-        (have-interval)
-        )
+        (have-interval))
     (insert
      (concat
       "\n\n"
       "// MANIPULATORS\n\n"
       class-name "::reset()\n"
-      "{\n"
-      ))
+      "{\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -929,22 +838,15 @@ of values for individual nullable columns."
       (if (string= full-data-type "bdlt::Datetime")
           (setq have-date t)
         (when (string= full-data-type "bdlt::DatetimeInterval")
-          (setq have-interval t)
-          )
-        )
-      (setq attrs (cdr attrs))
-      )
+          (setq have-interval t)))
+      (setq attrs (cdr attrs)))
     (if have-interval
         (progn
           (insert (concat ipad "bdlt::DatetimeInterval  defaultInterval;\n"))
           (when have-date
-            (insert (concat ipad "bdlt::Datetime          defaultTime;\n"))
-            )
-          )
+            (insert (concat ipad "bdlt::Datetime          defaultTime;\n"))))
       (when have-date
-        (insert (concat ipad "bdlt::Datetime   defaultTime;\n"))
-        )
-      )
+        (insert (concat ipad "bdlt::Datetime   defaultTime;\n"))))
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
@@ -962,16 +864,9 @@ of values for individual nullable columns."
               (if (string= full-data-type "int")
                   (insert " = 0")
                 (when (string= full-data-type "double")
-                  (insert " = 0.0")
-                  )
-                )
-              )
-            )
-          )
-        )
+                  (insert " = 0.0")))))))
       (insert ";\n")
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     (insert "}\n")
     ))
 
@@ -984,8 +879,7 @@ of values for individual nullable columns."
 (defun shu-cpp-attributes-gen-set-values-gen (class-name attributes)
   "Generate the code for the setValues function that sets all of the member variable
 values from an instance of bcem_Aggregate."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -1002,8 +896,7 @@ values from an instance of bcem_Aggregate."
         (pad)
         (member-prefix "m_")
         (have-date)
-        (have-interval)
-        )
+        (have-interval))
     (insert
      (concat
       "\n\n"
@@ -1019,8 +912,7 @@ values from an instance of bcem_Aggregate."
       ipad "    \"in database '\" + databaseName + \"'.\");\n"
       ipad "int fetchCount(0);\n"
       ipad "int missingCount(0);\n"
-      ipad "const bsl::string  tableName(\"cross_outer_row join virtual\");\n"
-      ))
+      ipad "const bsl::string  tableName(\"cross_outer_row join virtual\");\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -1030,12 +922,10 @@ values from an instance of bcem_Aggregate."
         ipad "const bcem_Aggregate &" name " = data[" column-name "];\n"
         ipad "if ( !" name ".isNul2() )\n"
         ipad "{\n"
-        ipad ipad member-prefix name
-        ))
+        ipad ipad member-prefix name))
       (if nullable
           (insert ".makeValue(")
-        (insert " = ")
-        )
+        (insert " = "))
       (insert (concat name ".as"))
       (if (string= data-type "bsl::string")
           (insert "String()")
@@ -1046,15 +936,9 @@ values from an instance of bcem_Aggregate."
             (if (string= data-type "int")
                 (insert "Int()")
               (when (string= data-type "double")
-                (insert "Double()")
-                )
-              )
-            )
-          )
-        )
+                (insert "Double()"))))))
       (when nullable
-        (insert ")")
-        )
+        (insert ")"))
       (insert
        (concat
         ";\n"
@@ -1065,10 +949,8 @@ values from an instance of bcem_Aggregate."
         ipad ipad "BALL_LOG_ERROR << \"No data found for input column '\"\n"
         ipad ipad "               << " column-name " << \"'. \" << why;\n"
         ipad ipad "missingCount++;\n"
-        ipad "}\n"
-        ))
-      (setq attrs (cdr attrs))
-      )
+        ipad "}\n"))
+      (setq attrs (cdr attrs)))
     (insert
      (concat
       ipad "if (missingCount)\n"
@@ -1079,8 +961,7 @@ values from an instance of bcem_Aggregate."
       ipad "}\n"
       ipad "\n"
       ipad "return fetchCount;\n"
-      "}\n"
-      ))
+      "}\n"))
     ))
 
 
@@ -1091,8 +972,7 @@ values from an instance of bcem_Aggregate."
 ;;
 (defun shu-cpp-attributes-gen-operator-equal-gen (class-name attributes)
   "Generate the code for operator==()"
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -1115,8 +995,7 @@ values from an instance of bcem_Aggregate."
         (longest-non-nullable-name-length 0)
         (last-name)
         (last-nullable-name)
-        (last-non-nullable-name)
-        )
+        (last-non-nullable-name))
     (insert
      (concat
       "\n"
@@ -1127,8 +1006,7 @@ values from an instance of bcem_Aggregate."
       "    const " class-name "   &lhs,\n"
       "    const " class-name "   &rhs)\n"
       "{\n"
-      "    bool  isSame(false);\n"
-      ))
+      "    bool  isSame(false);\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -1138,22 +1016,17 @@ values from an instance of bcem_Aggregate."
             (setq have-nullable t)
             (setq last-nullable-name name)
             (when (> (length name) longest-nullable-name-length)
-              (setq longest-nullable-name-length (length name))
-              )
-            )
+              (setq longest-nullable-name-length (length name))))
         (when (> (length name) longest-non-nullable-name-length)
-          (setq longest-non-nullable-name-length (length name))
-          )
-        (setq last-non-nullable-name name)
-        )
+          (setq longest-non-nullable-name-length (length name)))
+        (setq last-non-nullable-name name))
       (when (> (length name) longest-name-length)
-        (setq longest-name-length (length name))
-        )
+        (setq longest-name-length (length name)))
       (setq last-name name)
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     (setq attrs attributes)
     (if (not have-nullable)
+        ;;; Generat operator==() for a class with no nullable values
         (progn
           (setq lpad "")
           (insert (concat ipad "if ("))
@@ -1166,19 +1039,16 @@ values from an instance of bcem_Aggregate."
                                        reference nullable column-name)
             (setq pad-count 0)
             (when (< (length name) longest-name-length)
-              (setq pad-count (- longest-name-length (length name)))
-              )
+              (setq pad-count (- longest-name-length (length name))))
             (setq pad-count (1+ pad-count))
             (setq pad (make-string pad-count ? ))
             (insert (concat lpad "(lhs." name "()" pad "== rhs." name "())"))
             (if (not (string= name last-name))
                 (insert (concat pad "&&"))
-              (insert ")")
-              )
+              (insert ")"))
             (insert "\n")
             (setq lpad (concat ipad ipad))
-            (setq attrs (cdr attrs))
-            )
+            (setq attrs (cdr attrs)))
           (insert
            (concat
             ipad "{\n"
@@ -1186,9 +1056,10 @@ values from an instance of bcem_Aggregate."
             ipad "}\n"
             "\n"
             ipad "return isSame;\n"
-            "}\n"
-            ))
-          )
+            "}\n")))
+      ;;; Generat operator==() for a class with nullable values
+
+      ;;; First - Comparison for equality of all of the hasValue() functions
       (insert (concat ipad "if ("))
       (setq lpad "")
       (while attrs
@@ -1198,21 +1069,17 @@ values from an instance of bcem_Aggregate."
         (when nullable
           (setq pad-count 0)
           (when (< (length name) longest-nullable-name-length)
-            (setq pad-count (- longest-nullable-name-length (length name)))
-            )
+            (setq pad-count (- longest-nullable-name-length (length name))))
           (setq pad-count (1+ pad-count))
           (setq pad (make-string pad-count ? ))
           (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
           (insert (concat lpad "(lhs." uname pad "== rhs." uname ")"))
           (if (not (string= name last-nullable-name))
               (insert (concat pad "&&"))
-            (insert ")")
-            )
+            (insert ")"))
           (insert "\n")
-          (setq lpad (concat ipad ipad))
-          )
-        (setq attrs (cdr attrs))
-        )
+          (setq lpad (concat ipad ipad)))
+        (setq attrs (cdr attrs)))
       (insert
        (concat
         ipad "{\n"
@@ -1221,8 +1088,9 @@ values from an instance of bcem_Aggregate."
         ipad "if (isSame)\n"
         ipad "{\n"
         ipad ipad "isSame = false;\n"
-        ipad ipad "if ("
-        ))
+        ipad ipad "if ("))
+
+      ;;; Second - Comparison for equality of all of the non-nullable values
       (setq attrs attributes)
       (setq lpad "")
       (while attrs
@@ -1232,21 +1100,17 @@ values from an instance of bcem_Aggregate."
         (when (not nullable)
           (setq pad-count 0)
           (when (< (length name) longest-non-nullable-name-length)
-            (setq pad-count (- longest-non-nullable-name-length (length name)))
-            )
+            (setq pad-count (- longest-non-nullable-name-length (length name))))
           (setq pad-count (1+ pad-count))
           (setq pad (make-string pad-count ? ))
           (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
           (insert (concat lpad "(lhs." name "()" pad "== rhs." name "())"))
           (if (not (string= name last-non-nullable-name))
               (insert (concat pad "&&"))
-            (insert ")")
-            )
+            (insert ")"))
           (insert "\n")
-          (setq lpad (concat ipad ipad ipad))
-          )
-        (setq attrs (cdr attrs))
-        )
+          (setq lpad (concat ipad ipad ipad)))
+        (setq attrs (cdr attrs)))
       (insert
        (concat
         ipad ipad "{\n"
@@ -1255,8 +1119,9 @@ values from an instance of bcem_Aggregate."
         ipad ipad "if (isSame)\n"
         ipad ipad "{\n"
         ipad ipad ipad "isSame = false;\n"
-        ipad ipad ipad "if ("
-        ))
+        ipad ipad ipad "if ("))
+
+      ;;; Third - Comparison of all of the nullable values that have values
       (setq attrs attributes)
       (setq lpad " ")
       (while attrs
@@ -1264,6 +1129,7 @@ values from an instance of bcem_Aggregate."
         (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                    reference nullable column-name)
         (when nullable
+          (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
           (insert (concat lpad "( ( !lhs." uname " ) ||\n"))
           (setq lpad (concat ipad ipad ipad ipad " "))
           (insert
@@ -1273,12 +1139,9 @@ values from an instance of bcem_Aggregate."
             ))
           (if (not (string= name last-nullable-name))
               (insert (concat " &&"))
-            (insert " )")
-            )
-          (insert "\n")
-          )
-        (setq attrs (cdr attrs))
-        )
+            (insert " )"))
+          (insert "\n"))
+        (setq attrs (cdr attrs)))
       (insert
        (concat
         ipad ipad ipad "{\n"
@@ -1288,9 +1151,7 @@ values from an instance of bcem_Aggregate."
         ipad "}\n"
         "\n"
         ipad "return isSame;\n"
-        "}\n"
-        ))
-      )
+        "}\n")))
 
     (insert
      (concat
@@ -1301,8 +1162,7 @@ values from an instance of bcem_Aggregate."
       "    const " class-name "   &rhs)\n"
       "{\n"
       "    return  ( !operator==(lhs, rhs) );\n"
-      "}\n"
-      ))
+      "}\n"))
     ))
 
 
