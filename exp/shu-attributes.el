@@ -554,7 +554,12 @@ of nullable values."
                 (insert "Int")
               (when (string= data-type "double")
                 (insert "Double"))))))
-      (insert (concat "(\"@\" + " column-name ", " name "(), __FILE__, __LINE__);\n"))
+      (insert (concat "(\"@\" + " column-name ", " name "()"))
+      (when (string= data-type "bdlt::DatetimeInterval")
+        (insert ".totalMilliseconds()")
+        )
+      (insert ", __FILE__, __LINE__);\n")
+
       (setq attrs (cdr attrs)))
     (insert "}\n")
     ))
