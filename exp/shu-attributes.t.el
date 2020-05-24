@@ -41,8 +41,7 @@
 ;;  shu-test-shu-cpp-make-attr-info-1
 ;;
 (ert-deftest shu-test-shu-cpp-make-attr-info-1 ()
-  (let (
-        (name "fred")
+  (let ((name "fred")
         (data-type "std::string")
         (full-data-type "std::optional<std::string>")
         (comment "This is a comment")
@@ -56,8 +55,7 @@
         (xcomment)
         (xnullable)
         (xcolumn-name)
-        (xreference)
-        )
+        (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
@@ -93,8 +91,7 @@
 ;;  shu-test-shu-cpp-make-attr-info-2
 ;;
 (ert-deftest shu-test-shu-cpp-make-attr-info-2()
-  (let (
-        (name "fred")
+  (let ((name "fred")
         (data-type "std::string")
         (full-data-type "std::optional<std::string>")
         (comment "This is a comment")
@@ -108,8 +105,7 @@
         (xcomment)
         (xnullable)
         (xcolumn-name)
-        (xreference)
-        )
+        (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
@@ -126,8 +122,7 @@
 ;;  shu-test-shu-cpp-make-attr-info-3
 ;;
 (ert-deftest shu-test-shu-cpp-make-attr-info-3()
-  (let (
-        (name "fred")
+  (let ((name "fred")
         (data-type "std::string")
         (full-data-type "std::optional<std::string>")
         (comment "This is a comment")
@@ -141,8 +136,7 @@
         (xcomment)
         (xnullable)
         (xcolumn-name)
-        (xreference)
-        )
+        (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
@@ -159,8 +153,7 @@
 ;;  shu-test-shu-cpp-make-attr-info-4
 ;;
 (ert-deftest shu-test-shu-cpp-make-attr-info-4()
-  (let (
-        (name "fred")
+  (let ((name "fred")
         (data-type "std::string")
         (full-data-type "std::optional<std::string>")
         (comment "This is a comment")
@@ -174,8 +167,7 @@
         (xcomment)
         (xnullable)
         (xcolumn-name)
-        (xreference)
-        )
+        (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
@@ -193,8 +185,7 @@
 ;;  shu-test-shu-cpp-make-attr-info-5
 ;;
 (ert-deftest shu-test-shu-cpp-make-attr-info-5 ()
-  (let (
-        (name "fred")
+  (let ((name "fred")
         (data-type "std::string")
         (full-data-type "std::optional<std::string>")
         (comment "This is a comment")
@@ -207,8 +198,7 @@
         (xcomment)
         (xreference)
         (xnullable)
-        (xcolumn-name)
-        )
+        (xcolumn-name))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
                                xreference xnullable xcolumn-name)
@@ -237,8 +227,7 @@
 ;;  shu-test-shu-cpp-make-attr-info-name
 ;;
 (ert-deftest shu-test-shu-cpp-make-attr-info-name ()
-  (let (
-        (name "frederick")
+  (let ((name "frederick")
         (data-type "std::string")
         (full-data-type "std::optional<std::string>")
         (comment "This is a comment")
@@ -246,8 +235,7 @@
         (nullable t)
         (column-name "MumbleBar::otherThing")
         (attr-info)
-        (xname)
-        )
+        (xname))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name))
     (setq xname (shu-cpp-extract-attr-info-name attr-info))
@@ -263,11 +251,9 @@
 ;;  shu-test-shu-upcase-first-letter-1
 ;;
 (ert-deftest shu-test-shu-upcase-first-letter-1 ()
-  (let (
-        (phrase "now is the time")
+  (let ((phrase "now is the time")
         (expected "Now is the time")
-        (actual)
-        )
+        (actual))
     (setq actual (shu-upcase-first-letter phrase))
     (should actual)
     (should (stringp actual))
@@ -281,11 +267,9 @@
 ;;  shu-test-shu-downcase-first-letter-1
 ;;
 (ert-deftest shu-test-shu-downcase-first-letter-1 ()
-  (let (
-        (phrase "Now is the time")
+  (let ((phrase "Now is the time")
         (expected "now is the time")
-        (actual)
-        )
+        (actual))
     (setq actual (shu-downcase-first-letter phrase))
     (should actual)
     (should (stringp actual))
