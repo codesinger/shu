@@ -488,7 +488,15 @@ name is less than the right hand name."
         (pad)
         (member-prefix "m_")
         )
-    (insert (concat "\n\n" ipad "// ACCESSORS\n"))
+    (insert
+     (concat
+      "\n\n" ipad "// ACCESSORS\n\n"
+      ipad "/*!\n"
+      ipad " * \brief Bind our values to column names\n"
+      ipad " */\n"
+      ipad "void bindValues)\n"
+      ipad "fxpricingdb::Binder   &binder);\n"
+    ))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -541,7 +549,8 @@ name is less than the right hand name."
     (insert
      (concat
       "\n\n"
-      class-name "::bindValues)\n"
+      "// ACCESSORS\n"
+      "void " class-name "::bindValues)\n"
       ipad "fxpricingdb::Binder   &binder)\n"
       "{\n"
       ))
@@ -607,7 +616,6 @@ name is less than the right hand name."
         (pad)
         (member-prefix "m_")
         )
-    (insert (concat "\n\n// ACCESSORS\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
