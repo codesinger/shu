@@ -332,6 +332,8 @@ name is less than the right hand name."
                 (princ (concat "comment: [" comment "]\n") gb)
                 )
             (setq x (split-string line nil t))
+            (setq column-name (car x))
+            (setq x (cdr x))
             (setq data-type (car x))
             (setq x (cdr x))
             (setq name (car x))
