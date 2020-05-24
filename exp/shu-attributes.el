@@ -407,6 +407,7 @@ name is less than the right hand name."
     (shu-cpp-attributes-gen-ctor-gen class-name attributes)
     (shu-cpp-attributes-gen-reset-gen class-name attributes)
     (shu-cpp-attributes-gen-set-values-gen class-name attributes)
+    (shu-cpp-attributes-gen-operator-equal-gen class-name attributes)
     ))
 
 
@@ -497,7 +498,7 @@ name is less than the right hand name."
       ipad " */\n"
       ipad "void bindValues(\n"
       ipad ipad "fxpricingdb::Binder   &binder);\n"
-    ))
+      ))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -550,7 +551,7 @@ name is less than the right hand name."
     (insert
      (concat
       "\n\n"
-      "// ACCESSORS\n\n"
+      "// ACCESSORS\n\n8"
       "void " class-name "::bindValues)\n"
       ipad "fxpricingdb::Binder   &binder)\n"
       "{\n"
@@ -571,22 +572,22 @@ name is less than the right hand name."
           ipad ipad "binder.bind"
           ))
         )
-        (if (string= data-type "bsl::string")
-            (insert "Text")
-          (if (string= data-type "bdlt::Datetime")
-              (insert "Datetime")
-            (if (string= data-type "bdlt::DatetimeInterval")
+      (if (string= data-type "bsl::string")
+          (insert "Text")
+        (if (string= data-type "bdlt::Datetime")
+            (insert "Datetime")
+          (if (string= data-type "bdlt::DatetimeInterval")
+              (insert "Int")
+            (if (string= data-type "int")
                 (insert "Int")
-              (if (string= data-type "int")
-                  (insert "Int")
-                (when (string= data-type "double")
-                  (insert "Double")
-                    )
-                  )
+              (when (string= data-type "double")
+                (insert "Double")
+                )
               )
             )
           )
-        (insert (concat "(\"@\" + " column-name ", " name "(), __FILE__, __LINE__);\n"))
+        )
+      (insert (concat "(\"@\" + " column-name ", " name "(), __FILE__, __LINE__);\n"))
       (setq attrs (cdr attrs))
       )
     (insert "}\n")
@@ -786,12 +787,12 @@ name is less than the right hand name."
         class-name "::" name  "() const\n"
         "{\n"))
       (when nullable
-          (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
-          (insert
-           (concat
-            ipad "BSLS_ASSERT_OPT(" uname ");\n\n"
-            ))
-          )
+        (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
+        (insert
+         (concat
+          ipad "BSLS_ASSERT_OPT(" uname ");\n\n"
+          ))
+        )
       (insert
        (concat
         ipad "return " member-prefix name))
@@ -938,8 +939,8 @@ name is less than the right hand name."
                   (insert " = 0")
                 (when (string= full-data-type "double")
                   (insert " = 0.0")
-                    )
                   )
+                )
               )
             )
           )
@@ -1011,24 +1012,24 @@ name is less than the right hand name."
         (insert " = ")
         )
       (insert (concat name ".as"))
-        (if (string= data-type "bsl::string")
-            (insert "String()")
-          (if (string= data-type "bdlt::Datetime")
-              (insert "DatetimeTz().utcDatetime()")
-            (if (string= data-type "bdlt::DatetimeInterval")
+      (if (string= data-type "bsl::string")
+          (insert "String()")
+        (if (string= data-type "bdlt::Datetime")
+            (insert "DatetimeTz().utcDatetime()")
+          (if (string= data-type "bdlt::DatetimeInterval")
+              (insert "Int()")
+            (if (string= data-type "int")
                 (insert "Int()")
-              (if (string= data-type "int")
-                  (insert "Int()")
-                (when (string= data-type "double")
-                  (insert "Double()")
-                    )
-                  )
+              (when (string= data-type "double")
+                (insert "Double()")
+                )
               )
             )
           )
-        (when nullable
-          (insert ")")
-          )
+        )
+      (when nullable
+        (insert ")")
+        )
       (insert
        (concat
         ";\n"
@@ -1040,7 +1041,7 @@ name is less than the right hand name."
         ipad ipad "               << " column-name " << \"'. \" << why;\n"
         ipad ipad "missingCount++;\n"
         ipad "}\n"
-      ))
+        ))
       (setq attrs (cdr attrs))
       )
     (insert
@@ -1053,6 +1054,173 @@ name is less than the right hand name."
       ipad "}\n"
       ipad "\n"
       ipad "return fetchCount;\n"
+      "}\n"
+      ))
+    ))
+
+
+
+
+;;
+;;  shu-cpp-attributes-gen-operator-equal-gen
+;;
+(defun shu-cpp-attributes-gen-operator-equal-gen (class-name attributes)
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (uname)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (lpad)
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        (have-nullable)
+        (longest-name-length 0)
+        (longest-nullable-name-length 0)
+        (longest-non-nullable-name-length 0)
+        (last-nullable-name)
+        (last-non-nullable-name)
+        )
+    (insert
+     (concat
+      "\n"
+      "\n"
+      "// FREE OPERATORS\n"
+      "\n"
+      "bool operator==(\n"
+      "    const CrossRowPrimaryKey   &lhs,\n"
+      "    const CrossRowPrimaryKey   &rhs)\n"
+      "{\n"
+      "    bool  isSame(false);\n"
+      ))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
+      (if nullable
+          (progn
+            (setq have-nullable t)
+            (setq last-nullable-name name)
+            (when (> (length name) longest-nullable-name-length)
+              (setq longest-nullable-name-length (length name))
+              )
+            )
+        (when (> (length name) longest-non-nullable-name-length)
+          (setq longest-non-nullable-name-length (length name))
+          )
+        (setq last-non-nullable-name name)
+        )
+      (when (> (length name) longest-name-length)
+        (setq longest-name-length (length name))
+        )
+      (setq attrs (cdr attrs))
+      )
+    (setq attrs attributes)
+    (if (not have-nullable)
+        (progn
+          (while attrs
+            (setq attr-info (car attrs))
+            (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                       reference nullable column-name)
+            (setq attrs (cdr attrs))
+            )
+          )
+      (insert (concat ipad "if ("))
+      (setq lpad "")
+      (while attrs
+        (setq attr-info (car attrs))
+        (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                   reference nullable column-name)
+        (when nullable
+          (setq pad-count 0)
+          (when (< (length name) longest-nullable-name-length)
+            (setq pad-count (- longest-nullable-name-length (length name)))
+            )
+          (setq pad-count (1+ pad-count))
+          (setq pad (make-string pad-count ? ))
+          (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
+          (insert (concat lpad "(lhs." uname pad "== rhs." uname ")"))
+          (if (not (string= name last-nullable-name))
+              (insert (concat pad "&&"))
+            (insert ")")
+            )
+          (insert "\n")
+          (setq lpad (concat ipad ipad))
+          )
+        (setq attrs (cdr attrs))
+        )
+      (insert
+       (concat
+        ipad "{\n"
+        ipad ipad "isSame = true;\n"
+        ipad "}\n"
+        ipad "if (isSame)\n"
+        ipad "{\n"
+        ipad ipad "isSame = false;\n"
+        ipad ipad "if ("
+        ))
+      (setq attrs attributes)
+      (setq lpad "")
+      (while attrs
+        (setq attr-info (car attrs))
+        (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                   reference nullable column-name)
+        (when (not nullable)
+          (setq pad-count 0)
+          (when (< (length name) longest-non-nullable-name-length)
+            (setq pad-count (- longest-non-nullable-name-length (length name)))
+            )
+          (setq pad-count (1+ pad-count))
+          (setq pad (make-string pad-count ? ))
+          (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
+          (insert (concat lpad "(lhs." name "()" pad "== rhs." name "())"))
+          (if (not (string= name last-non-nullable-name))
+              (insert (concat pad "&&"))
+            (insert ")")
+            )
+          (insert "\n")
+          (setq lpad (concat ipad ipad ipad))
+          )
+        (setq attrs (cdr attrs))
+        )
+      (insert
+       (concat
+        ipad ipad "{\n"
+        ipad ipad ipad "isSame = true;\n"
+        ipad ipad "}\n"
+        ipad ipad "if (isSame)\n"
+        ipad ipad "{\n"
+        ipad ipad ipad "isSame = false;\n"
+        ipad ipad ipad "if ("
+        ))
+      (setq attrs attributes)
+      (setq lpad "")
+      (while attrs
+        (setq attr-info (car attrs))
+        (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                   reference nullable column-name)
+        (setq attrs (cdr attrs))
+        )
+      )
+    (insert
+     (concat
+      "\n"
+      "\n"
+      "bool operator!=(\n"
+      "    const CrossRowPrimaryKey   &lhs,\n"
+      "    const CrossRowPrimaryKey   &rhs)\n"
+      "{\n"
+      "    return  ( !operator==(lhs, rhs) );\n"
       "}\n"
       ))
     ))
