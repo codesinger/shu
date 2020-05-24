@@ -1204,14 +1204,40 @@ name is less than the right hand name."
         ipad ipad ipad "if ("
         ))
       (setq attrs attributes)
-      (setq lpad "")
+      (setq lpad " ")
       (while attrs
         (setq attr-info (car attrs))
         (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                    reference nullable column-name)
+        (when nullable
+        (insert (concat lpad "( ( !lhs." uname " ) ||\n"))
+        (setq lpad (concat ipad ipad ipad ipad " "))
+        (insert
+         (concat
+          lpad "  (  lhs." uname  " &&\n"
+          lpad "    (lhs." name "() == rhs." name "() ) ) )"
+          ))
+          (if (not (string= name last-nullable-name))
+              (insert (concat " &&"))
+            (insert " )")
+            )
+          (insert "\n")
+          )
         (setq attrs (cdr attrs))
         )
       )
+      (insert
+       (concat
+        ipad ipad ipad "{\n"
+        ipad ipad ipad ipad "isSame = true;\n"
+        ipad ipad ipad "}\n"
+        ipad ipad "}\n"
+        ipad "}\n"
+        "\n"
+        ipad "return isSame;\n"
+        "}\n"
+      ))
+
     (insert
      (concat
       "\n"
