@@ -270,7 +270,8 @@ name is less than the right hand name."
 ;;  shu-upcase-first-letter
 ;;
 (defun shu-upcase-first-letter (string)
-  "Doc string."
+  "Return the given string with the first character of the string converted
+to upper case"
   (let (
         (first-letter (substring string 0 1))
         (remainder (substring string 1))
@@ -284,7 +285,8 @@ name is less than the right hand name."
 ;;  shu-downcase-first-letter
 ;;
 (defun shu-downcase-first-letter (string)
-  "Doc string."
+  "Return the given string with the first character of the string converted
+to lower case"
   (let (
         (first-letter (substring string 0 1))
         (remainder (substring string 1))
@@ -296,11 +298,31 @@ name is less than the right hand name."
 
 
 ;;
-;;  zzx
+;;  shu-make-class
 ;;
-(defun zzx (start end)
-  "Doc string."
+(defun shu-make-class (start end)
   (interactive "r")
+  "Create a row class for a table in a comdb2 database.
+
+The columns are defined as a series of lines in a text file.  The first line
+identifies the class name ns is simply
+
+    class className
+
+Blank lines are ignored.  Any line that starts with \"//\" is assumed to be a
+comment for a following column definition.
+
+Each column is has x attributes all on a single line
+
+    1. The name of the variable that holds the column name
+    2. The data type of the column
+    3. The name of the member variable that holds the column value
+    4. If this is \"&\" the value is passed by reference.  If this is absent or
+       has any value other than \"&\", the value is passed by value.
+    5. If this is present, the column is nullable
+
+Mark the lines to be scanned and then invoke this function.  The generated code
+snippets will be inserted into the same file."
   (let (
         (gb (get-buffer-create "**boo**"))
         (sline (shu-the-line-at start))
@@ -380,7 +402,7 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen
 ;;
 (defun shu-cpp-attributes-gen (class-name attributes)
-  "Doc string."
+  "Generate all of the code snippets."
   (let (
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -416,7 +438,7 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-decl
 ;;
 (defun shu-cpp-attributes-gen-decl (attributes)
-  "Doc string."
+  "Generate the declaration of the member variables."
   (let (
         (attrs attributes)
         (attr-info)
@@ -471,7 +493,8 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-getter-has-decl
 ;;
 (defun shu-cpp-attributes-gen-getter-has-decl (attributes)
-  "Doc string."
+  "Generate the declaration of the functions that indicate presence or absence
+of nullable values."
   (let (
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -527,7 +550,7 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-bind-values-gen
 ;;
 (defun shu-cpp-attributes-gen-bind-values-gen (class-name attributes)
-  "Doc string."
+  "Generate the code that binds all of the values to their column names."
   (let (
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -599,7 +622,8 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-getter-has-gen
 ;;
 (defun shu-cpp-attributes-gen-getter-has-gen (class-name attributes)
-  "Doc string."
+  "Generate the code for the functions that indicate the presence or absence
+of values for individual nullable columns."
   (let (
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -644,7 +668,7 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-setter-decl
 ;;
 (defun shu-cpp-attributes-gen-setter-decl ()
-  "Doc string."
+  "Generate the declarations for the two manipulator functions."
   (let (
         (gb (get-buffer-create "**boo**"))
         (ipad (make-string shu-cpp-indent-length ? ))
@@ -692,7 +716,7 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-getter-decl
 ;;
 (defun shu-cpp-attributes-gen-getter-decl (attributes)
-  "Doc string."
+  "Generate the declarations for the functions that return attribute values."
   (let (
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -751,7 +775,7 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-getter-gen
 ;;
 (defun shu-cpp-attributes-gen-getter-gen (class-name attributes)
-  "Doc string."
+  "Generate the code for the functions that return attribute values."
   (let (
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -814,7 +838,7 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-ctor-gen
 ;;
 (defun shu-cpp-attributes-gen-ctor-gen (class-name attributes)
-  "Doc string."
+  "Generate the code for the constructor."
   (let (
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -870,7 +894,7 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-reset-gen
 ;;
 (defun shu-cpp-attributes-gen-reset-gen (class-name attributes)
-  "Doc string."
+  "Generate the code for the reset function"
   (let (
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -958,7 +982,8 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-set-values-gen
 ;;
 (defun shu-cpp-attributes-gen-set-values-gen (class-name attributes)
-  "Doc string."
+  "Generate the code for the setValues function that sets all of the member variable
+values from an instance of bcem_Aggregate."
   (let (
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -1065,7 +1090,7 @@ name is less than the right hand name."
 ;;  shu-cpp-attributes-gen-operator-equal-gen
 ;;
 (defun shu-cpp-attributes-gen-operator-equal-gen (class-name attributes)
-  "Doc string."
+  "Generate the code for operator==()"
   (let (
         (gb (get-buffer-create "**boo**"))
         (attrs attributes)
