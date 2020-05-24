@@ -398,6 +398,7 @@ name is less than the right hand name."
     (shu-cpp-attributes-gen-decl attributes)
     (setq sorted-attributes (copy-tree attributes))
     (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
+    (shu-cpp-attributes-gen-setter-decl)
     (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
     (shu-cpp-attributes-gen-getter-decl sorted-attributes)
     (shu-cpp-attributes-gen-bind-values-gen class-name attributes)
@@ -492,10 +493,10 @@ name is less than the right hand name."
      (concat
       "\n\n" ipad "// ACCESSORS\n\n"
       ipad "/*!\n"
-      ipad " * \brief Bind our values to column names\n"
+      ipad " * \\brief Bind our values to column names\n"
       ipad " */\n"
-      ipad "void bindValues)\n"
-      ipad "fxpricingdb::Binder   &binder);\n"
+      ipad "void bindValues(\n"
+      ipad ipad "fxpricingdb::Binder   &binder);\n"
     ))
     (while attrs
       (setq attr-info (car attrs))
@@ -549,7 +550,7 @@ name is less than the right hand name."
     (insert
      (concat
       "\n\n"
-      "// ACCESSORS\n"
+      "// ACCESSORS\n\n"
       "void " class-name "::bindValues)\n"
       ipad "fxpricingdb::Binder   &binder)\n"
       "{\n"
@@ -634,6 +635,54 @@ name is less than the right hand name."
       (setq attrs (cdr attrs))
       )
 
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-setter-decl
+;;
+(defun shu-cpp-attributes-gen-setter-decl ()
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        )
+    (insert
+     (concat
+      "\n\n"
+      ipad "// MANIPULATORS\n\n"
+      ipad "/*!\n"
+      ipad " * \\brief Reset this object to the newly constructed state\n"
+      ipad " */\n"
+      ipad "void reset();\n"
+      ipad "\n"
+      ipad "\n"
+      ipad "/*!\n"
+      ipad " * \\brief Reset the state of this object to the newly constructed state\n"
+      ipad " *        and then set all of the attributes of this object from the\n"
+      ipad " *        given bcem_Aggregate\n"
+      ipad " *\n"
+      ipad " * The database name is provided for inclusion in error logs.\n"
+      ipad " * The table name is included for the same purpose because this object\n"
+      ipad " * sets values from any table that contains this key as either a\n"
+      ipad " * primary or foreign key.\n"
+      ipad " *\n"
+      ipad " * Return the number of attributes that were actually set, not including\n"
+      ipad " * those values in the bcem_Aggregate that were null.\n"
+      ipad " *\n"
+      ipad " * Assertion failure if any expected column values are missing.  Missing\n"
+      ipad " * column data can only be caused by a mis-match between this program and\n"
+      ipad " * the schema definition of the database.  This is a fatal error for which\n"
+      ipad " * no recovery is possible.  Most programs do not even detect this error,\n"
+      ipad " * and, instead, use undefined values when column data are missing.\n"
+      ipad " *\n"
+      ipad " */\n"
+      ipad "int setValues(\n"
+      ipad ipad "const bsl::string       &databaseName,\n"
+      ipad ipad "const bsl::string       &tableName,\n"
+      ipad ipad "const bcem_Aggregate    &data);\n"
+      ))
     ))
 
 
