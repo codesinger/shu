@@ -927,10 +927,22 @@ values from an instance of bcem_Aggregate."
         ipad "const bcem_Aggregate &" name " = data[" column-name "];\n"
         ipad "if ( !" name ".isNul2() )\n"
         ipad "{\n"
-        ipad ipad member-prefix name))
+        ))
+      (when (string= data-type "bdlt::DatetimeInterval")
+        (insert
+         (concat
+          ipad ipad "const bsls::Types::Int64      intval(" name ".asInt());\n"
+          ipad ipad "const bdlt::DatetimeInterval  interval(0, 0, 0, 0, intval, 0));\n"
+          )))
+      (insert
+       (concat
+        ipad ipad member-prefix name
+        ))
       (if nullable
           (insert ".makeValue(")
         (insert " = "))
+      (if (string= data-type "bdlt::DatetimeInterval")
+          (insert "interval")
       (insert (concat name ".as"))
       (if (string= data-type "bsl::string")
           (insert "String()")
@@ -941,7 +953,7 @@ values from an instance of bcem_Aggregate."
             (if (string= data-type "int")
                 (insert "Int()")
               (when (string= data-type "double")
-                (insert "Double()"))))))
+                (insert "Double()")))))))
       (when nullable
         (insert ")"))
       (insert
