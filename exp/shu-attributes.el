@@ -2,7 +2,7 @@
 ;;
 ;; Copyright (C) 2020 Stewart L. Palmer
 ;;
-;; Package: shu-cpp-mch-funs
+;; Package: shu-attributes
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -407,7 +407,7 @@ name is less than the right hand name."
     (shu-cpp-attributes-gen-ctor-gen class-name attributes)
     (shu-cpp-attributes-gen-reset-gen class-name attributes)
     (shu-cpp-attributes-gen-set-values-gen class-name attributes)
-    (shu-cpp-attributes-gen-operator-equal-gen class-name attributes)
+    (shu-cpp-attributes-gen-operator-equal-gen class-name sorted-attributes)
     ))
 
 
@@ -1088,6 +1088,7 @@ name is less than the right hand name."
         (longest-name-length 0)
         (longest-nullable-name-length 0)
         (longest-non-nullable-name-length 0)
+        (last-name)
         (last-nullable-name)
         (last-non-nullable-name)
         )
@@ -1098,8 +1099,8 @@ name is less than the right hand name."
       "// FREE OPERATORS\n"
       "\n"
       "bool operator==(\n"
-      "    const CrossRowPrimaryKey   &lhs,\n"
-      "    const CrossRowPrimaryKey   &rhs)\n"
+      "    const " class-name "   &lhs,\n"
+      "    const " class-name "   &rhs)\n"
       "{\n"
       "    bool  isSame(false);\n"
       ))
@@ -1123,11 +1124,14 @@ name is less than the right hand name."
       (when (> (length name) longest-name-length)
         (setq longest-name-length (length name))
         )
+      (setq last-name name)
       (setq attrs (cdr attrs))
       )
     (setq attrs attributes)
     (if (not have-nullable)
         (progn
+          (setq lpad "")
+          (insert (concat ipad "if ("))
           (while attrs
             (setq attr-info (car attrs))
             (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -1135,22 +1139,30 @@ name is less than the right hand name."
             (setq attr-info (car attrs))
             (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                        reference nullable column-name)
-            (when nullable
-              (insert (concat lpad "( ( !lhs." uname " ) ||\n"))
-              (setq lpad (concat ipad ipad ipad ipad " "))
-              (insert
-               (concat
-                lpad "  (  lhs." uname  " &&\n"
-                lpad "    (lhs." name "() == rhs." name "() ) ) )"
-                ))
-              (if (not (string= name last-nullable-name))
-                  (insert (concat " &&"))
-                (insert " )")
-                )
-              (insert "\n")
+            (setq pad-count 0)
+            (when (< (length name) longest-name-length)
+              (setq pad-count (- longest-name-length (length name)))
               )
+            (setq pad-count (1+ pad-count))
+            (setq pad (make-string pad-count ? ))
+            (insert (concat lpad "(lhs." name "()" pad "== rhs." name "())"))
+            (if (not (string= name last-name))
+                (insert (concat pad "&&"))
+              (insert ")")
+              )
+            (insert "\n")
+            (setq lpad (concat ipad ipad))
             (setq attrs (cdr attrs))
             )
+          (insert
+           (concat
+            ipad "{\n"
+            ipad ipad "isSame = true;\n"
+            ipad "}\n"
+            "\n"
+            ipad "return isSame;\n"
+            "}\n"
+            ))
           )
       (insert (concat ipad "if ("))
       (setq lpad "")
@@ -1260,271 +1272,12 @@ name is less than the right hand name."
       "\n"
       "\n"
       "bool operator!=(\n"
-      "    const CrossRowPrimaryKey   &lhs,\n"
-      "    const CrossRowPrimaryKey   &rhs)\n"
+      "    const " class-name "   &lhs,\n"
+      "    const " class-name "   &rhs)\n"
       "{\n"
       "    return  ( !operator==(lhs, rhs) );\n"
       "}\n"
       ))
-    ))
-
-
-
-
-
-;;
-;;  shu-test-shu-cpp-make-attr-info-1
-;;
-(ert-deftest shu-test-shu-cpp-make-attr-info-1 ()
-  (let (
-        (name "fred")
-        (data-type "std::string")
-        (full-data-type "std::optional<std::string>")
-        (comment "This is a comment")
-        (nullable t)
-        (column-name "MumbleBar::otherThing")
-        (reference t)
-        (attr-info)
-        (xname)
-        (xdata-type)
-        (xfull-data-type)
-        (xcomment)
-        (xnullable)
-        (xcolumn-name)
-        (xreference)
-        )
-    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
-                                            reference nullable column-name))
-    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name)
-    (should xname)
-    (should (stringp xname))
-    (should (string= name xname))
-
-    (should xdata-type)
-    (should (stringp xdata-type))
-    (should (string= data-type xdata-type))
-
-    (should xfull-data-type)
-    (should (stringp xfull-data-type))
-    (should (string= full-data-type xfull-data-type))
-
-    (should xcomment)
-    (should (stringp xcomment))
-    (should (string= comment xcomment))
-
-    (should xcolumn-name)
-    (should (stringp xcolumn-name))
-    (should (string= column-name xcolumn-name))
-
-    (should xreference)
-
-    (should xnullable)
-    ))
-
-
-
-;;
-;;  shu-test-shu-cpp-make-attr-info-2
-;;
-(ert-deftest shu-test-shu-cpp-make-attr-info-2()
-  (let (
-        (name "fred")
-        (data-type "std::string")
-        (full-data-type "std::optional<std::string>")
-        (comment "This is a comment")
-        (reference nil)
-        (nullable t)
-        (column-name "MumbleBar::otherThing")
-        (attr-info)
-        (xname)
-        (xdata-type)
-        (xfull-data-type)
-        (xcomment)
-        (xnullable)
-        (xcolumn-name)
-        (xreference)
-        )
-    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
-                                            reference nullable column-name))
-    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name)
-
-    (should (not xreference))
-
-    (should xnullable)
-    ))
-
-
-
-;;
-;;  shu-test-shu-cpp-make-attr-info-3
-;;
-(ert-deftest shu-test-shu-cpp-make-attr-info-3()
-  (let (
-        (name "fred")
-        (data-type "std::string")
-        (full-data-type "std::optional<std::string>")
-        (comment "This is a comment")
-        (reference t)
-        (nullable nil)
-        (column-name "MumbleBar::otherThing")
-        (attr-info)
-        (xname)
-        (xdata-type)
-        (xfull-data-type)
-        (xcomment)
-        (xnullable)
-        (xcolumn-name)
-        (xreference)
-        )
-    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
-                                            reference nullable column-name))
-    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name)
-
-    (should xreference)
-
-    (should (not xnullable))
-    ))
-
-
-
-;;
-;;  shu-test-shu-cpp-make-attr-info-4
-;;
-(ert-deftest shu-test-shu-cpp-make-attr-info-4()
-  (let (
-        (name "fred")
-        (data-type "std::string")
-        (full-data-type "std::optional<std::string>")
-        (comment "This is a comment")
-        (reference nil)
-        (nullable nil)
-        (column-name "MumbleBar::otherThing")
-        (attr-info)
-        (xname)
-        (xdata-type)
-        (xfull-data-type)
-        (xcomment)
-        (xnullable)
-        (xcolumn-name)
-        (xreference)
-        )
-    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
-                                            reference nullable column-name))
-    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name)
-
-    (should (not xreference))
-
-    (should (not xnullable))
-    ))
-
-
-
-
-;;
-;;  shu-test-shu-cpp-make-attr-info-5
-;;
-(ert-deftest shu-test-shu-cpp-make-attr-info-5 ()
-  (let (
-        (name "fred")
-        (data-type "std::string")
-        (full-data-type "std::optional<std::string>")
-        (comment "This is a comment")
-        (nullable t)
-        (column-name "MumbleBar::otherThing")
-        (attr-info)
-        (xname)
-        (xdata-type)
-        (xfull-data-type)
-        (xcomment)
-        (xreference)
-        (xnullable)
-        (xcolumn-name)
-        )
-    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type))
-    (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name)
-    (should xname)
-    (should (stringp xname))
-    (should (string= name xname))
-
-    (should xdata-type)
-    (should (stringp xdata-type))
-    (should (string= data-type xdata-type))
-
-    (should xfull-data-type)
-    (should (stringp xfull-data-type))
-    (should (string= full-data-type xfull-data-type))
-
-    (should (not xcomment))
-
-    (should (not xnullable))
-
-    (should (not xreference))
-    ))
-
-
-
-;;
-;;  shu-test-shu-cpp-make-attr-info-name
-;;
-(ert-deftest shu-test-shu-cpp-make-attr-info-name ()
-  (let (
-        (name "frederick")
-        (data-type "std::string")
-        (full-data-type "std::optional<std::string>")
-        (comment "This is a comment")
-        (reference)
-        (nullable t)
-        (column-name "MumbleBar::otherThing")
-        (attr-info)
-        (xname)
-        )
-    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
-                                            reference nullable column-name))
-    (setq xname (shu-cpp-extract-attr-info-name attr-info))
-    (should xname)
-    (should (stringp xname))
-    (should (string= name xname))
-    ))
-
-
-
-
-;;
-;;  shu-test-shu-upcase-first-letter-1
-;;
-(ert-deftest shu-test-shu-upcase-first-letter-1 ()
-  (let (
-        (phrase "now is the time")
-        (expected "Now is the time")
-        (actual)
-        )
-    (setq actual (shu-upcase-first-letter phrase))
-    (should actual)
-    (should (stringp actual))
-    (should (string= expected actual))
-    ))
-
-
-
-
-;;
-;;  shu-test-shu-downcase-first-letter-1
-;;
-(ert-deftest shu-test-shu-downcase-first-letter-1 ()
-  (let (
-        (phrase "Now is the time")
-        (expected "now is the time")
-        (actual)
-        )
-    (setq actual (shu-downcase-first-letter phrase))
-    (should actual)
-    (should (stringp actual))
-    (should (string= expected actual))
     ))
 
 
