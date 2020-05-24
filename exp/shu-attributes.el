@@ -400,6 +400,8 @@ name is less than the right hand name."
     (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
     (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
     (shu-cpp-attributes-gen-getter-decl sorted-attributes)
+    (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
+    (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
     ))
 
 
@@ -429,7 +431,8 @@ name is less than the right hand name."
     (insert (concat "\n\n" ipad "// DATA\n"))
     (while attrs
       (setq attr-info (car attrs))
-      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable column-name)
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
       (when (> (length full-data-type) max-type-len)
         (setq max-type-len (length full-data-type))
         )
@@ -438,7 +441,8 @@ name is less than the right hand name."
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
-      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable column-name)
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
       (insert "\n")
       (when comment
         (insert (concat ipad "//! " comment " (" (number-to-string attr-num) ")\n"))
@@ -483,7 +487,8 @@ name is less than the right hand name."
     (insert (concat "\n\n" ipad "// ACCESSORS\n"))
     (while attrs
       (setq attr-info (car attrs))
-      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable column-name)
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
       (when nullable
         (insert "\n")
         (when comment
@@ -495,6 +500,52 @@ name is less than the right hand name."
           )
         (setq uname (shu-upcase-first-letter name))
         (insert (concat ipad "bool has" uname "() const;\n"))
+        )
+      (setq attrs (cdr attrs))
+      )
+
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-getter-has-gen
+;;
+(defun shu-cpp-attributes-gen-getter-has-gen (class-name attributes)
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (uname)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        )
+    (insert (concat "\n\n// ACCESSORS\n"))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
+      (when nullable
+        (insert "\n\n")
+        (setq uname (shu-upcase-first-letter name))
+        (insert
+         (concat
+          "bool" class-name "::has" uname "() const\n"
+          "{\n"
+          ipad "return ( !(" member-prefix name ".isNull()) );\n"
+          "}\n"
+          ))
         )
       (setq attrs (cdr attrs))
       )
@@ -528,7 +579,8 @@ name is less than the right hand name."
         )
     (while attrs
       (setq attr-info (car attrs))
-      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable column-name)
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
       (insert "\n")
       (when comment
         (insert
@@ -555,6 +607,69 @@ name is less than the right hand name."
         (insert "&")
         )
       (insert (concat name  "() const;\n"))
+      (setq attrs (cdr attrs))
+      )
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-getter-gen
+;;
+(defun shu-cpp-attributes-gen-getter-gen (class-name attributes)
+  "Doc string."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (uname)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        )
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
+      (insert "\n\n")
+      (when reference
+        (insert "const ")
+        )
+      (insert (concat data-type " "))
+      (when reference
+        (insert "&")
+        )
+      (insert
+       (concat
+        class-name "::" name  "() const\n"
+        "{\n"))
+      (when nullable
+          (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
+          (insert
+           (concat
+            ipad "BSLS_ASSERT_OPT(" uname ");\n\n"
+            ))
+          )
+      (insert
+       (concat
+        ipad "return " member-prefix name))
+      (when nullable
+        (insert ".value()")
+        )
+      (insert
+       (concat
+        ";\n"
+        "}\n"
+        ))
       (setq attrs (cdr attrs))
       )
     ))
