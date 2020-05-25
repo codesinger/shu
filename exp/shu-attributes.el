@@ -474,6 +474,8 @@ snippets will be inserted into the same file."
     (insert
      (concat
       "\n\n"
+      "#include <fxcrossdb_crossrowprimarykey.h>\n"
+      "\n"
       "#include <bdlb_nullablevalue.h>\n"
       "#include <bdlt_datetime.h>\n"
       "#include <bdlt_datetimeinterval.h>\n"
