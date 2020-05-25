@@ -236,7 +236,8 @@
 (defun shu-cpp-print-attr-info (attr-info buf)
   "Print the contents of ATTR-INFO into the buffer BUF"
   (interactive)
-  (let ((name)
+  (let ((column-name)
+        (name)
         (data-type)
         (full-data-type)
         (comment)
@@ -246,13 +247,14 @@
         (column-count))
     (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                reference nullable column-name column-count)
-    (princ (concat "name: [" name "], type: [" data-type "], ref: " (shu-bool-to-string nullable)
-                   "], nullable: " (shu-bool-to-string nullable)
-                   ", full-type: [" full-data-type "]\n") buf)
+    (princ (concat
+            "col: " column-name
+            ", name: [" name "], type: [" data-type "], ref: " (shu-bool-to-string nullable)
+            "], nullable: " (shu-bool-to-string nullable)
+            ", full-type: [" full-data-type "]"
+            ", count: " (number-to-string column-count) "\n") buf)
     (when comment
       (princ (concat "    [" comment "]\n") buf))
-
-
     ))
 
 
@@ -327,6 +329,9 @@ comment for a following column definition.
 Each column is has x attributes all on a single line
 
     1. The name of the variable that holds the column name
+       If this name is \"std\", it may also have a column count in
+       parenthesis as in \"std(5)\".  This indicates that this is not
+       actually a column but is an instance of another class of this type
     2. The data type of the column
     3. The name of the member variable that holds the column value
     4. If this is \"&\" the value is passed by reference.  If this is absent or
@@ -342,6 +347,7 @@ snippets will be inserted into the same file."
         (eol)
         (line)
         (x)
+        (ss "std\\s-*(\\([0-9]*\\))")
         (class-name)
         (data-type)
         (full-data-type)
@@ -350,6 +356,7 @@ snippets will be inserted into the same file."
         (reference)
         (nullable)
         (column-name)
+        (column-ct)
         (column-count)
         (attr-info)
         (attributes)
@@ -366,6 +373,11 @@ snippets will be inserted into the same file."
                 (princ (concat "comment: [" comment "]\n") gb))
             (setq x (split-string line nil t))
             (setq column-name (car x))
+            (setq column-count 1)
+            (when (string-match ss column-name)
+              (setq column-ct (match-string-no-properties 1 column-name))
+              (setq column-count (string-to-number column-ct))
+              (setq column-name "std"))
             (setq x (cdr x))
             (setq data-type (car x))
             (if (string= column-name "class")
@@ -386,7 +398,7 @@ snippets will be inserted into the same file."
                 (setq full-data-type (shu-cpp-make-nullable data-type)))))
           (when name
             (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
-                                                    reference nullable column-name))
+                                                    reference nullable column-name column-count))
             (push attr-info attributes)
             (shu-cpp-print-attr-info attr-info gb)
             (setq comment nil)
