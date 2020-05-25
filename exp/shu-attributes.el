@@ -34,13 +34,7 @@
 (require 'shu-base)
 
 
-;;Things to copy per attribute
-;;
-;;   - name
-;;   - data type
-;;   - full data type
-;;   - nullable
-;;   - comment
+;;  Stored information about each attribute (attr-info)
 ;;
 ;;
 ;;
@@ -957,6 +951,7 @@ of values for individual nullable columns."
         )
     (insert
      (concat
+      "\n\n\n"
       "#include <fxcrossdb_tenorcolumnnames.h>\n"
       "\n"
       "#include <ball_log.h>\n"
