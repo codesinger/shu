@@ -116,7 +116,23 @@
 ;;   |    |   |   |    |
 ;;   -----|-------|-----
 ;;        |       |
-;;        |       +-----> column-name
+;;        |       +-----> attr-ct
+;;        |
+;;        +-------------> column-name
+;;
+;;
+;;
+;;
+;;
+;;  attr-ct
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> column-count
 ;;        |
 ;;        +-------------> nullable
 ;;
@@ -138,19 +154,25 @@
 ;;
 ;;  shu-cpp-extract-attr-info
 ;;
-(defmacro shu-cpp-extract-attr-info (attr-info name data-type full-data-type
-                                               comment reference nullable column-name)
+(defmacro shu-cpp-extract-attr-info (attr-info name data-type full-data-type comment
+                                               reference nullable column-name column-count)
   "Extract the information out of an attr-info"
-  (let ((tattr-ext (make-symbol "attr-ext"))
+  (let (
+        (tattr-ext (make-symbol "attr-ext"))
         (tattr-other (make-symbol "attr-other"))
         (tattr-cmt (make-symbol "attr-cmt"))
         (tattr-col (make-symbol "attr-col"))
-        (tflags (make-symbol "flags")))
-    `(let ((,tattr-ext)
+        (tattr-ct (make-symbol "attr-ct"))
+        (tflags (make-symbol "flags"))
+        )
+    `(let (
+           (,tattr-ext)
            (,tattr-other)
            (,tattr-cmt)
            (,tattr-col)
-           (,tflags))
+           (,tattr-ct)
+           (,tflags)
+           )
        (setq ,name (car ,attr-info))
        (setq ,tattr-ext (cdr ,attr-info))
        (setq ,full-data-type (car ,tattr-ext))
@@ -158,15 +180,20 @@
        (setq ,data-type (car ,tattr-other))
        (setq ,tattr-cmt (cdr ,tattr-other))
        (setq ,tattr-col (cdr ,tattr-cmt))
+       (setq ,tattr-ct (cdr ,tattr-col))
        (setq ,comment (car ,tattr-cmt))
-       (setq ,tflags (car ,tattr-col))
+       (setq ,tflags (car ,tattr-ct))
        (if (= (logand ,tflags shu-cpp-attributes-reference) shu-cpp-attributes-reference)
            (setq ,reference t)
-         (setq ,reference nil))
+         (setq ,reference nil)
+         )
        (if (= (logand ,tflags shu-cpp-attributes-nullable) shu-cpp-attributes-nullable)
            (setq ,nullable t)
-         (setq ,nullable nil))
-       (setq ,column-name (cdr ,tattr-col)))
+         (setq ,nullable nil)
+         )
+       (setq ,column-name (car ,tattr-col))
+       (setq ,column-count (car ,tattr-ct))
+       )
     ))
 
 
@@ -212,8 +239,10 @@
         (comment)
         (reference)
         (nullable)
-        (column-name))
-    (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment reference nullable column-name)
+        (column-name)
+        (column-count))
+    (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                               reference nullable column-name column-count)
     (princ (concat "name: [" name "], type: [" data-type "], ref: " (shu-bool-to-string nullable)
                    "], nullable: " (shu-bool-to-string nullable)
                    ", full-type: [" full-data-type "]\n") buf)
@@ -318,6 +347,7 @@ snippets will be inserted into the same file."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (attr-info)
         (attributes)
         (z))
@@ -417,6 +447,7 @@ snippets will be inserted into the same file."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (max-type-len 31)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
@@ -427,7 +458,7 @@ snippets will be inserted into the same file."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (when (> (length full-data-type) max-type-len)
         (setq max-type-len (length full-data-type)))
       (setq attrs (cdr attrs)))
@@ -435,7 +466,7 @@ snippets will be inserted into the same file."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (insert "\n")
       (when comment
         (insert (concat ipad "//! " comment " (" (number-to-string attr-num) ")\n"))
@@ -468,6 +499,7 @@ of nullable values."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -485,7 +517,7 @@ of nullable values."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (when nullable
         (insert "\n")
         (when comment
@@ -518,6 +550,7 @@ of nullable values."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -537,7 +570,7 @@ of nullable values."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -591,6 +624,7 @@ of values for individual nullable columns."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -599,7 +633,7 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (when nullable
         (insert "\n\n")
         (setq uname (shu-upcase-first-letter name))
@@ -677,6 +711,7 @@ of values for individual nullable columns."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -685,7 +720,7 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (insert "\n")
       (when comment
         (insert
@@ -728,6 +763,7 @@ of values for individual nullable columns."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -736,7 +772,7 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (insert "\n\n")
       (when reference
         (insert "const "))
@@ -783,6 +819,7 @@ of values for individual nullable columns."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (ipad (make-string shu-cpp-indent-length ? ))
         (lpad "")
         (comma "")
@@ -807,7 +844,7 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -819,7 +856,7 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -871,6 +908,7 @@ of values for individual nullable columns."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -888,7 +926,7 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -930,6 +968,7 @@ of values for individual nullable columns."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -947,7 +986,7 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (if (string= full-data-type "bdlt::Datetime")
           (setq have-date t)
         (when (string= full-data-type "bdlt::DatetimeInterval")
@@ -964,7 +1003,7 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -1007,6 +1046,7 @@ values from an instance of bcem_Aggregate."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -1034,7 +1074,7 @@ values from an instance of bcem_Aggregate."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -1148,6 +1188,7 @@ values from an instance of bcem_Aggregate."
         (reference)
         (nullable)
         (column-name)
+        (column-count)
         (ipad (make-string shu-cpp-indent-length ? ))
         (lpad)
         (attr-num 1)
@@ -1175,7 +1216,7 @@ values from an instance of bcem_Aggregate."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name)
+                                 reference nullable column-name column-count)
       (if nullable
           (progn
             (setq have-nullable t)
@@ -1198,10 +1239,10 @@ values from an instance of bcem_Aggregate."
           (while attrs
             (setq attr-info (car attrs))
             (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                       reference nullable column-name)
+                                       reference nullable column-name column-count)
             (setq attr-info (car attrs))
             (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                       reference nullable column-name)
+                                       reference nullable column-name column-count)
             (setq pad-count 0)
             (when (< (length name) longest-name-length)
               (setq pad-count (- longest-name-length (length name))))
@@ -1230,7 +1271,7 @@ values from an instance of bcem_Aggregate."
       (while attrs
         (setq attr-info (car attrs))
         (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                   reference nullable column-name)
+                                   reference nullable column-name column-count)
         (when nullable
           (setq pad-count 0)
           (when (< (length name) longest-nullable-name-length)
@@ -1261,7 +1302,7 @@ values from an instance of bcem_Aggregate."
       (while attrs
         (setq attr-info (car attrs))
         (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                   reference nullable column-name)
+                                   reference nullable column-name column-count)
         (when (not nullable)
           (setq pad-count 0)
           (when (< (length name) longest-non-nullable-name-length)
@@ -1292,7 +1333,7 @@ values from an instance of bcem_Aggregate."
       (while attrs
         (setq attr-info (car attrs))
         (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                   reference nullable column-name)
+                                   reference nullable column-name column-count)
         (when nullable
           (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
           (insert (concat lpad "( ( !lhs." uname " ) ||\n"))
