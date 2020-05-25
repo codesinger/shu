@@ -772,8 +772,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-print-self-gen (class-name attributes)
   "Generate the code that binds all of the values to their column names."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -794,8 +793,7 @@ of values for individual nullable columns."
         (member-prefix "m_")
         (have-date)
         (have-interval)
-        (contained-class)
-        )
+        (contained-class))
     (setq lpad (concat ipad "os "))
     (insert
      (concat
@@ -813,13 +811,10 @@ of values for individual nullable columns."
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
-        (setq contained-class nil)
-        )
+        (setq contained-class nil))
       (when contained-class
-        (insert (concat ipad name "().printSelf(os);\n"))
-        )
-      (setq attrs (cdr attrs))
-      )
+        (insert (concat ipad name "().printSelf(os);\n")))
+      (setq attrs (cdr attrs)))
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
@@ -828,28 +823,27 @@ of values for individual nullable columns."
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
-        (setq contained-class nil)
-        )
+        (setq contained-class nil))
       (when (not contained-class)
         (if (not nullable)
             (progn
-              (insert (concat lpad "<< \"" comma name ": \" << " name "()\n"))
+              (insert (concat semi lpad "<< \"" comma name ": \" << " name "()"))
               (setq lpad (concat ipad "   "))
               (setq comma ", ")
-              (setq semi ";")
-              )
+              (setq semi "\n"))
           (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
           (setq lpad (concat ipad "os "))
+          (when (/= (length semi) 0)
+            (setq semi ";\n"))
           (insert
            (concat
+            semi
             ipad "if (" uname ")\n"
             ipad ipad "os << \"" comma name ": \" << " name "();\n"
             ))
           (setq comma ", ")
-          )
-        )
-      (setq attrs (cdr attrs))
-      )
+          (setq semi "")))
+      (setq attrs (cdr attrs)))
     (insert
      (concat
       "\n"
@@ -865,7 +859,8 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-ctor-gen (class-name attributes)
   "Generate the code for the constructor."
-  (let ((gb (get-buffer-create "**boo**"))
+  (let (
+        (gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -880,7 +875,9 @@ of values for individual nullable columns."
         (attr-num 1)
         (pad-count 0)
         (pad)
-        (member-prefix "m_"))
+        (member-prefix "m_")
+        (contained-class)
+          )
     (insert
      (concat
       "\n\n"
@@ -892,14 +889,22 @@ of values for individual nullable columns."
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
+      (if (and (not nullable)
+               (string= column-name "std"))
+          (setq contained-class t)
+        (setq contained-class nil))
       (insert (concat member-prefix name "("))
-      (when (string= full-data-type "bsl::string")
-        (insert "allocator"))
+      (when (or (string= full-data-type "bsl::string")
+                contained-class)
+        (insert "allocator")
+        )
       (insert ")")
       (when (cdr attrs)
-        (insert ","))
+        (insert ",")
+        )
       (insert "\n")
-      (setq attrs (cdr attrs)))
+      (setq attrs (cdr attrs))
+      )
     (insert
      (concat
       "{\n"
