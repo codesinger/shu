@@ -477,7 +477,14 @@ snippets will be inserted into the same file."
         (pad)
         (member-prefix "m_")
         )
-    (insert (concat "\n\n" ipad "// DATA\n"))
+    (insert
+     (concat
+      "\n\n"
+      "#include <bdlb_nullablevalue.h>\n"
+      "#include <bdlt_datetime.h>\n"
+      "#include <bdlt_datetimeinterval.h>\n"
+      "#include <bsl_string.h>\n"
+      "\n\n" ipad "// DATA\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -950,7 +957,10 @@ of values for individual nullable columns."
         )
     (insert
      (concat
-      "\n\n"
+      "#include <fxcrossdb_tenorcolumnnames.h>\n"
+      "\n"
+      "#include <ball_log.h>\n"
+      "\n\n\n"
       "// CREATORS\n\n"
       class-name "::" class-name "(\n"
       ipad "bslma::Allocator    *allocator)\n"
