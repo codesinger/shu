@@ -505,7 +505,8 @@ of nullable values."
 ;;
 (defun shu-cpp-attributes-gen-bind-values-gen (class-name attributes)
   "Generate the code that binds all of the values to their column names."
-  (let ((gb (get-buffer-create "**boo**"))
+  (let (
+        (gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -522,7 +523,9 @@ of nullable values."
         (pad)
         (member-prefix "m_")
         (have-date)
-        (have-interval))
+        (have-interval)
+        (contained-class)
+        )
     (insert
      (concat
       "\n\n"
@@ -535,33 +538,47 @@ of nullable values."
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
-      (if (not nullable)
-          (insert (concat ipad  "binder.bind"))
-        (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
-        (insert
-         (concat
-          ipad  "if ( !" uname " )\n"
-          ipad ipad "binder.bindNull(\"@\" + "  column-name ", __FILE__, __LINE__)\n"
-          ipad  "else\n"
-          ipad ipad "binder.bind"
-          )))
-      (if (string= data-type "bsl::string")
-          (insert "Text")
-        (if (string= data-type "bdlt::Datetime")
-            (insert "Datetime")
-          (if (string= data-type "bdlt::DatetimeInterval")
-              (insert "Int")
-            (if (string= data-type "int")
-                (insert "Int")
-              (when (string= data-type "double")
-                (insert "Double"))))))
-      (insert (concat "(\"@\" + " column-name ", " name "()"))
-      (when (string= data-type "bdlt::DatetimeInterval")
-        (insert ".totalMilliseconds()")
+      (when (and (not nullable)
+                 (string= column-name "std"))
+        (setq contained-class t)
         )
-      (insert ", __FILE__, __LINE__);\n")
+      (if contained-class
+          (insert (concat ipad name "().bindValues(binder);\n"))
+        (if (not nullable)
+            (insert (concat ipad  "binder.bind"))
+          (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
+          (insert
+           (concat
+            ipad  "if ( !" uname " )\n"
+            ipad ipad "binder.bindNull(\"@\" + "  column-name ", __FILE__, __LINE__)\n"
+            ipad  "else\n"
+            ipad ipad "binder.bind"
+            ))
+          )
+        (if (string= data-type "bsl::string")
+            (insert "Text")
+          (if (string= data-type "bdlt::Datetime")
+              (insert "Datetime")
+            (if (string= data-type "bdlt::DatetimeInterval")
+                (insert "Int")
+              (if (string= data-type "int")
+                  (insert "Int")
+                (when (string= data-type "double")
+                  (insert "Double")
+                  )
+                )
+              )
+            )
+          )
+        (insert (concat "(\"@\" + " column-name ", " name "()"))
+        (when (string= data-type "bdlt::DatetimeInterval")
+          (insert ".totalMilliseconds()")
 
-      (setq attrs (cdr attrs)))
+          )
+        (insert ", __FILE__, __LINE__);\n")
+        )
+      (setq attrs (cdr attrs))
+      )
     (insert "}\n")
     ))
 
@@ -885,7 +902,8 @@ of values for individual nullable columns."
 (defun shu-cpp-attributes-gen-set-values-gen (class-name attributes)
   "Generate the code for the setValues function that sets all of the member variable
 values from an instance of bcem_Aggregate."
-  (let ((gb (get-buffer-create "**boo**"))
+  (let (
+        (gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -902,7 +920,9 @@ values from an instance of bcem_Aggregate."
         (pad)
         (member-prefix "m_")
         (have-date)
-        (have-interval))
+        (have-interval)
+        (contained-class)
+          )
     (insert
      (concat
       "\n\n"
@@ -923,6 +943,12 @@ values from an instance of bcem_Aggregate."
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
+      (when (and (not nullable)
+                 (string= column-name "std"))
+        (setq contained-class t)
+        )
+      (if contained-class
+          (insert)
       (insert
        (concat
         ipad "const bcem_Aggregate &" name " = data[" column-name "];\n"
@@ -934,14 +960,16 @@ values from an instance of bcem_Aggregate."
          (concat
           ipad ipad "const bsls::Types::Int64      intval(" name ".asInt());\n"
           ipad ipad "const bdlt::DatetimeInterval  interval(0, 0, 0, 0, intval, 0));\n"
-          )))
+          ))
+        )
       (insert
        (concat
         ipad ipad member-prefix name
         ))
       (if nullable
           (insert ".makeValue(")
-        (insert " = "))
+        (insert " = ")
+        )
       (if (string= data-type "bdlt::DatetimeInterval")
           (insert "interval")
         (insert (concat name ".as"))
@@ -952,9 +980,15 @@ values from an instance of bcem_Aggregate."
             (if (string= data-type "int")
                 (insert "Int()")
               (when (string= data-type "double")
-                (insert "Double()"))))))
+                (insert "Double()")
+                )
+              )
+            )
+          )
+        )
       (when nullable
-        (insert ")"))
+        (insert ")")
+        )
       (insert
        (concat
         ";\n"
@@ -966,7 +1000,9 @@ values from an instance of bcem_Aggregate."
         ipad ipad "               << " column-name " << \"'. \" << why;\n"
         ipad ipad "missingCount++;\n"
         ipad "}\n"))
-      (setq attrs (cdr attrs)))
+      )
+      (setq attrs (cdr attrs))
+      )
     (insert
      (concat
       ipad "if (missingCount)\n"
