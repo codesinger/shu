@@ -47,6 +47,7 @@
         (comment "This is a comment")
         (nullable t)
         (column-name "MumbleBar::otherThing")
+        (column-count 8)
         (reference t)
         (attr-info)
         (xname)
@@ -55,11 +56,12 @@
         (xcomment)
         (xnullable)
         (xcolumn-name)
+        (xcolumn-count)
         (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
-                                            reference nullable column-name))
+                                            reference nullable column-name column-count))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name)
+                               xreference xnullable xcolumn-name xcolumn-count)
     (should xname)
     (should (stringp xname))
     (should (string= name xname))
@@ -83,6 +85,10 @@
     (should xreference)
 
     (should xnullable)
+
+    (should xcolumn-count)
+    (should (numberp xcolumn-count))
+    (should (= column-count xcolumn-count))
     ))
 
 
@@ -98,6 +104,7 @@
         (reference nil)
         (nullable t)
         (column-name "MumbleBar::otherThing")
+        (column-count 5)
         (attr-info)
         (xname)
         (xdata-type)
@@ -105,11 +112,12 @@
         (xcomment)
         (xnullable)
         (xcolumn-name)
+        (xcolumn-count)
         (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
-                                            reference nullable column-name))
+                                            reference nullable column-name column-count))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name)
+                               xreference xnullable xcolumn-name xcolumn-count)
 
     (should (not xreference))
 
@@ -136,11 +144,12 @@
         (xcomment)
         (xnullable)
         (xcolumn-name)
+        (xcolumn-count)
         (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name)
+                               xreference xnullable xcolumn-name xcolumn-count)
 
     (should xreference)
 
@@ -167,11 +176,12 @@
         (xcomment)
         (xnullable)
         (xcolumn-name)
+        (xcolumn-count)
         (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name)
+                               xreference xnullable xcolumn-name xcolumn-count)
 
     (should (not xreference))
 
@@ -198,10 +208,11 @@
         (xcomment)
         (xreference)
         (xnullable)
-        (xcolumn-name))
+        (xcolumn-name)
+        (xcolumn-count))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name)
+                               xreference xnullable xcolumn-name xcolumn-count)
     (should xname)
     (should (stringp xname))
     (should (string= name xname))

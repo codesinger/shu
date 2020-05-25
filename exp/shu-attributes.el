@@ -134,7 +134,7 @@
 ;;        |       |
 ;;        |       +-----> column-count
 ;;        |
-;;        +-------------> nullable
+;;        +-------------> nullable & reference
 ;;
 ;;
 ;;
@@ -192,7 +192,7 @@
          (setq ,nullable nil)
          )
        (setq ,column-name (car ,tattr-col))
-       (setq ,column-count (car ,tattr-ct))
+       (setq ,column-count (cdr ,tattr-ct))
        )
     ))
 
@@ -211,9 +211,11 @@
 ;;  shu-cpp-make-attr-info
 ;;
 (defun shu-cpp-make-attr-info (name data-type full-data-type &optional comment
-                                    reference nullable column-name)
+                                    reference nullable column-name column-count)
   "Return an attr-info created from the given arguments"
   (let ((flags 0))
+    (when (not column-count)
+      (setq column-count 1))
     (when reference
       (setq flags shu-cpp-attributes-reference))
     (when nullable
@@ -222,7 +224,8 @@
           (cons full-data-type
                 (cons data-type
                       (cons comment
-                            (cons flags column-name)))))
+                            (cons column-name
+                                  (cons flags column-count))))))
     ))
 
 
