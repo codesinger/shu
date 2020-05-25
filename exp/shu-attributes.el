@@ -349,6 +349,7 @@ snippets will be inserted into the same file."
         (x)
         (ss "std\\s-*(\\([0-9]*\\))")
         (class-name)
+        (table-name)
         (data-type)
         (full-data-type)
         (name)
@@ -382,20 +383,22 @@ snippets will be inserted into the same file."
             (setq data-type (car x))
             (if (string= column-name "class")
                 (setq class-name data-type)
-              (setq x (cdr x))
-              (setq name (car x))
-              (setq nullable nil)
-              (setq full-data-type data-type)
-              (setq reference nil)
-              (setq x (cdr x))
-              (when x
-                (setq z (car x))
-                (princ "z: [" gb)(princ z gb)(princ "]\n" gb)
-                (when (string=  z "&")
-                  (setq reference t)))
-              (when (cdr x)
-                (setq nullable t)
-                (setq full-data-type (shu-cpp-make-nullable data-type)))))
+              (if (string= column-name "table")
+                  (setq table-name data-type)
+                (setq x (cdr x))
+                (setq name (car x))
+                (setq nullable nil)
+                (setq full-data-type data-type)
+                (setq reference nil)
+                (setq x (cdr x))
+                (when x
+                  (setq z (car x))
+                  (princ "z: [" gb)(princ z gb)(princ "]\n" gb)
+                  (when (string=  z "&")
+                    (setq reference t)))
+                (when (cdr x)
+                  (setq nullable t)
+                  (setq full-data-type (shu-cpp-make-nullable data-type))))))
           (when name
             (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                                     reference nullable column-name column-count))
@@ -407,7 +410,7 @@ snippets will be inserted into the same file."
     (setq line-diff (forward-line 1))
     (setq attributes (nreverse attributes))
     (princ "class-name: " gb)(princ class-name gb) (princ "\n" gb)
-    (shu-cpp-attributes-gen class-name attributes)
+    (shu-cpp-attributes-gen class-name table-name attributes)
     ))
 
 
@@ -416,7 +419,7 @@ snippets will be inserted into the same file."
 ;;
 ;;  shu-cpp-attributes-gen
 ;;
-(defun shu-cpp-attributes-gen (class-name attributes)
+(defun shu-cpp-attributes-gen (class-name table-name attributes)
   "Generate all of the code snippets."
   (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -443,7 +446,7 @@ snippets will be inserted into the same file."
       (shu-cpp-attributes-gen-print-self-gen class-name sorted-attributes)
       (shu-cpp-attributes-gen-ctor-gen class-name attributes)
       (shu-cpp-attributes-gen-reset-gen class-name attributes)
-      (shu-cpp-attributes-gen-set-values-gen class-name attributes)
+      (shu-cpp-attributes-gen-set-values-gen class-name table-name attributes)
       (shu-cpp-attributes-gen-operator-equal-gen class-name sorted-attributes))
     ))
 
@@ -1062,7 +1065,7 @@ of values for individual nullable columns."
 ;;
 ;;  shu-cpp-attributes-gen-set-values-gen
 ;;
-(defun shu-cpp-attributes-gen-set-values-gen (class-name attributes)
+(defun shu-cpp-attributes-gen-set-values-gen (class-name table-name attributes)
   "Generate the code for the setValues function that sets all of the member variable
 values from an instance of bcem_Aggregate."
   (let ((gb (get-buffer-create "**boo**"))
@@ -1096,11 +1099,10 @@ values from an instance of bcem_Aggregate."
       ipad "reset();\n"
       ipad "const bsl::string  why(\n"
       ipad "    \"This is caused by a query definition mis-match between this \"\n"
-      ipad "    \"program and the definition of the table \"\n"
+      ipad "    \"program and the definition of the table \" + " table-name "\n"
       ipad "    \"in database '\" + databaseName + \"'.\");\n"
       ipad "int fetchCount(0);\n"
-      ipad "int missingCount(0);\n"
-      ipad "const bsl::string  tableName(\"cross_outer_row join virtual\");\n"))
+      ipad "int missingCount(0);\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment

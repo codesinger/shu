@@ -287,5 +287,44 @@
     (should (string= expected actual))
     ))
 
+;;;  SAMPLE INPUT
+;;;
+;;;  class TenorRow
+;;;
+;;;  table TenorColumnNames::table
+;;;
+;;;  // The name of the tenor
+;;;  TenorColumnNames::name             bsl::string     name    &
+;;;
+;;;  // The primary key of the cross parent
+;;;  std(5)                               CrossRowPrimaryKey   key &
+;;;
+;;;  // Time that this definition was deleted
+;;;  TenorColumnNames::deleteTime       bdlt::Datetime  deleteTime  &
+;;;
+;;;  // Pricing start time
+;;;  TenorColumnNames::startTime        bdlt::Datetime  startTime   &  t
+;;;
+;;;  // Time zone for start time
+;;;  TenorColumnNames::timezone         bsl::string     timezone    &  t
+;;;
+;;;  // Pricing frequency
+;;;  TenorColumnNames::frequency        bdlt::DatetimeInterval  frequency    &
+;;;
+;;;  // Maximum age for first ISO
+;;;  TenorColumnNames::ageout1          bdlt::DatetimeInterval  ageout1      &  t
+;;;
+;;;  // Maximum age for second ISO
+;;;  TenorColumnNames::ageout2          bdlt::DatetimeInterval  ageout2      &  t
+;;;
+;;;  // Tick override
+;;;  TenorColumnNames::tickerOverride   bsl::string     tickerOverride  &  t
+;;;
+;;;  // via ISO
+;;;  TenorColumnNames::viaIso           bsl::string     viaIso   &  t
+;;;
+;;;  // Note for the tenor
+;;;  TenorColumnNames::note             bsl::string     note     &  t
+;;;
 
 ;;; shu-attributes.t.el ends here
