@@ -538,9 +538,10 @@ of nullable values."
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
-      (when (and (not nullable)
+      (if (and (not nullable)
                  (string= column-name "std"))
-        (setq contained-class t)
+          (setq contained-class t)
+        (setq contained-class nil)
         )
       (if contained-class
           (insert (concat ipad name "().bindValues(binder);\n"))
@@ -830,7 +831,8 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-reset-gen (class-name attributes)
   "Generate the code for the reset function"
-  (let ((gb (get-buffer-create "**boo**"))
+  (let (
+        (gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -847,7 +849,9 @@ of values for individual nullable columns."
         (pad)
         (member-prefix "m_")
         (have-date)
-        (have-interval))
+        (have-interval)
+        (contained-class)
+          )
     (insert
      (concat
       "\n\n"
@@ -861,22 +865,34 @@ of values for individual nullable columns."
       (if (string= full-data-type "bdlt::Datetime")
           (setq have-date t)
         (when (string= full-data-type "bdlt::DatetimeInterval")
-          (setq have-interval t)))
-      (setq attrs (cdr attrs)))
+          (setq have-interval t)
+          )
+        )
+      (setq attrs (cdr attrs))
+      )
     (if have-interval
         (progn
           (insert (concat ipad "bdlt::DatetimeInterval  defaultInterval;\n"))
           (when have-date
-            (insert (concat ipad "bdlt::Datetime          defaultTime;\n"))))
+            (insert (concat ipad "bdlt::Datetime          defaultTime;\n"))
+            )
+          )
       (when have-date
-        (insert (concat ipad "bdlt::Datetime   defaultTime;\n"))))
+        (insert (concat ipad "bdlt::Datetime   defaultTime;\n"))
+        )
+      )
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
+      (if (and (not nullable)
+                 (string= column-name "std"))
+          (setq contained-class t)
+        (setq contained-class nil)
+        )
       (insert (concat ipad member-prefix name))
-      (if nullable
+      (if (or nullable contained-class)
           (insert ".reset()")
         (if (string= full-data-type "bsl::string")
             (insert ".clear()")
@@ -887,9 +903,16 @@ of values for individual nullable columns."
               (if (string= full-data-type "int")
                   (insert " = 0")
                 (when (string= full-data-type "double")
-                  (insert " = 0.0")))))))
+                  (insert " = 0.0")
+                  )
+                )
+              )
+            )
+          )
+        )
       (insert ";\n")
-      (setq attrs (cdr attrs)))
+      (setq attrs (cdr attrs))
+      )
     (insert "}\n")
     ))
 
@@ -922,7 +945,7 @@ values from an instance of bcem_Aggregate."
         (have-date)
         (have-interval)
         (contained-class)
-          )
+        )
     (insert
      (concat
       "\n\n"
@@ -943,64 +966,65 @@ values from an instance of bcem_Aggregate."
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name)
-      (when (and (not nullable)
+      (if (and (not nullable)
                  (string= column-name "std"))
-        (setq contained-class t)
+          (setq contained-class t)
+        (setq contained-class nil)
         )
       (if contained-class
-          (insert)
-      (insert
-       (concat
-        ipad "const bcem_Aggregate &" name " = data[" column-name "];\n"
-        ipad "if ( !" name ".isNul2() )\n"
-        ipad "{\n"
-        ))
-      (when (string= data-type "bdlt::DatetimeInterval")
+          (insert (concat ipad name "().setValues(databaseName, data);\n"))
         (insert
          (concat
-          ipad ipad "const bsls::Types::Int64      intval(" name ".asInt());\n"
-          ipad ipad "const bdlt::DatetimeInterval  interval(0, 0, 0, 0, intval, 0));\n"
+          ipad "const bcem_Aggregate &" name " = data[" column-name "];\n"
+          ipad "if ( !" name ".isNul2() )\n"
+          ipad "{\n"
           ))
-        )
-      (insert
-       (concat
-        ipad ipad member-prefix name
-        ))
-      (if nullable
-          (insert ".makeValue(")
-        (insert " = ")
-        )
-      (if (string= data-type "bdlt::DatetimeInterval")
-          (insert "interval")
-        (insert (concat name ".as"))
-        (if (string= data-type "bsl::string")
-            (insert "String()")
-          (if (string= data-type "bdlt::Datetime")
-              (insert "DatetimeTz().utcDatetime()")
-            (if (string= data-type "int")
-                (insert "Int()")
-              (when (string= data-type "double")
-                (insert "Double()")
+        (when (string= data-type "bdlt::DatetimeInterval")
+          (insert
+           (concat
+            ipad ipad "const bsls::Types::Int64      intval(" name ".asInt());\n"
+            ipad ipad "const bdlt::DatetimeInterval  interval(0, 0, 0, 0, intval, 0));\n"
+            ))
+          )
+        (insert
+         (concat
+          ipad ipad member-prefix name
+          ))
+        (if nullable
+            (insert ".makeValue(")
+          (insert " = ")
+          )
+        (if (string= data-type "bdlt::DatetimeInterval")
+            (insert "interval")
+          (insert (concat name ".as"))
+          (if (string= data-type "bsl::string")
+              (insert "String()")
+            (if (string= data-type "bdlt::Datetime")
+                (insert "DatetimeTz().utcDatetime()")
+              (if (string= data-type "int")
+                  (insert "Int()")
+                (when (string= data-type "double")
+                  (insert "Double()")
+                  )
                 )
               )
             )
           )
+        (when nullable
+          (insert ")")
+          )
+        (insert
+         (concat
+          ";\n"
+          ipad ipad "fetchCount++;\n"
+          ipad "}\n"
+          ipad "else\n"
+          ipad "{\n"
+          ipad ipad "BALL_LOG_ERROR << \"No data found for input column '\"\n"
+          ipad ipad "               << " column-name " << \"'. \" << why;\n"
+          ipad ipad "missingCount++;\n"
+          ipad "}\n"))
         )
-      (when nullable
-        (insert ")")
-        )
-      (insert
-       (concat
-        ";\n"
-        ipad ipad "fetchCount++;\n"
-        ipad "}\n"
-        ipad "else\n"
-        ipad "{\n"
-        ipad ipad "BALL_LOG_ERROR << \"No data found for input column '\"\n"
-        ipad ipad "               << " column-name " << \"'. \" << why;\n"
-        ipad ipad "missingCount++;\n"
-        ipad "}\n"))
-      )
       (setq attrs (cdr attrs))
       )
     (insert
