@@ -427,23 +427,24 @@ snippets will be inserted into the same file."
       (setq attr-info (car attrs))
       (shu-cpp-print-attr-info attr-info gb)
       (setq attrs (cdr attrs)))
-    (goto-char (point-max))
-    (insert "\n\n")
-    (shu-cpp-attributes-gen-decl attributes)
-    (setq sorted-attributes (copy-tree attributes))
-    (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
-    (shu-cpp-attributes-gen-setter-decl)
-    (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
-    (shu-cpp-attributes-gen-getter-decl sorted-attributes)
-    (shu-cpp-attributes-gen-operator-equal-decl class-name)
-    (shu-cpp-attributes-gen-bind-values-gen class-name attributes)
-    (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
-    (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
-    (shu-cpp-attributes-gen-print-self-gen class-name sorted-attributes)
-    (shu-cpp-attributes-gen-ctor-gen class-name attributes)
-    (shu-cpp-attributes-gen-reset-gen class-name attributes)
-    (shu-cpp-attributes-gen-set-values-gen class-name attributes)
-    (shu-cpp-attributes-gen-operator-equal-gen class-name sorted-attributes)
+    (save-excursion
+      (goto-char (point-max))
+      (insert "\n\n")
+      (shu-cpp-attributes-gen-decl attributes)
+      (setq sorted-attributes (copy-tree attributes))
+      (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
+      (shu-cpp-attributes-gen-setter-decl)
+      (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
+      (shu-cpp-attributes-gen-getter-decl sorted-attributes)
+      (shu-cpp-attributes-gen-operator-equal-decl class-name)
+      (shu-cpp-attributes-gen-bind-values-gen class-name attributes)
+      (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
+      (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
+      (shu-cpp-attributes-gen-print-self-gen class-name sorted-attributes)
+      (shu-cpp-attributes-gen-ctor-gen class-name attributes)
+      (shu-cpp-attributes-gen-reset-gen class-name attributes)
+      (shu-cpp-attributes-gen-set-values-gen class-name attributes)
+      (shu-cpp-attributes-gen-operator-equal-gen class-name sorted-attributes))
     ))
 
 
@@ -453,7 +454,8 @@ snippets will be inserted into the same file."
 ;;
 (defun shu-cpp-attributes-gen-decl (attributes)
   "Generate the declaration of the member variables."
-  (let ((attrs attributes)
+  (let (
+        (attrs attributes)
         (attr-info)
         (name)
         (data-type)
@@ -466,17 +468,22 @@ snippets will be inserted into the same file."
         (max-type-len 31)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
+        (end-attr-num 0)
+        (attr-range)
         (pad-count 0)
         (pad)
-        (member-prefix "m_"))
+        (member-prefix "m_")
+        )
     (insert (concat "\n\n" ipad "// DATA\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name column-count)
       (when (> (length full-data-type) max-type-len)
-        (setq max-type-len (length full-data-type)))
-      (setq attrs (cdr attrs)))
+        (setq max-type-len (length full-data-type))
+        )
+      (setq attrs (cdr attrs))
+      )
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
@@ -484,15 +491,23 @@ snippets will be inserted into the same file."
                                  reference nullable column-name column-count)
       (insert "\n")
       (when comment
-        (insert (concat ipad "//! " comment " (" (number-to-string attr-num) ")\n"))
+        (setq attr-range (number-to-string attr-num))
+        (when (/= column-count 1)
+          (setq end-attr-num (+ attr-num (1- column-count)))
+          (setq attr-range (concat (number-to-string attr-num) " - " (number-to-string end-attr-num)))
+          )
+        (insert (concat ipad "//! " comment " (" attr-range ")\n"))
         (setq pad-count 0)
         (when (< (length full-data-type) max-type-len)
-          (setq pad-count (- max-type-len (length full-data-type)))))
+          (setq pad-count (- max-type-len (length full-data-type)))
+          )
+        )
       (setq pad-count (+ pad-count 3))
       (setq pad (make-string pad-count ? ))
       (insert (concat ipad full-data-type pad member-prefix name ";\n"))
-      (setq attr-num (1+ attr-num))
-      (setq attrs (cdr attrs)))
+      (setq attr-num (+ attr-num column-count))
+      (setq attrs (cdr attrs))
+      )
     ))
 
 
@@ -930,7 +945,7 @@ of values for individual nullable columns."
         (pad)
         (member-prefix "m_")
         (contained-class)
-          )
+        )
     (insert
      (concat
       "\n\n"
@@ -1095,7 +1110,7 @@ values from an instance of bcem_Aggregate."
           (setq contained-class t)
         (setq contained-class nil))
       (if contained-class
-          (insert (concat ipad member-prefix name ".setValues(databaseName, data);\n"))
+          (insert (concat ipad "fetchCount += " member-prefix name ".setValues(databaseName, data);\n"))
         (insert
          (concat
           ipad "const bcem_Aggregate &" name " = data[" column-name "];\n"
