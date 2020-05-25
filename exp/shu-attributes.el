@@ -352,7 +352,8 @@ snippets will be inserted into the same file."
                 (setq nullable t)
                 (setq full-data-type (shu-cpp-make-nullable data-type)))))
           (when name
-            (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment reference nullable column-name))
+            (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
+                                                    reference nullable column-name))
             (push attr-info attributes)
             (shu-cpp-print-attr-info attr-info gb)
             (setq comment nil)
@@ -393,6 +394,7 @@ snippets will be inserted into the same file."
     (shu-cpp-attributes-gen-bind-values-gen class-name attributes)
     (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
     (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
+    (shu-cpp-attributes-gen-print-self-gen class-name sorted-attributes)
     (shu-cpp-attributes-gen-ctor-gen class-name attributes)
     (shu-cpp-attributes-gen-reset-gen class-name attributes)
     (shu-cpp-attributes-gen-set-values-gen class-name attributes)
@@ -760,6 +762,100 @@ of values for individual nullable columns."
         ";\n"
         "}\n"))
       (setq attrs (cdr attrs)))
+    ))
+
+
+
+
+;;
+;;  shu-cpp-attributes-gen-print-self-gen
+;;
+(defun shu-cpp-attributes-gen-print-self-gen (class-name attributes)
+  "Generate the code that binds all of the values to their column names."
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (attrs attributes)
+        (attr-info)
+        (name)
+        (uname)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (lpad "")
+        (comma "")
+        (semi "")
+        (attr-num 1)
+        (pad-count 0)
+        (pad)
+        (member-prefix "m_")
+        (have-date)
+        (have-interval)
+        (contained-class)
+        )
+    (setq lpad (concat ipad "os "))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      "bsl::ostream &" class-name "::printSelf(\n"
+      "    bsl::ostream    &os)\n"
+      "const\n"
+      "{\n"
+      ))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
+      (if (and (not nullable)
+               (string= column-name "std"))
+          (setq contained-class t)
+        (setq contained-class nil)
+        )
+      (when contained-class
+        (insert (concat ipad name "().printSelf(os);\n"))
+        )
+      (setq attrs (cdr attrs))
+      )
+    (setq attrs attributes)
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name)
+      (if (and (not nullable)
+               (string= column-name "std"))
+          (setq contained-class t)
+        (setq contained-class nil)
+        )
+      (when (not contained-class)
+        (if (not nullable)
+            (progn
+              (insert (concat lpad "<< \"" comma name ": \" << " name "()\n"))
+              (setq lpad (concat ipad "   "))
+              (setq comma ", ")
+              (setq semi ";")
+              )
+          (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
+          (setq lpad (concat ipad "os "))
+          (insert
+           (concat
+            ipad "if (" uname ")\n"
+            ipad ipad "os << \"" comma name ": \" << " name "();\n"
+            ))
+          (setq comma ", ")
+          )
+        )
+      (setq attrs (cdr attrs))
+      )
+    (insert
+     (concat
+      "\n"
+      ipad "return os;\n"
+      "}\n"
+      ))
     ))
 
 
