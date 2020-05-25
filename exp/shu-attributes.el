@@ -595,8 +595,8 @@ of nullable values."
     (insert
      (concat
       "\n\n"
-      "// ACCESSORS\n\n8"
-      "void " class-name "::bindValues)\n"
+      "// ACCESSORS\n\n"
+      "void " class-name "::bindValues(\n"
       ipad "fxpricingdb::Binder   &binder)\n"
       "{\n"
       ))
@@ -616,7 +616,7 @@ of nullable values."
           (insert
            (concat
             ipad  "if ( !" uname " )\n"
-            ipad ipad "binder.bindNull(\"@\" + "  column-name ", __FILE__, __LINE__)\n"
+            ipad ipad "binder.bindNull(\"@\" + "  column-name ", __FILE__, __LINE__);\n"
             ipad  "else\n"
             ipad ipad "binder.bind"
             )))
@@ -672,7 +672,7 @@ of values for individual nullable columns."
         (setq uname (shu-upcase-first-letter name))
         (insert
          (concat
-          "bool" class-name "::has" uname "() const\n"
+          "bool " class-name "::has" uname "() const\n"
           "{\n"
           ipad "return ( !(" member-prefix name ".isNull()) );\n"
           "}\n"
@@ -721,7 +721,6 @@ of values for individual nullable columns."
       ipad " */\n"
       ipad "int setValues(\n"
       ipad ipad "const bsl::string       &databaseName,\n"
-      ipad ipad "const bsl::string       &tableName,\n"
       ipad ipad "const bcem_Aggregate    &data);\n"
       ))
     ))
@@ -1014,7 +1013,7 @@ of values for individual nullable columns."
      (concat
       "\n\n"
       "// MANIPULATORS\n\n"
-      class-name "::reset()\n"
+      "void " class-name "::reset()\n"
       "{\n"))
     (while attrs
       (setq attr-info (car attrs))
@@ -1049,7 +1048,7 @@ of values for individual nullable columns."
           (if (string= full-data-type "bdlt::Datetime")
               (insert " = defaultTime")
             (if (string= full-data-type "bdlt::DatetimeInterval")
-                (insert " = defaultTime")
+                (insert " = defaultInterval")
               (if (string= full-data-type "int")
                   (insert " = 0")
                 (when (string= full-data-type "double")
@@ -1091,7 +1090,7 @@ values from an instance of bcem_Aggregate."
     (insert
      (concat
       "\n\n"
-      class-name "::setValues)\n"
+      "int " class-name "::setValues(\n"
       ipad "const bsl::string       &databaseName,\n"
       ipad "const bcem_Aggregate    &data)\n"
       "{\n"
@@ -1099,8 +1098,9 @@ values from an instance of bcem_Aggregate."
       ipad "reset();\n"
       ipad "const bsl::string  why(\n"
       ipad "    \"This is caused by a query definition mis-match between this \"\n"
-      ipad "    \"program and the definition of the table \" + " table-name "\n"
+      ipad "    \"program and the definition of the table \" + " table-name " +\n"
       ipad "    \"in database '\" + databaseName + \"'.\");\n"
+      ipad "const bsl::string  tableName(" table-name ");\n"
       ipad "int fetchCount(0);\n"
       ipad "int missingCount(0);\n"))
     (while attrs
@@ -1112,7 +1112,7 @@ values from an instance of bcem_Aggregate."
           (setq contained-class t)
         (setq contained-class nil))
       (if contained-class
-          (insert (concat ipad "fetchCount += " member-prefix name ".setValues(databaseName, data);\n"))
+          (insert (concat ipad "fetchCount += " member-prefix name ".setValues(databaseName, tableName, data);\n"))
         (insert
          (concat
           ipad "const bcem_Aggregate &" name " = data[" column-name "];\n"
@@ -1123,7 +1123,7 @@ values from an instance of bcem_Aggregate."
           (insert
            (concat
             ipad ipad "const bsls::Types::Int64      intval(" name ".asInt());\n"
-            ipad ipad "const bdlt::DatetimeInterval  interval(0, 0, 0, 0, intval, 0));\n"
+            ipad ipad "const bdlt::DatetimeInterval  interval(0, 0, 0, 0, intval, 0);\n"
             )))
         (insert
          (concat
@@ -1195,7 +1195,7 @@ values from an instance of bcem_Aggregate."
     "\n"
     "/*!\n"
     " * Return true if any attributes of `lhs` and `rhs` have different values\n"
-    " *\n"
+    " */\n"
     "bool operator!=(\n"
     "    const " class-name "   &lhs,\n"
     "    const " class-name "   &rhs);\n"
