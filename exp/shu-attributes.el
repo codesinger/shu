@@ -1156,13 +1156,16 @@ values from an instance of bcem_Aggregate."
          (concat
           ";\n"
           ipad ipad "fetchCount++;\n"
-          ipad "}\n"
-          ipad "else\n"
-          ipad "{\n"
-          ipad ipad "BALL_LOG_ERROR << \"No data found for input column '\"\n"
-          ipad ipad "               << " column-name " << \"'. \" << why;\n"
-          ipad ipad "missingCount++;\n"
-          ipad "}\n")))
+          ipad "}\n"))
+        (when (not nullable)
+          (insert
+           (concat
+            ipad "else\n"
+            ipad "{\n"
+            ipad ipad "BALL_LOG_ERROR << \"No data found for input column '\"\n"
+            ipad ipad "               << " column-name " << \"'. \" << why;\n"
+            ipad ipad "missingCount++;\n"
+            ipad "}\n"))))
       (setq attrs (cdr attrs)))
     (insert
      (concat
