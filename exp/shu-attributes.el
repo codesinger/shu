@@ -370,6 +370,7 @@ snippets will be inserted into the same file."
         (line)
         (x)
         (ss "std\\s-*(\\([0-9]*\\))")
+        (enum-ss "[:_a-zA-Z0-9]+\\s-*(\\([:_a-zA-Z0-9]+\\))")
         (class-name)
         (table-name)
         (data-type)
@@ -381,6 +382,7 @@ snippets will be inserted into the same file."
         (column-name)
         (column-ct)
         (column-count)
+        (enum-base)
         (enum-base)
         (attr-info)
         (attributes)
@@ -408,6 +410,9 @@ snippets will be inserted into the same file."
                 (setq class-name data-type)
               (if (string= column-name "table")
                   (setq table-name data-type)
+                (setq enum-base nil)
+                (when (string-match enum-ss data-type)
+                  (setq enum-base (match-string-no-properties 1 data-type)))
                 (setq x (cdr x))
                 (setq name (car x))
                 (setq nullable nil)
@@ -424,7 +429,8 @@ snippets will be inserted into the same file."
                   (setq full-data-type (shu-cpp-make-nullable data-type))))))
           (when name
             (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
-                                                    reference nullable column-name column-count enum-base))
+                                                    reference nullable column-name column-count
+                                                    enum-base))
             (push attr-info attributes)
             (shu-cpp-print-attr-info attr-info gb)
             (setq comment nil)
