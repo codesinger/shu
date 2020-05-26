@@ -260,15 +260,21 @@
         (nullable)
         (column-name)
         (column-count)
-        (enum-base))
+        (enum-base)
+        (penum-base))
     (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                reference nullable column-name column-count enum-base)
+    (if enum-base
+        (setq penum-base enum-base)
+      (setq penum-base "nil")
+        )
     (princ (concat
             "col: " column-name
             ", name: [" name "], type: [" data-type "], ref: " (shu-bool-to-string nullable)
             "], nullable: " (shu-bool-to-string nullable)
             ", full-type: [" full-data-type "]"
-            ", count: " (number-to-string column-count) "\n") buf)
+            ", count: " (number-to-string column-count)
+            ", enum-base: " penum-base "\n") buf)
     (when comment
       (princ (concat "    [" comment "]\n") buf))
     ))
