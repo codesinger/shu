@@ -1106,7 +1106,7 @@ values from an instance of bcem_Aggregate."
       ipad "const bsl::string  why(\n"
       ipad "    \"This is caused by a query definition mis-match between this \"\n"
       ipad "    \"program and the definition of the table \" + " table-name " +\n"
-      ipad "    \"in database '\" + databaseName + \"'.\");\n"
+      ipad "    \" in database '\" + databaseName + \"'.\");\n"
       ipad "const bsl::string  tableName(" table-name ");\n"
       ipad "int fetchCount(0);\n"
       ipad "int missingCount(0);\n"))
