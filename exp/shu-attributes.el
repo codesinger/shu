@@ -1252,8 +1252,10 @@ of values for individual nullable columns."
                   (insert " = defaultInterval")
                 (if (string= full-data-type "int")
                     (insert " = 0")
-                  (when (string= full-data-type "double")
-                    (insert " = 0.0"))))))))
+                  (if (string= full-data-type "double")
+                      (insert " = 0.0")
+                    (when reset-value
+                      (insert (concat " = " reset-value))))))))))
       (insert ";\n")
       (setq attrs (cdr attrs)))
     (insert "}\n")
