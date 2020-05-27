@@ -441,6 +441,11 @@ Each column is has x attributes all on a single line
        parenthesis as in \"std(5)\".  This indicates that this is not
        actually a column but is an instance of another class of this type
     2. The data type of the column
+       If this data type is to be cast to a different type for inserting
+       and fetching, then the database type is in parenthesis following
+       the data type.  For example (\"Mumble(int)\" indicates that the data
+       type Mumble is to be cast to an int for inserting and from an int
+       back to Mumble when fetching.
     3. The name of the member variable that holds the column value
     4. If this is \"&\" the value is passed by reference.  If this is absent or
        has any value other than \"&\", the value is passed by value.
@@ -739,8 +744,7 @@ of nullable values."
             ipad  "if ( !" uname " )\n"
             ipad ipad "binder.bindNull(\"@\" + "  column-name ", __FILE__, __LINE__);\n"
             ipad  "else\n"
-            ipad ipad "binder.bind"
-            )))
+            ipad ipad "binder.bind")))
         (setq tmp-data-type data-type)
         (when enum-base
           (setq tmp-data-type enum-base))
@@ -1269,7 +1273,9 @@ values from an instance of bcem_Aggregate."
           (insert " = "))
         (if (string= data-type "bdlt::DatetimeInterval")
             (insert "interval")
-          (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type))))
+          (if enum-base
+              (insert (concat "static_cast<" data-type ">(" name "." (shu-cpp-attributes-aggregate-type enum-base) ")"))
+            (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type)))))
         (when nullable
           (insert ")"))
         (insert
