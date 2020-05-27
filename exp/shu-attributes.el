@@ -456,7 +456,7 @@ snippets will be inserted into the same file."
         (line)
         (x)
         (ss "std\\s-*(\\([0-9]*\\))")
-        (enum-ss "[:_a-zA-Z0-9$]+\\s-*(\\([:_a-zA-Z0-9$]+\\))")
+        (enum-ss "\\([:_a-zA-Z0-9$]+\\)\\s-*(\\([:_a-zA-Z0-9$]+\\))")
         (class-name)
         (table-name)
         (data-type)
@@ -468,7 +468,6 @@ snippets will be inserted into the same file."
         (column-name)
         (column-ct)
         (column-count)
-        (enum-base)
         (enum-base)
         (attr-info)
         (attributes)
@@ -498,7 +497,8 @@ snippets will be inserted into the same file."
                   (setq table-name data-type)
                 (setq enum-base nil)
                 (when (string-match enum-ss data-type)
-                  (setq enum-base (match-string-no-properties 1 data-type)))
+                  (setq enum-base (match-string-no-properties 2 data-type))
+                  (setq data-type (match-string-no-properties 1 data-type)))
                 (setq x (cdr x))
                 (setq name (car x))
                 (setq nullable nil)
@@ -548,12 +548,12 @@ snippets will be inserted into the same file."
     (save-excursion
       (goto-char (point-max))
       (insert "\n\n")
-      (shu-cpp-attributes-gen-decl attributes)
+      (shu-cpp-attributes-gen-decl class-name attributes)
       (setq sorted-attributes (copy-tree attributes))
       (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
       (shu-cpp-attributes-gen-setter-decl)
       (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
-      (shu-cpp-attributes-gen-getter-decl sorted-attributes)
+      (shu-cpp-attributes-gen-getter-decl class-name sorted-attributes)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
       (shu-cpp-attributes-gen-bind-values-gen class-name attributes)
       (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
@@ -570,10 +570,9 @@ snippets will be inserted into the same file."
 ;;
 ;;  shu-cpp-attributes-gen-decl
 ;;
-(defun shu-cpp-attributes-gen-decl (attributes)
+(defun shu-cpp-attributes-gen-decl (class-name attributes)
   "Generate the declaration of the member variables."
-  (let (
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (data-type)
@@ -591,8 +590,7 @@ snippets will be inserted into the same file."
         (attr-range)
         (pad-count 0)
         (pad)
-        (member-prefix "m_")
-        )
+        (member-prefix "m_"))
     (insert
      (concat
       "\n\n"
@@ -608,34 +606,29 @@ snippets will be inserted into the same file."
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name column-count enum-base)
       (when (> (length full-data-type) max-type-len)
-        (setq max-type-len (length full-data-type))
-        )
-      (setq attrs (cdr attrs))
-      )
+        (setq max-type-len (length full-data-type)))
+      (setq attrs (cdr attrs)))
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name column-count enum-base)
+      (setq full-data-type (shu-cpp-attributes-header-type class-name full-data-type))
       (insert "\n")
       (when comment
         (setq attr-range (number-to-string attr-num))
         (when (/= column-count 1)
           (setq end-attr-num (+ attr-num (1- column-count)))
-          (setq attr-range (concat (number-to-string attr-num) " - " (number-to-string end-attr-num)))
-          )
+          (setq attr-range (concat (number-to-string attr-num) " - " (number-to-string end-attr-num))))
         (insert (concat ipad "//! " comment " (" attr-range ")\n"))
         (setq pad-count 0)
         (when (< (length full-data-type) max-type-len)
-          (setq pad-count (- max-type-len (length full-data-type)))
-          )
-        )
+          (setq pad-count (- max-type-len (length full-data-type)))))
       (setq pad-count (+ pad-count 3))
       (setq pad (make-string pad-count ? ))
       (insert (concat ipad full-data-type pad member-prefix name ";\n"))
       (setq attr-num (+ attr-num column-count))
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     ))
 
 
@@ -849,7 +842,7 @@ of values for individual nullable columns."
 ;;
 ;;  shu-cpp-attributes-gen-getter-decl
 ;;
-(defun shu-cpp-attributes-gen-getter-decl (attributes)
+(defun shu-cpp-attributes-gen-getter-decl (class-name attributes)
   "Generate the declarations for the functions that return attribute values."
   (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -890,7 +883,7 @@ of values for individual nullable columns."
       (insert ipad)
       (when reference
         (insert "const "))
-      (insert (concat data-type " "))
+      (insert (concat (shu-cpp-attributes-header-type class-name data-type) " "))
       (when reference
         (insert "&"))
       (insert (concat name  "() const;\n"))
