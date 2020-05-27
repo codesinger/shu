@@ -1135,6 +1135,7 @@ of values for individual nullable columns."
         (pad)
         (member-prefix "m_")
         (have-date)
+        (have-date-tz)
         (have-interval)
         (contained-class))
     (insert
@@ -1149,16 +1150,22 @@ of values for individual nullable columns."
                                  reference nullable column-name column-count enum-base)
       (if (string= full-data-type "bdlt::Datetime")
           (setq have-date t)
+      (if (string= full-data-type "bdlt::DatetimeTz")
+          (setq have-date-tz t)
         (when (string= full-data-type "bdlt::DatetimeInterval")
-          (setq have-interval t)))
+          (setq have-interval t))))
       (setq attrs (cdr attrs)))
     (if have-interval
         (progn
           (insert (concat ipad "bdlt::DatetimeInterval  defaultInterval;\n"))
           (when have-date
-            (insert (concat ipad "bdlt::Datetime          defaultTime;\n"))))
+            (insert (concat ipad "bdlt::Datetime          defaultTime;\n")))
+          (when have-date-tz
+            (insert (concat ipad "bdlt::DatetimeTz        defaultTimeTz;\n"))))
       (when have-date
-        (insert (concat ipad "bdlt::Datetime   defaultTime;\n"))))
+        (insert (concat ipad "bdlt::Datetime     defaultTime;\n")))
+      (when have-date-tz
+        (insert (concat ipad "bdlt::DatetimeTz   defaultTimeTz;\n"))))
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
@@ -1175,12 +1182,14 @@ of values for individual nullable columns."
             (insert ".clear()")
           (if (string= full-data-type "bdlt::Datetime")
               (insert " = defaultTime")
+          (if (string= full-data-type "bdlt::DatetimeTz")
+              (insert " = defaultTimeTz")
             (if (string= full-data-type "bdlt::DatetimeInterval")
                 (insert " = defaultInterval")
               (if (string= full-data-type "int")
                   (insert " = 0")
                 (when (string= full-data-type "double")
-                  (insert " = 0.0")))))))
+                  (insert " = 0.0"))))))))
       (insert ";\n")
       (setq attrs (cdr attrs)))
     (insert "}\n")
