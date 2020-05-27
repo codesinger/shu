@@ -142,9 +142,25 @@
 ;;   |    |   |   |    |
 ;;   -----|-------|-----
 ;;        |       |
-;;        |       +-----> column-count
+;;        |       +-----> attr-dft
 ;;        |
 ;;        +-------------> enum-base
+;;
+;;
+;;
+;;
+;;
+;;  attr-dft
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> column-count
+;;        |
+;;        +-------------> reset-value
 ;;
 ;;
 ;;
@@ -165,7 +181,8 @@
 ;;  shu-cpp-extract-attr-info
 ;;
 (defmacro shu-cpp-extract-attr-info (attr-info name data-type full-data-type comment
-                                               reference nullable column-name column-count enum-base)
+                                               reference nullable column-name column-count
+                                               enum-base reset-value)
   "Extract the information out of an attr-info"
   (let (
         (tattr-ext (make-symbol "attr-ext"))
@@ -174,6 +191,7 @@
         (tattr-col (make-symbol "attr-col"))
         (tattr-ct (make-symbol "attr-ct"))
         (tattr-enu (make-symbol "attr-enu"))
+        (tattr-dft (make-symbol "attr-dft"))
         (tflags (make-symbol "flags"))
         )
     `(let (
@@ -183,6 +201,7 @@
            (,tattr-col)
            (,tattr-ct)
            (,tattr-enu)
+           (,tattr-dft)
            (,tflags)
            )
        (setq ,name (car ,attr-info))
@@ -194,6 +213,7 @@
        (setq ,tattr-col (cdr ,tattr-cmt))
        (setq ,tattr-ct (cdr ,tattr-col))
        (setq ,tattr-enu (cdr ,tattr-ct))
+       (setq ,tattr-dft (cdr ,tattr-enu))
        (setq ,comment (car ,tattr-cmt))
        (setq ,tflags (car ,tattr-ct))
        (if (= (logand ,tflags shu-cpp-attributes-reference) shu-cpp-attributes-reference)
@@ -206,7 +226,8 @@
          )
        (setq ,column-name (car ,tattr-col))
        (setq ,enum-base (car ,tattr-enu))
-       (setq ,column-count (cdr ,tattr-enu))
+       (setq ,column-count (cdr ,tattr-dft))
+       (setq ,reset-value (car ,tattr-dft))
        )
     ))
 
@@ -225,7 +246,8 @@
 ;;  shu-cpp-make-attr-info
 ;;
 (defun shu-cpp-make-attr-info (name data-type full-data-type &optional comment
-                                    reference nullable column-name column-count enum-base)
+                                    reference nullable column-name column-count
+                                    enum-base reset-value)
   "Return an attr-info created from the given arguments"
   (let ((flags 0))
     (when (not column-count)
@@ -240,7 +262,8 @@
                       (cons comment
                             (cons column-name
                                   (cons flags
-                                        (cons enum-base column-count)))))))
+                                        (cons enum-base
+                                              (cons reset-value column-count))))))))
     ))
 
 
@@ -261,20 +284,26 @@
         (column-name)
         (column-count)
         (enum-base)
-        (penum-base))
+        (penum-base)
+        (reset-value)
+        (preset-value))
     (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                               reference nullable column-name column-count enum-base)
+                               reference nullable column-name column-count
+                               enum-base reset-value)
     (if enum-base
         (setq penum-base enum-base)
-      (setq penum-base "nil")
-      )
+      (setq penum-base "nil"))
+    (if reset-value
+        (setq preset-value reset-value)
+      (setq preset-value "nil"))
     (princ (concat
             "col: " column-name
             ", name: [" name "], type: [" data-type "], ref: " (shu-bool-to-string nullable)
             "], nullable: " (shu-bool-to-string nullable)
             ", full-type: [" full-data-type "]"
             ", count: " (number-to-string column-count)
-            ", enum-base: " penum-base "\n") buf)
+            ", enum-base: " penum-base
+            ", reset-value: " preset-value "\n") buf)
     (when comment
       (princ (concat "    [" comment "]\n") buf))
     ))
@@ -474,6 +503,7 @@ snippets will be inserted into the same file."
         (column-ct)
         (column-count)
         (enum-base)
+        (reset-value)
         (attr-info)
         (attributes)
         (z))
@@ -588,6 +618,7 @@ snippets will be inserted into the same file."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (max-type-len 31)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
@@ -609,7 +640,8 @@ snippets will be inserted into the same file."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (when (> (length full-data-type) max-type-len)
         (setq max-type-len (length full-data-type)))
       (setq attrs (cdr attrs)))
@@ -617,7 +649,8 @@ snippets will be inserted into the same file."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (setq full-data-type (shu-cpp-attributes-header-type class-name full-data-type))
       (insert "\n")
       (when comment
@@ -657,6 +690,7 @@ of nullable values."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -674,7 +708,8 @@ of nullable values."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (when nullable
         (insert "\n")
         (when comment
@@ -710,6 +745,7 @@ of nullable values."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -729,7 +765,8 @@ of nullable values."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -781,6 +818,7 @@ of values for individual nullable columns."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -789,7 +827,8 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (when nullable
         (insert "\n\n")
         (setq uname (shu-upcase-first-letter name))
@@ -868,6 +907,7 @@ of values for individual nullable columns."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -876,7 +916,8 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (insert "\n")
       (when comment
         (insert
@@ -921,6 +962,7 @@ of values for individual nullable columns."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -929,7 +971,8 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (insert "\n\n")
       (when reference
         (insert "const "))
@@ -978,6 +1021,7 @@ of values for individual nullable columns."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (ipad (make-string shu-cpp-indent-length ? ))
         (lpad "")
         (comma "")
@@ -1002,7 +1046,8 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -1014,7 +1059,8 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -1068,6 +1114,7 @@ of values for individual nullable columns."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -1089,7 +1136,8 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -1133,6 +1181,7 @@ of values for individual nullable columns."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -1151,7 +1200,8 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (if (string= full-data-type "bdlt::Datetime")
           (setq have-date t)
         (if (string= full-data-type "bdlt::DatetimeTz")
@@ -1174,7 +1224,8 @@ of values for individual nullable columns."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -1221,6 +1272,7 @@ values from an instance of bcem_Aggregate."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (ipad (make-string shu-cpp-indent-length ? ))
         (attr-num 1)
         (pad-count 0)
@@ -1248,7 +1300,8 @@ values from an instance of bcem_Aggregate."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
@@ -1358,6 +1411,7 @@ values from an instance of bcem_Aggregate."
         (column-name)
         (column-count)
         (enum-base)
+        (reset-value)
         (ipad (make-string shu-cpp-indent-length ? ))
         (lpad)
         (attr-num 1)
@@ -1385,7 +1439,8 @@ values from an instance of bcem_Aggregate."
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count enum-base)
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
       (if nullable
           (progn
             (setq have-nullable t)
@@ -1408,10 +1463,12 @@ values from an instance of bcem_Aggregate."
           (while attrs
             (setq attr-info (car attrs))
             (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                       reference nullable column-name column-count enum-base)
+                                       reference nullable column-name column-count
+                                       enum-base reset-value)
             (setq attr-info (car attrs))
             (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                       reference nullable column-name column-count enum-base)
+                                       reference nullable column-name column-count
+                                       enum-base reset-value)
             (setq pad-count 0)
             (when (< (length name) longest-name-length)
               (setq pad-count (- longest-name-length (length name))))
@@ -1440,7 +1497,8 @@ values from an instance of bcem_Aggregate."
       (while attrs
         (setq attr-info (car attrs))
         (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                   reference nullable column-name column-count enum-base)
+                                   reference nullable column-name column-count
+                                   enum-base reset-value)
         (when nullable
           (setq pad-count 0)
           (when (< (length name) longest-nullable-name-length)
@@ -1471,7 +1529,8 @@ values from an instance of bcem_Aggregate."
       (while attrs
         (setq attr-info (car attrs))
         (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                   reference nullable column-name column-count enum-base)
+                                   reference nullable column-name column-count
+                                   enum-base reset-value)
         (when (not nullable)
           (setq pad-count 0)
           (when (< (length name) longest-non-nullable-name-length)
@@ -1502,7 +1561,8 @@ values from an instance of bcem_Aggregate."
       (while attrs
         (setq attr-info (car attrs))
         (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                   reference nullable column-name column-count enum-base)
+                                   reference nullable column-name column-count
+                                   enum-base reset-value)
         (when nullable
           (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
           (insert (concat lpad "( ( !lhs." uname " ) ||\n"))

@@ -49,6 +49,7 @@
         (column-name "MumbleBar::otherThing")
         (column-count 8)
         (enum-base "int")
+        (reset-value "8097")
         (reference t)
         (attr-info)
         (xname)
@@ -59,11 +60,14 @@
         (xcolumn-name)
         (xcolumn-count)
         (xenum-base)
+        (xreset-value)
         (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
-                                            reference nullable column-name column-count enum-base))
+                                            reference nullable column-name column-count
+                                            enum-base reset-value))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name xcolumn-count xenum-base)
+                               xreference xnullable xcolumn-name xcolumn-count
+                               xenum-base xreset-value)
     (should xname)
     (should (stringp xname))
     (should (string= name xname))
@@ -95,6 +99,10 @@
     (should xenum-base)
     (should (stringp xenum-base))
     (should (string= enum-base xenum-base))
+
+    (should xreset-value)
+    (should (stringp xreset-value))
+    (should (string= reset-value xreset-value))
     ))
 
 
@@ -120,11 +128,13 @@
         (xcolumn-name)
         (xcolumn-count)
         (xenum-base)
+        (xreset-value)
         (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name column-count))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name xcolumn-count xenum-base)
+                               xreference xnullable xcolumn-name xcolumn-count
+                               xenum-base xreset-value)
 
     (should (not xreference))
 
@@ -153,11 +163,13 @@
         (xcolumn-name)
         (xcolumn-count)
         (xenum-base)
+        (xreset-value)
         (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name xcolumn-count xenum-base)
+                               xreference xnullable xcolumn-name xcolumn-count
+                               xenum-base xreset-value)
 
     (should xreference)
 
@@ -186,11 +198,13 @@
         (xcolumn-name)
         (xcolumn-count)
         (xenum-base)
+        (xreset-value)
         (xreference))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name xcolumn-count xenum-base)
+                               xreference xnullable xcolumn-name xcolumn-count
+                               xenum-base xreset-value)
 
     (should (not xreference))
 
@@ -219,10 +233,12 @@
         (xnullable)
         (xcolumn-name)
         (xcolumn-count)
-        (xenum-base))
+        (xenum-base)
+        (xreset-value))
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type))
     (shu-cpp-extract-attr-info attr-info xname xdata-type xfull-data-type xcomment
-                               xreference xnullable xcolumn-name xcolumn-count xenum-base)
+                               xreference xnullable xcolumn-name xcolumn-count
+                               xenum-base xreset-value)
     (should xname)
     (should (stringp xname))
     (should (string= name xname))
