@@ -267,7 +267,7 @@
     (if enum-base
         (setq penum-base enum-base)
       (setq penum-base "nil")
-        )
+      )
     (princ (concat
             "col: " column-name
             ", name: [" name "], type: [" data-type "], ref: " (shu-bool-to-string nullable)
@@ -697,6 +697,7 @@ of nullable values."
         (name)
         (uname)
         (data-type)
+        (tmp-data-type)
         (full-data-type)
         (comment)
         (reference)
@@ -740,8 +741,14 @@ of nullable values."
             ipad  "else\n"
             ipad ipad "binder.bind"
             )))
-        (insert (shu-cpp-attributes-bind-type data-type))
-        (insert (concat "(\"@\" + " column-name ", " name "()"))
+        (setq tmp-data-type data-type)
+        (when enum-base
+          (setq tmp-data-type enum-base))
+        (insert (shu-cpp-attributes-bind-type tmp-data-type))
+        (insert (concat "(\"@\" + " column-name ", "))
+        (if enum-base
+            (insert (concat "static_cast<" enum-base ">(" name "())"))
+          (insert (concat name "()")))
         (when (string= data-type "bdlt::DatetimeInterval")
           (insert ".totalMilliseconds()"))
         (insert ", __FILE__, __LINE__);\n"))
@@ -1143,10 +1150,10 @@ of values for individual nullable columns."
                                  reference nullable column-name column-count enum-base)
       (if (string= full-data-type "bdlt::Datetime")
           (setq have-date t)
-      (if (string= full-data-type "bdlt::DatetimeTz")
-          (setq have-date-tz t)
-        (when (string= full-data-type "bdlt::DatetimeInterval")
-          (setq have-interval t))))
+        (if (string= full-data-type "bdlt::DatetimeTz")
+            (setq have-date-tz t)
+          (when (string= full-data-type "bdlt::DatetimeInterval")
+            (setq have-interval t))))
       (setq attrs (cdr attrs)))
     (if have-interval
         (progn
@@ -1175,14 +1182,14 @@ of values for individual nullable columns."
             (insert ".clear()")
           (if (string= full-data-type "bdlt::Datetime")
               (insert " = defaultTime")
-          (if (string= full-data-type "bdlt::DatetimeTz")
-              (insert " = defaultTimeTz")
-            (if (string= full-data-type "bdlt::DatetimeInterval")
-                (insert " = defaultInterval")
-              (if (string= full-data-type "int")
-                  (insert " = 0")
-                (when (string= full-data-type "double")
-                  (insert " = 0.0"))))))))
+            (if (string= full-data-type "bdlt::DatetimeTz")
+                (insert " = defaultTimeTz")
+              (if (string= full-data-type "bdlt::DatetimeInterval")
+                  (insert " = defaultInterval")
+                (if (string= full-data-type "int")
+                    (insert " = 0")
+                  (when (string= full-data-type "double")
+                    (insert " = 0.0"))))))))
       (insert ";\n")
       (setq attrs (cdr attrs)))
     (insert "}\n")
