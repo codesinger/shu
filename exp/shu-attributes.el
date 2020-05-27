@@ -747,16 +747,7 @@ of nullable values."
             ipad  "else\n"
             ipad ipad "binder.bind"
             )))
-        (if (string= data-type "bsl::string")
-            (insert "Text")
-          (if (string= data-type "bdlt::Datetime")
-              (insert "Datetime")
-            (if (string= data-type "bdlt::DatetimeInterval")
-                (insert "Int")
-              (if (string= data-type "int")
-                  (insert "Int")
-                (when (string= data-type "double")
-                  (insert "Double"))))))
+        (insert (shu-cpp-attributes-bind-type data-type))
         (insert (concat "(\"@\" + " column-name ", " name "()"))
         (when (string= data-type "bdlt::DatetimeInterval")
           (insert ".totalMilliseconds()"))
