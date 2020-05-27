@@ -356,7 +356,7 @@
   (let (
         (data-type "bdlt::Datetime")
         (aggregate-type)
-        (expected-aggregate-type "asDatetimeTz()().utcDatetime()")
+        (expected-aggregate-type "asDatetimeTz().utcDatetime()")
         )
     (setq aggregate-type (shu-cpp-attributes-aggregate-type data-type))
     (should aggregate-type)

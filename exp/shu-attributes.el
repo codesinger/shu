@@ -320,7 +320,7 @@
      ((string= data-type "bsl::string")
       (setq aggregate-type "asString()"))
      ((string= data-type "bdlt::Datetime")
-      (setq aggregate-type "asDatetimeTz()().utcDatetime()"))
+      (setq aggregate-type "asDatetimeTz().utcDatetime()"))
      ((string= data-type "bdlt::DatetimeTz")
       (setq aggregate-type "asDatetimeTz()"))
      ((string= data-type "bdlt::DatetimeInterval")
@@ -1255,32 +1255,21 @@ values from an instance of bcem_Aggregate."
          (concat
           ipad "const bcem_Aggregate &" name " = data[" column-name "];\n"
           ipad "if ( !" name ".isNul2() )\n"
-          ipad "{\n"
-          ))
+          ipad "{\n"))
         (when (string= data-type "bdlt::DatetimeInterval")
           (insert
            (concat
             ipad ipad "const bsls::Types::Int64      intval(" name ".asInt());\n"
-            ipad ipad "const bdlt::DatetimeInterval  interval(0, 0, 0, 0, intval, 0);\n"
-            )))
+            ipad ipad "const bdlt::DatetimeInterval  interval(0, 0, 0, 0, intval, 0);\n")))
         (insert
          (concat
-          ipad ipad member-prefix name
-          ))
+          ipad ipad member-prefix name))
         (if nullable
             (insert ".makeValue(")
           (insert " = "))
         (if (string= data-type "bdlt::DatetimeInterval")
             (insert "interval")
-          (insert (concat name ".as"))
-          (if (string= data-type "bsl::string")
-              (insert "String()")
-            (if (string= data-type "bdlt::Datetime")
-                (insert "DatetimeTz().utcDatetime()")
-              (if (string= data-type "int")
-                  (insert "Int()")
-                (when (string= data-type "double")
-                  (insert "Double()"))))))
+          (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type))))
         (when nullable
           (insert ")"))
         (insert
