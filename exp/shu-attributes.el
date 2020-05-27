@@ -281,6 +281,102 @@
 
 
 
+;;
+;;  shu-cpp-attributes-bind-type
+;;
+(defun shu-cpp-attributes-bind-type (data-type)
+  "Return the data type for the database bind.  \"string\" returns \"Text\",
+\"int\" returns \"Int\", etc."
+  (let ((bind-type "Text"))
+    (cond
+     ((string= data-type "bsl::string")
+      (setq bind-type "Text"))
+     ((string= data-type "bdlt::Datetime")
+      (setq bind-type "Datetime"))
+     ((string= data-type "bdlt::DatetimeTz")
+      (setq bind-type "DatetimeTz"))
+     ((string= data-type "bdlt::DatetimeInterval")
+      (setq bind-type "Int"))
+     ((string= data-type "bsls::Types::Int64")
+      (setq bind-type "Int"))
+     ((string= data-type "int")
+      (setq bind-type "Int"))
+     ((string= data-type "double")
+      (setq bind-type "Double")))
+    bind-type
+    ))
+
+
+
+
+;;
+;;  shu-cpp-attributes-aggregate-type
+;;
+(defun shu-cpp-attributes-aggregate-type (data-type)
+  "Return the data type for the set from aggregate value.  \"string\" returns
+\"asString()\".  \"int\" returns \"asInt()\", etc."
+  (let (
+        (aggregate-type "asString()")
+        )
+    (cond
+     ((string= data-type "bsl::string")
+      (setq aggregate-type "asString()")
+      )
+     ((string= data-type "bdlt::Datetime")
+      (setq aggregate-type "asDatetimeTz()().utcDatetime()")
+      )
+     ((string= data-type "bdlt::DatetimeTz")
+      (setq aggregate-type "asDatetimeTz()")
+      )
+     ((string= data-type "bdlt::DatetimeInterval")
+      (setq aggregate-type "asInt()")
+      )
+     ((string= data-type "bsls::Types::Int64")
+      (setq aggregate-type "asInt()")
+      )
+     ((string= data-type "int")
+      (setq aggregate-type "asInt()")
+      )
+     ((string= data-type "double")
+      (setq aggregate-type "asDouble()")
+      )
+     )
+    aggregate-type
+    ))
+
+
+
+
+;;
+;;  shu-cpp-attributes-current-data-type
+;;
+(defun shu-cpp-attributes-current-data-type (data-type enum-base)
+  "If ENUM-BASE is null, return DATA-TYPE.  if ENUM-BASE is non-nil, return ENUM-BASE."
+  (let ((current-data-type (if enum-base enum-base data-type)))
+    current-data-type
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-header-type
+;;
+(defun shu-cpp-attributes-header-type (class-name data-type)
+  "If DATA-TYPE is a name that is qualiified by CLASS-NAME, then return the
+data type minus the class name qualification.  Otherwise, return the data type
+unaltered."
+  (let ((ss "\\([_a-zA-Z0-9$]+\\)::\\([_a-zA-Z0-9$]+\\)")
+        (unqualified-type data-type)
+        (first-part))
+    (when (string-match ss data-type)
+      (setq first-part (match-string-no-properties 1 data-type))
+      (when (string= first-part class-name)
+        (setq unqualified-type (match-string-no-properties 2 data-type))))
+    unqualified-type
+    ))
+
+
+
 
 
 ;;
@@ -370,7 +466,7 @@ snippets will be inserted into the same file."
         (line)
         (x)
         (ss "std\\s-*(\\([0-9]*\\))")
-        (enum-ss "[:_a-zA-Z0-9]+\\s-*(\\([:_a-zA-Z0-9]+\\))")
+        (enum-ss "[:_a-zA-Z0-9$]+\\s-*(\\([:_a-zA-Z0-9$]+\\))")
         (class-name)
         (table-name)
         (data-type)

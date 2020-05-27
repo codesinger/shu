@@ -297,6 +297,261 @@
     (should (string= expected actual))
     ))
 
+
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-header-type-1
+;;
+(ert-deftest shu-test-shu-cpp-attributes-header-type-1 ()
+  (let ((class-name "farble")
+        (data-type "Double")
+        (unqualified-type))
+    (setq unqualified-type (shu-cpp-attributes-header-type class-name data-type))
+    (should unqualified-type)
+    (should (stringp unqualified-type))
+    (should (string= data-type unqualified-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-header-type-2
+;;
+(ert-deftest shu-test-shu-cpp-attributes-header-type-2 ()
+  (let ((class-name "farble")
+        (data-type "farble::Mumble")
+        (unqualified-type)
+        (expected-type "Mumble"))
+    (setq unqualified-type (shu-cpp-attributes-header-type class-name data-type))
+    (should unqualified-type)
+    (should (stringp unqualified-type))
+    (should (string= expected-type unqualified-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-aggregate-type-1
+;;
+(ert-deftest shu-test-shu-cpp-attributes-aggregate-type-1 ()
+  (let (
+        (data-type "bsl::string")
+        (aggregate-type)
+        (expected-aggregate-type "asString()")
+        )
+    (setq aggregate-type (shu-cpp-attributes-aggregate-type data-type))
+    (should aggregate-type)
+    (should (stringp aggregate-type))
+    (should (string= expected-aggregate-type aggregate-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-aggregate-type-2
+;;
+(ert-deftest shu-test-shu-cpp-attributes-aggregate-type-2 ()
+  (let (
+        (data-type "bdlt::Datetime")
+        (aggregate-type)
+        (expected-aggregate-type "asDatetimeTz()().utcDatetime()")
+        )
+    (setq aggregate-type (shu-cpp-attributes-aggregate-type data-type))
+    (should aggregate-type)
+    (should (stringp aggregate-type))
+    (should (string= expected-aggregate-type aggregate-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-aggregate-type-3
+;;
+(ert-deftest shu-test-shu-cpp-attributes-aggregate-type-3 ()
+  (let (
+        (data-type "bdlt::DatetimeTz")
+        (aggregate-type)
+        (expected-aggregate-type "asDatetimeTz()")
+        )
+    (setq aggregate-type (shu-cpp-attributes-aggregate-type data-type))
+    (should aggregate-type)
+    (should (stringp aggregate-type))
+    (should (string= expected-aggregate-type aggregate-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-aggregate-type-4
+;;
+(ert-deftest shu-test-shu-cpp-attributes-aggregate-type-4 ()
+  (let (
+        (data-type "bdlt::DatetimeInterval")
+        (aggregate-type)
+        (expected-aggregate-type "asInt()")
+        )
+    (setq aggregate-type (shu-cpp-attributes-aggregate-type data-type))
+    (should aggregate-type)
+    (should (stringp aggregate-type))
+    (should (string= expected-aggregate-type aggregate-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-aggregate-type-5
+;;
+(ert-deftest shu-test-shu-cpp-attributes-aggregate-type-5 ()
+  (let (
+        (data-type "bsls::Types::Int64")
+        (aggregate-type)
+        (expected-aggregate-type "asInt()")
+        )
+    (setq aggregate-type (shu-cpp-attributes-aggregate-type data-type))
+    (should aggregate-type)
+    (should (stringp aggregate-type))
+    (should (string= expected-aggregate-type aggregate-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-aggregate-type-6
+;;
+(ert-deftest shu-test-shu-cpp-attributes-aggregate-type-6 ()
+  (let (
+        (data-type "int")
+        (aggregate-type)
+        (expected-aggregate-type "asInt()")
+        )
+    (setq aggregate-type (shu-cpp-attributes-aggregate-type data-type))
+    (should aggregate-type)
+    (should (stringp aggregate-type))
+    (should (string= expected-aggregate-type aggregate-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-aggregate-type-7
+;;
+(ert-deftest shu-test-shu-cpp-attributes-aggregate-type-7 ()
+  (let (
+        (data-type "double")
+        (aggregate-type)
+        (expected-aggregate-type "asDouble()")
+        )
+    (setq aggregate-type (shu-cpp-attributes-aggregate-type data-type))
+    (should aggregate-type)
+    (should (stringp aggregate-type))
+    (should (string= expected-aggregate-type aggregate-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-bind-type-1
+;;
+(ert-deftest shu-test-shu-cpp-attributes-bind-type-1 ()
+  (let (
+        (data-type "bsl::string")
+        (bind-type)
+        (expected-bind-type "Text")
+        )
+    (setq bind-type (shu-cpp-attributes-bind-type data-type))
+    (should bind-type)
+    (should (stringp bind-type))
+    (should (string= bind-type expected-bind-type))
+
+    (setq data-type "bdlt::Datetime")
+    (setq bind-type nil)
+    (setq expected-bind-type "Datetime")
+    (setq bind-type (shu-cpp-attributes-bind-type data-type))
+    (should bind-type)
+    (should (stringp bind-type))
+    (should (string= bind-type expected-bind-type))
+
+    (setq data-type "bdlt::DatetimeTz")
+    (setq bind-type nil)
+    (setq expected-bind-type "DatetimeTz")
+    (setq bind-type (shu-cpp-attributes-bind-type data-type))
+    (should bind-type)
+    (should (stringp bind-type))
+    (should (string= bind-type expected-bind-type))
+
+    (setq data-type "bdlt::DatetimeInterval")
+    (setq bind-type nil)
+    (setq expected-bind-type "Int")
+    (setq bind-type (shu-cpp-attributes-bind-type data-type))
+    (should bind-type)
+    (should (stringp bind-type))
+    (should (string= bind-type expected-bind-type))
+
+    (setq data-type "bsls::Types::Int64")
+    (setq bind-type nil)
+    (setq expected-bind-type "Int")
+    (setq bind-type (shu-cpp-attributes-bind-type data-type))
+    (should bind-type)
+    (should (stringp bind-type))
+    (should (string= bind-type expected-bind-type))
+
+    (setq data-type "int")
+    (setq bind-type nil)
+    (setq expected-bind-type "Int")
+    (setq bind-type (shu-cpp-attributes-bind-type data-type))
+    (should bind-type)
+    (should (stringp bind-type))
+    (should (string= bind-type expected-bind-type))
+
+    (setq data-type "double")
+    (setq bind-type nil)
+    (setq expected-bind-type "Double")
+    (setq bind-type (shu-cpp-attributes-bind-type data-type))
+    (should bind-type)
+    (should (stringp bind-type))
+    (should (string= bind-type expected-bind-type))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-current-data-type-1
+;;
+(ert-deftest shu-test-shu-cpp-attributes-current-data-type-1 ()
+  (let (
+        (enum-base)
+        (data-type "std::string")
+        (current-data-type)
+        )
+    (setq current-data-type (shu-cpp-attributes-current-data-type data-type enum-base))
+    (should current-data-type)
+    (should (stringp current-data-type))
+    (should (string= data-type current-data-type))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-current-data-type-2
+;;
+(ert-deftest shu-test-shu-cpp-attributes-current-data-type-2 ()
+  (let (
+        (enum-base "int")
+        (data-type "Mumble::Bar")
+        (current-data-type)
+        )
+    (setq current-data-type (shu-cpp-attributes-current-data-type data-type enum-base))
+    (should current-data-type)
+    (should (stringp current-data-type))
+    (should (string= enum-base current-data-type))
+    ))
+
+
+
 ;;;  SAMPLE INPUT
 ;;;
 ;;;  class TenorRow
