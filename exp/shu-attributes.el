@@ -476,6 +476,10 @@ Each column is has x attributes all on a single line
        type Mumble is to be cast to an int for inserting and from an int
        back to Mumble when fetching.
     3. The name of the member variable that holds the column value
+       If the member variable has a value that indicates it is in the \"reset\"
+       or initial state, the value may follow the name in parenthesis.
+       This value will be used in the generated reset() function to reset
+       the variable to its initially constructed state.
     4. If this is \"&\" the value is passed by reference.  If this is absent or
        has any value other than \"&\", the value is passed by value.
     5. If this is present, the column is nullable
@@ -491,6 +495,7 @@ snippets will be inserted into the same file."
         (x)
         (ss "std\\s-*(\\([0-9]*\\))")
         (enum-ss "\\([:_a-zA-Z0-9$]+\\)\\s-*(\\([:_a-zA-Z0-9$]+\\))")
+        (reset-ss "\\([:_a-zA-Z0-9$]+\\)\\s-*(\\([:._a-zA-Z0-9$]+\\))")
         (class-name)
         (table-name)
         (data-type)
@@ -536,6 +541,10 @@ snippets will be inserted into the same file."
                   (setq data-type (match-string-no-properties 1 data-type)))
                 (setq x (cdr x))
                 (setq name (car x))
+                (setq reset-value nil)
+                (when (string-match reset-ss name)
+                  (setq reset-value (match-string-no-properties 2 name))
+                  (setq name (match-string-no-properties 1 name)))
                 (setq nullable nil)
                 (setq full-data-type data-type)
                 (setq reference nil)
@@ -551,7 +560,7 @@ snippets will be inserted into the same file."
           (when name
             (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                                     reference nullable column-name column-count
-                                                    enum-base))
+                                                    enum-base reset-value))
             (push attr-info attributes)
             (shu-cpp-print-attr-info attr-info gb)
             (setq comment nil)
