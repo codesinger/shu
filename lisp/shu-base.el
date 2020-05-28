@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.24
+;; Version: 1.6.25
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.24"
+(defconst shu-version "1.6.25"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -872,6 +872,32 @@ if any."
     (when arg
       (setq sval "t"))
     sval
+    ))
+
+
+
+;;
+;;  shu-upcase-first-letter
+;;
+(defun shu-upcase-first-letter (string)
+  "Return the given string with the first character of the string converted
+to upper case"
+  (let ((first-letter (substring string 0 1))
+        (remainder (substring string 1)))
+    (concat (upcase first-letter) remainder)
+    ))
+
+
+
+;;
+;;  shu-downcase-first-letter
+;;
+(defun shu-downcase-first-letter (string)
+  "Return the given string with the first character of the string converted
+to lower case"
+  (let ((first-letter (substring string 0 1))
+        (remainder (substring string 1)))
+    (concat (downcase first-letter) remainder)
     ))
 
 

@@ -421,32 +421,6 @@ name is less than the right hand name."
 
 
 
-;;
-;;  shu-upcase-first-letter
-;;
-(defun shu-upcase-first-letter (string)
-  "Return the given string with the first character of the string converted
-to upper case"
-  (let ((first-letter (substring string 0 1))
-        (remainder (substring string 1)))
-    (concat (upcase first-letter) remainder)
-    ))
-
-
-
-;;
-;;  shu-downcase-first-letter
-;;
-(defun shu-downcase-first-letter (string)
-  "Return the given string with the first character of the string converted
-to lower case"
-  (let ((first-letter (substring string 0 1))
-        (remainder (substring string 1)))
-    (concat (downcase first-letter) remainder)
-    ))
-
-
-
 
 ;;
 ;;  shu-make-class
@@ -511,6 +485,7 @@ snippets will be inserted into the same file."
         (reset-value)
         (attr-info)
         (attributes)
+        (have-nullables)
         (z))
     (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
       (setq eol (line-end-position))
@@ -556,6 +531,7 @@ snippets will be inserted into the same file."
                     (setq reference t)))
                 (when (cdr x)
                   (setq nullable t)
+                  (setq have-nullables t)
                   (setq full-data-type (shu-cpp-make-nullable data-type))))))
           (when name
             (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
@@ -569,7 +545,7 @@ snippets will be inserted into the same file."
     (setq line-diff (forward-line 1))
     (setq attributes (nreverse attributes))
     (princ "class-name: " gb)(princ class-name gb) (princ "\n" gb)
-    (shu-cpp-attributes-gen class-name table-name attributes)
+    (shu-cpp-attributes-gen class-name table-name have-nullables attributes)
     ))
 
 
@@ -578,7 +554,7 @@ snippets will be inserted into the same file."
 ;;
 ;;  shu-cpp-attributes-gen
 ;;
-(defun shu-cpp-attributes-gen (class-name table-name attributes)
+(defun shu-cpp-attributes-gen (class-name table-name have-nullables attributes)
   "Generate all of the code snippets."
   (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
