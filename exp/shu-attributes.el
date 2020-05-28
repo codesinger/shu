@@ -1217,8 +1217,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-ctor-gen (class-name attributes)
   "Generate the code for the constructor."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+  (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -1237,8 +1236,7 @@ of values for individual nullable columns."
         (pad-count 0)
         (pad)
         (member-prefix "m_")
-        (contained-class)
-        )
+        (contained-class))
     (insert
      (concat
       "\n\n\n"
@@ -1262,15 +1260,14 @@ of values for individual nullable columns."
       (insert (concat member-prefix name "("))
       (when (or (string= full-data-type "bsl::string")
                 contained-class)
-        (insert "allocator")
-        )
+        (insert "allocator"))
+      (when reset-value
+        (insert reset-value))
       (insert ")")
       (when (cdr attrs)
-        (insert ",")
-        )
+        (insert ","))
       (insert "\n")
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     (insert
      (concat
       "{\n"
