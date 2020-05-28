@@ -818,7 +818,8 @@ of nullable values."
       ipad " * \\brief Bind our values to column names\n"
       ipad " */\n"
       ipad "void bindValues(\n"
-      ipad ipad "fxpricingdb::Binder   &binder);\n"
+      ipad ipad "fxpricingdb::Binder   &binder)\n"
+      ipad "const;\n"
       ))
     (while attrs
       (setq attr-info (car attrs))
@@ -875,6 +876,7 @@ of nullable values."
       "// ACCESSORS\n\n"
       "void " class-name "::bindValues(\n"
       ipad "fxpricingdb::Binder   &binder)\n"
+      "const\n"
       "{\n"
       ))
     (while attrs
