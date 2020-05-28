@@ -1030,6 +1030,7 @@ of values for individual nullable columns."
         (attr-num 1)
         (pad-count 0)
         (pad)
+        (ref)
         (member-prefix "m_"))
     (while attrs
       (setq attr-info (car attrs))
@@ -1038,10 +1039,13 @@ of values for individual nullable columns."
                                  enum-base reset-value)
       (insert "\n")
       (when comment
+        (setq ref "")
+        (when reference
+          (setq ref "a reference to "))
         (insert
          (concat "\n"
                  ipad "/*!\n"
-                 ipad " * Return " (shu-downcase-first-letter comment) "\n"))
+                 ipad " * Return " ref (shu-downcase-first-letter comment) "\n"))
         (when nullable
           (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
           (insert
