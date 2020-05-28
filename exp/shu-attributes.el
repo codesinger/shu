@@ -574,14 +574,15 @@ snippets will be inserted into the same file."
       (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
       (shu-cpp-attributes-gen-reset-decl)
       (when have-nullables
-        (shu-cpp-attributes-gen-setter-decl class-name sorted-attributes)
-        )
+        (shu-cpp-attributes-gen-setter-decl class-name sorted-attributes))
       (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
       (shu-cpp-attributes-gen-getter-decl class-name sorted-attributes)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
       (shu-cpp-attributes-gen-ctor-gen class-name attributes)
       (shu-cpp-attributes-gen-reset-gen class-name attributes)
       (shu-cpp-attributes-gen-set-values-gen class-name table-name attributes)
+      (when have-nullables
+        (shu-cpp-attributes-gen-setter-gen class-name sorted-attributes))
       (shu-cpp-attributes-gen-bind-values-gen class-name attributes)
       (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
       (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
@@ -1393,6 +1394,50 @@ values from an instance of bcem_Aggregate."
       ipad "\n"
       ipad "return fetchCount;\n"
       "}\n"))
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-setter-gen
+;;
+(defun shu-cpp-attributes-gen-setter-gen (class-name attributes)
+  "Generate the code for the functions that set attribute values."
+  (let ((attrs attributes)
+        (attr-info)
+        (name)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (column-count)
+        (enum-base)
+        (reset-value)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (amper)
+        (member-prefix "m_"))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (when nullable
+        (setq amper "")
+        (when reference
+          (setq amper "&"))
+        (insert
+         (concat
+          "\n"
+          "\n"
+          "void " class-name "::set" (shu-upcase-first-letter name) "(\n"
+          ipad "const " data-type "   " amper name ")\n"
+          "{\n"
+          ipad member-prefix name ".makeValue(" name ");\n"
+          "}\n"
+          )))
+      (setq attrs (cdr attrs)))
     ))
 
 
