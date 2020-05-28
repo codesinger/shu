@@ -566,12 +566,16 @@ snippets will be inserted into the same file."
       (shu-cpp-print-attr-info attr-info gb)
       (setq attrs (cdr attrs)))
     (save-excursion
+      (princ (concat "nullables: " (shu-bool-to-string have-nullables) "\n") gb)
       (goto-char (point-max))
       (insert "\n\n")
       (shu-cpp-attributes-gen-decl class-name attributes)
       (setq sorted-attributes (copy-tree attributes))
       (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
-      (shu-cpp-attributes-gen-setter-decl)
+      (shu-cpp-attributes-gen-reset-decl)
+      (when have-nullables
+        (shu-cpp-attributes-gen-setter-decl class-name sorted-attributes)
+        )
       (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
       (shu-cpp-attributes-gen-getter-decl class-name sorted-attributes)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
@@ -830,9 +834,9 @@ of values for individual nullable columns."
 
 
 ;;
-;;  shu-cpp-attributes-gen-setter-decl
+;;  shu-cpp-attributes-gen-reset-decl
 ;;
-(defun shu-cpp-attributes-gen-setter-decl ()
+(defun shu-cpp-attributes-gen-reset-decl ()
   "Generate the declarations for the two manipulator functions."
   (let ((gb (get-buffer-create "**boo**"))
         (ipad (make-string shu-cpp-indent-length ? )))
@@ -1235,6 +1239,51 @@ of values for individual nullable columns."
       (insert ";\n")
       (setq attrs (cdr attrs)))
     (insert "}\n")
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-setter-decl
+;;
+(defun shu-cpp-attributes-gen-setter-decl (class-name attributes)
+  "Generate the declarations for the functions that set attribute values."
+  (let ((attrs attributes)
+        (attr-info)
+        (name)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (column-count)
+        (enum-base)
+        (reset-value)
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (amper))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (when nullable
+        (insert "\n")
+        (when comment
+          (insert
+           (concat
+            "\n"
+            ipad "/*!\n"
+            ipad " * Set " (shu-downcase-first-letter comment) "\n"))
+          (insert (concat ipad " */\n")))
+        (setq amper "")
+        (when reference
+          (setq amper "&"))
+        (insert
+         (concat
+          ipad "void set" (shu-upcase-first-letter name) "(\n"
+          ipad ipad "const " (shu-cpp-attributes-header-type class-name data-type) "   " amper name ");\n")))
+      (setq attrs (cdr attrs)))
     ))
 
 
