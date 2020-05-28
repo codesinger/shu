@@ -568,6 +568,40 @@
 
 
 
+;;
+;;  shu-test-shu-cpp-attributes-make-pad-1
+;;
+(ert-deftest shu-test-shu-cpp-attributes-make-pad-1 ()
+  (let ((max-type-len (length "std::string"))
+        (reference)
+        (data-type "std::st")
+        (pad)
+        (expected-pad (make-string 8 ? )))
+    (setq pad (shu-cpp-attributes-make-pad max-type-len reference data-type))
+    (should pad)
+    (should (stringp pad))
+    (should (string= expected-pad pad))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-attributes-make-pad-2
+;;
+(ert-deftest shu-test-shu-cpp-attributes-make-pad-2 ()
+  (let ((max-type-len (length "std::string"))
+        (reference t)
+        (data-type "std::st")
+        (pad)
+        (expected-pad (concat (make-string 7 ? ) "&")))
+    (setq pad (shu-cpp-attributes-make-pad max-type-len reference data-type))
+    (should pad)
+    (should (stringp pad))
+    (should (string= expected-pad pad))
+    ))
+
+
+
 ;;;  SAMPLE INPUT
 ;;;
 ;;;  class TenorRow

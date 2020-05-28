@@ -460,7 +460,8 @@ Each column is has x attributes all on a single line
 
 Mark the lines to be scanned and then invoke this function.  The generated code
 snippets will be inserted into the same file."
-  (let ((gb (get-buffer-create "**boo**"))
+  (let (
+        (gb (get-buffer-create "**boo**"))
         (sline (shu-the-line-at start))
         (eline (shu-the-line-at end))
         (line-diff 0)
@@ -486,7 +487,9 @@ snippets will be inserted into the same file."
         (attr-info)
         (attributes)
         (have-nullables)
-        (z))
+        (have-non-nullables)
+        (z)
+        )
     (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
       (setq eol (line-end-position))
       (when (> eol (point))
@@ -496,14 +499,16 @@ snippets will be inserted into the same file."
           (if (string= (substring line 0 2) "//")
               (progn
                 (setq comment (shu-trim (substring line 2)))
-                (princ (concat "comment: [" comment "]\n") gb))
+                (princ (concat "comment: [" comment "]\n") gb)
+                )
             (setq x (split-string line nil t))
             (setq column-name (car x))
             (setq column-count 1)
             (when (string-match ss column-name)
               (setq column-ct (match-string-no-properties 1 column-name))
               (setq column-count (string-to-number column-ct))
-              (setq column-name "std"))
+              (setq column-name "std")
+              )
             (setq x (cdr x))
             (setq data-type (car x))
             (if (string= column-name "class")
@@ -513,13 +518,15 @@ snippets will be inserted into the same file."
                 (setq enum-base nil)
                 (when (string-match enum-ss data-type)
                   (setq enum-base (match-string-no-properties 2 data-type))
-                  (setq data-type (match-string-no-properties 1 data-type)))
+                  (setq data-type (match-string-no-properties 1 data-type))
+                  )
                 (setq x (cdr x))
                 (setq name (car x))
                 (setq reset-value nil)
                 (when (string-match reset-ss name)
                   (setq reset-value (match-string-no-properties 2 name))
-                  (setq name (match-string-no-properties 1 name)))
+                  (setq name (match-string-no-properties 1 name))
+                  )
                 (setq nullable nil)
                 (setq full-data-type data-type)
                 (setq reference nil)
@@ -528,11 +535,20 @@ snippets will be inserted into the same file."
                   (setq z (car x))
                   (princ "z: [" gb)(princ z gb)(princ "]\n" gb)
                   (when (string=  z "&")
-                    (setq reference t)))
-                (when (cdr x)
-                  (setq nullable t)
-                  (setq have-nullables t)
-                  (setq full-data-type (shu-cpp-make-nullable data-type))))))
+                    (setq reference t)
+                    )
+                  )
+                (if (cdr x)
+                    (progn
+                      (setq nullable t)
+                      (setq have-nullables t)
+                      (setq full-data-type (shu-cpp-make-nullable data-type))
+                      )
+                  (setq have-non-nullables t)
+                  )
+                )
+              )
+            )
           (when name
             (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                                     reference nullable column-name column-count
@@ -540,12 +556,17 @@ snippets will be inserted into the same file."
             (push attr-info attributes)
             (shu-cpp-print-attr-info attr-info gb)
             (setq comment nil)
-            (setq name nil))))
-      (setq line-diff (forward-line 1)))
+            (setq name nil)
+            )
+          )
+        )
+      (setq line-diff (forward-line 1))
+      )
     (setq line-diff (forward-line 1))
     (setq attributes (nreverse attributes))
     (princ "class-name: " gb)(princ class-name gb) (princ "\n" gb)
-    (shu-cpp-attributes-gen class-name table-name have-nullables attributes)
+    (shu-cpp-attributes-gen class-name table-name have-nullables
+                            have-non-nullables attributes)
     ))
 
 
@@ -554,7 +575,8 @@ snippets will be inserted into the same file."
 ;;
 ;;  shu-cpp-attributes-gen
 ;;
-(defun shu-cpp-attributes-gen (class-name table-name have-nullables attributes)
+(defun shu-cpp-attributes-gen (class-name table-name have-nullables
+                                          have-non-nullables attributes)
   "Generate all of the code snippets."
   (let ((gb (get-buffer-create "**boo**"))
         (attrs attributes)
@@ -572,6 +594,7 @@ snippets will be inserted into the same file."
       (shu-cpp-attributes-gen-decl class-name attributes)
       (setq sorted-attributes (copy-tree attributes))
       (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
+      (shu-cpp-attributes-gen-ctor-decl class-name have-non-nullables attributes)
       (shu-cpp-attributes-gen-reset-decl)
       (when have-nullables
         (shu-cpp-attributes-gen-setter-decl class-name sorted-attributes))
@@ -657,6 +680,106 @@ snippets will be inserted into the same file."
       (insert (concat ipad full-data-type pad member-prefix name ";\n"))
       (setq attr-num (+ attr-num column-count))
       (setq attrs (cdr attrs)))
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-ctor-decl
+;;
+(defun shu-cpp-attributes-gen-ctor-decl (class-name have-non-nullables attributes)
+  "Generate the declarations for the functions that set attribute values."
+  (let ((attrs attributes)
+        (attr-info)
+        (name)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (column-count)
+        (enum-base)
+        (reset-value)
+        (header-data-type)
+        (pad)
+        (max-type-len (length "bslma::Allocator"))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (amper)
+        (member-prefix "m_"))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      ipad "// CREATORS\n"
+      "\n"
+      ipad "/*!\n"
+      ipad " * \\brief Create an empty " class-name " object\n"
+      ipad " *\n"
+      ipad " * Its values are expected to be set by the setValues() function from the\n"
+      ipad " * data contained in an instance of bsidb2::Cursor.\n"
+      ipad " */\n"
+      ipad "explicit " class-name "(\n"
+      ipad ipad "bslma::Allocator   *allocator);\n"))
+    (when have-non-nullables
+      (insert
+       (concat
+        "\n"
+        "\n"
+        ipad "/*!\n"
+        ipad " * \\brief Create a " class-name " object with values for all of\n"
+        ipad " *         the non-null columns\n"
+        ipad " */\n"
+        ipad "explicit " class-name "(\n"))
+      (while attrs
+        (setq attr-info (car attrs))
+        (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                   reference nullable column-name column-count
+                                   enum-base reset-value)
+        (when (not nullable)
+          (setq header-data-type (shu-cpp-attributes-header-type class-name data-type))
+          (when ( > (length header-data-type) max-type-len)
+            (setq max-type-len (length header-data-type))))
+        (setq attrs (cdr attrs)))
+      (setq attrs attributes)
+      (while attrs
+        (setq attr-info (car attrs))
+        (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                   reference nullable column-name column-count
+                                   enum-base reset-value)
+        (when (not nullable)
+          (setq header-data-type (shu-cpp-attributes-header-type class-name data-type))
+          (setq pad (shu-cpp-attributes-make-pad max-type-len reference header-data-type))
+          (insert (concat ipad ipad header-data-type pad name ",\n")))
+        (setq attrs (cdr attrs)))
+      (setq header-data-type "bslma::Allocator")
+      (setq name "allocator")
+      (setq pad (shu-cpp-attributes-make-pad max-type-len nil header-data-type))
+      (setq pad (substring pad 1))
+      (insert (concat ipad ipad header-data-type pad "*" name ");\n")))
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-make-pad
+;;
+(defun shu-cpp-attributes-make-pad (max-type-len reference data-type)
+  "Return a pad string used to extend the DATA-TYPE name to the length of the
+longest data type plus three in the list of attributes.  If REFERENCE is true,
+append an ampersand to the end of the pad string.  If REFERENCE is false, append
+a blank to the resulting pad string.  MAX-TYPE-LEN is the length of the longest
+data type name in the list of attributes."
+  (let ((pad-len 0)
+        (pad))
+    (when (< (length data-type) max-type-len)
+      (setq pad-len (- max-type-len (length data-type))))
+    (setq pad-len (+ pad-len 3))
+    (setq pad (make-string pad-len ? ))
+    (if reference
+        (setq pad (concat pad "&"))
+      (setq pad (concat pad " ")))
+    pad
     ))
 
 
