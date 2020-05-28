@@ -1158,8 +1158,7 @@ of values for individual nullable columns."
       "bsl::ostream &" class-name "::printSelf(\n"
       "    bsl::ostream    &os)\n"
       "const\n"
-      "{\n"
-      ))
+      "{\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -1197,17 +1196,17 @@ of values for individual nullable columns."
            (concat
             semi
             ipad "if (" uname ")\n"
-            ipad ipad "os << \"" comma name ": \" << " name "();\n"
-            ))
+            ipad ipad "os << \"" comma name ": \" << " name "();\n"))
           (setq comma ", ")
           (setq semi "")))
+      (when (and (not nullable) (not (cdr attrs)))
+        (insert ";\n"))
       (setq attrs (cdr attrs)))
     (insert
      (concat
       "\n"
       ipad "return os;\n"
-      "}\n"
-      ))
+      "}\n"))
     ))
 
 
