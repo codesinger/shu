@@ -1655,20 +1655,20 @@ values from an instance of bcem_Aggregate."
 ;;
 (defun shu-cpp-attributes-gen-print-self-decl ()
   "Generate the declaration for the printSelf function"
+  (let((ipad (make-string shu-cpp-indent-length ? )))
   (insert
    (concat
     "\n"
     "\n"
-    "/*!\n"
-    " *  \brief Stream object out to a stream\n"
-    " *\n"
-    " * Intended for use by operator<<()\n"
-    " */\n"
-    "bsl::ostream &printSelf(\n"
-    "    bsl::ostream    &os)\n"
-    "const;\n"
-    ))
-  )
+    ipad "/*!\n"
+    ipad " *  \\brief Stream object out to a stream\n"
+    ipad " *\n"
+    ipad " * Intended for use by operator<<()\n"
+    ipad " */\n"
+    ipad "bsl::ostream &printSelf(\n"
+    ipad ipad "bsl::ostream    &os)\n"
+    ipad "const;\n"))
+  ))
 
 
 
