@@ -602,6 +602,8 @@ snippets will be inserted into the same file."
       (shu-cpp-attributes-gen-getter-decl class-name sorted-attributes)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
       (shu-cpp-attributes-gen-ctor-gen class-name attributes)
+      (when have-non-nullables
+        (shu-cpp-attributes-gen-ctor-gen-full class-name attributes))
       (shu-cpp-attributes-gen-reset-gen class-name attributes)
       (shu-cpp-attributes-gen-set-values-gen class-name table-name attributes)
       (when have-nullables
@@ -750,12 +752,12 @@ snippets will be inserted into the same file."
         (when (not nullable)
           (setq header-data-type (shu-cpp-attributes-header-type class-name data-type))
           (setq pad (shu-cpp-attributes-make-pad max-type-len reference header-data-type))
-          (insert (concat ipad ipad header-data-type pad name ",\n")))
+          (insert (concat ipad ipad "const "header-data-type pad name ",\n")))
         (setq attrs (cdr attrs)))
       (setq header-data-type "bslma::Allocator")
       (setq name "allocator")
       (setq pad (shu-cpp-attributes-make-pad max-type-len nil header-data-type))
-      (setq pad (substring pad 1))
+      (setq pad (concat pad "     "))
       (insert (concat ipad ipad header-data-type pad "*" name ");\n")))
     ))
 
@@ -1271,6 +1273,89 @@ of values for individual nullable columns."
      (concat
       "{\n"
       ipad "reset();\n"
+      "}\n"))
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-ctor-gen-full
+;;
+(defun shu-cpp-attributes-gen-ctor-gen-full (class-name attributes)
+  "Generate the code for the constructor that sets all of the non-nullable
+attributes."
+  (let ((attrs attributes)
+        (attr-info)
+        (name)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (column-count)
+        (enum-base)
+        (reset-value)
+        (header-data-type)
+        (pad)
+        (max-type-len (length "bslma::Allocator"))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (amper)
+        (member-prefix "m_")
+        (contained-class))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      class-name "::" class-name "(\n"))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (when (not nullable)
+        (when ( > (length data-type) max-type-len)
+          (setq max-type-len (length data-type))))
+      (setq attrs (cdr attrs)))
+    (setq attrs attributes)
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (when (not nullable)
+        (setq data-type (shu-cpp-attributes-header-type class-name data-type))
+        (setq pad (shu-cpp-attributes-make-pad max-type-len reference data-type))
+        (insert (concat ipad "const " data-type pad name ",\n")))
+      (setq attrs (cdr attrs)))
+    (setq data-type "bslma::Allocator")
+    (setq name "allocator")
+    (setq pad (shu-cpp-attributes-make-pad max-type-len nil data-type))
+    (setq pad (concat pad "     "))
+    (insert (concat ipad data-type pad "*" name ")\n:\n"))
+    (setq attrs attributes)
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (if (and (not nullable)
+               (string= column-name "std"))
+          (setq contained-class t)
+        (setq contained-class nil))
+      (insert (concat member-prefix name "("))
+      (when (not nullable)
+        (insert name))
+      (when (string= full-data-type "bsl::string")
+        (insert ", allocator"))
+      (insert ")")
+      (when (cdr attrs)
+        (insert ","))
+      (insert "\n")
+      (setq attrs (cdr attrs)))
+    (insert
+     (concat
+      "{\n"
       "}\n"))
     ))
 
