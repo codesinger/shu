@@ -600,6 +600,7 @@ snippets will be inserted into the same file."
         (shu-cpp-attributes-gen-setter-decl class-name sorted-attributes))
       (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
       (shu-cpp-attributes-gen-getter-decl class-name sorted-attributes)
+      (shu-cpp-attributes-gen-print-self-decl)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
       (shu-cpp-attributes-gen-ctor-gen class-name attributes)
       (when have-non-nullables
@@ -1650,7 +1651,30 @@ values from an instance of bcem_Aggregate."
 
 
 ;;
-;;  shu-cpp-attributes-gen-operator-equal-gen
+;;  shu-cpp-attributes-gen-print-self-gen
+;;
+(defun shu-cpp-attributes-gen-print-self-decl ()
+  "Generate the declaration for the printSelf function"
+  (insert
+   (concat
+    "\n"
+    "\n"
+    "/*!\n"
+    " *  \brief Stream object out to a stream\n"
+    " *\n"
+    " * Intended for use by operator<<()\n"
+    " */\n"
+    "bsl::ostream &printSelf(\n"
+    "    bsl::ostream    &os)\n"
+    "const;\n"
+    ))
+  )
+
+
+
+
+;;
+;;  shu-cpp-attributes-gen-operator-equal-decl
 ;;
 (defun shu-cpp-attributes-gen-operator-equal-decl (class-name)
   "Generate the declaration for operator==()"
