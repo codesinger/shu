@@ -722,7 +722,7 @@ snippets will be inserted into the same file."
       ipad " * data contained in an instance of bsidb2::Cursor.\n"
       ipad " */\n"
       ipad "explicit " class-name "(\n"
-      ipad ipad "bslma::Allocator   *allocator);\n"))
+      ipad ipad "bslma::Allocator   *allocator = 0);\n"))
     (when have-non-nullables
       (insert
        (concat
@@ -758,7 +758,7 @@ snippets will be inserted into the same file."
       (setq name "allocator")
       (setq pad (shu-cpp-attributes-make-pad max-type-len nil header-data-type))
       (setq pad (concat pad "     "))
-      (insert (concat ipad ipad header-data-type pad "*" name ");\n")))
+      (insert (concat ipad ipad header-data-type pad "*" name " = 0);\n")))
     ))
 
 
