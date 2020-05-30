@@ -421,6 +421,39 @@ name is less than the right hand name."
 
 
 
+;;
+;;  shu-attributes-internal-gen
+;;
+(defun shu-attributes-internal-gen (input-file output-file)
+  "Doc string."
+  (let (
+        (class-list)
+        (class-name)
+        (table-name)
+        (have-nullables)
+        (have-non-nullables)
+        (attributes)
+        )
+    (if (not (file-readable-p input-file))
+        (message "%s: File not found." input-file)
+      (when (file-readable-p output-file)
+        (delete-file output-file)
+        )
+      (find-file input-file)
+      (setq class-list (shu-attributes-fetch-attributes (point-min) (point-max)))
+      (setq class-name (pop class-list))
+      (setq table-name (pop class-list))
+      (setq have-nullables (pop class-list))
+      (setq have-non-nullables (pop class-list))
+      (setq attributes (pop class-list))
+      (find-file output-file)
+      (shu-cpp-attributes-gen class-name table-name have-nullables
+                              have-non-nullables attributes)
+      )
+    ))
+
+
+
 
 ;;
 ;;  shu-make-class
@@ -453,7 +486,6 @@ name is less than the right hand name."
 ;;  shu-attributes-fetch-attributes
 ;;
 (defun shu-attributes-fetch-attributes (start end)
-  (interactive "r")
   "Create a row class for a table in a comdb2 database.
 
 The columns are defined as a series of lines in a text file.  The first line

@@ -55,7 +55,8 @@ searches in the local \"~/emacs\" directory."
          (list
           "rmv-using.elc"
           "slp-comment-hooks.elc"
-          "slp-bb-comment-hooks.elc"))
+          "slp-bb-comment-hooks.elc"
+          "shu-attributes.elc"))
         (ln)
         (no-error nil)
         (no-message t)
@@ -246,6 +247,25 @@ files."
       (setq shu-cpp-use-bde-library t)
       (setq shu-cpp-include-user-brackets t)
       (shu-internal-gen-bde-component class-name author namespace file-prefix))
+    ))
+
+
+
+;;
+;;  shu-generate-comdb2-code
+;;
+(defun shu-generate-comdb2-code ()
+  "Doc string."
+  (let ((input-file)
+        (output-file)
+        (nargs (length command-line-args-left)))
+    (shu-batch-init)
+    (if (/= nargs 2)
+        (progn
+          (message "%s" "Require 2 args: input-file output-file"))
+      (setq input-file (pop command-line-args-left))
+      (setq output-file (pop command-line-args-left))
+      (shu-attributes-internal-gen input-file output-file))
     ))
 
 
