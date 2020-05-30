@@ -255,7 +255,7 @@ files."
 ;;  shu-generate-comdb2-code
 ;;
 (defun shu-generate-comdb2-code ()
-  "Doc string."
+  "Generate the C++ code fo a comdb2 row class"
   (let ((input-file)
         (output-file)
         (nargs (length command-line-args-left)))
@@ -265,7 +265,8 @@ files."
           (message "%s" "Require 2 args: input-file output-file"))
       (setq input-file (pop command-line-args-left))
       (setq output-file (pop command-line-args-left))
-      (shu-attributes-internal-gen input-file output-file))
+      (shu-attributes-internal-gen input-file output-file)
+      (save-buffer))
     ))
 
 
