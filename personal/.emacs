@@ -24,6 +24,25 @@
 ;; It is not part of the shu package
 
 
+
+
+;;
+;;  shu-show-load-path
+;;
+(defun shu-show-load-path (ident)
+  "Doc string."
+  (let (
+        (lp load-path)
+        (path)
+        (gb (get-buffer-create "**shu-load-path**"))
+        )
+    (princ (concat "\n\n" ident ":\n") gb)
+    (princ load-path gb)
+    (princ "\n" gb)
+    ))
+
+(shu-show-load-path "INITIAL")
+
 ;;
 ;;  shu-system-type-is-unix
 ;;
@@ -68,12 +87,14 @@
     type
     ))
 
-
-(setq home (getenv "HOME"))
+(setq shu-home (getenv "HOME"))
   (setq load-path
-        (append (list (concat home "/emacs"))
+        (append (list (concat shu-home "/emacs"))
           (append load-path))
   )
+
+(shu-show-load-path "AFTER-HOME")
+
 
 (if (shu-system-type-is-mac-osx)
     (progn
@@ -87,6 +108,9 @@
       )
   (require 'org)
   )
+
+(shu-show-load-path "AFTER-ORG")
+
 
 (defvar shu-org-home nil
   "Home directory of the org data files.")
@@ -173,6 +197,8 @@
 ;;(load-file "~/emacs/s-mode.elc")
 (when (file-readable-p "~/emacs/useful.elc")
   (load-file "~/emacs/useful.elc"))
+(when (file-readable-p "~/emacs/shu-attributes.elc")
+  (load-file "~/emacs/shu-attributes.elc"))
 (load-file "~/emacs/macros.elc")
 ;;(load-file "~/emacs/clearcase.elc");;Incompatible with Emacs 24
 ;;(load-file "~/emacs/visible.elc")
