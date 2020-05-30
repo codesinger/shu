@@ -426,6 +426,33 @@ name is less than the right hand name."
 ;;  shu-make-class
 ;;
 (defun shu-make-class (start end)
+  "Doc string."
+  (interactive "r")
+  (let (
+        (class-list)
+        (class-name)
+        (table-name)
+        (have-nullables)
+        (have-non-nullables)
+        (attributes)
+        )
+    (setq class-list (shu-attributes-fetch-attributes start end))
+    (setq class-name (pop class-list))
+    (setq table-name (pop class-list))
+    (setq have-nullables (pop class-list))
+    (setq have-non-nullables (pop class-list))
+    (setq attributes (pop class-list))
+    (shu-cpp-attributes-gen class-name table-name have-nullables
+                            have-non-nullables attributes)
+    ))
+
+
+
+
+;;
+;;  shu-attributes-fetch-attributes
+;;
+(defun shu-attributes-fetch-attributes (start end)
   (interactive "r")
   "Create a row class for a table in a comdb2 database.
 
@@ -459,9 +486,16 @@ Each column is has x attributes all on a single line
     5. If this is present, the column is nullable
 
 Mark the lines to be scanned and then invoke this function.  The generated code
-snippets will be inserted into the same file."
-  (let (
-        (gb (get-buffer-create "**boo**"))
+snippets will be inserted into the same file.
+
+Return a list that holds the following information:
+
+    1. class-name
+    2. table-name
+    3. have-nullables (t if any nullable attributes exist)
+    4. have-non-nullables (t if any non-nullable attributes exist)
+    5. The list of attr-info that describes the attributes"
+  (let ((gb (get-buffer-create "**boo**"))
         (sline (shu-the-line-at start))
         (eline (shu-the-line-at end))
         (line-diff 0)
@@ -488,8 +522,7 @@ snippets will be inserted into the same file."
         (attributes)
         (have-nullables)
         (have-non-nullables)
-        (z)
-        )
+        (z))
     (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
       (setq eol (line-end-position))
       (when (> eol (point))
@@ -499,16 +532,14 @@ snippets will be inserted into the same file."
           (if (string= (substring line 0 2) "//")
               (progn
                 (setq comment (shu-trim (substring line 2)))
-                (princ (concat "comment: [" comment "]\n") gb)
-                )
+                (princ (concat "comment: [" comment "]\n") gb))
             (setq x (split-string line nil t))
             (setq column-name (car x))
             (setq column-count 1)
             (when (string-match ss column-name)
               (setq column-ct (match-string-no-properties 1 column-name))
               (setq column-count (string-to-number column-ct))
-              (setq column-name "std")
-              )
+              (setq column-name "std"))
             (setq x (cdr x))
             (setq data-type (car x))
             (if (string= column-name "class")
@@ -518,15 +549,13 @@ snippets will be inserted into the same file."
                 (setq enum-base nil)
                 (when (string-match enum-ss data-type)
                   (setq enum-base (match-string-no-properties 2 data-type))
-                  (setq data-type (match-string-no-properties 1 data-type))
-                  )
+                  (setq data-type (match-string-no-properties 1 data-type)))
                 (setq x (cdr x))
                 (setq name (car x))
                 (setq reset-value nil)
                 (when (string-match reset-ss name)
                   (setq reset-value (match-string-no-properties 2 name))
-                  (setq name (match-string-no-properties 1 name))
-                  )
+                  (setq name (match-string-no-properties 1 name)))
                 (setq nullable nil)
                 (setq full-data-type data-type)
                 (setq reference nil)
@@ -535,20 +564,13 @@ snippets will be inserted into the same file."
                   (setq z (car x))
                   (princ "z: [" gb)(princ z gb)(princ "]\n" gb)
                   (when (string=  z "&")
-                    (setq reference t)
-                    )
-                  )
+                    (setq reference t)))
                 (if (cdr x)
                     (progn
                       (setq nullable t)
                       (setq have-nullables t)
-                      (setq full-data-type (shu-cpp-make-nullable data-type))
-                      )
-                  (setq have-non-nullables t)
-                  )
-                )
-              )
-            )
+                      (setq full-data-type (shu-cpp-make-nullable data-type)))
+                  (setq have-non-nullables t)))))
           (when name
             (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                                     reference nullable column-name column-count
@@ -556,17 +578,12 @@ snippets will be inserted into the same file."
             (push attr-info attributes)
             (shu-cpp-print-attr-info attr-info gb)
             (setq comment nil)
-            (setq name nil)
-            )
-          )
-        )
-      (setq line-diff (forward-line 1))
-      )
+            (setq name nil))))
+      (setq line-diff (forward-line 1)))
     (setq line-diff (forward-line 1))
     (setq attributes (nreverse attributes))
     (princ "class-name: " gb)(princ class-name gb) (princ "\n" gb)
-    (shu-cpp-attributes-gen class-name table-name have-nullables
-                            have-non-nullables attributes)
+    (list class-name table-name have-nullables have-non-nullables attributes)
     ))
 
 
