@@ -860,7 +860,8 @@
 ;;
 (defun shu-cpp-decl-cpp-class-name (class-name)
   "Generate a comment which is the name of the class with a line of dashes
-above and below it to set off the class name in a cpp file."
+above and below it to set off the class name in a cpp file.
+CLASS-NAME is the name of the containing C++ class."
   (let ((outline-character "-"))
     (shu-cpp-decl-class-name class-name outline-character)
     ))
@@ -872,7 +873,8 @@ above and below it to set off the class name in a cpp file."
 ;;
 (defun shu-cpp-decl-h-class-name (class-name)
   "Generate a comment which is the name of the class with a line of equal
-signs above and below it to set off the class name in a header file."
+signs above and below it to set off the class name in a header file.
+CLASS-NAME is the name of the containing C++ class."
   (let ((outline-character "="))
     (shu-cpp-decl-class-name class-name outline-character)
     ))
@@ -899,8 +901,7 @@ OUTLINE-CHARACTER is a string containing the outline character (usually
       "\n"
       blank24 "// " outline-pad "\n"
       blank24 "// class " class-name "\n"
-      blank24 "// " outline-pad "\n"
-      "\n"))
+      blank24 "// " outline-pad "\n"))
     ))
 
 
@@ -931,7 +932,8 @@ OUTLINE-CHARACTER is a string containing the outline character (usually
 ;;  shu-cpp-decl-cpp-print-self
 ;;
 (defun shu-cpp-decl-cpp-print-self (class-name)
-  "Generate the skeleton code for the printSelf() function."
+  "Generate the skeleton code for the printSelf() function.
+CLASS-NAME is the name of the containing C++ class."
   (let ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
         (ipad (make-string shu-cpp-indent-length ? )))
     (insert
@@ -951,7 +953,8 @@ OUTLINE-CHARACTER is a string containing the outline character (usually
 ;;  shu-cpp-decl-h-stream
 ;;
 (defun shu-cpp-decl-h-stream (class-name)
-  "Geneate the declaration for the streaming operator (operator<<())."
+  "Geneate the declaration for the streaming operator (operator<<()).
+CLASS-NAME is the name of the containing C++ class."
   (let ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
         (ipad (make-string shu-cpp-indent-length ? ))
         (ostream-length (length "std::ostream  "))
@@ -979,7 +982,8 @@ OUTLINE-CHARACTER is a string containing the outline character (usually
 ;;  shu-cpp-decl-cpp-stream
 ;;
 (defun shu-cpp-decl-cpp-stream (class-name)
-  "Geneate the code for the streaming operator (operator<<())."
+  "Geneate the code for the streaming operator (operator<<()).  CLASS-NAME is the
+name of the containing C++ class."
   (let ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
         (ipad (make-string shu-cpp-indent-length ? ))
         (ostream-length (length "std::ostream  "))
@@ -993,6 +997,7 @@ OUTLINE-CHARACTER is a string containing the outline character (usually
     (insert
      (concat
       "\n"
+      "inline\n"
       std-name "::ostream &" class-name "::operator<<(\n"
       ipad std-name "::ostream" ostream-pad "  &os,\n"
       ipad  "const " class-name ostream-class-pad "  &cn)\n"

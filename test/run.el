@@ -19,6 +19,7 @@
          "shu-capture-doc.t.elc"
          "shu-cpp-general.t.elc"
          "shu-cpp-match.t.elc"
+         "shu-cpp-misc.t.elc"
          "shu-cpp-project.t.elc"
          "shu-cpp-token.t.elc"
          "shu-match.t.elc"
