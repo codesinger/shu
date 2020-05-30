@@ -853,6 +853,156 @@
     (goto-char start-pos)
     ))
 
+
+
+;;
+;;  shu-cpp-decl-cpp-class-name
+;;
+(defun shu-cpp-decl-cpp-class-name (class-name)
+  "Generate a comment which is the name of the class with a line of dashes
+above and below it to set off the class name in a cpp file."
+  (let ((outline-character "-"))
+    (shu-cpp-decl-class-name class-name outline-character)
+    ))
+
+
+
+;;
+;;  shu-cpp-decl-h-class-name
+;;
+(defun shu-cpp-decl-h-class-name (class-name)
+  "Generate a comment which is the name of the class with a line of equal
+signs above and below it to set off the class name in a header file."
+  (let ((outline-character "="))
+    (shu-cpp-decl-class-name class-name outline-character)
+    ))
+
+
+
+
+;;
+;;  shu-cpp-decl-class-name
+;;
+(defun shu-cpp-decl-class-name (class-name outline-character)
+  "Generate a comment which is the name of the class with a line of outline
+characters above and below it.  CLASS-NAME is the name of the class.
+OUTLINE-CHARACTER is a string containing the outline character (usually
+\"=\" or \"-\")"
+  (let ((outline-pad (make-string (+ 6 (length class-name))
+                                  (string-to-char outline-character)))
+        (blank24 (make-string 24 ? ))
+        (class-name-pad (make-string (length class-name) ? )))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      "\n"
+      blank24 "// " outline-pad "\n"
+      blank24 "// class " class-name "\n"
+      blank24 "// " outline-pad "\n"
+      "\n"))
+    ))
+
+
+
+;;
+;;  shu-cpp-decl-h-print-self
+;;
+(defun shu-cpp-decl-h-print-self ()
+  "Generate the declaration of the printSelf() function."
+  (let ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
+        (ipad (make-string shu-cpp-indent-length ? )))
+    (insert
+     (concat
+      ipad "\n"
+      ipad "/*!\n"
+      ipad " *  \\brief Stream object out to a stream\n"
+      ipad " *\n"
+      ipad " * Intended for use by operator<<()\n"
+      ipad " */\n"
+      ipad std-name "::ostream &printSelf(\n"
+      ipad ipad std-name "::ostream    &os)\n"
+      ipad "const;\n"))
+    ))
+
+
+
+;;
+;;  shu-cpp-decl-cpp-print-self
+;;
+(defun shu-cpp-decl-cpp-print-self (class-name)
+  "Generate the skeleton code for the printSelf() function."
+  (let ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
+        (ipad (make-string shu-cpp-indent-length ? )))
+    (insert
+     (concat
+      "\n"
+      std-name "::ostream &" class-name "::printSelf(\n"
+      ipad std-name "::ostream    &os)\n"
+      "const\n"
+      "{\n"
+      ipad "os << \"Instance of '" class-name "'\";\n"
+      "}\n"))
+    ))
+
+
+
+;;
+;;  shu-cpp-decl-h-stream
+;;
+(defun shu-cpp-decl-h-stream (class-name)
+  "Geneate the declaration for the streaming operator (operator<<())."
+  (let ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (ostream-length (length "std::ostream  "))
+        (ostream-class-length (+ (length "const ") (length class-name) 2))
+        (ostream-pad "")
+        (ostream-class-pad ""))
+    (if (> ostream-length ostream-class-length)
+        (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
+      (when (> ostream-class-length ostream-length)
+        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
+    (insert
+     (concat
+      "\n"
+      ipad "/*!\n"
+      ipad " *  \\brief Stream an instance of " class-name " to the stream `os`\n"
+      ipad " */\n"
+      ipad std-name "::ostream &operator<<(\n"
+      ipad ipad std-name "::ostream" ostream-pad "  &os,\n"
+      ipad ipad  "const " class-name ostream-class-pad "  &cn);\n"))
+    ))
+
+
+
+;;
+;;  shu-cpp-decl-cpp-stream
+;;
+(defun shu-cpp-decl-cpp-stream (class-name)
+  "Geneate the code for the streaming operator (operator<<())."
+  (let ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (ostream-length (length "std::ostream  "))
+        (ostream-class-length (+ (length "const ") (length class-name) 2))
+        (ostream-pad "")
+        (ostream-class-pad ""))
+    (if (> ostream-length ostream-class-length)
+        (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
+      (when (> ostream-class-length ostream-length)
+        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
+    (insert
+     (concat
+      "\n"
+      std-name "::ostream &" class-name "::operator<<(\n"
+      ipad std-name "::ostream" ostream-pad "  &os,\n"
+      ipad  "const " class-name ostream-class-pad "  &cn)\n"
+      "{\n"
+      ipad "return cn.printSelf(os);\n"
+      "}\n"))
+    ))
+
+
+
 ;;
 ;;  shu-shu-misc-set-alias
 ;;

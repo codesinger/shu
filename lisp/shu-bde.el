@@ -692,7 +692,7 @@ the buffer GITBUF."
     (save-excursion
       (beginning-of-line)
       (setq cgen-point (point))
-)
+      )
     (insert
      (concat
       "\n"
