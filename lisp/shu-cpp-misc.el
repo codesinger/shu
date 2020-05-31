@@ -1012,6 +1012,40 @@ CLASS-NAME is the name of the containing C++ class."
 
 
 
+
+;;
+;;  shu-cpp-misc-gen-not-implemented
+;;
+(defun shu-cpp-misc-gen-not-implemented (class-name)
+  "Generate a declaration of a non-implemented copy constructor and operator=()."
+  (interactive)
+  (let ((ipad (make-string shu-cpp-indent-length ? )))
+    (insert
+     (concat
+      "\n"
+      ipad "// NOT IMPLEMENTED\n"
+      ipad "\n"
+      ipad "/*!\n"
+      ipad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
+      ipad " *\n"
+      ipad " * \\param original the object from which we are to be constructed\n"
+      ipad " */\n"
+      ipad "explicit " class-name "(\n"
+      ipad ipad "const " class-name " &original);\n"
+      "\n"
+      ipad "/*!\n"
+      ipad " * \\brief operator=() is deliberately private and unimplemented.\n"
+      ipad " *\n"
+      ipad " * \\param rhs the object from which we are to be assigned\n"
+      ipad " *\n"
+      ipad " * \\return reference to self to allow for chained operators\n"
+      ipad " */\n"
+      ipad class-name " &operator=(\n"
+      ipad ipad "const " class-name " &rhs);\n"))
+    ))
+
+
+
 ;;
 ;;  shu-cpp-decl-h-stream
 ;;
