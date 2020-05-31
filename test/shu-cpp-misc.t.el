@@ -187,6 +187,31 @@
 
 
 
+;;
+;;  shu-test-shu-cpp-misc-gen-h-dtor
+;;
+(ert-deftest shu-test-shu-cpp-misc-gen-h-dtor ()
+  (let* ((class-name "MumbleFrotz")
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           ipad "/*!\n"
+           ipad " * \\brief Destroy this object\n"
+           ipad " */\n"
+           ipad "// ~" class-name "();\n"))
+         (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-misc-gen-h-dtor class-name)
+      (goto-char (point-min))
+      (should (search-forward "/*!" nil t))
+      (beginning-of-line)
+      (setq actual (buffer-substring-no-properties (point) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
 
 ;;
 ;;  shu-test-shu-cpp-decl-h-print-self

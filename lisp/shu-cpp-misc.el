@@ -950,6 +950,26 @@ allocator."
 
 
 ;;
+;;  shu-cpp-misc-gen-h-dtor
+;;
+(defun shu-cpp-misc-gen-h-dtor (class-name)
+  "Generate a commented out declaration of a destructor for the given CLASS-NAME."
+  (interactive)
+  (let (
+        (ipad (make-string shu-cpp-indent-length ? ))
+        )
+    (insert
+     (concat
+      "\n"
+      ipad "/*!\n"
+      ipad " * \\brief Destroy this object\n"
+      ipad " */\n"
+      ipad "// ~" class-name "();\n"))
+    ))
+
+
+
+;;
 ;;  shu-cpp-decl-h-print-self
 ;;
 (defun shu-cpp-decl-h-print-self ()
