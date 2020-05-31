@@ -84,4 +84,116 @@
 
 
 
+;;
+;;  shu-test-shu-cpp-decl-h-print-self
+;;
+(ert-deftest shu-test-shu-cpp-decl-h-print-self ()
+  (let* ((ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           ipad "/*!\n"
+           ipad " *  \\brief Stream object out to a stream\n"
+           ipad " *\n"
+           ipad " * Intended for use by operator<<()\n"
+           ipad " */\n"
+           ipad "std::ostream &printSelf(\n"
+           ipad "    std::ostream    &os)\n"
+           ipad "const;\n"))
+         (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-decl-h-print-self)
+      (goto-char (point-min))
+      (search-forward "/*!" nil t)
+      (beginning-of-line)
+      (setq actual (buffer-substring-no-properties (point) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-decl-cpp-print-self
+;;
+(ert-deftest shu-test-shu-cpp-decl-cpp-print-self ()
+  (let* ((class-name "MumbleFrotz")
+         (expected
+          (concat
+           "std::ostream &" class-name "::printSelf(\n"
+           "    std::ostream    &os)\n"
+           "const\n"
+           "{\n"
+           "    os << \"Instance of '" class-name "'\";\n"
+           "}\n"))
+         (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-decl-cpp-print-self class-name)
+      (goto-char (point-min))
+      (search-forward "::print" nil t)
+      (beginning-of-line)
+      (setq actual (buffer-substring-no-properties (point) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-decl-h-stream
+;;
+(ert-deftest shu-test-shu-cpp-decl-h-stream ()
+  (let* ((ipad (make-string shu-cpp-indent-length ? ))
+         (class-name "MumbleFrotz")
+         (expected
+          (concat
+           ipad "/*!\n"
+           ipad " *  \\brief Stream an instance of " class-name " to the stream `os`\n"
+           ipad " */\n"
+           ipad "std::ostream &operator<<(\n"
+           ipad "    std::ostream       &os,\n"
+           ipad "    const " class-name "  &cn);\n"))
+         (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-decl-h-stream class-name)
+      (goto-char (point-min))
+      (search-forward "/*!" nil t)
+      (beginning-of-line)
+      (setq actual (buffer-substring-no-properties (point) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-decl-cpp-stream
+;;
+(ert-deftest shu-test-shu-cpp-decl-cpp-stream ()
+  (let* ((class-name "MumbleFrotz")
+         (expected
+          (concat
+           "inline\n"
+           "std::ostream &MumbleFrotz::operator<<(\n"
+           "    std::ostream       &os,\n"
+           "    const MumbleFrotz  &cn)\n"
+           "{\n"
+           "    return cn.printSelf(os);\n"
+           "}\n"))
+         (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-decl-cpp-stream class-name)
+      (goto-char (point-min))
+      (search-forward "inline" nil t)
+      (beginning-of-line)
+      (setq actual (buffer-substring-no-properties (point) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+
 ;;; shu-cpp-misc.t.el ends here
