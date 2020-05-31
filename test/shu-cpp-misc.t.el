@@ -212,6 +212,30 @@
 
 
 
+;;
+;;  shu-test-shu-cpp-misc-gen-nested-traits
+;;
+(ert-deftest shu-test-shu-cpp-misc-gen-nested-traits ()
+  (let* ((class-name "MumbleFrotz")
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           ipad "// TRAITS\n"
+           ipad "\n"
+           ipad "BSLMF_NESTED_TRAIT_DECLARATION(" class-name ", bslma::UsesBslmaAllocator);\n"))
+         (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-misc-gen-nested-traits class-name)
+      (goto-char (point-min))
+      (should (search-forward "TRAITS" nil t))
+      (beginning-of-line)
+      (setq actual (buffer-substring-no-properties (point) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
 
 ;;
 ;;  shu-test-shu-cpp-decl-h-print-self

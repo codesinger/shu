@@ -240,7 +240,6 @@ C++ header file")
 ;;
 (defun shu-generate-tfile (author namespace class-name)
   "Generate a skeleton t.cpp file"
-  (interactive)
   (let* (
          (tfile-name (file-name-nondirectory (buffer-file-name)))
          (tbase-name (file-name-sans-extension tfile-name))
@@ -348,26 +347,37 @@ C++ header file")
 ;;
 (defun shu-cpp-inner-cdecl (class-name copy-allowed &optional use-allocator)
   "Generate a skeleton class declaration at point."
-  (let
-      ((std-name "std")
-       (ostream-length (length "std::ostream  "))
-       (ostream-class-length 0)
-       (ostream-pad "")
-       (ostream-class-pad "")
-       (equal-pad )
-       (dash-pad )
-       (blank24 )
-       (creator-a )
-       (starts-with-vowel )
-       (copy-ctor )
-       (op-equal )
-       (class-name-pad )
-       (ipad (make-string shu-cpp-indent-length ? ))
-       (header-pos (point))
-       (have-include )
-       (start-pos ))
+  (let (
+        (gb (get-buffer-create "**foo**"))
+        (std-name "std")
+        (ostream-length (length "std::ostream  "))
+        (ostream-class-length 0)
+        (ostream-pad "")
+        (ostream-class-pad "")
+        (equal-pad )
+        (dash-pad )
+        (blank24 )
+        (creator-a )
+        (starts-with-vowel )
+        (copy-ctor )
+        (op-equal )
+        (class-name-pad )
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (header-pos (point))
+        (have-include )
+        (start-pos )
+        )
+    (princ
+     (concat
+      "shu-cpp-inner-cdecl: "
+      "class-name: " class-name
+      ", use-allocator: " (shu-bool-to-string use-allocator)
+      ) gb)
+
+
     (when shu-cpp-use-bde-library
-      (setq std-name shu-cpp-std-namespace))
+      (setq std-name shu-cpp-std-namespace)
+      )
     (setq class-name-pad (make-string (length class-name) ? ))
     (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
     (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
@@ -376,10 +386,13 @@ C++ header file")
     (if (> ostream-length ostream-class-length)
         (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
       (when (> ostream-class-length ostream-length)
-        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
+        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))
+        )
+      )
     (setq starts-with-vowel (string-match (substring class-name 0 1) "aeioAEIO"))
     (setq creator-a "a")
-    (when starts-with-vowel (setq creator-a "an"))
+    (when starts-with-vowel (setq creator-a "an")
+          )
 
     (setq copy-ctor (concat
                      ipad "explicit " class-name "(\n"
@@ -389,20 +402,17 @@ C++ header file")
                     ipad class-name " &operator=(\n"
                     ipad ipad "const " class-name " &rhs);\n"))
 
+    (insert "\n")
+    (shu-cpp-decl-h-class-name class-name)
     (insert
      (concat
-      "\n"
-      "\n"
-      blank24 "// " equal-pad "\n"
-      blank24 "// class " class-name "\n"
-      blank24 "// " equal-pad "\n"
       "\n"
       "/*!\n"
       " * \\brief "))
     (setq start-pos (point))
     (insert
      (concat
-      "Description of " class-name "\n"
+      "Description of " class-name " FIXME!  FIXME!  FIXME!  FIXME!\n"
       " */\n"
       "class " class-name "\n"
       "{\n"
@@ -412,75 +422,37 @@ C++ header file")
       (insert
        (concat
         ipad "bslma::Allocator                 *" shu-cpp-default-allocator-name ";\n"
-        )))
+        ))
+      )
     (insert
      (concat
       "\n"
       "  public:\n"))
     (when use-allocator
-      (insert
-       (concat
-        "\n"
-        ipad "// TRAITS\n"
-        "\n"
-        ipad "BSLMF_NESTED_TRAIT_DECLARATION(" class-name ", bslma::UsesBslmaAllocator);\n")))
+      (shu-cpp-misc-gen-nested-traits class-name)
+      )
     (insert
      (concat
       "\n"
-      "    // CREATORS\n\n"
-      ipad "/*!\n"
-      ipad " * \\brief Create " creator-a " " class-name " object ...\n"
-      ipad " */\n"
-      "    explicit " class-name "("))
-    (when use-allocator
-      (insert
-       (concat
-        "\n"
-        ipad "    bslma::Allocator    *allocator = 0")))
+      "    // CREATORS\n"))
+    (shu-cpp-misc-gen-h-ctor class-name use-allocator)
+    (shu-cpp-misc-gen-h-dtor class-name)
     (insert
      (concat
-      ");\n"
-      "\n"
-      ipad "/*!\n"
-      ipad " * \\brief Destroy this object\n"
-      ipad " */\n"
-      ipad "// ~" class-name "();\n"
       "\n"
       ipad "// MANIPULATORS\n"
       "\n"
       ipad "// ACCESSORS\n"
-      "\n"
-      ipad "/*!\n"
-      ipad " *  \\brief Stream object out to a stream\n"
-      ipad " *\n"
-      ipad " * Intended for use by operator<<()\n"
-      ipad " */\n"
-      ipad std-name "::ostream &printSelf(\n"
-      ipad "    " std-name "::ostream    &os)\n"
-      ipad "const;\n"
+      "\n"))
+    (shu-cpp-decl-h-print-self)
+    (insert
+     (concat
       "\n"
       "  private:\n"))
     (when (not copy-allowed)
-      (insert
-       (concat
-        "\n"
-        ipad "// NOT IMPLEMENTED\n"
-        ipad "\n"
-        ipad "/*!\n"
-        ipad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
-        ipad " *\n"
-        ipad " * \\param original the object from which we are to be constructed\n"
-        ipad " */\n"
-        copy-ctor
-        "\n"
-        ipad "/*!\n"
-        ipad " * \\brief operator=() is deliberately private and unimplemented.\n"
-        ipad " *\n"
-        ipad " * \\param rhs the object from which we are to be assigned\n"
-        ipad " *\n"
-        ipad " * \\return reference to self to allow for chained operators\n"
-        ipad " */\n"
-        op-equal)))
+      (shu-cpp-misc-gen-not-implemented class-name)
+
+      )
     (insert
      (concat
       "\n"
@@ -490,17 +462,12 @@ C++ header file")
       "\n"
       "};\n"
       "\n"
-      "// FREE OPERATORS\n"
+      ipad "// FREE OPERATORS\n"))
+    (shu-cpp-decl-h-stream class-name)
+    (insert
+     (concat
       "\n"
-      "/*!\n"
-      " *  \\brief Stream an instance of " class-name " to the stream `os`\n"
-      " */\n"
-      std-name "::ostream &operator<<(\n"
-      "    " std-name "::ostream" ostream-pad "  &os,\n"
-      "    const " class-name ostream-class-pad "  &cn);\n"
-      "\n"
-      "\n"
-      ))
+      "\n"))
     (shu-cpp-hcgen class-name)
     (when use-allocator
       (save-excursion
@@ -508,14 +475,19 @@ C++ header file")
           (widen)
           (goto-char (point-min))
           (when (search-forward "#include <bslma_allocator.h>" nil t)
-            (setq have-include t))))
+            (setq have-include t)
+            )
+          )
+        )
       (when (not have-include)
         (goto-char header-pos)
         (beginning-of-line)
         (insert
          (concat
           "\n"
-          "#include <bslma_allocator.h>\n"))))
+          "#include <bslma_allocator.h>\n"))
+        )
+      )
     (goto-char start-pos)))
 
 
@@ -549,20 +521,15 @@ C++ header file")
         (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
       (when (> ostream-class-length ostream-length)
         (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
-    (insert (concat
-             "\n"
-             "// ===========================================================================\n"
-             "//                  INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS\n"
-             "// ===========================================================================\n"
-             "\n"
-             "\n"
-             blank24 "// " dash-pad "\n"
-             blank24 "// class " class-name "\n"
-             blank24 "// " dash-pad "\n"
-             "\n"
-             "// CREATORS\n\n"
-             "inline\n"
-             class-name "::" class-name "("))
+    (shu-cpp-gen-inline-template-header)
+    (insert "\n\n")
+    (shu-cpp-decl-cpp-class-name class-name)
+    (insert
+     (concat
+      "\n"
+      "// CREATORS\n\n"
+      "inline\n"
+      class-name "::" class-name "("))
     (if use-allocator
         (progn
           (insert
@@ -591,15 +558,8 @@ C++ header file")
       ipad "return os;\n"
       "}\n"
       "\n"
-      "// FREE OPERATORS\n\n"
-      "inline\n"
-      std-name "::ostream &operator<<(\n"
-      "    " std-name "::ostream" ostream-pad "  &os,\n"
-      "    const " class-name ostream-class-pad "  &cn)\n"
-      "{\n"
-      ipad "return cn.printSelf(os);\n"
-      "}\n"
-      ))
+      "// FREE OPERATORS\n"))
+    (shu-cpp-decl-cpp-stream class-name)
     (goto-char start-pos)
     ))
 
@@ -634,16 +594,16 @@ C++ header file")
         (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
       (when (> ostream-class-length ostream-length)
         (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
-    (insert (concat
-             "\n"
-             "\n"
-             "\n"
-             blank24 "// " dash-pad "\n"
-             blank24 "// class " class-name "\n"
-             blank24 "// " dash-pad "\n"
-             "\n"
-             "// CREATORS\n\n"
-             class-name "::" class-name "()\n"))
+    (insert
+     (concat
+      "\n"
+      "\n"))
+    (shu-cpp-decl-cpp-class-name class-name)
+    (insert
+     (concat
+      "\n"
+      "// CREATORS\n\n"
+      class-name "::" class-name "()\n"))
     (setq start-pos (save-excursion (forward-line -1) (end-of-line) (forward-char -1) (point)))
     (insert
      (concat
@@ -677,42 +637,23 @@ C++ header file")
   "Generate a skeleton class code generation at point."
   (interactive "*sClass name?: ")
   (let
-      ((std-name "std")
-       (ostream-length (length "std::ostream  "))
-       (ostream-class-length 0)
-       (ostream-pad "")
-       (ostream-class-pad "")
-       (equal-pad )
-       (dash-pad )
-       (blank24 )
-       (class-name-pad )
+      (
        (start-pos )
        (header-pos (point))
        (have-include )
        (include-line )
-       (ipad (make-string shu-cpp-indent-length ? )))
-    (when shu-cpp-use-bde-library
-      (setq std-name shu-cpp-std-namespace))
-    (setq class-name-pad (make-string (length class-name) ? ))
-    (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
-    (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
-    (setq blank24 (make-string 24 ? ))
-    (setq ostream-class-length (+ (length "const ") (length class-name) 2))
-    (if (> ostream-length ostream-class-length)
-        (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
-      (when (> ostream-class-length ostream-length)
-        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
+       (ipad (make-string shu-cpp-indent-length ? ))
+         )
     (insert (concat
              "\n"
-             "\n"
-             "\n"
-             blank24 "// " dash-pad "\n"
-             blank24 "// class " class-name "\n"
-             blank24 "// " dash-pad "\n"
+             "\n"))
+    (shu-cpp-decl-cpp-class-name class-name)
+    (insert (concat
              "\n"
              "// CREATORS\n\n"
              class-name "::" class-name "(\n"))
-    (setq start-pos (save-excursion (forward-line -1) (end-of-line) (point)))
+    (setq start-pos (save-excursion (forward-line -1) (end-of-line) (point))
+                      )
     (insert (concat
              "    bslma::Allocator    *allocator)\n"
              ":\n"
@@ -727,15 +668,10 @@ C++ header file")
       "// MANIPULATORS\n"
       "\n"
       "// ACCESSORS\n"
-      "\n"
-      std-name "::ostream &" class-name "::printSelf(\n"
-      "    " std-name "::ostream    &os)\n"
-      "const\n"
-      "{\n"
-      ipad "os << \"Instance of '" class-name "'\";\n"
-      "\n"
-      ipad "return os;\n"
-      "}\n"
+      "\n"))
+      (shu-cpp-decl-cpp-print-self class-name)
+    (insert
+     (concat
       "\n"
       "// FREE OPERATORS\n\n\n"
       ))
@@ -744,7 +680,10 @@ C++ header file")
         (widen)
         (goto-char (point-min))
         (when (search-forward "#include <bslma_default.h>" nil t)
-          (setq have-include t))))
+          (setq have-include t)
+          )
+        )
+      )
     (when (not have-include)
       (goto-char header-pos)
       (beginning-of-line)
@@ -753,7 +692,8 @@ C++ header file")
              "\n"
              "#include <bslma_default.h>\n"))
       (setq start-pos (+ start-pos (length include-line)))
-      (insert include-line))
+      (insert include-line)
+      )
     (goto-char start-pos)
     ))
 
@@ -765,47 +705,23 @@ C++ header file")
 (defun shu-cpp-hcgen (class-name)
   "Generate a skeleton class code generation at point."
   (interactive "*sClass name?: ")
-  (let
-      ((std-name "std")
-       (ostream-length (length "std::ostream  "))
-       (ostream-class-length 0)
-       (ostream-pad "")
-       (ostream-class-pad "")
-       (equal-pad )
-       (dash-pad )
-       (blank24 )
-       (class-name-pad )
+  (let (
        (start-pos )
        (ipad (make-string shu-cpp-indent-length ? ))
-       (header "INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS")
        (have-header))
-    (when shu-cpp-use-bde-library
-      (setq std-name shu-cpp-std-namespace))
     (save-excursion
       (save-restriction
         (widen)
-        (setq have-header (search-backward header nil t))))
-    (setq class-name-pad (make-string (length class-name) ? ))
-    (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
-    (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
-    (setq blank24 (make-string 24 ? ))
-    (setq ostream-class-length (+ (length "const ") (length class-name) 2))
-    (if (> ostream-length ostream-class-length)
-        (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
-      (when (> ostream-class-length ostream-length)
-        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
+        (setq have-header (search-backward shu-cpp-misc-inline-template-label nil t))))
     (insert "\n")
     (when (not have-header)
-      (insert (concat
-               "// ===========================================================================\n"
-               "//                  " header "\n"
-               "// ===========================================================================\n")))
+      (shu-cpp-gen-inline-template-header)
+      )
     (insert (concat
              "\n"
-             "\n"
-             blank24 "// " dash-pad "\n"
-             blank24 "// class " class-name "\n"
-             blank24 "// " dash-pad "\n"
+             "\n"))
+    (shu-cpp-decl-cpp-class-name class-name)
+    (insert (concat
              "\n"
              "// CREATORS\n"))
     (setq start-pos (save-excursion (forward-line -1) (end-of-line) (forward-char -1) (point)))
@@ -816,15 +732,8 @@ C++ header file")
       "\n"
       "// ACCESSORS\n"
       "\n"
-      "// FREE OPERATORS\n\n"
-      "inline\n"
-      std-name "::ostream &operator<<(\n"
-      "    " std-name "::ostream" ostream-pad "  &os,\n"
-      "    const " class-name ostream-class-pad "  &cn)\n"
-      "{\n"
-      ipad "return cn.printSelf(os);\n"
-      "}\n"
-      ))
+      "// FREE OPERATORS\n\n"))
+    (shu-cpp-decl-cpp-stream class-name)
     (goto-char start-pos)
     ))
 
@@ -924,7 +833,6 @@ OUTLINE-CHARACTER is a string containing the outline character (usually
   "Generate a declaration of a constructor for the given CLASS-NAME.  If
 USE-ALLOCATOR is true, the constructor declaration includes an optional
 allocator."
-  (interactive)
   (let ((ipad (make-string shu-cpp-indent-length ? ))
         (creator-a "a")
         (starts-with-vowel (string-match (substring class-name 0 1) "aeioAEIO")))
@@ -954,10 +862,7 @@ allocator."
 ;;
 (defun shu-cpp-misc-gen-h-dtor (class-name)
   "Generate a commented out declaration of a destructor for the given CLASS-NAME."
-  (interactive)
-  (let (
-        (ipad (make-string shu-cpp-indent-length ? ))
-        )
+  (let ((ipad (make-string shu-cpp-indent-length ? )))
     (insert
      (concat
       "\n"
@@ -965,6 +870,22 @@ allocator."
       ipad " * \\brief Destroy this object\n"
       ipad " */\n"
       ipad "// ~" class-name "();\n"))
+    ))
+
+
+
+;;
+;;  shu-cpp-misc-gen-nested-traits
+;;
+(defun shu-cpp-misc-gen-nested-traits (class-name)
+  "Generate a nested traits declaration."
+  (let ((ipad (make-string shu-cpp-indent-length ? )))
+    (insert
+     (concat
+      "\n"
+      ipad "// TRAITS\n"
+      ipad "\n"
+      ipad "BSLMF_NESTED_TRAIT_DECLARATION(" class-name ", bslma::UsesBslmaAllocator);\n"))
     ))
 
 
@@ -1018,7 +939,6 @@ CLASS-NAME is the name of the containing C++ class."
 ;;
 (defun shu-cpp-misc-gen-not-implemented (class-name)
   "Generate a declaration of a non-implemented copy constructor and operator=()."
-  (interactive)
   (let ((ipad (make-string shu-cpp-indent-length ? )))
     (insert
      (concat
@@ -1110,7 +1030,6 @@ name of the containing C++ class."
 ;;
 (defun shu-cpp-gen-inline-template-header ()
   "Doc string."
-  (interactive)
   (let ((outline (make-string 75 ?=))
         (prefix (make-string 17 ? )))
     (insert
