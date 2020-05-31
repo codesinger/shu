@@ -158,6 +158,13 @@ by angle brackets and an include of \"myclass.h\" would be written as
   :group 'shu-base)
 
 
+(defcustom shu-cpp-default-member_prefix "m_"
+  "The prefix used to indicate that a variable in a class is a member variable of
+that class."
+  :type '(string)
+  :group 'shu-base)
+
+
 (defcustom shu-cpp-default-allocator-name "m_allocator"
   "The name of the class member variable that holds the pointer to the allocator
 used by the class."
