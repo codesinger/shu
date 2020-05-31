@@ -462,7 +462,7 @@ C++ header file")
       "\n"
       "};\n"
       "\n"
-      ipad "// FREE OPERATORS\n"))
+      "// FREE OPERATORS\n"))
     (shu-cpp-decl-h-stream class-name)
     (insert
      (concat
@@ -928,6 +928,8 @@ CLASS-NAME is the name of the containing C++ class."
       "const\n"
       "{\n"
       ipad "os << \"Instance of '" class-name "'\";\n"
+      "\n"
+      ipad "return os;\n"
       "}\n"))
     ))
 
@@ -1015,7 +1017,7 @@ name of the containing C++ class."
      (concat
       "\n"
       "inline\n"
-      std-name "::ostream &" class-name "::operator<<(\n"
+      std-name "::ostream &operator<<(\n"
       ipad std-name "::ostream" ostream-pad "  &os,\n"
       ipad  "const " class-name ostream-class-pad "  &cn)\n"
       "{\n"
