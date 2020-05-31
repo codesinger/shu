@@ -83,6 +83,110 @@
 
 
 
+;;
+;;  shu-test-shu-cpp-misc-gen-h-ctor-1
+;;
+(ert-deftest shu-test-shu-cpp-misc-gen-h-ctor-1 ()
+  (let* ((class-name "MumbleFrotz")
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           ipad "/*!\n"
+           ipad " * \\brief Create a " class-name " object ...\n"
+           ipad " */\n"
+           ipad "explicit " class-name "();\n"))
+         (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-misc-gen-h-ctor class-name)
+      (goto-char (point-min))
+      (should (search-forward "/*!" nil t))
+      (beginning-of-line)
+      (setq actual (buffer-substring-no-properties (point) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-misc-gen-h-ctor-2
+;;
+(ert-deftest shu-test-shu-cpp-misc-gen-h-ctor-2 ()
+  (let* ((class-name "OutstandingRefresher")
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           ipad "/*!\n"
+           ipad " * \\brief Create an " class-name " object ...\n"
+           ipad " */\n"
+           ipad "explicit " class-name "();\n"))
+         (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-misc-gen-h-ctor class-name)
+      (goto-char (point-min))
+      (should (search-forward "/*!" nil t))
+      (beginning-of-line)
+      (setq actual (buffer-substring-no-properties (point) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-misc-gen-h-ctor-3
+;;
+(ert-deftest shu-test-shu-cpp-misc-gen-h-ctor-3 ()
+  (let* ((class-name "LoneRamblerGuy")
+         (use-allocator t)
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           ipad "/*!\n"
+           ipad " * \\brief Create a " class-name " object ...\n"
+           ipad " */\n"
+           ipad "explicit " class-name "(\n"
+           ipad ipad "bslma::Allocator    *allocator = 0);\n"))
+         (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-misc-gen-h-ctor class-name use-allocator)
+      (goto-char (point-min))
+      (should (search-forward "/*!" nil t))
+      (beginning-of-line)
+      (setq actual (buffer-substring-no-properties (point) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-misc-gen-h-ctor-4
+;;
+(ert-deftest shu-test-shu-cpp-misc-gen-h-ctor-4 ()
+  (let* ((class-name "OutstandingRefresher")
+         (use-allocator t)
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (expected
+          (concat
+           ipad "/*!\n"
+           ipad " * \\brief Create an " class-name " object ...\n"
+           ipad " */\n"
+           ipad "explicit " class-name "(\n"
+           ipad ipad "bslma::Allocator    *allocator = 0);\n"))
+         (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-misc-gen-h-ctor class-name use-allocator)
+      (goto-char (point-min))
+      (should (search-forward "/*!" nil t))
+      (beginning-of-line)
+      (setq actual (buffer-substring-no-properties (point) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
 
 ;;
 ;;  shu-test-shu-cpp-decl-h-print-self
@@ -192,6 +296,28 @@
       (setq actual (buffer-substring-no-properties (point) (point-max)))
       (should (string= expected actual)))
     ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-gen-inline-template-header
+;;
+(ert-deftest shu-test-shu-cpp-gen-inline-template-header ()
+  (let ((expected
+         (concat
+          "\n"
+          "// ===========================================================================\n"
+          "//                  INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS\n"
+          "// ===========================================================================\n"))
+        (actual))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (shu-cpp-gen-inline-template-header)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
 
 
 

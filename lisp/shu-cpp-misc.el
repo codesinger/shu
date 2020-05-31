@@ -33,6 +33,37 @@
 (require 'shu-base)
 
 ;;
+;;  shu-cpp-misc-inline-template-label
+;;
+(defconst shu-cpp-misc-inline-template-label
+  "INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS"
+  "The text of the header that starts inline and template functions in a
+C++ header file")
+
+
+
+;;
+;;  shu-cpp-gen-inline-template-header
+;;
+(defun shu-cpp-gen-inline-template-header ()
+  "Doc string."
+  (interactive)
+  (let (
+        (outline (make-string 75 ?=))
+        (prefix (make-string 17 ? ))
+        )
+    (insert
+     (concat
+      "\n"
+      "// " outline "\n"
+      "// " prefix shu-cpp-misc-inline-template-label "\n"
+      "// " outline "\n"))
+    ))
+
+
+
+
+;;
 ;;  shu-gen-component
 ;;
 (defun shu-gen-component (class-name)
@@ -907,6 +938,38 @@ OUTLINE-CHARACTER is a string containing the outline character (usually
 
 
 ;;
+;;  shu-cpp-misc-gen-h-ctor
+;;
+(defun shu-cpp-misc-gen-h-ctor (class-name &optional use-allocator)
+  "Doc string."
+  (interactive)
+  (let (
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (creator-a "a")
+        (starts-with-vowel (string-match (substring class-name 0 1) "aeioAEIO"))
+        )
+    (when starts-with-vowel
+      (setq creator-a "an"))
+    (insert
+     (concat
+      "\n"
+      ipad "/*!\n"
+      ipad " * \\brief Create " creator-a " " class-name " object ...\n"
+      ipad " */\n"
+      "    explicit " class-name "("))
+    (when use-allocator
+      (insert
+       (concat
+        "\n"
+        ipad "    bslma::Allocator    *allocator = 0")))
+    (insert
+     (concat
+      ");\n"))
+    ))
+
+
+
+;;
 ;;  shu-cpp-decl-h-print-self
 ;;
 (defun shu-cpp-decl-h-print-self ()
@@ -1004,6 +1067,24 @@ name of the containing C++ class."
       "{\n"
       ipad "return cn.printSelf(os);\n"
       "}\n"))
+    ))
+
+
+
+;;
+;;  shu-cpp-gen-inline-template-header
+;;
+(defun shu-cpp-gen-inline-template-header ()
+  "Doc string."
+  (interactive)
+  (let ((outline (make-string 75 ?=))
+        (prefix (make-string 17 ? )))
+    (insert
+     (concat
+      "\n"
+      "// " outline "\n"
+      "// " prefix shu-cpp-misc-inline-template-label "\n"
+      "// " outline "\n"))
     ))
 
 
