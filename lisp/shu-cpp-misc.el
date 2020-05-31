@@ -522,7 +522,6 @@ C++ header file")
       (when (> ostream-class-length ostream-length)
         (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
     (shu-cpp-gen-inline-template-header)
-    (insert "\n\n")
     (shu-cpp-decl-cpp-class-name class-name)
     (insert
      (concat
@@ -594,10 +593,6 @@ C++ header file")
         (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
       (when (> ostream-class-length ostream-length)
         (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))))
-    (insert
-     (concat
-      "\n"
-      "\n"))
     (shu-cpp-decl-cpp-class-name class-name)
     (insert
      (concat
@@ -644,9 +639,6 @@ C++ header file")
        (include-line )
        (ipad (make-string shu-cpp-indent-length ? ))
          )
-    (insert (concat
-             "\n"
-             "\n"))
     (shu-cpp-decl-cpp-class-name class-name)
     (insert (concat
              "\n"
@@ -717,9 +709,6 @@ C++ header file")
     (when (not have-header)
       (shu-cpp-gen-inline-template-header)
       )
-    (insert (concat
-             "\n"
-             "\n"))
     (shu-cpp-decl-cpp-class-name class-name)
     (insert (concat
              "\n"
