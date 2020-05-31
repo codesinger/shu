@@ -985,12 +985,12 @@ CLASS-NAME is the name of the containing C++ class."
     (insert
      (concat
       "\n"
-      ipad "/*!\n"
-      ipad " *  \\brief Stream an instance of " class-name " to the stream `os`\n"
-      ipad " */\n"
-      ipad std-name "::ostream &operator<<(\n"
-      ipad ipad std-name "::ostream" ostream-pad "  &os,\n"
-      ipad ipad  "const " class-name ostream-class-pad "  &cn);\n"))
+      "/*!\n"
+      " *  \\brief Stream an instance of " class-name " to the stream `os`\n"
+      " */\n"
+      std-name "::ostream &operator<<(\n"
+      ipad std-name "::ostream" ostream-pad "  &os,\n"
+      ipad  "const " class-name ostream-class-pad "  &cn);\n"))
     ))
 
 
