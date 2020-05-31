@@ -462,7 +462,7 @@ C++ header file")
       "\n"
       "};\n"
       "\n"
-      "// FREE OPERATORS"))
+      "// FREE OPERATORS\n"))
     (shu-cpp-decl-h-stream class-name)
     (insert
      (concat
@@ -557,7 +557,7 @@ C++ header file")
       ipad "return os;\n"
       "}\n"
       "\n"
-      "// FREE OPERATORS"))
+      "// FREE OPERATORS\n"))
     (shu-cpp-decl-cpp-stream class-name)
     (goto-char start-pos)
     ))
@@ -721,7 +721,7 @@ C++ header file")
       "\n"
       "// ACCESSORS\n"
       "\n"
-      "// FREE OPERATORS"))
+      "// FREE OPERATORS\n"))
     (shu-cpp-decl-cpp-stream class-name)
     (goto-char start-pos)
     ))
