@@ -42,26 +42,6 @@ C++ header file")
 
 
 
-;;
-;;  shu-cpp-gen-inline-template-header
-;;
-(defun shu-cpp-gen-inline-template-header ()
-  "Doc string."
-  (interactive)
-  (let (
-        (outline (make-string 75 ?=))
-        (prefix (make-string 17 ? ))
-        )
-    (insert
-     (concat
-      "\n"
-      "// " outline "\n"
-      "// " prefix shu-cpp-misc-inline-template-label "\n"
-      "// " outline "\n"))
-    ))
-
-
-
 
 ;;
 ;;  shu-gen-component
@@ -941,13 +921,13 @@ OUTLINE-CHARACTER is a string containing the outline character (usually
 ;;  shu-cpp-misc-gen-h-ctor
 ;;
 (defun shu-cpp-misc-gen-h-ctor (class-name &optional use-allocator)
-  "Doc string."
+  "Generate a declaration of a constructor for the given CLASS-NAME.  If
+USE-ALLOCATOR is true, the constructor declaration includes an optional
+allocator."
   (interactive)
-  (let (
-        (ipad (make-string shu-cpp-indent-length ? ))
+  (let ((ipad (make-string shu-cpp-indent-length ? ))
         (creator-a "a")
-        (starts-with-vowel (string-match (substring class-name 0 1) "aeioAEIO"))
-        )
+        (starts-with-vowel (string-match (substring class-name 0 1) "aeioAEIO")))
     (when starts-with-vowel
       (setq creator-a "an"))
     (insert
@@ -956,12 +936,12 @@ OUTLINE-CHARACTER is a string containing the outline character (usually
       ipad "/*!\n"
       ipad " * \\brief Create " creator-a " " class-name " object ...\n"
       ipad " */\n"
-      "    explicit " class-name "("))
+      ipad "explicit " class-name "("))
     (when use-allocator
       (insert
        (concat
         "\n"
-        ipad "    bslma::Allocator    *allocator = 0")))
+        ipad ipad shu-cpp-default-allocator-type "    *allocator = 0")))
     (insert
      (concat
       ");\n"))

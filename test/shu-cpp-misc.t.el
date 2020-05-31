@@ -146,7 +146,7 @@
            ipad " * \\brief Create a " class-name " object ...\n"
            ipad " */\n"
            ipad "explicit " class-name "(\n"
-           ipad ipad "bslma::Allocator    *allocator = 0);\n"))
+           ipad ipad shu-cpp-default-allocator-type "    *allocator = 0);\n"))
          (actual))
     (with-temp-buffer
       (goto-char (point-min))
@@ -173,7 +173,7 @@
            ipad " * \\brief Create an " class-name " object ...\n"
            ipad " */\n"
            ipad "explicit " class-name "(\n"
-           ipad ipad "bslma::Allocator    *allocator = 0);\n"))
+           ipad ipad shu-cpp-default-allocator-type "    *allocator = 0);\n"))
          (actual))
     (with-temp-buffer
       (goto-char (point-min))

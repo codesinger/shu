@@ -243,6 +243,7 @@
   (setq shu-cpp-use-bde-library t)
   (setq shu-cpp-include-user-brackets t)
   (setq shu-cpp-std-namespace "bsl")
+  (setq shu-cpp-default-allocator-type "bslma::Allocator")
   (slp-bb-set-comment-hooks))
 
 ;;
