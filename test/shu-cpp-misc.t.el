@@ -270,14 +270,17 @@
 ;;  shu-test-shu-cpp-decl-cpp-print-self
 ;;
 (ert-deftest shu-test-shu-cpp-decl-cpp-print-self ()
-  (let* ((class-name "MumbleFrotz")
+  (let* ((ipad (make-string shu-cpp-indent-length ? ))
+         (class-name "MumbleFrotz")
          (expected
           (concat
            "std::ostream &" class-name "::printSelf(\n"
            "    std::ostream    &os)\n"
            "const\n"
            "{\n"
-           "    os << \"Instance of '" class-name "'\";\n"
+           ipad "os << \"Instance of '" class-name "'\";\n"
+           "\n"
+           ipad "return os;\n"
            "}\n"))
          (actual))
     (with-temp-buffer
@@ -342,12 +345,12 @@
          (class-name "MumbleFrotz")
          (expected
           (concat
-           ipad "/*!\n"
-           ipad " *  \\brief Stream an instance of " class-name " to the stream `os`\n"
-           ipad " */\n"
-           ipad "std::ostream &operator<<(\n"
-           ipad "    std::ostream       &os,\n"
-           ipad "    const " class-name "  &cn);\n"))
+           "/*!\n"
+           " *  \\brief Stream an instance of " class-name " to the stream `os`\n"
+           " */\n"
+           "std::ostream &operator<<(\n"
+           ipad "std::ostream       &os,\n"
+           ipad "const " class-name "  &cn);\n"))
          (actual))
     (with-temp-buffer
       (goto-char (point-min))
@@ -370,7 +373,7 @@
          (expected
           (concat
            "inline\n"
-           "std::ostream &MumbleFrotz::operator<<(\n"
+           "std::ostream &operator<<(\n"
            "    std::ostream       &os,\n"
            "    const MumbleFrotz  &cn)\n"
            "{\n"
