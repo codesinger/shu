@@ -650,6 +650,7 @@ Return a list that holds the following information:
       (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
       (shu-cpp-attributes-gen-getter-decl class-name sorted-attributes)
       (shu-cpp-attributes-gen-print-self-decl)
+      (shu-cpp-gen-decl-h-private class-name)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
       (shu-cpp-attributes-gen-ctor-gen class-name attributes)
       (when have-non-nullables
@@ -700,8 +701,9 @@ Return a list that holds the following information:
       "#include <bdlb_nullablevalue.h>\n"
       "#include <bdlt_datetime.h>\n"
       "#include <bdlt_datetimeinterval.h>\n"
-      "#include <bsl_string.h>\n"
-      "\n\n" ipad "// DATA\n"))
+      "#include <bsl_string.h>\n"))
+    (shu-cpp-gen-h-class-intro class-name)
+    (insert (concat "\n" ipad "// DATA\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -762,6 +764,7 @@ Return a list that holds the following information:
     (insert
      (concat
       "\n"
+      "  public:\n"
       "\n"
       ipad "// CREATORS\n"
       "\n"
@@ -1205,14 +1208,9 @@ of values for individual nullable columns."
         (have-interval)
         (contained-class))
     (setq lpad (concat ipad "os "))
-    (insert
-     (concat
-      "\n"
-      "\n"
-      "bsl::ostream &" class-name "::printSelf(\n"
-      "    bsl::ostream    &os)\n"
-      "const\n"
-      "{\n"))
+    (insert "\n")
+    (shu-cpp-decl-h-print-self)
+    (insert "\n")
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -1295,7 +1293,10 @@ of values for individual nullable columns."
       "\n\n\n"
       "#include <fxcrossdb_tenorcolumnnames.h>\n"
       "\n"
-      "#include <ball_log.h>\n"
+      "#include <ball_log.h>\n"))
+    (shu-cpp-decl-cpp-class-name class-name)
+    (insert
+     (concat
       "\n\n\n"
       "// CREATORS\n\n"
       class-name "::" class-name "(\n"
@@ -1709,18 +1710,8 @@ values from an instance of bcem_Aggregate."
 (defun shu-cpp-attributes-gen-print-self-decl ()
   "Generate the declaration for the printSelf function"
   (let((ipad (make-string shu-cpp-indent-length ? )))
-  (insert
-   (concat
-    "\n"
-    "\n"
-    ipad "/*!\n"
-    ipad " *  \\brief Stream object out to a stream\n"
-    ipad " *\n"
-    ipad " * Intended for use by operator<<()\n"
-    ipad " */\n"
-    ipad "bsl::ostream &printSelf(\n"
-    ipad ipad "bsl::ostream    &os)\n"
-    ipad "const;\n"))
+    (insert "\n")
+    (shu-cpp-decl-h-print-self)
   ))
 
 
@@ -1736,6 +1727,10 @@ values from an instance of bcem_Aggregate."
     "\n"
     "\n"
     "// FREE OPERATORS\n"
+    "\n"))
+  (shu-cpp-decl-h-stream class-name)
+  (insert
+   (concat
     "\n"
     "\n"
     "/*!\n"

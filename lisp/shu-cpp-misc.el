@@ -348,76 +348,13 @@ C++ header file")
 (defun shu-cpp-inner-cdecl (class-name copy-allowed &optional use-allocator)
   "Generate a skeleton class declaration at point."
   (let (
-        (gb (get-buffer-create "**foo**"))
-        (std-name "std")
-        (ostream-length (length "std::ostream  "))
-        (ostream-class-length 0)
-        (ostream-pad "")
-        (ostream-class-pad "")
-        (equal-pad )
-        (dash-pad )
-        (blank24 )
-        (creator-a )
-        (starts-with-vowel )
-        (copy-ctor )
-        (op-equal )
-        (class-name-pad )
         (ipad (make-string shu-cpp-indent-length ? ))
         (header-pos (point))
         (have-include )
         (start-pos )
         )
-    (princ
-     (concat
-      "shu-cpp-inner-cdecl: "
-      "class-name: " class-name
-      ", use-allocator: " (shu-bool-to-string use-allocator)
-      ) gb)
-
-
-    (when shu-cpp-use-bde-library
-      (setq std-name shu-cpp-std-namespace)
-      )
-    (setq class-name-pad (make-string (length class-name) ? ))
-    (setq equal-pad (make-string (+ 6 (length class-name)) ?=))
-    (setq dash-pad (make-string (+ 6 (length class-name)) ?-))
-    (setq blank24 (make-string 24 ? ))
-    (setq ostream-class-length (+ (length "const ") (length class-name) 2))
-    (if (> ostream-length ostream-class-length)
-        (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
-      (when (> ostream-class-length ostream-length)
-        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))
-        )
-      )
-    (setq starts-with-vowel (string-match (substring class-name 0 1) "aeioAEIO"))
-    (setq creator-a "a")
-    (when starts-with-vowel (setq creator-a "an")
-          )
-
-    (setq copy-ctor (concat
-                     ipad "explicit " class-name "(\n"
-                     ipad ipad "const " class-name " &original);\n"))
-
-    (setq op-equal (concat
-                    ipad class-name " &operator=(\n"
-                    ipad ipad "const " class-name " &rhs);\n"))
-
-    (insert "\n")
-    (shu-cpp-decl-h-class-name class-name)
-    (insert
-     (concat
-      "\n"
-      "/*!\n"
-      " * \\brief "))
-    (setq start-pos (point))
-    (insert
-     (concat
-      "Description of " class-name " FIXME!  FIXME!  FIXME!  FIXME!\n"
-      " */\n"
-      "class " class-name "\n"
-      "{\n"
-      "\n"
-      ipad "// DATA\n\n"))
+    (setq start-pos (shu-cpp-gen-h-class-intro class-name))
+    (insert (concat "\n" ipad "// DATA\n\n"))
     (when use-allocator
       (insert
        (concat
@@ -434,7 +371,7 @@ C++ header file")
     (insert
      (concat
       "\n"
-      "    // CREATORS\n"))
+      ipad "// CREATORS\n"))
     (shu-cpp-misc-gen-h-ctor class-name use-allocator)
     (shu-cpp-misc-gen-h-dtor class-name)
     (insert
@@ -442,25 +379,11 @@ C++ header file")
       "\n"
       ipad "// MANIPULATORS\n"
       "\n"
-      ipad "// ACCESSORS\n"
-      "\n"))
+      ipad "// ACCESSORS\n"))
     (shu-cpp-decl-h-print-self)
-    (insert
-     (concat
-      "\n"
-      "  private:\n"))
-    (when (not copy-allowed)
-      (shu-cpp-misc-gen-not-implemented class-name)
-
-      )
-    (insert
-     (concat
-      "\n"
-      ipad "// MANIPULATORS\n"
-      "\n"
-      ipad "// ACCESSORS\n"
-      "\n"
-      "};\n"
+    (shu-cpp-gen-decl-h-private class-name copy-allowed)
+      (insert
+       (concat
       "\n"
       "// FREE OPERATORS\n"))
     (shu-cpp-decl-h-stream class-name)
@@ -1029,6 +952,62 @@ name of the containing C++ class."
       "// " outline "\n"
       "// " prefix shu-cpp-misc-inline-template-label "\n"
       "// " outline "\n"))
+    ))
+
+
+
+
+;;
+;;  shu-cpp-gen-h-class-intro
+;;
+(defun shu-cpp-gen-h-class-intro (class-name)
+  "Generate the preamble to a class declaration in a header file.  This is all
+of the code that precedes the \\ DATA comment.  Return the position at which
+the class comment was placed."
+  (let ((start-pos))
+    (insert "\n")
+    (shu-cpp-decl-h-class-name class-name)
+    (insert
+     (concat
+      "\n"
+      "/*!\n"
+      " * \\brief "))
+    (setq start-pos (point))
+    (insert
+     (concat
+      "Description of " class-name " FIXME!  FIXME!  FIXME!  FIXME!\n"
+      " */\n"
+      "class " class-name "\n"
+      "{\n"))
+    start-pos
+    ))
+
+
+
+
+;;
+;;  shu-cpp-gen-decl-h-private
+;;
+(defun shu-cpp-gen-decl-h-private (class-name &optional copy-allowed)
+  "Doc string."
+  (let (
+        (ipad (make-string shu-cpp-indent-length ? ))
+        )
+    (insert
+     (concat
+      "\n"
+      "  private:\n"))
+    (when (not copy-allowed)
+      (shu-cpp-misc-gen-not-implemented class-name)
+      )
+    (insert
+     (concat
+      "\n"
+      ipad "// MANIPULATORS\n"
+      "\n"
+      ipad "// ACCESSORS\n"
+      "\n"
+      "};\n"))
     ))
 
 
