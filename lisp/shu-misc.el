@@ -1511,6 +1511,7 @@ of contents entry created and inserted at point will be
         (toc-name))
     (setq toc-name (shu-make-md-section-name section-name))
     (setq index-name (shu-make-md-index-name toc-name))
+    (beginning-of-line)
     (insert
      (concat
       " * [" toc-name "]"
