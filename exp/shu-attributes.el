@@ -900,13 +900,18 @@ of nullable values."
 ;;
 (defun shu-cpp-attributes-gen-bind-values-gen (class-name attributes)
   "Generate the code that binds all of the values to their column names."
-  (let ((gb (get-buffer-create "**boo**"))
+  (let (
+        (gb (get-buffer-create "**boo**"))
         (attrs attributes)
         (attr-info)
         (name)
         (uname)
         (data-type)
         (tmp-data-type)
+        (bind-type)
+        (bind-prefix)
+        (pad-count)
+        (pad)
         (full-data-type)
         (comment)
         (reference)
@@ -922,7 +927,9 @@ of nullable values."
         (member-prefix "m_")
         (have-date)
         (have-interval)
-        (contained-class))
+        (contained-class)
+        )
+    (setq bind-prefix (concat ipad ipad "binder.bind"))
     (insert
      (concat
       "\n\n"
@@ -940,7 +947,8 @@ of nullable values."
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
-        (setq contained-class nil))
+        (setq contained-class nil)
+        )
       (if contained-class
           (insert (concat ipad member-prefix name ".bindValues(binder);\n"))
         (if (not nullable)
@@ -951,19 +959,28 @@ of nullable values."
             ipad  "if ( !" uname " )\n"
             ipad ipad "binder.bindNull(\"@\" + "  column-name ", __FILE__, __LINE__);\n"
             ipad  "else\n"
-            ipad ipad "binder.bind")))
+            bind-prefix))
+          )
         (setq tmp-data-type data-type)
         (when enum-base
-          (setq tmp-data-type enum-base))
+          (setq tmp-data-type enum-base)
+          (setq bind-type (shu-cpp-attributes-bind-type tmp-data-type))
+          (setq pad-count (+ (length bind-type) (length bind-prefix)))
+          (setq pad (make-string pad-count ? ))
+          )
         (insert (shu-cpp-attributes-bind-type tmp-data-type))
         (insert (concat "(\"@\" + " column-name ", "))
         (if enum-base
-            (insert (concat "static_cast<" enum-base ">(" name "())"))
-          (insert (concat name "()")))
+            (insert (concat "\n" pad "static_cast<" enum-base ">(" name "())"))
+          (insert (concat name "()"))
+          )
         (when (string= data-type "bdlt::DatetimeInterval")
-          (insert ".totalMilliseconds()"))
-        (insert ", __FILE__, __LINE__);\n"))
-      (setq attrs (cdr attrs)))
+          (insert ".totalMilliseconds()")
+          )
+        (insert ", __FILE__, __LINE__);\n")
+        )
+      (setq attrs (cdr attrs))
+      )
     (insert "}\n")
     ))
 
