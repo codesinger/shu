@@ -261,10 +261,11 @@
 
 
 ;;
-;;  shu-test-shu-cpp-make-attr-info-name
+;;  shu-test-shu-cpp-extract-attr-info-type
 ;;
-(ert-deftest shu-test-shu-cpp-make-attr-info-name ()
-  (let ((name "frederick")
+(ert-deftest shu-test-shu-cpp-extract-attr-info-type ()
+  (let (
+        (name "frederick")
         (data-type "std::string")
         (full-data-type "std::optional<std::string>")
         (comment "This is a comment")
@@ -272,7 +273,43 @@
         (nullable t)
         (column-name "MumbleBar::otherThing")
         (attr-info)
-        (xname))
+        (xname)
+        (xdata-type)
+        (xfull-data-type)
+          )
+    (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
+                                            reference nullable column-name))
+    (shu-cpp-extract-attr-info-type attr-info xname xdata-type xfull-data-type)
+    (should xname)
+    (should (stringp xname))
+    (should (string= name xname))
+
+    (should xdata-type)
+    (should (stringp xdata-type))
+    (should (string= data-type xdata-type))
+
+    (should xfull-data-type)
+    (should (stringp xfull-data-type))
+    (should (string= full-data-type xfull-data-type))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-make-attr-info-name
+;;
+(ert-deftest shu-test-shu-cpp-make-attr-info-name ()
+  (let (
+        (name "frederick")
+        (data-type "std::string")
+        (full-data-type "std::optional<std::string>")
+        (comment "This is a comment")
+        (reference)
+        (nullable t)
+        (column-name "MumbleBar::otherThing")
+        (attr-info)
+        (xname)
+          )
     (setq attr-info (shu-cpp-make-attr-info name data-type full-data-type comment
                                             reference nullable column-name))
     (setq xname (shu-cpp-extract-attr-info-name attr-info))

@@ -183,27 +183,23 @@
 (defmacro shu-cpp-extract-attr-info (attr-info name data-type full-data-type comment
                                                reference nullable column-name column-count
                                                enum-base reset-value)
-  "Extract the information out of an attr-info"
-  (let (
-        (tattr-ext (make-symbol "attr-ext"))
+  "Extract the information out of an ATTR-INFO"
+  (let ((tattr-ext (make-symbol "attr-ext"))
         (tattr-other (make-symbol "attr-other"))
         (tattr-cmt (make-symbol "attr-cmt"))
         (tattr-col (make-symbol "attr-col"))
         (tattr-ct (make-symbol "attr-ct"))
         (tattr-enu (make-symbol "attr-enu"))
         (tattr-dft (make-symbol "attr-dft"))
-        (tflags (make-symbol "flags"))
-        )
-    `(let (
-           (,tattr-ext)
+        (tflags (make-symbol "flags")))
+    `(let ((,tattr-ext)
            (,tattr-other)
            (,tattr-cmt)
            (,tattr-col)
            (,tattr-ct)
            (,tattr-enu)
            (,tattr-dft)
-           (,tflags)
-           )
+           (,tflags))
        (setq ,name (car ,attr-info))
        (setq ,tattr-ext (cdr ,attr-info))
        (setq ,full-data-type (car ,tattr-ext))
@@ -218,18 +214,35 @@
        (setq ,tflags (car ,tattr-ct))
        (if (= (logand ,tflags shu-cpp-attributes-reference) shu-cpp-attributes-reference)
            (setq ,reference t)
-         (setq ,reference nil)
-         )
+         (setq ,reference nil))
        (if (= (logand ,tflags shu-cpp-attributes-nullable) shu-cpp-attributes-nullable)
            (setq ,nullable t)
-         (setq ,nullable nil)
-         )
+         (setq ,nullable nil))
        (setq ,column-name (car ,tattr-col))
        (setq ,enum-base (car ,tattr-enu))
        (setq ,column-count (cdr ,tattr-dft))
        (setq ,reset-value (car ,tattr-dft))
-       )
-    ))
+    )))
+
+
+
+
+;;
+;;
+;;  shu-cpp-extract-attr-info-type
+;;
+(defmacro shu-cpp-extract-attr-info-type (attr-info name data-type full-data-type)
+  "Extract the NAME, DATA-TYPE, and FULL-DATA-TYPE from an ATTR-INFO"
+  (let ((tattr-ext (make-symbol "attr-ext"))
+        (tattr-other (make-symbol "attr-other")))
+    `(let ((,tattr-ext)
+           (,tattr-other))
+       (setq ,name (car ,attr-info))
+       (setq ,tattr-ext (cdr ,attr-info))
+       (setq ,full-data-type (car ,tattr-ext))
+       (setq ,tattr-other (cdr ,tattr-ext))
+       (setq ,data-type (car ,tattr-other))
+    )))
 
 
 
@@ -306,6 +319,63 @@
             ", reset-value: " preset-value "\n") buf)
     (when comment
       (princ (concat "    [" comment "]\n") buf))
+    ))
+
+
+
+;;
+;;  shu-attributes-get-max-data-type-len
+;;
+(defun shu-attributes-get-max-data-type-len (attributes &optional min-length)
+  "Return the length of the longest daya type name.  If MIN-LENGTH is
+present, the number returned has a value greater than or equal to MIN-LENGTH."
+  (let ((attrs attributes)
+        (attr-info)
+        (name)
+        (data-type)
+        (full-data-type)
+        (max-type-len (if min-length min-length 0)))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info-type attr-info name data-type full-data-type)
+      (when ( > (length data-type) max-type-len)
+        (setq max-type-len (length data-type)))
+      (setq attrs (cdr attrs)))
+    max-type-len
+    ))
+
+
+
+
+;;
+;;  shu-attributes-get-max-non-null-data-type-len
+;;
+(defun shu-attributes-get-max-non-null-data-type-len (attributes &optional min-length)
+  "Return the length of the longest non-nullable data type name.  If MIN-LENGTH is
+present, the number returned has a value greater than or equal to MIN-LENGTH."
+  (let ((attrs attributes)
+        (attr-info)
+        (name)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (column-count)
+        (enum-base)
+        (reset-value)
+        (max-type-len 0))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (when (not nullable)
+        (when ( > (length data-type) max-type-len)
+          (setq max-type-len (length data-type))))
+      (setq attrs (cdr attrs)))
+    max-type-len
     ))
 
 
@@ -1371,15 +1441,7 @@ attributes."
       "\n"
       "\n"
       class-name "::" class-name "(\n"))
-    (while attrs
-      (setq attr-info (car attrs))
-      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count
-                                 enum-base reset-value)
-      (when (not nullable)
-        (when ( > (length data-type) max-type-len)
-          (setq max-type-len (length data-type))))
-      (setq attrs (cdr attrs)))
+    (setq max-type-len (shu-attributes-get-max-non-null-data-type-len attrs max-type-len))
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
@@ -1956,7 +2018,6 @@ values from an instance of bcem_Aggregate."
         "\n"
         ipad "return isSame;\n"
         "}\n")))
-
     (insert
      (concat
       "\n"
@@ -1967,6 +2028,27 @@ values from an instance of bcem_Aggregate."
       "{\n"
       "    return  ( !operator==(lhs, rhs) );\n"
       "}\n"))
+    ))
+
+
+
+;;
+;;  shu-attributes-gen-test-start
+;;
+(defun shu-attributes-gen-test-start (class-name test-name)
+  "Generate the opening code of a Google test unit test."
+  (let ((ipad (make-string shu-cpp-indent-length ? ))
+        (top-string (make-string 68 ?-)))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      "// " top-string "\n"
+      "// TEST\n"
+      "// " top-string "\n"
+      "TEST(Test" class-name ", " test-name ")\n"
+      "{\n"
+      ipad "BALL_LOG_SET_CATEGORY(__func__);\n"))
     ))
 
 
