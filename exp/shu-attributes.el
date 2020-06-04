@@ -1353,6 +1353,7 @@ of values for individual nullable columns."
 (defun shu-cpp-attributes-gen-print-self-gen (class-name attributes)
   "Generate the code that binds all of the values to their column names."
   (let ((gb (get-buffer-create "**boo**"))
+        (std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -1379,8 +1380,13 @@ of values for individual nullable columns."
         (contained-class))
     (setq lpad (concat ipad "os "))
     (insert "\n")
-    (shu-cpp-decl-cpp-print-self class-name)
-    (insert "\n")
+    (insert
+     (concat
+      "\n"
+      std-name "::ostream &" class-name "::printSelf(\n"
+      ipad std-name "::ostream    &os)\n"
+      "const\n"
+      "{\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
