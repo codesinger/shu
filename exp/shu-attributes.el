@@ -726,6 +726,7 @@ Return a list that holds the following information:
       (shu-cpp-gen-decl-h-private class-name t)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
       (shu-cpp-attributes-gen-ctor-gen class-name attributes)
+      (shu-cpp-attributes-gen-copy-ctor-gen class-name attributes)
       (when have-non-nullables
         (shu-cpp-attributes-gen-ctor-gen-full class-name attributes))
       (shu-cpp-attributes-gen-reset-gen class-name attributes)
@@ -854,14 +855,11 @@ Return a list that holds the following information:
 
 
 
-
-
 ;;
 ;;  shu-cpp-attributes-gen-copy-ctor-decl
 ;;
 (defun shu-cpp-attributes-gen-copy-ctor-decl (class-name)
-  "Generate the declaration of the constructor that initializes all of the
-non-nullable values."
+  "Generate the declaration of the copy constructor."
   (let ((pad)
         (max-type-len (length shu-attributes-allocator-type))
         (allocator-type shu-attributes-allocator-type)
@@ -1495,6 +1493,100 @@ of values for individual nullable columns."
       "{\n"
       ipad "reset();\n"
       "}\n"))
+    ))
+
+
+
+
+;;
+;;  shu-cpp-attributes-gen-copy-ctor-gen
+;;
+(defun shu-cpp-attributes-gen-copy-ctor-gen (class-name attributes)
+  "Generate the code for the copy constructor."
+  (let ((attrs attributes)
+        (attr-info)
+        (name)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (column-count)
+        (enum-base)
+        (reset-value)
+        (pad)
+        (max-type-len (length shu-attributes-allocator-type))
+        (allocator-type shu-attributes-allocator-type)
+        (class-type (concat "const " class-name))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (member-prefix "m_")
+        (contained-class)
+        (uses-allocator)
+        (uname))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      class-name "::" class-name "(\n"))
+    (when (> (length class-type) max-type-len)
+      (setq max-type-len (length class-type)))
+    (setq pad (concat
+               (shu-cpp-attributes-make-pad-no-ref max-type-len class-type)
+               "&"))
+    (insert (concat ipad class-type pad "rhs,\n"))
+    (setq pad (concat
+               (shu-cpp-attributes-make-pad-no-ref max-type-len allocator-type)
+               "*"))
+    (insert
+     (concat
+      ipad allocator-type pad "allocator)\n"
+      ":\n"
+      ))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (if (and (not nullable)
+               (string= column-name "std"))
+          (setq contained-class t)
+        (setq contained-class nil))
+      (if (or contained-class (string= data-type "bsl::string"))
+          (setq uses-allocator t)
+        (setq uses-allocator nil))
+
+      (insert (concat member-prefix name "("))
+      (if (not nullable)
+          (progn
+            (insert (concat "rhs." member-prefix name))
+            (when uses-allocator
+              (insert ", allocator")))
+        (when (not uses-allocator)
+          (insert (concat "rhs." member-prefix name))))
+      (insert ")")
+      (when (cdr attrs)
+        (insert ","))
+      (insert "\n")
+      (setq attrs (cdr attrs)))
+    (insert
+     (concat
+      "{\n"))
+    (setq attrs attributes)
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (when (and nullable (string= data-type "bsl::string"))
+        (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
+        (insert
+         (concat
+          ipad "if (rhs." uname ")\n"
+          ipad ipad member-prefix name ".makeValue(bsl::string(rhs." name "(), allocator));\n"
+          )))
+      (setq attrs (cdr attrs)))
+    (insert "}\n")
     ))
 
 
