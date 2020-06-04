@@ -989,17 +989,15 @@ the class comment was placed."
 ;;  shu-cpp-gen-decl-h-private
 ;;
 (defun shu-cpp-gen-decl-h-private (class-name &optional copy-allowed)
-  "Doc string."
-  (let (
-        (ipad (make-string shu-cpp-indent-length ? ))
-        )
+  "Generate the private section of the class declaration.  If COPY-ALLOWED
+is false, generate private an unimplemented copy constructor and operator=()"
+  (let ((ipad (make-string shu-cpp-indent-length ? )))
     (insert
      (concat
       "\n"
       "  private:\n"))
     (when (not copy-allowed)
-      (shu-cpp-misc-gen-not-implemented class-name)
-      )
+      (shu-cpp-misc-gen-not-implemented class-name))
     (insert
      (concat
       "\n"

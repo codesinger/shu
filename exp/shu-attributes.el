@@ -720,7 +720,7 @@ Return a list that holds the following information:
       (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
       (shu-cpp-attributes-gen-getter-decl class-name sorted-attributes)
       (shu-cpp-attributes-gen-print-self-decl)
-      (shu-cpp-gen-decl-h-private class-name)
+      (shu-cpp-gen-decl-h-private class-name t)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
       (shu-cpp-attributes-gen-ctor-gen class-name attributes)
       (when have-non-nullables
