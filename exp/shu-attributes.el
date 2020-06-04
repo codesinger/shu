@@ -228,7 +228,7 @@
        (setq ,enum-base (car ,tattr-enu))
        (setq ,column-count (cdr ,tattr-dft))
        (setq ,reset-value (car ,tattr-dft))
-    )))
+       )))
 
 
 
@@ -248,7 +248,7 @@
        (setq ,full-data-type (car ,tattr-ext))
        (setq ,tattr-other (cdr ,tattr-ext))
        (setq ,data-type (car ,tattr-other))
-    )))
+       )))
 
 
 
@@ -740,7 +740,7 @@ Return a list that holds the following information:
       (shu-cpp-attributes-gen-bind-values-gen class-name attributes)
       (shu-cpp-attributes-gen-getter-has-gen class-name sorted-attributes)
       (shu-cpp-attributes-gen-getter-gen class-name sorted-attributes)
-      (shu-cpp-attributes-gen-print-self-gen class-name sorted-attributes)
+      (shu-cpp-attributes-gen-print-self-gen class-name attributes)
       (shu-cpp-attributes-gen-operator-equal-gen class-name sorted-attributes))
     ))
 
@@ -967,7 +967,7 @@ data type name in the list of attributes."
   (let (
         (pad-len 0)
         (pad)
-          )
+        )
     (when (< (length data-type) max-type-len)
       (setq pad-len (- max-type-len (length data-type)))
       )
@@ -991,7 +991,7 @@ longest data type plus three in the list of attributes."
   (let (
         (pad-len 0)
         (pad)
-          )
+        )
     (when (< (length data-type) max-type-len)
       (setq pad-len (- max-type-len (length data-type)))
       )
@@ -1392,37 +1392,23 @@ of values for individual nullable columns."
                (string= column-name "std"))
           (setq contained-class t)
         (setq contained-class nil))
-      (when contained-class
-        (insert (concat ipad name "().printSelf(os);\n")))
-      (setq attrs (cdr attrs)))
-    (setq attrs attributes)
-    (while attrs
-      (setq attr-info (car attrs))
-      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                 reference nullable column-name column-count
-                                 enum-base reset-value)
-      (if (and (not nullable)
-               (string= column-name "std"))
-          (setq contained-class t)
-        (setq contained-class nil))
-      (when (not contained-class)
-        (if (not nullable)
-            (progn
-              (insert (concat semi lpad "<< \"" comma name ": \" << " name "()"))
-              (setq lpad (concat ipad "   "))
-              (setq comma ", ")
-              (setq semi "\n"))
-          (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
-          (setq lpad (concat ipad "os "))
-          (when (/= (length semi) 0)
-            (setq semi ";\n"))
-          (insert
-           (concat
-            semi
-            ipad "if (" uname ")\n"
-            ipad ipad "os << \"" comma name ": \" << " name "();\n"))
-          (setq comma ", ")
-          (setq semi "")))
+      (if (not nullable)
+          (progn
+            (insert (concat semi lpad "<< \"" comma name ": \" << " name "()"))
+            (setq lpad (concat ipad "   "))
+            (setq comma ", ")
+            (setq semi "\n"))
+        (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
+        (setq lpad (concat ipad "os "))
+        (when (/= (length semi) 0)
+          (setq semi ";\n"))
+        (insert
+         (concat
+          semi
+          ipad "if (" uname ")\n"
+          ipad ipad "os << \"" comma name ": \" << " name "();\n"))
+        (setq comma ", ")
+        (setq semi ""))
       (when (and (not nullable) (not (cdr attrs)))
         (insert ";\n"))
       (setq attrs (cdr attrs)))
@@ -1968,7 +1954,7 @@ values from an instance of bcem_Aggregate."
   (let((ipad (make-string shu-cpp-indent-length ? )))
     (insert "\n")
     (shu-cpp-decl-h-print-self)
-  ))
+    ))
 
 
 
