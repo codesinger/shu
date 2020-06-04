@@ -178,6 +178,9 @@
 (defconst shu-attributes-allocator-type "bslma::Allocator"
   "Data type for the memory allocator base class.")
 
+(defconst shu-attributes-string-type "bsl::string"
+  "Data type for string.")
+
 
 ;;
 ;;
@@ -391,7 +394,7 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
 \"int\" returns \"Int\", etc."
   (let ((bind-type "Text"))
     (cond
-     ((string= data-type "bsl::string")
+     ((string= data-type shu-attributes-string-type)
       (setq bind-type "Text"))
      ((string= data-type "bdlt::Datetime")
       (setq bind-type "Datetime"))
@@ -419,7 +422,7 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
 \"asString()\".  \"int\" returns \"asInt()\", etc."
   (let ((aggregate-type "asString()"))
     (cond
-     ((string= data-type "bsl::string")
+     ((string= data-type shu-attributes-string-type)
       (setq aggregate-type "asString()"))
      ((string= data-type "bdlt::Datetime")
       (setq aggregate-type "asDatetimeTz().utcDatetime()"))
@@ -1478,7 +1481,7 @@ of values for individual nullable columns."
           (setq contained-class t)
         (setq contained-class nil))
       (insert (concat member-prefix name "("))
-      (when (or (string= full-data-type "bsl::string")
+      (when (or (string= full-data-type shu-attributes-string-type)
                 contained-class)
         (insert "allocator"))
       (when reset-value
@@ -1541,8 +1544,7 @@ of values for individual nullable columns."
     (insert
      (concat
       ipad allocator-type pad "allocator)\n"
-      ":\n"
-      ))
+      ":\n"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -1552,7 +1554,7 @@ of values for individual nullable columns."
                (string= column-name "std"))
           (setq contained-class t)
         (setq contained-class nil))
-      (if (or contained-class (string= data-type "bsl::string"))
+      (if (or contained-class (string= data-type shu-attributes-string-type))
           (setq uses-allocator t)
         (setq uses-allocator nil))
 
@@ -1578,12 +1580,14 @@ of values for individual nullable columns."
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name column-count
                                  enum-base reset-value)
-      (when (and nullable (string= data-type "bsl::string"))
+      (when (and nullable (string= data-type shu-attributes-string-type))
         (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
         (insert
          (concat
           ipad "if (rhs." uname ")\n"
-          ipad ipad member-prefix name ".makeValue(bsl::string(rhs." name "(), allocator));\n"
+          ipad ipad member-prefix name ".makeValue("
+          shu-attributes-string-type
+          "(rhs." name "(), allocator));\n"
           )))
       (setq attrs (cdr attrs)))
     (insert "}\n")
@@ -1651,7 +1655,7 @@ attributes."
       (insert (concat member-prefix name "("))
       (when (not nullable)
         (insert name))
-      (when (string= full-data-type "bsl::string")
+      (when (string= full-data-type shu-attributes-string-type)
         (insert ", allocator"))
       (insert ")")
       (when (cdr attrs)
@@ -1736,7 +1740,7 @@ attributes."
       (insert (concat ipad member-prefix name))
       (if (or nullable contained-class)
           (insert ".reset()")
-        (if (string= full-data-type "bsl::string")
+        (if (string= full-data-type shu-attributes-string-type)
             (insert ".clear()")
           (if (string= full-data-type "bdlt::Datetime")
               (insert " = defaultTime")
