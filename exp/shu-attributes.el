@@ -1005,8 +1005,7 @@ longest data type plus three in the list of attributes."
 (defun shu-cpp-attributes-gen-getter-has-decl (attributes)
   "Generate the declaration of the functions that indicate presence or absence
 of nullable values."
-  (let ((gb (get-buffer-create "**boo**"))
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1060,8 +1059,7 @@ of nullable values."
 ;;
 (defun shu-cpp-attributes-gen-bind-values-gen (class-name attributes)
   "Generate the code that binds all of the values to their column names."
-  (let ((gb (get-buffer-create "**boo**"))
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1145,8 +1143,7 @@ of nullable values."
 (defun shu-cpp-attributes-gen-getter-has-gen (class-name attributes)
   "Generate the code for the functions that indicate the presence or absence
 of values for individual nullable columns."
-  (let ((gb (get-buffer-create "**boo**"))
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1189,8 +1186,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-reset-decl ()
   "Generate the declarations for the two manipulator functions."
-  (let ((gb (get-buffer-create "**boo**"))
-        (ipad (make-string shu-cpp-indent-length ? )))
+  (let ((ipad (make-string shu-cpp-indent-length ? )))
     (insert
      (concat
       "\n\n"
@@ -1234,8 +1230,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-getter-decl (class-name attributes)
   "Generate the declarations for the functions that return attribute values."
-  (let ((gb (get-buffer-create "**boo**"))
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1293,8 +1288,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-getter-gen (class-name attributes)
   "Generate the code for the functions that return attribute values."
-  (let ((gb (get-buffer-create "**boo**"))
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1352,8 +1346,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-print-self-gen (class-name attributes)
   "Generate the code that binds all of the values to their column names."
-  (let ((gb (get-buffer-create "**boo**"))
-        (std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
+  (let ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
         (attrs attributes)
         (attr-info)
         (name)
@@ -1444,8 +1437,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-ctor-gen (class-name attributes)
   "Generate the code for the constructor."
-  (let ((gb (get-buffer-create "**boo**"))
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1682,8 +1674,7 @@ attributes."
 ;;
 (defun shu-cpp-attributes-gen-reset-gen (class-name attributes)
   "Generate the code for the reset function"
-  (let ((gb (get-buffer-create "**boo**"))
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1820,8 +1811,7 @@ attributes."
 (defun shu-cpp-attributes-gen-set-values-gen (class-name table-name attributes)
   "Generate the code for the setValues function that sets all of the member variable
 values from an instance of bcem_Aggregate."
-  (let ((gb (get-buffer-create "**boo**"))
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -2020,8 +2010,7 @@ values from an instance of bcem_Aggregate."
 ;;
 (defun shu-cpp-attributes-gen-operator-equal-gen (class-name attributes)
   "Generate the code for operator==()"
-  (let ((gb (get-buffer-create "**boo**"))
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
