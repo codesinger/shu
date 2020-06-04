@@ -813,6 +813,52 @@ Return a list that holds the following information:
 ;;
 (defun shu-cpp-attributes-gen-ctor-decl (class-name have-non-nullables attributes)
   "Generate the declarations for the functions that set attribute values."
+  (let ((attrs attributes)
+        (attr-info)
+        (name)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (column-count)
+        (enum-base)
+        (reset-value)
+        (header-data-type)
+        (pad)
+        (ipad (make-string shu-cpp-indent-length ? )))
+    (insert
+     (concat
+      "\n"
+      "  public:\n"
+      "\n"
+      ipad "// CREATORS\n"
+      "\n"
+      ipad "/*!\n"
+      ipad " * \\brief Create an empty " class-name " object\n"
+      ipad " *\n"
+      ipad " * Its values are expected to be set by the setValues() function from the\n"
+      ipad " * data contained in an instance of bsidb2::Cursor.\n"
+      ipad " */\n"
+      ipad "explicit " class-name "(\n"
+      ipad ipad "bslma::Allocator   *allocator = 0);\n"))
+    (shu-cpp-attributes-gen-copy-ctor-decl class-name attributes)
+    (when have-non-nullables
+      (shu-cpp-attributes-gen-init-ctor-decl class-name attributes))
+    ))
+
+
+
+
+
+
+;;
+;;  shu-cpp-attributes-gen-copy-ctor-decl
+;;
+(defun shu-cpp-attributes-gen-copy-ctor-decl (class-name attributes)
+  "Generate the declaration of the constructor that initializes all of the
+non-nullable values."
   (let (
         (attrs attributes)
         (attr-info)
@@ -829,28 +875,30 @@ Return a list that holds the following information:
         (header-data-type)
         (pad)
         (max-type-len (length "bslma::Allocator"))
+        (allocator-type "bslma::Allocator")
+        (class-type (concat "const " class-name))
         (ipad (make-string shu-cpp-indent-length ? ))
-        (amper)
-        (member-prefix "m_")
           )
     (insert
      (concat
       "\n"
-      "  public:\n"
-      "\n"
-      ipad "// CREATORS\n"
       "\n"
       ipad "/*!\n"
-      ipad " * \\brief Create an empty " class-name " object\n"
-      ipad " *\n"
-      ipad " * Its values are expected to be set by the setValues() function from the\n"
-      ipad " * data contained in an instance of bsidb2::Cursor.\n"
+      ipad " * \\brief Create a " class-name " object from another\n"
       ipad " */\n"
-      ipad "explicit " class-name "(\n"
-      ipad ipad "bslma::Allocator   *allocator = 0);\n"))
-    (when have-non-nullables
-      (shu-cpp-attributes-gen-init-ctor-decl class-name attributes)
+      ipad "explicit " class-name "(\n"))
+    (when (> (length class-type) max-type-len)
+      (setq max-type-len (length class-type))
+
       )
+    (setq pad (concat
+               (shu-cpp-attributes-make-pad-no-ref max-type-len class-type)
+               "&"))
+    (insert (concat ipad ipad class-type pad "rhs,\n"))
+    (setq pad (concat
+               (shu-cpp-attributes-make-pad-no-ref max-type-len allocator-type)
+               "*"))
+    (insert (concat ipad ipad allocator-type pad "allocator = 0);\n"))
     ))
 
 
@@ -926,15 +974,39 @@ longest data type plus three in the list of attributes.  If REFERENCE is true,
 append an ampersand to the end of the pad string.  If REFERENCE is false, append
 a blank to the resulting pad string.  MAX-TYPE-LEN is the length of the longest
 data type name in the list of attributes."
-  (let ((pad-len 0)
-        (pad))
+  (let (
+        (pad-len 0)
+        (pad)
+          )
     (when (< (length data-type) max-type-len)
-      (setq pad-len (- max-type-len (length data-type))))
+      (setq pad-len (- max-type-len (length data-type)))
+      )
     (setq pad-len (+ pad-len 3))
     (setq pad (make-string pad-len ? ))
     (if reference
         (setq pad (concat pad "&"))
-      (setq pad (concat pad " ")))
+      (setq pad (concat pad " "))
+      )
+    pad
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-make-pad-no-ref
+;;
+(defun shu-cpp-attributes-make-pad-no-ref (max-type-len data-type)
+  "Return a pad string used to extend the DATA-TYPE name to the length of the
+longest data type plus three in the list of attributes."
+  (let (
+        (pad-len 0)
+        (pad)
+          )
+    (when (< (length data-type) max-type-len)
+      (setq pad-len (- max-type-len (length data-type)))
+      )
+    (setq pad-len (+ pad-len 3))
+    (setq pad (make-string pad-len ? ))
     pad
     ))
 
