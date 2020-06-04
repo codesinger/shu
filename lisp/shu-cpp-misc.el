@@ -49,8 +49,7 @@ C++ header file")
 (defun shu-gen-component (class-name)
   "Generate the three files for a new component: .cpp, .h, and .t.cpp"
   (interactive "sClass name?: ")
-  (let* (
-         (debug-on-error t)
+  (let* ((debug-on-error t)
          (author shu-cpp-author)
          (namespace shu-cpp-default-namespace)
          (base-class-name (downcase class-name))
@@ -62,8 +61,7 @@ C++ header file")
          (found-files "")
          (file-comma "")
          (got-count 0)
-         (file-file "File")
-         )
+         (file-file "File"))
     (when (not namespace)
       (setq base-name base-class-name)
       (setq hfile-name (concat base-name ".h"))
@@ -84,7 +82,6 @@ C++ header file")
       (setq found-files (concat found-files file-comma tfile-name))
       (setq got-count (1+ got-count))
       (setq file-comma ", "))
-
     (if got-files
         (progn
           (when (> got-count 1)
@@ -103,9 +100,8 @@ C++ header file")
       (goto-char (point-min))
       (shu-generate-hfile author namespace class-name)
       (save-buffer)
-      (goto-char (point-min))
-
-      )))
+      (goto-char (point-min)))
+      ))
 
 
 
@@ -382,8 +378,8 @@ C++ header file")
       ipad "// ACCESSORS\n"))
     (shu-cpp-decl-h-print-self)
     (shu-cpp-gen-decl-h-private class-name copy-allowed)
-      (insert
-       (concat
+    (insert
+     (concat
       "\n"
       "// FREE OPERATORS\n"))
     (shu-cpp-decl-h-stream class-name)
@@ -561,14 +557,14 @@ C++ header file")
        (have-include )
        (include-line )
        (ipad (make-string shu-cpp-indent-length ? ))
-         )
+       )
     (shu-cpp-decl-cpp-class-name class-name)
     (insert (concat
              "\n"
              "// CREATORS\n\n"
              class-name "::" class-name "(\n"))
     (setq start-pos (save-excursion (forward-line -1) (end-of-line) (point))
-                      )
+          )
     (insert (concat
              "    bslma::Allocator    *allocator)\n"
              ":\n"
@@ -584,7 +580,7 @@ C++ header file")
       "\n"
       "// ACCESSORS\n"
       "\n"))
-      (shu-cpp-decl-cpp-print-self class-name)
+    (shu-cpp-decl-cpp-print-self class-name)
     (insert
      (concat
       "\n"
@@ -621,9 +617,9 @@ C++ header file")
   "Generate a skeleton class code generation at point."
   (interactive "*sClass name?: ")
   (let (
-       (start-pos )
-       (ipad (make-string shu-cpp-indent-length ? ))
-       (have-header))
+        (start-pos )
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (have-header))
     (save-excursion
       (save-restriction
         (widen)
@@ -648,6 +644,29 @@ C++ header file")
     (shu-cpp-decl-cpp-stream class-name)
     (goto-char start-pos)
     ))
+
+
+;;
+;;  shu-cpp-misc-h-tail-gen
+;;
+(defun shu-cpp-misc-h-tail-gen (class-name)
+  "Generate the tail code in a header file starting with
+\"INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS\""
+  (insert "\n\n\n")
+  (shu-cpp-gen-inline-template-header)
+  (shu-cpp-decl-cpp-class-name class-name)
+  (insert
+   (concat
+    "\n"
+    "\n"
+    "// CREATORS\n"
+    "\n"
+    "// MANIPULATORS\n"
+    "\n"
+    "// FREE OPERATORS\n"))
+  (shu-cpp-decl-cpp-stream class-name)
+  )
+
 
 
 ;;

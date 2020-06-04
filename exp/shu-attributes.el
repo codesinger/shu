@@ -728,6 +728,7 @@ Return a list that holds the following information:
       (shu-cpp-attributes-gen-print-self-decl)
       (shu-cpp-gen-decl-h-private class-name t)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
+      (shu-cpp-misc-h-tail-gen class-name)
       (shu-cpp-attributes-gen-ctor-gen class-name attributes)
       (shu-cpp-attributes-gen-copy-ctor-gen class-name attributes)
       (when have-non-nullables
@@ -1378,7 +1379,7 @@ of values for individual nullable columns."
         (contained-class))
     (setq lpad (concat ipad "os "))
     (insert "\n")
-    (shu-cpp-decl-h-print-self)
+    (shu-cpp-decl-cpp-print-self class-name)
     (insert "\n")
     (while attrs
       (setq attr-info (car attrs))
