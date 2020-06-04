@@ -839,7 +839,10 @@ Return a list that holds the following information:
     (insert
      (concat
       "\n"
-      "  public:\n"
+      "  public:\n"))
+    (shu-cpp-misc-gen-nested-traits class-name)
+    (insert
+     (concat
       "\n"
       ipad "// CREATORS\n"
       "\n"
