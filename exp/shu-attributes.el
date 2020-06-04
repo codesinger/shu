@@ -813,7 +813,8 @@ Return a list that holds the following information:
 ;;
 (defun shu-cpp-attributes-gen-ctor-decl (class-name have-non-nullables attributes)
   "Generate the declarations for the functions that set attribute values."
-  (let ((attrs attributes)
+  (let (
+        (attrs attributes)
         (attr-info)
         (name)
         (data-type)
@@ -830,7 +831,8 @@ Return a list that holds the following information:
         (max-type-len (length "bslma::Allocator"))
         (ipad (make-string shu-cpp-indent-length ? ))
         (amper)
-        (member-prefix "m_"))
+        (member-prefix "m_")
+          )
     (insert
      (concat
       "\n"
@@ -847,41 +849,70 @@ Return a list that holds the following information:
       ipad "explicit " class-name "(\n"
       ipad ipad "bslma::Allocator   *allocator = 0);\n"))
     (when have-non-nullables
-      (insert
-       (concat
-        "\n"
-        "\n"
-        ipad "/*!\n"
-        ipad " * \\brief Create a " class-name " object with values for all of\n"
-        ipad " *         the non-null columns\n"
-        ipad " */\n"
-        ipad "explicit " class-name "(\n"))
-      (while attrs
-        (setq attr-info (car attrs))
-        (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                   reference nullable column-name column-count
-                                   enum-base reset-value)
-        (when (not nullable)
-          (setq header-data-type (shu-cpp-attributes-header-type class-name data-type))
-          (when ( > (length header-data-type) max-type-len)
-            (setq max-type-len (length header-data-type))))
-        (setq attrs (cdr attrs)))
-      (setq attrs attributes)
-      (while attrs
-        (setq attr-info (car attrs))
-        (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
-                                   reference nullable column-name column-count
-                                   enum-base reset-value)
-        (when (not nullable)
-          (setq header-data-type (shu-cpp-attributes-header-type class-name data-type))
-          (setq pad (shu-cpp-attributes-make-pad max-type-len reference header-data-type))
-          (insert (concat ipad ipad "const "header-data-type pad name ",\n")))
-        (setq attrs (cdr attrs)))
-      (setq header-data-type "bslma::Allocator")
-      (setq name "allocator")
-      (setq pad (shu-cpp-attributes-make-pad max-type-len nil header-data-type))
-      (setq pad (concat pad "     "))
-      (insert (concat ipad ipad header-data-type pad "*" name " = 0);\n")))
+      (shu-cpp-attributes-gen-init-ctor-decl class-name attributes)
+      )
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-gen-init-ctor-decl
+;;
+(defun shu-cpp-attributes-gen-init-ctor-decl (class-name attributes)
+  "Generate the declaration of the constructor that initializes all of the
+non-nullable values."
+  (let ((attrs attributes)
+        (attr-info)
+        (name)
+        (data-type)
+        (full-data-type)
+        (comment)
+        (reference)
+        (nullable)
+        (column-name)
+        (column-count)
+        (enum-base)
+        (reset-value)
+        (header-data-type)
+        (pad)
+        (max-type-len (length "bslma::Allocator"))
+        (ipad (make-string shu-cpp-indent-length ? )))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      ipad "/*!\n"
+      ipad " * \\brief Create a " class-name " object with values for all of\n"
+      ipad " *         the non-null columns\n"
+      ipad " */\n"
+      ipad "explicit " class-name "(\n"))
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (when (not nullable)
+        (setq header-data-type (shu-cpp-attributes-header-type class-name data-type))
+        (when ( > (length header-data-type) max-type-len)
+          (setq max-type-len (length header-data-type))))
+      (setq attrs (cdr attrs)))
+    (setq attrs attributes)
+    (while attrs
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (when (not nullable)
+        (setq header-data-type (shu-cpp-attributes-header-type class-name data-type))
+        (setq pad (shu-cpp-attributes-make-pad max-type-len reference header-data-type))
+        (insert (concat ipad ipad "const "header-data-type pad name ",\n")))
+      (setq attrs (cdr attrs)))
+    (setq header-data-type "bslma::Allocator")
+    (setq name "allocator")
+    (setq pad (shu-cpp-attributes-make-pad max-type-len nil header-data-type))
+    (setq pad (concat pad "     "))
+    (insert (concat ipad ipad header-data-type pad "*" name " = 0);\n"))
+
     ))
 
 
