@@ -843,7 +843,7 @@ Return a list that holds the following information:
       ipad " */\n"
       ipad "explicit " class-name "(\n"
       ipad ipad "bslma::Allocator   *allocator = 0);\n"))
-    (shu-cpp-attributes-gen-copy-ctor-decl class-name attributes)
+    (shu-cpp-attributes-gen-copy-ctor-decl class-name)
     (when have-non-nullables
       (shu-cpp-attributes-gen-init-ctor-decl class-name attributes))
     ))
@@ -856,29 +856,14 @@ Return a list that holds the following information:
 ;;
 ;;  shu-cpp-attributes-gen-copy-ctor-decl
 ;;
-(defun shu-cpp-attributes-gen-copy-ctor-decl (class-name attributes)
+(defun shu-cpp-attributes-gen-copy-ctor-decl (class-name)
   "Generate the declaration of the constructor that initializes all of the
 non-nullable values."
-  (let (
-        (attrs attributes)
-        (attr-info)
-        (name)
-        (data-type)
-        (full-data-type)
-        (comment)
-        (reference)
-        (nullable)
-        (column-name)
-        (column-count)
-        (enum-base)
-        (reset-value)
-        (header-data-type)
-        (pad)
+  (let ((pad)
         (max-type-len (length "bslma::Allocator"))
         (allocator-type "bslma::Allocator")
         (class-type (concat "const " class-name))
-        (ipad (make-string shu-cpp-indent-length ? ))
-          )
+        (ipad (make-string shu-cpp-indent-length ? )))
     (insert
      (concat
       "\n"
@@ -888,9 +873,7 @@ non-nullable values."
       ipad " */\n"
       ipad "explicit " class-name "(\n"))
     (when (> (length class-type) max-type-len)
-      (setq max-type-len (length class-type))
-
-      )
+      (setq max-type-len (length class-type)))
     (setq pad (concat
                (shu-cpp-attributes-make-pad-no-ref max-type-len class-type)
                "&"))
@@ -960,7 +943,6 @@ non-nullable values."
     (setq pad (shu-cpp-attributes-make-pad max-type-len nil header-data-type))
     (setq pad (concat pad "     "))
     (insert (concat ipad ipad header-data-type pad "*" name " = 0);\n"))
-
     ))
 
 
