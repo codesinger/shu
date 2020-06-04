@@ -175,6 +175,9 @@
 (defconst shu-cpp-attributes-reference  2
   "Value that indicates that an attribute is accessed by reference")
 
+(defconst shu-attributes-allocator-type "bslma::Allocator"
+  "Data type for the memory allocator base class.")
+
 
 ;;
 ;;
@@ -860,8 +863,8 @@ Return a list that holds the following information:
   "Generate the declaration of the constructor that initializes all of the
 non-nullable values."
   (let ((pad)
-        (max-type-len (length "bslma::Allocator"))
-        (allocator-type "bslma::Allocator")
+        (max-type-len (length shu-attributes-allocator-type))
+        (allocator-type shu-attributes-allocator-type)
         (class-type (concat "const " class-name))
         (ipad (make-string shu-cpp-indent-length ? )))
     (insert
@@ -906,7 +909,7 @@ non-nullable values."
         (reset-value)
         (header-data-type)
         (pad)
-        (max-type-len (length "bslma::Allocator"))
+        (max-type-len (length shu-attributes-allocator-type))
         (ipad (make-string shu-cpp-indent-length ? )))
     (insert
      (concat
@@ -938,7 +941,7 @@ non-nullable values."
         (setq pad (shu-cpp-attributes-make-pad max-type-len reference header-data-type))
         (insert (concat ipad ipad "const "header-data-type pad name ",\n")))
       (setq attrs (cdr attrs)))
-    (setq header-data-type "bslma::Allocator")
+    (setq header-data-type shu-attributes-allocator-type)
     (setq name "allocator")
     (setq pad (shu-cpp-attributes-make-pad max-type-len nil header-data-type))
     (setq pad (concat pad "     "))
@@ -1516,7 +1519,7 @@ attributes."
         (reset-value)
         (header-data-type)
         (pad)
-        (max-type-len (length "bslma::Allocator"))
+        (max-type-len (length shu-attributes-allocator-type))
         (ipad (make-string shu-cpp-indent-length ? ))
         (amper)
         (member-prefix "m_")
@@ -1538,7 +1541,7 @@ attributes."
         (setq pad (shu-cpp-attributes-make-pad max-type-len reference data-type))
         (insert (concat ipad "const " data-type pad name ",\n")))
       (setq attrs (cdr attrs)))
-    (setq data-type "bslma::Allocator")
+    (setq data-type shu-attributes-allocator-type)
     (setq name "allocator")
     (setq pad (shu-cpp-attributes-make-pad max-type-len nil data-type))
     (setq pad (concat pad "     "))
