@@ -178,6 +178,9 @@
 (defconst shu-attributes-allocator-type "bslma::Allocator"
   "Data type for the memory allocator base class.")
 
+(defconst shu-attributes-test-allocator-type "bslma::TestAllocator"
+  "Data type for the unit test memory allocator base class.")
+
 (defconst shu-attributes-string-type "bsl::string"
   "Data type for string.")
 
@@ -2202,6 +2205,29 @@ values from an instance of bcem_Aggregate."
 
 
 ;;
+;;  shu-attributes-gen-test-prologue
+;;
+(defun shu-attributes-gen-test-prologue ()
+  "Insert common include files used in unit tests."
+    (insert
+     (concat
+      "\n"
+      "\n"
+      "\n"
+      "\n"
+      "\n"
+      "#include <ball_log.h>\n"
+      "#include <bdem_schema.h>\n"
+      "#include <bsidb2_testcursor.h>\n"
+      "#include <bsidb2mock_sqlservicemock.h>\n"
+      "#include <bslma_default.h>\n"
+      "#include <bslma_testallocator.h>\n"
+      "#include <bsls_asserttestexception.h>\n"))
+    )
+
+
+
+;;
 ;;  shu-attributes-gen-test-start
 ;;
 (defun shu-attributes-gen-test-start (class-name test-name)
@@ -2220,5 +2246,42 @@ values from an instance of bcem_Aggregate."
       ipad "BALL_LOG_SET_CATEGORY(__func__);\n"))
     ))
 
+
+
+;;
+;;  shu-attributes-make-test-allocator
+;;
+(defun shu-attributes-make-test-allocator (class-name)
+  "Insert the declaration of an instance of the test allocator.  Sample code
+is the following:
+
+      const char             *const allocatorName(\"TestAllocator\");
+      const bool              verboseFlag(false);
+      bslma::TestAllocator    ta(allocatorName, verboseFlag, 0);
+      bslma::TestAllocator   *const tap = &ta;
+
+Return the length of the longest type name used."
+  (let ((ipad (make-string shu-cpp-indent-length ? ))
+        (max-type-len (length shu-attributes-test-allocator-type))
+        (pad)
+        (pad-count))
+    (when (> (length class-name) max-type-len)
+      (setq max-type-len (length class-name)))
+    (setq pad-count (- max-type-len (length "const char")))
+    (setq pad-count (+ pad-count 3))
+    (setq pad (make-string pad-count ? ))
+    (insert
+     (concat
+      ipad "const char" pad "*const allocatorName(\"TestAllocator\");\n"
+      ipad "const bool" pad " verboseFlag(false);\n"))
+    (setq pad-count (- max-type-len (length shu-attributes-test-allocator-type)))
+    (setq pad-count (+ pad-count 3))
+    (setq pad (make-string pad-count ? ))
+    (insert
+     (concat
+      ipad shu-attributes-test-allocator-type pad " ta(allocatorName, verboseFlag, 0);\n"
+      ipad shu-attributes-test-allocator-type pad "*const tap = &ta;\n"))
+    max-type-len
+    ))
 
 ;;; shu-attributes.el ends here
