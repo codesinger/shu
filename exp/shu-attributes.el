@@ -1646,7 +1646,7 @@ attributes."
       (insert (concat member-prefix name "("))
       (when (not nullable)
         (insert name))
-      (when (string= full-data-type shu-attributes-string-type)
+      (when (or contained-class (string= full-data-type shu-attributes-string-type))
         (insert ", allocator"))
       (insert ")")
       (when (cdr attrs)
@@ -2209,21 +2209,21 @@ values from an instance of bcem_Aggregate."
 ;;
 (defun shu-attributes-gen-test-prologue ()
   "Insert common include files used in unit tests."
-    (insert
-     (concat
-      "\n"
-      "\n"
-      "\n"
-      "\n"
-      "\n"
-      "#include <ball_log.h>\n"
-      "#include <bdem_schema.h>\n"
-      "#include <bsidb2_testcursor.h>\n"
-      "#include <bsidb2mock_sqlservicemock.h>\n"
-      "#include <bslma_default.h>\n"
-      "#include <bslma_testallocator.h>\n"
-      "#include <bsls_asserttestexception.h>\n"))
-    )
+  (insert
+   (concat
+    "\n"
+    "\n"
+    "\n"
+    "\n"
+    "\n"
+    "#include <ball_log.h>\n"
+    "#include <bdem_schema.h>\n"
+    "#include <bsidb2_testcursor.h>\n"
+    "#include <bsidb2mock_sqlservicemock.h>\n"
+    "#include <bslma_default.h>\n"
+    "#include <bslma_testallocator.h>\n"
+    "#include <bsls_asserttestexception.h>\n"))
+  )
 
 
 
