@@ -2284,4 +2284,49 @@ Return the length of the longest type name used."
     max-type-len
     ))
 
+
+
+
+;;
+;;  shu-attributes-make-init-test-decl
+;;
+(defun shu-attributes-make-init-test-decl (class-name &optional max-type-length allocator)
+  "Generate equality tests for two empty instances of the class.  CLASS-NAME
+is the name of the class.
+
+Sample code:
+
+      TestRow           crn;
+      TestRow           crn2;
+      EXPECT_EQ(crn, crn2);
+      crn.reset();
+      EXPECT_EQ(crn, crn2);
+      crn2.reset();
+      EXPECT_EQ(crn, crn2);
+
+If MAX-TYPE-LENGTH is specified, it is used for declaration alignment if it is
+greater than the length of CLASS-NAME.  If ALLOCATOR is specified, it is the
+name of an allocator that is passed to the first instance of the class declared."
+  (let ((ipad (make-string shu-cpp-indent-length ? ))
+        (max-type-len (if max-type-length max-type-length (length class-name)))
+        (allocator-name (if allocator (concat "(" allocator ")") ""))
+        (pad)
+        (pad-count))
+    (when (> (length class-name) max-type-len)
+      (setq max-type-len (length class-name)))
+    (setq pad-count (- max-type-len (length class-name)))
+    (setq pad-count (+ pad-count 4))
+    (setq pad (make-string pad-count ? ))
+    (insert
+     (concat
+      ipad class-name pad "crn" allocator-name ";\n"
+      ipad class-name pad "crn2;\n"
+      ipad "EXPECT_EQ(crn, crn2);\n"
+      ipad "crn.reset();\n"
+      ipad "EXPECT_EQ(crn, crn2);\n"
+      ipad "crn2.reset();\n"
+      ipad "EXPECT_EQ(crn, crn2);\n"))
+    ))
+
+
 ;;; shu-attributes.el ends here
