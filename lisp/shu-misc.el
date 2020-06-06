@@ -401,14 +401,14 @@ point is placed where the the first line of code in the loop belongs."
 ;;
 (defconst shu-misc-rx-lets
   (concat
-          "("
-          "\\s-*"
-          "\\(let"
-          "\\|let\\*"
-          "\\)"
-          shu-all-whitespace-regexp "*"
-          "\\((\\)"
-          )
+   "("
+   "\\s-*"
+   "\\(let"
+   "\\|let\\*"
+   "\\)"
+   shu-all-whitespace-regexp "*"
+   "\\((\\)"
+   )
   "Rregular expression to find the beginning of a let soecial form.")
 
 
@@ -571,21 +571,21 @@ parentheses back where they belong."
         ;; Handle "let" and "let*"
         (goto-char bof)
         (while (re-search-forward shu-misc-rx-lets eof t)
-            (setq let-begin (match-beginning 0))
-            (setq p (point))
-            (setq start-col (current-column))
-            (setq pad-length start-col)
+          (setq let-begin (match-beginning 0))
+          (setq p (point))
+          (setq start-col (current-column))
+          (setq pad-length start-col)
+          (setq pad (concat "\n" (make-string pad-length ? )))
+          (insert pad)
+          (setq eof (+ eof (length pad)))
+          (goto-char p)
+          (when (re-search-backward "(\\s-*" let-begin t)
+            (forward-sexp)
+            (backward-char 1)
+            (setq pad-length (+ start-col 2))
             (setq pad (concat "\n" (make-string pad-length ? )))
             (insert pad)
-            (setq eof (+ eof (length pad)))
-            (goto-char p)
-            (when (re-search-backward "(\\s-*" let-begin t)
-              (forward-sexp)
-              (backward-char 1)
-              (setq pad-length (+ start-col 2))
-              (setq pad (concat "\n" (make-string pad-length ? )))
-              (insert pad)
-              (setq eof (+ eof (length pad)))))))
+            (setq eof (+ eof (length pad)))))))
     ))
 
 
@@ -1954,25 +1954,25 @@ becomes
         (arg1)
         (arg2))
     (save-excursion
-    (if (not (search-forward "(" nil t))
-        (progn
-          (ding)
-          (message "%s" "No opening parenthesis on this line"))
-      (setq spos (point))
-      (backward-char 1)
-      (forward-sexp)
-      (backward-char 1)
-      (setq epos (point))
-      (goto-char spos)
-      (if (not (re-search-forward rxnc eol t))
+      (if (not (search-forward "(" nil t))
           (progn
             (ding)
-            (message "%s" "No first expression found inside parenthesis"))
-        (setq arg1 (match-string 1))
-        (setq arg2 (buffer-substring-no-properties (point) epos))
-        (delete-region (point) epos)
-        (insert arg1)
-        (replace-match arg2 t t nil 1))))
+            (message "%s" "No opening parenthesis on this line"))
+        (setq spos (point))
+        (backward-char 1)
+        (forward-sexp)
+        (backward-char 1)
+        (setq epos (point))
+        (goto-char spos)
+        (if (not (re-search-forward rxnc eol t))
+            (progn
+              (ding)
+              (message "%s" "No first expression found inside parenthesis"))
+          (setq arg1 (match-string 1))
+          (setq arg2 (buffer-substring-no-properties (point) epos))
+          (delete-region (point) epos)
+          (insert arg1)
+          (replace-match arg2 t t nil 1))))
     ))
 
 
@@ -2010,6 +2010,22 @@ two lines for something.  These numbers should, at some point be customizable."
     (set-frame-position (selected-frame) x top-y)
     ))
 
+
+
+;;
+;;  shu-misc-random-ua-string
+;;
+(defun shu-misc-random-ua-string (length)
+  "Return a string composed of random upper case letters of length LENGTH."
+  (let* ((letters "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+         (nletters (length letters))
+         (rs "")
+         (count 0))
+    (while (< count length)
+      (setq rs (concat rs (char-to-string (elt letters (random nletters)))))
+      (setq count (1+ count)))
+    rs
+    ))
 
 
 

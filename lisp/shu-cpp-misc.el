@@ -903,7 +903,6 @@ CLASS-NAME is the name of the containing C++ class."
     (insert
      (concat
       "\n"
-      ipad "\n"
       ipad "/*!\n"
       ipad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
       ipad " *\n"

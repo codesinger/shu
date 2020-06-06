@@ -1311,4 +1311,17 @@
     ))
 
 
+
+;;
+;;  shu-test-shu-misc-random-ua-string
+;;
+(ert-deftest shu-test-shu-misc-random-ua-string ()
+  (let ((rs (shu-misc-random-ua-string 8)))
+    (should rs)
+    (should (stringp rs))
+    (should (= (length rs) 8))
+    ))
+
+
+
 ;;; shu-misc.t.el ends here

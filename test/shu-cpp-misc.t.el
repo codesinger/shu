@@ -295,47 +295,6 @@
 
 
 
-;;
-;;  shu-test-shu-cpp-misc-gen-not-implemented
-;;
-(ert-deftest shu-test-shu-cpp-misc-gen-not-implemented ()
-  (let* ((class-name "MumbleFrotz")
-         (ipad (make-string shu-cpp-indent-length ? ))
-         (expected
-          (concat
-           ipad "// NOT IMPLEMENTED\n"
-           ipad "\n"
-           ipad "/*!\n"
-           ipad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
-           ipad " *\n"
-           ipad " * \\param original the object from which we are to be constructed\n"
-           ipad " */\n"
-           ipad "explicit " class-name "(\n"
-           ipad ipad "const " class-name " &original);\n"
-           "\n"
-           ipad "/*!\n"
-           ipad " * \\brief operator=() is deliberately private and unimplemented.\n"
-           ipad " *\n"
-           ipad " * \\param rhs the object from which we are to be assigned\n"
-           ipad " *\n"
-           ipad " * \\return reference to self to allow for chained operators\n"
-           ipad " */\n"
-           ipad class-name " &operator=(\n"
-           ipad ipad "const " class-name " &rhs);\n"
-           ))
-         (actual))
-    (with-temp-buffer
-      (goto-char (point-min))
-      (shu-cpp-misc-gen-not-implemented class-name)
-      (goto-char (point-min))
-      (should (search-forward "NOT IMPLEMENTED" nil t))
-      (beginning-of-line)
-      (setq actual (buffer-substring-no-properties (point) (point-max)))
-      (should (string= expected actual)))
-    ))
-
-
-
 
 ;;
 ;;  shu-test-shu-cpp-decl-h-stream
