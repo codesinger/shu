@@ -3153,9 +3153,9 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
           (princ (concat "c: '" c "'\n") gb)
           (if (string= c "_")
               (progn
-            (setq looking t)
-            (delete-region (point) (1+ (point)))
-            (setq end-pos (1- end-pos)))
+                (setq looking t)
+                (delete-region (point) (1+ (point)))
+                (setq end-pos (1- end-pos)))
             (when looking
               (setq c (upcase c))
               (delete-region (point) (1+ (point)))
@@ -3174,8 +3174,8 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
   "insert a string that is the list of values to be passed to the constructor of a datetime
  type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
   (interactive)
-    (insert (concat (shu-cpp-internal-make-datetime) ";"))
-    )
+  (insert (concat (shu-cpp-internal-make-datetime) ";"))
+  )
 
 
 
@@ -3186,14 +3186,43 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
   "Return a string that is the list of values to be passed to the constructor of a datetime
  type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
   (let ((year (number-to-string (shu-random-range 2010 2020)))
-       (month (number-to-string (shu-random-range 1 12)))
-       (day (number-to-string (shu-random-range 1 27)))
-       (hour (number-to-string (shu-random-range 0 23)))
-       (minute (number-to-string (shu-random-range 0 59)))
-       (second (number-to-string (shu-random-range 0 59)))
-       (milli (number-to-string (shu-random-range 0 999)))
-       (micro (number-to-string (shu-random-range 0 999))))
+        (month (number-to-string (shu-random-range 1 12)))
+        (day (number-to-string (shu-random-range 1 27)))
+        (hour (number-to-string (shu-random-range 0 23)))
+        (minute (number-to-string (shu-random-range 0 59)))
+        (second (number-to-string (shu-random-range 0 59)))
+        (milli (number-to-string (shu-random-range 0 999)))
+        (micro (number-to-string (shu-random-range 0 999))))
     (concat "(" year ", " month ", " day ", " hour ", " minute ", " second ", " milli ", " micro ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-make-interval
+;;
+(defun shu-cpp-make-interval ()
+  "insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
+  (interactive)
+  (insert (concat (shu-cpp-internal-make-interval) ";"))
+  )
+
+
+
+;;
+;;  shu-cpp-internal-make-interval
+;;
+(defun shu-cpp-internal-make-interval ()
+  "Return a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts days, hours, minutes, seconds, milliseconds, microseconds."
+  (let ((days "0")
+        (hours (number-to-string (shu-random-range 0 23)))
+        (minutes (number-to-string (shu-random-range 0 59)))
+        (seconds (number-to-string (shu-random-range 0 59)))
+        (millis (number-to-string (shu-random-range 0 999)))
+        (micros (number-to-string (shu-random-range 0 999))))
+    (concat "(" days ", " hours ", " minutes ", " seconds ", " millis ", " micros ")")
     ))
 
 
@@ -3253,6 +3282,7 @@ shu- prefix removed."
   (defalias 'to-snake 'shu-to-snake)
   (defalias 'to-camel 'shu-to-camel)
   (defalias 'make-datetime 'shu-cpp-make-datetime)
+  (defalias 'make-interval 'shu-cpp-make-interval)
   )
 
 ;;; shu-cpp-general.el ends here
