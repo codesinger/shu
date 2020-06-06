@@ -3131,6 +3131,37 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
 
 
 
+;;
+;;  shu-cpp-make-datetime
+;;
+(defun shu-cpp-make-datetime ()
+  "insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
+  (interactive)
+    (insert (concat (shu-cpp-internal-make-datetime) ";"))
+    )
+
+
+
+;;
+;;  shu-cpp-internal-make-datetime
+;;
+(defun shu-cpp-internal-make-datetime ()
+  "Return a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
+  (let ((year (number-to-string (shu-random-range 2010 2020)))
+       (month (number-to-string (shu-random-range 1 12)))
+       (day (number-to-string (shu-random-range 1 27)))
+       (hour (number-to-string (shu-random-range 0 23)))
+       (minute (number-to-string (shu-random-range 0 59)))
+       (second (number-to-string (shu-random-range 0 59)))
+       (milli (number-to-string (shu-random-range 0 999)))
+       (micro (number-to-string (shu-random-range 0 999))))
+    (concat "(" year ", " month ", " day ", " hour ", " minute ", " second ", " milli ", " micro ")")
+    ))
+
+
+
 
 ;;
 ;;  shu-cpp-general-set-alias
@@ -3185,6 +3216,7 @@ shu- prefix removed."
   (defalias 'getdef 'shu-cpp-find-h-definition)
   (defalias 'to-snake 'shu-to-snake)
   (defalias 'to-camel 'shu-to-camel)
+  (defalias 'make-datetime 'shu-cpp-make-datetime)
   )
 
 ;;; shu-cpp-general.el ends here
