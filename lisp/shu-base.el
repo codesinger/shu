@@ -915,5 +915,28 @@ to lower case"
 
 
 
+;;
+;;  shu-random-range
+;;
+(defun shu-random-range (x y)
+  "Return a random number that lies within the closed interval [X, Y].  If Y < X, then the
+closed interval is [Y, X].  If Y is equal to X, then the returned value is X."
+  (let ((lower x)
+        (upper y)
+        (range)
+        (value)
+        (r1))
+    (when (< upper lower)
+      (setq lower (prog1 upper (setq upper lower))))
+    (setq value lower)
+    (when (< lower upper)
+      (setq range (1+ (- upper lower)))
+      (setq r1 (random range))
+      (setq value (+ lower r1)))
+    value
+    ))
+
+
+
 
 ;;; shu-base.el ends here

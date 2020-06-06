@@ -1741,4 +1741,83 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     ))
 
 
+
+;;
+;;  shu-test-shu-random-range-1
+;;
+(ert-deftest shu-test-shu-random-range-1 ()
+  (let ((lower 10)
+        (upper 20)
+        (value))
+    (setq value (shu-random-range lower upper))
+    (should value)
+    (should (numberp value))
+    (should (<= value upper))
+    (should (>= value lower))
+    ))
+
+
+
+;;
+;;  shu-test-shu-random-range-2
+;;
+(ert-deftest shu-test-shu-random-range-2 ()
+  (let ((lower 20)
+        (upper 10)
+        (value))
+    (setq value (shu-random-range lower upper))
+    (should value)
+    (should (numberp value))
+    (should (<= value lower))
+    (should (>= value upper))
+    ))
+
+
+
+;;
+;;  shu-test-shu-random-range-3
+;;
+(ert-deftest shu-test-shu-random-range-3 ()
+  (let ((lower 100)
+        (upper 100)
+        (value))
+    (setq value (shu-random-range lower upper))
+    (should value)
+    (should (numberp value))
+    (should (= value lower))
+    ))
+
+
+
+;;
+;;  shu-test-shu-random-range-4
+;;
+(ert-deftest shu-test-shu-random-range-4 ()
+  (let ((lower 100)
+        (upper 200)
+        (value))
+    (setq value (shu-random-range lower upper))
+    (should value)
+    (should (numberp value))
+    (should (<= value upper))
+    (should (>= value lower))
+    ))
+
+
+
+;;
+;;  shu-test-shu-random-range-5
+;;
+(ert-deftest shu-test-shu-random-range-5 ()
+  (let ((lower 2001)
+        (upper 2020)
+        (value))
+    (setq value (shu-random-range lower upper))
+    (should value)
+    (should (numberp value))
+    (should (<= value upper))
+    (should (>= value lower))
+    ))
+
+
 ;;; shu-base.t.el ends here
