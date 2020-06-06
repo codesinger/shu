@@ -42,6 +42,16 @@ C++ header file")
 
 
 
+;;
+;;  shu-cpp-misc-not-implemented-label
+;;
+(defconst shu-cpp-misc-not-implemented-label
+  "// NOT IMPLEMENTED"
+  "The label put in a header file for functions and operators that are
+deliberately not implemented.")
+
+
+
 
 ;;
 ;;  shu-gen-component
@@ -876,7 +886,23 @@ CLASS-NAME is the name of the containing C++ class."
     (insert
      (concat
       "\n"
-      ipad "// NOT IMPLEMENTED\n"
+      ipad shu-cpp-misc-not-implemented-label "\n"))
+    (shu-cpp-misc-gen-ctor-not-implemented class-name)
+    (shu-cpp-misc-gen-op-equal-not-implemented class-name)
+    ))
+
+
+
+
+;;
+;;  shu-cpp-misc-gen-ctor-not-implemented
+;;
+(defun shu-cpp-misc-gen-ctor-not-implemented (class-name)
+  "Generate a declaration of a non-implemented copy constructor and operator=()."
+  (let ((ipad (make-string shu-cpp-indent-length ? )))
+    (insert
+     (concat
+      "\n"
       ipad "\n"
       ipad "/*!\n"
       ipad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
@@ -884,7 +910,20 @@ CLASS-NAME is the name of the containing C++ class."
       ipad " * \\param original the object from which we are to be constructed\n"
       ipad " */\n"
       ipad "explicit " class-name "(\n"
-      ipad ipad "const " class-name " &original);\n"
+      ipad ipad "const " class-name " &original);\n"))
+    ))
+
+
+
+
+;;
+;;  shu-cpp-misc-gen-op-equal-not-implemented
+;;
+(defun shu-cpp-misc-gen-op-equal-not-implemented (class-name)
+  "Generate a declaration of a non-implemented copy constructor and operator=()."
+  (let ((ipad (make-string shu-cpp-indent-length ? )))
+    (insert
+     (concat
       "\n"
       ipad "/*!\n"
       ipad " * \\brief operator=() is deliberately private and unimplemented.\n"

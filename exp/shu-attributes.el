@@ -729,11 +729,10 @@ Return a list that holds the following information:
       (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
       (shu-cpp-attributes-gen-getter-decl class-name sorted-attributes)
       (shu-cpp-attributes-gen-print-self-decl)
-      (shu-cpp-gen-decl-h-private class-name t)
+      (shu-cpp-attributes-gen-decl-h-private class-name)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
       (shu-cpp-misc-h-tail-gen class-name)
       (shu-cpp-attributes-gen-ctor-gen class-name attributes)
-      (shu-cpp-attributes-gen-copy-ctor-gen class-name attributes)
       (when have-non-nullables
         (shu-cpp-attributes-gen-ctor-gen-full class-name attributes))
       (shu-cpp-attributes-gen-reset-gen class-name attributes)
@@ -857,7 +856,6 @@ Return a list that holds the following information:
       ipad " */\n"
       ipad "explicit " class-name "(\n"
       ipad ipad "bslma::Allocator   *allocator = 0);\n"))
-    (shu-cpp-attributes-gen-copy-ctor-decl class-name)
     (when have-non-nullables
       (shu-cpp-attributes-gen-init-ctor-decl class-name attributes))
     ))
@@ -869,7 +867,8 @@ Return a list that holds the following information:
 ;;  shu-cpp-attributes-gen-copy-ctor-decl
 ;;
 (defun shu-cpp-attributes-gen-copy-ctor-decl (class-name)
-  "Generate the declaration of the copy constructor."
+  "Generate the declaration of the copy constructor.  No longer used as the
+row classes disable copy construction."
   (let ((pad)
         (max-type-len (length shu-attributes-allocator-type))
         (allocator-type shu-attributes-allocator-type)
@@ -1496,7 +1495,8 @@ of values for individual nullable columns."
 ;;  shu-cpp-attributes-gen-copy-ctor-gen
 ;;
 (defun shu-cpp-attributes-gen-copy-ctor-gen (class-name attributes)
-  "Generate the code for the copy constructor."
+  "Generate the code for the copy constructor.  No longer used as the row
+classes disable copy construction."
   (let ((attrs attributes)
         (attr-info)
         (name)
@@ -1957,6 +1957,33 @@ values from an instance of bcem_Aggregate."
   (let((ipad (make-string shu-cpp-indent-length ? )))
     (insert "\n")
     (shu-cpp-decl-h-print-self)
+    ))
+
+
+
+
+;;
+;;  shu-cpp-attributes-gen-decl-h-private
+;;
+(defun shu-cpp-attributes-gen-decl-h-private (class-name)
+  "Generate the private section of the class declaration.  If COPY-ALLOWED
+is false, generate private an unimplemented copy constructor and operator=()"
+  (let ((ipad (make-string shu-cpp-indent-length ? )))
+    (insert
+     (concat
+      "\n"
+      "  private:\n"
+      "\n"
+      shu-cpp-misc-not-implemented-label "\n"))
+    (shu-cpp-misc-gen-ctor-not-implemented class-name)
+    (insert
+     (concat
+      "\n"
+      ipad "// MANIPULATORS\n"
+      "\n"
+      ipad "// ACCESSORS\n"
+      "\n"
+      "};\n"))
     ))
 
 
