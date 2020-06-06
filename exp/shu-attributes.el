@@ -175,14 +175,8 @@
 (defconst shu-cpp-attributes-reference  2
   "Value that indicates that an attribute is accessed by reference")
 
-(defconst shu-attributes-allocator-type "bslma::Allocator"
-  "Data type for the memory allocator base class.")
-
 (defconst shu-attributes-test-allocator-type "bslma::TestAllocator"
   "Data type for the unit test memory allocator base class.")
-
-(defconst shu-attributes-string-type "bsl::string"
-  "Data type for string.")
 
 
 ;;
@@ -397,15 +391,15 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
 \"int\" returns \"Int\", etc."
   (let ((bind-type "Text"))
     (cond
-     ((string= data-type shu-attributes-string-type)
+     ((string= data-type shu-cpp-string-type)
       (setq bind-type "Text"))
-     ((string= data-type "bdlt::Datetime")
+     ((string= data-type shu-cpp-datetime-type)
       (setq bind-type "Datetime"))
-     ((string= data-type "bdlt::DatetimeTz")
+     ((string= data-type shu-cpp-datetime-timezone-type)
       (setq bind-type "DatetimeTz"))
-     ((string= data-type "bdlt::DatetimeInterval")
+     ((string= data-type shu-cpp-interval-type)
       (setq bind-type "Int"))
-     ((string= data-type "bsls::Types::Int64")
+     ((string= data-type shu-cpp-long-long-type)
       (setq bind-type "Int"))
      ((string= data-type "int")
       (setq bind-type "Int"))
@@ -425,15 +419,15 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
 \"asString()\".  \"int\" returns \"asInt()\", etc."
   (let ((aggregate-type "asString()"))
     (cond
-     ((string= data-type shu-attributes-string-type)
+     ((string= data-type shu-cpp-string-type)
       (setq aggregate-type "asString()"))
-     ((string= data-type "bdlt::Datetime")
+     ((string= data-type shu-cpp-datetime-type)
       (setq aggregate-type "asDatetimeTz().utcDatetime()"))
-     ((string= data-type "bdlt::DatetimeTz")
+     ((string= data-type shu-cpp-datetime-timezone-type)
       (setq aggregate-type "asDatetimeTz()"))
-     ((string= data-type "bdlt::DatetimeInterval")
+     ((string= data-type shu-cpp-interval-type)
       (setq aggregate-type "asInt()"))
-     ((string= data-type "bsls::Types::Int64")
+     ((string= data-type shu-cpp-long-long-type)
       (setq aggregate-type "asInt()"))
      ((string= data-type "int")
       (setq aggregate-type "asInt()"))
@@ -870,8 +864,8 @@ Return a list that holds the following information:
   "Generate the declaration of the copy constructor.  No longer used as the
 row classes disable copy construction."
   (let ((pad)
-        (max-type-len (length shu-attributes-allocator-type))
-        (allocator-type shu-attributes-allocator-type)
+        (max-type-len (length shu-cpp-allocator-type))
+        (allocator-type shu-cpp-allocator-type)
         (class-type (concat "const " class-name))
         (ipad (make-string shu-cpp-indent-length ? )))
     (insert
@@ -916,7 +910,7 @@ non-nullable values."
         (reset-value)
         (header-data-type)
         (pad)
-        (max-type-len (length shu-attributes-allocator-type))
+        (max-type-len (length shu-cpp-allocator-type))
         (ipad (make-string shu-cpp-indent-length ? )))
     (insert
      (concat
@@ -948,7 +942,7 @@ non-nullable values."
         (setq pad (shu-cpp-attributes-make-pad max-type-len reference header-data-type))
         (insert (concat ipad ipad "const "header-data-type pad name ",\n")))
       (setq attrs (cdr attrs)))
-    (setq header-data-type shu-attributes-allocator-type)
+    (setq header-data-type shu-cpp-allocator-type)
     (setq name "allocator")
     (setq pad (shu-cpp-attributes-make-pad max-type-len nil header-data-type))
     (setq pad (concat pad "     "))
@@ -1133,7 +1127,7 @@ of nullable values."
         (if enum-base
             (insert (concat "\n" pad "static_cast<" enum-base ">(" name "())"))
           (insert (concat name "()")))
-        (when (string= data-type "bdlt::DatetimeInterval")
+        (when (string= data-type shu-cpp-interval-type)
           (insert ".totalMilliseconds()"))
         (insert ", __FILE__, __LINE__);\n"))
       (setq attrs (cdr attrs)))
@@ -1223,7 +1217,7 @@ of values for individual nullable columns."
       ipad " *\n"
       ipad " */\n"
       ipad "int setValues(\n"
-      ipad ipad "const bsl::string       &databaseName,\n"
+      ipad ipad "const " shu-cpp-string-type "       &databaseName,\n"
       ipad ipad "const bcem_Aggregate    &data);\n"
       ))
     ))
@@ -1471,7 +1465,7 @@ of values for individual nullable columns."
           (setq contained-class t)
         (setq contained-class nil))
       (insert (concat member-prefix name "("))
-      (when (or (string= full-data-type shu-attributes-string-type)
+      (when (or (string= full-data-type shu-cpp-string-type)
                 contained-class)
         (insert "allocator"))
       (when reset-value
@@ -1510,8 +1504,8 @@ classes disable copy construction."
         (enum-base)
         (reset-value)
         (pad)
-        (max-type-len (length shu-attributes-allocator-type))
-        (allocator-type shu-attributes-allocator-type)
+        (max-type-len (length shu-cpp-allocator-type))
+        (allocator-type shu-cpp-allocator-type)
         (class-type (concat "const " class-name))
         (ipad (make-string shu-cpp-indent-length ? ))
         (member-prefix "m_")
@@ -1545,7 +1539,7 @@ classes disable copy construction."
                (string= column-name "std"))
           (setq contained-class t)
         (setq contained-class nil))
-      (if (or contained-class (string= data-type shu-attributes-string-type))
+      (if (or contained-class (string= data-type shu-cpp-string-type))
           (setq uses-allocator t)
         (setq uses-allocator nil))
 
@@ -1571,13 +1565,13 @@ classes disable copy construction."
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name column-count
                                  enum-base reset-value)
-      (when (and nullable (string= data-type shu-attributes-string-type))
+      (when (and nullable (string= data-type shu-cpp-string-type))
         (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
         (insert
          (concat
           ipad "if (rhs." uname ")\n"
           ipad ipad member-prefix name ".makeValue("
-          shu-attributes-string-type
+          shu-cpp-string-type
           "(rhs." name "(), allocator));\n"
           )))
       (setq attrs (cdr attrs)))
@@ -1606,7 +1600,7 @@ attributes."
         (reset-value)
         (header-data-type)
         (pad)
-        (max-type-len (length shu-attributes-allocator-type))
+        (max-type-len (length shu-cpp-allocator-type))
         (ipad (make-string shu-cpp-indent-length ? ))
         (amper)
         (member-prefix "m_")
@@ -1628,7 +1622,7 @@ attributes."
         (setq pad (shu-cpp-attributes-make-pad max-type-len reference data-type))
         (insert (concat ipad "const " data-type pad name ",\n")))
       (setq attrs (cdr attrs)))
-    (setq data-type shu-attributes-allocator-type)
+    (setq data-type shu-cpp-allocator-type)
     (setq name "allocator")
     (setq pad (shu-cpp-attributes-make-pad max-type-len nil data-type))
     (setq pad (concat pad "     "))
@@ -1646,7 +1640,7 @@ attributes."
       (insert (concat member-prefix name "("))
       (when (not nullable)
         (insert name))
-      (when (or contained-class (string= full-data-type shu-attributes-string-type))
+      (when (or contained-class (string= full-data-type shu-cpp-string-type))
         (insert ", allocator"))
       (insert ")")
       (when (cdr attrs)
@@ -1699,24 +1693,24 @@ attributes."
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name column-count
                                  enum-base reset-value)
-      (if (string= full-data-type "bdlt::Datetime")
+      (if (string= full-data-type shu-cpp-datetime-type)
           (setq have-date t)
-        (if (string= full-data-type "bdlt::DatetimeTz")
+        (if (string= full-data-type shu-cpp-datetime-timezone-type)
             (setq have-date-tz t)
-          (when (string= full-data-type "bdlt::DatetimeInterval")
+          (when (string= full-data-type shu-cpp-interval-type)
             (setq have-interval t))))
       (setq attrs (cdr attrs)))
     (if have-interval
         (progn
-          (insert (concat ipad "bdlt::DatetimeInterval  defaultInterval;\n"))
+          (insert (concat ipad "const " shu-cpp-interval-type "  defaultInterval;\n"))
           (when have-date
-            (insert (concat ipad "bdlt::Datetime          defaultTime;\n")))
+            (insert (concat ipad "const " shu-cpp-datetime-type "          defaultTime;\n")))
           (when have-date-tz
-            (insert (concat ipad "bdlt::DatetimeTz        defaultTimeTz;\n"))))
+            (insert (concat ipad "const " shu-cpp-datetime-timezone-type "        defaultTimeTz;\n"))))
       (when have-date
-        (insert (concat ipad "bdlt::Datetime     defaultTime;\n")))
+        (insert (concat ipad "const " shu-cpp-datetime-type "     defaultTime;\n")))
       (when have-date-tz
-        (insert (concat ipad "bdlt::DatetimeTz   defaultTimeTz;\n"))))
+        (insert (concat ipad "const " shu-cpp-datetime-timezone-type "   defaultTimeTz;\n"))))
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
@@ -1730,13 +1724,13 @@ attributes."
       (insert (concat ipad member-prefix name))
       (if (or nullable contained-class)
           (insert ".reset()")
-        (if (string= full-data-type shu-attributes-string-type)
+        (if (string= full-data-type shu-cpp-string-type)
             (insert ".clear()")
-          (if (string= full-data-type "bdlt::Datetime")
+          (if (string= full-data-type shu-cpp-datetime-type)
               (insert " = defaultTime")
-            (if (string= full-data-type "bdlt::DatetimeTz")
+            (if (string= full-data-type shu-cpp-datetime-timezone-type)
                 (insert " = defaultTimeTz")
-              (if (string= full-data-type "bdlt::DatetimeInterval")
+              (if (string= full-data-type shu-cpp-interval-type)
                   (insert " = defaultInterval")
                 (if (string= full-data-type "int")
                     (insert " = 0")
@@ -1828,16 +1822,16 @@ values from an instance of bcem_Aggregate."
      (concat
       "\n\n"
       "int " class-name "::setValues(\n"
-      ipad "const bsl::string       &databaseName,\n"
+      ipad "const " shu-cpp-string-type "       &databaseName,\n"
       ipad "const bcem_Aggregate    &data)\n"
       "{\n"
       ipad "BALL_LOG_SET_CATEGORY(__func__);\n"
       ipad "reset();\n"
-      ipad "const bsl::string  why(\n"
+      ipad "const " shu-cpp-string-type "  why(\n"
       ipad "    \"This is caused by a query definition mis-match between this \"\n"
       ipad "    \"program and the definition of the table \" + " table-name " +\n"
       ipad "    \" in database '\" + databaseName + \"'.\");\n"
-      ipad "const bsl::string  tableName(" table-name ");\n"
+      ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n"
       ipad "int fetchCount(0);\n"
       ipad "int missingCount(0);\n"))
     (while attrs
@@ -1856,18 +1850,18 @@ values from an instance of bcem_Aggregate."
           ipad "const bcem_Aggregate &" name " = data[" column-name "];\n"
           ipad "if ( !" name ".isNul2() )\n"
           ipad "{\n"))
-        (when (string= data-type "bdlt::DatetimeInterval")
+        (when (string= data-type shu-cpp-interval-type)
           (insert
            (concat
-            ipad ipad "const bsls::Types::Int64      intval(" name ".asInt());\n"
-            ipad ipad "const bdlt::DatetimeInterval  interval(0, 0, 0, 0, intval, 0);\n")))
+            ipad ipad "const " shu-cpp-long-long-type "      intval(" name ".asInt());\n"
+            ipad ipad "const " shu-cpp-interval-type "  interval(0, 0, 0, 0, intval, 0);\n")))
         (insert
          (concat
           ipad ipad member-prefix name))
         (if nullable
             (insert ".makeValue(")
           (insert " = "))
-        (if (string= data-type "bdlt::DatetimeInterval")
+        (if (string= data-type shu-cpp-interval-type)
             (insert "interval")
           (if enum-base
               (insert (concat "static_cast<" data-type ">(" name "." (shu-cpp-attributes-aggregate-type enum-base) ")"))

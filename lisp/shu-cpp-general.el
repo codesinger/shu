@@ -46,6 +46,42 @@
 (require 'shu-cpp-token)
 
 
+(defcustom shu-cpp-allocator-type "bslma::Allocator"
+  "The data type that represents an allocator."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-datetime-type "bdlt::Datetime"
+  "The data type that represents a date and time."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-datetime-timezone-type "bdlt::DatetimeTz"
+  "The data type that represents a date and time with an associated time zone."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-interval-type "bdlt::DatetimeInterval"
+  "The data type that represents a time interval type."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-long-long-type "bsls::Types::Int64"
+  "The data type that represents a 64 bit integer."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-string-type "bsl::string"
+  "The data type that represents a string type."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
 (defconst shu-cpp-base-types
   (list
    "bool"
