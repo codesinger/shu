@@ -91,7 +91,7 @@ in a C or C++ program.")
   "A regular expression to match the name of a C or C++ file in the file system.")
 
 (defconst shu-cpp-file-directory-name (regexp-opt
-                             (append shu-cpp-file-name-list (list "/")) nil)
+                                       (append shu-cpp-file-name-list (list "/")) nil)
   "A regular expression to match the name of a C or C++ file in the file system
 including directory names.  This is the same regular expression as
 SHU-CPP-FILE-NAME-LIST with a \"/\" included.")
@@ -936,6 +936,18 @@ closed interval is [Y, X].  If Y is equal to X, then the returned value is X."
     value
     ))
 
+
+
+;;
+;;  shu-random-letter
+;;
+(defun shu-random-letter ()
+  "Return a randomly selected lower case letter as a single character (not as
+a string)."
+  (let* ((letters "abcdefghijklmnopqrstuvwxyz")
+         (nletters (length letters)))
+    (elt letters (random nletters))
+    ))
 
 
 

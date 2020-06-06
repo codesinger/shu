@@ -1820,4 +1820,17 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     ))
 
 
+
+
+;;
+;;  shu-test-shu-random-letter-1
+;;
+(ert-deftest shu-test-shu-random-letter-1 ()
+  (let ((letter (shu-random-letter)))
+    (should letter)
+    (should (<= letter ?z))
+    (should (>= letter ?a))
+    ))
+
+
 ;;; shu-base.t.el ends here
