@@ -3256,6 +3256,66 @@ a timezone datetime type."
 
 
 ;;
+;;  shu-cpp-fill-test-data
+;;
+(defun shu-cpp-fill-test-data ()
+  "If the data type at the beginning of the line is a recognized data type, then
+fill in a random value for that data type at point.  This allows someone writing
+a test to declare a data type and a name and then call this function.  If the
+author creates a line that looks like this and then invokes this function
+
+     std::string   abc
+
+The line will be transformed into one that looks something like this:
+
+     std::string   abc(\"RDATZC\");
+
+The recognized data types are the ones that are defined by the custom variables
+shu-cpp-datetime-type, shu-cpp-datetime-timezone-type, shu-cpp-interval-type,
+and shu-cpp-string-type"
+  (interactive)
+  (let ((xx)
+        (data)
+        (fail-type)
+        (bol (line-beginning-position))
+        (eol (line-end-position))
+        (ss
+         (concat
+          "\\s-*"
+          "\\("
+          "["
+          shu-cpp-datetime-timezone-type "\\|"
+          shu-cpp-interval-type "\\|"
+          shu-cpp-datetime-type "\\|"
+          shu-cpp-string-type "\\|"
+          "]+"
+          "\\)")))
+    (save-excursion
+      (beginning-of-line)
+      (when (re-search-forward ss nil t)
+        (setq xx (match-string 1))
+        (cond
+         ((string= xx shu-cpp-datetime-timezone-type)
+          (setq data (shu-cpp-internal-tz-make-datetime))
+          )
+         ((string= xx shu-cpp-interval-type)
+          (setq data (shu-cpp-internal-make-interval))
+          )
+         ((string= xx shu-cpp-datetime-type)
+          (setq data (shu-cpp-internal-make-datetime))
+          )
+         ((string= xx shu-cpp-string-type)
+          (setq data (concat "(\"" (shu-misc-random-ua-string 6) "\")"))))))
+    (if data
+        (insert (concat data ";"))
+      (ding)
+      (message "%s" "Unrecognized data type"))
+    ))
+
+
+
+
+;;
 ;;  shu-cpp-general-set-alias
 ;;
 (defun shu-cpp-general-set-alias ()
@@ -3311,6 +3371,7 @@ shu- prefix removed."
   (defalias 'make-datetime 'shu-cpp-make-datetime)
   (defalias 'make-tzdate 'shu-cpp-tz-make-datetime)
   (defalias 'make-interval 'shu-cpp-make-interval)
+  (defalias 'fill-data 'shu-cpp-fill-test-data)
   )
 
 ;;; shu-cpp-general.el ends here
