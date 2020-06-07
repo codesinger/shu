@@ -161,6 +161,25 @@ of every visited file.  Makes a useful history of all files visited."
 
 
 ;;
+;;  tap
+;;
+(defun tap ()
+  "Insert a BALL_LOG_INFO_BLOCK at point."
+  (interactive)
+  (let ((pad)
+        (ipad)
+        (pad-count (current-column)))
+    (setq pad (make-string pad-count ? ))
+    (insert
+     (concat
+      "const char             *const allocatorName(\"TestAllocator\");\n"
+      pad "const bool              verboseFlag(false);\n"
+      pad "bslma::TestAllocator    ta(allocatorName, verboseFlag, 0);\n"
+      pad "bslma::TestAllocator   *const tap = &ta;\n"))
+    ))
+
+
+;;
 ;;  blos
 ;;
 (defun blos ()
@@ -193,6 +212,16 @@ of every visited file.  Makes a useful history of all files visited."
   "Insert \"#include <fxpricingmetrics_localnumpunct.h>\" at point."
   (interactive)
     (insert "#include <fxpricingmetrics_localnumpunct.h>")
+    )
+
+
+;;
+;;  tai
+;;
+(defun tai ()
+  "Insert \"#include <bslma_testallocator.h>\" at point."
+  (interactive)
+    (insert "#include <bslma_testallocator.h>")
     )
 
 

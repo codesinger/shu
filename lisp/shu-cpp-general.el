@@ -3171,8 +3171,9 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
 ;;  shu-cpp-make-datetime
 ;;
 (defun shu-cpp-make-datetime ()
-  "insert a string that is the list of values to be passed to the constructor of a datetime
- type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
+  "insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds."
   (interactive)
   (insert (concat (shu-cpp-internal-make-datetime) ";"))
   )
@@ -3183,8 +3184,9 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
 ;;  shu-cpp-internal-make-datetime
 ;;
 (defun shu-cpp-internal-make-datetime ()
-  "Return a string that is the list of values to be passed to the constructor of a datetime
- type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
+  "Return a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds."
   (let ((year (number-to-string (shu-random-range 2010 2020)))
         (month (number-to-string (shu-random-range 1 12)))
         (day (number-to-string (shu-random-range 1 27)))
@@ -3195,6 +3197,31 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
         (micro (number-to-string (shu-random-range 0 999))))
     (concat "(" year ", " month ", " day ", " hour ", " minute ", " second ", " milli ", " micro ")")
     ))
+
+
+
+;;
+;;  shu-cpp-tz-make-datetime
+;;
+(defun shu-cpp-tz-make-datetime ()
+  "insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds."
+  (interactive)
+  (insert (concat (shu-cpp-internal-tz-make-datetime) ";"))
+  )
+
+
+
+;;
+;;  shu-cpp-internal-tz-make-datetime
+;;
+(defun shu-cpp-internal-tz-make-datetime ()
+  "Return a string that is the list of values to be passed to the constructor of
+a timezone datetime type."
+    (concat "(" shu-cpp-datetime-type (shu-cpp-internal-make-datetime) ", 0)")
+    )
+
 
 
 
@@ -3282,6 +3309,7 @@ shu- prefix removed."
   (defalias 'to-snake 'shu-to-snake)
   (defalias 'to-camel 'shu-to-camel)
   (defalias 'make-datetime 'shu-cpp-make-datetime)
+  (defalias 'make-tzdate 'shu-cpp-tz-make-datetime)
   (defalias 'make-interval 'shu-cpp-make-interval)
   )
 
