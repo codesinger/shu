@@ -3292,18 +3292,15 @@ and shu-cpp-string-type"
           "\\)")))
     (save-excursion
       (beginning-of-line)
-      (when (re-search-forward ss nil t)
+      (when (re-search-forward ss eol t)
         (setq xx (match-string 1))
         (cond
          ((string= xx shu-cpp-datetime-timezone-type)
-          (setq data (shu-cpp-internal-tz-make-datetime))
-          )
+          (setq data (shu-cpp-internal-tz-make-datetime)))
          ((string= xx shu-cpp-interval-type)
-          (setq data (shu-cpp-internal-make-interval))
-          )
+          (setq data (shu-cpp-internal-make-interval)))
          ((string= xx shu-cpp-datetime-type)
-          (setq data (shu-cpp-internal-make-datetime))
-          )
+          (setq data (shu-cpp-internal-make-datetime)))
          ((string= xx shu-cpp-string-type)
           (setq data (concat "(\"" (shu-misc-random-ua-string 6) "\")"))))))
     (if data
