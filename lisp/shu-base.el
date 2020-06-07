@@ -916,6 +916,18 @@ to lower case"
 
 
 ;;
+;;  shu-swap
+;;
+(defmacro shu-swap (x y)
+  "Swap the contents of X and Y.  X gets the value of Y.  Y gets the value of X."
+  `(setq ,x (prog1 ,y (setq ,y ,x)))
+ )
+
+
+
+
+
+;;
 ;;  shu-random-range
 ;;
 (defun shu-random-range (x y)
@@ -927,7 +939,7 @@ closed interval is [Y, X].  If Y is equal to X, then the returned value is X."
         (value)
         (r1))
     (when (< upper lower)
-      (setq lower (prog1 upper (setq upper lower))))
+      (shu-swap lower upper))
     (setq value lower)
     (when (< lower upper)
       (setq range (1+ (- upper lower)))

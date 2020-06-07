@@ -1743,6 +1743,44 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 ;;
+;;  shu-test-shu-swap-1
+;;
+(ert-deftest shu-test-shu-swap-1 ()
+  (let* ((x 10)
+        (y 5)
+        (x1 y)
+        (y1 x))
+    (shu-swap x y)
+    (should x)
+    (should (numberp x))
+    (should y)
+    (should (numberp y))
+    (should (= x x1))
+    (should (= y y1))
+    ))
+
+
+
+;;
+;;  shu-test-shu-swap-2
+;;
+(ert-deftest shu-test-shu-swap-2 ()
+  (let* ((x "Happy Birthday")
+        (y "Hello World")
+        (x1 y)
+        (y1 x))
+    (shu-swap x y)
+    (should x1)
+    (should (stringp x))
+    (should y)
+    (should (stringp y))
+    (should (string= x x1))
+    (should (string= y y1))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-random-range-1
 ;;
 (ert-deftest shu-test-shu-random-range-1 ()
