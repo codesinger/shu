@@ -3272,7 +3272,7 @@ The line will be transformed into one that looks something like this:
 
 The recognized data types are the ones that are defined by the custom variables
 shu-cpp-datetime-type, shu-cpp-datetime-timezone-type, shu-cpp-interval-type,
-and shu-cpp-string-type"
+and shu-cpp-string-type.  The data types may optionally be preceded by \"const\"."
   (interactive)
   (let ((xx)
         (data)
@@ -3282,6 +3282,8 @@ and shu-cpp-string-type"
         (ss
          (concat
           "\\s-*"
+          "[const ]*"
+          "\\s-*"
           "\\("
           "["
           shu-cpp-datetime-timezone-type "\\|"
@@ -3289,7 +3291,8 @@ and shu-cpp-string-type"
           shu-cpp-datetime-type "\\|"
           shu-cpp-string-type "\\|"
           "]+"
-          "\\)")))
+          "\\)"))
+        (did-fill))
     (save-excursion
       (beginning-of-line)
       (when (re-search-forward ss eol t)
@@ -3304,9 +3307,12 @@ and shu-cpp-string-type"
          ((string= xx shu-cpp-string-type)
           (setq data (concat "(\"" (shu-misc-random-ua-string 6) "\")"))))))
     (if data
-        (insert (concat data ";"))
+        (progn
+          (insert (concat data ";"))
+          (setq did-fill t))
       (ding)
       (message "%s" "Unrecognized data type"))
+    did-fill
     ))
 
 
