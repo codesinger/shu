@@ -3078,4 +3078,30 @@ This is most likely the name of an include file and not the name of a class."
 
 
 
+;;
+;;  shu-test-shu-gcc-1
+;;
+(ert-deftest shu-test-shu-gcc-1 ()
+  (let* ((expected "mumblebar with fruit on top")
+         (data
+          (concat
+           "blither blather bother $ " expected "\n"
+           "This is some random text\n"
+           "This is more random stuff\n"
+           "And yet more rubbish\n"
+           "etc.\n"))
+         (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-gcc))
+    (with-temp-buffer
+      (yank)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
 ;;; shu-cpp-general.t.el ends here

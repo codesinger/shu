@@ -3219,8 +3219,8 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
 (defun shu-cpp-internal-tz-make-datetime ()
   "Return a string that is the list of values to be passed to the constructor of
 a timezone datetime type."
-    (concat "(" shu-cpp-datetime-type (shu-cpp-internal-make-datetime) ", 0)")
-    )
+  (concat "(" shu-cpp-datetime-type (shu-cpp-internal-make-datetime) ", 0)")
+  )
 
 
 
@@ -3319,6 +3319,36 @@ and shu-cpp-string-type.  The data types may optionally be preceded by \"const\"
 
 
 ;;
+;;  shu-gcc
+;;
+(defun shu-gcc ()
+  "Get compile command command from current buffer.  While in a compile buffer,
+go to the top of the buffer, search for the \"$\" prompt, collect the rest of
+the line and put it into the kill ring.  This takes the string that was used for
+the last compile command in the current buffer and puts it into the kill ring.
+To compile again with the same command, kill the buffer, open a new shell, and
+yank."
+  (interactive)
+  (let ((eol)
+        (cc))
+    (save-excursion
+      (goto-char (point-min))
+      (setq eol (save-excursion (move-end-of-line nil) (point)))
+      (if (search-forward "$" eol t)
+          (progn
+            (forward-char 1)
+            (copy-region-as-kill (point) eol)
+            (with-temp-buffer
+              (yank)
+              (setq cc (buffer-substring-no-properties (point-min) (point-max))))
+            (message "%s" cc))
+        (ding)
+        (message "%s" "*** Not found ***")))
+    ))
+
+
+
+;;
 ;;  shu-cpp-general-set-alias
 ;;
 (defun shu-cpp-general-set-alias ()
@@ -3375,6 +3405,7 @@ shu- prefix removed."
   (defalias 'make-tzdate 'shu-cpp-tz-make-datetime)
   (defalias 'make-interval 'shu-cpp-make-interval)
   (defalias 'fill-data 'shu-cpp-fill-test-data)
+  (defalias 'gcc 'shu-gcc)
   )
 
 ;;; shu-cpp-general.el ends here
