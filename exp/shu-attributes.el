@@ -1113,7 +1113,7 @@ of nullable values."
           (insert
            (concat
             ipad  "if ( !" uname " )\n"
-            ipad ipad "binder.bindNull(\"@\" + "  column-name ", __FILE__, __LINE__);\n"
+            ipad ipad "binder.bindNull(" column-name ", __FILE__, __LINE__);\n"
             ipad  "else\n"
             bind-prefix)))
         (setq tmp-data-type data-type)
@@ -1123,7 +1123,7 @@ of nullable values."
           (setq pad-count (+ (length bind-type) (length bind-prefix) 1))
           (setq pad (make-string pad-count ? )))
         (insert (shu-cpp-attributes-bind-type tmp-data-type))
-        (insert (concat "(\"@\" + " column-name ", "))
+        (insert (concat "(" column-name ", "))
         (if enum-base
             (insert (concat "\n" pad "static_cast<" enum-base ">(" name "())"))
           (insert (concat name "()")))
