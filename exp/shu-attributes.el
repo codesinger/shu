@@ -499,30 +499,28 @@ name is less than the right hand name."
 ;;
 (defun shu-attributes-internal-gen (input-file output-file)
   "Doc string."
-  (let (
-        (class-list)
+  (let ((class-list)
         (class-name)
+        (class-is-key)
         (table-name)
         (have-nullables)
         (have-non-nullables)
-        (attributes)
-        )
+        (attributes))
     (if (not (file-readable-p input-file))
         (message "%s: File not found." input-file)
       (when (file-readable-p output-file)
-        (delete-file output-file)
-        )
+        (delete-file output-file))
       (find-file input-file)
       (setq class-list (shu-attributes-fetch-attributes (point-min) (point-max)))
       (setq class-name (pop class-list))
+      (setq class-is-key (pop class-list))
       (setq table-name (pop class-list))
       (setq have-nullables (pop class-list))
       (setq have-non-nullables (pop class-list))
       (setq attributes (pop class-list))
       (find-file output-file)
-      (shu-cpp-attributes-gen class-name table-name have-nullables
-                              have-non-nullables attributes)
-      )
+      (shu-cpp-attributes-gen class-name class-is-key table-name have-nullables
+                              have-non-nullables attributes))
     ))
 
 
@@ -537,6 +535,7 @@ name is less than the right hand name."
   (let (
         (class-list)
         (class-name)
+        (class-is-key)
         (table-name)
         (have-nullables)
         (have-non-nullables)
@@ -544,11 +543,12 @@ name is less than the right hand name."
         )
     (setq class-list (shu-attributes-fetch-attributes start end))
     (setq class-name (pop class-list))
+    (setq class-is-key (pop class-list))
     (setq table-name (pop class-list))
     (setq have-nullables (pop class-list))
     (setq have-non-nullables (pop class-list))
     (setq attributes (pop class-list))
-    (shu-cpp-attributes-gen class-name table-name have-nullables
+    (shu-cpp-attributes-gen class-name class-is-key table-name have-nullables
                             have-non-nullables attributes)
     ))
 
@@ -596,10 +596,11 @@ snippets will be inserted into the same file.
 Return a list that holds the following information:
 
     1. class-name
-    2. table-name
-    3. have-nullables (t if any nullable attributes exist)
-    4. have-non-nullables (t if any non-nullable attributes exist)
-    5. The list of attr-info that describes the attributes"
+    2. class-is-key (t if this is a primary key class)
+    3. table-name
+    4. have-nullables (t if any nullable attributes exist)
+    5. have-non-nullables (t if any non-nullable attributes exist)
+    6. The list of attr-info that describes the attributes"
   (let ((gb (get-buffer-create "**boo**"))
         (sline (shu-the-line-at start))
         (eline (shu-the-line-at end))
@@ -611,6 +612,8 @@ Return a list that holds the following information:
         (enum-ss "\\([:_a-zA-Z0-9$]+\\)\\s-*(\\([:_a-zA-Z0-9$]+\\))")
         (reset-ss "\\([:_a-zA-Z0-9$]+\\)\\s-*(\\([:._a-zA-Z0-9$]+\\))")
         (class-name)
+        (class-is-key)
+        (cresult)
         (table-name)
         (data-type)
         (full-data-type)
@@ -648,7 +651,11 @@ Return a list that holds the following information:
             (setq x (cdr x))
             (setq data-type (car x))
             (if (string= column-name "class")
-                (setq class-name data-type)
+                (progn
+                  (setq class-name data-type)
+                  (setq cresult (shu-attributes-get-class-type class-name))
+                  (setq class-name (car cresult))
+                  (setq class-is-key (cdr cresult)))
               (if (string= column-name "table")
                   (setq table-name data-type)
                 (setq enum-base nil)
@@ -688,7 +695,7 @@ Return a list that holds the following information:
     (setq line-diff (forward-line 1))
     (setq attributes (nreverse attributes))
     (princ "class-name: " gb)(princ class-name gb) (princ "\n" gb)
-    (list class-name table-name have-nullables have-non-nullables attributes)
+    (list class-name class-is-key table-name have-nullables have-non-nullables attributes)
     ))
 
 
@@ -732,7 +739,7 @@ for it."
 ;;
 ;;  shu-cpp-attributes-gen
 ;;
-(defun shu-cpp-attributes-gen (class-name table-name have-nullables
+(defun shu-cpp-attributes-gen (class-name class-is-key table-name have-nullables
                                           have-non-nullables attributes)
   "Generate all of the code snippets."
   (let ((gb (get-buffer-create "**boo**"))
@@ -752,18 +759,22 @@ for it."
       (setq sorted-attributes (copy-tree attributes))
       (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
       (shu-cpp-attributes-gen-ctor-decl class-name have-non-nullables attributes)
+      (when class-is-key
+        (shu-cpp-attributes-gen-copy-ctor-decl class-name))
       (shu-cpp-attributes-gen-reset-decl)
       (when have-nullables
         (shu-cpp-attributes-gen-setter-decl class-name sorted-attributes))
       (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
       (shu-cpp-attributes-gen-getter-decl class-name sorted-attributes)
       (shu-cpp-attributes-gen-print-self-decl)
-      (shu-cpp-attributes-gen-decl-h-private class-name)
+      (shu-cpp-attributes-gen-decl-h-private class-name class-is-key)
       (shu-cpp-attributes-gen-operator-equal-decl class-name)
       (shu-cpp-misc-h-tail-gen class-name)
       (shu-cpp-attributes-gen-ctor-gen class-name attributes)
       (when have-non-nullables
         (shu-cpp-attributes-gen-ctor-gen-full class-name attributes))
+      (when class-is-key
+        (shu-cpp-attributes-gen-copy-ctor-gen class-name attributes))
       (shu-cpp-attributes-gen-reset-gen class-name attributes)
       (shu-cpp-attributes-gen-set-values-gen class-name table-name attributes)
       (when have-nullables
@@ -920,7 +931,7 @@ row classes disable copy construction."
     (setq pad (concat
                (shu-cpp-attributes-make-pad-no-ref max-type-len allocator-type)
                "*"))
-    (insert (concat ipad ipad allocator-type pad "allocator = 0);\n"))
+    (insert (concat ipad ipad allocator-type pad "allocator);\n"))
     ))
 
 
@@ -1994,17 +2005,19 @@ values from an instance of bcem_Aggregate."
 ;;
 ;;  shu-cpp-attributes-gen-decl-h-private
 ;;
-(defun shu-cpp-attributes-gen-decl-h-private (class-name)
+(defun shu-cpp-attributes-gen-decl-h-private (class-name class-is-key)
   "Generate the private section of the class declaration.  If COPY-ALLOWED
 is false, generate private an unimplemented copy constructor and operator=()"
-  (let ((ipad (make-string shu-cpp-indent-length ? )))
+  (let ((ipad (make-string shu-cpp-indent-length ? ))
+        (no-copy (if class-is-key nil t)))
     (insert
      (concat
       "\n"
       "  private:\n"
-      "\n"
-      shu-cpp-misc-not-implemented-label "\n"))
-    (shu-cpp-misc-gen-ctor-not-implemented class-name)
+      "\n"))
+    (when no-copy
+      (insert (concat shu-cpp-misc-not-implemented-label "\n"))
+      (shu-cpp-misc-gen-ctor-not-implemented class-name))
     (insert
      (concat
       "\n"
