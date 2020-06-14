@@ -2016,7 +2016,7 @@ is false, generate private an unimplemented copy constructor and operator=()"
       "  private:\n"
       "\n"))
     (when no-copy
-      (insert (concat shu-cpp-misc-not-implemented-label "\n"))
+      (insert (concat ipad shu-cpp-misc-not-implemented-label "\n"))
       (shu-cpp-misc-gen-ctor-not-implemented class-name))
     (insert
      (concat
