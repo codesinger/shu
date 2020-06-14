@@ -755,13 +755,13 @@ for it."
       (princ (concat "nullables: " (shu-bool-to-string have-nullables) "\n") gb)
       (goto-char (point-max))
       (insert "\n\n")
-      (shu-cpp-attributes-gen-decl class-name attributes)
+      (shu-cpp-attributes-gen-decl class-name class-is-key attributes)
       (setq sorted-attributes (copy-tree attributes))
       (setq sorted-attributes (sort sorted-attributes 'shu-cpp-attributes-name-compare))
       (shu-cpp-attributes-gen-ctor-decl class-name have-non-nullables attributes)
       (when class-is-key
         (shu-cpp-attributes-gen-copy-ctor-decl class-name))
-      (shu-cpp-attributes-gen-reset-decl)
+      (shu-cpp-attributes-gen-reset-decl class-is-key)
       (when have-nullables
         (shu-cpp-attributes-gen-setter-decl class-name sorted-attributes))
       (shu-cpp-attributes-gen-getter-has-decl sorted-attributes)
@@ -776,7 +776,7 @@ for it."
       (when class-is-key
         (shu-cpp-attributes-gen-copy-ctor-gen class-name attributes))
       (shu-cpp-attributes-gen-reset-gen class-name attributes)
-      (shu-cpp-attributes-gen-set-values-gen class-name table-name attributes)
+      (shu-cpp-attributes-gen-set-values-gen class-name class-is-key table-name attributes)
       (when have-nullables
         (shu-cpp-attributes-gen-setter-gen class-name sorted-attributes))
       (shu-cpp-attributes-gen-bind-values-gen class-name attributes)
@@ -791,7 +791,7 @@ for it."
 ;;
 ;;  shu-cpp-attributes-gen-decl
 ;;
-(defun shu-cpp-attributes-gen-decl (class-name attributes)
+(defun shu-cpp-attributes-gen-decl (class-name class-is-key attributes)
   "Generate the declaration of the member variables."
   (let ((attrs attributes)
         (attr-info)
@@ -1229,7 +1229,7 @@ of values for individual nullable columns."
 ;;
 ;;  shu-cpp-attributes-gen-reset-decl
 ;;
-(defun shu-cpp-attributes-gen-reset-decl ()
+(defun shu-cpp-attributes-gen-reset-decl (class-is-key)
   "Generate the declarations for the two manipulator functions."
   (let ((ipad (make-string shu-cpp-indent-length ? )))
     (insert
@@ -1263,9 +1263,14 @@ of values for individual nullable columns."
       ipad " *\n"
       ipad " */\n"
       ipad "int setValues(\n"
-      ipad ipad "const " shu-cpp-string-type "       &databaseName,\n"
-      ipad ipad "const bcem_Aggregate    &data);\n"
-      ))
+      ipad ipad "const " shu-cpp-string-type "       &databaseName,\n"))
+    (when class-is-key
+      (insert
+       (concat
+        ipad ipad "const " shu-cpp-string-type "       &tableName,\n")))
+    (insert
+     (concat
+      ipad ipad "const bcem_Aggregate    &data);\n"))
     ))
 
 
@@ -1840,10 +1845,11 @@ attributes."
 ;;
 ;;  shu-cpp-attributes-gen-set-values-gen
 ;;
-(defun shu-cpp-attributes-gen-set-values-gen (class-name table-name attributes)
+(defun shu-cpp-attributes-gen-set-values-gen (class-name class-is-key table-name attributes)
   "Generate the code for the setValues function that sets all of the member variable
 values from an instance of bcem_Aggregate."
   (let ((attrs attributes)
+        (tbl-name table-name)
         (attr-info)
         (name)
         (uname)
@@ -1864,19 +1870,33 @@ values from an instance of bcem_Aggregate."
         (have-date)
         (have-interval)
         (contained-class))
+    (when class-is-key
+      (setq tbl-name "tableName"))
     (insert
      (concat
       "\n\n"
       "int " class-name "::setValues(\n"
-      ipad "const " shu-cpp-string-type "       &databaseName,\n"
+      ipad "const " shu-cpp-string-type "       &databaseName,\n"))
+    (when class-is-key
+    (insert
+     (concat
+      ipad "const " shu-cpp-string-type "       &tableName,\n")))
+    (insert
+     (concat
       ipad "const bcem_Aggregate    &data)\n"
       "{\n"
       ipad "BALL_LOG_SET_CATEGORY(__func__);\n"
       ipad "reset();\n"
       ipad "const " shu-cpp-string-type "  why(\n"
       ipad "    \"This is caused by a query definition mis-match between this \"\n"
-      ipad "    \"program and the definition of the table \" + " table-name " +\n"
-      ipad "    \" in database '\" + databaseName + \"'.\");\n"
+      ipad "    \"program and the definition of the table \" + " tbl-name " +\n"
+      ipad "    \" in database '\" + databaseName + \"'.\");\n"))
+    (when (not class-is-key)
+    (insert
+     (concat
+      ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n")))
+    (insert
+     (concat
       ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n"
       ipad "int fetchCount(0);\n"
       ipad "int missingCount(0);\n"))
