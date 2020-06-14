@@ -639,6 +639,52 @@
 
 
 
+
+;;
+;;  shu-test-shu-attributes-get-class-type-1
+;;
+(ert-deftest shu-test-shu-attributes-get-class-type-1 ()
+  (let* ((cname "MumbleBar")
+         (class-name (concat cname "(key)"))
+         (result)
+         (xcname)
+         (is-key))
+    (setq result (shu-attributes-get-class-type class-name))
+    (should result)
+    (should (consp result))
+    (setq xcname (car result))
+    (should xcname)
+    (should (stringp xcname))
+    (should (string= cname xcname))
+    (setq is-key (cdr result))
+    (should is-key)
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-attributes-get-class-type-2
+;;
+(ert-deftest shu-test-shu-attributes-get-class-type-2 ()
+  (let* ((cname "MumbleBar")
+         (class-name cname)
+         (result)
+         (xcname)
+         (is-key))
+    (setq result (shu-attributes-get-class-type class-name))
+    (should result)
+    (should (consp result))
+    (setq xcname (car result))
+    (should xcname)
+    (should (stringp xcname))
+    (should (string= cname xcname))
+    (setq is-key (cdr result))
+    (should (not is-key))
+    ))
+
+
+
 ;;;  SAMPLE INPUT
 ;;;
 ;;;  class TenorRow

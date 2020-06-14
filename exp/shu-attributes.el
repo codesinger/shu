@@ -695,6 +695,41 @@ Return a list that holds the following information:
 
 
 ;;
+;;  shu-attributes-get-class-type
+;;
+(defun shu-attributes-get-class-type (class-name)
+  "Given a CLASS-NAME that might be a simple name or might be a name followed
+by another name in parenthesis.  If the name is followed by \"(key),\" then the
+type of this class is a primary key which will have a copy constructor generated
+for it."
+  (let ((ss
+         (concat
+          "\\("
+          shu-cpp-name "+"
+          "\\)"
+          "\\s-*"
+          "("
+          "\\s-*"
+          "\\("
+          "[a-zA-Z0-9]+"
+          "\\)"
+          ")"))
+        (case-fold-search nil)
+        (cname class-name)
+        (type)
+        (is-key nil))
+    (when (string-match ss class-name)
+      (setq cname (match-string 1 class-name))
+      (setq type (match-string 2 class-name))
+      (when (string= type "key")
+        (setq is-key t)))
+    (cons cname is-key)
+    ))
+
+
+
+
+;;
 ;;  shu-cpp-attributes-gen
 ;;
 (defun shu-cpp-attributes-gen (class-name table-name have-nullables
