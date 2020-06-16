@@ -1897,7 +1897,6 @@ values from an instance of bcem_Aggregate."
       ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n")))
     (insert
      (concat
-      ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n"
       ipad "int fetchCount(0);\n"
       ipad "int missingCount(0);\n"))
     (while attrs
