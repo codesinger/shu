@@ -52,6 +52,12 @@
   :group 'shu-cpp-general)
 
 
+(defcustom shu-cpp-date-type "bdlt::Date"
+  "The data type that represents a date."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
 (defcustom shu-cpp-datetime-type "bdlt::Datetime"
   "The data type that represents a date and time."
   :type '(string)
@@ -78,6 +84,12 @@
 
 (defcustom shu-cpp-string-type "bsl::string"
   "The data type that represents a string type."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-time-type "bdlt::Time"
+  "The data type that represents a time."
   :type '(string)
   :group 'shu-cpp-general)
 
@@ -3168,6 +3180,18 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
 
 
 ;;
+;;  shu-cpp-make-date
+;;
+(defun shu-cpp-make-date ()
+  "insert a string that is the list of values to be passed to the constructor of
+ a date type that accepts year, month, day."
+  (interactive)
+  (insert (concat (shu-cpp-internal-make-date) ";"))
+  )
+
+
+
+;;
 ;;  shu-cpp-make-datetime
 ;;
 (defun shu-cpp-make-datetime ()
@@ -3177,6 +3201,21 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
   (interactive)
   (insert (concat (shu-cpp-internal-make-datetime) ";"))
   )
+
+
+
+;;
+;;  shu-cpp-internal-make-date
+;;
+(defun shu-cpp-internal-make-date ()
+  "Return a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds."
+  (let ((year (number-to-string (shu-random-range 2010 2020)))
+        (month (number-to-string (shu-random-range 1 12)))
+        (day (number-to-string (shu-random-range 1 27))))
+    (concat "(" year ", " month ", " day ")")
+    ))
 
 
 
@@ -3254,6 +3293,34 @@ a timezone datetime type."
 
 
 
+;;
+;;  shu-cpp-make-time
+;;
+(defun shu-cpp-make-time ()
+  "insert a string that is the list of values to be passed to the constructor of
+a time type that accepts hour, minute, second,  milliseconds, microseconds."
+  (interactive)
+  (insert (concat (shu-cpp-internal-make-time) ";"))
+  )
+
+
+
+;;
+;;  shu-cpp-internal-make-time
+;;
+(defun shu-cpp-internal-make-time ()
+  "Return a string that is the list of values to be passed to the constructor of
+ a time type that accepts hour, minute, second,  milliseconds, microseconds."
+  (let ((hour (number-to-string (shu-random-range 0 23)))
+        (minute (number-to-string (shu-random-range 0 59)))
+        (second (number-to-string (shu-random-range 0 59)))
+        (milli (number-to-string (shu-random-range 0 999)))
+        (micro (number-to-string (shu-random-range 0 999))))
+    (concat "(" hour ", " minute ", " second ", " milli ", " micro ")")
+    ))
+
+
+
 
 ;;
 ;;  shu-cpp-fill-test-data
@@ -3302,10 +3369,14 @@ and shu-cpp-string-type.  The data types may optionally be preceded by \"const\"
           (setq data (shu-cpp-internal-tz-make-datetime)))
          ((string= xx shu-cpp-interval-type)
           (setq data (shu-cpp-internal-make-interval)))
+         ((string= xx shu-cpp-date-type)
+          (setq data (shu-cpp-internal-make-date)))
          ((string= xx shu-cpp-datetime-type)
           (setq data (shu-cpp-internal-make-datetime)))
          ((string= xx shu-cpp-string-type)
-          (setq data (concat "(\"" (shu-misc-random-ua-string 6) "\")"))))))
+          (setq data (concat "(\"" (shu-misc-random-ua-string 6) "\")")))
+         ((string= xx shu-cpp-time-type)
+          (setq data (shu-cpp-internal-make-time))))))
     (if data
         (progn
           (insert (concat data ";"))
