@@ -1783,12 +1783,14 @@ attributes."
                 (insert " = defaultTimeTz")
               (if (string= full-data-type shu-cpp-interval-type)
                   (insert " = defaultInterval")
-                (if (string= full-data-type "int")
+                (if (string= full-data-type shu-cpp-long-long-type)
                     (insert " = 0")
-                  (if (string= full-data-type "double")
-                      (insert " = 0.0")
-                    (when reset-value
-                      (insert (concat " = " reset-value))))))))))
+                  (if (string= full-data-type "int")
+                      (insert " = 0")
+                    (if (string= full-data-type "double")
+                        (insert " = 0.0")
+                      (when reset-value
+                        (insert (concat " = " reset-value)))))))))))
       (insert ";\n")
       (setq attrs (cdr attrs)))
     (insert "}\n")
@@ -1878,9 +1880,9 @@ values from an instance of bcem_Aggregate."
       "int " class-name "::setValues(\n"
       ipad "const " shu-cpp-string-type "       &databaseName,\n"))
     (when class-is-key
-    (insert
-     (concat
-      ipad "const " shu-cpp-string-type "       &tableName,\n")))
+      (insert
+       (concat
+        ipad "const " shu-cpp-string-type "       &tableName,\n")))
     (insert
      (concat
       ipad "const bcem_Aggregate    &data)\n"
@@ -1892,9 +1894,9 @@ values from an instance of bcem_Aggregate."
       ipad "    \"program and the definition of the table \" + " tbl-name " +\n"
       ipad "    \" in database '\" + databaseName + \"'.\");\n"))
     (when (not class-is-key)
-    (insert
-     (concat
-      ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n")))
+      (insert
+       (concat
+        ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n")))
     (insert
      (concat
       ipad "int fetchCount(0);\n"
