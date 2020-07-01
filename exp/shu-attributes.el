@@ -428,7 +428,7 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
      ((string= data-type shu-cpp-interval-type)
       (setq aggregate-type "asInt()"))
      ((string= data-type shu-cpp-long-long-type)
-      (setq aggregate-type "asInt()"))
+      (setq aggregate-type "asInt64()"))
      ((string= data-type "int")
       (setq aggregate-type "asInt()"))
      ((string= data-type "double")
