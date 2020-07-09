@@ -1089,7 +1089,7 @@ of nullable values."
           (insert
            (concat "\n"
                    ipad "/*!\n"
-                   ipad " * Return true if " name " exists\n"
+                   ipad " * \\brief Return true if " name " exists\n"
                    ipad " */\n")))
         (setq uname (shu-upcase-first-letter name))
         (insert (concat ipad "bool has" uname "() const;\n")))
@@ -1312,7 +1312,7 @@ of values for individual nullable columns."
         (insert
          (concat "\n"
                  ipad "/*!\n"
-                 ipad " * Return " ref (shu-downcase-first-letter comment) "\n"))
+                 ipad " * \\brief Return " ref (shu-downcase-first-letter comment) "\n"))
         (when nullable
           (setq uname (concat "has" (shu-upcase-first-letter name) "()"))
           (insert
@@ -2069,7 +2069,7 @@ is false, generate private an unimplemented copy constructor and operator=()"
     "\n"
     "\n"
     "/*!\n"
-    " * Return true if all attributes of `lhs` and `rhs` have the same value\n"
+    " * \\brief Return true if all attributes of `lhs` and `rhs` have the same value\n"
     " */\n"
     "bool operator==(\n"
     "    const " class-name "   &lhs,\n"
@@ -2077,7 +2077,7 @@ is false, generate private an unimplemented copy constructor and operator=()"
     "\n"
     "\n"
     "/*!\n"
-    " * Return true if any attributes of `lhs` and `rhs` have different values\n"
+    " * \\brief Return true if any attributes of `lhs` and `rhs` have different values\n"
     " */\n"
     "bool operator!=(\n"
     "    const " class-name "   &lhs,\n"
