@@ -236,7 +236,7 @@ of every visited file.  Makes a useful history of all files visited."
    ((pad-count (current-column))
     (start ))
     (setq start (save-excursion (beginning-of-line) (point)))
-    (insert "BSLS_ASSERT();\n")
+    (insert "BSLS_ASSERT_OPT();\n")
     (goto-char (+ start pad-count 12))))
 
 
