@@ -398,7 +398,7 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
      ((string= data-type shu-cpp-datetime-timezone-type)
       (setq bind-type "DatetimeTz"))
      ((string= data-type shu-cpp-interval-type)
-      (setq bind-type "Int"))
+      (setq bind-type "Double"))
      ((string= data-type shu-cpp-long-long-type)
       (setq bind-type "Int"))
      ((string= data-type "int")
@@ -426,9 +426,9 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
      ((string= data-type shu-cpp-datetime-timezone-type)
       (setq aggregate-type "asDatetimeTz()"))
      ((string= data-type shu-cpp-interval-type)
-      (setq aggregate-type "asInt()"))
+      (setq aggregate-type "asDouble()"))
      ((string= data-type shu-cpp-long-long-type)
-      (setq aggregate-type "asInt64()"))
+      (setq aggregate-type "asInt()"))
      ((string= data-type "int")
       (setq aggregate-type "asInt()"))
      ((string= data-type "double")
@@ -1174,7 +1174,7 @@ of nullable values."
             (insert (concat "\n" pad "static_cast<" enum-base ">(" name "())"))
           (insert (concat name "()")))
         (when (string= data-type shu-cpp-interval-type)
-          (insert ".totalMilliseconds()"))
+          (insert ".totalSecondsAsDouble()"))
         (insert ", __FILE__, __LINE__);\n"))
       (setq attrs (cdr attrs)))
     (insert "}\n")
@@ -1920,8 +1920,11 @@ values from an instance of bcem_Aggregate."
         (when (string= data-type shu-cpp-interval-type)
           (insert
            (concat
-            ipad ipad "const " shu-cpp-long-long-type "      intval(" name ".asInt());\n"
-            ipad ipad "const " shu-cpp-interval-type "  interval(0, 0, 0, 0, intval, 0);\n")))
+            ipad ipad "const double                  intval(" name ".asDouble());\n"
+            ipad ipad "const " shu-cpp-interval-type "  interval;\n"
+            ipad ipad "interval.setTotalSecondsFromDouble(intval);\n"
+            )
+           ))
         (insert
          (concat
           ipad ipad member-prefix name))

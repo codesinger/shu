@@ -443,7 +443,7 @@
   (let (
         (data-type "bdlt::DatetimeInterval")
         (aggregate-type)
-        (expected-aggregate-type "asInt()")
+        (expected-aggregate-type "asDouble()")
         )
     (setq aggregate-type (shu-cpp-attributes-aggregate-type data-type))
     (should aggregate-type)
@@ -536,7 +536,7 @@
 
     (setq data-type "bdlt::DatetimeInterval")
     (setq bind-type nil)
-    (setq expected-bind-type "Int")
+    (setq expected-bind-type "Double")
     (setq bind-type (shu-cpp-attributes-bind-type data-type))
     (should bind-type)
     (should (stringp bind-type))
