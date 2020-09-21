@@ -541,6 +541,10 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
       (princ (concat "git reset HEAD " cfile-name "\n") gitbuf)
       (princ (concat "git reset HEAD " tfile-name "\n") gitbuf)
 
+      (princ (concat "git restore --staged " hfile-name "\n") gitbuf)
+      (princ (concat "git restore --staged " cfile-name "\n") gitbuf)
+      (princ (concat "git restore --staged " tfile-name "\n") gitbuf)
+
       (shu-generate-git-add hfile-name gitbuf)
       (shu-generate-git-add cfile-name gitbuf)
       (shu-generate-git-add tfile-name gitbuf)

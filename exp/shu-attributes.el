@@ -403,6 +403,12 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
       (setq bind-type "Int"))
      ((string= data-type "int")
       (setq bind-type "Int"))
+     ((string= data-type "uint")
+      (setq bind-type "Int"))
+     ((string= data-type "ushort")
+      (setq bind-type "Int"))
+     ((string= data-type "short")
+      (setq bind-type "Int"))
      ((string= data-type "double")
       (setq bind-type "Double")))
     bind-type
@@ -430,6 +436,12 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
      ((string= data-type shu-cpp-long-long-type)
       (setq aggregate-type "asInt()"))
      ((string= data-type "int")
+      (setq aggregate-type "asInt()"))
+     ((string= data-type "uint")
+      (setq aggregate-type "asInt()"))
+     ((string= data-type "ushort")
+      (setq aggregate-type "asInt()"))
+     ((string= data-type "short")
       (setq aggregate-type "asInt()"))
      ((string= data-type "double")
       (setq aggregate-type "asDouble()")))
@@ -670,6 +682,14 @@ Return a list that holds the following information:
                   (setq name (match-string-no-properties 1 name)))
                 (setq nullable nil)
                 (setq full-data-type data-type)
+                (cond
+                 ((string= data-type "uint")
+                  (setq full-data-type "unsigned int")
+                  )
+                 ((string= data-type "ushort")
+                  (setq full-data-type "unsigned short")
+                  )
+                 )
                 (setq reference nil)
                 (setq x (cdr x))
                 (when x
@@ -1298,12 +1318,20 @@ of values for individual nullable columns."
         (pad-count 0)
         (pad)
         (ref)
+        (local-data-type)
         (member-prefix "m_"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name column-count
                                  enum-base reset-value)
+      (setq local-data-type data-type)
+      (cond
+       ((string= data-type "uint")
+        (setq local-data-type "unsigned int"))
+       ((string= data-type "ushort")
+        (setq local-data-type "unsigned short"))
+       )
       (insert "\n")
       (when comment
         (setq ref "")
@@ -1324,7 +1352,7 @@ of values for individual nullable columns."
       (insert ipad)
       (when reference
         (insert "const "))
-      (insert (concat (shu-cpp-attributes-header-type class-name data-type) " "))
+      (insert (concat (shu-cpp-attributes-header-type class-name local-data-type) " "))
       (when reference
         (insert "&"))
       (insert (concat name  "() const;\n"))
@@ -1355,16 +1383,24 @@ of values for individual nullable columns."
         (attr-num 1)
         (pad-count 0)
         (pad)
+        (local-data-type)
         (member-prefix "m_"))
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name column-count
                                  enum-base reset-value)
+      (setq local-data-type data-type)
+      (cond
+       ((string= data-type "uint")
+        (setq local-data-type "unsigned int"))
+       ((string= data-type "ushort")
+        (setq local-data-type "unsigned short"))
+       )
       (insert "\n\n")
       (when reference
         (insert "const "))
-      (insert (concat data-type " "))
+      (insert (concat local-data-type " "))
       (when reference
         (insert "&"))
       (insert
@@ -1787,10 +1823,16 @@ attributes."
                     (insert " = 0")
                   (if (string= full-data-type "int")
                       (insert " = 0")
-                    (if (string= full-data-type "double")
-                        (insert " = 0.0")
-                      (when reset-value
-                        (insert (concat " = " reset-value)))))))))))
+                    (if (string= data-type "uint")
+                        (insert " = 0")
+                      (if (string= data-type "ushort")
+                          (insert " = 0")
+                        (if (string= data-type "short")
+                            (insert " = 0")
+                          (if (string= full-data-type "double")
+                              (insert " = 0.0")
+                              (when reset-value
+                                (insert (concat " = " reset-value))))))))))))))
       (insert ";\n")
       (setq attrs (cdr attrs)))
     (insert "}\n")
