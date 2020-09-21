@@ -1716,7 +1716,7 @@ characters in length."
 ;;
 ;;  shu-new-deallocate
 ;;
-(defun shu-new-deallocate (var-name class-name)
+(defun shu-new-deallocate (var-name)
   "Insert the code to do a standard deallocation of memory allocated by a
 specific allocator.  First prompt reads the variable name that points to the
 memory to be deallocated.  Second prompt reads the name of the class whose
@@ -1726,8 +1726,7 @@ This generates a code sequence as follows:
 
         if (var-name)
         {
-            var-name->~class-name();
-            m_allocator->deallocate(var-name);
+            m_allocator->deleteObject(var-name);
             var-name = 0;
         }
 
@@ -1736,7 +1735,7 @@ indent inside that braces is defined in the custom variable
 shu-cpp-indent-length.  The name of the member variable that points to the
 allocator in use by the class comes from the custom variable
 shu-cpp-default-allocator-name"
-  (interactive "*sVariable name?: \nsClass name?: ")
+  (interactive "*sVariable name?: ")
   (let ((pad)
         (pad-count (current-column))
         (start)
@@ -1746,8 +1745,7 @@ shu-cpp-default-allocator-name"
      (concat
       "if (" var-name ")\n"
       pad "{\n"
-      pad ipad var-name "->~" class-name "();\n"
-      pad ipad shu-cpp-default-allocator-name "->deallocate(" var-name ");\n"
+      pad ipad shu-cpp-default-allocator-name "->deleteObject(" var-name ");\n"
       pad ipad var-name " = 0;\n"
       pad "}\n"))
     ))
