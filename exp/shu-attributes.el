@@ -438,7 +438,7 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
      ((string= data-type "int")
       (setq aggregate-type "asInt()"))
      ((string= data-type "uint")
-      (setq aggregate-type "asInt()"))
+      (setq aggregate-type "asInt64()"))
      ((string= data-type "ushort")
       (setq aggregate-type "asInt()"))
      ((string= data-type "short")
@@ -1964,20 +1964,24 @@ values from an instance of bcem_Aggregate."
            (concat
             ipad ipad "const double                  intval(" name ".asDouble());\n"
             ipad ipad "const " shu-cpp-interval-type "  interval;\n"
-            ipad ipad "interval.setTotalSecondsFromDouble(intval);\n"
-            )
-           ))
+            ipad ipad "interval.setTotalSecondsFromDouble(intval);\n")))
+        (when (string= data-type "uint")
+          (insert
+           (concat
+            ipad ipad "unsigned int  intval = " name ".asInt64() & 0xFFFFFFFF;\n")))
         (insert
          (concat
           ipad ipad member-prefix name))
         (if nullable
             (insert ".makeValue(")
           (insert " = "))
+        (if (string= data-type "uint")
+            (insert "intval")
         (if (string= data-type shu-cpp-interval-type)
             (insert "interval")
           (if enum-base
               (insert (concat "static_cast<" data-type ">(" name "." (shu-cpp-attributes-aggregate-type enum-base) ")"))
-            (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type)))))
+            (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type))))))
         (when nullable
           (insert ")"))
         (insert
