@@ -66,6 +66,7 @@
          (package-dep (concat package-directory "/" library-name ".dep"))
          (package-mem (concat package-directory "/" library-name ".mem"))
          (mainpage-name (concat base-name library-name "/mainpage.dox"))
+         (main-make-name (concat base-name library-name "/" library-name ".mk"))
          (make1-name (concat test-directory "/" library-name ".t.mk"))
          (make2-name (concat test-directory "/" library-name ".build.t.mk"))
         )
@@ -94,6 +95,7 @@
       (basic-save-buffer)
       (kill-buffer (current-buffer))
       )
+    (shu-dpkg-internal-main-make main-make-name library-name)
     (shu-dpkg-internal-gen-make make1-name make2-name library-name)
     (unless (file-readable-p jenkins-name)
       (find-file jenkins-name)
@@ -330,6 +332,44 @@
       (basic-save-buffer)
       (kill-buffer (current-buffer))
     ))
+
+
+
+
+;;
+;;  shu-dpkg-internal-main-make
+;;
+(defun shu-dpkg-internal-main-make (main-make-name library-name)
+  "Doc string."
+  (interactive)
+  (let (
+        )
+    (find-file main-make-name)
+      (goto-char (point-min))
+      (insert
+       (concat
+        "# -*- makefile -*-\n"
+        "# $Id$ $CSID$\n"
+        "\n"
+        "LIBNAME=" library-name "\n"
+        "\n"
+        "USER_CPPFLAGS += -I.\n"
+        "\n"
+        "IS_GCC_WARNINGS_CLEAN=yes\n"
+        "IS_OPTIMIZED=yes\n"
+        "IS_BDE=yes\n"
+        "IS_PTHREAD=yes\n"
+        "IS_EXCEPTION=yes\n"
+        "IS_DEPENDS_NATIVE=1\n"
+        "\n"
+        "MKINCL?=/bbsrc/mkincludes/\n"
+        "include $(MKINCL)machindepy.lib\n"
+        "\n"
+        "# vim:ft=make\n"
+       ))
+      (basic-save-buffer)
+      (kill-buffer (current-buffer))
+      ))
 
 
 ;;; shu-exp-dpkg.el ends here
