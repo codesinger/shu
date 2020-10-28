@@ -45,34 +45,6 @@
         (dpkg-author "Stewart Palmer <spalmer62@bloomberg.net>")
         )
     (shu-internal-gen-dpkg library-name dpkg-author git-namespace)
-
-    ))
-
-
-
-;;
-;;  whatever
-;;
-(defun whatever ()
-  "Doc string."
-  (interactive)
-  (let* (
-         (gb (get-buffer-create "**boo**"))
-         (library-name "fxwonderful")
-         (base-name default-directory)
-         (debian-name (concat base-name "debian"))
-         (jenkins-name (concat base-name "Jenkinsfile"))
-         (control-name (concat debian-name "/control"))
-         (rules-name (concat debian-name "/rules"))
-         (package-directory (concat base-name library-name "/package"))
-         )
-    (princ (concat "base-name: " base-name "\n") gb)
-    (princ (concat "debian-name: " debian-name "\n") gb)
-    (princ (concat "jenkins-name: " jenkins-name "\n") gb)
-    (princ (concat "control-name: " control-name "\n") gb)
-    (princ (concat "rules-name: " rules-name "\n") gb)
-    (princ (concat "package-directory: " package-directory "\n") gb)
-
     ))
 
 
@@ -90,12 +62,16 @@
          (control-name (concat debian-name "/control"))
          (rules-name (concat debian-name "/rules"))
          (package-directory (concat base-name library-name "/package"))
+         (test-directory (concat base-name library-name "/t"))
          (package-dep (concat package-directory "/" library-name ".dep"))
          (package-mem (concat package-directory "/" library-name ".mem"))
          (mainpage-name (concat base-name library-name "/mainpage.dox"))
+         (make1-name (concat test-directory "/" library-name ".t.mk"))
+         (make2-name (concat test-directory "/" library-name ".build.t.mk"))
         )
     (unless (file-directory-p library-name)
       (make-directory package-directory t)
+      (make-directory test-directory t)
       (shu-internal-make-mainpage library-name mainpage-name)
       (find-file package-mem)
       (goto-char (point-min))
@@ -118,6 +94,7 @@
       (basic-save-buffer)
       (kill-buffer (current-buffer))
       )
+    (shu-dpkg-internal-gen-make make1-name make2-name library-name)
     (unless (file-readable-p jenkins-name)
       (find-file jenkins-name)
       (goto-char (point-min))
@@ -272,6 +249,86 @@
       ))
     (basic-save-buffer)
     (kill-buffer (current-buffer))
+    ))
+
+
+
+
+;;
+;;  shu-dpkg-internal-gen-make
+;;
+(defun shu-dpkg-internal-gen-make (make1-name make2-name library-name)
+  "Doc string."
+  (interactive)
+  (let (
+        )
+    (find-file make1-name)
+      (goto-char (point-min))
+      (insert
+       (concat
+        "TESTS=" library-name ".build.t\n"
+        "TESTS_tsk=$(patsubst %,%.tsk,$(TESTS))\n"
+        "\n"
+        "check: $(TESTS_tsk)\n"
+        "		echo \"Ran unit tests for $(TESTS_tsk)\"\n"
+        "\n"
+        "%.tsk: %.mk must-always-run-this-target\n"
+        "	$(MAKE) -f $< $@\n"
+        "\n"
+        ".PHONY: must-always-run-this-target check"
+       ))
+      (basic-save-buffer)
+      (kill-buffer (current-buffer))
+    (find-file make2-name)
+      (goto-char (point-min))
+      (insert
+       (concat
+        "PCDEPS += cmdtst\n"
+        "PCDEPS += cmdtstmain\n"
+        "PCDEPS += bal\n"
+        "PCDEPS += bdl\n"
+        "PCDEPS += bsl\n"
+        "TASK=" library-name ".build.t.tsk\n"
+        "SRCS= \\\n"
+        "../" library-name ".something.cpp \\\n"
+        library-name ".something.t.cpp\n"
+        "\n"
+        "USER_CFLAGS   += -I. -I..\n"
+        "USER_CPPFLAGS += -I. -I..\n"
+        "USER_FFLAGS   += -I. -I..\n"
+        "\n"
+        "IS_GTEST=yes\n"
+        "IS_GCC_WARNINGS_CLEAN=yes\n"
+        "\n"
+        "METAMKMK_VER=1.0\n"
+        "IS_CPPMAIN=1\n"
+        "IS_DEPENDS_NATIVE=1\n"
+        "MKINCL?=/bbsrc/mkincludes/\n"
+        "include $(MKINCL)sourcelist.mk\n"
+        "include $(LIBMACROS_MK)\n"
+        "OBJS?=$(OBJS_AR)\n"
+        "include $(MKINCL)machdep.newlink\n"
+        "include $(MKINCL)linktask.newlink\n"
+        "\n"
+        "" library-name ".build.t.tsk: " library-name ".build.t.$(ARCHCODE)$(ABI).tsk\n"
+        "	echo \"IN BUILD\"\n"
+        "	rm -f $@\n"
+        "	ln $< $@\n"
+        "	./$@\n"
+        "\n"
+        "\n"
+        "\n"
+        ".PHONY: test\n"
+        "test:\n"
+        "	EXTSHM=ON ./$(ARCHTASK) \\\n"
+        "		--bael-format \"%d %p:%t %s %f:%l %c %m %u\" \\\n"
+        "		--gtest_filter='*.*' \\\n"
+        "		--bael-log-on-success \\\n"
+        "		--bael-level INFO \\\n"
+        "		--gtest_output=xml:test_detail.xml\n"
+       ))
+      (basic-save-buffer)
+      (kill-buffer (current-buffer))
     ))
 
 
