@@ -410,6 +410,8 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
      ((string= data-type "short")
       (setq bind-type "Int"))
      ((string= data-type "double")
+      (setq bind-type "Double"))
+     ((string= data-type "float")
       (setq bind-type "Double")))
     bind-type
     ))
@@ -423,7 +425,9 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
 (defun shu-cpp-attributes-aggregate-type (data-type)
   "Return the data type for the set from aggregate value.  \"string\" returns
 \"asString()\".  \"int\" returns \"asInt()\", etc."
-  (let ((aggregate-type "asString()"))
+  (let (
+        (aggregate-type "asString()")
+          )
     (cond
      ((string= data-type shu-cpp-string-type)
       (setq aggregate-type "asString()"))
@@ -444,7 +448,11 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
      ((string= data-type "short")
       (setq aggregate-type "asInt()"))
      ((string= data-type "double")
-      (setq aggregate-type "asDouble()")))
+      (setq aggregate-type "asDouble()"))
+     ((string= data-type "float")
+      (setq aggregate-type "asFloat()"))
+     ((string= data-type "bool")
+      (setq aggregate-type "asInt()")))
     aggregate-type
     ))
 
@@ -1939,7 +1947,8 @@ attributes."
 (defun shu-cpp-attributes-gen-set-values-gen (class-name class-is-key table-name attributes)
   "Generate the code for the setValues function that sets all of the member variable
 values from an instance of bcem_Aggregate."
-  (let ((attrs attributes)
+  (let (
+        (attrs attributes)
         (tbl-name table-name)
         (attr-info)
         (name)
@@ -1960,9 +1969,11 @@ values from an instance of bcem_Aggregate."
         (member-prefix "m_")
         (have-date)
         (have-interval)
-        (contained-class))
+        (contained-class)
+          )
     (when class-is-key
-      (setq tbl-name "tableName"))
+      (setq tbl-name "tableName")
+      )
     (insert
      (concat
       "\n\n"
@@ -1971,7 +1982,8 @@ values from an instance of bcem_Aggregate."
     (when class-is-key
       (insert
        (concat
-        ipad "const " shu-cpp-string-type "       &tableName,\n")))
+        ipad "const " shu-cpp-string-type "       &tableName,\n"))
+      )
     (insert
      (concat
       ipad "const bcem_Aggregate    &data)\n"
@@ -1985,7 +1997,8 @@ values from an instance of bcem_Aggregate."
     (when (not class-is-key)
       (insert
        (concat
-        ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n")))
+        ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n"))
+      )
     (insert
      (concat
       ipad "int fetchCount(0);\n"
@@ -1998,7 +2011,8 @@ values from an instance of bcem_Aggregate."
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
-        (setq contained-class nil))
+        (setq contained-class nil)
+        )
       (if contained-class
           (insert (concat ipad "fetchCount += " member-prefix name ".setValues(databaseName, tableName, data);\n"))
         (insert
@@ -2011,26 +2025,36 @@ values from an instance of bcem_Aggregate."
            (concat
             ipad ipad "const double                  intval(" name ".asDouble());\n"
             ipad ipad "const " shu-cpp-interval-type "  interval;\n"
-            ipad ipad "interval.setTotalSecondsFromDouble(intval);\n")))
+            ipad ipad "interval.setTotalSecondsFromDouble(intval);\n"))
+          )
         (when (string= data-type "uint")
           (insert
            (concat
-            ipad ipad "unsigned int  intval = " name ".asInt64() & 0xFFFFFFFF;\n")))
+            ipad ipad "unsigned int  intval = " name ".asInt64() & 0xFFFFFFFF;\n"))
+          )
         (insert
          (concat
           ipad ipad member-prefix name))
         (if nullable
             (insert ".makeValue(")
-          (insert " = "))
+          (insert " = ")
+          )
         (if (string= data-type "uint")
             (insert "intval")
           (if (string= data-type shu-cpp-interval-type)
               (insert "interval")
             (if enum-base
                 (insert (concat "static_cast<" data-type ">(" name "." (shu-cpp-attributes-aggregate-type enum-base) ")"))
-              (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type))))))
+              (if (string= full-data-type "bool")
+                  (insert (concat "(" name "." (shu-cpp-attributes-aggregate-type data-type) " != 0)"))
+              (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type)))
+                  )
+              )
+            )
+          )
         (when nullable
-          (insert ")"))
+          (insert ")")
+          )
         (insert
          (concat
           ";\n"
@@ -2044,8 +2068,11 @@ values from an instance of bcem_Aggregate."
             ipad ipad "BALL_LOG_ERROR << \"No data found for input column '\"\n"
             ipad ipad "               << " column-name " << \"'. \" << why;\n"
             ipad ipad "missingCount++;\n"
-            ipad "}\n"))))
-      (setq attrs (cdr attrs)))
+            ipad "}\n"))
+          )
+        )
+      (setq attrs (cdr attrs))
+      )
     (insert
      (concat
       ipad "if (missingCount)\n"
