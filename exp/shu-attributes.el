@@ -1466,6 +1466,7 @@ of values for individual nullable columns."
         (member-prefix "m_")
         (have-date)
         (have-interval)
+        (have-nums)
         (contained-class))
     (setq lpad (concat ipad "os "))
     (insert "\n")
@@ -1476,6 +1477,24 @@ of values for individual nullable columns."
       ipad std-name "::ostream    &os)\n"
       "const\n"
       "{\n"))
+    (while (and attrs (not have-nums))
+      (setq attr-info (car attrs))
+      (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
+                                 reference nullable column-name column-count
+                                 enum-base reset-value)
+      (when (or
+            (string= full-data-type shu-cpp-long-long-type)
+            (string= full-data-type "int")
+            (string= data-type "uint")
+            (string= data-type "ushort")
+            (string= full-data-type "short")
+            (string= full-data-type "double")
+            (string= full-data-type "float"))
+        (setq have-nums t))
+      (setq attrs (cdr attrs)))
+    (when have-nums
+      (insert (concat ipad "fxpricingmetrics::NumpunctGuard  punct(os);\n")))
+    (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
@@ -1543,6 +1562,7 @@ of values for individual nullable columns."
      (concat
       "\n\n\n"
       "#include <fxcrossdb_tenorcolumnnames.h>\n"
+      "#include <fxpricingmetrics_localnumpunct.h>\n"
       "\n"
       "#include <ball_log.h>\n"))
     (shu-cpp-decl-cpp-class-name class-name)
