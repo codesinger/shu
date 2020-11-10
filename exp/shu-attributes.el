@@ -409,6 +409,8 @@ present, the number returned has a value greater than or equal to MIN-LENGTH."
       (setq bind-type "Int"))
      ((string= data-type "short")
       (setq bind-type "Int"))
+     ((string= data-type "bool")
+      (setq bind-type "Int"))
      ((string= data-type "double")
       (setq bind-type "Double"))
      ((string= data-type "float")
@@ -1517,8 +1519,7 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-ctor-gen (class-name attributes)
   "Generate the code for the constructor."
-  (let (
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1537,8 +1538,7 @@ of values for individual nullable columns."
         (pad)
         (member-prefix "m_")
         (contained-class)
-        (default-value)
-          )
+        (default-value))
     (insert
      (concat
       "\n\n\n"
@@ -1561,24 +1561,19 @@ of values for individual nullable columns."
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
-        (setq contained-class nil)
-        )
+        (setq contained-class nil))
       (insert (concat member-prefix name "("))
       (when (or (string= full-data-type shu-cpp-string-type)
                 contained-class)
-        (insert "allocator")
-        )
+        (insert "allocator"))
       (setq default-value (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
       (when default-value
-        (insert default-value)
-        )
+        (insert default-value))
       (insert ")")
       (when (cdr attrs)
-        (insert ",")
-        )
+        (insert ","))
       (insert "\n")
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     (insert
      (concat
       "{\n"
@@ -1764,8 +1759,7 @@ attributes."
 ;;
 (defun shu-cpp-attributes-gen-reset-gen (class-name attributes)
   "Generate the code for the reset function"
-  (let (
-        (attrs attributes)
+  (let ((attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1787,8 +1781,7 @@ attributes."
         (have-date-tz)
         (have-interval)
         (contained-class)
-        (default-value)
-          )
+        (default-value))
     (insert
      (concat
       "\n\n"
@@ -1805,29 +1798,19 @@ attributes."
         (if (string= full-data-type shu-cpp-datetime-timezone-type)
             (setq have-date-tz t)
           (when (string= full-data-type shu-cpp-interval-type)
-            (setq have-interval t)
-            )
-          )
-        )
-      (setq attrs (cdr attrs))
-      )
+            (setq have-interval t))))
+      (setq attrs (cdr attrs)))
     (if have-interval
         (progn
           (insert (concat ipad "const " shu-cpp-interval-type "  defaultInterval;\n"))
           (when have-date
-            (insert (concat ipad "const " shu-cpp-datetime-type "          defaultTime;\n"))
-            )
+            (insert (concat ipad "const " shu-cpp-datetime-type "          defaultTime;\n")))
           (when have-date-tz
-            (insert (concat ipad "const " shu-cpp-datetime-timezone-type "        defaultTimeTz;\n"))
-            )
-          )
+            (insert (concat ipad "const " shu-cpp-datetime-timezone-type "        defaultTimeTz;\n"))))
       (when have-date
-        (insert (concat ipad "const " shu-cpp-datetime-type "     defaultTime;\n"))
-        )
+        (insert (concat ipad "const " shu-cpp-datetime-type "     defaultTime;\n")))
       (when have-date-tz
-        (insert (concat ipad "const " shu-cpp-datetime-timezone-type "   defaultTimeTz;\n"))
-        )
-      )
+        (insert (concat ipad "const " shu-cpp-datetime-timezone-type "   defaultTimeTz;\n"))))
     (setq attrs attributes)
     (while attrs
       (setq default-value nil)
@@ -1838,8 +1821,7 @@ attributes."
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
-        (setq contained-class nil)
-        )
+        (setq contained-class nil))
       (insert (concat ipad member-prefix name))
       (if (or nullable contained-class)
           (insert ".reset()")
@@ -1853,16 +1835,9 @@ attributes."
                   (insert " = defaultInterval")
                 (setq default-value (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
                 (when default-value
-                  (insert (concat " = " default-value))
-                  )
-                )
-              )
-            )
-          )
-        )
+                  (insert (concat " = " default-value))))))))
       (insert ";\n")
-      (setq attrs (cdr attrs))
-      )
+      (setq attrs (cdr attrs)))
     (insert "}\n")
     ))
 
@@ -1947,8 +1922,7 @@ attributes."
 (defun shu-cpp-attributes-gen-set-values-gen (class-name class-is-key table-name attributes)
   "Generate the code for the setValues function that sets all of the member variable
 values from an instance of bcem_Aggregate."
-  (let (
-        (attrs attributes)
+  (let ((attrs attributes)
         (tbl-name table-name)
         (attr-info)
         (name)
@@ -1969,11 +1943,9 @@ values from an instance of bcem_Aggregate."
         (member-prefix "m_")
         (have-date)
         (have-interval)
-        (contained-class)
-          )
+        (contained-class))
     (when class-is-key
-      (setq tbl-name "tableName")
-      )
+      (setq tbl-name "tableName"))
     (insert
      (concat
       "\n\n"
@@ -1982,8 +1954,7 @@ values from an instance of bcem_Aggregate."
     (when class-is-key
       (insert
        (concat
-        ipad "const " shu-cpp-string-type "       &tableName,\n"))
-      )
+        ipad "const " shu-cpp-string-type "       &tableName,\n")))
     (insert
      (concat
       ipad "const bcem_Aggregate    &data)\n"
@@ -1997,8 +1968,7 @@ values from an instance of bcem_Aggregate."
     (when (not class-is-key)
       (insert
        (concat
-        ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n"))
-      )
+        ipad "const " shu-cpp-string-type "  tableName(" table-name ");\n")))
     (insert
      (concat
       ipad "int fetchCount(0);\n"
@@ -2011,8 +1981,7 @@ values from an instance of bcem_Aggregate."
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
-        (setq contained-class nil)
-        )
+        (setq contained-class nil))
       (if contained-class
           (insert (concat ipad "fetchCount += " member-prefix name ".setValues(databaseName, tableName, data);\n"))
         (insert
@@ -2025,20 +1994,17 @@ values from an instance of bcem_Aggregate."
            (concat
             ipad ipad "const double                  intval(" name ".asDouble());\n"
             ipad ipad "const " shu-cpp-interval-type "  interval;\n"
-            ipad ipad "interval.setTotalSecondsFromDouble(intval);\n"))
-          )
+            ipad ipad "interval.setTotalSecondsFromDouble(intval);\n")))
         (when (string= data-type "uint")
           (insert
            (concat
-            ipad ipad "unsigned int  intval = " name ".asInt64() & 0xFFFFFFFF;\n"))
-          )
+            ipad ipad "unsigned int  intval = " name ".asInt64() & 0xFFFFFFFF;\n")))
         (insert
          (concat
           ipad ipad member-prefix name))
         (if nullable
             (insert ".makeValue(")
-          (insert " = ")
-          )
+          (insert " = "))
         (if (string= data-type "uint")
             (insert "intval")
           (if (string= data-type shu-cpp-interval-type)
@@ -2047,14 +2013,9 @@ values from an instance of bcem_Aggregate."
                 (insert (concat "static_cast<" data-type ">(" name "." (shu-cpp-attributes-aggregate-type enum-base) ")"))
               (if (string= full-data-type "bool")
                   (insert (concat "(" name "." (shu-cpp-attributes-aggregate-type data-type) " != 0)"))
-              (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type)))
-                  )
-              )
-            )
-          )
+              (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type)))))))
         (when nullable
-          (insert ")")
-          )
+          (insert ")"))
         (insert
          (concat
           ";\n"
@@ -2068,11 +2029,8 @@ values from an instance of bcem_Aggregate."
             ipad ipad "BALL_LOG_ERROR << \"No data found for input column '\"\n"
             ipad ipad "               << " column-name " << \"'. \" << why;\n"
             ipad ipad "missingCount++;\n"
-            ipad "}\n"))
-          )
-        )
-      (setq attrs (cdr attrs))
-      )
+            ipad "}\n"))))
+      (setq attrs (cdr attrs)))
     (insert
      (concat
       ipad "if (missingCount)\n"
