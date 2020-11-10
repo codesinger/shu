@@ -1509,7 +1509,8 @@ of values for individual nullable columns."
 ;;
 (defun shu-cpp-attributes-gen-ctor-gen (class-name attributes)
   "Generate the code for the constructor."
-  (let ((attrs attributes)
+  (let (
+        (attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1527,7 +1528,8 @@ of values for individual nullable columns."
         (pad-count 0)
         (pad)
         (member-prefix "m_")
-        (contained-class))
+        (contained-class)
+          )
     (insert
      (concat
       "\n\n\n"
@@ -1550,18 +1552,23 @@ of values for individual nullable columns."
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
-        (setq contained-class nil))
+        (setq contained-class nil)
+        )
       (insert (concat member-prefix name "("))
       (when (or (string= full-data-type shu-cpp-string-type)
                 contained-class)
-        (insert "allocator"))
+        (insert "allocator")
+        )
       (when reset-value
-        (insert reset-value))
+        (insert reset-value)
+        )
       (insert ")")
       (when (cdr attrs)
-        (insert ","))
+        (insert ",")
+        )
       (insert "\n")
-      (setq attrs (cdr attrs)))
+      (setq attrs (cdr attrs))
+      )
     (insert
      (concat
       "{\n"
@@ -1747,7 +1754,8 @@ attributes."
 ;;
 (defun shu-cpp-attributes-gen-reset-gen (class-name attributes)
   "Generate the code for the reset function"
-  (let ((attrs attributes)
+  (let (
+        (attrs attributes)
         (attr-info)
         (name)
         (uname)
@@ -1768,7 +1776,8 @@ attributes."
         (have-date)
         (have-date-tz)
         (have-interval)
-        (contained-class))
+        (contained-class)
+          )
     (insert
      (concat
       "\n\n"
@@ -1785,19 +1794,29 @@ attributes."
         (if (string= full-data-type shu-cpp-datetime-timezone-type)
             (setq have-date-tz t)
           (when (string= full-data-type shu-cpp-interval-type)
-            (setq have-interval t))))
-      (setq attrs (cdr attrs)))
+            (setq have-interval t)
+            )
+          )
+        )
+      (setq attrs (cdr attrs))
+      )
     (if have-interval
         (progn
           (insert (concat ipad "const " shu-cpp-interval-type "  defaultInterval;\n"))
           (when have-date
-            (insert (concat ipad "const " shu-cpp-datetime-type "          defaultTime;\n")))
+            (insert (concat ipad "const " shu-cpp-datetime-type "          defaultTime;\n"))
+            )
           (when have-date-tz
-            (insert (concat ipad "const " shu-cpp-datetime-timezone-type "        defaultTimeTz;\n"))))
+            (insert (concat ipad "const " shu-cpp-datetime-timezone-type "        defaultTimeTz;\n"))
+            )
+          )
       (when have-date
-        (insert (concat ipad "const " shu-cpp-datetime-type "     defaultTime;\n")))
+        (insert (concat ipad "const " shu-cpp-datetime-type "     defaultTime;\n"))
+        )
       (when have-date-tz
-        (insert (concat ipad "const " shu-cpp-datetime-timezone-type "   defaultTimeTz;\n"))))
+        (insert (concat ipad "const " shu-cpp-datetime-timezone-type "   defaultTimeTz;\n"))
+        )
+      )
     (setq attrs attributes)
     (while attrs
       (setq attr-info (car attrs))
@@ -1807,7 +1826,8 @@ attributes."
       (if (and (not nullable)
                (string= column-name "std"))
           (setq contained-class t)
-        (setq contained-class nil))
+        (setq contained-class nil)
+        )
       (insert (concat ipad member-prefix name))
       (if (or nullable contained-class)
           (insert ".reset()")
@@ -1829,12 +1849,28 @@ attributes."
                           (insert " = 0")
                         (if (string= data-type "short")
                             (insert " = 0")
-                          (if (string= full-data-type "double")
-                              (insert " = 0.0")
+                          (if (string= data-type "bool")
+                              (insert " = false")
+                            (if (or (string= full-data-type "double") (string= full-data-type "float"))
+                                (insert " = 0.0")
                               (when reset-value
-                                (insert (concat " = " reset-value))))))))))))))
+                                (insert (concat " = " reset-value))
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
       (insert ";\n")
-      (setq attrs (cdr attrs)))
+      (setq attrs (cdr attrs))
+      )
     (insert "}\n")
     ))
 
@@ -1977,11 +2013,11 @@ values from an instance of bcem_Aggregate."
           (insert " = "))
         (if (string= data-type "uint")
             (insert "intval")
-        (if (string= data-type shu-cpp-interval-type)
-            (insert "interval")
-          (if enum-base
-              (insert (concat "static_cast<" data-type ">(" name "." (shu-cpp-attributes-aggregate-type enum-base) ")"))
-            (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type))))))
+          (if (string= data-type shu-cpp-interval-type)
+              (insert "interval")
+            (if enum-base
+                (insert (concat "static_cast<" data-type ">(" name "." (shu-cpp-attributes-aggregate-type enum-base) ")"))
+              (insert (concat name "." (shu-cpp-attributes-aggregate-type data-type))))))
         (when nullable
           (insert ")"))
         (insert
