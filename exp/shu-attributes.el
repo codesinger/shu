@@ -1529,6 +1529,7 @@ of values for individual nullable columns."
         (pad)
         (member-prefix "m_")
         (contained-class)
+        (default-value)
           )
     (insert
      (concat
@@ -1559,8 +1560,9 @@ of values for individual nullable columns."
                 contained-class)
         (insert "allocator")
         )
-      (when reset-value
-        (insert reset-value)
+      (setq default-value (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
+      (when default-value
+        (insert default-value)
         )
       (insert ")")
       (when (cdr attrs)
@@ -1777,6 +1779,7 @@ attributes."
         (have-date-tz)
         (have-interval)
         (contained-class)
+        (default-value)
           )
     (insert
      (concat
@@ -1819,6 +1822,7 @@ attributes."
       )
     (setq attrs attributes)
     (while attrs
+      (setq default-value nil)
       (setq attr-info (car attrs))
       (shu-cpp-extract-attr-info attr-info name data-type full-data-type comment
                                  reference nullable column-name column-count
@@ -1839,29 +1843,9 @@ attributes."
                 (insert " = defaultTimeTz")
               (if (string= full-data-type shu-cpp-interval-type)
                   (insert " = defaultInterval")
-                (if (string= full-data-type shu-cpp-long-long-type)
-                    (insert " = 0")
-                  (if (string= full-data-type "int")
-                      (insert " = 0")
-                    (if (string= data-type "uint")
-                        (insert " = 0")
-                      (if (string= data-type "ushort")
-                          (insert " = 0")
-                        (if (string= data-type "short")
-                            (insert " = 0")
-                          (if (string= data-type "bool")
-                              (insert " = false")
-                            (if (or (string= full-data-type "double") (string= full-data-type "float"))
-                                (insert " = 0.0")
-                              (when reset-value
-                                (insert (concat " = " reset-value))
-                                )
-                              )
-                            )
-                          )
-                        )
-                      )
-                    )
+                (setq default-value (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
+                (when default-value
+                  (insert (concat " = " default-value))
                   )
                 )
               )
@@ -1872,6 +1856,33 @@ attributes."
       (setq attrs (cdr attrs))
       )
     (insert "}\n")
+    ))
+
+
+
+;;
+;;  shu-cpp-attributes-get-default-value
+;;
+(defun shu-cpp-attributes-get-default-value (full-data-type data-type reset-value)
+  "Return a string that holds the default initialization value for the given data type"
+  (let ((default-value))
+    (if (string= full-data-type shu-cpp-long-long-type)
+        (setq default-value "0")
+      (if (string= full-data-type "int")
+          (setq default-value "0")
+        (if (string= data-type "uint")
+            (setq default-value "0")
+          (if (string= data-type "ushort")
+              (setq default-value "0")
+            (if (string= full-data-type "short")
+                (setq default-value "0")
+              (if (string= full-data-type "bool")
+                  (setq default-value "false")
+                (if (or (string= full-data-type "double") (string= full-data-type "float"))
+                    (setq default-value "0.0")
+                  (when reset-value
+                    (setq default-value reset-value)))))))))
+    default-value
     ))
 
 

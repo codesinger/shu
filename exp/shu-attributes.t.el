@@ -685,6 +685,143 @@
 
 
 
+;;
+;;  shu-test-shu-cpp-attributes-get-default-value-1
+;;
+(ert-deftest shu-test-shu-cpp-attributes-get-default-value-1 ()
+  (let (
+        (full-data-type shu-cpp-long-long-type)
+        (data-type "*")
+        (reset-value)
+        (expected "0")
+        (actual)
+        )
+    (setq actual (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-attributes-get-default-value-2
+;;
+(ert-deftest shu-test-shu-cpp-attributes-get-default-value-2 ()
+  (let (
+        (full-data-type "unsigned int")
+        (data-type "uint")
+        (reset-value)
+        (expected "0")
+        (actual)
+        )
+    (setq actual (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-attributes-get-default-value-3
+;;
+(ert-deftest shu-test-shu-cpp-attributes-get-default-value-3 ()
+  (let (
+        (full-data-type "unsigned short")
+        (data-type "ushort")
+        (reset-value)
+        (expected "0")
+        (actual)
+        )
+    (setq actual (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-attributes-get-default-value-4
+;;
+(ert-deftest shu-test-shu-cpp-attributes-get-default-value-4 ()
+  (let (
+        (full-data-type "short")
+        (data-type "*")
+        (reset-value)
+        (expected "0")
+        (actual)
+        )
+    (setq actual (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-attributes-get-default-value-5
+;;
+(ert-deftest shu-test-shu-cpp-attributes-get-default-value-5()
+  (let (
+        (full-data-type "bool")
+        (data-type "*")
+        (reset-value)
+        (expected "false")
+        (actual)
+        )
+    (setq actual (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-attributes-get-default-value-6
+;;
+(ert-deftest shu-test-shu-cpp-attributes-get-default-value-6 ()
+  (let (
+        (full-data-type "double")
+        (data-type "*")
+        (reset-value)
+        (expected "0.0")
+        (actual)
+        )
+    (setq actual (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-attributes-get-default-value-7
+;;
+(ert-deftest shu-test-shu-cpp-attributes-get-default-value-7 ()
+  (let (
+        (full-data-type "float")
+        (data-type "*")
+        (reset-value)
+        (expected "0.0")
+        (actual)
+        )
+    (setq actual (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-attributes-get-default-value-8
+;;
+(ert-deftest shu-test-shu-cpp-attributes-get-default-value-8 ()
+  (let (
+        (full-data-type "Happy Birthday")
+        (data-type "*")
+        (reset-value "Fred")
+        (expected "Fred")
+        (actual)
+        )
+    (setq actual (shu-cpp-attributes-get-default-value full-data-type data-type reset-value))
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
 ;;;  SAMPLE INPUT
 ;;;
 ;;;  class TenorRow
