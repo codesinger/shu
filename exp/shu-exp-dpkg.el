@@ -103,7 +103,7 @@
       (insert
        (concat
         "@Library('fxbuild-pipeline') _\n"
-        "fxbuild_pipeline(['fxbuild_package': '" library-name " '], scm)"
+        "fxbuild_pipeline(['fxbuild_package': '" library-name "'], scm)"
         ))
       (save-buffer)
       )
