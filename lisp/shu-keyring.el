@@ -186,6 +186,10 @@ entry in the keyring file.")
   "The name of the buffer into which keyring diagnostics and messages
 are recorded.")
 
+(defvar shu-keyring-external-passphrase nil
+  "Holds the exrernal passphrase for the keyring file.  This allows the user
+to type the passphrase at the beginning of an emacs session.  Once this is
+set it can then be put into kill ring by shu-kering-get-passphrase.")
 
 
 ;;
@@ -578,6 +582,31 @@ placed in the clipboard, (PW, ID, etc.)"
 
 
 ;;
+;;  shu-keyring-set-passphrase
+;;
+(defun shu-keyring-set-passphrase (phrase)
+  "Function to read and set the external pass phrase."
+  (interactive "sPass phrase?: ")
+    (setq shu-keyring-external-passphrase phrase)
+    )
+
+
+;;
+;;  shu-keyring-get-passphrase
+;;
+(defun shu-keyring-get-passphrase ()
+  "Doc string."
+  (interactive)
+  (let ((phrase "**unknown**"))
+    (if shu-keyring-external-passphrase
+        (setq phrase shu-keyring-external-passphrase)
+          (ding)
+          (message "%s" "Pass phrase is not set."))
+    (shu-kill-new phrase)
+    ))
+
+
+;;
 ;;  shu-keyring-set-alias
 ;;
 (defun shu-keyring-set-alias ()
@@ -592,6 +621,8 @@ to make them easier to type. "
   (defalias 'kracct 'shu-keyring-get-acct)
   (defalias 'krfn 'shu-keyring-get-file)
   (defalias 'krvf 'shu-keyring-verify-file)
+  (defalias 'krpps 'shu-keyring-get-passphrase)
+  (defalias 'set-passphrase 'shu-keyring-set-passphrase)
   )
 
 ;;; shu-keyring.el ends here
