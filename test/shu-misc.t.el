@@ -1324,4 +1324,60 @@
 
 
 
+;;
+;;  shu-test-shu-misc-random-lad-string
+;;
+(ert-deftest shu-test-shu-misc-random-lad-string ()
+  (let ((rs (shu-misc-random-lad-string 15)))
+    (should rs)
+    (should (stringp rs))
+    (should (= (length rs) 15))
+    ))
+
+
+
+;;
+;;  shu-test-shu-misc-make-unique-string-1
+;;
+(ert-deftest shu-test-shu-misc-make-unique-string-1 ()
+  (let ((ht (make-hash-table :test 'equal :size 50))
+        (string "HappyBirthday")
+        (suffix-length 6)
+        (nstring)
+        (s1)
+        (s2)
+        (s3)
+        (s4))
+    (setq nstring (shu-misc-make-unique-string string suffix-length ht))
+    (should nstring)
+    (should (stringp nstring))
+    (setq s1 nstring)
+    ;;;
+    (setq nstring (shu-misc-make-unique-string string suffix-length ht))
+    (should nstring)
+    (should (stringp nstring))
+    (setq s2 nstring)
+    (should (not (string= s1 s2)))
+    ;;;
+    (setq nstring (shu-misc-make-unique-string string suffix-length ht))
+    (should nstring)
+    (should (stringp nstring))
+    (setq s3 nstring)
+    (should (and (not (string= s1 s2)) (not (string= s1 s3))(not (string= s2 s3)) ))
+    ;;;
+    (setq nstring (shu-misc-make-unique-string string suffix-length ht))
+    (should nstring)
+    (should (stringp nstring))
+    (setq s4 nstring)
+    (should (and (not (string= s1 s2))
+                 (not (string= s1 s3))
+                 (not (string= s1 s4))
+                 (not (string= s2 s3))
+                 (not (string= s2 s4))
+                 (not (string= s3 s4))
+                 ))
+    ))
+
+
+
 ;;; shu-misc.t.el ends here

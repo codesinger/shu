@@ -2017,14 +2017,61 @@ two lines for something.  These numbers should, at some point be customizable."
 ;;
 (defun shu-misc-random-ua-string (length)
   "Return a string composed of random upper case letters of length LENGTH."
-  (let* ((letters "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-         (nletters (length letters))
-         (rs "")
-         (count 0))
+  (let ((letters "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+    (shu-misc-random-internal-string letters length)
+    ))
+
+
+
+;;
+;;  shu-misc-random-lad-string
+;;
+(defun shu-misc-random-lad-string (length)
+  "Return a string composed of random lower case letters and digits of length
+ LENGTH."
+  (let ((letters "abcdefghijklmnopqrstuvwxyz0123456789"))
+    (shu-misc-random-internal-string letters length)
+    ))
+
+
+
+;;
+;;  shu-misc-random-internal-string
+;;
+(defun shu-misc-random-internal-string (letters length)
+  "Return a string composed of random LETTERS of length LENGTH."
+  (let ((nletters (length letters))
+        (rs "")
+        (count 0))
     (while (< count length)
       (setq rs (concat rs (char-to-string (elt letters (random nletters)))))
       (setq count (1+ count)))
     rs
+    ))
+
+
+;;
+;;  shu-misc-make-unique-string
+;;
+(defun shu-misc-make-unique-string (string suffix-length ht)
+  "Input is a hash table, HT, as well as a STRING.  If the string does not
+already exist in HT, return the string.  If the string already exists in HT,
+add a suffix to the string that is a random string of length SUFFIX-LENGTH.  If
+the combination of the original STRING plus the random string added as a
+suffix, does not exist in the hash table, add the new string to the hash table
+and return it."
+  (let ((nstring string)
+        (value)
+        (something t))
+    (while something
+      (setq value (gethash nstring ht))
+      (if value
+          (progn
+            (setq nstring (concat string (shu-misc-random-lad-string suffix-length)))
+            (setq value (gethash nstring ht)))
+        (puthash nstring 1 ht)
+        (setq something nil)))
+    nstring
     ))
 
 
