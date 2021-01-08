@@ -1602,6 +1602,112 @@ The returned string would be
   section-name)
 
 
+
+;;
+;;  shu-get-markdown-prefix
+;;
+(defun shu-get-markdown-prefix (section-heading)
+  "Returns the pound sign prefix from a markdown section heading,
+SECTION-HEADING.  The sring of pound signs must begin at the beginning of the
+string.  If a section heading is
+
+   \"### This is a section heading\"
+
+then the string \"###\" is returned.  If the first character in the section
+heading is not a pound sign, nil is returned."
+  (let ((ss "\\`\\([#]+\\)")
+        (prefix))
+    (when (string-match ss section-heading)
+      (setq prefix (match-string 1 section-heading)))
+    prefix
+    ))
+
+
+
+;;
+;;  shu-get-markdown-heading
+;;
+(defun shu-get-markdown-heading (section-heading)
+  "Returns the heading text from a markdown section heading, SECTION-HEADING.
+There must be at least one pound sign at the beginning of the string.  If a
+section heading is
+
+   \"### This is a section heading\"
+
+then the string \"This is a section heading\" is returned.  If the first
+character in the section heading is not a pound sign, nil is returned."
+  (let ((sh section-heading)
+        (nsh)
+        (ss "\\`[#]+")
+        (heading))
+    (when (string-match ss sh)
+      (setq nsh (replace-match "" t t sh))
+      (setq heading (shu-trim nsh)))
+    heading
+    ))
+
+
+
+;;
+;;  shu-get-markdown-level
+;;
+(defun shu-get-markdown-level (section-heading)
+  "Return the level of a markdown section heading.  The level is defined as
+the number of leading pound signs that start at the beginning of the string.
+A level 1 heading begins with \"#\".  A level 2 heading begins with \"##\".
+If there are no leading pound signs at the beginning of the string, a level of
+zero is returned."
+  (let ((prefix (shu-get-markdown-prefix section-heading))
+        (level 0))
+    (when prefix
+      (setq level (length prefix)))
+    level
+    ))
+
+
+
+;;
+;;  shu-fix-markdown-section
+;;
+(defun shu-fix-markdown-section (max-depth)
+  "On entry, point is positioned after one or more pound signs that define the
+beginning of a markdown section heading.  If the number of pound signs is
+greater than MAX-DEPTH, ignore the line and return nil.  If the number of
+pound signs is less than or equal to MAX-DEPTH, fix the line as described
+below and return it.
+
+If the line ends with an expression that looks like
+
+      \"<a name=currentliveupdate></a>\",
+
+remove it.
+
+If the line ends with trailing pound signs, remove them as well.
+
+Then return the repaired line."
+  (let* ((ssa "\\s-*<a[ a-zA-Z0-9=-_]+>\\s-*</a>")
+         (sot (point))
+         (bol (line-beginning-position))
+         (eol (line-end-position))
+         (line (buffer-substring-no-properties bol eol))
+         (level (shu-get-markdown-level line))
+         (use-line (and (/= level 0) (<= level max-depth))))
+    (if (not use-line)
+        (setq line nil)
+      (if (re-search-forward ssa eol t)
+          (progn
+            (replace-match "")
+            (setq eol (line-end-position))
+            (setq line (buffer-substring-no-properties bol eol)))
+        (goto-char eol)
+        (while (search-backward "#" sot t)
+          (replace-match ""))
+        (setq eol (line-end-position))
+        (setq line (shu-trim (buffer-substring-no-properties bol eol)))))
+    line
+    ))
+
+
 ;;
 ;;  shu-os-name
 ;;
@@ -2055,11 +2161,12 @@ two lines for something.  These numbers should, at some point be customizable."
 ;;
 (defun shu-misc-make-unique-string (string suffix-length ht)
   "Input is a hash table, HT, as well as a STRING.  If the string does not
-already exist in HT, return the string.  If the string already exists in HT,
-add a suffix to the string that is a random string of length SUFFIX-LENGTH.  If
-the combination of the original STRING plus the random string added as a
-suffix, does not exist in the hash table, add the new string to the hash table
-and return it."
+already exist in HT, add the string to the hash table and return the string.
+If the string already exists in HT, add a suffix to the string that is a
+random string of length SUFFIX-LENGTH.  If the combination of the original
+STRING plus the random string added as a suffix, does not exist in the hash
+table, add the new string to the hash table and return it.  This provides the
+generation of a set of unique string names."
   (let ((nstring string)
         (value)
         (something t))
