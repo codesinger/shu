@@ -1708,6 +1708,125 @@ Then return the repaired line."
     ))
 
 
+
+;;
+;;  shu-tocify-markdown-file
+;;
+(defun shu-tocify-markdown-file ()
+  "Search the file starting at the current position for any markdown headings
+of the form \"## This is a heading\".  Add a tag to each heading and then
+insert a complete markdown table of contents at the current position.
+
+If a heading already has a tag, it is removed.  If a heading has trailing
+pound signs, they are also removed.
+
+The default maximum heading level is two, which means that heading levels
+greater than two are not included in the table of contents.  But a numeric
+prefix argument can change the maximum heading level.  The maximum heading
+level cannot be set to a value less than one."
+  (interactive)
+  (let ((default-max-depth 2)
+        (max-depth  current-prefix-arg)
+        (ht (make-hash-table :test 'equal :size 500))
+        (ss "^[#]+")
+        (index-name-max 15)
+        (suffix-length 6)
+        (line)
+        (heading)
+        (index-name)
+        (entry)
+        (entries)
+        (toc))
+    (setq toc (point))
+    (when (not max-depth)
+      (setq max-depth default-max-depth))
+    (when (< max-depth 1)
+      (setq max-depth 1))
+    (save-excursion
+      (while (re-search-forward ss nil t)
+        (setq line (shu-fix-markdown-section max-depth))
+        (when line
+          (setq heading (shu-get-markdown-heading line))
+          (setq index-name (shu-make-md-index-name heading))
+          (when (> (length index-name) index-name-max)
+            (setq index-name (substring index-name 0 index-name-max)))
+          (setq index-name (shu-misc-make-unique-string index-name suffix-length ht))
+          (setq entry (cons line index-name))
+          (push entry entries))))
+    (setq entries (nreverse entries))
+    (insert "\n")
+    (shu-insert-markdown-toc entries)
+    (shu-tocify-markdown-headings entries)
+    (goto-char toc)
+    ))
+
+
+
+
+;;
+;;  shu-tocify-markdown-headings
+;;
+(defun shu-tocify-markdown-headings (entries)
+  "ENTRIES is a list of cons cells.  The car of each item on the list is the
+markdown heading line, which looks something like \"## This is a heading\".
+The cdr of each item on the list is the link name.  This function searches for
+each markdown heading in the file and appends to the heading a tag of the form
+
+     <a name=link name></a>
+
+so that it may be referenced from the table of contents."
+  (let ((ents entries)
+        (entry)
+        (line)
+        (index-name)
+        (actual))
+    (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+    (while ents
+      (setq entry (car ents))
+      (setq line (car entry))
+      (setq index-name (cdr entry))
+      (search-forward line nil)
+      (insert (concat " <a name=" index-name "></a>"))
+      (setq ents (cdr ents)))
+    ))
+
+
+
+;;
+;;  shu-insert-markdown-toc
+;;
+(defun shu-insert-markdown-toc (entries)
+  "ENTRIES is a list of cons cells.  The car of each item on the list is the
+markdown heading line, which looks something like \"## This is a heading\".
+The cdr of each item on the list is the link name.  This function inserts a
+markdown table of contents in which each line in the table of contents
+consists of the heading text in brackets followed by the line name in
+parenthesis and preceded by a pound sign.  Each line that represents a heading
+level greater than one is also indented to indicate its heading level."
+  (let ((ents entries)
+        (entry)
+        (line)
+        (index-name)
+        (level)
+        (x)
+        (pad-count)
+        (pad)
+        (heading))
+    (while ents
+      (setq entry (car ents))
+      (setq line (car entry))
+      (setq index-name (cdr entry))
+      (setq level (shu-get-markdown-level line))
+      (setq x (1- level))
+      (setq pad-count (1+ (* 4 x)))
+      (setq pad (make-string pad-count ? ))
+      (setq heading (shu-get-markdown-heading line))
+      (insert (concat pad "- [" heading "](#" index-name ")\n"))
+      (setq ents (cdr ents)))
+    ))
+
+
+
 ;;
 ;;  shu-os-name
 ;;
@@ -2230,6 +2349,7 @@ shu- prefix removed."
   (defalias 'all-quit 'shu-all-quit)
   (defalias 'md-toc 'shu-make-md-toc-entry)
   (defalias 'md-name 'shu-make-md-name-entry)
+  (defalias 'make-md-toc 'shu-tocify-markdown-file)
   (defalias 'os-name 'shu-show-os-name)
   (defalias 'show-system-name 'shu-show-system-name)
   (defalias 'kill-system-name 'shu-kill-system-name)

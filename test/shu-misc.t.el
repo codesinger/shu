@@ -1127,6 +1127,96 @@
 
 
 
+
+;;
+;;  shu-test-shu-tocify-markdown-headings
+;;
+(ert-deftest shu-test-shu-tocify-markdown-headings ()
+  (let ((entries
+         (list
+          (cons "# This is a heading"   "thisisah")
+          (cons "## This is a level 2"  "somelink")
+          (cons "## Another level 2"    "anotherlevel")
+          (cons "### A level three"     "alevelth")
+          (cons "#### A level four"     "alevelfour")
+          (cons "## Back to level 2"    "backtolevel")
+          (cons "# Back to level 1"    "backtolevelhwty")))
+        (data
+         (concat
+          "\n"
+          "# This is a heading\n"
+          "blither\n"
+          "## This is a level 2\n"
+          "blither\n"
+          "## Another level 2\n"
+          "blither\n"
+          "### A level three\n"
+          "blither\n"
+          "#### A level four\n"
+          "blither\n"
+          "## Back to level 2\n"
+          "blither\n"
+          "# Back to level 1\n"
+          "blither\n"))
+        (actual)
+        (expected
+         (concat
+          "\n"
+          "# This is a heading <a name=thisisah></a>\n"
+          "blither\n"
+          "## This is a level 2 <a name=somelink></a>\n"
+          "blither\n"
+          "## Another level 2 <a name=anotherlevel></a>\n"
+          "blither\n"
+          "### A level three <a name=alevelth></a>\n"
+          "blither\n"
+          "#### A level four <a name=alevelfour></a>\n"
+          "blither\n"
+          "## Back to level 2 <a name=backtolevel></a>\n"
+          "blither\n"
+          "# Back to level 1 <a name=backtolevelhwty></a>\n"
+          "blither\n")))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (shu-tocify-markdown-headings entries)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-insert-markdown-toc
+;;
+(ert-deftest shu-test-shu-insert-markdown-toc ()
+  (let ((entries
+         (list
+          (cons "# This is a heading"   "thisisah")
+          (cons "## This is a level 2"  "somelink")
+          (cons "## Another level 2"    "anotherlevel")
+          (cons "### A level three"     "alevelth")
+          (cons "#### A level four"     "alevelfour")
+          (cons "## Back to level 2"    "backtolevel")
+          (cons "# Back to level 1"    "backtolevelhwty")))
+        (actual)
+        (expected
+         (concat
+          " - [This is a heading](#thisisah)\n"
+          "     - [This is a level 2](#somelink)\n"
+          "     - [Another level 2](#anotherlevel)\n"
+          "         - [A level three](#alevelth)\n"
+          "             - [A level four](#alevelfour)\n"
+          "     - [Back to level 2](#backtolevel)\n"
+          " - [Back to level 1](#backtolevelhwty)\n")))
+    (with-temp-buffer
+      (shu-insert-markdown-toc entries)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
 ;;
 ;;  shu-test-shu-misc-split-string-1
 ;;
