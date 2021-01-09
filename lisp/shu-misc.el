@@ -1686,7 +1686,7 @@ If the line ends with trailing pound signs, remove them as well.
 
 Then return the repaired line."
   (let* ((ssa "\\s-*<a[ a-zA-Z0-9=-_]+>\\s-*</a>")
-         (sot (point))
+         (sot (1+ (point)))
          (bol (line-beginning-position))
          (eol (line-end-position))
          (line (buffer-substring-no-properties bol eol))
