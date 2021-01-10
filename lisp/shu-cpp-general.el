@@ -3209,7 +3209,7 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
   "Return a string that is the list of values to be passed to the constructor of
  a datetime type that accepts year, month, day, hour, minute, second,
  milliseconds, microseconds."
-  (let ((year (number-to-string (shu-random-range 2010 2020)))
+  (let ((year (number-to-string (shu-random-range (- (shu-current-year) 8) (shu-current-year))))
         (month (number-to-string (shu-random-range 1 12)))
         (day (number-to-string (shu-random-range 1 27))))
     (concat "(" year ", " month ", " day ")")
@@ -3224,7 +3224,7 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
   "Return a string that is the list of values to be passed to the constructor of
  a datetime type that accepts year, month, day, hour, minute, second,
  milliseconds, microseconds."
-  (let ((year (number-to-string (shu-random-range 2010 2020)))
+  (let ((year (number-to-string (shu-random-range (- (shu-current-year) 8) (shu-current-year))))
         (month (number-to-string (shu-random-range 1 12)))
         (day (number-to-string (shu-random-range 1 27)))
         (hour (number-to-string (shu-random-range 0 23)))
@@ -3292,6 +3292,19 @@ a timezone datetime type."
 
 
 ;;
+;;  shu-cpp-internal-make-long-long
+;;
+(defun shu-cpp-internal-make-long-long ()
+  "Return a string that can be used to initialize a test variable of type long long."
+  (interactive)
+  (let ((min 12345678901)
+        (max 123456789012345678))
+    (concat "(" (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
 ;;  shu-cpp-make-time
 ;;
 (defun shu-cpp-make-time ()
@@ -3336,8 +3349,11 @@ The line will be transformed into one that looks something like this:
      std::string   abc(\"RDATZC\");
 
 The recognized data types are the ones that are defined by the custom variables
-shu-cpp-datetime-type, shu-cpp-datetime-timezone-type, shu-cpp-interval-type,
-and shu-cpp-string-type.  The data types may optionally be preceded by \"const\"."
+shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
+shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
+shu-cpp-time-type.
+
+The data types may optionally be preceded by \"const\"."
   (interactive)
   (let ((xx)
         (data)
@@ -3355,6 +3371,8 @@ and shu-cpp-string-type.  The data types may optionally be preceded by \"const\"
           shu-cpp-interval-type "\\|"
           shu-cpp-datetime-type "\\|"
           shu-cpp-string-type "\\|"
+          shu-cpp-time-type "\\|"
+          shu-cpp-long-long-type "\\|"
           "]+"
           "\\)"))
         (did-fill))
@@ -3374,7 +3392,10 @@ and shu-cpp-string-type.  The data types may optionally be preceded by \"const\"
          ((string= xx shu-cpp-string-type)
           (setq data (concat "(\"" (shu-misc-random-ua-string 6) "\")")))
          ((string= xx shu-cpp-time-type)
-          (setq data (shu-cpp-internal-make-time))))))
+          (setq data (shu-cpp-internal-make-time)))
+         ((string= xx shu-cpp-long-long-type)
+          (setq data (shu-cpp-internal-make-long-long)))
+         )))
     (if data
         (progn
           (insert (concat data ";"))

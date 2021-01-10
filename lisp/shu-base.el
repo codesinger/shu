@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.50
+;; Version: 1.6.51
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.50"
+(defconst shu-version "1.6.51"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -960,6 +960,16 @@ a string)."
          (nletters (length letters)))
     (elt letters (random nletters))
     ))
+
+
+
+;;
+;;  shu-current-year
+;;
+(defun shu-current-year ()
+  "Return an integer that represents the four digit current year."
+    (string-to-number (format-time-string "%Y"))
+    )
 
 
 
