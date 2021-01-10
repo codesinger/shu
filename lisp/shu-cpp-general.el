@@ -82,6 +82,12 @@
   :group 'shu-cpp-general)
 
 
+(defcustom shu-cpp-size-type "bsl::size_t"
+  "The data type that represents a size."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
 (defcustom shu-cpp-string-type "bsl::string"
   "The data type that represents a string type."
   :type '(string)
@@ -3203,6 +3209,29 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
 
 
 ;;
+;;  shu-cpp-internal-make-bool
+;;
+(defun shu-cpp-internal-make-bool ()
+  "Return  value for a bool type."
+  "(false)"
+    )
+
+
+
+;;
+;;  shu-cpp-internal-make-char
+;;
+(defun shu-cpp-internal-make-char ()
+  "Return a string that can be used to initialize a test variable of type int."
+  (interactive)
+  (let ((min 0)
+        (max 126))
+    (concat "(" (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
 ;;  shu-cpp-internal-make-date
 ;;
 (defun shu-cpp-internal-make-date ()
@@ -3261,6 +3290,47 @@ a timezone datetime type."
 
 
 
+;;
+;;  shu-cpp-internal-make-double
+;;
+(defun shu-cpp-internal-make-double ()
+  "Return a string that can be used to initialize a test variable of type double."
+  (interactive)
+  (let ((min 0)
+        (max 12345678))
+    (concat "(" (number-to-string (shu-random-range min max)) "."
+            (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-internal-make-float
+;;
+(defun shu-cpp-internal-make-float ()
+  "Return a string that can be used to initialize a test variable of type float."
+  (interactive)
+  (let ((min 0)
+        (max 12345))
+    (concat "(" (number-to-string (shu-random-range min max)) "."
+            (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-internal-make-int
+;;
+(defun shu-cpp-internal-make-int ()
+  "Return a string that can be used to initialize a test variable of type lint."
+  (interactive)
+  (let ((min 102)
+        (max 2147483647))
+    (concat "(" (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
 
 ;;
 ;;  shu-cpp-make-interval
@@ -3305,6 +3375,29 @@ a timezone datetime type."
 
 
 ;;
+;;  shu-cpp-internal-make-short
+;;
+(defun shu-cpp-internal-make-short ()
+  "Return a string that can be used to initialize a test variable of type short."
+  (interactive)
+  (let ((min 102)
+        (max 32768))
+    (concat "(" (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-make-size-type
+;;
+(defun shu-cpp-make-size-type ()
+  "insert a string that is a possible value for a size type."
+  (shu-cpp-internal-make-unsigned-int)
+  )
+
+
+
+;;
 ;;  shu-cpp-make-time
 ;;
 (defun shu-cpp-make-time ()
@@ -3332,6 +3425,19 @@ a time type that accepts hour, minute, second,  milliseconds, microseconds."
 
 
 
+;;
+;;  shu-cpp-internal-make-unsigned-int
+;;
+(defun shu-cpp-internal-make-unsigned-int ()
+  "Return a string that can be used to initialize a test variable of type lint."
+  (interactive)
+  (let ((min 102)
+        (max 4294967295))
+    (concat "(" (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
 
 ;;
 ;;  shu-cpp-fill-test-data
@@ -3355,31 +3461,47 @@ shu-cpp-time-type.
 
 The data types may optionally be preceded by \"const\"."
   (interactive)
-  (let ((xx)
-        (data)
-        (fail-type)
-        (bol (line-beginning-position))
-        (eol (line-end-position))
-        (ss
-         (concat
-          "\\s-*"
-          "[const ]*"
-          "\\s-*"
-          "\\("
-          "["
-          shu-cpp-datetime-timezone-type "\\|"
-          shu-cpp-interval-type "\\|"
-          shu-cpp-datetime-type "\\|"
-          shu-cpp-string-type "\\|"
-          shu-cpp-time-type "\\|"
-          shu-cpp-long-long-type "\\|"
-          "]+"
-          "\\)"))
-        (did-fill))
+  (let* ((gb (get-buffer-create "**foo**"))
+         (bool-type "bool")
+         (char-type "char")
+         (double-type "double")
+         (float-type "float")
+         (int-type "int")
+         (short-type "short")
+         (xx)
+         (data)
+         (fail-type)
+         (bol (line-beginning-position))
+         (eol (line-end-position))
+         (ss
+          (concat
+           "\\s-*"
+           "[const ]*"
+           "\\s-*"
+           "\\("
+           "["
+           shu-cpp-datetime-timezone-type "\\|"
+           shu-cpp-interval-type "\\|"
+           shu-cpp-datetime-type "\\|"
+           shu-cpp-size-type "\\|"
+           shu-cpp-string-type "\\|"
+           shu-cpp-time-type "\\|"
+           shu-cpp-long-long-type "\\|"
+           char-type "\\|"
+           bool-type "\\|"
+           double-type "\\|"
+           float-type "\\|"
+           int-type "\\|"
+           short-type
+           "]+"
+           "\\)"))
+         (did-fill))
+    (princ (concat ss "\n\n") gb)
     (save-excursion
       (beginning-of-line)
       (when (re-search-forward ss eol t)
         (setq xx (match-string 1))
+        (princ (concat "xx: [" xx "]\n") gb)
         (cond
          ((string= xx shu-cpp-datetime-timezone-type)
           (setq data (shu-cpp-internal-tz-make-datetime)))
@@ -3389,12 +3511,26 @@ The data types may optionally be preceded by \"const\"."
           (setq data (shu-cpp-internal-make-date)))
          ((string= xx shu-cpp-datetime-type)
           (setq data (shu-cpp-internal-make-datetime)))
+         ((string= xx shu-cpp-size-type)
+          (setq data (shu-cpp-make-size-type)))
          ((string= xx shu-cpp-string-type)
           (setq data (concat "(\"" (shu-misc-random-ua-string 6) "\")")))
          ((string= xx shu-cpp-time-type)
           (setq data (shu-cpp-internal-make-time)))
          ((string= xx shu-cpp-long-long-type)
           (setq data (shu-cpp-internal-make-long-long)))
+         ((string= xx bool-type)
+          (setq data (shu-cpp-internal-make-bool)))
+         ((string= xx "har")
+          (setq data (shu-cpp-internal-make-char)))
+         ((string= xx double-type)
+          (setq data (shu-cpp-internal-make-double)))
+         ((string= xx float-type)
+          (setq data (shu-cpp-internal-make-float)))
+         ((string= xx int-type)
+          (setq data (shu-cpp-internal-make-int)))
+         ((string= xx "hort")
+          (setq data (shu-cpp-internal-make-short)))
          )))
     (if data
         (progn
