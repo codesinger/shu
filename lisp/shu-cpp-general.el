@@ -3438,7 +3438,6 @@ a time type that accepts hour, minute, second,  milliseconds, microseconds."
 
 
 
-
 ;;
 ;;  shu-cpp-fill-test-data
 ;;
@@ -3457,10 +3456,51 @@ The line will be transformed into one that looks something like this:
 The recognized data types are the ones that are defined by the custom variables
 shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
 shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
-shu-cpp-time-type.
+shu-cpp-time-type plus many of the standard C++ types, such as int, bool, short,
+etc.
 
-The data types may optionally be preceded by \"const\"."
+The data types may optionally be preceded by \"const\".
+
+If the last character of the line is \";\", it is deleted before a data type is
+filled in with a new semi-colon following it."
   (interactive)
+  (let ((did-fill (shu-cpp-internal-fill-test-data)))
+    (when (not did-fill)
+      (ding)
+      (message "%s" "Unrecognized data type"))
+    ))
+
+
+
+
+
+;;
+;;  shu-cpp-internal-fill-test-data
+;;
+(defun shu-cpp-internal-fill-test-data ()
+  "If the data type at the beginning of the line is a recognized data type, then
+fill in a random value for that data type at point.  This allows someone writing
+a test to declare a data type and a name and then call this function.  If the
+author creates a line that looks like this and then invokes this function
+
+     std::string   abc
+
+The line will be transformed into one that looks something like this:
+
+     std::string   abc(\"RDATZC\");
+
+The recognized data types are the ones that are defined by the custom variables
+shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
+shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
+shu-cpp-time-type plus many of the standard C++ types, such as int, bool, short,
+etc.
+
+The data types may optionally be preceded by \"const\".
+
+If the last character of the line is \";\", it is deleted before a data type is
+filled in with a new semi-colon following it.
+
+Return t if a recognized data type was found and a value was filled in."
   (let* ((gb (get-buffer-create "**foo**"))
          (bool-type "bool")
          (char-type "char")
@@ -3539,6 +3579,40 @@ The data types may optionally be preceded by \"const\"."
       (ding)
       (message "%s" "Unrecognized data type"))
     did-fill
+    ))
+
+
+
+;;
+;;  shu-cpp-fill-test-area
+;;
+(defun shu-cpp-fill-test-area (start end)
+  "For all lines between the marked start and end points, if a recognized data
+type has been declared on a line, fill it with random test data."
+  (interactive "r")
+  (let ((sline (shu-the-line-at start))
+        (eline (shu-the-line-at end))
+        (line-diff 0)
+        (eol)
+        (did-fill)
+        (fill-count 0)
+        (skip-count 0))
+    (save-excursion
+      (goto-char start)
+      (while (and (<= (shu-current-line) eline) (= line-diff 0))
+        (setq eol (line-end-position))
+        (goto-char (1- eol))
+        (when (looking-at ";")
+          (delete-char 1)
+          (setq eol (line-end-position)))
+        (setq did-fill (shu-cpp-internal-fill-test-data))
+        (if did-fill
+            (setq fill-count (1+ fill-count))
+          (setq skip-count (1+ skip-count)))
+        (setq line-diff (forward-line 1))))
+    (if (= skip-count 0)
+        (message "%d values filled in" fill-count)
+      (message "%d values filled in, %d data types unrecognized" fill-count skip-count))
     ))
 
 
@@ -3631,6 +3705,7 @@ shu- prefix removed."
   (defalias 'make-tzdate 'shu-cpp-tz-make-datetime)
   (defalias 'make-interval 'shu-cpp-make-interval)
   (defalias 'fill-data 'shu-cpp-fill-test-data)
+  (defalias 'fill-area 'shu-cpp-fill-test-area)
   (defalias 'gcc 'shu-gcc)
   )
 
