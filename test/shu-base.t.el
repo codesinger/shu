@@ -1871,4 +1871,100 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     ))
 
 
+
+;;
+;;  shu-test-shu-string-starts-ends-1
+;;
+(ert-deftest shu-test-shu-string-starts-ends-1 ()
+  (let* ((is-true)
+         (prefix "xxx")
+         (suffix "yy")
+         (string (concat prefix "hello" suffix)))
+    (setq is-true (shu-string-starts-ends string prefix suffix))
+    (should is-true)
+    ))
+
+
+
+;;
+;;  shu-test-shu-string-starts-ends-2
+;;
+(ert-deftest shu-test-shu-string-starts-ends-2 ()
+  (let* ((is-true)
+         (prefix "xxx")
+         (string (concat prefix "hello" prefix)))
+    (setq is-true (shu-string-starts-ends string prefix))
+    (should is-true)
+    ))
+
+
+
+;;
+;;  shu-test-shu-string-starts-ends-3
+;;
+(ert-deftest shu-test-shu-string-starts-ends-3 ()
+  (let ((is-true)
+        (prefix "xxx")
+        (suffix "yy")
+        (string "tt"))
+    (setq is-true (shu-string-starts-ends string prefix suffix))
+    (should (not is-true))
+    ))
+
+
+
+;;
+;;  shu-test-shu-string-starts-ends-4
+;;
+(ert-deftest shu-test-shu-string-starts-ends-4 ()
+  (let* ((is-true)
+         (prefix "/")
+         (string (concat prefix "hello" prefix)))
+    (setq is-true (shu-string-starts-ends string prefix))
+    (should is-true)
+    ))
+
+
+
+;;
+;;  shu-test-shu-string-starts-ends-5
+;;
+(ert-deftest shu-test-shu-string-starts-ends-5 ()
+  (let* ((is-true)
+         (prefix "")
+         (suffix "yy")
+         (string (concat prefix "hello" suffix)))
+    (setq is-true (shu-string-starts-ends string prefix suffix))
+    (should is-true)
+    ))
+
+
+
+;;
+;;  shu-test-shu-string-starts-ends-6
+;;
+(ert-deftest shu-test-shu-string-starts-ends-6 ()
+  (let* ((is-true)
+         (prefix "")
+         (suffix "")
+         (string (concat prefix "hello" suffix)))
+    (setq is-true (shu-string-starts-ends string prefix suffix))
+    (should is-true)
+    ))
+
+
+
+;;
+;;  shu-test-shu-string-starts-ends-7
+;;
+(ert-deftest shu-test-shu-string-starts-ends-7 ()
+  (let* ((is-true)
+         (prefix "")
+         (suffix "")
+         (string (concat prefix "hello" suffix)))
+    (setq is-true (shu-string-starts-ends string prefix))
+    (should is-true)
+    ))
+
+
 ;;; shu-base.t.el ends here

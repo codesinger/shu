@@ -2303,6 +2303,51 @@ generation of a set of unique string names."
 
 
 ;;
+;;  shu-extract-name-open-grok
+;;
+(defun shu-extract-name-open-grok ()
+  "The current buffer contains output from an OpenGrok search that has been
+copied from the web page and pasted into the buffer.  This function scans the
+buffer from the current point and harvests all of the file names that hold the
+references for which OpenGrok searched.  It puts the file names (including their
+top level directories) into the buffer \"**shu-open-grok**\".
+The number of file names found is returned, mostly for the benefit of unit
+tests."
+  (interactive)
+  (let ((gb (get-buffer-create "**shu-open-grok**"))
+        (ss "H A D	")
+        (son)
+        (eon)
+        (eol)
+        (file-name)
+        (file-path)
+        (prev-file-path "")
+        (full-name)
+        (count 0))
+    (while (search-forward ss nil t)
+      (setq son (point))
+      (setq eol (line-end-position))
+      (re-search-forward shu-all-whitespace-regexp eol t)
+      (setq eon (point))
+      (setq file-name (shu-trim (buffer-substring-no-properties son eon)))
+      (forward-line -1)
+      (setq file-path (shu-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+      (if (shu-string-starts-ends file-path "/")
+          (setq prev-file-path file-path)
+        (setq file-path prev-file-path))
+      (setq full-name (concat file-path file-name))
+      (goto-char eon)
+      (princ (concat full-name "\n") gb)
+      (setq count (1+ count)))
+    (if (= count 0)
+        (message "%s" "No file names found")
+      (message "%d file names placed in buffer **shu-open-grok**" count))
+    count
+    ))
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -2355,6 +2400,7 @@ shu- prefix removed."
   (defalias 'kill-system-name 'shu-kill-system-name)
   (defalias 'obfuscate-region 'shu-obfuscate-region)
   (defalias 'af 'shu-adapt-frame)
+  (defalias 'scan-grok 'shu-extract-name-open-grok)
   )
 
 ;;; shu-misc.el ends here

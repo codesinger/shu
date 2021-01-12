@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.51
+;; Version: 1.6.52
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.51"
+(defconst shu-version "1.6.52"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -970,6 +970,32 @@ a string)."
   "Return an integer that represents the four digit current year."
     (string-to-number (format-time-string "%Y"))
     )
+
+
+
+;;
+;;  shu-string-starts-ends
+;;
+(defun shu-string-starts-ends (string start-string &optional end-string)
+  "Return true if the given STRING starts with START-STRING and ends with
+END-STRING.  If END-STRING is omitted, START-STRING is used instead.
+An empty START-STRING matches anything.  An empty END-STRING matches anything."
+  (interactive)
+  (let ((is-true)
+        (slen (length string))
+        (prefix)
+        (suffix))
+    (when (not end-string)
+      (setq end-string start-string))
+    (when (and (>= slen (length start-string))
+               (>= slen (length end-string)))
+      (setq prefix (substring string 0 (length start-string)))
+      (setq suffix (substring string (- (length string) (length end-string))))
+      (when (and (string= prefix start-string)
+                 (string= suffix end-string))
+        (setq is-true t)))
+    is-true
+    ))
 
 
 
