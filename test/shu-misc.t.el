@@ -1129,6 +1129,30 @@
 
 
 ;;
+;;  shu-test-shu-fix-markdown-section-6
+;;
+(ert-deftest shu-test-shu-fix-markdown-section-6 ()
+  (let* (
+         (heading "## This is a heading")
+         (section-heading (concat heading " <a name=aspecificexample-abcd></a> <a name=aspecificexampl></a>"))
+         (max-depth 2)
+         (actual-line)
+         )
+    (with-temp-buffer
+      (insert section-heading)
+      (goto-char (point-min))
+      (search-forward "##")
+      (setq actual-line (shu-fix-markdown-section max-depth))
+      )
+    (should actual-line)
+    (should (stringp actual-line))
+    (should (string= heading actual-line))
+    ))
+
+
+
+
+;;
 ;;  shu-test-shu-tocify-markdown-headings
 ;;
 (ert-deftest shu-test-shu-tocify-markdown-headings ()
