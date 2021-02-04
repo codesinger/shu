@@ -111,7 +111,7 @@ deliberately not implemented.")
       (shu-generate-hfile author namespace class-name)
       (save-buffer)
       (goto-char (point-min)))
-      ))
+    ))
 
 
 
@@ -353,37 +353,39 @@ deliberately not implemented.")
 ;;
 (defun shu-cpp-inner-cdecl (class-name copy-allowed &optional use-allocator)
   "Generate a skeleton class declaration at point."
-  (let (
-        (ipad (make-string shu-cpp-indent-length ? ))
+  (let ((ipad (make-string shu-cpp-indent-length ? ))
         (header-pos (point))
         (have-include )
-        (start-pos )
-        )
+        (start-pos ))
     (setq start-pos (shu-cpp-gen-h-class-intro class-name))
     (insert (concat "\n" ipad "// DATA\n\n"))
     (when use-allocator
       (insert
        (concat
         ipad "bslma::Allocator                 *" shu-cpp-default-allocator-name ";\n"
-        ))
-      )
+        )))
     (insert
      (concat
       "\n"
       "  public:\n"))
     (when use-allocator
-      (shu-cpp-misc-gen-nested-traits class-name)
-      )
+      (shu-cpp-misc-gen-nested-traits class-name))
     (insert
      (concat
       "\n"
       ipad "// CREATORS\n"))
     (shu-cpp-misc-gen-h-ctor class-name use-allocator)
+    (when (and shu-cpp-modern (not copy-allowed))
+      (shu-cpp-misc-gen-ctor-not-implemented class-name))
     (shu-cpp-misc-gen-h-dtor class-name)
     (insert
      (concat
       "\n"
-      ipad "// MANIPULATORS\n"
+      ipad "// MANIPULATORS\n"))
+    (when (and shu-cpp-modern (not copy-allowed))
+      (shu-cpp-misc-gen-op-equal-not-implemented class-name))
+    (insert
+     (concat
       "\n"
       ipad "// ACCESSORS\n"))
     (shu-cpp-decl-h-print-self)
@@ -404,20 +406,16 @@ deliberately not implemented.")
           (widen)
           (goto-char (point-min))
           (when (search-forward "#include <bslma_allocator.h>" nil t)
-            (setq have-include t)
-            )
-          )
-        )
+            (setq have-include t))))
       (when (not have-include)
         (goto-char header-pos)
         (beginning-of-line)
         (insert
          (concat
           "\n"
-          "#include <bslma_allocator.h>\n"))
-        )
-      )
-    (goto-char start-pos)))
+          "#include <bslma_allocator.h>\n"))))
+    (goto-char start-pos)
+    ))
 
 
 
@@ -900,16 +898,32 @@ CLASS-NAME is the name of the containing C++ class."
 (defun shu-cpp-misc-gen-ctor-not-implemented (class-name)
   "Generate a declaration of a non-implemented copy constructor and operator=()."
   (let ((ipad (make-string shu-cpp-indent-length ? )))
-    (insert
-     (concat
-      "\n"
-      ipad "/*!\n"
-      ipad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
-      ipad " *\n"
-      ipad " * \\param original the object from which we are to be constructed\n"
-      ipad " */\n"
-      ipad "explicit " class-name "(\n"
-      ipad ipad "const " class-name " &original);\n"))
+    (if shu-cpp-modern
+        (progn
+          (insert
+           (concat
+            "\n"
+            ipad "/*!\n"
+            ipad " * \\brief The copy constructor is deleted\n"
+            ipad " */\n"
+            ipad "explicit " class-name "(\n"
+            ipad ipad "const " class-name " &original) = delete;\n"
+            "\n"
+            ipad "/*!\n"
+            ipad " * \\brief The move constructor is deleted\n"
+            ipad " */\n"
+            ipad "explicit " class-name "(\n"
+            ipad ipad class-name " &&original) = delete;\n")))
+      (insert
+       (concat
+        "\n"
+        ipad "/*!\n"
+        ipad " * \\brief The copy constructor is deliberately private and unimplemented.\n"
+        ipad " *\n"
+        ipad " * \\param original the object from which we are to be constructed\n"
+        ipad " */\n"
+        ipad "explicit " class-name "(\n"
+        ipad ipad "const " class-name " &original);\n")))
     ))
 
 
@@ -921,18 +935,34 @@ CLASS-NAME is the name of the containing C++ class."
 (defun shu-cpp-misc-gen-op-equal-not-implemented (class-name)
   "Generate a declaration of a non-implemented copy constructor and operator=()."
   (let ((ipad (make-string shu-cpp-indent-length ? )))
-    (insert
-     (concat
-      "\n"
-      ipad "/*!\n"
-      ipad " * \\brief operator=() is deliberately private and unimplemented.\n"
-      ipad " *\n"
-      ipad " * \\param rhs the object from which we are to be assigned\n"
-      ipad " *\n"
-      ipad " * \\return reference to self to allow for chained operators\n"
-      ipad " */\n"
-      ipad class-name " &operator=(\n"
-      ipad ipad "const " class-name " &rhs);\n"))
+    (if shu-cpp-modern
+        (progn
+          (insert
+           (concat
+            "\n"
+            ipad "/*!\n"
+            ipad " * \\brief Copy assignment is deleted.\n"
+            ipad " */\n"
+            ipad class-name " &operator=(\n"
+            ipad ipad "const " class-name " &rhs) = delete;\n"
+            "\n"
+            ipad "/*!\n"
+            ipad " * \\brief Move assignment is deleted.\n"
+            ipad " */\n"
+            ipad class-name " &operator=(\n"
+            ipad ipad class-name " &&rhs) = delete;\n")))
+      (insert
+       (concat
+        "\n"
+        ipad "/*!\n"
+        ipad " * \\brief operator=() is deliberately private and unimplemented.\n"
+        ipad " *\n"
+        ipad " * \\param rhs the object from which we are to be assigned\n"
+        ipad " *\n"
+        ipad " * \\return reference to self to allow for chained operators\n"
+        ipad " */\n"
+        ipad class-name " &operator=(\n"
+        ipad ipad "const " class-name " &rhs);\n")))
     ))
 
 
@@ -1053,7 +1083,7 @@ is false, generate private an unimplemented copy constructor and operator=()"
      (concat
       "\n"
       "  private:\n"))
-    (when (not copy-allowed)
+    (when (and (not copy-allowed) (not shu-cpp-modern))
       (shu-cpp-misc-gen-not-implemented class-name))
     (insert
      (concat

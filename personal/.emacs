@@ -237,6 +237,7 @@
 (if (shu-system-type-is-mac-osx)
     (progn
       (shu-set-author "Stewart L. Palmer (stewart@stewartpalmer.com)")
+      (setq shu-cpp-modern t)
       (slp-set-comment-hooks))
   (shu-set-author "Stewart Palmer (spalmer62@bloomberg.net)")
   (shu-set-default-global-namespace "BloombergLP")
@@ -244,6 +245,7 @@
   (setq shu-cpp-include-user-brackets t)
   (setq shu-cpp-std-namespace "bsl")
   (setq shu-cpp-default-allocator-type "bslma::Allocator")
+  (setq shu-cpp-modern t)
   (slp-bb-set-comment-hooks))
 
 ;;

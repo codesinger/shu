@@ -41,12 +41,14 @@ def main():
                         help="Author of new component")
     parser.add_argument("--classname", required=True,
                         help="Name of the class")
+    parser.add_argument("--modern", action='store_true',
+                        help="If specified, use 'delete' for deleted constructors")
     args = parser.parse_args()
 
     cmd =(
         f'emacs -batch -l {args.shufiles}/shu-batch-mode.elc '
         f'-f shu-generate-component '
-        f'{args.globalname} {args.namespace} {args.classname} "{args.author}"'
+        f'{args.globalname} {args.namespace} {args.classname} "{args.author}" {args.modern}'
         )
     print(cmd)
     subprocess.run(cmd, shell=True)
