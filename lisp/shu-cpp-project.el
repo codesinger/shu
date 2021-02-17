@@ -1310,6 +1310,81 @@ project whose files are in PROJ-LIST."
     ))
 
 
+
+;;
+;;  shu-list-c-duplicates
+;;
+(defun shu-list-c-duplicates ()
+  "Doc string."
+  (interactive)
+  (if (not shu-cpp-class-list)
+      (progn
+        (message "There is no project to list.")
+        (ding))
+    (shu-internal-list-c-duplicates shu-cpp-class-list))
+    )
+
+
+
+;;
+;;  shu-internal-list-c-duplicates
+;;
+(defun shu-internal-list-c-duplicates (proj-list)
+  "Doc string."
+  (let ((plist proj-list)
+        (file-name)
+        (dup-name)
+        (flist)
+        (full-name-list)
+        (dlist)
+        (proj-dups)
+        (dups)
+        (entry)
+        (nl "")
+        (name1)
+        (name2))
+    (while plist
+      (shu-project-get-file-info plist file-name full-name-list)
+      (when (> (length full-name-list) 1)
+        (setq dlist (cons file-name full-name-list))
+        (push dlist proj-dups))
+      (setq plist (cdr plist)))
+    (if (not proj-dups)
+        (message "%s" "Project has no duplicates")
+      (setq dlist (sort proj-dups
+                        (lambda(lhs rhs)
+                          (string< (car lhs) (car rhs))
+                          )))
+      (setq proj-dups dlist)
+      (while dlist
+        (setq entry (car dlist))
+        (setq file-name (car entry))
+        (setq full-name-list (cdr entry))
+        (setq flist (sort full-name-list 'string<))
+        (insert (concat nl file-name "\n\n"))
+        (setq nl "\n")
+        (while flist
+          (setq dup-name (car flist))
+          (insert (concat "    " dup-name "\n"))
+          (setq flist (cdr flist)))
+        (setq dlist (cdr dlist)))
+      (setq dlist proj-dups)
+      (insert "\n")
+      (while dlist
+        (setq entry (car dlist))
+        (setq full-name-list (cdr entry))
+        (setq flist (sort full-name-list 'string<))
+        (setq name1 (car flist))
+        (setq flist (cdr flist))
+        (while flist
+          (setq name2 (car flist))
+          (insert (concat "diff -b " name1 "  " name2 "\n"))
+          (setq flist (cdr flist)))
+        (setq dlist (cdr dlist))))
+    ))
+
+
+
 ;;
 ;;  shu-list-c-prefixes
 ;;
@@ -2161,6 +2236,7 @@ shu- prefix removed."
   (defalias 'renew-c-project 'shu-renew-c-project)
   (defalias 'clear-c-project 'shu-clear-c-project)
   (defalias 'count-c-project 'shu-count-c-project)
+  (defalias 'list-c-duplicates 'shu-list-c-duplicates)
   (defalias 'list-c-project 'shu-list-c-project)
   (defalias 'list-c-prefixes 'shu-list-c-prefixes)
   (defalias 'list-short-names 'shu-cpp-list-short-names)
