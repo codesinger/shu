@@ -1278,6 +1278,48 @@ the message in the minibuffer and passing the totals back to the caller."
     ))
 
 
+
+;;
+;;  shu-list-c-file-names
+;;
+(defun shu-list-c-file-names ()
+  "Insert into the buffer a list of all of the unique file names in the project.
+This does not include the file path as it will be different for duplicate
+names."
+  (interactive)
+  (if (not shu-cpp-class-list)
+      (progn
+        (message "There is no project to list.")
+        (ding))
+    (shu-internal-list-c-file-names shu-cpp-class-list))
+    )
+
+
+
+
+;;
+;;  shu-internal-list-c-file-names
+;;
+(defun shu-internal-list-c-file-names (proj-list)
+  "Doc string."
+  (interactive)
+  (let ((plist proj-list)
+        (file-name)
+        (full-name-list)
+        (file-names))
+    (while plist
+      (shu-project-get-file-info plist file-name full-name-list)
+      (push file-name file-names)
+      (setq plist (cdr plist)))
+    (setq file-names (sort file-names `string<))
+    (while file-names
+      (setq file-name (car file-names))
+      (insert (concat file-name "\n"))
+      (setq file-names (cdr file-names)))
+    ))
+
+
+
 ;;
 ;;  shu-list-c-project
 ;;
@@ -1315,7 +1357,9 @@ project whose files are in PROJ-LIST."
 ;;  shu-list-c-duplicates
 ;;
 (defun shu-list-c-duplicates ()
-  "Doc string."
+  "Insert into the current buffer a list of all of the duplicate files names.
+Under each duplicate file name, insert a list of the full paths to all of the
+duplicates."
   (interactive)
   (if (not shu-cpp-class-list)
       (progn
@@ -1330,7 +1374,7 @@ project whose files are in PROJ-LIST."
 ;;  shu-internal-list-c-duplicates
 ;;
 (defun shu-internal-list-c-duplicates (proj-list)
-  "Doc string."
+  "Internal implementation of shu-list-c-duplicates."
   (let ((plist proj-list)
         (file-name)
         (dup-name)
