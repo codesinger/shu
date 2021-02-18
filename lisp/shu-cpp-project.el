@@ -2281,6 +2281,7 @@ shu- prefix removed."
   (defalias 'clear-c-project 'shu-clear-c-project)
   (defalias 'count-c-project 'shu-count-c-project)
   (defalias 'list-c-duplicates 'shu-list-c-duplicates)
+  (defalias 'list-c-file-names 'shu-list-c-file-names)
   (defalias 'list-c-project 'shu-list-c-project)
   (defalias 'list-c-prefixes 'shu-list-c-prefixes)
   (defalias 'list-short-names 'shu-cpp-list-short-names)
