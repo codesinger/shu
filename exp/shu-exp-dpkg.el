@@ -38,11 +38,12 @@
 ;;  shu-gen-dpkg
 ;;
 (defun shu-gen-dpkg (library-name)
-  "Doc string."
+  "Generate an empty DPKG library."
   (interactive "sLibrary name?: ")
   (let (
-        (git-namespace "drqs68")
+        (git-namespace "drqs1011")
         (dpkg-author "Stewart Palmer <spalmer62@bloomberg.net>")
+        (debug-on-error t)
         )
     (shu-internal-gen-dpkg library-name dpkg-author git-namespace)
     ))
@@ -52,11 +53,10 @@
 ;;  shu-internal-gen-dpkg
 ;;
 (defun shu-internal-gen-dpkg (library-name author git-namespace)
-  "Doc string."
-  (interactive)
   (let* (
-         (gb (get-buffer-create "**boo**"))
+         (gb (get-buffer-create "**shu-dpkg**"))
          (base-name default-directory)
+         (top-cmake-name (concat base-name "CMakeLists.txt"))
          (debian-name (concat base-name "debian"))
          (jenkins-name (concat base-name "Jenkinsfile"))
          (control-name (concat debian-name "/control"))
@@ -66,9 +66,11 @@
          (package-dep (concat package-directory "/" library-name ".dep"))
          (package-mem (concat package-directory "/" library-name ".mem"))
          (mainpage-name (concat base-name library-name "/mainpage.dox"))
+         (main-cmake-name (concat base-name library-name "/CMakeLists.txt"))
          (main-make-name (concat base-name library-name "/" library-name ".mk"))
          (make1-name (concat test-directory "/" library-name ".t.mk"))
          (make2-name (concat test-directory "/" library-name ".build.t.mk"))
+         (test-cmake-name (concat test-directory "/CMakeLists.txt"))
         )
     (unless (file-directory-p library-name)
       (make-directory package-directory t)
@@ -112,7 +114,9 @@
       (shu-internal-gen-debian-control library-name control-name author git-namespace)
       (shu-internal-gen-debian-rules library-name rules-name)
       )
-
+    (shu-dpkg-make-top-level-cmake library-name top-cmake-name)
+    (shu-dpkg-make-main-cmake library-name main-cmake-name)
+    (shu-dpkg-make-test-cmake library-name test-cmake-name)
     ))
 
 
@@ -122,7 +126,7 @@
 (defun shu-internal-gen-debian-control (library-name control-name author git-namespace)
   "Doc string."
   (let (
-        (gb (get-buffer-create "**boo**"))
+        (gb (get-buffer-create "**shu-dpkg**"))
         )
     (princ (concat "control: " default-directory "\n") gb)
     (unless (file-readable-p control-name)
@@ -135,7 +139,9 @@
        "Source: " library-name "\n"
        "Section: unknown\n"
        "Priority: extra\n"
-       "Build-Depends: plink, plink-debhelper,\n"
+       "Build-Depends:\n"
+       "  bbtoolchain-cmake-debhelper,\n"
+       "  cmake-configure-bb-target,\n"
        "  libbal-dev,\n"
        "  libbdl-dev,\n"
        "  libbsl-dev,\n"
@@ -150,12 +156,11 @@
        "Package: lib" library-name "-dev\n"
        "Depends: ${" library-name "-bdemeta-Depends}\n"
        "Architecture: any\n"
-       "Description: FIXME FIXME FIXME DIXME!!!"
+       "Description: FIXME FIXME FIXME FIXME FIXME FIXME FIXME!!!"
         ))
       (basic-save-buffer)
       (kill-buffer (current-buffer))
       )
-
     ))
 
 
@@ -165,7 +170,7 @@
 (defun shu-internal-gen-debian-rules (library-name rules-name)
   "Doc string."
   (let (
-        (gb (get-buffer-create "**boo**"))
+        (gb (get-buffer-create "**shu-dpkg**"))
         )
     (princ (concat "rules: " default-directory "\n") gb)
     (princ (concat "rules-name : " rules-name "\n") gb)
@@ -292,8 +297,8 @@
         "PCDEPS += bsl\n"
         "TASK=" library-name ".build.t.tsk\n"
         "SRCS= \\\n"
-        "../" library-name ".something.cpp \\\n"
-        library-name ".something.t.cpp\n"
+        "../" library-name "_something.cpp \\\n"
+        library-name "_something.t.cpp\n"
         "\n"
         "USER_CFLAGS   += -I. -I..\n"
         "USER_CPPFLAGS += -I. -I..\n"
@@ -370,6 +375,140 @@
       (basic-save-buffer)
       (kill-buffer (current-buffer))
       ))
+
+
+
+;;
+;;  shu-dpkg-make-top-level-cmake
+;;
+(defun shu-dpkg-make-top-level-cmake (library-name cmake-name)
+  (let (
+        (gb (get-buffer-create "**shu-dpkg**"))
+        )
+    (princ (concat "make-top-level-cmake: '" cmake-name "'\n") gb)
+    (find-file cmake-name)
+    (goto-char (point-min))
+    (insert
+     (concat
+      "cmake_minimum_required(VERSION 3.14)\n"
+      "project(" library-name " LANGUAGES C CXX)\n"
+      "\n"
+      "enable_testing()\n"
+      "\n"
+      "SET( " library-name "_BUILD_LOCAL TRUE )\n"
+      "SET( test_t.tsk_BUILD_LOCAL TRUE )\n"
+      "\n"
+      "add_subdirectory(" library-name" )\n"
+      "\n"
+      "#==============================================================================\n"
+      "# Fix Linking of cyclic libraries\n"
+      "# http://tutti.prod.bloomberg.com/cmake-docs/troubleshooting/troubleshooting#unresolved-symbols\n"
+      "# Uncomment required libraries below\n"
+      "#==============================================================================\n"
+      "#set_property( TARGET apputil PROPERTY IMPORTED_LINK_INTERFACE_MULTIPLICITY 5 )\n"
+      ))
+    (basic-save-buffer)
+    (kill-buffer (current-buffer))
+    ))
+
+
+
+;;
+;;  shu-dpkg-make-main-cmake
+;;
+(defun shu-dpkg-make-main-cmake (library-name cmake-name)
+  (let (
+        (gb (get-buffer-create "**shu-dpkg**"))
+        )
+    (princ (concat "make-main-cmake: '" cmake-name "'\n") gb)
+    (find-file cmake-name)
+    (goto-char (point-min))
+    (insert
+     (concat
+      "add_subdirectory(t)\n"
+      "#==============================================================================\n"
+      "# Add Library\n"
+      "# https://cmake.org/cmake/help/v3.14/command/add_library.html\n"
+      "#==============================================================================\n"
+      "add_library(" library-name" \n"
+      "        " library-name "_something.cpp\n"
+      "        )\n"
+      "\n"
+      "#==============================================================================\n"
+      "# Add Link Dependencies\n"
+      "# https://cmake.org/cmake/help/v3.14/command/target_link_libraries.html\n"
+      "#==============================================================================\n"
+      "target_link_libraries(" library-name"  PUBLIC\n"
+      "        # external dependencies\n"
+      "        bdl\n"
+      "        bsl\n"
+      "        )\n"
+      "\n"
+      "#==============================================================================\n"
+      "# Configure Target for use at Bloomberg\n"
+      "# https://bbgithub.dev.bloomberg.com/cmake-community/cmake-configure-bb-target\n"
+      "#==============================================================================\n"
+      "find_package(ConfigureBbTarget REQUIRED)\n"
+      "configure_bb_target(" library-name " V2 INSTALL HEADER_DIRS .)\n"
+      ))
+    (basic-save-buffer)
+    (kill-buffer (current-buffer))
+    ))
+
+
+
+;;
+;;  shu-dpkg-make-test-cmake
+;;
+(defun shu-dpkg-make-test-cmake (library-name cmake-name)
+  (let (
+        (gb (get-buffer-create "**shu-dpkg**"))
+        )
+    (princ (concat "make-test-cmake: '" cmake-name "'\n") gb)
+    (find-file cmake-name)
+    (goto-char (point-min))
+    (insert
+     (concat
+      "#==============================================================================\n"
+      "# Add Executable\n"
+      "# https://cmake.org/cmake/help/v3.14/command/add_executable.html\n"
+      "#==============================================================================\n"
+      "add_executable(test_t.tsk\n"
+      "        " library-name " _something.t.cpp\n"
+      "        )\n"
+      "\n"
+      "#==============================================================================\n"
+      "# Add Link Dependencies\n"
+      "# https://cmake.org/cmake/help/v3.14/command/target_link_libraries.html\n"
+      "#==============================================================================\n"
+      "target_link_libraries(test_t.tsk PUBLIC\n"
+      "        cmdtstmain\n"
+      "        # local dependencies\n"
+      "        " library-name "\n"
+      "        # external dependencies\n"
+      "        bal\n"
+      "        bdl\n"
+      "        bsl\n"
+      "        )\n"
+      "\n"
+      "#==============================================================================\n"
+      "# Configure Target for use at Bloomberg\n"
+      "# https://bbgithub.dev.bloomberg.com/cmake-community/cmake-configure-bb-target\n"
+      "#==============================================================================\n"
+      "find_package(ConfigureBbTarget REQUIRED)\n"
+      "configure_bb_target(test_t.tsk V2 HEADER_DIRS .)\n"
+      "\n"
+      "#==============================================================================\n"
+      "# Add Test\n"
+      "# https://cmake.org/cmake/help/v3.14/module/GoogleTest.html\n"
+      "#==============================================================================\n"
+      "include(GoogleTest)\n"
+      "gtest_discover_tests(test_t.tsk)\n"
+      ))
+    (basic-save-buffer)
+    (kill-buffer (current-buffer))
+    ))
+
 
 
 ;;; shu-exp-dpkg.el ends here
