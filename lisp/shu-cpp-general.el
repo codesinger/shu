@@ -153,6 +153,14 @@ inversion of shu-std-include-liat or shu-bsl-include-list.")
 ;;
 (defconst shu-std-include-list
   (list
+   (cons "algorithm"    (list
+                         "std::for_each"
+                         "std::copy"
+                         "std::sort"
+                         "std::transform"
+                         "std::replace"
+                         "std::replace_if"
+                         ))
    (cons "cstddef"    (list
                        "std::size_t"
                        "std::ptrdiff_t"
@@ -207,7 +215,7 @@ inversion of shu-std-include-liat or shu-bsl-include-list.")
                      "std::basic_string"
                      "std::char_traits"
                      "std::string"
-                     "std::u16striung"
+                     "std::u16string"
                      "std::wstring"
                      "std::stoi"
                      "std::stol"
@@ -229,6 +237,14 @@ inversion of shu-std-include-liat or shu-bsl-include-list.")
 ;;
 (defconst shu-bsl-include-list
   (list
+   (cons "bsl_algorithm.h"    (list
+                               "std::for_each"
+                               "std::copy"
+                               "std::sort"
+                               "std::transform"
+                               "std::replace"
+                               "std::replace_if"
+                               ))
    (cons "bsl_cstddef.h"    (list
                              "bsl::size_t"
                              "bsl::ptrdiff_t"
@@ -283,7 +299,7 @@ inversion of shu-std-include-liat or shu-bsl-include-list.")
                            "bsl::basic_string"
                            "bsl::char_traits"
                            "bsl::string"
-                           "bsl::u16striung"
+                           "bsl::u16string"
                            "bsl::wstring"
                            "bsl::stoi"
                            "bsl::stol"
@@ -3405,7 +3421,7 @@ For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
 (defun shu-cpp-internal-make-bool ()
   "Return  value for a bool type."
   "(false)"
-    )
+  )
 
 
 
