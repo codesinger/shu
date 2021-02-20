@@ -1221,6 +1221,134 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 
 
 ;;
+;;  shu-test-shu-add-to-alist-list-1
+;;
+(ert-deftest shu-test-shu-add-to-alist-list-1 ()
+  (let ((alist)
+        (expected
+         (list
+          (cons "Fred" (list "Miller"))))
+        (actual))
+    (setq actual (shu-add-to-alist-list "Fred" "Miller" alist))
+    (should actual)
+    (should (listp actual))
+    (should (equal expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-add-to-alist-list-2
+;;
+(ert-deftest shu-test-shu-add-to-alist-list-2 ()
+  (let ((alist
+         (list
+          (cons "Fred" (list "Able"))))
+        (expected
+         (list
+          (cons "Fred" (list "Miller" "Able"))))
+        (actual))
+    (setq actual (shu-add-to-alist-list "Fred" "Miller" alist))
+    (should actual)
+    (should (listp actual))
+    (should (equal expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-invert-alist-to-hash-1
+;;
+(ert-deftest shu-test-shu-invert-alist-to-hash-1 ()
+  (let (
+        (alist
+         (list
+          (cons "A" (list "G" "W"))
+          (cons "B" (list "X" "Y"))))
+        (ret-val)
+        (ht)
+        (dup-list)
+        (hv)
+        (debug-on-error t)
+        )
+    (setq ret-val (shu-invert-alist-to-hash alist))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq ht (car ret-val))
+    (setq dup-list (cdr ret-val))
+    (should (not dup-list))
+    (should ht)
+    (should (hash-table-p ht))
+    (setq hv (gethash "G" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= hv "A"))
+    (setq hv (gethash "W" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= hv "A"))
+    (setq hv (gethash "X" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= hv "B"))
+    (setq hv (gethash "Y" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= hv "B"))
+    ))
+
+
+
+;;
+;;  shu-test-shu-invert-alist-to-hash-2
+;;
+(ert-deftest shu-test-shu-invert-alist-to-hash-2 ()
+  (let (
+        (alist
+         (list
+          (cons "A" (list "X" "G" "W"))
+          (cons "B" (list "X" "Y"))))
+        (ret-val)
+        (ht)
+        (dup-list)
+        (expected-dups
+         (list
+          (cons "X" (list "A" "B"))))
+        (hv)
+        (debug-on-error t)
+        )
+    (setq ret-val (shu-invert-alist-to-hash alist))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq ht (car ret-val))
+    (setq dup-list (cdr ret-val))
+    (should dup-list)
+    (should (listp dup-list))
+    (should (equal expected-dups dup-list))
+    (should ht)
+    (should (hash-table-p ht))
+    (setq hv (gethash "X" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= hv "A"))
+    (setq hv (gethash "G" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= hv "A"))
+    (setq hv (gethash "W" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= hv "A"))
+    (setq hv (gethash "Y" ht))
+    (should hv)
+    (should (stringp hv))
+    (should (string= hv "B"))
+    ))
+
+
+
+
+;;
 ;;  shu-test-split-new-lines-1
 ;;
 (ert-deftest shu-test-split-new-lines-1 ()

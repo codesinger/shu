@@ -757,6 +757,120 @@ results in the following output being returned:
 
 
 
+;;
+;;  shu-invert-alist-to-hash
+;;
+(defun shu-invert-alist-to-hash (alist)
+  "ALIST is an alist in which the cdr of each item in the list and the car of
+each item is an associated list of values.  The function constructs two items to
+return.
+
+The first is a hash table that is an inversion of the alist.  If the input ALIST
+contains:
+
+       A ->(G W)
+       B ->(X Y)
+
+then the returned hash table would be:
+
+       G->A
+       M->A
+       X->B
+       Y->B
+
+But if the values contain duplicates, it is impossible to construct the complete
+hash table.  If ALIST contains
+
+       A ->(X G W)
+       B ->(X Y)
+
+then the returned hash table would have to contain
+
+       G->A
+       M->A
+       X->A
+       X->B
+       Y->B
+
+but you cannot have duplicate keys in a hash table.  In this latter case, this
+function constructs an alist that contains the duplicated keys.  The key of the
+alist is the value of what would be a duplicate key in the hash table.  The
+value of the alist is a list of all of the values to which the key maps.
+
+In the case illustrated above, the returned hash table would contain
+
+       G->A
+       M->A
+       X->A
+       Y->B
+
+and the returned alist would be
+
+      X->(A B)
+
+The return value of this function is a cons cell whose car is the hash table and
+whose cdr is the alist.  If the cdr of the return value is nil, then the entire
+hash table could be constructed."
+  (let ((al alist)
+        (ht)
+        (count 0)
+        (dup-alist)
+        (item)
+        (key)
+        (value-list)
+        (value)
+        (hv)
+        (ret-val))
+    (while al
+      (setq item (car al))
+      (setq key (car item))
+      (setq value-list (cdr item))
+      (setq count (+ count (length value-list)))
+      (setq al (cdr al)))
+    (setq ht (make-hash-table :test 'equal :size count))
+    (setq al alist)
+    (while al
+      (setq item (car al))
+      (setq key (car item))
+      (setq value-list (cdr item))
+      (while value-list
+        (setq value (car value-list))
+        (setq hv (gethash value ht))
+        (if (not hv)
+              (puthash value key ht)
+          (setq dup-alist (shu-add-to-alist-list value key dup-alist))
+          (setq dup-alist (shu-add-to-alist-list value hv dup-alist)))
+        (setq value-list (cdr value-list)))
+      (setq al (cdr al)))
+    (setq ret-val (cons ht dup-alist))
+    ret-val
+    ))
+
+
+
+
+;;
+;;  shu-add-to-alist-list
+;;
+(defun shu-add-to-alist-list (key value alist)
+  "ALIST is an alist in which each element has a car that is the key and a cdr
+that is a list of values associated with that key.  If the given KEY does not
+already exist in ALIST, it is added to ALIST with a list of length one
+containing VALUE.  If the KEY exists in ALIST, VALUE is pushed onto the list of
+values associated with KEY.  The return value is the modified ALIST."
+  (let ((xkey)
+        (vlist))
+    (setq xkey (assoc key alist))
+    (if (not xkey)
+        (push (cons key (list value)) alist)
+      (setq vlist (cdr xkey))
+      (push value vlist)
+      (setcdr xkey vlist))
+    alist
+    ))
+
+
+
 
 ;;
 ;;  shu-split-new-lines
