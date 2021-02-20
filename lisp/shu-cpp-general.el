@@ -877,7 +877,8 @@ angle brackets.
 Return true if a class name was found an an include generated.  This is for the
 benefit of unit tests."
   (interactive)
-  (let* ((bol (line-beginning-position))
+  (let* ((gb (get-buffer-create "**foo**"))
+         (bol (line-beginning-position))
          (eol (line-end-position))
          (target-list (append shu-cpp-name-list (list ":")))
          (target-char (regexp-opt target-list nil))
@@ -891,10 +892,8 @@ benefit of unit tests."
          (qualified-name)
          (file-name)
          (include-name)
-         (left-delim (if shu-cpp-include-user-brackets "<" "\"")
-                       )
-         (right-delim (if shu-cpp-include-user-brackets ">" "\"")
-                        )
+         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+         (right-delim (if shu-cpp-include-user-brackets ">" "\""))
          (got-it))
     (save-excursion
       (if (not (looking-at target-char)) ;; Looking at a legal class name character
@@ -910,6 +909,7 @@ benefit of unit tests."
           (setq namespace (match-string 1)) ;; Have something that matches file name syntax
           (setq class-name (match-string 2))
           (setq qualified-name (concat namespace "::" class-name))
+          (princ (concat "qualified-name: " qualified-name "\n") gb)
           (setq file-name (shu-cpp-map-class-to-include qualified-name))
           (when (not file-name)
             (setq file-name (concat

@@ -38,9 +38,9 @@
 
 (defconst shu-test-cpp-general-expected-split1
   (concat
-"\"abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()_+-={}[]|:;'<>,.?ABCDEFGHIJKLMNO\"\n"
-"\"PQRSTUVWXYZ0987654321!@#$%^&*()_+-={}[]|:;'<>,.?abcdefghijklmnopqrstuvwxyz1234\"\n"
-"\"567890!@#$%^&*()_+-={}[]|:;'<>,.?ABCDEFGHIJKLMNOPQ\"")
+   "\"abcdefghijklmnopqrstuvwxyz1234567890!@#$%^&*()_+-={}[]|:;'<>,.?ABCDEFGHIJKLMNO\"\n"
+   "\"PQRSTUVWXYZ0987654321!@#$%^&*()_+-={}[]|:;'<>,.?abcdefghijklmnopqrstuvwxyz1234\"\n"
+   "\"567890!@#$%^&*()_+-={}[]|:;'<>,.?ABCDEFGHIJKLMNOPQ\"")
   "A test string for unit tests.")
 
 (defconst shu-test-cpp-general--dox-cbt1-input
@@ -65,8 +65,8 @@
 ;;
 (ert-deftest shu-test-shu-dox-cbt-1 ()
   (let ((result))
-          ;; Split of one long line starting in column 1
-  (with-temp-buffer
+    ;; Split of one long line starting in column 1
+    (with-temp-buffer
       (insert shu-test-cpp-general--dox-cbt1-input)
       (goto-char (point-min))
       (shu-dox-cbt)
@@ -74,7 +74,7 @@
       ;; Make sure the result is what we expect
       (setq result (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= shu-test-cpp-general-expected-dox-cbt1 result)))
-  ))
+    ))
 
 
 
@@ -91,7 +91,7 @@
     ;; Split of one long line starting in column 1
     (setq shu-cpp-line-end 80)
     (setq debug-on-error t)
-  (with-temp-buffer
+    (with-temp-buffer
       (insert shu-test-cpp-general-base-string)
       (goto-char (point-min))  ;; Sitting on top of open quote
       (shu-internal-csplit)             ;; Try to split
@@ -100,15 +100,15 @@
       (shu-internal-csplit t)             ;; Now try to split
       (should (= 215 (point))) ;; Point should have moved
       ;; Make sure the result is what we expect
-;;      (setq actual-split (buffer-substring-no-properties (point-min) (point-max)))
-;;      (should (string= shu-test-cpp-general-expected-split1 actual-split))
-;;      (goto-char 20)
-;;      ;; This should restore it to its original state
-;;      (shu-cunsplit)
-;;      (setq actual-unsplit (buffer-substring-no-properties 1 (1+ (length shu-test-cpp-general-base-string))))
-;;      (should (string= shu-test-cpp-general-base-string actual-unsplit))
+      ;;      (setq actual-split (buffer-substring-no-properties (point-min) (point-max)))
+      ;;      (should (string= shu-test-cpp-general-expected-split1 actual-split))
+      ;;      (goto-char 20)
+      ;;      ;; This should restore it to its original state
+      ;;      (shu-cunsplit)
+      ;;      (setq actual-unsplit (buffer-substring-no-properties 1 (1+ (length shu-test-cpp-general-base-string))))
+      ;;      (should (string= shu-test-cpp-general-base-string actual-unsplit))
       )
-))
+    ))
 
 
 
@@ -121,9 +121,9 @@
         (actual-unsplit)
         (base3 "\"abcdefg\"")
         )
-      ;; Split of very short line starting in column 1
+    ;; Split of very short line starting in column 1
     (setq shu-cpp-line-end 80)
-  (with-temp-buffer
+    (with-temp-buffer
       (insert base3)
       (goto-char (point-min))  ;; Sitting on top of open quote
       (shu-internal-csplit)             ;; Try to split
@@ -138,7 +138,7 @@
       (shu-cunsplit)           ;; Unsplit should do nothing either
       (setq actual-unsplit (buffer-substring-no-properties 1 (1+ (length base3))))
       (should (string= base3 actual-unsplit)))
-))
+    ))
 
 
 
@@ -154,9 +154,9 @@
                  "      \"JKLMNOPQRSTUVWXYZ0987654321!@#$%^&*()_+-={}[]|:;'<>,.?abcdefghijklmnopqr\"\n"
                  "      \"stuvwxyz1234567890!@#$%^&*()_+-={}[]|:;'<>,.?ABCDEFGHIJKLMNOPQ\""))
         )
-      ;; Split of one long line with 6 blanks in front of
+    ;; Split of one long line with 6 blanks in front of
     (setq shu-cpp-line-end 80)
-  (with-temp-buffer
+    (with-temp-buffer
       (insert (concat "      " shu-test-cpp-general-base-string))
       (goto-char (point-min))  ;; Sitting in front of string
       (shu-internal-csplit)             ;; Try to split
@@ -170,7 +170,7 @@
       (shu-cunsplit)           ;; Unsplit should restore to the original form
       (setq actual-unsplit (buffer-substring-no-properties 7 (+ 7 (length shu-test-cpp-general-base-string))))
       (should (string= shu-test-cpp-general-base-string actual-unsplit)))
-))
+    ))
 
 
 
@@ -232,18 +232,18 @@
         ;;                1         2         3         4         5         6         7         8
         (expected-split3
          (concat
-;;          "      \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
-;;          "      \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
-;;          "      \"\\t\\t\\t\\t\""))
-;;          "       \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
-;;          "       \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
-;;          "       \"\\t\\t\\t\\t\\t\\t\""))
-;;
+          ;;          "      \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
+          ;;          "      \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
+          ;;          "      \"\\t\\t\\t\\t\""))
+          ;;          "       \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
+          ;;          "       \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
+          ;;          "       \"\\t\\t\\t\\t\\t\\t\""))
+          ;;
           "       \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
           "       \"\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\\t\"\n"
           "       \"\\t\\t\\t\\t\\t\\t\""))
         (z)
-)
+        )
 
     ;; Split a long string full of tab characters
     ;; Make sure there is no split between a "\" and a "t" in the "\t" sequence
@@ -262,7 +262,7 @@
       (goto-char 30)           ;; Go inside of top string
       (shu-cunsplit)           ;; Unsplit should restore to the original form
       (setq actual-unsplit (buffer-substring-no-properties 8 (+ 8 (length base2))))
-;;      (setq actual-unsplit (buffer-substring-no-properties (point-min) (point-max)))
+      ;;      (setq actual-unsplit (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= base2 actual-unsplit)))
     ))
 
@@ -354,7 +354,7 @@
       (goto-char (point-min))
       (should (search-forward "that" nil t))
       (shu-internal-csplit)    ;; Now try to split
-    ;;  (should (= 179 (point))) ;; Point should be here
+      ;;  (should (= 179 (point))) ;; Point should be here
       (setq actual-split (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected-split4 actual-split))
       (goto-char 30)           ;; Go inside of top string
@@ -371,37 +371,37 @@
 ;;
 (ert-deftest shu-test-shu-creplace-1 ()
   (let (
-    (actual-split)
-    (actual-replace)
-    (replace1
-      (concat
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
-        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
-        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
-        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
-        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
-        "finibus lorem at elit varius, volutpat semper arcu"
-        "interdum. Quisque egestas tristique velit vel varius. In nisi"
-        "nulla, mollis quis mauris sit amet, dictum molestie"
-        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
-        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
-        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
-        "vulputate orci facilisis at."))
-    (expected-replace1
-      (concat
-       "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
-       "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
-       "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
-       "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
-       "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
-       "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
-       "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
-       "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
-       "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\""))
-    )
+        (actual-split)
+        (actual-replace)
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (expected-replace1
+         (concat
+          "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
+          "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
+          "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
+          "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
+          "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
+          "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
+          "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
+          "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
+          "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\""))
+        )
     ;; Do a shu-creplace of a split string with a long, unquoted string
     (setq shu-cpp-line-end 80)
-  (with-temp-buffer
+    (with-temp-buffer
       (insert shu-test-cpp-general-base-string)
       (goto-char (point-min))  ;; Sitting on top of open quote
       (shu-internal-csplit t)             ;; Try to split
@@ -412,14 +412,14 @@
       (setq actual-split (buffer-substring-no-properties 1 215))
       (should (string= shu-test-cpp-general-expected-split1 actual-split))
       (with-temp-buffer        ;; Put a different string in the kill ring
-          (insert replace1)
-          (copy-region-as-kill (point-min) (point-max)))
+        (insert replace1)
+        (copy-region-as-kill (point-min) (point-max)))
       (goto-char 30)           ;; Go to first line of split string
       (shu-internal-creplace t)           ;; Replace with contents of kill ring
       ;; Buffer must hold the expected result
       (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected-replace1 actual-replace)))
-))
+    ))
 
 
 
@@ -428,39 +428,39 @@
 ;;
 (ert-deftest shu-test-shu-creplace-2 ()
   (let (
-    (actual-split)
-    (actual-replace)
-    (replace1
-      (concat
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
-        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
-        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
-        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
-        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
-        "finibus lorem at elit varius, volutpat semper arcu"
-        "interdum. Quisque egestas tristique velit vel varius. In nisi"
-        "nulla, mollis quis mauris sit amet, dictum molestie"
-        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
-        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
-        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
-        "vulputate orci facilisis at."))
-    (replace2)
-    (expected-replace1
-      (concat
-       "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
-       "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
-       "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
-       "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
-       "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
-       "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
-       "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
-       "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
-       "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\""))
-    )
-  ;; Do a shu-creplace with a quoted string in the kill ring
-  (setq replace2 (concat "\"" replace1 "\""))
-  (setq shu-cpp-line-end 80)
-  (with-temp-buffer
+        (actual-split)
+        (actual-replace)
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (replace2)
+        (expected-replace1
+         (concat
+          "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
+          "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
+          "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
+          "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
+          "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
+          "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
+          "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
+          "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
+          "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\""))
+        )
+    ;; Do a shu-creplace with a quoted string in the kill ring
+    (setq replace2 (concat "\"" replace1 "\""))
+    (setq shu-cpp-line-end 80)
+    (with-temp-buffer
       (insert shu-test-cpp-general-base-string)
       (goto-char (point-min))  ;; Sitting on top of open quote
       (shu-internal-csplit t)             ;; Try to split
@@ -471,13 +471,13 @@
       (setq actual-split (buffer-substring-no-properties 1 215))
       (should (string= shu-test-cpp-general-expected-split1 actual-split))
       (with-temp-buffer        ;; Put a different, quoted string in the kill ring
-          (insert replace2)    ;; in the kill ring
-          (copy-region-as-kill (point-min) (point-max)))
+        (insert replace2)    ;; in the kill ring
+        (copy-region-as-kill (point-min) (point-max)))
       (goto-char 10)
       (shu-internal-creplace t)
       (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected-replace1 actual-replace)))
-))
+    ))
 
 
 
@@ -486,29 +486,29 @@
 ;;
 (ert-deftest shu-test-shu-creplace-3 ()
   (let (
-    (actual-split)
-    (actual-replace)
-    (replace1
-      (concat
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
-        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
-        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
-        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
-        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
-        "finibus lorem at elit varius, volutpat semper arcu"
-        "interdum. Quisque egestas tristique velit vel varius. In nisi"
-        "nulla, mollis quis mauris sit amet, dictum molestie"
-        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
-        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
-        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
-        "vulputate orci facilisis at."))
-    (replace2)
-    )
-  ;; Do a shu-creplace with a string in the kill ring that has a quote
-  ;; at the beginning but not the end
-  (setq replace2 (concat "\"" replace1))
-  (setq shu-cpp-line-end 80)
-  (with-temp-buffer
+        (actual-split)
+        (actual-replace)
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (replace2)
+        )
+    ;; Do a shu-creplace with a string in the kill ring that has a quote
+    ;; at the beginning but not the end
+    (setq replace2 (concat "\"" replace1))
+    (setq shu-cpp-line-end 80)
+    (with-temp-buffer
       (insert shu-test-cpp-general-base-string)
       (goto-char (point-min))  ;; Sitting on top of open quote
       (shu-internal-csplit t)             ;; Try to split
@@ -519,15 +519,15 @@
       (setq actual-split (buffer-substring-no-properties 1 215))
       (should (string= shu-test-cpp-general-expected-split1 actual-split))
       (with-temp-buffer        ;; Put a quote in the kill ring that
-          (insert replace2)    ;; has a quote at beginning but not end
-          (copy-region-as-kill (point-min) (point-max)))
+        (insert replace2)    ;; has a quote at beginning but not end
+        (copy-region-as-kill (point-min) (point-max)))
       (goto-char 10)           ;; Go to first line of string in buffer
       (shu-internal-creplace t)           ;; Try to do a replace
       (should (= 10 (point)))  ;; Nothing should have happened
       (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
       ;; Buffer should remain unchanged
       (should (string= shu-test-cpp-general-expected-split1 actual-replace)))
-))
+    ))
 
 
 
@@ -536,29 +536,29 @@
 ;;
 (ert-deftest shu-test-shu-creplace-4 ()
   (let (
-    (actual-split)
-    (actual-replace)
-    (replace1
-      (concat
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
-        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
-        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
-        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
-        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
-        "finibus lorem at elit varius, volutpat semper arcu"
-        "interdum. Quisque egestas tristique velit vel varius. In nisi"
-        "nulla, mollis quis mauris sit amet, dictum molestie"
-        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
-        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
-        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
-        "vulputate orci facilisis at."))
-    (replace2)
-    )
-  ;; Do a shu-creplace with a string in the kill ring that has a quote
-  ;; at the end but not the beginning
-  (setq replace2 (concat  replace1 "\""))
-  (setq shu-cpp-line-end 80)
-  (with-temp-buffer
+        (actual-split)
+        (actual-replace)
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (replace2)
+        )
+    ;; Do a shu-creplace with a string in the kill ring that has a quote
+    ;; at the end but not the beginning
+    (setq replace2 (concat  replace1 "\""))
+    (setq shu-cpp-line-end 80)
+    (with-temp-buffer
       (insert shu-test-cpp-general-base-string)
       (goto-char (point-min))  ;; Sitting on top of open quote
       (shu-internal-csplit t)             ;; Try to split
@@ -569,8 +569,8 @@
       (setq actual-split (buffer-substring-no-properties 1 215))
       (should (string= shu-test-cpp-general-expected-split1 actual-split))
       (with-temp-buffer        ;; Put a quote in the kill ring that
-          (insert replace2)    ;; has a quote at beginning but not end
-          (copy-region-as-kill (point-min) (point-max)))
+        (insert replace2)    ;; has a quote at beginning but not end
+        (copy-region-as-kill (point-min) (point-max)))
       (goto-char 10)           ;; Go to first line of string in buffer
       (shu-internal-creplace t)           ;; Try to do a replace
       (should (= 10 (point)))  ;; Nothing should have happened
@@ -578,7 +578,7 @@
       ;; Buffer should remain unchanged
       (should (string= shu-test-cpp-general-expected-split1 actual-replace)))
 
-))
+    ))
 
 
 
@@ -629,7 +629,7 @@
           "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
           "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\"")))
     ;; Do a shu-creplace of a split string with a long, unquoted string
-  (setq shu-cpp-line-end 80)
+    (setq shu-cpp-line-end 80)
     (with-temp-buffer
       (insert original1)
       (goto-char (point-min))  ;; Sitting on top of open quote
@@ -693,7 +693,7 @@
           "\"magna,vitae commodo leo dictum at. Donec aliquam purus tortor, sit \"\n"
           "\"ametvulputate orci facilisis at.\"")))
     ;; Do a shu-creplace of a split string with a long, unquoted string
-  (setq shu-cpp-line-end 80)
+    (setq shu-cpp-line-end 80)
     (with-temp-buffer
       (insert original1)
       (goto-char (point-min))  ;; Sitting on top of open quote
@@ -892,37 +892,37 @@
 ;;
 (ert-deftest shu-test-shu-creplace-1 ()
   (let (
-    (actual-split)
-    (actual-replace)
-    (replace1
-      (concat
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
-        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
-        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
-        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
-        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
-        "finibus lorem at elit varius, volutpat semper arcu"
-        "interdum. Quisque egestas tristique velit vel varius. In nisi"
-        "nulla, mollis quis mauris sit amet, dictum molestie"
-        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
-        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
-        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
-        "vulputate orci facilisis at."))
-    (expected-replace1
-      (concat
-       "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
-       "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
-       "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
-       "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
-       "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
-       "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
-       "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
-       "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
-       "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\""))
-    )
+        (actual-split)
+        (actual-replace)
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (expected-replace1
+         (concat
+          "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
+          "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
+          "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
+          "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
+          "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
+          "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
+          "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
+          "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
+          "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\""))
+        )
     ;; Do a shu-creplace of a split string with a long, unquoted string
     (setq shu-cpp-line-end 80)
-  (with-temp-buffer
+    (with-temp-buffer
       (insert shu-test-cpp-general-base-string)
       (goto-char (point-min))  ;; Sitting on top of open quote
       (shu-internal-csplit t)             ;; Try to split
@@ -933,14 +933,14 @@
       (setq actual-split (buffer-substring-no-properties 1 215))
       (should (string= shu-test-cpp-general-expected-split1 actual-split))
       (with-temp-buffer        ;; Put a different string in the kill ring
-          (insert replace1)
-          (copy-region-as-kill (point-min) (point-max)))
+        (insert replace1)
+        (copy-region-as-kill (point-min) (point-max)))
       (goto-char 30)           ;; Go to first line of split string
       (shu-internal-creplace t)           ;; Replace with contents of kill ring
       ;; Buffer must hold the expected result
       (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected-replace1 actual-replace)))
-))
+    ))
 
 
 
@@ -949,39 +949,39 @@
 ;;
 (ert-deftest shu-test-shu-creplace-2 ()
   (let (
-    (actual-split)
-    (actual-replace)
-    (replace1
-      (concat
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
-        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
-        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
-        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
-        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
-        "finibus lorem at elit varius, volutpat semper arcu"
-        "interdum. Quisque egestas tristique velit vel varius. In nisi"
-        "nulla, mollis quis mauris sit amet, dictum molestie"
-        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
-        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
-        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
-        "vulputate orci facilisis at."))
-    (replace2)
-    (expected-replace1
-      (concat
-       "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
-       "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
-       "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
-       "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
-       "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
-       "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
-       "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
-       "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
-       "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\""))
-    )
-  ;; Do a shu-creplace with a quoted string in the kill ring
-  (setq replace2 (concat "\"" replace1 "\""))
-  (setq shu-cpp-line-end 80)
-  (with-temp-buffer
+        (actual-split)
+        (actual-replace)
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (replace2)
+        (expected-replace1
+         (concat
+          "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eujusto lacinia\"\n"
+          "\" lectus imperdiet dignissim. Suspendisse neque purus,tincidunt gravida interdu\"\n"
+          "\"m et, egestas quis dolor. Quisquefermentum lorem nec dictum tempor. Etiam eget\"\n"
+          "\" enim pharetra,tristique ex at, porta dui. Fusce varius non orci ut semper. Nu\"\n"
+          "\"ncfinibus lorem at elit varius, volutpat semper arcuinterdum. Quisque egestas \"\n"
+          "\"tristique velit vel varius. In nisinulla, mollis quis mauris sit amet, dictum \"\n"
+          "\"molestiejusto. Curabitur feugiat eu mi at consectetur. Sed ultrices massavel t\"\n"
+          "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
+          "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\""))
+        )
+    ;; Do a shu-creplace with a quoted string in the kill ring
+    (setq replace2 (concat "\"" replace1 "\""))
+    (setq shu-cpp-line-end 80)
+    (with-temp-buffer
       (insert shu-test-cpp-general-base-string)
       (goto-char (point-min))  ;; Sitting on top of open quote
       (shu-internal-csplit t)             ;; Try to split
@@ -992,13 +992,13 @@
       (setq actual-split (buffer-substring-no-properties 1 215))
       (should (string= shu-test-cpp-general-expected-split1 actual-split))
       (with-temp-buffer        ;; Put a different, quoted string in the kill ring
-          (insert replace2)    ;; in the kill ring
-          (copy-region-as-kill (point-min) (point-max)))
+        (insert replace2)    ;; in the kill ring
+        (copy-region-as-kill (point-min) (point-max)))
       (goto-char 10)
       (shu-internal-creplace t)
       (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected-replace1 actual-replace)))
-))
+    ))
 
 
 
@@ -1007,29 +1007,29 @@
 ;;
 (ert-deftest shu-test-shu-creplace-3 ()
   (let (
-    (actual-split)
-    (actual-replace)
-    (replace1
-      (concat
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
-        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
-        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
-        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
-        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
-        "finibus lorem at elit varius, volutpat semper arcu"
-        "interdum. Quisque egestas tristique velit vel varius. In nisi"
-        "nulla, mollis quis mauris sit amet, dictum molestie"
-        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
-        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
-        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
-        "vulputate orci facilisis at."))
-    (replace2)
-    )
-  ;; Do a shu-creplace with a string in the kill ring that has a quote
-  ;; at the beginning but not the end
-  (setq replace2 (concat "\"" replace1))
-  (setq shu-cpp-line-end 80)
-  (with-temp-buffer
+        (actual-split)
+        (actual-replace)
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (replace2)
+        )
+    ;; Do a shu-creplace with a string in the kill ring that has a quote
+    ;; at the beginning but not the end
+    (setq replace2 (concat "\"" replace1))
+    (setq shu-cpp-line-end 80)
+    (with-temp-buffer
       (insert shu-test-cpp-general-base-string)
       (goto-char (point-min))  ;; Sitting on top of open quote
       (shu-internal-csplit t)             ;; Try to split
@@ -1040,15 +1040,15 @@
       (setq actual-split (buffer-substring-no-properties 1 215))
       (should (string= shu-test-cpp-general-expected-split1 actual-split))
       (with-temp-buffer        ;; Put a quote in the kill ring that
-          (insert replace2)    ;; has a quote at beginning but not end
-          (copy-region-as-kill (point-min) (point-max)))
+        (insert replace2)    ;; has a quote at beginning but not end
+        (copy-region-as-kill (point-min) (point-max)))
       (goto-char 10)           ;; Go to first line of string in buffer
       (shu-internal-creplace t)           ;; Try to do a replace
       (should (= 10 (point)))  ;; Nothing should have happened
       (setq actual-replace (buffer-substring-no-properties (point-min) (point-max)))
       ;; Buffer should remain unchanged
       (should (string= shu-test-cpp-general-expected-split1 actual-replace)))
-))
+    ))
 
 
 
@@ -1057,29 +1057,29 @@
 ;;
 (ert-deftest shu-test-shu-creplace-4 ()
   (let (
-    (actual-split)
-    (actual-replace)
-    (replace1
-      (concat
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
-        "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
-        "tincidunt gravida interdum et, egestas quis dolor. Quisque"
-        "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
-        "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
-        "finibus lorem at elit varius, volutpat semper arcu"
-        "interdum. Quisque egestas tristique velit vel varius. In nisi"
-        "nulla, mollis quis mauris sit amet, dictum molestie"
-        "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
-        "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
-        "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
-        "vulputate orci facilisis at."))
-    (replace2)
-    )
-  ;; Do a shu-creplace with a string in the kill ring that has a quote
-  ;; at the end but not the beginning
-  (setq replace2 (concat  replace1 "\""))
-  (setq shu-cpp-line-end 80)
-  (with-temp-buffer
+        (actual-split)
+        (actual-replace)
+        (replace1
+         (concat
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eu"
+          "justo lacinia lectus imperdiet dignissim. Suspendisse neque purus,"
+          "tincidunt gravida interdum et, egestas quis dolor. Quisque"
+          "fermentum lorem nec dictum tempor. Etiam eget enim pharetra,"
+          "tristique ex at, porta dui. Fusce varius non orci ut semper. Nunc"
+          "finibus lorem at elit varius, volutpat semper arcu"
+          "interdum. Quisque egestas tristique velit vel varius. In nisi"
+          "nulla, mollis quis mauris sit amet, dictum molestie"
+          "justo. Curabitur feugiat eu mi at consectetur. Sed ultrices massa"
+          "vel turpis pulvinar tristique. Etiam aliquam vulputate magna,"
+          "vitae commodo leo dictum at. Donec aliquam purus tortor, sit amet"
+          "vulputate orci facilisis at."))
+        (replace2)
+        )
+    ;; Do a shu-creplace with a string in the kill ring that has a quote
+    ;; at the end but not the beginning
+    (setq replace2 (concat  replace1 "\""))
+    (setq shu-cpp-line-end 80)
+    (with-temp-buffer
       (insert shu-test-cpp-general-base-string)
       (goto-char (point-min))  ;; Sitting on top of open quote
       (shu-internal-csplit t)             ;; Try to split
@@ -1090,8 +1090,8 @@
       (setq actual-split (buffer-substring-no-properties 1 215))
       (should (string= shu-test-cpp-general-expected-split1 actual-split))
       (with-temp-buffer        ;; Put a quote in the kill ring that
-          (insert replace2)    ;; has a quote at beginning but not end
-          (copy-region-as-kill (point-min) (point-max)))
+        (insert replace2)    ;; has a quote at beginning but not end
+        (copy-region-as-kill (point-min) (point-max)))
       (goto-char 10)           ;; Go to first line of string in buffer
       (shu-internal-creplace t)           ;; Try to do a replace
       (should (= 10 (point)))  ;; Nothing should have happened
@@ -1099,7 +1099,7 @@
       ;; Buffer should remain unchanged
       (should (string= shu-test-cpp-general-expected-split1 actual-replace)))
 
-))
+    ))
 
 
 
@@ -1150,7 +1150,7 @@
           "\"urpis pulvinar tristique. Etiam aliquam vulputate magna,vitae commodo leo dict\"\n"
           "\"um at. Donec aliquam purus tortor, sit ametvulputate orci facilisis at.\"")))
     ;; Do a shu-creplace of a split string with a long, unquoted string
-  (setq shu-cpp-line-end 80)
+    (setq shu-cpp-line-end 80)
     (with-temp-buffer
       (insert original1)
       (goto-char (point-min))  ;; Sitting on top of open quote
@@ -1214,7 +1214,7 @@
           "\"magna,vitae commodo leo dictum at. Donec aliquam purus tortor, sit \"\n"
           "\"ametvulputate orci facilisis at.\"")))
     ;; Do a shu-creplace of a split string with a long, unquoted string
-  (setq shu-cpp-line-end 80)
+    (setq shu-cpp-line-end 80)
     (with-temp-buffer
       (insert original1)
       (goto-char (point-min))  ;; Sitting on top of open quote
@@ -1235,11 +1235,11 @@
 ;;
 (ert-deftest shu-test-cif ()
   (let (
-    (expected-if1  "if ()\n{\n}")
-    (expected-if2  "         if ()\n         {\n         }")
-    (actual-if )
-       )
-  (with-temp-buffer
+        (expected-if1  "if ()\n{\n}")
+        (expected-if2  "         if ()\n         {\n         }")
+        (actual-if )
+        )
+    (with-temp-buffer
       (shu-cif)
       (should (= 5 (point)))
       (setq actual-if (buffer-substring-no-properties 1 10))
@@ -1250,8 +1250,8 @@
       (should (= 24 (point)))
       (setq actual-if (buffer-substring-no-properties 11 (point-max)))
       (should (string= expected-if2 actual-if))
-  )
-))
+      )
+    ))
 
 
 ;;
@@ -1259,11 +1259,11 @@
 ;;
 (ert-deftest shu-test-celse ()
   (let (
-    (expected-else1  "else\n{\n    \n}\n")
-    (expected-else2  "         else\n         {\n             \n         }\n")
-    (actual-else )
-       )
-  (with-temp-buffer
+        (expected-else1  "else\n{\n    \n}\n")
+        (expected-else2  "         else\n         {\n             \n         }\n")
+        (actual-else )
+        )
+    (with-temp-buffer
       (shu-celse)
       (should (= 12 (point)))
       (setq actual-else (buffer-substring-no-properties 1 15))
@@ -1274,8 +1274,8 @@
       (should (= 54 (point)))
       (setq actual-else (buffer-substring-no-properties 16 (point-max)))
       (should (string= expected-else2 actual-else))
-  )
-))
+      )
+    ))
 
 
 ;;
@@ -1283,11 +1283,11 @@
 ;;
 (ert-deftest shu-test-cfor ()
   (let (
-    (expected-for1  "for ()\n{\n}")
-    (expected-for2  "         for ()\n         {\n         }")
-    (actual-for )
-       )
-  (with-temp-buffer
+        (expected-for1  "for ()\n{\n}")
+        (expected-for2  "         for ()\n         {\n         }")
+        (actual-for )
+        )
+    (with-temp-buffer
       (shu-cfor)
       (should (= 6 (point)))
       (setq actual-for (buffer-substring-no-properties 1 11))
@@ -1298,8 +1298,8 @@
       (should (= 26 (point)))
       (setq actual-for (buffer-substring-no-properties 12 (point-max)))
       (should (string= expected-for2 actual-for))
-  )
-))
+      )
+    ))
 
 
 ;;
@@ -1307,11 +1307,11 @@
 ;;
 (ert-deftest shu-test-cwhile ()
   (let (
-    (expected-while1  "while ()\n{\n}")
-    (expected-while2  "         while ()\n         {\n         }")
-    (actual-while )
-       )
-  (with-temp-buffer
+        (expected-while1  "while ()\n{\n}")
+        (expected-while2  "         while ()\n         {\n         }")
+        (actual-while )
+        )
+    (with-temp-buffer
       (shu-cwhile)
       (should (= 8 (point)))
       (setq actual-while (buffer-substring-no-properties 1 13))
@@ -1322,8 +1322,8 @@
       (should (= 30 (point)))
       (setq actual-while (buffer-substring-no-properties 14 (point-max)))
       (should (string= expected-while2 actual-while))
-  )
-))
+      )
+    ))
 
 
 ;;
@@ -1331,11 +1331,11 @@
 ;;
 (ert-deftest shu-test-cdo ()
   (let (
-    (expected-do1  "do\n{\n} while();")
-    (expected-do2  "         do\n         {\n         } while();")
-    (actual-do )
-       )
-  (with-temp-buffer
+        (expected-do1  "do\n{\n} while();")
+        (expected-do2  "         do\n         {\n         } while();")
+        (actual-do )
+        )
+    (with-temp-buffer
       (shu-cdo)
       (should (= 14 (point)))
       (setq actual-do (buffer-substring-no-properties 1 16))
@@ -1346,8 +1346,8 @@
       (should (= 57 (point)))
       (setq actual-do (buffer-substring-no-properties 17 (point-max)))
       (should (string= expected-do2 actual-do))
-  )
-))
+      )
+    ))
 
 
 
@@ -1357,10 +1357,10 @@
 (ert-deftest shu-test-shu-qualify-class-name-1 ()
   "Add a namespace to a class name when it is the only thing in the buffer"
   (let* ((class "Mumble")
-        (namespace "abcdef")
-        (expected (concat namespace "::" class))
-        (actual)
-        (count))
+         (namespace "abcdef")
+         (expected (concat namespace "::" class))
+         (actual)
+         (count))
     (with-temp-buffer
       (insert class)
       (goto-char (point-min))
@@ -1368,7 +1368,7 @@
       (should (= 1 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1378,12 +1378,12 @@
   "Add a namespace to a class name when it is the only thing in the buffer and it has
 something in front of it."
   (let* ((class "Mumble")
-        (namespace "abcdef")
-        (prefix "  <")
-        (suffix "")
-        (expected (concat prefix namespace "::" class suffix))
-        (actual)
-        (count))
+         (namespace "abcdef")
+         (prefix "  <")
+         (suffix "")
+         (expected (concat prefix namespace "::" class suffix))
+         (actual)
+         (count))
     (with-temp-buffer
       (insert (concat prefix class suffix))
       (goto-char (point-min))
@@ -1391,7 +1391,7 @@ something in front of it."
       (should (= 1 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1401,12 +1401,12 @@ something in front of it."
   "Add a namespace to a class name when it is the only thing in the buffer and it has
 something in front of it and following it."
   (let* ((class "Mumble")
-        (namespace "abcdef")
-        (prefix "  <")
-        (suffix ">")
-        (expected (concat prefix namespace "::" class suffix))
-        (actual)
-        (count))
+         (namespace "abcdef")
+         (prefix "  <")
+         (suffix ">")
+         (expected (concat prefix namespace "::" class suffix))
+         (actual)
+         (count))
     (with-temp-buffer
       (insert (concat prefix class suffix))
       (goto-char (point-min))
@@ -1414,7 +1414,7 @@ something in front of it and following it."
       (should (= 1 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1424,13 +1424,13 @@ something in front of it and following it."
   "Do not add a namespace to something that might look like a class name but has the
 wrong case."
   (let* ((class "Mumble")
-        (data "mumble")
-        (namespace "abcdef")
-        (prefix "  <")
-        (suffix ">")
-        (expected (concat prefix data suffix))
-        (actual)
-        (count))
+         (data "mumble")
+         (namespace "abcdef")
+         (prefix "  <")
+         (suffix ">")
+         (expected (concat prefix data suffix))
+         (actual)
+         (count))
     (with-temp-buffer
       (insert (concat prefix data suffix))
       (goto-char (point-min))
@@ -1438,7 +1438,7 @@ wrong case."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1448,13 +1448,13 @@ wrong case."
   "Do not add a namespace to something that might look like a class name but is part
 of a variable name with characters in front and with something also surrounding it."
   (let* ((class "Mumble")
-        (data "d_Mumble")
-        (namespace "abcdef")
-        (prefix "  <")
-        (suffix ">")
-        (expected (concat prefix data suffix))
-        (actual)
-        (count))
+         (data "d_Mumble")
+         (namespace "abcdef")
+         (prefix "  <")
+         (suffix ">")
+         (expected (concat prefix data suffix))
+         (actual)
+         (count))
     (with-temp-buffer
       (insert (concat prefix data suffix))
       (goto-char (point-min))
@@ -1462,7 +1462,7 @@ of a variable name with characters in front and with something also surrounding 
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1472,13 +1472,13 @@ of a variable name with characters in front and with something also surrounding 
   "Do not add a namespace to something that might look like a class name but is part
 of a variable name with characters at the end and with something also surrounding it."
   (let* ((class "Mumble")
-        (data "MumbleIn")
-        (namespace "abcdef")
-        (prefix "  <")
-        (suffix ">")
-        (expected (concat prefix data suffix))
-        (actual)
-        (count))
+         (data "MumbleIn")
+         (namespace "abcdef")
+         (prefix "  <")
+         (suffix ">")
+         (expected (concat prefix data suffix))
+         (actual)
+         (count))
     (with-temp-buffer
       (insert (concat prefix data suffix))
       (goto-char (point-min))
@@ -1486,7 +1486,7 @@ of a variable name with characters at the end and with something also surroundin
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1496,11 +1496,11 @@ of a variable name with characters at the end and with something also surroundin
   "Do not add a namespace to something that might look like a class name but is part
 of a variable name with characters in front."
   (let* ((class "Mumble")
-        (data "d_Mumble")
-        (namespace "abcdef")
-        (expected data)
-        (actual)
-        (count))
+         (data "d_Mumble")
+         (namespace "abcdef")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1508,7 +1508,7 @@ of a variable name with characters in front."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1518,11 +1518,11 @@ of a variable name with characters in front."
   "Do not add a namespace to something that might look like a class name but is part
 of a variable name with characters at the end."
   (let* ((class "Mumble")
-        (data "MumbleIn")
-        (namespace "abcdef")
-        (expected data)
-        (actual)
-        (count))
+         (data "MumbleIn")
+         (namespace "abcdef")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1530,7 +1530,7 @@ of a variable name with characters at the end."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1539,11 +1539,11 @@ of a variable name with characters at the end."
 (ert-deftest shu-test-shu-qualify-class-name-9 ()
   "Add a namespace to multiple class names."
   (let* ((class "Mumble")
-        (data "Mumble Mumble    Mumble")
-        (namespace "abcdef")
-        (expected "abcdef::Mumble abcdef::Mumble    abcdef::Mumble")
-        (actual)
-        (count))
+         (data "Mumble Mumble    Mumble")
+         (namespace "abcdef")
+         (expected "abcdef::Mumble abcdef::Mumble    abcdef::Mumble")
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1551,7 +1551,7 @@ of a variable name with characters at the end."
       (should (= 3 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1560,11 +1560,11 @@ of a variable name with characters at the end."
 (ert-deftest shu-test-shu-qualify-class-name-10 ()
   "Do not add namespace to qualified class name."
   (let* ((class "Mumble")
-        (data "abcdef::Mumble")
-        (namespace "abcdef")
-        (expected data)
-        (actual)
-        (count))
+         (data "abcdef::Mumble")
+         (namespace "abcdef")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1572,7 +1572,7 @@ of a variable name with characters at the end."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1581,11 +1581,11 @@ of a variable name with characters at the end."
 (ert-deftest shu-test-shu-qualify-class-name-11 ()
   "Do not add namespace to qualified class name."
   (let* ((class "Mumble")
-        (data "abcdef  ::  Mumble")
-        (namespace "abcdef")
-        (expected data)
-        (actual)
-        (count))
+         (data "abcdef  ::  Mumble")
+         (namespace "abcdef")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1593,7 +1593,7 @@ of a variable name with characters at the end."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1602,11 +1602,11 @@ of a variable name with characters at the end."
 (ert-deftest shu-test-shu-qualify-class-name-12 ()
   "Do not add namespace to qualified class name."
   (let* ((class "Mumble")
-        (data "abcdef::Mumble")
-        (namespace "abcdef")
-        (expected data)
-        (actual)
-        (count))
+         (data "abcdef::Mumble")
+         (namespace "abcdef")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1614,7 +1614,7 @@ of a variable name with characters at the end."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1623,11 +1623,11 @@ of a variable name with characters at the end."
 (ert-deftest shu-test-shu-qualify-class-name-13 ()
   "Do not add namespace to lower case name."
   (let* ((class "Mumble")
-        (data "mumble")
-        (namespace "abcdef")
-        (expected data)
-        (actual)
-        (count))
+         (data "mumble")
+         (namespace "abcdef")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1635,7 +1635,7 @@ of a variable name with characters at the end."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1645,11 +1645,11 @@ of a variable name with characters at the end."
   "Do not add namespace to class name preceeded by \">\".  This is most likely
 an arrow operator preceeding a function call."
   (let* ((class "Mumble")
-        (data "boo -> Mumble")
-        (namespace "abcdef")
-        (expected data)
-        (actual)
-        (count))
+         (data "boo -> Mumble")
+         (namespace "abcdef")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1657,7 +1657,7 @@ an arrow operator preceeding a function call."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1667,11 +1667,11 @@ an arrow operator preceeding a function call."
   "Do not add namespace to class name preceeded by \">\".  This is most likely
 an arrow operator preceeding a function call."
   (let* ((class "Mumble")
-        (data "boo->Mumble")
-        (namespace "abcdef")
-        (expected data)
-        (actual)
-        (count))
+         (data "boo->Mumble")
+         (namespace "abcdef")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1679,7 +1679,7 @@ an arrow operator preceeding a function call."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1689,11 +1689,11 @@ an arrow operator preceeding a function call."
   "Do not add namespace to class name preceeded by \".\".  This is most likely
 a reference doing a function call."
   (let* ((class "Mumble")
-        (data "boo.Mumble")
-        (namespace "abcdef")
-        (expected data)
-        (actual)
-        (count))
+         (data "boo.Mumble")
+         (namespace "abcdef")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1701,7 +1701,7 @@ a reference doing a function call."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1711,11 +1711,11 @@ a reference doing a function call."
   "Do not add namespace to class name preceeded by \".\".  This is most likely
 a reference doing a function call."
   (let* ((class "Mumble")
-        (data "boo . Mumble")
-        (namespace "abcdef")
-        (expected data)
-        (actual)
-        (count))
+         (data "boo . Mumble")
+         (namespace "abcdef")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1723,7 +1723,7 @@ a reference doing a function call."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1733,11 +1733,11 @@ a reference doing a function call."
   "Do not reject a class name that is preceeded by a dot, arrow, or colon on
 a previous line."
   (let* ((class "Mumble")
-        (data "boo . \n  Mumble")
-        (namespace "abcdef")
-        (expected "abcdef::Mumble")
-        (actual)
-        (count))
+         (data "boo . \n  Mumble")
+         (namespace "abcdef")
+         (expected "abcdef::Mumble")
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1745,7 +1745,7 @@ a previous line."
       (should (= 1 count))
       (setq actual (buffer-substring-no-properties 10 (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1755,11 +1755,11 @@ a previous line."
   "Do not add namespace to class name preceeded by \"#include\" on the same line.
 This is most likely the name of an include file and not the name of a class."
   (let* ((class "string")
-        (data "#include <string>")
-        (namespace "std")
-        (expected data)
-        (actual)
-        (count))
+         (data "#include <string>")
+         (namespace "std")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1767,7 +1767,7 @@ This is most likely the name of an include file and not the name of a class."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1777,11 +1777,11 @@ This is most likely the name of an include file and not the name of a class."
   "Do not add namespace to class name preceeded by \"#include\" on the same line.
 This is most likely the name of an include file and not the name of a class."
   (let* ((class "string")
-        (data " # include <string>")
-        (namespace "std")
-        (expected data)
-        (actual)
-        (count))
+         (data " # include <string>")
+         (namespace "std")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1789,7 +1789,7 @@ This is most likely the name of an include file and not the name of a class."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1798,11 +1798,11 @@ This is most likely the name of an include file and not the name of a class."
 (ert-deftest shu-test-shu-qualify-class-name-21 ()
   "Do not add namespace to class name that is locaated inside a string."
   (let* ((class "set")
-        (data "\"This is how we set the pointer.\"")
-        (namespace "std")
-        (expected data)
-        (actual)
-        (count))
+         (data "\"This is how we set the pointer.\"")
+         (namespace "std")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1810,7 +1810,7 @@ This is most likely the name of an include file and not the name of a class."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1819,11 +1819,11 @@ This is most likely the name of an include file and not the name of a class."
 (ert-deftest shu-test-shu-qualify-class-name-22 ()
   "Do not add namespace to class name that is locaated inside a comment."
   (let* ((class "set")
-        (data " // This is how we set the pointer.")
-        (namespace "std")
-        (expected data)
-        (actual)
-        (count))
+         (data " // This is how we set the pointer.")
+         (namespace "std")
+         (expected data)
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1831,7 +1831,7 @@ This is most likely the name of an include file and not the name of a class."
       (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1840,13 +1840,13 @@ This is most likely the name of an include file and not the name of a class."
 (ert-deftest shu-test-shu-qualify-class-name-23 ()
   "Add a namespace to a class name that is followed by a comment."
   (let* ((class "Mumble")
-        (namespace "abcdef")
-        (prefix "  ")
-        (suffix "  // A comment")
-        (expected (concat prefix namespace "::" class suffix))
-        (data (concat prefix class suffix))
-        (actual)
-        (count))
+         (namespace "abcdef")
+         (prefix "  ")
+         (suffix "  // A comment")
+         (expected (concat prefix namespace "::" class suffix))
+         (data (concat prefix class suffix))
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1854,7 +1854,7 @@ This is most likely the name of an include file and not the name of a class."
       (should (= 1 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 ;;
@@ -1863,13 +1863,13 @@ This is most likely the name of an include file and not the name of a class."
 (ert-deftest shu-test-shu-qualify-class-name-24 ()
   "Add a namespace to a class name that is preceeded by a comment in a string."
   (let* ((class "Mumble")
-        (namespace "abcdef")
-        (prefix "  \" // cmt in string \" ")
-        (suffix "  ")
-        (expected (concat prefix namespace "::" class suffix))
-        (data (concat prefix class suffix))
-        (actual)
-        (count))
+         (namespace "abcdef")
+         (prefix "  \" // cmt in string \" ")
+         (suffix "  ")
+         (expected (concat prefix namespace "::" class suffix))
+         (data (concat prefix class suffix))
+         (actual)
+         (count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1877,7 +1877,7 @@ This is most likely the name of an include file and not the name of a class."
       (should (= 1 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
-))
+    ))
 
 
 
@@ -2534,13 +2534,13 @@ This is most likely the name of an include file and not the name of a class."
 ;;
 (ert-deftest shu-test-shu-binclude-1 ()
   (let* ((data "  abcdef::MumbleFrotz  x(5);\n")
-        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
-        (right-delim (if shu-cpp-include-user-brackets ">" "\""))
-        (actual)
-        (expected
-         (concat
-          "#include "
-          left-delim "abcdef_mumblefrotz.h" right-delim)))
+         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+         (right-delim (if shu-cpp-include-user-brackets ">" "\""))
+         (actual)
+         (expected
+          (concat
+           "#include "
+           left-delim "abcdef_mumblefrotz.h" right-delim)))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -2560,13 +2560,13 @@ This is most likely the name of an include file and not the name of a class."
 ;;
 (ert-deftest shu-test-shu-binclude-2 ()
   (let* ((data "  abcdef::MumbleFrotz  x(5);\n")
-        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
-        (right-delim (if shu-cpp-include-user-brackets ">" "\""))
-        (actual)
-        (expected
-         (concat
-          "#include "
-          left-delim "abcdef_mumblefrotz.h" right-delim)))
+         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+         (right-delim (if shu-cpp-include-user-brackets ">" "\""))
+         (actual)
+         (expected
+          (concat
+           "#include "
+           left-delim "abcdef_mumblefrotz.h" right-delim)))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -2586,13 +2586,13 @@ This is most likely the name of an include file and not the name of a class."
 ;;
 (ert-deftest shu-test-shu-binclude-3 ()
   (let* ((data "  abcdef::MumbleFrotz  x(5);\n")
-        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
-        (right-delim (if shu-cpp-include-user-brackets ">" "\""))
-        (actual)
-        (expected
-         (concat
-          "#include "
-          left-delim "abcdef_mumblefrotz.h" right-delim)))
+         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+         (right-delim (if shu-cpp-include-user-brackets ">" "\""))
+         (actual)
+         (expected
+          (concat
+           "#include "
+           left-delim "abcdef_mumblefrotz.h" right-delim)))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -2612,13 +2612,43 @@ This is most likely the name of an include file and not the name of a class."
 ;;
 (ert-deftest shu-test-shu-binclude-4 ()
   (let* ((data "  abcdef::MumbleFrotz xxx(5);\n")
-        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
-        (right-delim (if shu-cpp-include-user-brackets ">" "\"")))
+         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+         (right-delim (if shu-cpp-include-user-brackets ">" "\"")))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
       (should (search-forward "xxx"))
       (should (not (shu-binclude))))
+    ))
+
+
+
+;;
+;;  shu-test-shu-binclude-5
+;;
+(ert-deftest shu-test-shu-binclude-5 ()
+  (let* ((namespace (if shu-cpp-use-bde-library "bsl" "std"))
+         (data (concat "  " namespace "::size_t  x(5);\n"))
+         (left-delim (if shu-cpp-include-user-brackets "<" "\"")
+                     )
+         (right-delim (if shu-cpp-include-user-brackets ">" "\"")
+                      )
+         (actual)
+         (hname (if shu-cpp-use-bde-library "bsl_cstddef.h" "cstddef"))
+         (expected
+          (concat
+           "#include "
+           left-delim hname right-delim)))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (should (search-forward ":"))
+      (shu-binclude))
+    (with-temp-buffer
+      (yank)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (stringp actual))
+    (should (string= expected actual))
     ))
 
 
@@ -2717,10 +2747,10 @@ This is most likely the name of an include file and not the name of a class."
 (ert-deftest shu-test-shu-cpp-get-variable-name-1 ()
   (let* ((expected-name "mumble")
          (actual-name)
-        (data
-         (concat
-          "\n  // hello\n"
-          "x = " expected-name  " * 2\n")))
+         (data
+          (concat
+           "\n  // hello\n"
+           "x = " expected-name  " * 2\n")))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -2740,7 +2770,7 @@ This is most likely the name of an include file and not the name of a class."
 (ert-deftest shu-test-shu-cpp-get-variable-name-2 ()
   (let* ((expected-name "mumble")
          (actual-name)
-        (data expected-name))
+         (data expected-name))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -2759,10 +2789,10 @@ This is most likely the name of an include file and not the name of a class."
 (ert-deftest shu-test-shu-cpp-get-variable-name-3 ()
   (let* ((non-name "@.@!")
          (actual-name)
-        (data
-         (concat
-          "\n  // hello\n"
-          "x = " non-name  " * 2\n")))
+         (data
+          (concat
+           "\n  // hello\n"
+           "x = " non-name  " * 2\n")))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -3109,9 +3139,10 @@ This is most likely the name of an include file and not the name of a class."
 ;;  shu-test-shu-cpp-map-class-to-include-1
 ;;
 (ert-deftest shu-test-shu-cpp-map-class-to-include-1 ()
-  (let ((class-name "std::make_shared")
-        (expected-name "memory")
-        (actual-name))
+  (let* ((namespace (if shu-cpp-use-bde-library "bsl" "std"))
+         (class-name (concat namespace "::make_shared"))
+         (expected-name (if shu-cpp-use-bde-library "bsl_memory.h?" "memory"))
+         (actual-name))
     (setq actual-name (shu-cpp-map-class-to-include class-name))
     (should actual-name)
     (should (stringp actual-name))
