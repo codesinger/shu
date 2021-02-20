@@ -3104,4 +3104,33 @@ This is most likely the name of an include file and not the name of a class."
 
 
 
+
+;;
+;;  shu-test-shu-cpp-map-class-to-include-1
+;;
+(ert-deftest shu-test-shu-cpp-map-class-to-include-1 ()
+  (let ((class-name "std::make_shared")
+        (expected-name "memory")
+        (actual-name))
+    (setq actual-name (shu-cpp-map-class-to-include class-name))
+    (should actual-name)
+    (should (stringp actual-name))
+    (should (string= expected-name actual-name))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-map-class-to-include-2
+;;
+(ert-deftest shu-test-shu-cpp-map-class-to-include-2 ()
+  (let ((class-name "zzz::mumble")
+        (actual-name))
+    (setq actual-name (shu-cpp-map-class-to-include class-name))
+    (should (not actual-name))
+    ))
+
+
+
 ;;; shu-cpp-general.t.el ends here

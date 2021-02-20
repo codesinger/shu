@@ -144,6 +144,139 @@ This is used by shu-internal-get-set when generating getters and setters for a c
   "An alist of \"using namespace\" directives and their line numbers where first declared.
 Used to filter duplicates.")
 
+(defvar shu-cpp-include-names nil
+  "A hash table that maps class names to include file names  This is the hash table
+inversion of shu-std-include-liat.")
+
+;;
+;;  shu-std-include-liat
+;;
+(defconst shu-std-include-list
+  (if (not shu-cpp-use-bde-library)
+      (progn
+        (list
+         (cons "cstddef"    (list
+                             "std::size_t"
+                             "std::ptrdiff_t"
+                             "std::max_align_t"
+                             "std::nullptr_t"
+                             ))
+         (cons "memory"    (list
+                            "std::allocator"
+                            "std::allocator_arg"
+                            "std::allocator_arg_t"
+                            "std::allocator_traits"
+                            "std::auto_ptr"
+                            "std::auto_ptr_ref"
+                            "std::shared_ptr"
+                            "std::weak_ptr"
+                            "std::unique_ptr"
+                            "std::default_delete"
+                            "std::make_shared"
+                            "std::allocate_shared"
+                            "std::static_pointer_cast"
+                            "std::dynamic_pointer_cast"
+                            "std::const_pointer_cast"
+                            "std::get_deleter"
+                            "std::owner_less"
+                            "std::enable_shared_from_this"
+                            "std::raw_storage_iterator"
+                            "std::get_temporary_buffer"
+                            "std::return_temporary_buffer"
+                            "std::uninitialized_copy"
+                            "std::uninitialized_copy_n"
+                            "std::uninitialized_fill"
+                            "std::uninitialized_fill_n"
+                            "std::pointer_traits"
+                            "std::pointer_safety"
+                            "std::declare_reachable"
+                            "std::undeclare_reachable"
+                            "std::declare_no_pointers"
+                            "std::undeclare_no_pointers"
+                            "std::get_pointer_safety"
+                            "std::align"
+                            "std::addressof"
+                            ))
+         (cons "string"   (list
+                           "std::basic_string"
+                           "std::char_traits"
+                           "std::string"
+                           "std::u16striung"
+                           "std::wstring"
+                           "std::stoi"
+                           "std::stol"
+                           "std::stoul"
+                           "std::stoll"
+                           "std::stoull"
+                           "std::stof"
+                           "std::stod"
+                           "std::stold"
+                           "std::to_string"
+                           "std::to_wstring"
+                           ))))
+    (list
+     (cons "bsl_cstddef.h"    (list
+                               "bsl::size_t"
+                               "bsl::ptrdiff_t"
+                               "bsl::max_align_t"
+                               "bsl::nullptr_t"
+                               ))
+     (cons "bsl_memory.h"    (list
+                              "bsl::allocator"
+                              "bsl::allocator_arg"
+                              "bsl::allocator_arg_t"
+                              "bsl::allocator_traits"
+                              "bsl::auto_ptr"
+                              "bsl::auto_ptr_ref"
+                              "bsl::shared_ptr"
+                              "bsl::weak_ptr"
+                              "bsl::unique_ptr"
+                              "bsl::default_delete"
+                              "bsl::make_shared"
+                              "bsl::allocate_shared"
+                              "bsl::static_pointer_cast"
+                              "bsl::dynamic_pointer_cast"
+                              "bsl::const_pointer_cast"
+                              "bsl::get_deleter"
+                              "bsl::owner_less"
+                              "bsl::enable_shared_from_this"
+                              "bsl::raw_storage_iterator"
+                              "bsl::get_temporary_buffer"
+                              "bsl::return_temporary_buffer"
+                              "bsl::uninitialized_copy"
+                              "bsl::uninitialized_copy_n"
+                              "bsl::uninitialized_fill"
+                              "bsl::uninitialized_fill_n"
+                              "bsl::pointer_traits"
+                              "bsl::pointer_safety"
+                              "bsl::declare_reachable"
+                              "bsl::undeclare_reachable"
+                              "bsl::declare_no_pointers"
+                              "bsl::undeclare_no_pointers"
+                              "bsl::get_pointer_safety"
+                              "bsl::align"
+                              "bsl::addressof"
+                              ))
+     (cons "bsl_string.h"   (list
+                             "bsl::basic_string"
+                             "bsl::char_traits"
+                             "bsl::string"
+                             "bsl::u16striung"
+                             "bsl::wstring"
+                             "bsl::stoi"
+                             "bsl::stol"
+                             "bsl::stoul"
+                             "bsl::stoll"
+                             "bsl::stoull"
+                             "bsl::stof"
+                             "bsl::stod"
+                             "bsl::stold"
+                             "bsl::to_string"
+                             "bsl::to_wstring"
+                             ))))
+  "An alist that maps include file names to class names.")
+
+
 ;;
 ;;  Functions for customzing
 ;;
@@ -160,6 +293,23 @@ This modifies shu-cpp-base-types."
     (when (not (listp nt))
       (setq nt (list nt)))
     (setq shu-cpp-base-types (append shu-cpp-base-types nt))
+    ))
+
+
+
+;;
+;;  shu-cpp-map-class-to-include
+;;
+(defun shu-cpp-map-class-to-include (class-name)
+  "CLASS-NAME is a fully qualified class name (std::string as an example).  This
+function returns the name of the include file that defines the class, if known."
+  (let ((ret-val)
+        (file-name))
+    (when (not shu-cpp-include-names)
+      (setq ret-val (shu-invert-alist-to-hash shu-std-include-list))
+      (setq shu-cpp-include-names (car ret-val)))
+    (setq file-name (gethash class-name shu-cpp-include-names))
+    file-name
     ))
 
 
@@ -738,10 +888,13 @@ benefit of unit tests."
            "\\(" shu-cpp-name "+\\)"))
          (namespace)
          (class-name)
+         (qualified-name)
          (file-name)
          (include-name)
-         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
-         (right-delim (if shu-cpp-include-user-brackets ">" "\""))
+         (left-delim (if shu-cpp-include-user-brackets "<" "\"")
+                       )
+         (right-delim (if shu-cpp-include-user-brackets ">" "\"")
+                        )
          (got-it))
     (save-excursion
       (if (not (looking-at target-char)) ;; Looking at a legal class name character
@@ -756,9 +909,12 @@ benefit of unit tests."
             (message "%s" "Not a properly formed class name")
           (setq namespace (match-string 1)) ;; Have something that matches file name syntax
           (setq class-name (match-string 2))
-          (setq file-name (concat
-                           (downcase namespace) "_"
-                           (downcase class-name) ".h"))
+          (setq qualified-name (concat namespace "::" class-name))
+          (setq file-name (shu-cpp-map-class-to-include qualified-name))
+          (when (not file-name)
+            (setq file-name (concat
+                             (downcase namespace) "_"
+                             (downcase class-name) ".h")))
           (setq include-name (concat
                               "#include "
                               left-delim file-name right-delim))
