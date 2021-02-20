@@ -159,6 +159,14 @@ inversion of shu-std-include-liat or shu-bsl-include-list.")
                        "std::max_align_t"
                        "std::nullptr_t"
                        ))
+   (cons "functional"    (list
+                          "std::function"
+                          "std::mem_fn"
+                          "std::bad_function_call"
+                          "std::is_bind_expression"
+                          "std::is_placeholder"
+                          "std::reference_wrapper"
+                          ))
    (cons "memory"    (list
                       "std::allocator"
                       "std::allocator_arg"
@@ -227,6 +235,14 @@ inversion of shu-std-include-liat or shu-bsl-include-list.")
                              "bsl::max_align_t"
                              "bsl::nullptr_t"
                              ))
+   (cons "bsl_functional.h"    (list
+                                "bsl::function"
+                                "bsl::mem_fn"
+                                "bsl::bad_function_call"
+                                "bsl::is_bind_expression"
+                                "bsl::is_placeholder"
+                                "bsl::reference_wrapper"
+                                ))
    (cons "bsl_memory.h"    (list
                             "bsl::allocator"
                             "bsl::allocator_arg"
@@ -279,8 +295,19 @@ inversion of shu-std-include-liat or shu-bsl-include-list.")
                            "bsl::stold"
                            "bsl::to_string"
                            "bsl::to_wstring"
-                           )))
+                           ))
+   (cons "bsls_atomic.h"   (list
+                            "bsls::AtomicBool"
+                            "bsls::AtomicInt"
+                            "bsls::AtomicInt64"
+                            "bsls::AtomicUint"
+                            "bsls::AtomicUint64"
+                            "bsls::AtomicPointer"
+                            ))
+   )
   "An alist that maps include file names to class names when using BDE.")
+
+
 
 
 ;;
