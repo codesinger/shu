@@ -238,12 +238,12 @@ inversion of shu-std-include-liat or shu-bsl-include-list.")
 (defconst shu-bsl-include-list
   (list
    (cons "bsl_algorithm.h"    (list
-                               "std::for_each"
-                               "std::copy"
-                               "std::sort"
-                               "std::transform"
-                               "std::replace"
-                               "std::replace_if"
+                               "bsl::for_each"
+                               "bsl::copy"
+                               "bsl::sort"
+                               "bsl::transform"
+                               "bsl::replace"
+                               "bsl::replace_if"
                                ))
    (cons "bsl_cstddef.h"    (list
                              "bsl::size_t"
