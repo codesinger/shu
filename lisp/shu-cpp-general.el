@@ -146,10 +146,10 @@ Used to filter duplicates.")
 
 (defvar shu-cpp-include-names nil
   "A hash table that maps class names to include file names  This is the hash table
-inversion of shu-std-include-liat or shu-bsl-include-list.")
+inversion of shu-std-include-list or shu-bsl-include-list.")
 
 ;;
-;;  shu-std-include-liat
+;;  shu-std-include-list
 ;;
 (defconst shu-std-include-list
   (list
@@ -233,7 +233,7 @@ inversion of shu-std-include-liat or shu-bsl-include-list.")
 
 
 ;;
-;;  shu-bsl-include-liat
+;;  shu-bsl-include-list
 ;;
 (defconst shu-bsl-include-list
   (list
