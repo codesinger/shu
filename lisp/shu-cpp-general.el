@@ -911,10 +911,13 @@ function returns the name of the include file that defines the class, if known."
 ;;
 (defun shu-binclude ()
   "If point is sitting on something that resembles a fully qualified class name,
-use the standard BDE algorithm to turn the class name into the name of an
-include file.  The standard BDE algorithm replaces the :: between namespace and
-class name with an underscore, makes all letters lower case, and appends \".h\"
-to the end of the name.
+first check to see if it is in list of standard class names defined in
+SHU-CPP-INCLUDE-NAMES.  If it is found there, that defines the name of the
+defining include file.  If it is not found there, then use the standard BDE
+algorithm to turn the class name into the name of an include file.  The standard
+BDE algorithm replaces the :: between namespace and class name with an
+underscore, makes all letters lower case, and appends \".h\" to the end of the
+name.
 
 Thus \"abcdef::MumbleFrotz\" becomes \"abcdef_mumblefrotz.h\".
 

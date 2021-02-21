@@ -3164,4 +3164,46 @@ This is most likely the name of an include file and not the name of a class."
 
 
 
+;;
+;;  shu-test-shu-std-include-list
+;;
+(ert-deftest shu-test-shu-std-include-list ()
+  "Check to ensure that SHU-STD-INCLUDE-LIST does not include any overlapping
+class names."
+  (let ((ret-val)
+        (ht)
+        (dup-alist))
+    (setq ret-val (shu-invert-alist-to-hash shu-std-include-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq ht (car ret-val))
+    (should ht)
+    (should (hash-table-p ht))
+    (setq dup-alist (cdr ret-val))
+    (should (not dup-alist))
+    ))
+
+
+
+;;
+;;  shu-test-shu-bsl-include-list
+;;
+(ert-deftest shu-test-shu-bsl-include-list ()
+  "Check to ensure that SHU-BSL-INCLUDE-LIST does not include any overlapping
+class names."
+  (let ((ret-val)
+        (ht)
+        (dup-alist))
+    (setq ret-val (shu-invert-alist-to-hash shu-bsl-include-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq ht (car ret-val))
+    (should ht)
+    (should (hash-table-p ht))
+    (setq dup-alist (cdr ret-val))
+    (should (not dup-alist))
+    ))
+
+
+
 ;;; shu-cpp-general.t.el ends here

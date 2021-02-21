@@ -457,19 +457,33 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 
 
 
+;;
+;;  shu-gen-bde-create-prompt
+;;
+(defun shu-gen-bde-create-prompt ()
+  "This function creates the prompt for the interactive special form of the
+function SHU-GEN-BDE-COMPONENT.  The prompt includes the namespace in which the
+new class will be created or the string \"NO NAMESPACE\" if there is no default
+namespace set."
+  (let ((query)
+        (namespace (if shu-cpp-default-namespace shu-cpp-default-namespace "NO NAMESPACE")))
+    (setq query (concat "Class name in " namespace "? "))
+    (read-string query)
+    ))
+
+
 
 ;;
 ;;  shu-gen-bde-component
 ;;
 (defun shu-gen-bde-component (class-name)
   "Generate the three files for a new component: .cpp, .h, and .t.cpp"
-  (interactive "sClass name?: ")
+  (interactive (list (shu-gen-bde-create-prompt)))
   (let ((author shu-cpp-author)
          (namespace shu-cpp-default-namespace)
          (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix "")))
     (shu-internal-gen-bde-component class-name author namespace file-prefix)
     ))
-
 
 
 
