@@ -734,7 +734,7 @@ number."
        (completion-prefix)
        (default-file-string))
     (when shu-completion-is-directory
-      (setq completion-prefix (shu-cpp-directory-prefix)))
+      (setq completion-prefix (shu-get-directory-prefix)))
     (when shu-cpp-completion-prefix
       (setq completion-prefix shu-cpp-completion-prefix)
       (when shu-cpp-project-short-names
@@ -780,22 +780,6 @@ number."
       (shu-cpp-choose-file tfile))
     ))
 
-
-
-;;
-;;  shu-cpp-directory-prefix
-;;
-(defun shu-cpp-directory-prefix ()
-  "Get a directory based prefix, which is the last name in the current path.  If the current
-directory is \"foo/blah/humbug\", the value returned from this function is \"humbug\""
-  (let*
-      ((gbuf (get-buffer-create shu-unit-test-buffer))
-       (sep-char (substring default-directory -1))
-       (rr (split-string default-directory sep-char t))
-       (prefix-name ))
-    (setq prefix-name (nth (1- (length rr)) rr))
-    prefix-name
-    ))
 
 
 ;;

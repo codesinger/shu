@@ -464,10 +464,16 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
   "This function creates the prompt for the interactive special form of the
 function SHU-GEN-BDE-COMPONENT.  The prompt includes the namespace in which the
 new class will be created or the string \"NO NAMESPACE\" if there is no default
-namespace set."
+namespace set.  If the name of the current directory does not match the default
+namespace, the prompt also includes the directory name to remind the user that
+the current directory name does not match the namespace."
   (let ((query)
-        (namespace (if shu-cpp-default-namespace shu-cpp-default-namespace "NO NAMESPACE")))
+        (namespace (if shu-cpp-default-namespace shu-cpp-default-namespace "NO NAMESPACE"))
+        (prefix (shu-get-directory-prefix))
+        (debug-on-error t))
     (setq query (concat "Class name in " namespace "? "))
+      (when (and shu-cpp-default-namespace (not (string= prefix namespace)))
+        (setq query (concat "Class name in " namespace  " in directory '" prefix "'? ")))
     (read-string query)
     ))
 

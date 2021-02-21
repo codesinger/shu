@@ -1119,4 +1119,21 @@ An empty START-STRING matches anything.  An empty END-STRING matches anything."
 
 
 
+;;
+;;  shu-get-directory-prefix
+;;
+(defun shu-get-directory-prefix ()
+  "Get a directory based prefix, which is the last name in the current path.  If the current
+directory is \"foo/blah/humbug\", the value returned from this function is \"humbug\""
+  (let*
+      ((gbuf (get-buffer-create shu-unit-test-buffer))
+       (sep-char (substring default-directory -1))
+       (rr (split-string default-directory sep-char t))
+       (prefix-name ))
+    (setq prefix-name (nth (1- (length rr)) rr))
+    prefix-name
+    ))
+
+
+
 ;;; shu-base.el ends here
