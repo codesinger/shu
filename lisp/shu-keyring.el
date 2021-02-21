@@ -587,8 +587,8 @@ placed in the clipboard, (PW, ID, etc.)"
 (defun shu-keyring-set-passphrase (phrase)
   "Function to read and set the external pass phrase."
   (interactive "sPass phrase?: ")
-    (setq shu-keyring-external-passphrase phrase)
-    )
+  (setq shu-keyring-external-passphrase phrase)
+  )
 
 
 ;;
@@ -600,8 +600,8 @@ placed in the clipboard, (PW, ID, etc.)"
   (let ((phrase "**unknown**"))
     (if shu-keyring-external-passphrase
         (setq phrase shu-keyring-external-passphrase)
-          (ding)
-          (message "%s" "Pass phrase is not set."))
+      (ding)
+      (message "%s" "Pass phrase is not set."))
     (shu-kill-new phrase)
     ))
 

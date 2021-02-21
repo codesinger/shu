@@ -837,7 +837,7 @@ hash table could be constructed."
         (setq value (car value-list))
         (setq hv (gethash value ht))
         (if (not hv)
-              (puthash value key ht)
+            (puthash value key ht)
           (setq dup-alist (shu-add-to-alist-list value key dup-alist))
           (setq dup-alist (shu-add-to-alist-list value hv dup-alist)))
         (setq value-list (cdr value-list)))
@@ -1041,7 +1041,7 @@ to lower case"
 (defmacro shu-swap (x y)
   "Swap the contents of X and Y.  X gets the value of Y.  Y gets the value of X."
   `(setq ,x (prog1 ,y (setq ,y ,x)))
- )
+  )
 
 
 
@@ -1088,8 +1088,8 @@ a string)."
 ;;
 (defun shu-current-year ()
   "Return an integer that represents the four digit current year."
-    (string-to-number (format-time-string "%Y"))
-    )
+  (string-to-number (format-time-string "%Y"))
+  )
 
 
 

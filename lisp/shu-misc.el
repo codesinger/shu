@@ -1703,7 +1703,7 @@ Then return the repaired line."
             (setq son (match-beginning 0))
             (setq eol (line-end-position))
             (while (search-forward "</a>" eol t)
-            (princ (concat "found [" (match-string 0) "]\n") gb)
+              (princ (concat "found [" (match-string 0) "]\n") gb)
               (setq eon (match-end 0))
               (delete-region son eon)
               (setq eol (line-end-position)))

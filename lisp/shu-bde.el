@@ -472,8 +472,8 @@ the current directory name does not match the namespace."
         (prefix (shu-get-directory-prefix))
         (debug-on-error t))
     (setq query (concat "Class name in " namespace "? "))
-      (when (and shu-cpp-default-namespace (not (string= prefix namespace)))
-        (setq query (concat "Class name in " namespace  " in directory '" prefix "'? ")))
+    (when (and shu-cpp-default-namespace (not (string= prefix namespace)))
+      (setq query (concat "Class name in " namespace  " in directory '" prefix "'? ")))
     (read-string query)
     ))
 
@@ -486,8 +486,8 @@ the current directory name does not match the namespace."
   "Generate the three files for a new component: .cpp, .h, and .t.cpp"
   (interactive (list (shu-gen-bde-create-prompt)))
   (let ((author shu-cpp-author)
-         (namespace shu-cpp-default-namespace)
-         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix "")))
+        (namespace shu-cpp-default-namespace)
+        (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix "")))
     (shu-internal-gen-bde-component class-name author namespace file-prefix)
     ))
 
@@ -502,7 +502,7 @@ the current directory name does not match the namespace."
   (let* ((gitbuf (get-buffer-create "**git-add**"))
          (debug-on-error t)
          (base-class-name (downcase class-name))
-;;         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix (concat namespace "_")))
+         ;;         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix (concat namespace "_")))
          (base-name (concat file-prefix base-class-name))
          (hfile-name (concat base-name ".h"))
          (cfile-name (concat base-name ".cpp"))

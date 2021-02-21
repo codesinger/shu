@@ -1276,7 +1276,7 @@ names."
         (message "There is no project to list.")
         (ding))
     (shu-internal-list-c-file-names shu-cpp-class-list))
-    )
+  )
 
 
 
@@ -1350,7 +1350,7 @@ duplicates."
         (message "There is no project to list.")
         (ding))
     (shu-internal-list-c-duplicates shu-cpp-class-list))
-    )
+  )
 
 
 
