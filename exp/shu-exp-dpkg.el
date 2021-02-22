@@ -32,6 +32,7 @@
 
 (provide 'shu-exp-dpkg)
 (require 'shu-base)
+(require 'shu-misc)
 
 
 ;;
@@ -53,8 +54,8 @@
 ;;  shu-internal-gen-dpkg
 ;;
 (defun shu-internal-gen-dpkg (library-name author git-namespace)
-  (let* (
-         (gb (get-buffer-create "**shu-dpkg**"))
+  (let* ((log-buffer-name "**shu-dpkg**")
+         (gb (get-buffer-create log-buffer-name))
          (base-name default-directory)
          (top-cmake-name (concat base-name "CMakeLists.txt"))
          (debian-name (concat base-name "debian"))
@@ -71,7 +72,7 @@
          (make1-name (concat test-directory "/" library-name ".t.mk"))
          (make2-name (concat test-directory "/" library-name ".build.t.mk"))
          (test-cmake-name (concat test-directory "/CMakeLists.txt"))
-        )
+         (error-string))
     (unless (file-directory-p library-name)
       (make-directory package-directory t)
       (make-directory test-directory t)
@@ -95,8 +96,7 @@
        (concat
         ))
       (basic-save-buffer)
-      (kill-buffer (current-buffer))
-      )
+      (kill-buffer (current-buffer)))
     (shu-dpkg-internal-main-make main-make-name library-name)
     (shu-dpkg-internal-gen-make make1-name make2-name library-name)
     (unless (file-readable-p jenkins-name)
@@ -107,17 +107,51 @@
         "@Library('fxbuild-pipeline') _\n"
         "fxbuild_pipeline(['fxbuild_package': '" library-name "'], scm)"
         ))
-      (save-buffer)
-      )
+      (basic-save-buffer)
+      (kill-buffer (current-buffer)))
     (unless (file-directory-p debian-name)
       (make-directory debian-name)
       (shu-internal-gen-debian-control library-name control-name author git-namespace)
-      (shu-internal-gen-debian-rules library-name rules-name)
-      )
+      (shu-internal-gen-debian-rules library-name rules-name))
     (shu-dpkg-make-top-level-cmake library-name top-cmake-name)
     (shu-dpkg-make-main-cmake library-name main-cmake-name)
     (shu-dpkg-make-test-cmake library-name test-cmake-name)
+    (setq error-string (shu-dpkg-populate-git-add library-name))
+    (when error-string
+      (princ error-string gb)
+      (message "git add failures: See buffer %s" log-buffer-name))
     ))
+
+
+;;
+;;  shu-dpkg-populate-git-add
+;;
+(defun shu-dpkg-populate-git-add (library-name)
+  "LIBRARY-NAME is the name of the library.  This function issues `git add`
+requests for the top level items in the newly created DPKG library.  Any error
+messages from any of the `git add` commands are returned in a single string.  If
+the returned string is nil, all of the `git add` commands worked."
+  (let ((error-string)
+        (names
+         (list
+          "CMakeLists.txt"
+          "Jenkinsfile"
+          "debian"
+          library-name
+          ))
+        (nn)
+        (name)
+        (result))
+    (setq nn names)
+    (while nn
+      (setq name (car nn))
+      (setq result (shu-git-add-file name))
+      (when (not (string= result ""))
+        (setq error-string (concat error-string result "\n")))
+      (setq nn (cdr nn)))
+    error-string
+    ))
+
 
 
 ;;
@@ -125,9 +159,7 @@
 ;;
 (defun shu-internal-gen-debian-control (library-name control-name author git-namespace)
   "Doc string."
-  (let (
-        (gb (get-buffer-create "**shu-dpkg**"))
-        )
+  (let ((gb (get-buffer-create "**shu-dpkg**")))
     (princ (concat "control: " default-directory "\n") gb)
     (unless (file-readable-p control-name)
       (princ (concat "control2: " default-directory "\n") gb)
@@ -159,8 +191,7 @@
        "Description: FIXME FIXME FIXME FIXME FIXME FIXME FIXME!!!"
         ))
       (basic-save-buffer)
-      (kill-buffer (current-buffer))
-      )
+      (kill-buffer (current-buffer)))
     ))
 
 
@@ -169,9 +200,7 @@
 ;;
 (defun shu-internal-gen-debian-rules (library-name rules-name)
   "Doc string."
-  (let (
-        (gb (get-buffer-create "**shu-dpkg**"))
-        )
+  (let ((gb (get-buffer-create "**shu-dpkg**")))
     (princ (concat "rules: " default-directory "\n") gb)
     (princ (concat "rules-name : " rules-name "\n") gb)
     (unless (file-readable-p rules-name)
@@ -192,9 +221,7 @@
         "include $(DEBHELPER_PATH)/plink-debhelper-rules.mk\n"
         ))
       (basic-save-buffer)
-      (kill-buffer (current-buffer))
-      )
-
+      (kill-buffer (current-buffer)))
     ))
 
 
@@ -204,10 +231,8 @@
 (defun shu-internal-make-mainpage (library-name mainpage-name)
   "Doc string."
   (interactive)
-  (let (
-        (outer-close "}  // close enterprise namespace\n")
-        (outer-namespace)
-        )
+  (let ((outer-close "}  // close enterprise namespace\n")
+        (outer-namespace))
     (if shu-cpp-default-global-namespace
         (setq outer-namespace (concat "namespace " shu-cpp-default-global-namespace " {\n"))
       (setq outer-close ""))
@@ -267,8 +292,6 @@
 (defun shu-dpkg-internal-gen-make (make1-name make2-name library-name)
   "Doc string."
   (interactive)
-  (let (
-        )
     (find-file make1-name)
       (goto-char (point-min))
       (insert
@@ -336,7 +359,7 @@
        ))
       (basic-save-buffer)
       (kill-buffer (current-buffer))
-    ))
+    )
 
 
 
@@ -347,8 +370,6 @@
 (defun shu-dpkg-internal-main-make (main-make-name library-name)
   "Doc string."
   (interactive)
-  (let (
-        )
     (find-file main-make-name)
       (goto-char (point-min))
       (insert
@@ -374,7 +395,7 @@
        ))
       (basic-save-buffer)
       (kill-buffer (current-buffer))
-      ))
+      )
 
 
 
@@ -382,9 +403,7 @@
 ;;  shu-dpkg-make-top-level-cmake
 ;;
 (defun shu-dpkg-make-top-level-cmake (library-name cmake-name)
-  (let (
-        (gb (get-buffer-create "**shu-dpkg**"))
-        )
+  (let ((gb (get-buffer-create "**shu-dpkg**")))
     (princ (concat "make-top-level-cmake: '" cmake-name "'\n") gb)
     (find-file cmake-name)
     (goto-char (point-min))
@@ -417,9 +436,7 @@
 ;;  shu-dpkg-make-main-cmake
 ;;
 (defun shu-dpkg-make-main-cmake (library-name cmake-name)
-  (let (
-        (gb (get-buffer-create "**shu-dpkg**"))
-        )
+  (let ((gb (get-buffer-create "**shu-dpkg**")))
     (princ (concat "make-main-cmake: '" cmake-name "'\n") gb)
     (find-file cmake-name)
     (goto-char (point-min))
@@ -461,9 +478,7 @@
 ;;  shu-dpkg-make-test-cmake
 ;;
 (defun shu-dpkg-make-test-cmake (library-name cmake-name)
-  (let (
-        (gb (get-buffer-create "**shu-dpkg**"))
-        )
+  (let ((gb (get-buffer-create "**shu-dpkg**")))
     (princ (concat "make-test-cmake: '" cmake-name "'\n") gb)
     (find-file cmake-name)
     (goto-char (point-min))

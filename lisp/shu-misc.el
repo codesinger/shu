@@ -1084,7 +1084,10 @@ return git error message."
     (with-temp-buffer
       (call-process "git" nil (current-buffer) nil "add" filename)
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
-    (shu-trim-trailing result)
+    (setq result (shu-trim-trailing result))
+    (when (not (string= result ""))
+      (setq result (concat "After git add " filename ":\n" result)))
+      result
     ))
 
 
