@@ -2363,15 +2363,14 @@ tests."
 ;;  shu-get-repo
 ;;
 (defun shu-get-repo ()
-  "When positioned in the top level directory of a git repository, place into
-the kill ring the git path to the repository.  This is found in .git/config as
-the url of [remote \"origin\"]
+  "When positioned in the top level directory of a git repository, return the
+git path to the repository.  This is found in .git/config as the url of
+[remote \"origin\"].  Return nil if the path cannot b found.
 
 This should probably be extended to do a search for the .git directory anywhere
 above the current position, which would remove the requirement to be in the root
 of the repository."
-  (interactive)
-  (let ((gb (get-buffer-create "**fo**"))
+  (let ((gb (get-buffer-create "**foo**"))
         (rr)
         (ss1 "remote\\s-*\"origin\"")
         (ss2 "url\\s-*=\\s-*")
@@ -2396,7 +2395,26 @@ of the repository."
             (setq pstart (point))
             (setq pend (line-end-position))
             (setq path (buffer-substring-no-properties pstart pend))))))
-    (shu-kill-new path)
+    path
+    ))
+
+
+
+;;
+;;  shu-kill-repo
+;;
+(defun shu-kill-repo ()
+  "When positioned in the top level directory of a git repository, place into
+the kill ring the git path to the repository.  This is found in .git/config as
+the url of [remote \"origin\"]
+
+This should probably be extended to do a search for the .git directory anywhere
+above the current position, which would remove the requirement to be in the root
+of the repository."
+  (interactive)
+  (let ((path (shu-get-repo)))
+    (when path
+      (shu-kill-new path))
     ))
 
 
