@@ -2360,6 +2360,48 @@ tests."
 
 
 ;;
+;;  shu-get-repo
+;;
+(defun shu-get-repo ()
+  "When positioned in the top level directory of a git repository, place into
+the kill ring the git path to the repository.  This is found in .git/config as
+the url of [remote \"origin\"]
+
+This should probably be extended to do a search for the .git directory anywhere
+above the current position, which would remove the requirement to be in the root
+of the repository."
+  (interactive)
+  (let ((gb (get-buffer-create "**fo**"))
+        (rr)
+        (ss1 "remote\\s-*\"origin\"")
+        (ss2 "url\\s-*=\\s-*")
+        (pstart)
+        (pend)
+        (path))
+    (with-temp-buffer
+      (setq rr (insert-file-contents-literally ".git/config"))
+      (if (not rr)
+          (progn
+            (ding)
+            (message "%s" "Cannot open .git/config"))
+        (goto-char (point-min))
+        (if (not (re-search-forward ss1 nil t))
+            (progn
+              (ding)
+              (message "%s" "Cannot find [remote \"origin\"] in .git/config"))
+          (if (not (re-search-forward ss2 nil t))
+              (progn
+                (ding)
+                (message "%s" "Cannot find \"url = \" following [remote \"origin\"] in .git/config"))
+            (setq pstart (point))
+            (setq pend (line-end-position))
+            (setq path (buffer-substring-no-properties pstart pend))))))
+    (shu-kill-new path)
+    ))
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -2413,6 +2455,7 @@ shu- prefix removed."
   (defalias 'obfuscate-region 'shu-obfuscate-region)
   (defalias 'af 'shu-adapt-frame)
   (defalias 'scan-grok 'shu-extract-name-open-grok)
+  (defalias 'get-repo 'shu-get-repo)
   )
 
 ;;; shu-misc.el ends here

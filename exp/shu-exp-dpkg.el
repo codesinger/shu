@@ -57,6 +57,7 @@
   (let* ((log-buffer-name "**shu-dpkg**")
          (gb (get-buffer-create log-buffer-name))
          (base-name default-directory)
+         (readme-name (concat base-name "README.md"))
          (top-cmake-name (concat base-name "CMakeLists.txt"))
          (debian-name (concat base-name "debian"))
          (jenkins-name (concat base-name "Jenkinsfile"))
@@ -116,11 +117,41 @@
     (shu-dpkg-make-top-level-cmake library-name top-cmake-name)
     (shu-dpkg-make-main-cmake library-name main-cmake-name)
     (shu-dpkg-make-test-cmake library-name test-cmake-name)
+    (shu-dpkg-readme-alexandria readme-name library-name)
     (setq error-string (shu-dpkg-populate-git-add library-name))
     (when error-string
       (princ error-string gb)
       (message "git add failures: See buffer %s" log-buffer-name))
+    (find-file control-name)
+    (goto-char (point-min))
+    (search-forward "FIXME FIXME" nil t)
+    (beginning-of-line)
+    (search-forward "Description: " nil t)
+    (find-file mainpage-name)
+    (search-forward "INSERT YOUR ONE" nil t)
+    (search-backward "INSERT YOUR ONE" nil t)
     ))
+
+
+;;
+;;  shu-dpkg-readme-alexandria
+;;
+(defun shu-dpkg-readme-alexandria (readme-name library-name)
+  "Put an Alexandria badge in the README file"
+    (find-file readme-name)
+    (goto-char (point-max))
+    (insert
+     (concat
+      "[![Alexandria doxygen](https://badges.dev.bloomberg.com/badge"
+      "//Alexandria%20|%20Doxygen/blue?icon=fa-book-open)]"
+      "(http://alexandria-doc.stacker.dev.bloomberg.com/drqs1011/"
+      library-name
+      "/master/)"
+      ))
+    (basic-save-buffer)
+    (kill-buffer (current-buffer))
+  )
+
 
 
 ;;
@@ -174,6 +205,7 @@ the returned string is nil, all of the `git add` commands worked."
        "Build-Depends:\n"
        "  bbtoolchain-cmake-debhelper,\n"
        "  cmake-configure-bb-target,\n"
+       "  cmake-warnings-clean-if-gcc,\n"
        "  libbal-dev,\n"
        "  libbdl-dev,\n"
        "  libbsl-dev,\n"
@@ -212,13 +244,9 @@ the returned string is nil, all of the `git add` commands worked."
        (concat
         "#!/usr/bin/make -f\n"
         "# -*- makefile -*-\n"
-        "DEBHELPER_PATH=$(DISTRIBUTION_REFROOT)/opt/bb/share/plink\n"
-        "include $(DEBHELPER_PATH)/plink-debhelper-macros.mk\n"
         "\n"
-        "$(eval $(call LIBRARY_PACKAGE_TEMPLATE," library-name "))\n"
-        "$(eval $(call RUNTESTS_TEMPLATE," library-name "))\n"
-        "\n"
-        "include $(DEBHELPER_PATH)/plink-debhelper-rules.mk\n"
+        "DEBHELPER_CTEST_ENABLE=1\n"
+        "include $(DISTRIBUTION_REFROOT)/opt/bb/share/bbtoolchain-cmake-debhelper/oneline.mk\n"
         ))
       (basic-save-buffer)
       (kill-buffer (current-buffer)))
@@ -417,7 +445,7 @@ the returned string is nil, all of the `git add` commands worked."
       "SET( " library-name "_BUILD_LOCAL TRUE )\n"
       "SET( test_t.tsk_BUILD_LOCAL TRUE )\n"
       "\n"
-      "add_subdirectory(" library-name" )\n"
+      "add_subdirectory(" library-name ")\n"
       "\n"
       "#==============================================================================\n"
       "# Fix Linking of cyclic libraries\n"
@@ -467,6 +495,9 @@ the returned string is nil, all of the `git add` commands worked."
       "#==============================================================================\n"
       "find_package(ConfigureBbTarget REQUIRED)\n"
       "configure_bb_target(" library-name " V2 INSTALL HEADER_DIRS .)\n"
+      "\n"
+      "find_package( WarningsCleanIfGcc REQUIRED )\n"
+      "target_warnings_if_gcc( " library-name " WERROR WEXTRA )\n"
       ))
     (basic-save-buffer)
     (kill-buffer (current-buffer))
