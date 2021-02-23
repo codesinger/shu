@@ -31,11 +31,9 @@
 ;;
 (defun shu-show-load-path (ident)
   "Doc string."
-  (let (
-        (lp load-path)
+  (let ((lp load-path)
         (path)
-        (gb (get-buffer-create "**shu-load-path**"))
-        )
+        (gb (get-buffer-create "**shu-load-path**")))
     (princ (concat "\n\n" ident ":\n") gb)
     (princ load-path gb)
     (princ "\n" gb)
@@ -241,6 +239,8 @@
       (slp-set-comment-hooks))
   (shu-set-author "Stewart Palmer (spalmer62@bloomberg.net)")
   (shu-set-default-global-namespace "BloombergLP")
+  (setq shu-internal-dev-url "dev.bloomberg.com")
+  (setq shu-internal-group-name "drqs1011")
   (setq shu-cpp-use-bde-library t)
   (setq shu-cpp-include-user-brackets t)
   (setq shu-cpp-std-namespace "bsl")

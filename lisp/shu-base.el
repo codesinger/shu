@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.61
+;; Version: 1.6.62
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.61"
+(defconst shu-version "1.6.62"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -199,7 +199,19 @@ namespace with the global namespace encompassing the local one"
 
 (defcustom shu-cpp-modern nil
   "Set to true if using the features of C++ 11/14 such as auto and explicitly
-deleted copy /move constructors."
+deleted copy / move constructors."
+  :type '(string)
+  :group 'shu-base)
+
+(defcustom shu-internal-dev-url nil
+  "A string that identifies the internal development URL of an organization
+(if any)."
+  :type '(string)
+  :group 'shu-base)
+
+(defcustom shu-internal-group-name nil
+  "A string that identifies the group name of which an individual is a member
+(if any)."
   :type '(string)
   :group 'shu-base)
 

@@ -42,8 +42,8 @@
   "Generate an empty DPKG library."
   (interactive "sLibrary name?: ")
   (let (
-        (git-namespace "drqs1011")
-        (dpkg-author "Stewart Palmer <spalmer62@bloomberg.net>")
+        (git-namespace shu-internal-group-name)
+        (dpkg-author shu-cpp-author)
         (debug-on-error t)
         )
     (shu-internal-gen-dpkg library-name dpkg-author git-namespace)
@@ -140,14 +140,7 @@
   "Put an Alexandria badge in the README file"
     (find-file readme-name)
     (goto-char (point-max))
-    (insert
-     (concat
-      "[![Alexandria doxygen](https://badges.dev.bloomberg.com/badge"
-      "//Alexandria%20|%20Doxygen/blue?icon=fa-book-open)]"
-      "(http://alexandria-doc.stacker.dev.bloomberg.com/drqs1011/"
-      library-name
-      "/master/)"
-      ))
+    (shu-add-alexandria-badge)
     (basic-save-buffer)
     (kill-buffer (current-buffer))
   )

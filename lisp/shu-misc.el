@@ -2402,6 +2402,114 @@ of the repository."
 
 
 ;;
+;;  shu-add-alexandria-badge
+;;
+(defun shu-add-alexandria-badge ()
+  "Insert an Alexandria badge for the current project."
+  (interactive)
+  (let ((library-name (shu-get-directory-prefix)))
+    (if (not shu-internal-dev-url)
+        (progn
+          (ding)
+          (message "%s" "SHU-INTERNAL-DEV-URL custom variable is not set."))
+      (if (not shu-internal-group-name)
+          (progn
+            (ding)
+            (message "%s" "SHU-INTERNAL-GROUP-NAME custom variable is not set."))
+        (insert
+         (concat
+          "[![Alexandria doxygen](https://badges." shu-internal-dev-url "/badge"
+          "//Alexandria%20|%20Doxygen/blue?icon=fa-book-open)]"
+          "(http://alexandria-doc.stacker." shu-internal-dev-url "/" shu-internal-group-name "/"
+          library-name
+          "/master/)"))))
+    ))
+
+
+
+
+;;
+;;  shu-fixup-doxyfile
+;;
+(defun shu-fixup-doxyfile ()
+  "The current directory is assumed to have the same name as the project for
+which the Doxyfile was created.  This function sets various default values in
+the Doxyfile.  The current buffer is the Doxyfile.  This function does not add an
+instance of the ALEXANDRIA_DOC_DEPENDENCIES tag."
+  (interactive)
+    (shu-fixup-project-doxyfile (shu-get-directory-prefix))
+    )
+
+
+
+
+;;
+;;  shu-fixup-project-doxyfile
+;;
+(defun shu-fixup-project-doxyfile (project-name)
+  "PROJECT-NAME is the name of the project for which the Doxyfile has been created.
+This function sets standard default values.  It does not add an instance of a
+ALEXANDRIA_DOC_DEPENDENCIES tag."
+  (interactive "sProject name? ")
+  (let ((library-name "fxpricingimplfw")
+        (extract-private "EXTRACT_PRIVATE\\s-*=")
+        (extract-static "EXTRACT_STATIC\\s-*=")
+        (generate-latex "GENERATE_LATEX\\s-*=")
+        (have-dot "HAVE_DOT\\s-*=")
+        (project-name "PROJECT_NAME\\s-*=")
+        (input "INPUT\\s-*=")
+        (project-brief "PROJECT_BRIEF\\s-*="))
+    (goto-char (point-min))
+    (if (not (re-search-forward extract-private nil t))
+        (progn
+          (ding)
+          (message "%s" "Cannot find EXTRACT_PRIVATE tag."))
+      (when (search-forward "NO" (line-end-position)  t)
+        (replace-match "YES" t t))
+      (goto-char (point-min))
+      (if (not (re-search-forward extract-static nil t))
+          (progn
+            (ding)
+            (message "%s" "Cannot find EXTRACT_STATIC tag."))
+        (when (search-forward "NO" (line-end-position)  t)
+          (replace-match "YES" t t))
+        (goto-char (point-min))
+        (if (not (re-search-forward generate-latex nil t))
+            (progn
+              (ding)
+              (message "%s" "Cannot find GENERATE_LATEX tag."))
+          (when (search-forward "NO" (line-end-position)  t)
+            (replace-match "YES" t t))
+          (goto-char (point-min))
+          (if (not (re-search-forward have-dot nil t))
+              (progn
+                (ding)
+                (message "%s" "Cannot find HAVE_DOT tag."))
+            (when (search-forward "NO" (line-end-position)  t)
+              (replace-match "YES" t t))
+            (goto-char (point-min))
+            (if (not (re-search-forward project-name nil t))
+                (progn
+                  (ding)
+                  (message "%s" "Cannot find PROJECT_NAME tag."))
+              (when (search-forward "\"My Project\"" (line-end-position)  t)
+                (replace-match (concat "\"" library-name "\"")t t))
+              (goto-char (point-min))
+              (if (not (re-search-forward input nil t))
+                  (progn
+                    (ding)
+                    (message "%s" "Cannot find INPUT tag."))
+                (end-of-line)
+                (insert (concat " ./" library-name))
+                (goto-char (point-min))
+                (when (not (re-search-forward project-brief nil t))
+                  (ding)
+                  (message "%s" "Cannot find PROJECT_BRIEF tag."))))))))
+    ))
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -2456,6 +2564,8 @@ shu- prefix removed."
   (defalias 'af 'shu-adapt-frame)
   (defalias 'scan-grok 'shu-extract-name-open-grok)
   (defalias 'get-repo 'shu-get-repo)
+  (defalias 'add-alexandria-badge `shu-add-alexandria-badge)
+  (defalias 'fixup-doxyfile 'shu-fixup-doxyfile)
   )
 
 ;;; shu-misc.el ends here
