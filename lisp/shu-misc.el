@@ -2562,7 +2562,7 @@ of the repository."
         (library-name (shu-get-directory-prefix))
         (repo-path (shu-get-git-repo-path))
         (badge-added)
-          )
+        )
     (if (not shu-internal-dev-url)
         (progn
           (ding)
