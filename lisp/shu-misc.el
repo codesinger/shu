@@ -2572,6 +2572,24 @@ of the repository."
 
 
 ;;
+;;  shu-get-git-repo-name
+;;
+(defun shu-get-git-repo-name ()
+  "This function tries to get the name of the current git repository
+from the .git/config file.  Returns nil if it cannot open .git/config."
+  (let ((git-url)
+        (ret-val)
+        (repo-name)
+        (git-url (shu-get-repo)))
+    (when git-url
+      (setq ret-val (shu-get-git-name git-url))
+      (setq repo-name (cdr ret-val)))
+    repo-name
+    ))
+
+
+
+;;
 ;;  shu-get-git-repo-path
 ;;
 (defun shu-get-git-repo-path ()
@@ -2623,7 +2641,7 @@ the Doxyfile.  The current buffer is the Doxyfile."
   "PROJECT-NAME is the name of the project for which the Doxyfile has been created.
 This function sets standard default values."
   (interactive "sProject name? ")
-  (let ((library-name "fxpricingimplfw")
+  (let ((library-name (shu-get-git-repo-name))
         (extract-private "EXTRACT_PRIVATE\\s-*=")
         (extract-static "EXTRACT_STATIC\\s-*=")
         (generate-latex "GENERATE_LATEX\\s-*=")
