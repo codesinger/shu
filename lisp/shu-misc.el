@@ -2679,7 +2679,7 @@ This function sets standard default values."
                  (concat
                   "\n"
                   "# The ALEXANDRIA_DOC_DEPENDENCIES tag is used to list other repositories that\n"
-                  "# this repository references.  Ifyou have other referenced repositories, uncomment\n"
+                  "# this repository references.  If you have other referenced repositories, uncomment\n"
                   "# the line below and list the repository names in a line, space separated.  The\n"
                   "# repository name is the name of the owning group followed by a slash followed\n"
                   "# the repository name.\n"
