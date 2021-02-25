@@ -2414,6 +2414,7 @@ the Doxyfile as a comment."
               (kill-buffer file-buf)
               )
             (shu-add-doxyfile)
+            (shu-git-add-file doxyfile-name)
             (find-file doxyfile-name)
             (shu-fixup-doxyfile)
             )
