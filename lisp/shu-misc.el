@@ -2372,55 +2372,47 @@ file, a Doxyfile is created, and some of the tags in the Doxyfile are set to
 reasonable defaults.  An ALEXANDRIA_DOC_DEPENDENCIES tag is added to the end of
 the Doxyfile as a comment."
   (interactive)
-  (let (
-        (readme-name "README.md")
+  (let ((readme-name "README.md")
         (doxyfile-name "Doxyfile")
         (have-badge)
         (fbuf)
         (file-buf)
-        (badge-added)
-        )
+        (badge-added))
     (if (not (file-readable-p readme-name))
         (progn
           (ding)
-          (message "%s file does not exist." readme-name)
-          )
+          (message "%s file does not exist." readme-name))
       (if (file-readable-p doxyfile-name)
           (progn
             (ding)
-            (message "%s file already exists." doxyfile-name)
-            )
-        (with-temp-buffer
-          (insert-file-contents readme-name)
-          (goto-char (point-min))
-          (setq have-badge (search-forward "[![Alexandria doxygen]" nil t))
-          )
-        (if have-badge
+            (message "%s file already exists." doxyfile-name))
+        (setq fbuf (get-file-buffer readme-name))
+        (if (and fbuf (buffer-modified-p fbuf))
             (progn
               (ding)
-              (message "Alexandria badge already exists in %s file." readme-name)
-              )
-          (setq fbuf (get-file-buffer readme-name))
-          (if fbuf
-              (setq file-buf fbuf)
-            (setq file-buf (find-file-noselect readme-name)))
-          (goto-char (point-max))
-          (insert "\n")
-          (setq badge-added (shu-add-alexandria-badge))
-          (if (not badge-added)
-              (ding)
+              (message "%s file is already open and modified" readme-name))
+          (find-file readme-name)
+          (goto-char (point-min))
+          (setq have-badge (search-forward "[![Alexandria doxygen]" nil t))
+          (if have-badge
+              (progn
+                (ding)
+                (message "Alexandria badge already exists in %s file." readme-name)
+                (when (not fbuf)
+                  (shu-kill-current-buffer)))
+            (goto-char (point-max))
+            (insert "\n")
+            (setq badge-added (shu-add-alexandria-badge))
             (basic-save-buffer)
             (when (not fbuf)
-              (kill-buffer file-buf)
-              )
-            (shu-add-doxyfile)
-            (shu-git-add-file doxyfile-name)
-            (find-file doxyfile-name)
-            (shu-fixup-doxyfile)
-            )
-          )
-        )
-      )
+              (shu-kill-current-buffer))
+            (if (not badge-added)
+                (progn
+                  (ding))
+              (shu-add-doxyfile)
+              (shu-git-add-file doxyfile-name)
+              (find-file doxyfile-name)
+              (shu-fixup-doxyfile))))))
     ))
 
 
@@ -2504,7 +2496,7 @@ git path to the repository.  This is found in .git/config as the url of
 This should probably be extended to do a search for the .git directory anywhere
 above the current position, which would remove the requirement to be in the root
 of the repository."
-  (let ((gb (get-buffer-create "**foo**"))
+  (let (
         (rr)
         (ss1 "remote\\s-*\"origin\"")
         (ss2 "url\\s-*=\\s-*")
@@ -2559,16 +2551,13 @@ of the repository."
 (defun shu-add-alexandria-badge ()
   "Insert an Alexandria badge for the current project."
   (interactive)
-  (let (
-        (library-name (shu-get-directory-prefix))
+  (let ((library-name (shu-get-directory-prefix))
         (repo-path (shu-get-git-repo-path))
-        (badge-added)
-        )
+        (badge-added))
     (if (not shu-internal-dev-url)
         (progn
           (ding)
-          (message "%s" "SHU-INTERNAL-DEV-URL custom variable is not set.")
-          )
+          (message "%s" "SHU-INTERNAL-DEV-URL custom variable is not set."))
       (when repo-path
         (insert
          (concat
@@ -2576,9 +2565,7 @@ of the repository."
           "//Alexandria%20|%20Doxygen/blue?icon=fa-book-open)]"
           "(http://alexandria-doc.stacker." shu-internal-dev-url "/" repo-path
           "/master/)"))
-        (setq badge-added t)
-        )
-      )
+        (setq badge-added t)))
     badge-added
     ))
 
@@ -2696,12 +2683,13 @@ This function sets standard default values."
                   "# the line below and list the repository names in a line, space separated.  The\n"
                   "# repository name is the name of the owning group followed by a slash followed\n"
                   "# the repository name.\n"
-                  "\n"
+                  "#\n"
                   ))
                 (when dep-line
                   (insert
                    (concat
-                    "# Dependencies of this repository: " dep-line "\n")))
+                    "# Dependencies of this repository: " dep-line "\n"
+                    "#\n")))
                 (insert "# ALEXANDRIA_DOC_DEPENDENCIES = group1/repo1 group2/repo2\n")
                 (goto-char (point-min))
                 (when (not (re-search-forward project-brief nil t))
@@ -2780,13 +2768,10 @@ file so that it may be opened.  If no such file exists, return nil."
 ;;
 (defun shu-add-doxyfile ()
   "Call \"doxygen -g\" to create a Doxyfile.  Return the output from the doxygen command."
-  (let (
-        (result)
-        )
+  (let ((result))
     (with-temp-buffer
-      (call-process "doxygen" nil (current-buffer) nil "-g")
-      (setq result (buffer-substring-no-properties (point-min) (point-max)))
-      )
+      (process-file "doxygen" nil nil nil "-g")
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
     (shu-trim-trailing result)
     ))
 
