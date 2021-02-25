@@ -30,6 +30,7 @@
 ;;; Code:
 
 (provide 'shu-misc)
+(require 'subr-x)
 
 
 (defconst shu-dired-mode-name "Dired by date"
@@ -1087,7 +1088,7 @@ return git error message."
     (setq result (shu-trim-trailing result))
     (when (not (string= result ""))
       (setq result (concat "After git add " filename ":\n" result)))
-      result
+    result
     ))
 
 
@@ -2360,6 +2361,138 @@ tests."
 
 
 ;;
+;;  shu-add-alexandria
+;;
+(defun shu-add-alexandria ()
+  "Add Alexandria coverage to a git repository.
+This function first checks to ensure that a README.md file exists that does not
+contain an Alexandria badge and that a Doxyfile does not exist.  If those two
+conditions are met, an Alexandria badge is added to the bottom of the README.md
+file, a Doxyfile is created, and some of the tags in the Doxyfile are set to
+reasonable defaults.  An ALEXANDRIA_DOC_DEPENDENCIES tag is added to the end of
+the Doxyfile as a comment."
+  (interactive)
+  (let (
+        (readme-name "README.md")
+        (doxyfile-name "Doxyfile")
+        (have-badge)
+        (fbuf)
+        (file-buf)
+        (badge-added)
+        )
+    (if (not (file-readable-p readme-name))
+        (progn
+          (ding)
+          (message "%s file does not exist." readme-name)
+          )
+      (if (file-readable-p doxyfile-name)
+          (progn
+            (ding)
+            (message "%s file already exists." doxyfile-name)
+            )
+        (with-temp-buffer
+          (insert-file-contents readme-name)
+          (goto-char (point-min))
+          (setq have-badge (search-forward "[![Alexandria doxygen]" nil t))
+          )
+        (if have-badge
+            (progn
+              (ding)
+              (message "Alexandria badge already exists in %s file." readme-name)
+              )
+          (setq fbuf (get-file-buffer readme-name))
+          (if fbuf
+              (setq file-buf fbuf)
+            (setq file-buf (find-file-noselect readme-name)))
+          (goto-char (point-max))
+          (insert "\n")
+          (setq badge-added (shu-add-alexandria-badge))
+          (if (not badge-added)
+              (ding)
+            (basic-save-buffer)
+            (when (not fbuf)
+              (kill-buffer file-buf)
+              )
+            (shu-add-doxyfile)
+            (find-file doxyfile-name)
+            (shu-fixup-doxyfile)
+            )
+          )
+        )
+      )
+    ))
+
+
+
+;;
+;;  shu-get-git-name
+;;
+(defun shu-get-git-name (path)
+  "PATH is the url of a git repository from the [remote \"origin\"] section of a
+.git/config file.  For example, the entry for this repository is
+
+      https://github.com/codesinger/shu.git
+
+This function extracts two pieces of information from the URL.  One is the name
+of the repository, which in this case is \"shu\".  The other is the path to the
+repository, which includes the owning group, which in this case is
+\"codesinger/shu\".
+
+Those two items are returned in a cons cell with the car of the cons cell
+holding the path (with owning group) and the cdr of the cons cell holding the
+repository name.
+
+The assumptions made by this function are as follows: The beginning of the
+owning group and repository name are preceded by a domain name followed by
+either a colon or a slash.  In the case of this repository, the owning group and
+repository name are preceded by \"github.com/\".  The repository name may or may
+not have a trailing \".git\", which this function removes."
+  (let ((tpath (shu-trim-git-end path))
+        (sep-char "/")
+        (ss1 "\\.[com|net|edu]+[:/]+")
+        (pstart)
+        (pend)
+        (fpath)
+        (plist)
+        (repository-name))
+    (with-temp-buffer
+      (insert tpath)
+      (setq pstart (point-min))
+      (goto-char (point-min))
+      (when (re-search-forward ss1 nil t)
+        (setq pstart (point)))
+      (setq fpath (buffer-substring-no-properties pstart (point-max))))
+    (setq plist (split-string fpath sep-char t))
+    (setq repository-name (nth (1- (length plist)) plist))
+    (cons fpath repository-name)
+    ))
+
+
+
+
+;;
+;;  shu-trim-git-end
+;;
+(defun shu-trim-git-end (path)
+  "First trim leading and trailing spaces from PATH.  If PATH ends in \".git\",
+trim the last four characters from the path.  If PATH does not end in \".git\",
+do not trim the last four characters.
+
+Return the PATH, leading and trailing spaces trimmed, with perhaps \".git\"
+removed from the end."
+  (interactive)
+  (let ((git-end ".git")
+        (tpath (shu-trim path))
+        (ending))
+    (setq ending (substring tpath (- (length tpath) (length git-end))))
+    (when (string= ending git-end)
+      (setq tpath (substring tpath 0 (- (length tpath) (length git-end)))))
+    tpath
+    ))
+
+
+
+;;
 ;;  shu-get-repo
 ;;
 (defun shu-get-repo ()
@@ -2425,22 +2558,57 @@ of the repository."
 (defun shu-add-alexandria-badge ()
   "Insert an Alexandria badge for the current project."
   (interactive)
-  (let ((library-name (shu-get-directory-prefix)))
+  (let (
+        (library-name (shu-get-directory-prefix))
+        (repo-path (shu-get-git-repo-path))
+        (badge-added)
+          )
     (if (not shu-internal-dev-url)
         (progn
           (ding)
-          (message "%s" "SHU-INTERNAL-DEV-URL custom variable is not set."))
-      (if (not shu-internal-group-name)
-          (progn
-            (ding)
-            (message "%s" "SHU-INTERNAL-GROUP-NAME custom variable is not set."))
+          (message "%s" "SHU-INTERNAL-DEV-URL custom variable is not set.")
+          )
+      (when repo-path
         (insert
          (concat
           "[![Alexandria doxygen](https://badges." shu-internal-dev-url "/badge"
           "//Alexandria%20|%20Doxygen/blue?icon=fa-book-open)]"
-          "(http://alexandria-doc.stacker." shu-internal-dev-url "/" shu-internal-group-name "/"
-          library-name
-          "/master/)"))))
+          "(http://alexandria-doc.stacker." shu-internal-dev-url "/" repo-path
+          "/master/)"))
+        (setq badge-added t)
+        )
+      )
+    badge-added
+    ))
+
+
+
+;;
+;;  shu-get-git-repo-path
+;;
+(defun shu-get-git-repo-path ()
+  "This function tries to get the host local path to the current git repository
+from the .git/config file if possible.  If it cannot find the .git/config file,
+the it uses the shu custom variable SHU-INTERNAL-GROUP-NAME as the group owner
+and uses the name of the current directory as the repository name and constructs
+a host local path that is the owning group name, a slash, and the putative
+repository name (the name of the current directory."
+  (let ((git-url)
+        (ret-val)
+        (repo-name)
+        (repo-path))
+    (setq git-url (shu-get-repo))
+    (if git-url
+        (progn
+          (setq ret-val (shu-get-git-name git-url))
+          (setq repo-path (car ret-val)))
+      (if (not shu-internal-group-name)
+          (progn
+            (ding)
+            (message "%s" "SHU-INTERNAL-GROUP-NAME custom variable is not set."))
+        (setq repo-name (shu-get-directory-prefix))
+        (setq repo-path (concat shu-internal-group-name "/" repo-name))))
+    repo-path
     ))
 
 
@@ -2452,11 +2620,10 @@ of the repository."
 (defun shu-fixup-doxyfile ()
   "The current directory is assumed to have the same name as the project for
 which the Doxyfile was created.  This function sets various default values in
-the Doxyfile.  The current buffer is the Doxyfile.  This function does not add an
-instance of the ALEXANDRIA_DOC_DEPENDENCIES tag."
+the Doxyfile.  The current buffer is the Doxyfile."
   (interactive)
-    (shu-fixup-project-doxyfile (shu-get-directory-prefix))
-    )
+  (shu-fixup-project-doxyfile (shu-get-directory-prefix))
+  )
 
 
 
@@ -2466,8 +2633,7 @@ instance of the ALEXANDRIA_DOC_DEPENDENCIES tag."
 ;;
 (defun shu-fixup-project-doxyfile (project-name)
   "PROJECT-NAME is the name of the project for which the Doxyfile has been created.
-This function sets standard default values.  It does not add an instance of a
-ALEXANDRIA_DOC_DEPENDENCIES tag."
+This function sets standard default values."
   (interactive "sProject name? ")
   (let ((library-name "fxpricingimplfw")
         (extract-private "EXTRACT_PRIVATE\\s-*=")
@@ -2476,7 +2642,8 @@ ALEXANDRIA_DOC_DEPENDENCIES tag."
         (have-dot "HAVE_DOT\\s-*=")
         (project-name "PROJECT_NAME\\s-*=")
         (input "INPUT\\s-*=")
-        (project-brief "PROJECT_BRIEF\\s-*="))
+        (project-brief "PROJECT_BRIEF\\s-*=")
+        (dep-line (shu-get-debian-dependency-line)))
     (goto-char (point-min))
     (if (not (re-search-forward extract-private nil t))
         (progn
@@ -2519,11 +2686,109 @@ ALEXANDRIA_DOC_DEPENDENCIES tag."
                     (message "%s" "Cannot find INPUT tag."))
                 (end-of-line)
                 (insert (concat " ./" library-name))
+                (goto-char (point-max))
+                (insert
+                 (concat
+                  "\n"
+                  "# The ALEXANDRIA_DOC_DEPENDENCIES tag is used to list other repositories that\n"
+                  "# this repository references.  Ifyou have other referenced repositories, uncomment\n"
+                  "# the line below and list the repository names in a line, space separated.  The\n"
+                  "# repository name is the name of the owning group followed by a slash followed\n"
+                  "# the repository name.\n"
+                  "\n"
+                  ))
+                (when dep-line
+                  (insert
+                   (concat
+                    "# Dependencies of this repository: " dep-line "\n")))
+                (insert "# ALEXANDRIA_DOC_DEPENDENCIES = group1/repo1 group2/repo2\n")
                 (goto-char (point-min))
                 (when (not (re-search-forward project-brief nil t))
                   (ding)
                   (message "%s" "Cannot find PROJECT_BRIEF tag."))))))))
     ))
+
+
+
+;;
+;;  shu-get-debian-dependency-line
+;;
+(defun shu-get-debian-dependency-line ()
+  "This function tries to find a Debian library dependency file in the current
+directory tree.  If such a file is found, this function returns a single line of
+text that holds the space separated names of all of the dependencies."
+  (let ((deps (shu-get-debian-dependencies))
+        (dep-line))
+    (when deps
+      (setq dep-line (string-join deps " ")))
+    dep-line
+    ))
+
+
+
+;;
+;;  shu-get-debian-dependencies
+;;
+(defun shu-get-debian-dependencies ()
+  "This function tries to find a Debian library dependency file in the current
+directory tree.  If such a file is found, this function returns a sorted list of
+the dependencies listed in the Debian dependency file.  If no such file exists,
+nil is returned."
+  (let ((dep-file (shu-get-debian-dependency-file))
+        (dep)
+        (deps)
+        (line-diff 0))
+    (when dep-file
+      (with-temp-buffer
+        (insert-file-contents dep-file)
+        (goto-char (point-min))
+        (while (and (= line-diff 0)
+                    (not (= (point) (point-max))))
+          (setq dep (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+          (push dep deps)
+          (setq line-diff (forward-line 1))))
+      (setq deps (sort deps 'string<)))
+    deps
+    ))
+
+
+
+
+;;
+;;  shu-get-debian-dependency-file
+;;
+(defun shu-get-debian-dependency-file ()
+  "Use the name of the current directory as the name of a debian library.
+Construct a dependency file name which is the name of the current directory with
+a file type of \".dep\".  Search through the directory tree for such a file.  If
+the file is found return its fully qualified name, i.e., the full path to the
+file so that it may be opened.  If no such file exists, return nil."
+  (let ((dep-name (concat (shu-get-directory-prefix) "\\.dep"))
+        (dep-list)
+        (dep-file))
+    (setq dep-list (directory-files-recursively "." dep-name))
+    (when (and dep-list (= (length dep-list) 1))
+      (setq dep-file (car dep-list)))
+    dep-file
+    ))
+
+
+
+;;
+;;  shu-add-doxyfile
+;;
+(defun shu-add-doxyfile ()
+  "Call \"doxygen -g\" to create a Doxyfile.  Return the output from the doxygen command."
+  (let (
+        (result)
+        )
+    (with-temp-buffer
+      (call-process "doxygen" nil (current-buffer) nil "-g")
+      (setq result (buffer-substring-no-properties (point-min) (point-max)))
+      )
+    (shu-trim-trailing result)
+    ))
+
 
 
 
@@ -2581,6 +2846,7 @@ shu- prefix removed."
   (defalias 'obfuscate-region 'shu-obfuscate-region)
   (defalias 'af 'shu-adapt-frame)
   (defalias 'scan-grok 'shu-extract-name-open-grok)
+  (defalias 'add-alexandria 'shu-add-alexandria)
   (defalias 'get-repo 'shu-get-repo)
   (defalias 'add-alexandria-badge `shu-add-alexandria-badge)
   (defalias 'fixup-doxyfile 'shu-fixup-doxyfile)

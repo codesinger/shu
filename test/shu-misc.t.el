@@ -1859,9 +1859,9 @@
 
 
 ;;
-;;  shu-test-=shu-obfuscate-region-1
+;;  shu-test-shu-obfuscate-region-1
 ;;
-(ert-deftest shu-test-=shu-obfuscate-region-1 ()
+(ert-deftest shu-test-shu-obfuscate-region-1 ()
   (let ((data
          "Now is the time for all good men to come to the aid of the Party 10 times.")
         (expected
@@ -1942,6 +1942,160 @@
                  (not (string= s2 s4))
                  (not (string= s3 s4))
                  ))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-git-name-1
+;;
+(ert-deftest shu-test-shu-get-git-name-1 ()
+  (let (
+        (git-url "https://github.com/codesinger/shu.git")
+        (expected-path "codesinger/shu")
+        (expected-name "shu")
+        (ret-val)
+        (actual-path)
+        (actual-name)
+        )
+    (setq ret-val (shu-get-git-name git-url))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq actual-path (car ret-val))
+    (should actual-path)
+    (should (stringp actual-path))
+    (should (string= expected-path actual-path))
+    (setq actual-name (cdr ret-val))
+    (should actual-name)
+    (should (stringp actual-name))
+    (should (string= expected-name actual-name))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-git-name-2
+;;
+(ert-deftest shu-test-shu-get-git-name-2 ()
+  (let (
+        (git-url "https://git@github.dev.acme.com:group_name/repo_name")
+        (expected-path "group_name/repo_name")
+        (expected-name "repo_name")
+        (ret-val)
+        (actual-path)
+        (actual-name)
+        )
+    (setq ret-val (shu-get-git-name git-url))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq actual-path (car ret-val))
+    (should actual-path)
+    (should (stringp actual-path))
+    (should (string= expected-path actual-path))
+    (setq actual-name (cdr ret-val))
+    (should actual-name)
+    (should (stringp actual-name))
+    (should (string= expected-name actual-name))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-git-name-3
+;;
+(ert-deftest shu-test-shu-get-git-name-3 ()
+  (let (
+        (git-url "https://git@github.dev.acme.edu:group_name/repo_name")
+        (expected-path "group_name/repo_name")
+        (expected-name "repo_name")
+        (ret-val)
+        (actual-path)
+        (actual-name)
+        )
+    (setq ret-val (shu-get-git-name git-url))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq actual-path (car ret-val))
+    (should actual-path)
+    (should (stringp actual-path))
+    (should (string= expected-path actual-path))
+    (setq actual-name (cdr ret-val))
+    (should actual-name)
+    (should (stringp actual-name))
+    (should (string= expected-name actual-name))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-git-name-4
+;;
+(ert-deftest shu-test-shu-get-git-name-4 ()
+  (let (
+        (git-url "https://git@github.dev.acme.net:group_name/repo_name")
+        (expected-path "group_name/repo_name")
+        (expected-name "repo_name")
+        (ret-val)
+        (actual-path)
+        (actual-name)
+        )
+    (setq ret-val (shu-get-git-name git-url))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq actual-path (car ret-val))
+    (should actual-path)
+    (should (stringp actual-path))
+    (should (string= expected-path actual-path))
+    (setq actual-name (cdr ret-val))
+    (should actual-name)
+    (should (stringp actual-name))
+    (should (string= expected-name actual-name))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-trim-git-end-1
+;;
+(ert-deftest shu-test-shu-trim-git-end-1 ()
+  (let ((path "https://github.com/codesinger/shu.git")
+        (expected "https://github.com/codesinger/shu")
+        (actual))
+    (setq actual (shu-trim-git-end path))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-git-end-2
+;;
+(ert-deftest shu-test-shu-trim-git-end-2 ()
+  (let ((path "https://github.com/codesinger/shu")
+        (expected "https://github.com/codesinger/shu")
+        (actual))
+    (setq actual (shu-trim-git-end path))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-git-end-3
+;;
+(ert-deftest shu-test-shu-trim-git-end-3 ()
+  (let ((path "  https://github.com/codesinger/shu.git  ")
+        (expected "https://github.com/codesinger/shu")
+        (actual))
+    (setq actual (shu-trim-git-end path))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
     ))
 
 
