@@ -2656,7 +2656,8 @@ This function sets standard default values."
         (gen-latex "GENERATE_LATEX\\s-*=")
         (input "INPUT\\s-*=")
         (project-brief "PROJECT_BRIEF\\s-*=")
-        (dep-line (shu-get-debian-dependency-line)))
+        (dep-line (shu-get-debian-dependency-line))
+        (now (format-time-string "%Y-%m-%dT%T")))
     (princ (concat "shu-fixup-project-doxyfile: dep-line: '" dep-line "'\n") gb)
     (goto-char (point-min))
     (if (not (re-search-forward extract-private nil t))
@@ -2721,6 +2722,7 @@ This function sets standard default values."
                   (when dep-line
                     (insert
                      (concat
+                      "# As of " now "\n"
                       "# Dependencies of this repository: " dep-line "\n"
                       "#\n")))
                   (insert "# ALEXANDRIA_DOC_DEPENDENCIES = group1/repo1 group2/repo2\n")
