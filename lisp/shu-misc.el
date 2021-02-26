@@ -2646,101 +2646,88 @@ the Doxyfile.  The current buffer is the Doxyfile."
   "PROJECT-NAME is the name of the project for which the Doxyfile has been created.
 This function sets standard default values."
   (interactive "sProject name? ")
-  (let (
-        (gb (get-buffer-create "**foo**"))
+  (let ((gb (get-buffer-create "**foo**"))
         (library-name (shu-get-git-repo-name))
         (extract-private "EXTRACT_PRIVATE\\s-*=")
         (extract-static "EXTRACT_STATIC\\s-*=")
         (generate-latex "GENERATE_LATEX\\s-*=")
         (have-dot "HAVE_DOT\\s-*=")
         (project-name "PROJECT_NAME\\s-*=")
+        (gen-latex "GENERATE_LATEX\\s-*=")
         (input "INPUT\\s-*=")
         (project-brief "PROJECT_BRIEF\\s-*=")
-        (dep-line (shu-get-debian-dependency-line))
-        )
+        (dep-line (shu-get-debian-dependency-line)))
     (princ (concat "shu-fixup-project-doxyfile: dep-line: '" dep-line "'\n") gb)
     (goto-char (point-min))
     (if (not (re-search-forward extract-private nil t))
         (progn
           (ding)
-          (message "%s" "Cannot find EXTRACT_PRIVATE tag.")
-          )
+          (message "%s" "Cannot find EXTRACT_PRIVATE tag."))
       (when (search-forward "NO" (line-end-position)  t)
-        (replace-match "YES" t t)
-        )
+        (replace-match "YES" t t))
       (goto-char (point-min))
       (if (not (re-search-forward extract-static nil t))
           (progn
             (ding)
-            (message "%s" "Cannot find EXTRACT_STATIC tag.")
-            )
+            (message "%s" "Cannot find EXTRACT_STATIC tag."))
         (when (search-forward "NO" (line-end-position)  t)
-          (replace-match "YES" t t)
-          )
+          (replace-match "YES" t t))
         (goto-char (point-min))
         (if (not (re-search-forward generate-latex nil t))
             (progn
               (ding)
-              (message "%s" "Cannot find GENERATE_LATEX tag.")
-              )
+              (message "%s" "Cannot find GENERATE_LATEX tag."))
           (when (search-forward "NO" (line-end-position)  t)
-            (replace-match "YES" t t)
-            )
+            (replace-match "YES" t t))
           (goto-char (point-min))
           (if (not (re-search-forward have-dot nil t))
               (progn
                 (ding)
-                (message "%s" "Cannot find HAVE_DOT tag.")
-                )
+                (message "%s" "Cannot find HAVE_DOT tag."))
             (when (search-forward "NO" (line-end-position)  t)
-              (replace-match "YES" t t)
-              )
+              (replace-match "YES" t t))
             (goto-char (point-min))
             (if (not (re-search-forward project-name nil t))
                 (progn
                   (ding)
-                  (message "%s" "Cannot find PROJECT_NAME tag.")
-                  )
+                  (message "%s" "Cannot find PROJECT_NAME tag."))
               (when (search-forward "\"My Project\"" (line-end-position)  t)
-                (replace-match (concat "\"" library-name "\"")t t)
-                )
+                (replace-match (concat "\"" library-name "\"")t t))
               (goto-char (point-min))
               (if (not (re-search-forward input nil t))
                   (progn
                     (ding)
-                    (message "%s" "Cannot find INPUT tag.")
-                    )
+                    (message "%s" "Cannot find INPUT tag."))
                 (end-of-line)
                 (insert (concat " ./" library-name))
-                (goto-char (point-max))
-                (insert
-                 (concat
-                  "\n"
-                  "# The ALEXANDRIA_DOC_DEPENDENCIES tag is used to list other repositories that\n"
-                  "# this repository references.  If you have other referenced repositories, uncomment\n"
-                  "# the line below and list the repository names in a line, space separated.  The\n"
-                  "# repository name is the name of the owning group followed by a slash followed\n"
-                  "# the repository name.\n"
-                  "#\n"
-                  ))
-                (when dep-line
+                (goto-char (point-min))
+                (if (not (re-search-forward gen-latex nil t))
+                    (progn
+                      (ding)
+                      (message "%s" "Cannot find GENERATE_LATEX tag."))
+                  (when (search-forward "YES" (line-end-position)  t)
+                    (replace-match "NO" t t))
+                  (goto-char (point-max))
                   (insert
                    (concat
-                    "# Dependencies of this repository: " dep-line "\n"
-                    "#\n"))
-                  )
-                (insert "# ALEXANDRIA_DOC_DEPENDENCIES = group1/repo1 group2/repo2\n")
-                (goto-char (point-min))
-                (when (not (re-search-forward project-brief nil t))
-                  (ding)
-                  (message "%s" "Cannot find PROJECT_BRIEF tag.")
-                  )
-                )
-              )
-            )
-          )
-        )
-      )
+                    "\n"
+                    "# The ALEXANDRIA_DOC_DEPENDENCIES tag is used to list other repositories that\n"
+                    "# this repository references.  If you have other referenced repositories, uncomment\n"
+                    "# the line below and list the repository names in a line, space separated.  The\n"
+                    "# repository name is the name of the owning group followed by a slash followed\n"
+                    "# the repository name.\n"
+                    "#\n"
+                    ))
+                  (when dep-line
+                    (insert
+                     (concat
+                      "# Dependencies of this repository: " dep-line "\n"
+                      "#\n")))
+                  (insert "# ALEXANDRIA_DOC_DEPENDENCIES = group1/repo1 group2/repo2\n")
+                  (goto-char (point-min))
+                  (when (not (re-search-forward project-brief nil t))
+                    (ding)
+                    (message "%s" "Cannot find PROJECT_BRIEF tag.")))))))))
     ))
 
 
