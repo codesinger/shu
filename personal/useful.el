@@ -789,7 +789,18 @@ files reside."
    )
    (message (concat "Converted " ccount " occurrences."))
   )
-)
+  )
+
+
+;;
+;;  shu-code
+;;
+(defun shu-code ()
+  "Move to the shu code directory."
+  (interactive)
+    (dired "~/emacs/external/shu")
+    )
+
 
 ;;
 ;;  Get the names of a set of Java files with the directory
@@ -939,3 +950,6 @@ of the individial Java files."
     (princ (format "%s%d: %s\n" pad line-no modified-line) log-buffer)
   (setq show-list (cdr show-list)))
 ))
+
+
+;;; useful.el ends here
