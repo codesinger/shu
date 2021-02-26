@@ -128,11 +128,11 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-the-line-at ()
   (let ((x)             ;; current value of (point)
-       (y)             ;; Current line number
-       (shu-test-point-list)    ;; List of points to go to
-       (shu-test-line-list)     ;; List of corresponding line numbers for above
-       (shu-test-start-narrow)  ;; Narrowed region start
-       (shu-test-end-narrow))   ;; Narrowed region end
+        (y)             ;; Current line number
+        (shu-test-point-list)    ;; List of points to go to
+        (shu-test-line-list)     ;; List of corresponding line numbers for above
+        (shu-test-start-narrow)  ;; Narrowed region start
+        (shu-test-end-narrow))   ;; Narrowed region end
 
     (with-temp-buffer
       (shu-test-fillbuffer-ipsum)
@@ -161,11 +161,11 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-current-line ()
   (let ((x)             ;; current value of (point)
-       (y)             ;; Current line number
-       (shu-test-point-list)    ;; List of points to go to
-       (shu-test-line-list)     ;; List of corresponding line numbers for above
-       (shu-test-start-narrow)  ;; Narrowed region start
-       (shu-test-end-narrow))   ;; Narrowed region end
+        (y)             ;; Current line number
+        (shu-test-point-list)    ;; List of points to go to
+        (shu-test-line-list)     ;; List of corresponding line numbers for above
+        (shu-test-start-narrow)  ;; Narrowed region start
+        (shu-test-end-narrow))   ;; Narrowed region end
 
     (with-temp-buffer
       (shu-test-fillbuffer-ipsum)
@@ -258,7 +258,7 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-point-in-string-1 ()
   (let ((gbuf (get-buffer-create shu-unit-test-buffer))
-       (p1))
+        (p1))
     (with-temp-buffer
       (insert "\"Hello\"")
       (forward-char -4)
@@ -302,7 +302,7 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-point-in-string-2 ()
   (let ((gbuf (get-buffer-create shu-unit-test-buffer))
-       (p1))
+        (p1))
     (with-temp-buffer
       (insert "\"A\"\"B\"")
       (goto-char 5)
@@ -328,7 +328,7 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
       (goto-char 5)
       (setq p1 (shu-point-in-string))
       (should (= 5 p1)))
-))
+    ))
 
 
 
@@ -337,13 +337,13 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-point-in-string-3 ()
   (let ((gbuf (get-buffer-create shu-unit-test-buffer))
-       (p1))
+        (p1))
     (with-temp-buffer
       (insert "\"A\"\"B\"")
       (goto-char 6)
       (setq p1 (shu-point-in-string))
       (should (not p1)))
-))
+    ))
 
 
 
@@ -352,7 +352,7 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-point-in-string-4 ()
   (let ((gbuf (get-buffer-create shu-unit-test-buffer))
-       (p1))
+        (p1))
     (with-temp-buffer
       (insert "\"A\"\"B\"")
       (setq p1 (shu-point-in-string 5))
@@ -525,8 +525,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-remove-trailing-all-whitespace-1 ()
   (let ((s1 "Hello    ")
-       (ts1 "Hello")
-       (result))
+        (ts1 "Hello")
+        (result))
     (setq result (shu-remove-trailing-all-whitespace s1))
     (should (string= ts1 result))))
 
@@ -536,8 +536,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-remove-trailing-all-whitespace-2 ()
   (let ((s1 "   Hello    \n")
-       (ts1 "   Hello")
-       (result))
+        (ts1 "   Hello")
+        (result))
     (setq result (shu-remove-trailing-all-whitespace s1))
     (should (string= ts1 result))))
 
@@ -547,8 +547,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-remove-trailing-all-whitespace-3 ()
   (let ((s1 "   Hello     \b \t \n \v \f \r")
-       (ts1 "   Hello")
-       (result))
+        (ts1 "   Hello")
+        (result))
     (setq result (shu-remove-trailing-all-whitespace s1))
     (should (string= ts1 result))))
 
@@ -558,8 +558,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-format-num-1 ()
   (let ((x 902)
-      (gx "  902")
-       (result))
+        (gx "  902")
+        (result))
     (setq result (shu-format-num x 5))
     (should (string= gx result))))
 
@@ -569,8 +569,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-format-num-2 ()
   (let ((x 902)
-      (gx "902")
-       (result))
+        (gx "902")
+        (result))
     (setq result (shu-format-num x 2))
     (should (string= gx result))))
 
@@ -580,8 +580,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-format-num-3 ()
   (let ((x 902)
-      (gx "00902")
-       (result))
+        (gx "00902")
+        (result))
     (setq result (shu-format-num x 5 ?0))
     (should (string= gx result))))
 
@@ -591,8 +591,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-fixed-format-num-1 ()
   (let ((x 902)
-      (gx "  902")
-       (result))
+        (gx "  902")
+        (result))
     (setq result (shu-fixed-format-num x 5))
     (should (string= gx result))))
 
@@ -602,8 +602,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-fixed-format-num-2 ()
   (let ((x 902)
-      (gx "902")
-       (result))
+        (gx "902")
+        (result))
     (setq result (shu-fixed-format-num x 2))
     (should (string= gx result))))
 
@@ -613,8 +613,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-fixed-format-num-3 ()
   (let ((x 103902)
-      (gx "  103,902")
-       (result))
+        (gx "  103,902")
+        (result))
     (setq result (shu-fixed-format-num x 9))
     (should (string= gx result))))
 
@@ -624,8 +624,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-group-number-1 ()
   (let ((x 902)
-      (gx "902")
-       (result))
+        (gx "902")
+        (result))
     (setq result (shu-group-number x))
     (should (string= gx result))))
 
@@ -635,8 +635,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-group-number-2 ()
   (let ((x "902")
-      (gx "902")
-       (result))
+        (gx "902")
+        (result))
     (setq result (shu-group-number x))
     (should (string= gx result))))
 
@@ -646,8 +646,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-group-number-3 ()
   (let ((x 1902)
-      (gx "1,902")
-       (result))
+        (gx "1,902")
+        (result))
     (setq result (shu-group-number x))
     (should (string= gx result))))
 
@@ -657,8 +657,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-group-number-4 ()
   (let ((x 1101902)
-      (gx "1,101,902")
-       (result))
+        (gx "1,101,902")
+        (result))
     (setq result (shu-group-number x))
     (should (string= gx result))))
 
@@ -668,8 +668,8 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-group-number-5 ()
   (let ((x 1101902)
-      (gx "1;10;19;02")
-       (result))
+        (gx "1;10;19;02")
+        (result))
     (setq result (shu-group-number x 2 ";"))
     (should (string= gx result))))
 
@@ -1759,18 +1759,18 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-line-number-at-pos-1 ()
   (let ((p)
-    (data
-     (concat
-      "Line 1\n"
-      "Line 2\n"
-      "Line 3\n"
-      "Line 4\n"
-      "Line 5\n"
-      "Line 6\n"
-      "Line 7\n"
-      "Line 8\n"
-      "Line 9\n"
-      "Line 10\n")))
+        (data
+         (concat
+          "Line 1\n"
+          "Line 2\n"
+          "Line 3\n"
+          "Line 4\n"
+          "Line 5\n"
+          "Line 6\n"
+          "Line 7\n"
+          "Line 8\n"
+          "Line 9\n"
+          "Line 10\n")))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1789,18 +1789,18 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-line-number-at-pos-2 ()
   (let ((p)
-    (data
-     (concat
-      "Line 1\n"
-      "Line 2\n"
-      "Line 3\n"
-      "Line 4\n"
-      "Line 5\n"
-      "Line 6\n"
-      "Line 7\n"
-      "Line 8\n"
-      "Line 9\n"
-      "Line 10\n")))
+        (data
+         (concat
+          "Line 1\n"
+          "Line 2\n"
+          "Line 3\n"
+          "Line 4\n"
+          "Line 5\n"
+          "Line 6\n"
+          "Line 7\n"
+          "Line 8\n"
+          "Line 9\n"
+          "Line 10\n")))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1821,18 +1821,18 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-line-number-at-pos-3 ()
   (let ((p)
-    (data
-     (concat
-      "Line 1\n"
-      "Line 2\n"
-      "Line 3\n"
-      "Line 4\n"
-      "Line 5\n"
-      "Line 6\n"
-      "Line 7\n"
-      "Line 8\n"
-      "Line 9\n"
-      "Line 10\n")))
+        (data
+         (concat
+          "Line 1\n"
+          "Line 2\n"
+          "Line 3\n"
+          "Line 4\n"
+          "Line 5\n"
+          "Line 6\n"
+          "Line 7\n"
+          "Line 8\n"
+          "Line 9\n"
+          "Line 10\n")))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
@@ -1875,9 +1875,9 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-swap-1 ()
   (let* ((x 10)
-        (y 5)
-        (x1 y)
-        (y1 x))
+         (y 5)
+         (x1 y)
+         (y1 x))
     (shu-swap x y)
     (should x)
     (should (numberp x))
@@ -1894,9 +1894,9 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
 ;;
 (ert-deftest shu-test-shu-swap-2 ()
   (let* ((x "Happy Birthday")
-        (y "Hello World")
-        (x1 y)
-        (y1 x))
+         (y "Hello World")
+         (x1 y)
+         (y1 x))
     (shu-swap x y)
     (should x1)
     (should (stringp x))
@@ -2092,6 +2092,51 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
          (string (concat prefix "hello" suffix)))
     (setq is-true (shu-string-starts-ends string prefix))
     (should is-true)
+    ))
+
+
+
+;;
+;;  shu-test-shu-bool-to-string-1
+;;
+(ert-deftest shu-test-shu-bool-to-string-1 ()
+  (let ((value)
+        (expected "nil")
+        (actual))
+    (setq actual (shu-bool-to-string value))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-bool-to-string-2
+;;
+(ert-deftest shu-test-shu-bool-to-string-2 ()
+  (let ((value t)
+        (expected "t")
+        (actual))
+    (setq actual (shu-bool-to-string value))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-bool-to-string-2
+;;
+(ert-deftest shu-test-shu-bool-to-string-2 ()
+  (let* ((value "Hello world")
+         (expected value)
+         (actual))
+    (setq actual (shu-bool-to-string value))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
     ))
 
 

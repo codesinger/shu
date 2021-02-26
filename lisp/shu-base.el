@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.65
+;; Version: 1.6.66
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.65"
+(defconst shu-version "1.6.66"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -1015,7 +1015,9 @@ if any."
   "Convert a boolean value to its string representation and return the string."
   (let ((sval "nil"))
     (when arg
-      (setq sval "t"))
+      (if (stringp arg)
+          (setq sval arg)
+        (setq sval "t")))
     sval
     ))
 

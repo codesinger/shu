@@ -2577,13 +2577,18 @@ of the repository."
 (defun shu-get-git-repo-name ()
   "This function tries to get the name of the current git repository
 from the .git/config file.  Returns nil if it cannot open .git/config."
-  (let ((git-url)
+  (let (
+        (gb (get-buffer-create "**foo**"))
+        (git-url)
         (ret-val)
         (repo-name)
-        (git-url (shu-get-repo)))
+        (git-url (shu-get-repo))
+          )
     (when git-url
+      (princ (concat "git-url: " git-url "\n") gb)
       (setq ret-val (shu-get-git-name git-url))
-      (setq repo-name (cdr ret-val)))
+      (setq repo-name (cdr ret-val))
+      )
     repo-name
     ))
 
@@ -2641,7 +2646,9 @@ the Doxyfile.  The current buffer is the Doxyfile."
   "PROJECT-NAME is the name of the project for which the Doxyfile has been created.
 This function sets standard default values."
   (interactive "sProject name? ")
-  (let ((library-name (shu-get-git-repo-name))
+  (let (
+        (gb (get-buffer-create "**foo**"))
+        (library-name (shu-get-git-repo-name))
         (extract-private "EXTRACT_PRIVATE\\s-*=")
         (extract-static "EXTRACT_STATIC\\s-*=")
         (generate-latex "GENERATE_LATEX\\s-*=")
@@ -2649,47 +2656,60 @@ This function sets standard default values."
         (project-name "PROJECT_NAME\\s-*=")
         (input "INPUT\\s-*=")
         (project-brief "PROJECT_BRIEF\\s-*=")
-        (dep-line (shu-get-debian-dependency-line)))
+        (dep-line (shu-get-debian-dependency-line))
+        )
+    (princ (concat "shu-fixup-project-doxyfile: dep-line: '" dep-line "'\n") gb)
     (goto-char (point-min))
     (if (not (re-search-forward extract-private nil t))
         (progn
           (ding)
-          (message "%s" "Cannot find EXTRACT_PRIVATE tag."))
+          (message "%s" "Cannot find EXTRACT_PRIVATE tag.")
+          )
       (when (search-forward "NO" (line-end-position)  t)
-        (replace-match "YES" t t))
+        (replace-match "YES" t t)
+        )
       (goto-char (point-min))
       (if (not (re-search-forward extract-static nil t))
           (progn
             (ding)
-            (message "%s" "Cannot find EXTRACT_STATIC tag."))
+            (message "%s" "Cannot find EXTRACT_STATIC tag.")
+            )
         (when (search-forward "NO" (line-end-position)  t)
-          (replace-match "YES" t t))
+          (replace-match "YES" t t)
+          )
         (goto-char (point-min))
         (if (not (re-search-forward generate-latex nil t))
             (progn
               (ding)
-              (message "%s" "Cannot find GENERATE_LATEX tag."))
+              (message "%s" "Cannot find GENERATE_LATEX tag.")
+              )
           (when (search-forward "NO" (line-end-position)  t)
-            (replace-match "YES" t t))
+            (replace-match "YES" t t)
+            )
           (goto-char (point-min))
           (if (not (re-search-forward have-dot nil t))
               (progn
                 (ding)
-                (message "%s" "Cannot find HAVE_DOT tag."))
+                (message "%s" "Cannot find HAVE_DOT tag.")
+                )
             (when (search-forward "NO" (line-end-position)  t)
-              (replace-match "YES" t t))
+              (replace-match "YES" t t)
+              )
             (goto-char (point-min))
             (if (not (re-search-forward project-name nil t))
                 (progn
                   (ding)
-                  (message "%s" "Cannot find PROJECT_NAME tag."))
+                  (message "%s" "Cannot find PROJECT_NAME tag.")
+                  )
               (when (search-forward "\"My Project\"" (line-end-position)  t)
-                (replace-match (concat "\"" library-name "\"")t t))
+                (replace-match (concat "\"" library-name "\"")t t)
+                )
               (goto-char (point-min))
               (if (not (re-search-forward input nil t))
                   (progn
                     (ding)
-                    (message "%s" "Cannot find INPUT tag."))
+                    (message "%s" "Cannot find INPUT tag.")
+                    )
                 (end-of-line)
                 (insert (concat " ./" library-name))
                 (goto-char (point-max))
@@ -2707,12 +2727,20 @@ This function sets standard default values."
                   (insert
                    (concat
                     "# Dependencies of this repository: " dep-line "\n"
-                    "#\n")))
+                    "#\n"))
+                  )
                 (insert "# ALEXANDRIA_DOC_DEPENDENCIES = group1/repo1 group2/repo2\n")
                 (goto-char (point-min))
                 (when (not (re-search-forward project-brief nil t))
                   (ding)
-                  (message "%s" "Cannot find PROJECT_BRIEF tag."))))))))
+                  (message "%s" "Cannot find PROJECT_BRIEF tag.")
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
     ))
 
 
@@ -2741,10 +2769,18 @@ text that holds the space separated names of all of the dependencies."
 directory tree.  If such a file is found, this function returns a sorted list of
 the dependencies listed in the Debian dependency file.  If no such file exists,
 nil is returned."
-  (let ((dep-file (shu-get-debian-dependency-file))
+  (let (
+        (gb (get-buffer-create "**foo**"))
+        (dep-file (shu-get-debian-dependency-file))
         (dep)
         (deps)
-        (line-diff 0))
+        (line-diff 0)
+        (df "***NONE***")
+        )
+    (when dep-file
+      (setq df dep-file)
+      )
+    (princ (concat "shu-get-debian-dependencies: dep-file: '" df "'\n") gb)
     (when dep-file
       (with-temp-buffer
         (insert-file-contents dep-file)
@@ -2753,8 +2789,12 @@ nil is returned."
                     (not (= (point) (point-max))))
           (setq dep (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
           (push dep deps)
-          (setq line-diff (forward-line 1))))
-      (setq deps (sort deps 'string<)))
+          (princ (concat "    dep: " dep "\n") gb)
+          (setq line-diff (forward-line 1))
+          )
+        )
+      (setq deps (sort deps 'string<))
+      )
     deps
     ))
 
@@ -2770,12 +2810,20 @@ Construct a dependency file name which is the name of the current directory with
 a file type of \".dep\".  Search through the directory tree for such a file.  If
 the file is found return its fully qualified name, i.e., the full path to the
 file so that it may be opened.  If no such file exists, return nil."
-  (let ((dep-name (concat (shu-get-directory-prefix) "\\.dep"))
+  (let (
+        (gb (get-buffer-create "**foo**"))
+        (dep-name (concat (shu-get-directory-prefix) "\\.dep$"))
         (dep-list)
-        (dep-file))
+        (dep-file)
+        )
+    (princ (concat "shu-get-debian-dependency-file: dep-name: '" dep-name "'\n") gb)
     (setq dep-list (directory-files-recursively "." dep-name))
+    (princ "dep-list: " gb)(princ dep-list gb)(princ "\n" gb)
+    (princ (format "(length dep-list): %d\n" (length dep-list)) gb)
     (when (and dep-list (= (length dep-list) 1))
-      (setq dep-file (car dep-list)))
+      (setq dep-file (car dep-list))
+      (princ (concat "dep-file: '" dep-file "'\n") gb)
+      )
     dep-file
     ))
 
