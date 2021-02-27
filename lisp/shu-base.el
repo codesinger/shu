@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.66
+;; Version: 1.6.67
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.66"
+(defconst shu-version "1.6.67"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -252,7 +252,12 @@ the left and right brackets in the class of characters to be skipped.")
 a comment.")
 
 (defconst shu-unit-test-buffer "**shu-unit-tests**"
-  "The name of the buffer into which unit tests place their output and debug trace.")
+  "The name of the buffer into which unit tests place their output and
+debug trace.")
+
+(defconst shu-trace-buffer "**shu-trace**"
+  "The name of the buffer into which some functions write debug trace
+information.")
 
 (defconst shu-global-buffer-name "**shu-global-operations**"
   "The name of the buffer into which shu-global-operation places its output.")

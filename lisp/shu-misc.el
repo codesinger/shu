@@ -385,7 +385,9 @@ point is placed where the the first line of code in the loop belongs."
    "\\s-*"
    "\\(if"
    "\\|progn"
+   "\\|save-current-buffer"
    "\\|save-excursion"
+   "\\|save-mark-and-excursion"
    "\\|save-match-data"
    "\\|save-restriction"
    "\\|unless"
@@ -417,7 +419,7 @@ point is placed where the the first line of code in the loop belongs."
 ;;
 ;;  shu-get-containing-function
 ;;
-(defun shu-get-containing-functino ()
+(defun shu-get-containing-function ()
   "Search backiwards from the current point to find the beginning of the enclosing
 function, macro, etc.  If such a beginning is found, return a cons cell whose car
 is the point that defines the point at the beginning of the function and whose cdr
@@ -463,7 +465,7 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
         (xx (concat shu-all-whitespace-regexp "*" ")"))
         (zz (concat shu-all-whitespace-regexp "*" "(")))
     (save-excursion
-      (setq ret-val (shu-get-containing-functino))
+      (setq ret-val (shu-get-containing-function))
       (when ret-val
         (setq bof (car ret-val))
         (setq eof (cdr ret-val))
@@ -549,7 +551,7 @@ parentheses back where they belong."
         (start-col)
         (let-begin))
     (save-excursion
-      (setq ret-val (shu-get-containing-functino))
+      (setq ret-val (shu-get-containing-function))
       (when ret-val
         (setq bof (car ret-val))
         (setq eof (cdr ret-val))
@@ -1689,7 +1691,7 @@ remove it.
 If the line ends with trailing pound signs, remove them as well.
 
 Then return the repaired line."
-  (let* ((gb (get-buffer-create "**foo**"))
+  (let* ((gb (get-buffer-create shu-trace-buffer))
          (ssa "\\s-*<a\s-*name")
          (sot (1+ (point)))
          (bol (line-beginning-position))
@@ -2578,7 +2580,7 @@ of the repository."
   "This function tries to get the name of the current git repository
 from the .git/config file.  Returns nil if it cannot open .git/config."
   (let (
-        (gb (get-buffer-create "**foo**"))
+        (gb (get-buffer-create shu-trace-buffer))
         (git-url)
         (ret-val)
         (repo-name)
@@ -2646,7 +2648,7 @@ the Doxyfile.  The current buffer is the Doxyfile."
   "PROJECT-NAME is the name of the project for which the Doxyfile has been created.
 This function sets standard default values."
   (interactive "sProject name? ")
-  (let ((gb (get-buffer-create "**foo**"))
+  (let ((gb (get-buffer-create shu-trace-buffer))
         (library-name (shu-get-git-repo-name))
         (extract-private "EXTRACT_PRIVATE\\s-*=")
         (extract-static "EXTRACT_STATIC\\s-*=")
@@ -2759,7 +2761,7 @@ directory tree.  If such a file is found, this function returns a sorted list of
 the dependencies listed in the Debian dependency file.  If no such file exists,
 nil is returned."
   (let (
-        (gb (get-buffer-create "**foo**"))
+        (gb (get-buffer-create shu-trace-buffer))
         (dep-file (shu-get-debian-dependency-file))
         (dep)
         (deps)
@@ -2800,7 +2802,7 @@ a file type of \".dep\".  Search through the directory tree for such a file.  If
 the file is found return its fully qualified name, i.e., the full path to the
 file so that it may be opened.  If no such file exists, return nil."
   (let (
-        (gb (get-buffer-create "**foo**"))
+        (gb (get-buffer-create shu-trace-buffer))
         (dep-name (concat (shu-get-directory-prefix) "\\.dep$"))
         (dep-list)
         (dep-file)

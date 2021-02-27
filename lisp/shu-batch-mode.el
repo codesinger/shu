@@ -282,6 +282,28 @@ files."
 
 
 
+;;
+;;  shu-batch-copy-trace
+;;
+(defun shu-batch-copy-trace ()
+  "Copy the contents of the SHU-TRACE-BUFFER to stdout in batch mode."
+  (let ((gb (get-buffer-create shu-trace-buffer))
+        (line-diff 0)
+        (line))
+    (save-current-buffer
+      (set-buffer gb)
+      (if (= (buffer-size) 0)
+          (princ "*** Trace buffer is empty\n.")
+        (goto-char (point-min))
+        (while (and (= line-diff 0)
+                    (not (= (point) (point-max))))
+          (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+          (princ (concat line "\n"))
+          (setq line-diff (forward-line 1)))))
+    ))
+
+
+
 
 ;;
 ;;  shu-batch-test-args
