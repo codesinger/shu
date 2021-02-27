@@ -259,6 +259,33 @@ files."
 
 
 ;;
+;;  shu-batch-add-alexandria
+;;
+(defun shu-batch-add-alexandria ()
+  "Call the SHU-ADD-ALEXANDRIA function in batch mode.  One required argument is
+the value for the custom variable SHU-INTERNAL-DEV-URL."
+  (let (
+        (nargs (length command-line-args-left))
+        (done)
+        )
+    (shu-batch-init)
+    (if (/= nargs 1)
+        (progn
+          (message "Require one argument, internal-dev-url.  Called with %d args." nargs)
+          (error "Wrong number of command line arguments")
+          )
+      (setq shu-internal-dev-url (pop command-line-args-left))
+      (setq done (shu-add-alexandria-in-batch-mode))
+      (when (not done)
+        (shu-batch-copy-trace)
+        (error "Alexandria add failed")
+        )
+      )
+    ))
+
+
+
+;;
 ;;  shu-generate-comdb2-code
 ;;
 (defun shu-generate-comdb2-code ()

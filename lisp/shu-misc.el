@@ -2363,6 +2363,29 @@ tests."
 
 
 ;;
+;;  shu-add-alexandria-in-batch-mode
+;;
+(defun shu-add-alexandria-in-batch-mode ()
+  "Call the function SHU-ADD-ALEXANDRIA in batch mode.  The function
+SHU-ADD-ALEXANDRIA normally ends in edit mode in Doxyfile so that the user can
+do a final edit and save.  In batch mode, this function does a save of the
+Doxyfile since there is no interactive user.
+
+If the function succeeds, it returns true, else nil.  This allows the top level
+batch invoking function to terminate emacs with a zero or non-zero return code
+to indicate to an external script whether or not the add command worked."
+  (let ((done))
+    (setq done (shu-add-alexandria))
+    (when done
+      (basic-save-buffer)
+      (shu-kill-current-buffer))
+    done
+    ))
+
+
+
+
+;;
 ;;  shu-add-alexandria
 ;;
 (defun shu-add-alexandria ()
@@ -2372,14 +2395,18 @@ contain an Alexandria badge and that a Doxyfile does not exist.  If those two
 conditions are met, an Alexandria badge is added to the bottom of the README.md
 file, a Doxyfile is created, and some of the tags in the Doxyfile are set to
 reasonable defaults.  An ALEXANDRIA_DOC_DEPENDENCIES tag is added to the end of
-the Doxyfile as a comment."
+the Doxyfile as a comment.
+If this function succeeds, it returns true, else nil.  The return value may
+be used by batch mode functions that want to call this function and report
+whether or not it succeeded."
   (interactive)
   (let ((readme-name "README.md")
         (doxyfile-name "Doxyfile")
         (have-badge)
         (fbuf)
         (file-buf)
-        (badge-added))
+        (badge-added)
+        (done))
     (if (not (file-readable-p readme-name))
         (progn
           (ding)
@@ -2414,7 +2441,8 @@ the Doxyfile as a comment."
               (shu-add-doxyfile)
               (shu-git-add-file doxyfile-name)
               (find-file doxyfile-name)
-              (shu-fixup-doxyfile))))))
+              (setq done (shu-fixup-doxyfile)))))))
+    done
     ))
 
 
@@ -2585,7 +2613,7 @@ from the .git/config file.  Returns nil if it cannot open .git/config."
         (ret-val)
         (repo-name)
         (git-url (shu-get-repo))
-          )
+        )
     (when git-url
       (princ (concat "git-url: " git-url "\n") gb)
       (setq ret-val (shu-get-git-name git-url))
@@ -2646,7 +2674,9 @@ the Doxyfile.  The current buffer is the Doxyfile."
 ;;
 (defun shu-fixup-project-doxyfile (project-name)
   "PROJECT-NAME is the name of the project for which the Doxyfile has been created.
-This function sets standard default values."
+This function sets standard default values.
+If this function succeeds, it return true, else nil.  The return value may be used
+in batch mode to determine if the fixup was successful."
   (interactive "sProject name? ")
   (let ((gb (get-buffer-create shu-trace-buffer))
         (library-name (shu-get-git-repo-name))
@@ -2659,7 +2689,8 @@ This function sets standard default values."
         (input "INPUT\\s-*=")
         (project-brief "PROJECT_BRIEF\\s-*=")
         (dep-line (shu-get-debian-dependency-line))
-        (now (format-time-string "%Y-%m-%dT%T")))
+        (now (format-time-string "%Y-%m-%dT%T"))
+        (fixed))
     (princ (concat "shu-fixup-project-doxyfile: dep-line: '" dep-line "'\n") gb)
     (goto-char (point-min))
     (if (not (re-search-forward extract-private nil t))
@@ -2729,9 +2760,12 @@ This function sets standard default values."
                       "#\n")))
                   (insert "# ALEXANDRIA_DOC_DEPENDENCIES = group1/repo1 group2/repo2\n")
                   (goto-char (point-min))
-                  (when (not (re-search-forward project-brief nil t))
-                    (ding)
-                    (message "%s" "Cannot find PROJECT_BRIEF tag.")))))))))
+                  (if (not (re-search-forward project-brief nil t))
+                      (progn
+                        (ding)
+                        (message "%s" "Cannot find PROJECT_BRIEF tag."))
+                    (setq fixed t)))))))))
+    fixed
     ))
 
 
