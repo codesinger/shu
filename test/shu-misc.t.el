@@ -210,16 +210,16 @@
 (ert-deftest shu-test-shu-find-numbered-commit-1 ()
   (let ((data
          (concat
-         " 501. commit 6469db55adb3e05d68b88b087fabe892e3874321\n\n"
-         " 304. commit 7469db55adb3e05d68b88b087fabe892e3874321\n\n"))
+          " 501. commit 6469db55adb3e05d68b88b087fabe892e3874321\n\n"
+          " 304. commit 7469db55adb3e05d68b88b087fabe892e3874321\n\n"))
         (commit-number 304)
         (expected "7469db55adb3e05d68b88b087fabe892e3874321")
         (actual))
     (with-temp-buffer
       (insert data)
-    (setq actual (shu-find-numbered-commit commit-number))
-    (should (stringp actual))
-    (should (string= expected actual)))
+      (setq actual (shu-find-numbered-commit commit-number))
+      (should (stringp actual))
+      (should (string= expected actual)))
     ))
 
 
@@ -230,16 +230,16 @@
 (ert-deftest shu-test-shu-find-numbered-commit-2 ()
   (let ((data
          (concat
-         " 501. commit 6469db55adb3e05d68b88b087fabe892e3874321\n\n"
-         " 304. commit 7469db55adb3e05d68b88b087fabe892e3874321\n\n"))
+          " 501. commit 6469db55adb3e05d68b88b087fabe892e3874321\n\n"
+          " 304. commit 7469db55adb3e05d68b88b087fabe892e3874321\n\n"))
         (commit-number 501)
         (expected "6469db55adb3e05d68b88b087fabe892e3874321")
         (actual))
     (with-temp-buffer
       (insert data)
-    (setq actual (shu-find-numbered-commit commit-number))
-    (should (stringp actual))
-    (should (string= expected actual)))
+      (setq actual (shu-find-numbered-commit commit-number))
+      (should (stringp actual))
+      (should (string= expected actual)))
     ))
 
 
@@ -250,14 +250,14 @@
 (ert-deftest shu-test-shu-find-numbered-commit-3 ()
   (let ((data
          (concat
-         " 501. commit 6469db55adb3e05d68b88b087fabe892e3874321\n\n"
-         " 304. commit 7469db55adb3e05d68b88b087fabe892e3874321\n\n"))
+          " 501. commit 6469db55adb3e05d68b88b087fabe892e3874321\n\n"
+          " 304. commit 7469db55adb3e05d68b88b087fabe892e3874321\n\n"))
         (commit-number 329)
         (actual))
     (with-temp-buffer
       (insert data)
-    (setq actual (shu-find-numbered-commit commit-number))
-    (should (not actual)))
+      (setq actual (shu-find-numbered-commit commit-number))
+      (should (not actual)))
     ))
 
 
@@ -342,27 +342,27 @@
       (goto-char (point-min))
       (should (search-forward "save-excur" nil t))
       (beginning-of-line)
-       (setq ret-val (shu-get-containing-functino))
-       (should ret-val)
-       (should (consp ret-val))
-       (setq bof (car ret-val))
-       (setq eof (cdr ret-val))
-       (should bof)
-       (should (numberp bof))
-       (should eof)
-       (should (numberp eof))
-       (should (< bof eof))
-       (should (= expected-bof bof))
-       (should (= expected-eof eof))
-       (princ (format "bof: %d, eof: %d\n" bof eof) gb))
+      (setq ret-val (shu-get-containing-function))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq bof (car ret-val))
+      (setq eof (cdr ret-val))
+      (should bof)
+      (should (numberp bof))
+      (should eof)
+      (should (numberp eof))
+      (should (< bof eof))
+      (should (= expected-bof bof))
+      (should (= expected-eof eof))
+      (princ (format "bof: %d, eof: %d\n" bof eof) gb))
     ))
 
 
 
 ;;
-;;  shu-test-shu-get-containing-functino-2
+;;  shu-test-shu-get-containing-function-2
 ;;
-(ert-deftest shu-test-shu-get-containing-functino-2 ()
+(ert-deftest shu-test-shu-get-containing-function-2 ()
   (let (
         (data
          (concat
@@ -392,8 +392,8 @@
       (goto-char (point-min))
       (should (search-forward "save-excur" nil t))
       (beginning-of-line)
-       (setq ret-val (shu-get-containing-functino))
-       (should (not ret-val)))
+      (setq ret-val (shu-get-containing-function))
+      (should (not ret-val)))
     ))
 
 
@@ -1868,12 +1868,12 @@
          "Abc de fgh ijkl mno pqr stuv wxy za bcde fg hij klm no pqr Stuvw 10 xyzab.")
         (actual))
     (with-temp-buffer
-     (insert data)
-     (shu-obfuscate-region (point-min) (point-max))
-     (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-     (should actual)
-     (should (stringp actual))
-     (should (string= expected actual)))
+      (insert data)
+      (shu-obfuscate-region (point-min) (point-max))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
     ))
 
 
@@ -2097,6 +2097,41 @@
     (should (stringp actual))
     (should (string= expected actual))
     ))
+
+
+
+;;
+;;  shu-test-shu-internal-get-repo-1
+;;
+(ert-deftest shu-test-shu-internal-get-repo-1 ()
+  (let (
+        (data
+         (concat
+          "[core]\n"
+          "	repositoryformatversion = 0\n"
+          "	filemode = true\n"
+          "	bare = false\n"
+          "	logallrefupdates = true\n"
+          "	ignorecase = true\n"
+          "	precomposeunicode = true\n"
+          "[remote \"origin\"]\n"
+          "	url = https://github.com/codesinger/shu.git\n"
+          "	fetch = +refs/heads/*:refs/remotes/origin/*\n"
+          "[branch \"master\"]\n"
+          "	remote = origin\n"
+          "	merge = refs/heads/master\n"))
+        (expected "https://github.com/codesinger/shu.git")
+        (actual)
+        )
+    (with-temp-buffer
+      (insert data)
+      (setq actual (shu-internal-get-repo))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual))
+      )
+    ))
+
 
 
 

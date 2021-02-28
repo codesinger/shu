@@ -2521,38 +2521,52 @@ removed from the end."
 (defun shu-get-repo ()
   "When positioned in the top level directory of a git repository, return the
 git path to the repository.  This is found in .git/config as the url of
-[remote \"origin\"].  Return nil if the path cannot b found.
+[remote \"origin\"].  Return nil if the path cannot be found.
 
 This should probably be extended to do a search for the .git directory anywhere
 above the current position, which would remove the requirement to be in the root
 of the repository."
-  (let (
-        (rr)
-        (ss1 "remote\\s-*\"origin\"")
+  (let ((config)
+        (path))
+    (with-temp-buffer
+      (setq config (insert-file-contents-literally ".git/config"))
+      (if (not config)
+          (progn
+            (ding)
+            (message "%s" "Cannot open .git/config"))
+        (setq path (shu-internal-get-repo))))
+    path
+    ))
+
+
+
+;;
+;;  shu-internal-get-repo
+;;
+(defun shu-internal-get-repo ()
+  "The current buffer holds an instance of the \".git/config\" file for the
+repository.  This function returns the git path to the repository, which is the
+url given after [remote \"origin\"].  nil is returned if the path cannot be
+found."
+  (let ((ss1 "remote\\s-*\"origin\"")
         (ss2 "url\\s-*=\\s-*")
         (pstart)
         (pend)
         (path))
-    (with-temp-buffer
-      (setq rr (insert-file-contents-literally ".git/config"))
-      (if (not rr)
+    (goto-char (point-min))
+    (if (not (re-search-forward ss1 nil t))
+        (progn
+          (ding)
+          (message "%s" "Cannot find [remote \"origin\"] in .git/config"))
+      (if (not (re-search-forward ss2 nil t))
           (progn
             (ding)
-            (message "%s" "Cannot open .git/config"))
-        (goto-char (point-min))
-        (if (not (re-search-forward ss1 nil t))
-            (progn
-              (ding)
-              (message "%s" "Cannot find [remote \"origin\"] in .git/config"))
-          (if (not (re-search-forward ss2 nil t))
-              (progn
-                (ding)
-                (message "%s" "Cannot find \"url = \" following [remote \"origin\"] in .git/config"))
-            (setq pstart (point))
-            (setq pend (line-end-position))
-            (setq path (buffer-substring-no-properties pstart pend))))))
-    path
+            (message "%s" "Cannot find \"url = \" following [remote \"origin\"] in .git/config"))
+        (setq pstart (point))
+        (setq pend (line-end-position))
+        (setq path (buffer-substring-no-properties pstart pend))))
     ))
+
 
 
 

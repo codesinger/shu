@@ -314,8 +314,8 @@ the value for the custom variable SHU-INTERNAL-DEV-URL."
         (line))
     (save-current-buffer
       (set-buffer gb)
-      (if (= (buffer-size) 0)
-          (princ "*** Trace buffer is empty\n.")
+      (when (> (buffer-size) 0)
+        (princ "*** Trace buffer ***\n")
         (goto-char (point-min))
         (while (and (= line-diff 0)
                     (not (= (point) (point-max))))
@@ -362,8 +362,8 @@ produces the following output:
 (defun shu-batch-fail ()
   "A test function to terminate emacs via ERROR."
   (interactive)
-    (error "Shu batch failure")
-    )
+  (error "Shu batch failure")
+  )
 
 
 
