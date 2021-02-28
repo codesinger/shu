@@ -263,7 +263,15 @@ files."
 ;;
 (defun shu-batch-add-alexandria ()
   "Call the SHU-ADD-ALEXANDRIA function in batch mode.  One required argument is
-the value for the custom variable SHU-INTERNAL-DEV-URL."
+the value for the custom variable SHU-INTERNAL-DEV-URL.
+
+Invoke as:
+
+     emacs --batch -l ~/emacs/shu-batch-mode.elc -f shu-batch-add-alexandria <dev-url>
+
+where \"<dev-url>\" is the organization's internal web site that hosts its code
+and tools.  See the description of the custom variable SHU-INTERNAL-DEV-URL.
+for more information."
   (let ((nargs (length command-line-args-left))
         (done))
     (shu-batch-init)
