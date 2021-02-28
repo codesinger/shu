@@ -264,23 +264,18 @@ files."
 (defun shu-batch-add-alexandria ()
   "Call the SHU-ADD-ALEXANDRIA function in batch mode.  One required argument is
 the value for the custom variable SHU-INTERNAL-DEV-URL."
-  (let (
-        (nargs (length command-line-args-left))
-        (done)
-        )
+  (let ((nargs (length command-line-args-left))
+        (done))
     (shu-batch-init)
     (if (/= nargs 1)
         (progn
           (message "Require one argument, internal-dev-url.  Called with %d args." nargs)
-          (error "Wrong number of command line arguments")
-          )
+          (error "Wrong number of command line arguments"))
       (setq shu-internal-dev-url (pop command-line-args-left))
       (setq done (shu-add-alexandria-in-batch-mode))
       (when (not done)
         (shu-batch-copy-trace)
-        (error "Alexandria add failed")
-        )
-      )
+        (error "Alexandria add failed")))
     ))
 
 
@@ -358,6 +353,18 @@ produces the following output:
       (princ (format "arg: %d: \"%s\"\n" i arg))
       (setq i (1+ i)))
     ))
+
+
+
+;;
+;;  shu-batch-fail
+;;
+(defun shu-batch-fail ()
+  "A test function to terminate emacs via ERROR."
+  (interactive)
+    (error "Shu batch failure")
+    )
+
 
 
 
