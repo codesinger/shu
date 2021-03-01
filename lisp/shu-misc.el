@@ -384,6 +384,7 @@ point is placed where the the first line of code in the loop belongs."
    "("
    "\\s-*"
    "\\(if"
+   "\\|ignore-errors"
    "\\|progn"
    "\\|save-current-buffer"
    "\\|save-excursion"
@@ -393,9 +394,13 @@ point is placed where the the first line of code in the loop belongs."
    "\\|unless"
    "\\|when"
    "\\|while"
+   "\\|with-demoted-errors"
    "\\|with-temp-buffer"
    "\\)")
-  "Rregular expression to find the beginning of a function that is a conditional.")
+  "Regular expression to find the beginning of a function or macro that encloses
+a body.  Such functions usually require a future closing parenthesis that is
+likely not on the current line.  This is used by the functions SHU-TIGHTEN-LISP
+and SHU-LOOSEN-LISP.")
 
 
 
