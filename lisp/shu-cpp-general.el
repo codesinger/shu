@@ -211,6 +211,16 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                       "std::align"
                       "std::addressof"
                       ))
+   (cons "sstream"   (list
+                      "std::istringstream"
+                      "std::ostringstream"
+                      "std::stringbuf"
+                      "std::stringstream"
+                      "std::wistringstream"
+                      "std::wostringstream"
+                      "std::wstringbuf"
+                      "std::wstringstream"
+                      ))
    (cons "string"   (list
                      "std::basic_string"
                      "std::char_traits"
@@ -294,6 +304,16 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsl::get_pointer_safety"
                             "bsl::align"
                             "bsl::addressof"
+                            ))
+   (cons "bsl_sstream.h"   (list
+                            "bsl::istringstream"
+                            "bsl::ostringstream"
+                            "bsl::stringbuf"
+                            "bsl::stringstream"
+                            "bsl::wistringstream"
+                            "bsl::wostringstream"
+                            "bsl::wstringbuf"
+                            "bsl::wstringstream"
                             ))
    (cons "bsl_string.h"   (list
                            "bsl::basic_string"
