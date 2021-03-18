@@ -175,6 +175,9 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                           "std::is_placeholder"
                           "std::reference_wrapper"
                           ))
+   (cons "limits"    (list
+                      "std::numeric_limits"
+                      ))
    (cons "memory"    (list
                       "std::allocator"
                       "std::allocator_arg"
@@ -269,6 +272,9 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                 "bsl::is_placeholder"
                                 "bsl::reference_wrapper"
                                 ))
+   (cons "bsl_limits.h"    (list
+                            "bsl::numeric_limits"
+                            ))
    (cons "bsl_memory.h"    (list
                             "bsl::allocator"
                             "bsl::allocator_arg"
