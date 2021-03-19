@@ -175,6 +175,12 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                           "std::is_placeholder"
                           "std::reference_wrapper"
                           ))
+   (cons "locale"    (list
+                      "std::narrow"
+                      "std::tolower"
+                      "std::toupper"
+                      "std::widen"
+                      ))
    (cons "limits"    (list
                       "std::numeric_limits"
                       ))
@@ -272,6 +278,12 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                 "bsl::is_placeholder"
                                 "bsl::reference_wrapper"
                                 ))
+   (cons "bsl_locale.h"    (list
+                            "bsl::narrow"
+                            "bsl::tolower"
+                            "bsl::toupper"
+                            "bsl::widen"
+                            ))
    (cons "bsl_limits.h"    (list
                             "bsl::numeric_limits"
                             ))
