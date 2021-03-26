@@ -2228,11 +2228,28 @@ becomes
 (defun shu-adapt-frame ()
   "Adapt the current frame to the current display by stretching the frame to the
 full height of the display and putting the top of the frame at the top of the
+display.  This function makes some assumptions about the display geometry based
+on the current operating system.  It assumes that Windows loses five lines for
+top and bottom toolbars.  Mac OS X loses three lines for the top tool bar.  Unix
+loses two lines for something.  These numbers should, at some point be
+customizable.
+
+Implementation note:
+
+If this function is called when the left side of the frame is positioned to the
+left of the leftmost edge of the display, the function FRAME-POSITION returns a
+negative value for the x coordinate of the frame.  The function
+SET-FRAME-POSITION takes the x and y coordinates of the new position of the top
+left corner of the frame.
+
+But if x is negative, it specifies the coordinates of the right edge of the
+frame relative to the right edge of the display.  This puts a frame that is very
+close to the left edge of the display all the way over to the right edge of the
 display.
-This function makes some assumptions about the display geometry based on the
-current operating system.  It assumes that Windows loses five lines for top and
-bottom toolbars.  Mac OS X loses three lines for the top tool bar.  Unix loses
-two lines for something.  These numbers should, at some point be customizable."
+
+The assumption is that a negative x frame position means that the user has
+positioned the frame just a bit past the left edge and that the desired frame
+position is actually the leftmost edge of the display."
   (interactive)
   (let* ((lost-lines
           (if (shu-system-type-is-windows)
@@ -2251,6 +2268,8 @@ two lines for something.  These numbers should, at some point be customizable."
     (setq fp (frame-position))
     (setq x (car fp))
     (setq y (cdr fp))
+    (when (< x 0)
+      (setq x 0))
     (set-frame-height (selected-frame) hpl)
     (set-frame-position (selected-frame) x top-y)
     ))
