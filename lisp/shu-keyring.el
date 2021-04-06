@@ -187,9 +187,9 @@ entry in the keyring file.")
 are recorded.")
 
 (defvar shu-keyring-external-passphrase nil
-  "Holds the exrernal passphrase for the keyring file.  This allows the user
+  "Holds the external passphrase for the keyring file.  This allows the user
 to type the passphrase at the beginning of an emacs session.  Once this is
-set it can then be put into kill ring by shu-kering-get-passphrase.")
+set it can then be put into kill ring by shu-keyring-get-passphrase.")
 
 
 ;;

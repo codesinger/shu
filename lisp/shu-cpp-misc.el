@@ -971,7 +971,7 @@ CLASS-NAME is the name of the containing C++ class."
 ;;  shu-cpp-decl-h-stream
 ;;
 (defun shu-cpp-decl-h-stream (class-name)
-  "Geneate the declaration for the streaming operator (operator<<()).
+  "Generate the declaration for the streaming operator (operator<<()).
 CLASS-NAME is the name of the containing C++ class."
   (let ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
         (ipad (make-string shu-cpp-indent-length ? ))
@@ -1000,7 +1000,7 @@ CLASS-NAME is the name of the containing C++ class."
 ;;  shu-cpp-decl-cpp-stream
 ;;
 (defun shu-cpp-decl-cpp-stream (class-name)
-  "Geneate the code for the streaming operator (operator<<()).  CLASS-NAME is the
+  "Generate the code for the streaming operator (operator<<()).  CLASS-NAME is the
 name of the containing C++ class."
   (let ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
         (ipad (make-string shu-cpp-indent-length ? ))

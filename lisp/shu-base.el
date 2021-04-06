@@ -539,7 +539,7 @@ functions depend on this frankly strange behavior."
 (defun shu-end-of-dq-string ()
   "Return the point that represents the end of the current quoted string in the
 buffer.  The quote character is the double quote character (\").  Escaped quotes
-are skipped.  If the current string is not terminated by a ;doubloe quote
+are skipped.  If the current string is not terminated by a double quote
 character, nil is returned.  If the current string is terminated by a double
 quote character, the position following the quote is returned and point is set
 to that position."
@@ -951,7 +951,7 @@ two strings, which are \"Hi\" and \"How are you?\"."
 ;;
 (defun shu-starts-with (regexp)
   "If the first non-whitespace on the current line matches REGEXP, return the position
-of the beginning of the mqtched REGEXP.  If the first non-whitespace does not match
+of the beginning of the matched REGEXP.  If the first non-whitespace does not match
 REGEXP, return nil."
   (let ((isit))
     (save-excursion
@@ -983,7 +983,7 @@ to trim blank lines from the end of a file if SHU-TRIM-FILE is true."
   "line-number-at-pos in simple.el takes two arguments as of emacs 26.  This
 allows the two argument version to run on older versions of emacs.  If
 ABSOLUTE is specified, widen the buffer, then call the one argument version
-of line-number-at-pos, which is supported in amacs 24 and 25, and perhaps
+of line-number-at-pos, which is supported in emacs 24 and 25, and perhaps
 others."
   (let ((p))
     (save-restriction

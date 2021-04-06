@@ -372,7 +372,7 @@ point is placed where the the first line of code in the loop belongs."
    "\\|defconst"
    ")"
    "\\)")
-  "Rregular expression to find the beginning of a function, macro, etc.")
+  "Regular expression to find the beginning of a function, macro, etc.")
 
 
 
@@ -417,7 +417,7 @@ and SHU-LOOSEN-LISP.")
    shu-all-whitespace-regexp "*"
    "\\((\\)"
    )
-  "Rregular expression to find the beginning of a let soecial form.")
+  "Regular expression to find the beginning of a let special form.")
 
 
 
@@ -425,7 +425,7 @@ and SHU-LOOSEN-LISP.")
 ;;  shu-get-containing-function
 ;;
 (defun shu-get-containing-function ()
-  "Search backiwards from the current point to find the beginning of the enclosing
+  "Search backwards from the current point to find the beginning of the enclosing
 function, macro, etc.  If such a beginning is found, return a cons cell whose car
 is the point that defines the point at the beginning of the function and whose cdr
 defines the point at the end of the function.  If not inside a function, macro, etc.,
@@ -512,7 +512,7 @@ dangling right parenthesis will be moved up to the end of the line that also end
 in a right parenthesis.  This is an internal part of the function SHU-TIGHTEN-LISP.
 EOF is the point at which the current function on which we are operating ends.
 This function removes some text from the current function.  It adjusts EOF appropriately
-and reeturns thee new value to the caller.."
+and returns the new value to the caller."
   (interactive)
   (let ((sp)
         (end-pos)
@@ -1619,7 +1619,7 @@ The returned string would be
 ;;
 (defun shu-get-markdown-prefix (section-heading)
   "Returns the pound sign prefix from a markdown section heading,
-SECTION-HEADING.  The sring of pound signs must begin at the beginning of the
+SECTION-HEADING.  The string of pound signs must begin at the beginning of the
 string.  If a section heading is
 
    \"### This is a section heading\"
@@ -1889,7 +1889,7 @@ the host operating system."
 ;;
 (defun shu-system-name ()
   "Return the machine name.  Prior to emacs 25.1, this was held in the variable
-system-name.  As of enacs 25.1, system-name is now a function.  Return nil if
+system-name.  As of emacs 25.1, system-name is now a function.  Return nil if
 system-name is neither a function nor a variable."
   (let (
         (sys-name)
@@ -1910,7 +1910,7 @@ system-name is neither a function nor a variable."
 ;;
 (defun shu-system-name-string ()
   "Return the machine name.  Prior to emacs 25.1, this was held in the variable
-system-name.  As of enacs 25.1, system-name is now a function.  Unlike
+system-name.  As of emacs 25.1, system-name is now a function.  Unlike
 SHU-SYSTEM-NAME, this function always returns a string, even if the machine
 name is not available for some reason."
   (let ((sys-name (shu-system-name)))
@@ -1925,7 +1925,7 @@ name is not available for some reason."
 ;;  shu-show-system-name
 ;;
 (defun shu-show-system-name ()
-  "Place the sytem name (machine name) in the message area."
+  "Place the system name (machine name) in the message area."
   (interactive)
   (message "%s" (shu-system-name-string))
   )
@@ -1936,7 +1936,7 @@ name is not available for some reason."
 ;;  shu-kill-system-name
 ;;
 (defun shu-kill-system-name ()
-  "Place the sytem name (machine name) in the message area."
+  "Place the system name` (machine name) in the message area."
   (interactive)
   (setq debug-on-error t)
   (shu-kill-new (shu-system-name-string))
@@ -2119,8 +2119,8 @@ from the buffer the returned string."
 ;;  shu-obfuscate-region
 ;;
 (defun shu-obfuscate-region (start end)
-  "Obfusczte a region of text by replacing wvery alphabetic character in the
-region wth the next letter of the alphabet, staring with 'a'. For example, of
+  "Obfuscate a region of text by replacing every alphabetic character in the
+region with the next letter of the alphabet, staring with 'a'. For example, of
 the region contains
 
   Now is the time for all good men to come to the aid of the Party 10 times.
@@ -2130,7 +2130,7 @@ Then the obfuscated text would be:
   Abc de fgh ijkl mno pqr stuv wxy za bcde fg hij klm no pqr Stuvw 10 xyzab.
 
 This is useful if you want to capture some text for later testing and
-manipulation that might contain confidential or prlprietary information.  This
+manipulation that might contain confidential or proprietary information.  This
 is an encoding that cannot be reversed."
   (interactive "*r")
   (let ((current-char ?z)
@@ -2184,7 +2184,7 @@ CURRENT-CHAR is 'Z', then the next character returned is 'A'."
 ;;  shu-reverse2
 ;;
 (defun shu-reverse2 ()
-  "When positioned in front of a pair of pareenthesis that contains a pair of
+  "When positioned in front of a pair of parenthesis that contains a pair of
 expressions separated by a comma, reverse the positions of the two expressions.
 The first becomes the second and the second becomes the first.
 i.e.,
