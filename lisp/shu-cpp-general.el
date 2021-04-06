@@ -264,6 +264,13 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                "bsl::replace"
                                "bsl::replace_if"
                                ))
+   (cons "bdlf_bind.h"   (list
+                          "bdlf::BindUtil"
+                          "bdlf::BindWrapper"
+                          ))
+   (cons "bdlf_placeholder.h"    (list
+                                  "bdlf::Placeholders"
+                                  ))
    (cons "bsl_cstddef.h"    (list
                              "bsl::size_t"
                              "bsl::ptrdiff_t"
@@ -358,6 +365,10 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsls::AtomicUint64"
                             "bsls::AtomicPointer"
                             ))
+   (cons "mbsa_session.h"    (list
+                              "mbsa::Session"
+                              "mbsa::SessionEventHandler"
+                              ))
    )
   "An alist that maps include file names to class names when using BDE.")
 
