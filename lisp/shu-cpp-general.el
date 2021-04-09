@@ -3772,6 +3772,7 @@ Return t if a recognized data type was found and a value was filled in."
          (fail-type)
          (bol (line-beginning-position))
          (eol (line-end-position))
+         (semi "")
          (ss
           (concat
            "\\s-*"
@@ -3833,7 +3834,14 @@ Return t if a recognized data type was found and a value was filled in."
          )))
     (if data
         (progn
-          (insert (concat data ";"))
+          (end-of-line)
+          (backward-char 1)
+          (if (looking-at ";")
+              (setq semi "")
+            (setq semi ";")
+            (end-of-line)
+              )
+          (insert (concat data semi))
           (setq did-fill t))
       (ding)
       (message "%s" "Unrecognized data type"))
@@ -3847,7 +3855,11 @@ Return t if a recognized data type was found and a value was filled in."
 ;;
 (defun shu-cpp-fill-test-area (start end)
   "For all lines between the marked start and end points, if a recognized data
-type has been declared on a line, fill it with random test data."
+type has been declared on a line, fill it with random test data.
+
+For the benefit of unit tests, this function returns a a cons cell whose car is
+the number of unrecognized data types and whose cdr is the number of values
+generated."
   (interactive "r")
   (let ((sline (shu-the-line-at start))
         (eline (shu-the-line-at end))
@@ -3855,23 +3867,24 @@ type has been declared on a line, fill it with random test data."
         (eol)
         (did-fill)
         (fill-count 0)
-        (skip-count 0))
+        (skip-count 0)
+        (count 0))
     (save-excursion
       (goto-char start)
-      (while (and (<= (shu-current-line) eline) (= line-diff 0))
-        (setq eol (line-end-position))
-        (goto-char (1- eol))
-        (when (looking-at ";")
-          (delete-char 1)
-          (setq eol (line-end-position)))
-        (setq did-fill (shu-cpp-internal-fill-test-data))
-        (if did-fill
-            (setq fill-count (1+ fill-count))
-          (setq skip-count (1+ skip-count)))
+      (while (and (<= (shu-current-line) eline)
+                  (= line-diff 0)
+                  )
+        (end-of-line)
+        (when (> (- (line-end-position) (line-beginning-position)) 5)
+          (setq did-fill (shu-cpp-internal-fill-test-data))
+          (if did-fill
+              (setq fill-count (1+ fill-count))
+            (setq skip-count (1+ skip-count))))
         (setq line-diff (forward-line 1))))
     (if (= skip-count 0)
         (message "%d values filled in" fill-count)
       (message "%d values filled in, %d data types unrecognized" fill-count skip-count))
+    (cons skip-count fill-count)
     ))
 
 

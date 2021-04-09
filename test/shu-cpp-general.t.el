@@ -3206,4 +3206,309 @@ class names."
 
 
 
+;;
+;;  shu-test-shu-cpp-internal-fill-test-data-1
+;;
+(ert-deftest shu-test-shu-cpp-internal-fill-test-data-1 ()
+  (let ((data
+         (concat
+          "    "
+          shu-cpp-datetime-timezone-type
+          "  abc;\n"
+          ))
+        (in-length)
+        (out-length)
+        (did-fill)
+        (actual))
+    (setq in-length (length data))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 6)
+      (setq did-fill (shu-cpp-internal-fill-test-data))
+      (should did-fill)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq out-length (length actual))
+      (should (> out-length (+ in-length 8))))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-internal-fill-test-data-2
+;;
+(ert-deftest shu-test-shu-cpp-internal-fill-test-data-2 ()
+  (let ((data
+         (concat
+          "    "
+          shu-cpp-interval-type
+          "  abc;\n"
+          ))
+        (in-length)
+        (out-length)
+        (did-fill)
+        (actual))
+    (setq in-length (length data))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 6)
+      (setq did-fill (shu-cpp-internal-fill-test-data))
+      (should did-fill)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq out-length (length actual))
+      (should (> out-length (+ in-length 8))))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-internal-fill-test-data-3
+;;
+(ert-deftest shu-test-shu-cpp-internal-fill-test-data-3 ()
+  (let ((data
+         (concat
+          "    "
+          shu-cpp-datetime-type
+          "  abc;\n"
+          ))
+        (in-length)
+        (out-length)
+        (did-fill)
+        (actual))
+    (setq in-length (length data))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 6)
+      (setq did-fill (shu-cpp-internal-fill-test-data))
+      (should did-fill)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq out-length (length actual))
+      (should (> out-length (+ in-length 8))))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-internal-fill-test-data-4
+;;
+(ert-deftest shu-test-shu-cpp-internal-fill-test-data-4 ()
+  (let ((data
+         (concat
+          "    "
+          shu-cpp-size-type
+          "  abc;\n"
+          ))
+        (in-length)
+        (out-length)
+        (did-fill)
+        (actual))
+    (setq in-length (length data))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 6)
+      (setq did-fill (shu-cpp-internal-fill-test-data))
+      (should did-fill)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq out-length (length actual))
+      (should (> out-length (+ in-length 8))))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-internal-fill-test-data-5
+;;
+(ert-deftest shu-test-shu-cpp-internal-fill-test-data-5 ()
+  (let ((data
+         (concat
+          "    "
+          shu-cpp-string-type
+          "  abc;\n"
+          ))
+        (in-length)
+        (out-length)
+        (did-fill)
+        (actual))
+    (setq in-length (length data))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 6)
+      (setq did-fill (shu-cpp-internal-fill-test-data))
+      (should did-fill)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq out-length (length actual))
+      (should (> out-length (+ in-length 8))))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-internal-fill-test-data-6
+;;
+(ert-deftest shu-test-shu-cpp-internal-fill-test-data-6 ()
+  (let ((data
+         (concat
+          "    const "
+          shu-cpp-string-type
+          "  abc;\n"
+          ))
+        (in-length)
+        (out-length)
+        (did-fill)
+        (actual))
+    (setq in-length (length data))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 6)
+      (setq did-fill (shu-cpp-internal-fill-test-data))
+      (should did-fill)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq out-length (length actual))
+      (should (> out-length (+ in-length 8))))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-fill-test-area-1
+;;
+(ert-deftest shu-test-shu-cpp-fill-test-area-1 ()
+  (let ((data
+         (concat
+          "    " shu-cpp-datetime-timezone-type "  ab;\n"
+          "    " shu-cpp-interval-type          "  cd;\n"
+          "    " shu-cpp-datetime-type          "  ef;\n"
+          "    " shu-cpp-size-type              "  gh;\n"
+          "    " shu-cpp-string-type            "  ij;\n"
+          "    " shu-cpp-time-type              "  kl;\n"
+          "    " shu-cpp-long-long-type         "  mn;\n"
+          "    " "bool"                         "  op;\n"
+          "    " "char"                         "  qr;\n"
+          "    " "double"                       "  st;\n"
+          "    " "float"                        "  uv;\n"
+          "    " "int"                          "  wx;\n"
+          "    " "short"                        "  yz;\n"
+          ))
+        (result)
+        (skip-count)
+        (fill-count)
+        (in-length)
+        (out-length)
+        (actual))
+    (setq in-length (length data))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq result (shu-cpp-fill-test-area (point-min) (point-max)))
+      (should result)
+      (should (consp result))
+      (setq skip-count (car result))
+      (setq fill-count (cdr result))
+      (should skip-count)
+      (should (numberp skip-count))
+      (should (= skip-count 0))
+      (should (numberp fill-count))
+      (should (= fill-count 13))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq out-length (length actual))
+      (should (> out-length (+ in-length 62))))
+  ))
+
+
+
+;;
+;;  shu-test-shu-cpp-fill-test-area-2
+;;
+(ert-deftest shu-test-shu-cpp-fill-test-area-2 ()
+  (let ((data
+         (concat
+          "    const " shu-cpp-datetime-timezone-type "  ab;\n"
+          "    const " shu-cpp-interval-type          "  cd;\n"
+          "    const " shu-cpp-datetime-type          "  ef;\n"
+          "    const " shu-cpp-size-type              "  gh;\n"
+          "    const " shu-cpp-string-type            "  ij;\n"
+          "    const " shu-cpp-time-type              "  kl;\n"
+          "    const " shu-cpp-long-long-type         "  mn;\n"
+          "    const " "bool"                         "  op;\n"
+          "    const " "char"                         "  qr;\n"
+          "    const " "double"                       "  st;\n"
+          "    const " "float"                        "  uv;\n"
+          "    const " "int"                          "  wx;\n"
+          "    const " "short"                        "  yz;\n"
+          ))
+        (result)
+        (skip-count)
+        (fill-count)
+        (in-length)
+        (out-length)
+        (actual))
+    (setq in-length (length data))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq result (shu-cpp-fill-test-area (point-min) (point-max)))
+      (should result)
+      (should (consp result))
+      (setq skip-count (car result))
+      (setq fill-count (cdr result))
+      (should skip-count)
+      (should (numberp skip-count))
+      (should (= skip-count 0))
+      (should (numberp fill-count))
+      (should (= fill-count 13))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq out-length (length actual))
+      (should (> out-length (+ in-length 62))))
+  ))
+
+
+
+;;
+;;  shu-test-shu-cpp-fill-test-area-3
+;;
+(ert-deftest shu-test-shu-cpp-fill-test-area-3 ()
+  (let ((data
+         (concat
+          "    " shu-cpp-datetime-timezone-type "  ab;\n"
+          "    " shu-cpp-interval-type          "  cd;\n"
+          "    " shu-cpp-datetime-type          "  ef;\n"
+          "    " shu-cpp-size-type              "  gh;\n"
+          "    " "mumblefrotz"                  "  aaa;\n"
+          "    " shu-cpp-string-type            "  ij;\n"
+          "    " shu-cpp-time-type              "  kl;\n"
+          "    " shu-cpp-long-long-type         "  mn;\n"
+          "    " "bool"                         "  op;\n"
+          "    " "char"                         "  qr;\n"
+          "    " "double"                       "  st;\n"
+          "    " "mumblebars"                   "  bbb;\n"
+          "    " "float"                        "  uv;\n"
+          "    " "int"                          "  wx;\n"
+          "    " "short"                        "  yz;\n"
+          ))
+        (result)
+        (skip-count)
+        (fill-count)
+        (in-length)
+        (out-length)
+        (actual))
+    (setq in-length (length data))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq result (shu-cpp-fill-test-area (point-min) (point-max)))
+      (should result)
+      (should (consp result))
+      (setq skip-count (car result))
+      (setq fill-count (cdr result))
+      (should skip-count)
+      (should (numberp skip-count))
+      (should (= skip-count 2))
+      (should (numberp fill-count))
+      (should (= fill-count 13))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (setq out-length (length actual))
+      (should (> out-length (+ in-length 62))))
+  ))
+
+
+
 ;;; shu-cpp-general.t.el ends here
