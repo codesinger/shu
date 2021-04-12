@@ -418,7 +418,8 @@ and SHU-LOOSEN-LISP.")
    shu-all-whitespace-regexp "*"
    "\\((\\)"
    )
-  "Regular expression to find the beginning of a let special form.")
+  "Regular expression to find the beginning of a let special form.
+This searches for \"let\" or \"let*\" followed by \"(\".")
 
 
 
