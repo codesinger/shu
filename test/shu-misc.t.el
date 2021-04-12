@@ -399,9 +399,9 @@
 
 
 ;;
-;;  shu-test-shu-tighten-lisp
+;;  shu-test-shu-tighten-lisp-1
 ;;
-(ert-deftest shu-test-shu-tighten-lisp ()
+(ert-deftest shu-test-shu-tighten-lisp-1 ()
   (let ((data
          (concat
           "(defun jjj ()\n"
