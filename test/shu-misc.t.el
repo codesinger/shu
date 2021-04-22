@@ -2134,5 +2134,37 @@
 
 
 
+;;
+;;  shu-test-shu-unbrace-1
+;;
+(ert-deftest shu-test-shu-unbrace-1 ()
+  (let ((data
+         (concat
+          "{\n"
+          "    {\"This is one thing\"},\n"
+          "    {\"This is another thing\"},\n"
+          "    {\"And this is a third thing\"};\n"
+          "}\n"
+          "\n"
+          "{\n"
+          "    {\"This is one thing\"},\n"
+          "    {\"This is another thing\"},\n"
+          "    {\"And this is a third thing\"};\n"
+          "}\n"
+          "\n"
+          ))
+        (actual)
+        (expected 3))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq actual (shu-unbrace))
+      (should actual)
+      (should (numberp actual))
+      (should (= expected actual)))
+    ))
+
+
+
 
 ;;; shu-misc.t.el ends here

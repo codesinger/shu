@@ -2908,6 +2908,45 @@ file so that it may be opened.  If no such file exists, return nil."
 
 
 
+;;
+;;  shu-unbrace
+;;
+(defun shu-unbrace ()
+  "When point is on an opening sexp, this function converts, within the scope of
+the sexp, all \"{\" to \"(\" and all \"}\" to \").\".
+If the number of left braces does not match the number of right braces a warning
+message is emitted.
+
+For the benefit of unit tests, the count of left braces converted iff the count
+of left braces matches the count of right braces.  If the counts do not match,
+nil is returned."
+  (interactive)
+  (let ((spoint (1+ (point)))
+        (epoint)
+        (left-count 0)
+        (right-count 0)
+        (ccount nil))
+    (forward-sexp)
+    (setq epoint (1- (point)))
+    (goto-char spoint)
+    (while (search-forward "{" epoint t)
+      (setq left-count (1+ left-count))
+      (replace-match "(" t t))
+    (goto-char spoint)
+    (while (search-forward "}" epoint t)
+      (setq right-count (1+ right-count))
+      (replace-match ")" t t))
+    (if (= left-count right-count)
+        (progn
+          (message "%d braces converted" left-count)
+          (setq ccount left-count))
+      (ding)
+      (message "Found %d { and %d }" left-count right-count))
+    ccount
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias
@@ -2967,6 +3006,7 @@ shu- prefix removed."
   (defalias 'get-repo 'shu-get-repo)
   (defalias 'add-alexandria-badge `shu-add-alexandria-badge)
   (defalias 'fixup-doxyfile 'shu-fixup-doxyfile)
+  (defalias 'unbrace 'shu-unbrace)
   )
 
 ;;; shu-misc.el ends here
