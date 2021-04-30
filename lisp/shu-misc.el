@@ -2556,6 +2556,21 @@ the kill ring."
 
 
 ;;
+;;  shu-show-repo
+;;
+(defun shu-show-repo ()
+  "Call SHU-GET-REPO to find the path to the repository and show the result in
+the minibuffer."
+  (interactive)
+  (let ((repo (shu-get-repo)))
+    (if repo
+        (message "%s" repo)
+      (message "%s" "*** Not found ***"))
+    ))
+
+
+
+;;
 ;;  shu-get-repo
 ;;
 (defun shu-get-repo ()
@@ -3021,6 +3036,7 @@ shu- prefix removed."
   (defalias 'add-alexandria-badge 'shu-add-alexandria-badge)
   (defalias 'fixup-doxyfile 'shu-fixup-doxyfile)
   (defalias 'copy-repo 'shu-copy-repo)
+  (defalias 'show-repo 'shu-show-repo)
   (defalias 'unbrace 'shu-unbrace)
   )
 
