@@ -2542,6 +2542,20 @@ removed from the end."
 
 
 ;;
+;;  shu-copy-repo
+;;
+(defun shu-copy-repo ()
+  "Call SHU-GET-REPO to find the path to the repository and put the result in
+the kill ring."
+  (interactive)
+  (let ((repo (shu-get-repo)))
+    (when repo
+      (shu-kill-new repo))
+    ))
+
+
+
+;;
 ;;  shu-get-repo
 ;;
 (defun shu-get-repo ()
@@ -2984,7 +2998,7 @@ shu- prefix removed."
   (defalias 'inso 'shu-git-insert-origin-branch)
   (defalias 'gpl 'shu-git-insert-pull-origin-branch)
   (defalias 'gps 'shu-git-insert-push-origin-branch)
-  (defalias `gcm `shu-git-insert-git-commit)
+  (defalias 'gcm 'shu-git-insert-git-commit)
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
   (defalias 'number-lines 'shu-number-lines)
@@ -3004,8 +3018,9 @@ shu- prefix removed."
   (defalias 'scan-grok 'shu-extract-name-open-grok)
   (defalias 'add-alexandria 'shu-add-alexandria)
   (defalias 'get-repo 'shu-get-repo)
-  (defalias 'add-alexandria-badge `shu-add-alexandria-badge)
+  (defalias 'add-alexandria-badge 'shu-add-alexandria-badge)
   (defalias 'fixup-doxyfile 'shu-fixup-doxyfile)
+  (defalias 'copy-repo 'shu-copy-repo)
   (defalias 'unbrace 'shu-unbrace)
   )
 
