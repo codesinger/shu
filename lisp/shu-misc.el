@@ -2574,22 +2574,25 @@ the minibuffer."
 ;;  shu-get-repo
 ;;
 (defun shu-get-repo ()
-  "When positioned in the top level directory of a git repository, return the
-git path to the repository.  This is found in .git/config as the url of
-[remote \"origin\"].  Return nil if the path cannot be found.
+  "When positioned anywhere in a git repository, return the git path to the
+repository.  This is found in .git/config as the url of [remote \"origin\"].
+Return nil if the path cannot be found.
 
-This should probably be extended to do a search for the .git directory anywhere
-above the current position, which would remove the requirement to be in the root
-of the repository."
+The search is made from the current directory and upwards for the first
+directory called \".git\"."
   (let ((config)
-        (path))
-    (with-temp-buffer
-      (setq config (insert-file-contents-literally ".git/config"))
-      (if (not config)
-          (progn
-            (ding)
-            (message "%s" "Cannot open .git/config"))
-        (setq path (shu-internal-get-repo))))
+        (path)
+        (dom-path (locate-dominating-file "." ".git"))
+        (git-path))
+    (when dom-path
+      (setq git-path (concat dom-path ".git/config"))
+      (with-temp-buffer
+        (setq config (insert-file-contents-literally git-path))
+        (if (not config)
+            (progn
+              (ding)
+              (message "%s" "Cannot open .git/config"))
+          (setq path (shu-internal-get-repo)))))
     path
     ))
 
