@@ -1106,10 +1106,10 @@ function and all of the indivual bind functions, one per column."
       ipad " * \\brief Bind our values to column names\n"
       ipad " */\n"
       ipad "void bindValues(\n"
-      ipad ipad "fxpricingdb::Binder   &binder)\n"
+      ipad ipad "fxpricingdb::Binder   &binder,\n"
       ipad ipad "const char            *file,\n"
       ipad ipad "const int              line)\n"
-      ipad ipad "const;\n"
+      ipad "const;\n"
       ))
     (while attrs
       (setq attr-info (car attrs))
@@ -1127,7 +1127,7 @@ function and all of the indivual bind functions, one per column."
       (insert
        (concat
         ipad "void bind" uname "(\n"
-        ipad ipad "fxpricingdb::Binder   &binder)\n"
+        ipad ipad "fxpricingdb::Binder   &binder,\n"
         ipad ipad "const char            *file,\n"
         ipad ipad "const int              line)\n"
         ipad "const;\n"
