@@ -197,6 +197,8 @@
   (load-file "~/emacs/useful.elc"))
 (when (file-readable-p "~/emacs/shu-attributes.elc")
   (load-file "~/emacs/shu-attributes.elc"))
+(when (file-readable-p "~/emacs/shu-new-attributes.elc")
+  (load-file "~/emacs/shu-new-attributes.elc"))
 (load-file "~/emacs/macros.elc")
 ;;(load-file "~/emacs/clearcase.elc");;Incompatible with Emacs 24
 ;;(load-file "~/emacs/visible.elc")
