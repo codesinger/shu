@@ -2009,23 +2009,32 @@ This generates a code sequence as follows:
             var-name = 0;
         }
 
-VAR-NAME and CLASS-NAME are read from two prompts.  The number of spaces to
-indent inside that braces is defined in the custom variable
-shu-cpp-indent-length.  The name of the member variable that points to the
-allocator in use by the class comes from the custom variable
-shu-cpp-default-allocator-name"
+If SHU-CPP-MODERN is true, the code seuence is:
+
+        if (var-name != nullptr)
+        {
+            m_allocator->deleteObject(var-name);
+            var-name = nullptr;
+        }
+
+VAR-NAME is read from a prompt.  The number of spaces to indent inside that
+braces is defined in the custom variable shu-cpp-indent-length.  The name of the
+member variable that points to the allocator in use by the class comes from the
+custom variable shu-cpp-default-allocator-name"
   (interactive "*sVariable name?: ")
   (let ((pad)
         (pad-count (current-column))
         (start)
-        (ipad (make-string shu-cpp-indent-length ? )))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (equal-test (if shu-cpp-modern " != nullptr" ""))
+        (null-value (if shu-cpp-modern "nullptr" "0")))
     (setq pad (make-string pad-count ? ))
     (insert
      (concat
-      "if (" var-name ")\n"
+      "if (" var-name equal-test ")\n"
       pad "{\n"
       pad ipad shu-cpp-default-allocator-name "->deleteObject(" var-name ");\n"
-      pad ipad var-name " = 0;\n"
+      pad ipad var-name " = " null-value ";\n"
       pad "}\n"))
     ))
 
