@@ -774,7 +774,8 @@ USE-ALLOCATOR is true, the constructor declaration includes an optional
 allocator."
   (let ((ipad (make-string shu-cpp-indent-length ? ))
         (creator-a "a")
-        (starts-with-vowel (string-match (substring class-name 0 1) "aeioAEIO")))
+        (starts-with-vowel (string-match (substring class-name 0 1) "aeioAEIO"))
+        (nullptr (if shu-cpp-modern "nullptr" "0")))
     (when starts-with-vowel
       (setq creator-a "an"))
     (insert
@@ -788,7 +789,7 @@ allocator."
       (insert
        (concat
         "\n"
-        ipad ipad shu-cpp-default-allocator-type "    *allocator = 0")))
+        ipad ipad shu-cpp-default-allocator-type "    *allocator = " nullptr)))
     (insert
      (concat
       ");\n"))
