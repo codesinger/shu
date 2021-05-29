@@ -253,7 +253,15 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                           "std::u16string_view"
                           "std::u32string_view"
                           "std::wstring_view"
-                          )))
+                          ))
+   (cons "utility"    (list
+                       "std::swap"
+                       "std::make_pair"
+                       "std::move"
+                       "std::move_if_noexcept"
+                       "std::declval"
+                      ))
+   )
   "An alist that maps include file names to class names.")
 
 
@@ -371,6 +379,13 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                 "bsl::u32string_view"
                                 "bsl::wstring_view"
                                 ))
+   (cons "bsl_utility.h"    (list
+                             "bsl::swap"
+                             "bsl::make_pair"
+                             "bsl::move"
+                             "bsl::move_if_noexcept"
+                             "bsl::declval"
+                             ))
    (cons "bsls_atomic.h"   (list
                             "bsls::AtomicBool"
                             "bsls::AtomicInt"
