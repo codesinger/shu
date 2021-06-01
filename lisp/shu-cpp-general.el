@@ -76,6 +76,12 @@
   :group 'shu-cpp-general)
 
 
+(defcustom shu-cpp-short-interval-type "bsls::TimeInterval"
+  "The data type that represents a short time interval type."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
 (defcustom shu-cpp-long-long-type "bsls::Types::Int64"
   "The data type that represents a 64 bit integer."
   :type '(string)
@@ -3628,7 +3634,6 @@ a timezone datetime type."
 
 
 
-
 ;;
 ;;  shu-cpp-make-interval
 ;;
@@ -3654,6 +3659,32 @@ a timezone datetime type."
         (millis (number-to-string (shu-random-range 0 999)))
         (micros (number-to-string (shu-random-range 0 999))))
     (concat "(" days ", " hours ", " minutes ", " seconds ", " millis ", " micros ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-make-short-interval
+;;
+(defun shu-cpp-make-short-interval ()
+  "insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
+  (interactive)
+  (insert (concat (shu-cpp-internal-make-short-interval) ";"))
+  )
+
+
+
+;;
+;;  shu-cpp-internal-make-short-interval
+;;
+(defun shu-cpp-internal-make-short-interval ()
+  "Return a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts seconds and nanoseconds."
+  (let ((days "0")
+        (seconds (number-to-string (shu-random-range 0 999999)))
+        (nanos (number-to-string (shu-random-range 0 999999))))
+    (concat "(" seconds ", " nanos ")")
     ))
 
 
@@ -3845,6 +3876,8 @@ Return t if a recognized data type was found and a value was filled in."
           (setq data (shu-cpp-internal-tz-make-datetime)))
          ((string= xx shu-cpp-interval-type)
           (setq data (shu-cpp-internal-make-interval)))
+         ((string= xx shu-cpp-short-interval-type)
+          (setq data (shu-cpp-internal-make-short-interval)))
          ((string= xx shu-cpp-date-type)
           (setq data (shu-cpp-internal-make-date)))
          ((string= xx shu-cpp-datetime-type)
