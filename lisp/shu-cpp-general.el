@@ -2030,7 +2030,7 @@ This generates a code sequence as follows:
             var-name = 0;
         }
 
-If SHU-CPP-MODERN is true, the code seuence is:
+If SHU-CPP-MODERN is true, the code sequence is:
 
         if (var-name != nullptr)
         {
@@ -3966,11 +3966,11 @@ generated."
 ;;
 (defun shu-gcc ()
   "Get compile command command from current buffer.  While in a compile buffer,
-go to the top of the buffer, search for the \"$\" prompt, collect the rest of
-the line and put it into the kill ring.  This takes the string that was used for
-the last compile command in the current buffer and puts it into the kill ring.
-To compile again with the same command, kill the buffer, open a new shell, and
-yank."
+go to the top of the buffer, search for the end of the prompt line, collect the
+rest of the line and put it into the kill ring.  This takes the string that was
+used for the last compile command in the current buffer and puts it into the
+kill ring.  To compile again with the same command, kill the buffer, open a new
+shell, and yank."
   (interactive)
   (let ((eol)
         (cc))

@@ -2549,9 +2549,12 @@ removed from the end."
 the kill ring."
   (interactive)
   (let ((repo (shu-get-repo)))
-    (when repo
-      (shu-kill-new repo))
-    ))
+    (if repo
+        (progn
+          (message "%s" repo)
+          (shu-kill-new repo))
+      (message "%s" "*** Not found ***"))
+  ))
 
 
 
