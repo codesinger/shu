@@ -806,6 +806,39 @@ function returns the name of the include file that defines the class, if known."
   (setq shu-cpp-author name))
 
 
+
+;;
+;;  shu-set-modern
+;;
+(defun shu-set-modern ()
+  "Unconditionally set shu-cpp-modern to true."
+  (interactive)
+  (let ((msg))
+    (if shu-cpp-modern
+        (setq msg "shu-cpp-modern already true")
+      (setq shu-cpp-modern t)
+      (setq msg "shu-cpp-modern set to true"))
+    (message "%s" msg)
+    ))
+
+
+
+;;
+;;  shu-set-no-modern
+;;
+(defun shu-set-no-modern ()
+  "Unconditionally set shu-cpp-modern to false."
+  (interactive)
+  (let ((msg))
+    (if (not shu-cpp-modern)
+        (setq msg "shu-cpp-modern already false")
+      (setq shu-cpp-modern nil)
+      (setq msg "shu-cpp-modern set to false"))
+    (message "%s" msg)
+    ))
+
+
+
 ;;
 ;;  shu-set-default-global-namespace
 ;;
@@ -4022,6 +4055,8 @@ shu- prefix removed."
   (defalias 'csplit 'shu-csplit)
   (defalias 'cunsplit 'shu-cunsplit)
   (defalias 'creplace 'shu-creplace)
+  (defalias 'set-modern 'shu-set-modern)
+  (defalias 'set-no-modern 'shu-set-no-modern)
   (defalias 'cif 'shu-cif)
   (defalias 'celse 'shu-celse)
   (defalias 'cfor 'shu-cfor)
