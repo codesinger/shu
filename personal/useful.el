@@ -227,6 +227,25 @@ of every visited file.  Makes a useful history of all files visited."
 
 
 ;;
+;;  make-jrun
+;;
+(defun make-jrun (start end)
+  "Mark the beginning and end of a task name and then invoke this function
+interactively.  It will create a file called \"jrun\" that will run the
+given task as a Google test."
+  (interactive "r")
+  (let ((task-name (buffer-substring-no-properties start end)))
+    (find-file "jrun")
+    (insert
+     (concat
+      "#!/bin/ksh -x\n"
+      "time ./" task-name " "
+      "--gtest_filter=*.* --bael-log-on-success --baem-metrics   --bael-level INFO --bael-format \"%d %p:%t %s %f:%l %c %m %u\\n\"\n"))
+    ))
+
+
+
+;;
 ;;  cassert
 ;;
 (defun cassert ()

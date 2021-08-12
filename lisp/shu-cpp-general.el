@@ -578,6 +578,12 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsls::AtomicUint64"
                             "bsls::AtomicPointer"
                             ))
+   (cons "bdldfp_decimal.h"   (list
+                            "bdldfp::Decimal32"
+                            "bdldfp::Decimal64"
+                            "bdldfp::Decimal128"
+                            "bdldfp::DecimalNumGet"
+                            ))
    (cons "mbsa_session.h"    (list
                               "mbsa::Session"
                               "mbsa::SessionEventHandler"
