@@ -2190,6 +2190,23 @@ Otherwise, it will assume that all files reside in the same directory."
 
 
 ;;
+;;  shu-iother
+;;
+(defun shu-iother ()
+  "Visit a i.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.i.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory."
+  (interactive)
+  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+        (newfile))
+    (setq newfile (concat base-name ".i.cpp"))
+    (when (not (shu-cpp-choose-other-file newfile))
+      (message "Cannot find integration test file for %s" base-name))
+    ))
+
+
+;;
 ;;  shu-tother
 ;;
 (defun shu-tother ()
@@ -2202,7 +2219,7 @@ will assume that all files reside in the same directory."
         (newfile))
     (setq newfile (concat base-name ".t.cpp"))
     (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot find test file for %s" base-name))
+      (message "Cannot find unit test file for %s" base-name))
     ))
 
 
@@ -2277,6 +2294,7 @@ shu- prefix removed."
   (defalias 'other 'shu-other)
   (defalias 'cother 'shu-cother)
   (defalias 'hother 'shu-hother)
+  (defalias 'iother 'shu-iother)
   (defalias 'tother 'shu-tother)
   )
 
