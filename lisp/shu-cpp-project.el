@@ -2155,11 +2155,9 @@ t.cpp or .h file, invoke this function and you will be taken to the
 corresponding .cpp or .c file.  This function will use a project if one is
 active.  Otherwise, it will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+  (let ((base-name (shu-cpp-project-get-base-name))
         (newfile)
         (found))
-    (when (string= (file-name-extension base-name) "t")
-      (setq base-name (file-name-sans-extension base-name)))
     (setq newfile (concat base-name ".cpp"))
     (setq found (shu-cpp-choose-other-file newfile))
     (when (not found)
@@ -2179,10 +2177,8 @@ active.  Otherwise, it will assume that all files reside in the same directory."
 corresponding .h file.  This function will use a project if one is active.
 Otherwise, it will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+  (let ((base-name (shu-cpp-project-get-base-name))
         (newfile ))
-    (when (string= (file-name-extension base-name) "t")
-      (setq base-name (file-name-sans-extension base-name)))
     (setq newfile (concat base-name ".h"))
     (when (not (shu-cpp-choose-other-file newfile))
       (message "Cannot find H file for %s" base-name))
@@ -2198,7 +2194,7 @@ or .cpp file, invoke this function and you will be taken to the corresponding
 .i.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+  (let ((base-name (shu-cpp-project-get-base-name))
         (newfile))
     (setq newfile (concat base-name ".i.cpp"))
     (when (not (shu-cpp-choose-other-file newfile))
@@ -2215,11 +2211,43 @@ or .cpp file, invoke this function and you will be taken to the corresponding
 .t.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+  (let ((base-name (shu-cpp-project-get-base-name))
         (newfile))
     (setq newfile (concat base-name ".t.cpp"))
     (when (not (shu-cpp-choose-other-file newfile))
       (message "Cannot find unit test file for %s" base-name))
+    ))
+
+
+
+;;
+;;  shu-cpp-project-get-base-name
+;;
+(defun shu-cpp-project-get-base-name ()
+  "When visiting a file within a project, the name might consist of two or three
+parts - the file name, the normal extension, sush as .h or .cpp, and the
+intermediate extension, such as .i or .t when visiting .i.cpp or .t.cpp.  This
+function gets the buffer file name and removes the one or two extensions in
+order to get the name with no extensions at all."
+  (interactive)
+  (let ((base-name (buffer-file-name)))
+    (shu-cpp-project-extract-base-name base-name)
+    ))
+
+
+
+;;
+;;  shu-cpp-project-extract-base-name
+;;
+(defun shu-cpp-project-extract-base-name (name)
+  "This is the implementation function of SHU-CPP-PROJECT-GET-BASE-NAME so tht
+the logic of the function can be unit tested."
+  (let ((base-name (file-name-sans-extension name)))
+    (if (string= (file-name-extension base-name) "t")
+        (setq base-name (file-name-sans-extension base-name))
+      (when (string= (file-name-extension base-name) "i")
+        (setq base-name (file-name-sans-extension base-name))))
+    base-name
     ))
 
 

@@ -909,4 +909,68 @@
     (should (not actual-shorts))
     ))
 
+
+;;
+;;  shu-test-shu-cpp-project-extract-base-name-1
+;;
+(ert-deftest shu-test-shu-cpp-project-extract-base-name-1 ()
+  (let (
+        (base-name "brumble_mumble.h")
+        (actual)
+        (expected "brumble_mumble")
+        )
+    (setq actual (shu-cpp-project-extract-base-name base-name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-project-extract-base-name-2
+;;
+(ert-deftest shu-test-shu-cpp-project-extract-base-name-2 ()
+  (let (
+        (base-name "brumble_mumble.cpp")
+        (actual)
+        (expected "brumble_mumble")
+        )
+    (setq actual (shu-cpp-project-extract-base-name base-name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-project-extract-base-name-3
+;;
+(ert-deftest shu-test-shu-cpp-project-extract-base-name-3 ()
+  (let (
+        (base-name "brumble_mumble.i.cpp")
+        (actual)
+        (expected "brumble_mumble")
+        )
+    (setq actual (shu-cpp-project-extract-base-name base-name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-project-extract-base-name-4
+;;
+(ert-deftest shu-test-shu-cpp-project-extract-base-name-4 ()
+  (let (
+        (base-name "brumble_mumble.t.cpp")
+        (actual)
+        (expected "brumble_mumble")
+        )
+    (setq actual (shu-cpp-project-extract-base-name base-name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
 ;;; shu-cpp-project.t.el ends here
