@@ -270,6 +270,17 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                       "std::wstringbuf"
                       "std::wstringstream"
                       ))
+   (cons "stdexcept"    (list
+                         "std::domain_error"
+                         "std::invalid_argument"
+                         "std::length_error"
+                         "std::logic_error"
+                         "std::out_of_range"
+                         "std::overflow_error"
+                         "std::range_error"
+                         "std::runtime_error"
+                         "std::underflow_error"
+                         ))
    (cons "string"   (list
                      "std::basic_string"
                      "std::char_traits"
@@ -518,6 +529,17 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsl::wstringbuf"
                             "bsl::wstringstream"
                             ))
+   (cons "bsl_stdexcept.h"    (list
+                               "bsl::domain_error"
+                               "bsl::invalid_argument"
+                               "bsl::length_error"
+                               "bsl::logic_error"
+                               "bsl::out_of_range"
+                               "bsl::overflow_error"
+                               "bsl::range_error"
+                               "bsl::runtime_error"
+                               "bsl::underflow_error"
+                               ))
    (cons "bsl_string.h"   (list
                            "bsl::basic_string"
                            "bsl::char_traits"
