@@ -108,11 +108,11 @@ I work and play.  It is not part of the Shu elisp package."
 
       (setq org-todo-keywords
             '(
-              (sequence "TODO(t!)" "WAITING(w@)" "|" "CANCELLED(c!)" "DONE(d!)")
+              (sequence "TODO(t!)" "WAITING(w@)" "|" "CANCELLED(c!)" "DEFERRED(f!)" "DONE(d!)")
                 ))
-      ;; These are the keywords that represent the " notdone" state in the above list
+      ;; These are the keywords that represent the " not done" state in the above list
       (setq shu-org-todo-keywords
-            (list "TODO" "WAITING"))
+            (list "TODO" "WAITING" "DEFERRED"))
       ;; These are the keywords that represent the "done" state in the above list
       ;; Used to identify "stuck" projects, which are ones which are not done
       (setq shu-org-done-keywords

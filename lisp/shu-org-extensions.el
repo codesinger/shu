@@ -40,7 +40,7 @@
 (defvar shu-org-archive-expiry-days 7
   "Number of elapsed days before a closed TODO item is automatically archived.")
 
-(defvar shu-org-todo-keywords (list "TODO" "WAITING")
+(defvar shu-org-todo-keywords (list "TODO" "WAITING" "DEFERRED")
   "Key words that represent the not DONE state.")
 
 (defvar shu-org-done-keywords (list "DONE" "CANCELLED")
