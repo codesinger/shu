@@ -327,8 +327,6 @@
 
 (menu-bar-mode -1)
 
-(setq explicit-shell-file-name "/bin/bash")
-
 (fset 'rs 'replace-string)            ; Make rs a synonym for replace-string
 
 (fset 'xyank 'shu-yank-x-primary)     ; Similar to middle mouse button
@@ -403,14 +401,17 @@ text))
     text))
 )
 
-(setq shu-git-path "C:/Program Files/Git/usr/bin")
-(setq shu-git-windows-shell-file (concat shu-git-path "/sh.exe"))
-(when (and (shu-system-type-is-windows) (file-readable-p shu-git-windows-shell-file))
-  (setq explicit-shell-file-name shu-git-windows-shell-file)
-  ;; shell.el forms a variable name from the shell name.  In this case the shell
-  ;; name sans-directory is sh.exe.  So the variable name is explicit-sh.exe-args.
-  (setq explicit-sh.exe-args '("--login" "-i"))
-  (add-to-list 'exec-path shu-git-path))
+(when (shu-system-type-is-windows)
+  (setq shu-git-path "c:/Program Files/Git/usr/bin")
+  (setq shu-git-windows-shell-file (concat shu-git-path "/bash.exe"))
+  (when (file-readable-p shu-git-windows-shell-file)
+    (setq explicit-shell-file-name shu-git-windows-shell-file)
+    ;; shell.el forms a variable name from the shell name.  In this case the shell
+    ;; name sans-directory is bash.exe.  So the variable name is explicit-bash.exe-args.
+    (setq explicit-bash.exe-args '("--login" "-i"))
+    ;;(add-to-list 'exec-path shu-git-path)
+    ))
+
 
 ;; Projects enable short names
 (setq shu-cpp-project-short-names t)
