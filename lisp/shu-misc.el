@@ -1181,8 +1181,8 @@ proceed.  This is to prevent an accidental push to master."
   (interactive)
   (let ((branch (shu-git-find-branch))
         (insert-push t))
-    (when (string= branch "master")
-      (setq insert-push (yes-or-no-p "Really push to master branch? ")))
+    (when (or (string= branch "master") (string= branch "main"))
+      (setq insert-push (yes-or-no-p (concat "Really push to " branch " branch? "))))
     (when insert-push
       (insert (concat "git push origin " branch)))
     ))
