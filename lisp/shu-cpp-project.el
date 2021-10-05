@@ -113,6 +113,13 @@ as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-h-extensions")
 as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions or
 shu-add-cpp-h-extensions.")
 
+(defconst shu-project-exclude-list (list "cmake-build" "cmake-distro-dev")
+  "A list of top level directory names to exclude while creating a project via
+SHU-MAKE-C-PROJECT.  This list is ignored by SHU-MAKE-FULL-C-PROJECT")
+
+(defvar shu-project-exclude-hash nil
+  "The hash table that holds the directory names from SHU-PROJECT-EXCLUDE-LIST.")
+
 (defvar shu-cpp-project-file nil
   "The name of the file from which the current project was read.")
 
@@ -321,11 +328,30 @@ This modifies both shu-cpp-h-extensions and shu-project-extensions."
 ;;  shu-make-c-project
 ;;
 (defun shu-make-c-project (proj-root)
+  "Create a project file of all directories containing c or h files.  Starts at
+the specified root directory and searches all subdirectories for any that
+contain c or h files.  Top level directories whose names are found in
+SHU-PROJECT-EXCLUDE-LIST are excluded from the search.  Typically
+SHU-PROJECT-EXCLUDE-LIST is used to exclude CMake directories that include c or
+h files that have been created as part of the build process and are not members
+of the repository itself.  It then inserts all of the directory names into the
+current file at point."
+  (interactive "DRoot?: ")
+  (shu-project-make-exclude-hash)
+  (shu-sub-make-c-project proj-root)
+  )
+
+
+;;
+;;  shu-make-full-c-project
+;;
+(defun shu-make-full-c-project (proj-root)
   "Create a project file of all directories containing c or h files.
 Starts at the specified root directory and searches all subdirectories for
 any that contain c or h files.  It then inserts all of the directory names
 into the current file at point."
   (interactive "DRoot?: ")
+  (setq shu-project-exclude-hash nil)
   (shu-sub-make-c-project proj-root)
   )
 
@@ -379,7 +405,10 @@ source code."
           (progn
             (unless (or (string= sname  ".")
                         (string= sname ".."))
-              (setq dir-list (cons cname dir-list))))
+              (unless (and (= level 1)
+                           shu-project-exclude-hash
+                           (gethash sname shu-project-exclude-hash))
+                  (setq dir-list (cons cname dir-list)))))
         (when (not got-interest)
           (setq extension (file-name-extension sname))
           (when (member extension shu-project-extensions)
@@ -639,6 +668,31 @@ name \"/u/foo/bar/thing.c\"."
   (setq shu-cpp-short-list nil)
   (setq shu-cpp-completing-list nil)
   )
+
+
+;;
+;;  shu-project-make-exclude-hash
+;;
+(defun shu-project-make-exclude-hash ()
+  "Turn SHU-PROJECT-EXCLUDE-LIST into the hash table SHU-PROJECT-EXCLUDE-HASH.
+If SHU-PROJECT-EXCLUDE-LIST is nil or not a list or an empty list, then
+SHU-PROJECT-EXCLUDE-HASH is also set to nil."
+  (interactive)
+  (let ((ht)
+        (xl shu-project-exclude-list)
+        (xd))
+    (setq shu-project-exclude-hash nil)
+    (when shu-project-exclude-list
+      (when (listp shu-project-exclude-list)
+        (when (> (length shu-project-exclude-list) 0)
+          (setq ht (make-hash-table :test 'equal :size (length shu-project-exclude-list)))
+          (while xl
+            (setq xd (car xl))
+            (puthash xd xd ht)
+            (setq xl (cdr xl)))
+          (setq shu-project-exclude-hash ht))))
+    ))
+
 
 
 ;;
@@ -2304,6 +2358,7 @@ shu- prefix removed."
   (defalias 'clear-prefix 'shu-clear-prefix)
   (defalias 'make-p-project 'shu-make-p-project)
   (defalias 'make-c-project 'shu-make-c-project)
+  (defalias 'make-full-c-project 'shu-make-full-c-project)
   (defalias 'set-p-project 'shu-set-p-project)
   (defalias 'set-c-project 'shu-set-c-project)
   (defalias 'renew-c-project 'shu-renew-c-project)
