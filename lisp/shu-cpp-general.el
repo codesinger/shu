@@ -395,11 +395,15 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                            "std::underlying_type"
                            ))
    (cons "utility"    (list
-                       "std::swap"
+                       "std::declval"
+                       "std::forward"
                        "std::make_pair"
                        "std::move"
                        "std::move_if_noexcept"
-                       "std::declval"
+                       "std::pair"
+                       "std::piecewise_construct"
+                       "std::piecewise_construct_t"
+                       "std::swap"
                        ))
    )
   "An alist that maps include file names to class names.")
@@ -654,11 +658,15 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                  "bsl::underlying_type"
                                  ))
    (cons "bsl_utility.h"    (list
-                             "bsl::swap"
+                             "bsl::declval"
+                             "bsl::forward"
                              "bsl::make_pair"
                              "bsl::move"
                              "bsl::move_if_noexcept"
-                             "bsl::declval"
+                             "bsl::pair"
+                             "bsl::piecewise_construct"
+                             "bsl::piecewise_construct_t"
+                             "bsl::swap"
                              ))
    (cons "bsls_atomic.h"   (list
                             "bsls::AtomicBool"

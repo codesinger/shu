@@ -113,7 +113,7 @@ as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-h-extensions")
 as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions or
 shu-add-cpp-h-extensions.")
 
-(defconst shu-project-exclude-list (list "cmake-build" "cmake-distro-dev")
+(defconst shu-project-exclude-list (list "cmake-build" "cmake-distro-dev" "dists")
   "A list of top level directory names to exclude while creating a project via
 SHU-MAKE-C-PROJECT.  This list is ignored by SHU-MAKE-FULL-C-PROJECT")
 

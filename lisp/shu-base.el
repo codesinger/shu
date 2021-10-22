@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.93
+;; Version: 1.6.94
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -35,7 +35,7 @@
 
 (provide 'shu-base)
 
-(defconst shu-version "1.6.93"
+(defconst shu-version "1.6.94"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -374,7 +374,7 @@ in a place from which other programs running on Linux and Windows can
 do a paste."
   (with-temp-buffer
     (insert string)
-    (kill-ring-save (point-min) (point-max))))
+    (copy-region-as-kill (point-min) (point-max))))
 
 
 
