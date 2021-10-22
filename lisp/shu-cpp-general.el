@@ -305,6 +305,17 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                           "std::u32string_view"
                           "std::wstring_view"
                           ))
+   (cons "tuple"    (list
+                     "std::tuple"
+                     "std::tuple_size"
+                     "std::tuple_element"
+                     "std::make_tuple"
+                     "std::forward_as_tuple"
+                     "std::tie"
+                     "std::tuple_cat"
+                     "std::get"
+                     "std::ignore"
+                     ))
    (cons "type_traits"    (list
                            "std::alignment_of"
                            "std::extent"
@@ -568,6 +579,17 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                 "bsl::u32string_view"
                                 "bsl::wstring_view"
                                 ))
+   (cons "bsl_tuple.h"    (list
+                           "bsl::tuple"
+                           "bsl::tuple_size"
+                           "bsl::tuple_element"
+                           "bsl::make_tuple"
+                           "bsl::forward_as_tuple"
+                           "bsl::tie"
+                           "bsl::tuple_cat"
+                           "bsl::get"
+                           "bsl::ignore"
+                           ))
    (cons "bsl_type_traits.h"    (list
                                  "bsl::alignment_of"
                                  "bsl::extent"
