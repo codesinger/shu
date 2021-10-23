@@ -2225,16 +2225,47 @@ becomes
 
 
 ;;
+;;  shu-frame-width
+;;
+(defun shu-frame-width ()
+  "Return the width of an emacs frame.  Different operating systems appear to
+have slightly different windowing systems, which means that the
+FRAME-INNER-WIDTH function does not quite report the exact width."
+  (let ((frame-width (frame-inner-width))
+        (fudge
+         (if (shu-system-type-is-unix)
+             8
+           (if (shu-system-type-is-mac-osx)
+               4
+             0))))
+    (+ frame-width fudge)
+    ))
+
+
+
+
+;;
 ;;  shu-adapt-frame
 ;;
-(defun shu-adapt-frame ()
+(defun shu-adapt-frame (frame-no)
   "Adapt the current frame to the current display by stretching the frame to the
 full height of the display and putting the top of the frame at the top of the
 display.  This function makes some assumptions about the display geometry based
 on the current operating system.  It assumes that Windows loses five lines for
-top and bottom toolbars.  Mac OS X loses three lines for the top tool bar.  Unix
-loses two lines for something.  These numbers should, at some point be
+top and bottom tool bars.  Mac OS X loses three lines for the top tool bar.
+Unix loses two lines for something.  These numbers should, at some point, be
 customizable.
+
+With a numeric prefix argument N, the emacs window is positioned N frames from
+the right hand side of the display.  For example, if you open three frames and
+type into the first frame C-u 1 M-x SHU-ADAPT-FRAME, into the next frame
+C-u 2 M-x SHU-ADAPT-FRAME, and into the third frame C-u 3 M-x SHU-ADAPT-FRAME,
+then the three frames will be grouped together side by side at the right side of
+the display.
+
+If the prefix argument is large enough that the left side of the frame would be
+moved past the left side of the display, the window is positioned such that the
+left edge of the window is aligned with the left edge of the display.
 
 Implementation note:
 
@@ -2252,8 +2283,9 @@ display.
 The assumption is that a negative x frame position means that the user has
 positioned the frame just a bit past the left edge and that the desired frame
 position is actually the leftmost edge of the display."
-  (interactive)
-  (let* ((lost-lines
+  (interactive "P")
+  (let* (
+         (lost-lines
           (if (shu-system-type-is-windows)
               5
             (if (shu-system-type-is-mac-osx)
@@ -2261,19 +2293,34 @@ position is actually the leftmost edge of the display."
               (if (shu-system-type-is-unix)
                   2
                 2))))
+         (width-fudge (if (shu-system-type-is-unix) 10 0))
          (top-y 0)
          (hpx (- (x-display-pixel-height) (* lost-lines (frame-char-height))))
          (hpl (/ hpx (frame-char-height)))
          (fp)
-         (x)
-         (y))
+         (actual-x)
+         (calc-x)
+         (y)
+         (frame-pixel-width (shu-frame-width))
+         (display-pixel-width (x-display-pixel-width))
+         (offset 0))
     (setq fp (frame-position))
-    (setq x (car fp))
+    (setq actual-x (car fp))
+    (setq calc-x actual-x)
     (setq y (cdr fp))
-    (when (< x 0)
-      (setq x 0))
+    (when frame-no
+      (if (= frame-no 1)
+          (setq offset frame-pixel-width)
+        (setq offset (+ (* (1- frame-no) (- frame-pixel-width width-fudge)) frame-pixel-width)))
+      (setq calc-x (- display-pixel-width offset)))
+    (when (< calc-x 0)
+      (setq calc-x 0))
     (set-frame-height (selected-frame) hpl)
-    (set-frame-position (selected-frame) x top-y)
+    (set-frame-position (selected-frame) calc-x top-y)
+    (setq fp (frame-position))
+    (setq actual-x (car fp))
+    (message "frame-width: %d, display-wid: %d, calc-x: %d, actual-x: %d"
+             frame-pixel-width display-pixel-width calc-x actual-x)
     ))
 
 
