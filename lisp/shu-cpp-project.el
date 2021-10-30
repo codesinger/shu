@@ -408,7 +408,7 @@ source code."
               (unless (and (= level 1)
                            shu-project-exclude-hash
                            (gethash sname shu-project-exclude-hash))
-                  (setq dir-list (cons cname dir-list)))))
+                (setq dir-list (cons cname dir-list)))))
         (when (not got-interest)
           (setq extension (file-name-extension sname))
           (when (member extension shu-project-extensions)

@@ -2682,7 +2682,7 @@ the kill ring."
           (message "%s" repo)
           (shu-kill-new repo))
       (message "%s" "*** Not found ***"))
-  ))
+    ))
 
 
 
