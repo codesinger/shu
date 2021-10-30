@@ -1241,6 +1241,223 @@
 
 
 
+
+;;
+;;  shu-test-shu-get-md-boundaries-1
+;;
+(ert-deftest shu-test-shu-get-md-boundaries-1 ()
+  (let ((gb (get-buffer-create "**too**"))
+        (data
+         (concat
+          "This is some line of stuff\n"
+          "This is more stuff\n"
+          "And yet more stuff\n"
+          "And so on ...\n"
+          ))
+        (literals)
+        (place)
+        (open)
+        (close))
+    (with-temp-buffer
+      (insert data)
+      (setq literals (shu-get-md-boundaries))
+      (should (not literals)))
+    ))
+
+
+;;
+;;  shu-test-shu-get-md-boundaries-2
+;;
+(ert-deftest shu-test-shu-get-md-boundaries-2 ()
+  (let ((gb (get-buffer-create "**too**"))
+        (data
+         (concat
+          "This is some line of stuff\n"
+          "```\n"
+          "     Some sample code\n"
+          "```\n"
+          ))
+        (literals)
+        (place)
+        (open)
+        (close))
+    (with-temp-buffer
+      (insert data)
+      (setq literals (shu-get-md-boundaries))
+      (should literals)
+      (should (listp literals))
+      (should (= 1 (length literals)))
+      (setq place (car literals))
+      (should place)
+      (should (consp place))
+      (setq open (car place))
+      (setq close (cdr place))
+      (should (= 30 open))
+      (should (= 54 close)))
+    ))
+
+
+;;
+;;  shu-test-shu-get-md-boundaries-3
+;;
+(ert-deftest shu-test-shu-get-md-boundaries-3 ()
+  (let ((gb (get-buffer-create "**too**"))
+        (data
+         (concat
+          "This is some line of stuff\n"
+          "```\n"
+          "     Some sample code\n"
+          "```\n"
+          "This is some line of stuff\n"
+          "```\n"
+          "     Some sample code\n"
+          "```\n"
+          ))
+        (literals)
+        (place)
+        (open)
+        (close))
+    (with-temp-buffer
+      (insert data)
+      (setq literals (shu-get-md-boundaries))
+      (princ literals gb)
+      (should literals)
+      (should (listp literals))
+      (should (= 2 (length literals)))
+      (setq place (car literals))
+      (should place)
+      (should (consp place))
+      (setq open (car place))
+      (setq close (cdr place))
+      (should (= 30 open))
+      (should (= 54 close))
+      (setq literals (cdr literals))
+      (setq place (car literals))
+      (should place)
+      (should (consp place))
+      (setq open (car place))
+      (setq close (cdr place))
+      (should (= 87 open))
+      (should (= 111 close)))
+    ))
+
+
+;;
+;;  shu-test-shu-get-md-boundaries-4
+;;
+(ert-deftest shu-test-shu-get-md-boundaries-24()
+  (let ((gb (get-buffer-create "**too**"))
+        (data
+         (concat
+          "This is some line of stuff\n"
+          "```\n"
+          "     Some sample code\n"
+          "```\n"
+          "This is some line of stuff\n"
+          "```\n"
+          "Yet more stuff\n"
+          ))
+        (literals)
+        (place)
+        (open)
+        (close))
+    (with-temp-buffer
+      (insert data)
+      (setq literals (shu-get-md-boundaries))
+      (should literals)
+      (should (listp literals))
+      (should (= 1 (length literals)))
+      (setq place (car literals))
+      (should place)
+      (should (consp place))
+      (setq open (car place))
+      (setq close (cdr place))
+      (should (= 30 open))
+      (should (= 54 close)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-md-in-literal-1
+;;
+(ert-deftest shu-test-shu-md-in-literal-1 ()
+  (let ((literals
+         (list
+          (cons 10 20)
+          (cons 30 40)
+          (cons 50 60)))
+        (inside))
+    (setq inside (shu-md-in-literal literals 15))
+    (should inside)
+    ))
+
+
+
+;;
+;;  shu-test-shu-md-in-literal-2
+;;
+(ert-deftest shu-test-shu-md-in-literal-2 ()
+  (let ((literals
+         (list
+          (cons 10 20)
+          (cons 30 40)
+          (cons 50 60)))
+        (inside))
+    (setq inside (shu-md-in-literal literals 55))
+    (should inside)
+    ))
+
+
+
+;;
+;;  shu-test-shu-md-in-literal-3
+;;
+(ert-deftest shu-test-shu-md-in-literal-3 ()
+  (let ((literals
+         (list
+          (cons 10 20)
+          (cons 30 40)
+          (cons 50 60)))
+        (inside))
+    (setq inside (shu-md-in-literal literals 45))
+    (should (not inside))
+    ))
+
+
+
+;;
+;;  shu-test-shu-md-in-literal-4
+;;
+(ert-deftest shu-test-shu-md-in-literal-4 ()
+  (let ((literals
+         (list
+          (cons 10 20)
+          (cons 30 40)
+          (cons 50 60)))
+        (inside))
+    (setq inside (shu-md-in-literal literals 4))
+    (should (not inside))
+    ))
+
+
+
+;;
+;;  shu-test-shu-md-in-literal-5
+;;
+(ert-deftest shu-test-shu-md-in-literal-5 ()
+  (let ((literals
+         (list
+          (cons 10 20)
+          (cons 30 40)
+          (cons 50 60)))
+        (inside))
+    (setq inside (shu-md-in-literal literals 102))
+    (should (not inside))
+    ))
+
+
+
 ;;
 ;;  shu-test-shu-misc-split-string-1
 ;;

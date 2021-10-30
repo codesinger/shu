@@ -1732,22 +1732,102 @@ Then return the repaired line."
 
 
 ;;
+;;  shu-get-md-boundaries
+;;
+(defun shu-get-md-boundaries ()
+  "Find all pairs of markdown literal text.  In markdown, the sequence ``` is
+used to bound literal text.  When creating a markdown table of contents, we do
+not want to look at pound signs contained in literal text.  This function finds
+the location of each pair of ``` sentinels.  It returns a list of cons sells,
+each of which has the start and end position of a ``` sequence.  If there is a
+start ``` with no companion ``` close, it is not included in the list."
+  (let ((sentinel "```")
+        (looking-for-open t)
+        (open)
+        (close)
+        (pair)
+        (literals)
+        (last-open)
+        (msg)
+        (balanced))
+    (save-excursion
+      (save-restriction
+        (goto-char (point-min))
+        (while (search-forward sentinel nil t)
+          (if looking-for-open
+              (progn
+                (setq open (1- (point)))
+                (setq last-open open)
+                (setq looking-for-open nil))
+            (setq close  (match-beginning 0))
+            (setq pair (cons open close))
+            (setq open nil)
+            (setq close nil)
+            (push pair literals)
+            (setq looking-for-open t)))
+        (if looking-for-open
+            (setq balanced t)
+          (setq msg (format "open literal (```) at line %d has no matching close"
+                            (shu-the-line-at last-open)))
+          (message "%s" msg))))
+    (when literals
+      (setq literals (sort literals (lambda(lhs rhs) (< (car lhs) (car rhs))))))
+    literals
+    ))
+
+
+
+;;
+;;  shu-md-in-literal
+;;
+(defun shu-md-in-literal (literals pt)
+  "LITERALS is a list of markdown literal boundaries produced by
+SHU-GET-MD-BOUNDARIES.  This function returns t if the point PT lies within a
+markdown literal boundary."
+  (let ((lits literals)
+        (inside)
+        (pair)
+        (open)
+        (close)
+        (looking t))
+    (when lits
+      (while (and lits looking)
+        (setq pair (car lits))
+        (setq open (car pair))
+        (setq close (cdr pair))
+        (when  (and (> pt open) (< pt close))
+          (setq inside t)
+          (setq looking nil))
+        (when (> close pt)
+          (setq looking nil))
+        (setq lits (cdr lits))))
+    inside
+    ))
+
+
+
+;;
 ;;  shu-tocify-markdown-file
 ;;
 (defun shu-tocify-markdown-file ()
-  "Search the file starting at the current position for any markdown headings
-of the form \"## This is a heading\".  Add a tag to each heading and then
-insert a complete markdown table of contents at the current position.
+  "Search the file starting at the current position for any markdown headings of
+the form \"## This is a heading\".  Add a tag to each heading and then insert a
+complete markdown table of contents at the current position.
 
-If a heading already has a tag, it is removed.  If a heading has trailing
-pound signs, they are also removed.
+Pound signs that lie inside of markdown literal areas designated by \"```\" are
+ignored.  This prevents something such as an example of an #include directive
+from being treated as a level 1 heading.
+
+If a heading already has a tag, it is removed.  If a heading has trailing pound
+signs, they are also removed.
 
 The default maximum heading level is two, which means that heading levels
 greater than two are not included in the table of contents.  But a numeric
-prefix argument can change the maximum heading level.  The maximum heading
-level cannot be set to a value less than one."
+prefix argument can change the maximum heading level.  The maximum heading level
+cannot be set to a value less than one."
   (interactive)
-  (let ((default-max-depth 2)
+  (let ((literals (shu-get-md-boundaries))
+        (default-max-depth 2)
         (max-depth  current-prefix-arg)
         (ht (make-hash-table :test 'equal :size 500))
         (ss "^[#]+")
@@ -1766,15 +1846,16 @@ level cannot be set to a value less than one."
       (setq max-depth 1))
     (save-excursion
       (while (re-search-forward ss nil t)
-        (setq line (shu-fix-markdown-section max-depth))
-        (when line
-          (setq heading (shu-get-markdown-heading line))
-          (setq index-name (shu-make-md-index-name heading))
-          (when (> (length index-name) index-name-max)
-            (setq index-name (substring index-name 0 index-name-max)))
-          (setq index-name (shu-misc-make-unique-string index-name suffix-length ht))
-          (setq entry (cons line index-name))
-          (push entry entries))))
+        (when (not (shu-md-in-literal literals (point)))
+          (setq line (shu-fix-markdown-section max-depth))
+          (when line
+            (setq heading (shu-get-markdown-heading line))
+            (setq index-name (shu-make-md-index-name heading))
+            (when (> (length index-name) index-name-max)
+              (setq index-name (substring index-name 0 index-name-max)))
+            (setq index-name (shu-misc-make-unique-string index-name suffix-length ht))
+            (setq entry (cons line index-name))
+            (push entry entries)))))
     (setq entries (nreverse entries))
     (insert "\n")
     (shu-insert-markdown-toc entries)
