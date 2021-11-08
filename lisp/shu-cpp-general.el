@@ -414,6 +414,18 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                   "std::set"
                   "std::multiset"
                   ))
+   (cons "regex"   (list
+                    "std::basic_regex"
+                    "std::sub_match"
+                    "std::match_results"
+                    "std::regex_iterator"
+                    "std::regex_token_iterator"
+                    "std::regex_error"
+                    "std::regex_traits"
+                    "std::regex_match"
+                    "std::regex_search"
+                    "std::regex_replace"
+                    ))
    (cons "sstream"   (list
                       "std::istringstream"
                       "std::ostringstream"
@@ -905,6 +917,18 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
    (cons "bsl_queue.h"   (list
                           "bsl::queue"
                           "bsl::priority_queue"
+                          ))
+   (cons "bsl_regex.h"   (list
+                          "bsl::basic_regex"
+                          "bsl::sub_match"
+                          "bsl::match_results"
+                          "bsl::regex_iterator"
+                          "bsl::regex_token_iterator"
+                          "bsl::regex_error"
+                          "bsl::regex_traits"
+                          "bsl::regex_match"
+                          "bsl::regex_search"
+                          "bsl::regex_replace"
                           ))
    (cons "bsl_set.h"   (list
                         "bsl::set"
