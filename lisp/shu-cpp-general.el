@@ -1,4 +1,4 @@
-;;; shu-cpp-general.el --- Shu project code for dealing wth C++ in Emacs
+`;;; shu-cpp-general.el --- Shu project code for dealing wth C++ in Emacs
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
@@ -7,7 +7,7 @@
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
-;; This is free software: you can redistribute it and/or modify it
+;; This is free software: you can redistrcibute it and/or modify it
 ;; under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
@@ -400,6 +400,16 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                        "std::put_time"
                        "std::quoted"
                        ))
+   (cons "iostream"    (list
+                        "std::cin"
+                        "std::wcin"
+                        "std::cout"
+                        "std::wcout"
+                        "std::cerr"
+                        "std::wcerr"
+                        "std::clog"
+                        "std::wclog"
+                        ))
    (cons "ios"    (list
                    "std::basic_ios"
                    "std::fpos"
@@ -434,6 +444,15 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                    "std::left"
                    "std::right"
                    ))
+   (cons "istream"    (list
+                       "std::basic_istream"
+                       "std::istream"
+                       "std::wistream"
+                       "std::basic_iostream"
+                       "std::iostream"
+                       "std::wiostream"
+                       "std::ws"
+                       ))
    (cons "locale"    (list
                       "std::narrow"
                       "std::tolower"
@@ -513,6 +532,17 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                        "std::nullopt"
                        "std::make_optional"
                        ))
+   (cons "ostream"   (list
+                      "std::basic_ostream"
+                      "std::ostream"
+                      "std::wostream"
+                      "std::endl"
+                      "std::ends"
+                      "std::flush"
+                      "std::emit_on_flush"
+                      "std::noemit_on_flush"
+                      "std::flush_emit"
+                      ))
    (cons "queue"   (list
                     "std::queue"
                     "std::priority_queue"
@@ -1015,6 +1045,16 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                              "bsl::put_time"
                              "bsl::quoted"
                              ))
+   (cons "bsl_iostream.h"    (list
+                              "bsl::cin"
+                              "bsl::wcin"
+                              "bsl::cout"
+                              "bsl::wcout"
+                              "bsl::cerr"
+                              "bsl::wcerr"
+                              "bsl::clog"
+                              "bsl::wclog"
+                              ))
    (cons "bsl_ios.h"    (list
                          "bsl::basic_ios"
                          "bsl::fpos"
@@ -1049,6 +1089,15 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                          "bsl::left"
                          "bsl::right"
                          ))
+   (cons "bsl_istream.h"    (list
+                             "bsl::basic_istream"
+                             "bsl::istream"
+                             "bsl::wistream"
+                             "bsl::basic_iostream"
+                             "bsl::iostream"
+                             "bsl::wiostream"
+                             "bsl::ws"
+                             ))
    (cons "bsl_locale.h"    (list
                             "bsl::narrow"
                             "bsl::tolower"
@@ -1128,6 +1177,17 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                              "bsl::nullopt"
                              "bsl::make_optional"
                              ))
+   (cons "bsl_ostream.h"   (list
+                            "bsl::basic_ostream"
+                            "bsl::ostream"
+                            "bsl::wostream"
+                            "bsl::endl"
+                            "bsl::ends"
+                            "bsl::flush"
+                            "bsl::emit_on_flush"
+                            "bsl::noemit_on_flush"
+                            "bsl::flush_emit"
+                            ))
    (cons "bsl_queue.h"   (list
                           "bsl::queue"
                           "bsl::priority_queue"
