@@ -2279,7 +2279,7 @@ will assume that all files reside in the same directory."
 ;;
 (defun shu-cpp-project-get-base-name ()
   "When visiting a file within a project, the name might consist of two or three
-parts - the file name, the normal extension, sush as .h or .cpp, and the
+parts - the file name, the normal extension, such as .h or .cpp, and the
 intermediate extension, such as .i or .t when visiting .i.cpp or .t.cpp.  This
 function gets the buffer file name and removes the one or two extensions in
 order to get the name with no extensions at all."
@@ -2294,7 +2294,7 @@ order to get the name with no extensions at all."
 ;;  shu-cpp-project-extract-base-name
 ;;
 (defun shu-cpp-project-extract-base-name (name)
-  "This is the implementation function of SHU-CPP-PROJECT-GET-BASE-NAME so tht
+  "This is the implementation function of SHU-CPP-PROJECT-GET-BASE-NAME so that
 the logic of the function can be unit tested."
   (let ((base-name (file-name-sans-extension name)))
     (if (string= (file-name-extension base-name) "t")

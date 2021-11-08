@@ -9760,5 +9760,10 @@ LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de
 LocalWords:  proc rlists ht unresolvable uns clist thisistheoverview NB spoints np
 LocalWords:  thisisanoverview incl ns dciterate diterate ThingLoader thingloader os
 LocalWords:  myproject autocomplete Ctl tciterate titerate libs nThere nHow init
-LocalWords:  elc HEAPCACHE Nov inline insb inso stmt spos gpl gps gorg
+LocalWords:  elc HEAPCACHE Nov inline insb inso stmt spos gpl gps gorg paren
+LocalWords:  downcase fixedcase upcase alexandria stdout comdb RDATZC datetime gcc
+LocalWords:  timezone tzdate tz deleteObject nullptr printSelf ctor dtor iother vf
+LocalWords:  CMake doody ops py krpps Doxyfile af repo fixup doxyfile gcm config za
+LocalWords:  tocify fgh ijkl mno pqr stuv wxy bcde fg hij klm Stuvw xyzab OpenGrok
+LocalWords:  unbrace iff currentliveupdate debian dep codesinger github pt ua seq
 -->

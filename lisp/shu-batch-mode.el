@@ -292,7 +292,7 @@ for more information."
 ;;  shu-generate-comdb2-code
 ;;
 (defun shu-generate-comdb2-code ()
-  "Generate the C++ code fo a comdb2 row class"
+  "Generate the C++ code for a comdb2 row class"
   (let ((input-file)
         (output-file)
         (nargs (length command-line-args-left)))
