@@ -367,6 +367,18 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                        "std::max_align_t"
                        "std::nullptr_t"
                        ))
+   (cons "future"    (list
+                      "std::promise"
+                      "std::packaged_task"
+                      "std::future"
+                      "std::shared_future"
+                      "std::launch"
+                      "std::future_status"
+                      "std::future_error"
+                      "std::future_errc"
+                      "std::async"
+                      "std::future_category"
+                      ))
    (cons "functional"    (list
                           "std::function"
                           "std::mem_fn"
@@ -375,6 +387,19 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                           "std::is_placeholder"
                           "std::reference_wrapper"
                           ))
+   (cons "iomanip"    (list
+                       "std::resetiosflags"
+                       "std::setiosflags"
+                       "std::setbase"
+                       "std::setfill"
+                       "std::setprecision"
+                       "std::setw"
+                       "std::get_money"
+                       "std::put_money"
+                       "std::get_time"
+                       "std::put_time"
+                       "std::quoted"
+                       ))
    (cons "ios"    (list
                    "std::basic_ios"
                    "std::fpos"
@@ -965,6 +990,31 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                 "bsl::is_placeholder"
                                 "bsl::reference_wrapper"
                                 ))
+   (cons "bsl_future.h"    (list
+                            "bsl::promise"
+                            "bsl::packaged_task"
+                            "bsl::future"
+                            "bsl::shared_future"
+                            "bsl::launch"
+                            "bsl::future_status"
+                            "bsl::future_error"
+                            "bsl::future_errc"
+                            "bsl::async"
+                            "bsl::future_category"
+                            ))
+   (cons "bsl_iomanip.h"    (list
+                             "bsl::resetiosflags"
+                             "bsl::setiosflags"
+                             "bsl::setbase"
+                             "bsl::setfill"
+                             "bsl::setprecision"
+                             "bsl::setw"
+                             "bsl::get_money"
+                             "bsl::put_money"
+                             "bsl::get_time"
+                             "bsl::put_time"
+                             "bsl::quoted"
+                             ))
    (cons "bsl_ios.h"    (list
                          "bsl::basic_ios"
                          "bsl::fpos"
