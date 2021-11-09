@@ -219,6 +219,7 @@ template parameter \"int\"")
    (cons "const" 0)
    (cons "consteval" 0)
    (cons "constexpr" 0)
+   (cons "constinit" 0)
    (cons "const_cast" 0)
    (cons "continue" 0)
    (cons "co_await" 0)
@@ -292,7 +293,7 @@ template parameter \"int\"")
    (cons "while" 0)
    (cons "xor" 0)
    (cons "xor_eq" 0))
-  "alist of C++ key words up to approximately C++17")
+  "alist of C++ key words up to approximately C++20")
 
 
 ;;
