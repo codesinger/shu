@@ -807,7 +807,7 @@
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
-    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
+    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list nil))
     (should ret-val)
     (should (consp ret-val))
     (setq new-token-list (car ret-val))
@@ -878,7 +878,7 @@
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
-    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
+    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list nil))
     (should ret-val)
     (should (consp ret-val))
     (setq new-token-list (car ret-val))
@@ -889,7 +889,6 @@
     (princ "new-token-list-2: " gb)(princ new-token-list gb)(princ "\n" gb)
     (should (eq rlist new-rlist))
     (should (eq token-list new-token-list))
-
     ))
 
 
@@ -932,7 +931,7 @@
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
-    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
+    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list nil))
     (should (not ret-val))
     ))
 
@@ -975,7 +974,7 @@
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
-    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
+    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list nil))
     (should (not ret-val))
     ))
 
@@ -1018,7 +1017,7 @@
     (with-temp-buffer
       (insert data)
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
-    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
+    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list nil))
     (should (not ret-val))
     ))
 
@@ -1063,7 +1062,7 @@
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq rlist token-list)
     (setq token-list nil)
-    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list))
+    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list nil))
     (should ret-val)
     (should (consp ret-val))
     (setq new-token-list (car ret-val))
@@ -1074,6 +1073,124 @@
     (princ "new-token-list-2: " gb)(princ new-token-list gb)(princ "\n" gb)
     (should (eq rlist new-rlist))
     (should (eq token-list new-token-list))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-match-repeat-sub-list-7
+;;
+(ert-deftest shu-test-shu-cpp-match-repeat-sub-list-7 ()
+  "Whole list matches (with first mtvh required) , updated rlist and tlist
+returned."
+  (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          " :: bbbb  ;"
+          ))
+        (match-list
+         (list
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    t shu-cpp-token-type-op
+                                    "::")
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                    'shu-cpp-token-match-same-rx
+                                    t shu-cpp-token-type-uq
+                                    (concat shu-cpp-name "+"))
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    t shu-cpp-token-type-op
+                                    ";")
+          )
+         )
+        (rlist)
+        (token-list)
+        (match-info)
+        (ret-val)
+        (new-token-list)
+        (new-rlist)
+        (token)
+        (token-type)
+        (token-info))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list t))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq new-token-list (car ret-val))
+    (setq new-rlist (cdr ret-val))
+    (shu-cpp-token-show-token-info new-rlist "NEW_RLIST 8889")
+    (shu-cpp-token-show-token-info new-token-list "NEW_TOKEN-LIST 8889")
+    (princ "new-rlist: " gb)(princ new-rlist gb)(princ "\n" gb)
+    (princ "new-token-list: " gb)(princ new-token-list gb)(princ "\n" gb)
+
+    (setq token-info (car new-rlist))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (= token-type shu-cpp-token-type-op))
+    (should (string= token ";"))
+
+    (setq new-rlist (cdr new-rlist))
+    (setq token-info (car new-rlist))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should (string= token "bbbb"))
+
+    (setq new-rlist (cdr new-rlist))
+    (setq token-info (car new-rlist))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token (shu-cpp-token-extract-token token-info))
+    (should (= token-type shu-cpp-token-type-op))
+    (should (string= token "::"))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-cpp-match-repeat-sub-list-8
+;;
+(ert-deftest shu-test-shu-cpp-match-repeat-sub-list-8 ()
+  "First item is required but does not match.  nil returned."
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
+        (data
+         (concat
+          " ; bbbb  ;"
+          ))
+        (match-list
+         (list
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    t shu-cpp-token-type-op
+                                    "::")
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                    'shu-cpp-token-match-same-rx
+                                    t shu-cpp-token-type-uq
+                                    (concat shu-cpp-name "+"))
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    t shu-cpp-token-type-op
+                                    ";")))
+        (rlist)
+        (token-list)
+        (match-info)
+        (ret-val)
+        (new-token-list)
+        (new-rlist)
+        (token)
+        (token-type)
+        (token-info))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-cpp-match-repeat-sub-list rlist token-list match-list t))
+    (should (not ret-val))
     ))
 
 
@@ -1469,6 +1586,228 @@
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
     (setq ret-val (shu-cpp-match-repeat-list rlist token-list match-info))
     (should (not ret-val))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-match-repeat-list-once-1
+;;
+(ert-deftest shu-test-shu-cpp-match-repeat-list-once-1 ()
+  "Mis-match in first item.  Should return nil."
+  (let ((data
+         (concat
+          "      zzzz"
+          " :: yyyy"
+          " :: :: wwww"
+          " ::  ;  "
+          ))
+        (match-list
+         (list
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    nil shu-cpp-token-type-op
+                                    "::")
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                    'shu-cpp-token-match-same-rx
+                                    t shu-cpp-token-type-uq
+                                    (concat shu-cpp-name "+"))))
+        (rlist)
+        (rlist-data " namespace using ")
+        (token-list)
+        (match-info)
+        (ret-val)
+        (new-token-list)
+        (new-rlist)
+        (token)
+        (token-type)
+        (title)
+        (nrl))
+    (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop
+                                                   match-list))
+    (with-temp-buffer
+      (insert rlist-data)
+      (setq rlist (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (shu-cpp-tokenize-show-list rlist "RLIST IN TEST6:"))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq title (format "\nRLIST IN TEST6 BEFORE CALL, length: %d: " (length rlist)))
+    (shu-cpp-tokenize-show-list rlist title)
+    (setq ret-val (shu-cpp-match-repeat-list-once rlist token-list match-info))
+    (should (not ret-val))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-match-repeat-list-once-2
+;;
+(ert-deftest shu-test-shu-cpp-match-repeat-list-once-2 ()
+  (let ((data
+         (concat
+          "    ::  zzzz"
+          " :: yyyy"
+          " ::   qqqq"
+          ))
+        (match-list
+         (list
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    nil shu-cpp-token-type-op
+                                    "::")
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                    'shu-cpp-token-match-same-rx
+                                    t shu-cpp-token-type-uq
+                                    (concat shu-cpp-name "+"))))
+        (rlist)
+        (token-list)
+        (match-info)
+        (ret-val)
+        (new-token-list)
+        (new-rlist)
+        (token)
+        (token-type)
+        (token-info))
+    (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop-once
+                                                   match-list))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-cpp-match-repeat-list-once rlist token-list match-info))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq new-token-list (car ret-val))
+    (setq new-rlist (cdr ret-val))
+    (should (not new-token-list))
+    (should new-rlist)
+    (should (listp new-rlist))
+    (shu-cpp-tokenize-show-list new-rlist)
+    (setq token-info (car new-rlist))
+    (should token-info)
+    (should (consp token-info))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token ( shu-cpp-token-extract-token token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should token)
+    (should (stringp token))
+    (should (string= token "qqqq"))
+
+    (setq new-rlist (cdr new-rlist))
+    (setq token-info (car new-rlist))
+    (should token-info)
+    (should (consp token-info))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token ( shu-cpp-token-extract-token token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should token)
+    (should (stringp token))
+    (should (string= token "yyyy"))
+
+    (setq new-rlist (cdr new-rlist))
+    (setq token-info (car new-rlist))
+    (should token-info)
+    (should (consp token-info))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token ( shu-cpp-token-extract-token token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should token)
+    (should (stringp token))
+    (should (string= token "zzzz"))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-match-repeat-list-once-3
+;;
+(ert-deftest shu-test-shu-cpp-match-repeat-list-once-3 ()
+  (let ((data
+         (concat
+          "    ::  zzzz\n"
+          " :: yyyy\n"
+          " ::   qqqq    it;\n"
+          "// A command\n"
+          "  std::string   other;\n"
+          ))
+        (match-list
+         (list
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                                    'shu-cpp-token-match-same
+                                    nil shu-cpp-token-type-op
+                                    "::")
+          (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                                    'shu-cpp-token-match-same-rx
+                                    t shu-cpp-token-type-uq
+                                    (concat shu-cpp-name "+"))))
+        (rlist)
+        (token-list)
+        (match-info)
+        (ret-val)
+        (new-token-list)
+        (new-rlist)
+        (token)
+        (token-type)
+        (token-info))
+    (setq match-info (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop-once
+                                                   match-list))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (setq ret-val (shu-cpp-match-repeat-list-once rlist token-list match-info))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq new-token-list (car ret-val))
+    (setq new-rlist (cdr ret-val))
+    (should new-token-list)
+    (should (listp new-token-list))
+    (should new-rlist)
+    (should (listp new-rlist))
+    (shu-cpp-tokenize-show-list new-rlist)
+    (setq token-info (car new-rlist))
+    (should token-info)
+    (should (consp token-info))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token ( shu-cpp-token-extract-token token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should token)
+    (should (stringp token))
+    (should (string= token "qqqq"))
+
+    (setq new-rlist (cdr new-rlist))
+    (setq token-info (car new-rlist))
+    (should token-info)
+    (should (consp token-info))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token ( shu-cpp-token-extract-token token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should token)
+    (should (stringp token))
+    (should (string= token "yyyy"))
+
+    (setq new-rlist (cdr new-rlist))
+    (setq token-info (car new-rlist))
+    (should token-info)
+    (should (consp token-info))
+    (setq token-type (shu-cpp-token-extract-type token-info))
+    (setq token ( shu-cpp-token-extract-token token-info))
+    (should token-type)
+    (should (numberp token-type))
+    (should (= token-type shu-cpp-token-type-uq))
+    (should token)
+    (should (stringp token))
+    (should (string= token "zzzz"))
     ))
 
 
@@ -2205,6 +2544,142 @@
 
     (setq rlist (cdr rlist))
     (should (not rlist))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-match-classname-forms-1
+;;
+(ert-deftest shu-test-shu-cpp-match-classname-forms-1 ()
+  (let ((gb      (get-buffer-create shu-unit-test-buffer))
+        (token-list)
+        (token-info)
+        (token)
+        (rlist)
+        (ret-val)
+        (rlist)
+        (data
+         (concat
+          "// this is some stuff\n"
+          "\n"
+          "bdlt::Datetime  time;\n"
+          "\n"
+          "std::string   it;\n"
+          "\n"
+          "\n"
+          "my::name::Fred  thing;\n"
+          "\n"
+          "Datetime  it;\n"
+          "\n"
+          "// Some sort of comment\n"
+          "\n"
+          "mumble  it\n"
+          "\n"
+          "bdlt::Interval  y;\n"
+          "/* */\n"
+          )))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+      (shu-cpp-tokenize-show-list token-list)
+      (setq ret-val (shu-cpp-all-search-match-tokens rlist shu-cpp-match-classname-forms token-list))
+      (princ "\ncar ret-val: " gb)(princ (car ret-val) gb) (princ "\n" gb)
+      (princ "\ncdr ret-val: " gb)(princ (cdr ret-val) gb) (princ "\n" gb)
+      (should ret-val)
+      (should (consp ret-val))
+      (should (cdr ret-val))
+      (setq rlist (cdr ret-val))
+      (should (listp rlist))
+      (setq rlist (nreverse rlist))
+      (shu-cpp-tokenize-show-list rlist)
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "bdlt" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "::" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "Datetime" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "std" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "::" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "string" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "my" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "::" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "name" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "::" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "Fred" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "bdlt" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "::" token))
+      (setq rlist (cdr rlist))
+
+      (should rlist)
+      (setq token-info (car rlist))
+      (setq token (shu-cpp-token-extract-token token-info))
+      (should (string= "Interval" token))
+      (setq rlist (cdr rlist))
+
+      (should (not rlist)))
     ))
 
 
