@@ -73,7 +73,7 @@
 ;;
 ;;  shu-show-glist
 ;;
-(defun shu-show-glist (glist)
+(defun shu-show-glist (glist-in)
   "Doc string."
   (interactive)
   (let (
@@ -81,7 +81,14 @@
         (gather)
         (token)
         (name)
+        (glist)
         )
+    (while glist-in
+      (setq gather (car glist-in))
+      (push gather glist)
+      (setq glist-in (cdr glist-in))
+      )
+
     (princ "\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n" gb)
     (setq glist (sort glist (lambda(lgather rgather)
                              (let (
@@ -252,6 +259,7 @@ the number of names in any given name list to use as part of the key.  This
 function returns a new list in which the CAR of each item is the key and the CDR
 of each item is a list of names that map to that key."
   (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
         (gather)
         (ht (make-hash-table :test 'equal :size (length glist)))
         (qname)
