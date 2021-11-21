@@ -46,6 +46,7 @@
         (rlist)
         (ret-val)
         (glist)
+        (debug-on-error t)
         )
       (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
       (shu-cpp-tokenize-show-list token-list)
@@ -60,6 +61,8 @@
           (shu-cpp-tokenize-show-list rlist)
           (setq glist (shu-gather-qualified-names rlist))
           (shu-show-glist glist)
+          (setq rlist (shu-make-reduced-name-list glist 1))
+          (shu-show-reduced-list rlist)
             )
           )
 
@@ -80,19 +83,19 @@
         (name)
         )
     (princ "\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n" gb)
-;;;    (setq glist (sort glist (lambda(lgather rgather)
-;;;                             (let (
-;;;                                    (less)
-;;;                                    )
-;;;                              (if (string= (car lgather) (car rgather))
-;;;                                  (setq less (string< (cadr lgather) (cadr rgather)))
-;;;                                (setq less (string< (car lgather) (car rgather)))
-;;;                                  )
-;;;                             less
-;;;                              )
-;;;                              )
-;;;                      )
-;;;          )
+    (setq glist (sort glist (lambda(lgather rgather)
+                             (let (
+                                    (less)
+                                    )
+                              (if (string= (car lgather) (car rgather))
+                                  (setq less (string< (cadr lgather) (cadr rgather)))
+                                (setq less (string< (car lgather) (car rgather)))
+                                  )
+                             less
+                              )
+                              )
+                      )
+          )
     (while glist
       (setq gather (car glist))
       (setq name "")
@@ -108,6 +111,37 @@
       (setq glist (cdr glist))
       )
     ))
+
+
+;;
+;;  shu-show-reduced-list
+;;
+(defun shu-show-reduced-list (reduced-list)
+  "Doc string."
+  (let (
+        (gb      (get-buffer-create shu-unit-test-buffer))
+        (rlist reduced-list)
+        (kv)
+        (qname)
+        (qlist)
+        (gather)
+        )
+    (princ "\n\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\n" gb)
+    (while rlist
+      (setq kv (car rlist))
+      (setq qname (car kv))
+      (setq qlist (cdr kv))
+      (princ (concat qname "\n") gb)
+      (while qlist
+        (setq gather (car qlist))
+        (princ (concat "      " (shu-make-qualified-name gather) "\n" )gb)
+        (setq qlist (cdr qlist))
+        )
+      (setq rlist (cdr rlist))
+      )
+
+    ))
+
 
 
 
@@ -174,6 +208,152 @@ The second item on the list is the list
         (setq last-token-type token-type)
         (setq rlist (cdr rlist))))
     glist
+    ))
+
+
+
+;;
+;;  shu-make-qualified-name
+;;
+(defun shu-make-qualified-name (gather &optional level)
+  "GATHER is a list of the parts of a C++ qualified name created by a function
+such as SHU-GATHER-QUALIFIED-NAMES.  LEVEL is the optional number of name parts
+to be returned as a single string.  If the list is \"a, b, c\" and the level is
+one, the returned name is \"a\".  If the level is two, the returned name is
+\"a::b\".  If the level is three, the returned name is \"a::b::c\".  If the
+level is four, the returned name is nil because the name does not have four
+parts.  If LEVEL is not specified, the entire name is returned."
+  (let ((tlevel 0)
+        (waiting)
+        (qname))
+    (when (not level)
+      (setq level (length gather)))
+    (when (>= (length gather) level)
+      (setq qname "")
+      (while (< tlevel level)
+        (when waiting
+          (setq qname (concat qname "::"))
+          (setq waiting nil))
+        (setq qname (concat qname (car gather)))
+        (setq waiting t)
+        (setq tlevel (1+ tlevel))
+        (setq gather (cdr gather))))
+    qname
+    ))
+
+
+
+;;
+;;  shu-make-reduced-name-list
+;;
+(defun shu-make-reduced-name-list (glist level)
+  "Doc string."
+  (interactive)
+  (let (
+        (gather)
+        (ht (make-hash-table :test 'equal :size (length glist)))
+        (qname)
+        (qlist)
+        (nlist)
+        (nl)
+        (kv)
+        )
+    (when glist
+      (while glist
+        (setq gather (car glist))
+        (setq qname (shu-make-qualified-name gather level))
+        (setq qlist (gethash qname ht))
+        (if (not qlist)
+            (setq qlist (list gather))
+          (push gather qlist)
+          )
+        (puthash qname qlist ht)
+        (setq glist (cdr glist))
+        )
+      (maphash (lambda (k v) (push (cons k v) nlist)) ht)
+      (setq nl nlist)
+      (setq nlist nil)
+      (while nl
+        (setq kv (car nl))
+        (setq qname (car kv))
+        (setq qlist (cdr kv))
+        (setq qlist (sort qlist (lambda (lhs rhs)
+                                  (string< (shu-make-qualified-name lhs) (shu-make-qualified-name rhs)))))
+        (push (cons qname qlist) nlist)
+        (setq nl (cdr nl))
+        )
+      )
+    (setq nlist (sort nlist (lambda (lhs rhs) (string< (car lhs) (car rhs)))))
+    nlist
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-make-qualified-name-1
+;;
+(ert-deftest shu-test-shu-make-qualified-name-1 ()
+  (let ((gather (list "a" "b"))
+        (qname))
+    (setq qname (shu-make-qualified-name gather 1))
+    (should qname)
+    (should (stringp qname))
+    (should (string= qname "a"))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-qualified-name-2
+;;
+(ert-deftest shu-test-shu-make-qualified-name-2 ()
+  (let ((gather (list "a" "b"))
+        (qname))
+    (setq qname (shu-make-qualified-name gather 2))
+    (should qname)
+    (should (stringp qname))
+    (should (string= qname "a::b"))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-qualified-name-3
+;;
+(ert-deftest shu-test-shu-make-qualified-name-3 ()
+  (let ((gather (list "a" "b"))
+        (qname))
+    (setq qname (shu-make-qualified-name gather 3))
+    (should (not qname))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-qualified-name-4
+;;
+(ert-deftest shu-test-shu-make-qualified-name-4 ()
+  (let ((gather (list "a" "b" "c" "d"))
+        (qname))
+    (setq qname (shu-make-qualified-name gather 4))
+    (should qname)
+    (should (stringp qname))
+    (should (string= qname "a::b::c::d"))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-qualified-name-5
+;;
+(ert-deftest shu-test-shu-make-qualified-name-45()
+  (let ((gather (list "a" "b" "c" "d"))
+        (qname))
+    (setq qname (shu-make-qualified-name gather))
+    (should qname)
+    (should (stringp qname))
+    (should (string= qname "a::b::c::d"))
     ))
 
 
