@@ -58,7 +58,7 @@
           (setq rlist (nreverse rlist))
           (princ "\n\n====================================================\n\n" gb)
           (shu-cpp-tokenize-show-list rlist)
-          (setq glist (shu-gather-other rlist))
+          (setq glist (shu-gather-qualified-names rlist))
           (shu-show-glist glist)
             )
           )
@@ -80,19 +80,19 @@
         (name)
         )
     (princ "\n\n+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n" gb)
-    (setq glist (sort glist (lambda(lgather rgather)
-                             (let (
-                                    (less)
-                                    )
-                              (if (string= (car lgather) (car rgather))
-                                  (setq less (string< (cadr lgather) (cadr rgather)))
-                                (setq less (string< (car lgather) (car rgather)))
-                                  )
-                             less
-                              )
-                              )
-                      )
-          )
+;;;    (setq glist (sort glist (lambda(lgather rgather)
+;;;                             (let (
+;;;                                    (less)
+;;;                                    )
+;;;                              (if (string= (car lgather) (car rgather))
+;;;                                  (setq less (string< (cadr lgather) (cadr rgather)))
+;;;                                (setq less (string< (car lgather) (car rgather)))
+;;;                                  )
+;;;                             less
+;;;                              )
+;;;                              )
+;;;                      )
+;;;          )
     (while glist
       (setq gather (car glist))
       (setq name "")
@@ -112,19 +112,45 @@
 
 
 ;;
-;;  shu-gather-other
+;;  shu-gather-qualified-names
 ;;
-(defun shu-gather-other (rlist)
-  "Doc string."
-  (let (
-        (token-info)
+(defun shu-gather-qualified-names (rlist)
+  "RLIST is a list of TOKEN-INFO representing unquoted tokens that are separated
+from each other by instances of \"::\".  These potentially represent fully
+qualified C++ names.  If names are separated by instances of \"::\", they are
+qualified names.  But if there are two names in a row with no intervening
+instance of \"::\", then the first of the names is the last part of a fully
+qualified name and the second of the names in the first part of the next fully
+qualified name.  This function returns a list of the fully qualified names.
+Each names is represented by a list of its parts.
+
+For example, the following list represents two fully qualified names:
+
+       1. \"std\"
+       2. \"::\"
+       3. \"string\"
+       4. \"std\"
+       5. \"::\"
+       6. \"vector\"
+
+The names, of course, are \"std::string\" and \"std::vector\".  They would be
+returned as a list that contains two lists.  The first item on the list is the
+list
+
+       1. \"std\"
+       2. \"string\"
+
+The second item on the list is the list
+
+       1. \"std\"
+       2. \"vector\""
+  (let ((token-info)
         (token)
         (token-type)
         (last-token)
         (last-token-type)
         (gathered)
-        (glist)
-        )
+        (glist))
     (when rlist
       (setq token-info (car rlist))
       (setq token (shu-cpp-token-extract-token token-info))
@@ -143,17 +169,100 @@
             (setq gathered (nreverse gathered))
             (push gathered glist)
             (setq gathered nil)
-            (push token gathered)
-            )
-          )
+            (push token gathered)))
         (setq last-token token)
         (setq last-token-type token-type)
-        (setq rlist (cdr rlist))
-        )
-      )
+        (setq rlist (cdr rlist))))
     glist
     ))
 
+
+
+;;
+;;  shu-test-shu-gather-qualified-names-1
+;;
+1(ert-deftest shu-test-shu-gather-qualified-names-1 ()
+   "This should create a GLIST that holds the following lists:
+        1. my
+           name
+           Fred
+        2. std
+           string
+        3. std
+           numeric_limits"
+  (let ((token-list)
+        (rlist)
+        (ret-val)
+        (glist)
+        (gather)
+        (data
+         (concat
+          "// this is some stuff\n"
+          "\n"
+          "std::numeric_limits<int>  limit1;\n"
+          "\n"
+          "std::string   it;\n"
+          "\n"
+          "\n"
+          "my::name::Fred  thing;\n"
+          "\n"
+          "Datetime  it;\n"
+          "\n"
+          "// Some sort of comment\n"
+          "\n"
+          "mumble  it\n"
+          "\n"
+          "std::tuple  y;\n"
+          "/* */\n"
+          )))
+    (with-temp-buffer
+      (insert data)
+      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max))))
+    (shu-cpp-tokenize-show-list token-list)
+    (setq ret-val (shu-cpp-all-search-match-tokens rlist shu-cpp-match-classname-forms token-list))
+    (should ret-val)
+    (should (consp ret-val))
+    (setq rlist (cdr ret-val))
+    (should rlist)
+    (should (listp rlist))
+    (setq rlist (nreverse rlist))
+    (setq glist (shu-gather-qualified-names rlist))
+    (should glist)
+    (should (listp glist))
+    (should (= 3 (length glist)))
+    (setq gather (car glist))
+    (should gather)
+    (should (listp gather))
+    (should (= 3 (length gather)))
+    (should (car gather))
+    (should (string= "my" (car gather)))
+    (should (cadr gather))
+    (should (string= "name" (cadr gather)))
+    (should (caddr gather))
+    (should (string= "Fred" (caddr gather)))
+    (setq glist (cdr glist))
+    (should glist)
+    (should (listp glist))
+    (setq gather (car glist))
+    (should gather)
+    (should (listp gather))
+    (should (= 2 (length gather)))
+    (should (car gather))
+    (should (string= "std" (car gather)))
+    (should (cadr gather))
+    (should (string= "string" (cadr gather)))
+    (setq glist (cdr glist))
+    (should glist)
+    (should (listp glist))
+    (setq gather (car glist))
+    (should gather)
+    (should (listp gather))
+    (should (= 2 (length gather)))
+    (should (car gather))
+    (should (string= "std" (car gather)))
+    (should (cadr gather))
+    (should (string= "numeric_limits" (cadr gather)))
+    ))
 
 
 
