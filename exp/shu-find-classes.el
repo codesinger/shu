@@ -247,8 +247,10 @@ parts.  If LEVEL is not specified, the entire name is returned."
 ;;  shu-make-reduced-name-list
 ;;
 (defun shu-make-reduced-name-list (glist level)
-  "Doc string."
-  (interactive)
+  "GLIST is a list produced by the function SHU-GATHER-QUALIFIED-NAMES.  LEVEL is
+the number of names in any given name list to use as part of the key.  This
+function returns a new list in which the CAR of each item is the key and the CDR
+of each item is a list of names that map to that key."
   (let (
         (gather)
         (ht (make-hash-table :test 'equal :size (length glist)))
@@ -277,13 +279,38 @@ parts.  If LEVEL is not specified, the entire name is returned."
         (setq kv (car nl))
         (setq qname (car kv))
         (setq qlist (cdr kv))
-        (setq qlist (sort qlist (lambda (lhs rhs)
-                                  (string< (shu-make-qualified-name lhs) (shu-make-qualified-name rhs)))))
+        (setq qlist (shu-make-unique-name-list qlist))
         (push (cons qname qlist) nlist)
         (setq nl (cdr nl))
         )
       )
     (setq nlist (sort nlist (lambda (lhs rhs) (string< (car lhs) (car rhs)))))
+    nlist
+    ))
+
+
+
+;;
+;;  shu-make-unique-name-list
+;;
+(defun shu-make-unique-name-list (qlist)
+  "QLIST is a list of gather that is unordered and may contain duplicates.
+Return a sorted list with the duplicates removed."
+  (let (
+        (ht (make-hash-table :test 'equal :size (length qlist)))
+        (gather)
+        (qname)
+        (nlist)
+        )
+    (while qlist
+      (setq gather (car qlist))
+      (setq qname (shu-make-qualified-name gather))
+      (puthash qname gather ht)
+      (setq qlist (cdr qlist))
+      )
+    (maphash (lambda (k v) (push v nlist)) ht)
+    (setq nlist (sort nlist (lambda (lhs rhs)
+                              (string< (shu-make-qualified-name lhs) (shu-make-qualified-name rhs)))))
     nlist
     ))
 
