@@ -272,12 +272,14 @@ of each item is a list of names that map to that key."
       (while glist
         (setq gather (car glist))
         (setq qname (shu-make-qualified-name gather level))
-        (setq qlist (gethash qname ht))
-        (if (not qlist)
-            (setq qlist (list gather))
-          (push gather qlist)
+        (when qname
+          (setq qlist (gethash qname ht))
+          (if (not qlist)
+              (setq qlist (list gather))
+            (push gather qlist)
+            )
+          (puthash qname qlist ht)
           )
-        (puthash qname qlist ht)
         (setq glist (cdr glist))
         )
       (maphash (lambda (k v) (push (cons k v) nlist)) ht)
@@ -292,7 +294,7 @@ of each item is a list of names that map to that key."
         (setq nl (cdr nl))
         )
       )
-    (setq nlist (sort nlist (lambda (lhs rhs) (string< (car lhs) (car rhs)))))
+    (setq nlist (sort nlist (lambda (lhs rhs) (string< (upcase (car lhs)) (upcase (car rhs))))))
     nlist
     ))
 
@@ -318,7 +320,8 @@ Return a sorted list with the duplicates removed."
       )
     (maphash (lambda (k v) (push v nlist)) ht)
     (setq nlist (sort nlist (lambda (lhs rhs)
-                              (string< (shu-make-qualified-name lhs) (shu-make-qualified-name rhs)))))
+                              (string< (upcase (shu-make-qualified-name lhs))
+                                       (upcase (shu-make-qualified-name rhs))))))
     nlist
     ))
 
