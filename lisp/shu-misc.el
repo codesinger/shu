@@ -1122,12 +1122,12 @@ return git error message."
 ;;
 (defun shu-git-get-pr-url ()
   "Put into the kill ring the path required to create a new pull request for
-the current branch."
+the current branch of the current repository."
   (interactive)
-  (let ((repo (shu-get-repo))
+  (let ((url-repo (shu-get-url-repo))
         (branch (shu-git-find-branch))
         (url))
-    (setq url (concat repo "/pull/new/" branch))
+    (setq url (concat url-repo "/pull/new/" branch))
     (shu-kill-new url)
     ))
 
@@ -2742,6 +2742,52 @@ directory called \".git\"."
           (setq path (shu-internal-get-repo)))))
     path
     ))
+
+
+
+;;
+;;  shu-get-url-repo
+;;
+(defun shu-get-url-repo ()
+  "Return the web URL for the current git repository.  If the URL cannot be
+found, nil is returned.
+
+The url for the git repository in .git/config is of the form
+
+       git@web-address:repository-name.git
+
+This function removes the trailing \".git\", replaces the leading \"git@\" with
+\"https://\" and replaces the \":\" between the web-address and repository-name
+with \"/\"."
+  (let ((repo (shu-get-repo))
+        (prefix)
+        (postfix)
+        (url-repo)
+        (ss ".[com|net|edu]\\(:\\)"))
+    (setq prefix (substring repo 0 4))
+    (if (not (string= prefix "git@"))
+        (progn
+          (ding)
+          (message "Unknown repository prefix.  Expected 'git@', found '%s'" prefix))
+      (setq postfix (substring repo (- (length repo) 4)))
+      (if (not (string= postfix ".git"))
+          (progn
+            (ding)
+            (message "Unknown repository postfix.  Expected '.git', found '%s'" postfix))
+        (setq url-repo (concat "https://" (substring repo 4 (- (length repo) 4)))))
+      (with-temp-buffer
+        (insert url-repo)
+        (goto-char (point-min))
+        (if (re-search-forward ss nil t)
+            (progn
+              (replace-match "/" t t nil 1)
+              (setq url-repo (buffer-substring-no-properties (point-min) (point-max))))
+          (ding)
+          (message "Cannot find ':' in git url (%s)" url-repo)
+          (setq url-repo nil))))
+    url-repo
+    ))
+
 
 
 
