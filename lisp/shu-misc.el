@@ -1117,6 +1117,22 @@ return git error message."
 
 
 
+;;
+;;  shu-git-get-pr-url
+;;
+(defun shu-git-get-pr-url ()
+  "Put into the kill ring the path required to create a new pull request for
+the current branch."
+  (interactive)
+  (let ((repo (shu-get-repo))
+        (branch (shu-git-find-branch))
+        (url))
+    (setq url (concat repo "/pull/new/" branch))
+    (shu-kill-new url)
+    ))
+
+
+
 
 ;;
 ;;  shu-git-show-branch
@@ -3142,6 +3158,7 @@ shu- prefix removed."
   (defalias 'remove-test-names 'shu-remove-test-names)
   (defalias 'number-commits 'shu-git-number-commits)
   (defalias 'diff-commits 'shu-git-diff-commits)
+  (defalias 'get-pr-url 'shu-git-get-pr-url)
   (defalias 'show-branch 'shu-git-show-branch)
   (defalias 'insb 'shu-git-insert-branch)
   (defalias 'inso 'shu-git-insert-origin-branch)
