@@ -367,6 +367,20 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                        "std::max_align_t"
                        "std::nullptr_t"
                        ))
+   (cons "fstream"   (list
+                      "std::basic_ifstream"
+                      "std::basic_ofstream"
+                      "std::basic_fstream"
+                      "std::basic_filebuf"
+                      "std::ifstream"
+                      "std::ofstream"
+                      "std::fstream"
+                      "std::filebuf"
+                      "std::wifstream"
+                      "std::wofstream"
+                      "std::wfstream"
+                      "std::wfilebuf"
+                      ))
    (cons "future"    (list
                       "std::promise"
                       "std::packaged_task"
@@ -1012,6 +1026,20 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                              "bsl::max_align_t"
                              "bsl::nullptr_t"
                              ))
+   (cons "bsl_fstream.h"   (list
+                            "bsl::basic_ifstream"
+                            "bsl::basic_ofstream"
+                            "bsl::basic_fstream"
+                            "bsl::basic_filebuf"
+                            "bsl::ifstream"
+                            "bsl::ofstream"
+                            "bsl::fstream"
+                            "bsl::filebuf"
+                            "bsl::wifstream"
+                            "bsl::wofstream"
+                            "bsl::wfstream"
+                            "bsl::wfilebuf"
+                            ))
    (cons "bsl_functional.h"    (list
                                 "bsl::function"
                                 "bsl::mem_fn"
