@@ -638,6 +638,7 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                      "std::stold"
                      "std::to_string"
                      "std::to_wstring"
+                     "std::getline"
                      ))
    (cons "string_view"   (list
                           "std::string_view"
@@ -1321,6 +1322,7 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                            "bsl::stold"
                            "bsl::to_string"
                            "bsl::to_wstring"
+                           "bsl::getline"
                            ))
    (cons "bsl_string_view.h"   (list
                                 "bsl::string_view"
