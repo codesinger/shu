@@ -361,6 +361,12 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                       "std::reload_tzdb"
                       "std::remote_version"
                       ))
+   (cons "condition_variable" (list
+                               "std::condition_variable"
+                               "std::condition_variable_any"
+                               "std::cv_status"
+                               "std::notify_all_at_thread_exit"
+                               ))
    (cons "cstddef"    (list
                        "std::size_t"
                        "std::ptrdiff_t"
@@ -551,6 +557,21 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                       "std::addressof"
                       "std::reinterpret_pointer_cast"
                       ))
+   (cons "mutex" (list
+                  "std::mutex"
+                  "std::recursive_mutex"
+                  "std::timed_mutex"
+                  "std::recursive_timed_mutex"
+                  "std::lock_guard"
+                  "std::unique_lock"
+                  "std::once_flag"
+                  "std::adopt_lock_t"
+                  "std::defer_lock_t"
+                  "std::try_to_lock_t"
+                  "std::try_lock"
+                  "std::lock"
+                  "std::call_once"
+                  ))
    (cons "new"   (list
                   "std::bad_alloc"
                   "std::bad_array_new_length"
@@ -647,6 +668,10 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                           "std::u32string_view"
                           "std::wstring_view"
                           ))
+   (cons "thread" (list
+                   "std::thread"
+                   "std::this_thread"
+                   ))
    (cons "tuple"    (list
                      "std::tuple"
                      "std::tuple_size"
@@ -1045,6 +1070,12 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsl::reload_tzdb"
                             "bsl::remote_version"
                             ))
+   (cons "bsl_condition_variable.h" (list
+                               "bsl::condition_variable"
+                               "bsl::condition_variable_any"
+                               "bsl::cv_status"
+                               "bsl::notify_all_at_thread_exit"
+                               ))
    (cons "bsl_cstddef.h"    (list
                              "bsl::size_t"
                              "bsl::ptrdiff_t"
@@ -1235,6 +1266,21 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsl::addressof"
                             "bsl::reinterpret_pointer_cast"
                             ))
+   (cons "bsl_mutex.h" (list
+                  "bsl::mutex"
+                  "bsl::recursive_mutex"
+                  "bsl::timed_mutex"
+                  "bsl::recursive_timed_mutex"
+                  "bsl::lock_guard"
+                  "bsl::unique_lock"
+                  "bsl::once_flag"
+                  "bsl::adopt_lock_t"
+                  "bsl::defer_lock_t"
+                  "bsl::try_to_lock_t"
+                  "bsl::try_lock"
+                  "bsl::lock"
+                  "bsl::call_once"
+                  ))
    (cons "bsl_new.h"   (list
                         "bsl::bad_alloc"
                         "bsl::bad_array_new_length"
@@ -1331,6 +1377,10 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                 "bsl::u32string_view"
                                 "bsl::wstring_view"
                                 ))
+   (cons "bsl_thread.h" (list
+                   "bsl::thread"
+                   "bsl::this_thread"
+                   ))
    (cons "bsl_tuple.h"    (list
                            "bsl::tuple"
                            "bsl::tuple_size"
@@ -2387,7 +2437,7 @@ is delimited by left and right angle brackets."
     (insert " * \\author " shu-cpp-author " \n")
     (insert " */\n")
     (insert "\n")
-    (insert "#include <iostream>\n")
+    (insert "#include <ostream>\n")
     (insert "\n")
     (insert "\n")
     (insert "\n")
