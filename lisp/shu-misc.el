@@ -1117,6 +1117,23 @@ return git error message."
 
 
 
+
+;;
+;;  shu-git-find-default-branch
+;;
+(defun shu-git-find-default-branch ()
+  "Return the name of the default branch in a git repository.  The default
+branch is the one branch that is createsd with a new repository."
+  (let ((branch)
+        (fset (length "origin/")))
+    (with-temp-buffer
+      (call-process "git" nil (current-buffer) nil "rev-parse" "--abbrev-ref" "origin/HEAD")
+      (setq branch (buffer-substring-no-properties (+ (point-min) fset) (1- (point-max)))))
+    branch
+    ))
+
+
+
 ;;
 ;;  shu-git-get-pr-url
 ;;
@@ -1191,13 +1208,15 @@ word \"origin\"..  This can be used as part of git push or pull."
 ;;  shu-git-insert-push-origin-branch
 ;;
 (defun shu-git-insert-push-origin-branch ()
-  "Insert at point the git command to push the current branch out to origin.
-If the current branch is \"master\", you are prompted to see if you want to
-proceed.  This is to prevent an accidental push to master."
+  "Insert at point the git command to push the current branch out to origin.  If
+the current branch is the default branch (fka \"master\"), you are prompted to
+see if you want to proceed.  This is to prevent an accidental push to the
+default branch."
   (interactive)
   (let ((branch (shu-git-find-branch))
-        (insert-push t))
-    (when (or (string= branch "master") (string= branch "main"))
+        (insert-push t)
+        (default-branch (shu-git-find-default-branch)))
+    (when (string= branch default-branch)
       (setq insert-push (yes-or-no-p (concat "Really push to " branch " branch? "))))
     (when insert-push
       (insert (concat "git push origin " branch)))
