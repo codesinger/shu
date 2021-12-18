@@ -728,7 +728,8 @@
         (expected-short-name "and_wonderful.cpp")
         (actual-prefix)
         (actual-short-name)
-        (ps))
+        (ps)
+        (shu-cpp-project-very-short-names nil))
     (setq ps (shu-project-split-file-name file-name))
     (should ps)
     (should (consp ps))
@@ -770,7 +771,8 @@
         (expected-short-name "and_wonderful.cpp")
         (actual-prefix)
         (actual-short-name)
-        (ps))
+        (ps)
+        (shu-cpp-project-very-short-names nil))
     (setq ps (shu-project-split-file-name file-name))
     (should ps)
     (should (consp ps))
@@ -791,7 +793,52 @@
         (expected-short-name "and_wonderful.cpp")
         (actual-prefix)
         (actual-short-name)
-        (ps))
+        (ps)
+        (shu-cpp-project-very-short-names nil))
+    (setq ps (shu-project-split-file-name file-name))
+    (should ps)
+    (should (consp ps))
+    (setq actual-prefix (car ps))
+    (setq actual-short-name (cdr ps))
+    (should (string= expected-prefix actual-prefix))
+    (should (string= expected-short-name actual-short-name))
+    ))
+
+
+
+;;
+;;  shu-test-shu-project-split-file-name-7
+;;
+(ert-deftest shu-test-shu-project-split-file-name-7 ()
+  (let ((file-name "lovely_AND_Wonderful.cpp")
+        (expected-prefix "lovely_AND")
+        (expected-short-name "wonderful.cpp")
+        (actual-prefix)
+        (actual-short-name)
+        (ps)
+        (shu-cpp-project-very-short-names t))
+    (setq ps (shu-project-split-file-name file-name))
+    (should ps)
+    (should (consp ps))
+    (setq actual-prefix (car ps))
+    (setq actual-short-name (cdr ps))
+    (should (string= expected-prefix actual-prefix))
+    (should (string= expected-short-name actual-short-name))
+    ))
+
+
+
+;;
+;;  shu-test-shu-project-split-file-name-8
+;;
+(ert-deftest shu-test-shu-project-split-file-name-8 ()
+  (let ((file-name "lovely_and_truly_very_much_wonderful.cpp")
+        (expected-prefix "lovely_and_truly_very_much")
+        (expected-short-name "wonderful.cpp")
+        (actual-prefix)
+        (actual-short-name)
+        (ps)
+        (shu-cpp-project-very-short-names t))
     (setq ps (shu-project-split-file-name file-name))
     (should ps)
     (should (consp ps))

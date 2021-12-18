@@ -1,4 +1,4 @@
-;;; shu-cpp-project.el --- Shu project code for dealing wth C++ in Emacs
+;; shu-cpp-project.el --- Shu project code for dealing wth C++ in Emacs
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
@@ -236,7 +236,7 @@ It is used when a global change needs to visit every file in the project.")
 ;; says use the last part of the current directory as the prefix.  The
 ;; current directory is held in the variable default-directory.  Consider
 ;; using something like the f.el package to extract the last part of the
-;; path to use as the prefis
+;; path to use as the prefix
 
 
 (defcustom shu-cpp-project-short-names nil
@@ -248,6 +248,19 @@ these two files would be \"mumble.cpp\" and \"stumble.cpp\".  This means that
 the user does not have to type the prefix in order to find the file.  If the
 user types \"mumble.cpp\" as the file name, emacs will open the file
 \"x_server_mumble.cpp\"."
+  :type '(number)
+  :group 'shu-cpp-project)
+
+
+(defcustom shu-cpp-project-very-short-names t
+  "Set non-nil if shu-cpp-project creates very short names for files in a
+project.  A short name is an approximation of the file name that may be easier
+to type.  For example, if all of the files in a project begin with a common
+prefix (e.g., \"my_own_server_mumble.cpp\" and \"my_own_server_stumble.cpp\",
+then the short names for these two files would be \"mumble.cpp\" and
+\"stumble.cpp\".  This means that the user does not have to type the prefix in
+order to find the file.  If the user types \"mumble.cpp\" as the file name,
+emacs will open the file \"my_own_server_mumble.cpp\"."
   :type '(number)
   :group 'shu-cpp-project)
 
@@ -2112,16 +2125,21 @@ Return a cons cell of the form (prefix . short-name)"
       (setq pfx (car nlist))
       (setq short (cadr nlist)))
      (t        ;; At least two underscores in name
-      (setq pfx (car nlist))
-      (setq nlist (cdr nlist))
-      (when (= 1 (length pfx))
-        (setq pfx (concat pfx "_" (car nlist)))
-        (setq nlist (cdr nlist)))
-      (setq short (car nlist))
-      (setq nlist (cdr nlist))
-      (while nlist
-        (setq short (concat short "_" (car nlist)))
-        (setq nlist (cdr nlist)))))
+      (if shu-cpp-project-very-short-names
+          (progn
+            (setq short (car (last nlist)))
+            (setq nlist (nbutlast nlist))
+            (setq pfx (string-join nlist "_")))
+        (setq pfx (car nlist))
+        (setq nlist (cdr nlist))
+        (when (= 1 (length pfx))
+          (setq pfx (concat pfx "_" (car nlist)))
+          (setq nlist (cdr nlist)))
+        (setq short (car nlist))
+        (setq nlist (cdr nlist))
+        (while nlist
+          (setq short (concat short "_" (car nlist)))
+          (setq nlist (cdr nlist))))))
     (setq short (downcase short))
     (cons pfx short)
     ))
