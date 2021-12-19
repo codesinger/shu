@@ -681,6 +681,23 @@ argument is used, a prompt is placed in the mini-buffer."
 
 
 ;;
+;;  insert-tap
+;;
+(defun insert-tap ()
+  "Insert the code required to create an instance of bslma::TestAllocator"
+  (interactive)
+    (beginning-of-line)
+    (insert
+     (concat
+      "    const char            *const allocatorName = \"TestAllocator\";\n"
+      "    const bool                   verboseFlag(false);\n"
+      "    bslma::TestAllocator         ta(allocatorName, verboseFlag, 0);\n"
+      "    bslma::TestAllocator  *const tap = &ta;\n"
+      ))
+    )
+
+
+;;
 ;;  cite-bib - Turn a BibTex file into a list of @nocite
 ;;             for all entries in the file.
 ;;
