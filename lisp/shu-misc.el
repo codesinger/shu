@@ -1123,7 +1123,7 @@ return git error message."
 ;;
 (defun shu-git-find-default-branch ()
   "Return the name of the default branch in a git repository.  The default
-branch is the one branch that is createsd with a new repository."
+branch is the one branch that is created with a new repository."
   (let ((branch)
         (fset (length "origin/")))
     (with-temp-buffer

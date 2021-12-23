@@ -162,7 +162,7 @@ helps to weed out some of the extraneous ones but not all of them."
                              (concat shu-cpp-name "+"))
    )
   "A repeating side list to match one or more instances of {:: <name>} with the
-double colons aling up part of the return value.")
+double colons making up part of the return value.")
 
 
 
@@ -177,7 +177,7 @@ double colons aling up part of the return value.")
     (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop-once
                                   shu-cpp-match-colon-name-return)
     )
-  "Match name::name or name::name::name oe name::name::name::name, etc.  The
+  "Match name::name or name::name::name or name::name::name::name, etc.  The
 double colons make up the return value so that you can tell where one name
 ends and another starts.")
 
