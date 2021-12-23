@@ -3511,4 +3511,373 @@ class names."
 
 
 
+
+;;
+;;  shu-test-shu-line-is-include-1
+;;
+(ert-deftest shu-test-shu-line-is-include-1 ()
+  (let ((data
+         (concat
+          "\n"
+          "// Hello\n"
+          "#include <something>\n"
+          "// Goodbye\n"))
+        (found)
+        (is-inc))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "#include" nil t))
+      (should found)
+      (setq is-inc (shu-line-is-include))
+      (should is-inc))
+    ))
+
+
+
+;;
+;;  shu-test-shu-line-is-include-2
+;;
+(ert-deftest shu-test-shu-line-is-include-2 ()
+  (let ((data
+         (concat
+          "\n"
+          "// Hello\n"
+          "#include <something>\n"
+          "// Goodbye\n"))
+        (found)
+        (is-inc))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "// He" nil t))
+      (should found)
+      (setq is-inc (shu-line-is-include))
+      (should (not is-inc)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-line-is-include-3
+;;
+(ert-deftest shu-test-shu-line-is-include-3 ()
+  (let ((data
+         (concat
+          "\n"
+          "// Hello\n"
+          " # include <something>\n"
+          "// Goodbye\n"))
+        (found)
+        (is-inc))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq is-inc (shu-line-is-include))
+      (should is-inc))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-includes-1
+;;
+(ert-deftest shu-test-shu-sort-includes-1 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <gg>\n"
+          "#include <aa>\n"
+          "#include <zz>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <aa>\n"
+          "#include <gg>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 5 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-includes-2
+;;
+(ert-deftest shu-test-shu-sort-includes-2 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <gg>\n"
+          "#include <aa>\n"
+          "#include <zz>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <aa>\n"
+          "#include <gg>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 5 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-includes-3
+;;
+(ert-deftest shu-test-shu-sort-includes-3 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <gg>\n"
+          "#include <aa>\n"
+          "#include <zz>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <aa>\n"
+          "#include <gg>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 5 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-includes-4
+;;
+(ert-deftest shu-test-shu-sort-includes-4 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <gg>\n"
+          "#include <aa>\n"
+          "#include <zz>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <aa>\n"
+          "#include <gg>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 5 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-includes-5
+;;
+(ert-deftest shu-test-shu-sort-includes-5 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <gg>\n"
+          "#include <aa>\n"
+          "#include <zz>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <aa>\n"
+          "#include <gg>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 5 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-includes-6
+;;
+(ert-deftest shu-test-shu-sort-includes-6 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <gg>\n"
+          "#include <aa>\n"
+          "#  include <zz>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <aa>\n"
+          "#include <gg>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 5 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-includes-7
+;;
+(ert-deftest shu-test-shu-sort-includes-7 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 1 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
 ;;; shu-cpp-general.t.el ends here

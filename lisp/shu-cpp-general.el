@@ -5200,6 +5200,95 @@ shell, and yank."
 
 
 ;;
+;;  shu-sort-includes
+;;
+(defun shu-sort-includes ()
+  "When positioned on a line that is an #include directive, find all of the
+#include directives above and below that line that are not separated by a blank
+line and sort them into alphabetical order with case ignored.  If not positioned
+on a line that is an #include directive, do nothing.  Case is ignored for the
+sort.  The return value is the number of lines sorted.  If no lines were sorted
+because (point) is not positioned on an #include directive, return nil.  The
+return value is for the benefit of the unit tests.
+Additionally, if there are spaces surrounding the \"#\" of the #include, they
+are removed."
+  (interactive)
+  (let ((here (point))
+        (top1)
+        (bot1)
+        (line-count)
+        (sort-fold-case t))
+    (if (not (shu-line-is-include))
+        (progn
+          (ding)
+          (message "%s" "Not on an #include line"))
+      (setq top1 (shu-find-end-include -1))
+      (goto-char here)
+      (setq bot1 (shu-find-end-include 1))
+      (goto-char bot1)
+      (setq bot1 (line-end-position))
+      (setq line-count (1+ (- (shu-the-line-at bot1) (shu-the-line-at top1))))
+      (sort-lines nil top1 bot1)
+      (message "Sorted %d lines" line-count))
+    line-count
+    ))
+
+
+
+
+;;
+;;  shu-find-end-include
+;;
+(defun shu-find-end-include (dir)
+  "On entry, (point) is positioned on an #include directive.  This function
+searches either backwards or forward for the next line that does not contain an
+include directive.  If DIR is positive the search is forward, else backward.
+The return value is the (line-beginning-position) of the last line that contains
+an #include directive."
+  (let ((mc (if (< dir 0) -1 1))
+        (something t)
+        (last1)
+        (n))
+    (when (shu-line-is-include)
+      (goto-char (line-beginning-position))
+      (setq last1 (point))
+      (while something
+        (setq n (forward-line mc))
+        (if (= n 0)
+            (progn
+              (if (shu-line-is-include t)
+                  (setq last1 (line-beginning-position))
+                (setq something nil)))
+          (setq something nil))))
+    last1
+    ))
+
+
+
+
+;;
+;;  shu-line-is-include
+;;
+(defun shu-line-is-include (&optional fix)
+  "Return true if the line on which (point) resides is an #include directive."
+  (let ((ss "\\s-*#\\s-*include\\s-+")
+        (min-length (length "#include <a>"))
+        (include-length (length "#include "))
+        (line-length)
+        (line-start)
+        (is-inc nil))
+    (save-excursion
+      (goto-char (line-beginning-position))
+      (when (re-search-forward ss (line-end-position) t)
+        (setq is-inc t)
+        (when fix
+          (replace-match "#include " t t))))
+    is-inc
+    ))
+
+
+
+;;
 ;;  shu-cpp-general-set-alias
 ;;
 (defun shu-cpp-general-set-alias ()
@@ -5260,6 +5349,7 @@ shu- prefix removed."
   (defalias 'fill-data 'shu-cpp-fill-test-data)
   (defalias 'fill-area 'shu-cpp-fill-test-area)
   (defalias 'gcc 'shu-gcc)
+  (defalias 'sort-includes 'shu-sort-includes)
   )
 
 ;;; shu-cpp-general.el ends here
