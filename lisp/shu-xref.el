@@ -156,7 +156,6 @@
 ;;  Ref: Is a list of all of the functions that call this one
 
 (require 'shu-base)
-(provide 'shu-xref)
 
 
 (defconst shu-xref-buffer "**shu-xref**"
@@ -623,5 +622,7 @@ in the CAR and the line number in which the function definition starts in the CD
               (setq retval (cons fun-name fun-start-line)))))))
     retval
     ))
+
+(provide 'shu-xref)
 
 ;;; shu-xref.el ends here

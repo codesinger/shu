@@ -43,7 +43,7 @@
 * [shu-nvplist](#shu-nvplist)
 * [shu-org-extensions](#shu-org-extensions)
 * [shu-xref](#shu-xref)
-* [Index](#Index)
+
 
 
 
@@ -68,7 +68,9 @@ Version 1.5 was merged with the master branch on 18 August 2019.
 
 Version 1.6 was merged with the master branch on 16 November 2019.
 
-This is Version 1.6.0 of the Shu elisp repository.
+Version 1.6.108 was merged with the master branch on 24 December 2021
+
+This is Version 1.6.108 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -134,6 +136,18 @@ released on May 28, 2018
 
 
 
+#### shu-add-to-alist-list ####
+shu-add-to-alist-list *key* *value* *alist*
+[Function]
+
+*alist* is an alist in which each element has a car that is the key and a cdr
+that is a list of values associated with that key.  If the given *key* does not
+already exist in *alist*, it is added to *alist* with a list of length one
+containing *value*.  If the *key* exists in *alist*, *value* is pushed onto the list of
+values associated with *key*.  The return value is the modified *alist*.
+
+
+
 #### shu-all-commits ####
 [Constant]
 
@@ -170,6 +184,14 @@ This is the regular expression contained in shu-all-whitespace-regexp but with
 the enclosing left and right square brackets removed.  skip-chars-forward does
 not expect character alternatives to be enclosed in square brackets and thus
 will include the brackets as characters to be skipped.
+
+
+
+#### shu-bool-to-string ####
+shu-bool-to-string *arg*
+[Function]
+
+Convert a boolean value to its string representation and return the string.
 
 
 
@@ -222,12 +244,27 @@ used by the class.
 
 
 
+#### shu-cpp-default-allocator-type ####
+[Custom]
+
+The class name of the standard abstract allocator.
+
+
+
 #### shu-cpp-default-global-namespace ####
 [Custom]
 
 The string that defines the default global C++ namepace, if any.
 If this has a value, then C++ classes are declared with a two level
 namespace with the global namespace encompassing the local one
+
+
+
+#### shu-cpp-default-member ####
+[Custom]
+
+The prefix used to indicate that a variable in a class is a member variable of
+that class.
 
 
 
@@ -238,10 +275,26 @@ The string that defines the default C++ namepace, if any.
 
 
 
+#### shu-cpp-file-directory-name ####
+[Constant]
+
+A regular expression to match the name of a C or C++ file in the file system
+including directory names.  This is the same regular expression as
+*shu-cpp-file-name-list* with a "/" included.
+
+
+
 #### shu-cpp-file-name ####
 [Constant]
 
 A regular expression to match the name of a C or C++ file in the file system.
+
+
+
+#### shu-cpp-file-name-list ####
+[Constant]
+
+List of all characters that can be present in a C++ file name.
 
 
 
@@ -276,6 +329,21 @@ by angle brackets and an include of "myclass.h" would be written as
 [Custom]
 
 Size of the standard indent for names within class declarations, etc.
+
+
+
+#### shu-cpp-line-end ####
+[Custom]
+
+Standard end point (right hand margin) for a line of code.
+
+
+
+#### shu-cpp-modern ####
+[Custom]
+
+Set to true if using the features of C++ 11/14 such as auto and explicitly
+deleted copy / move constructors.
 
 
 
@@ -315,6 +383,13 @@ Return the line number of the current line relative to the start of the buffer.
 
 
 
+#### shu-current-year ####
+[Function]
+
+Return an integer that represents the four digit current year.
+
+
+
 #### shu-date ####
 [Constant]
 
@@ -329,6 +404,27 @@ shu-delete-last-char-if *input* *test-char*
 Return the string *input* with the last character removed if the last character
 is equal to the string *test-char*.  If the last character is not equal to the
 string *test-char*, return the input string unmodified.
+
+
+
+#### shu-downcase-first-letter ####
+shu-downcase-first-letter *string*
+[Function]
+
+Return the given string with the first character of the string converted
+to lower case
+
+
+
+#### shu-end-of-dq-string ####
+[Function]
+
+Return the point that represents the end of the current quoted string in the
+buffer.  The quote character is the double quote character (").  Escaped quotes
+are skipped.  If the current string is not terminated by a double quote
+character, nil is returned.  If the current string is terminated by a double
+quote character, the position following the quote is returned and point is set
+to that position.
 
 
 
@@ -371,6 +467,14 @@ pad character of ?0.  Do not use a pad character of "0"
 
 
 
+#### shu-get-directory-prefix ####
+[Function]
+
+Get a directory based prefix, which is the last name in the current path.  If the current
+directory is "foo/blah/humbug", the value returned from this function is "humbug"
+
+
+
 #### shu-global-buffer-name ####
 [Constant]
 
@@ -393,6 +497,22 @@ shu-group-number *num* **&optional** *size* *char*
 Format *num* as string grouped to *size* with *char*.  Default *size* if 3.  Default *char*
 is ','.  e.g., 1234567 is formatted as 1,234,567.  Argument to be formatted may be
 either a string or a number.
+
+
+
+#### shu-internal-dev-url ####
+[Custom]
+
+A string that identifies the internal development URL of an organization
+(if any).
+
+
+
+#### shu-internal-group-name ####
+[Custom]
+
+A string that identifies the group name of which an individual is a member
+(if any).
 
 
 
@@ -426,6 +546,75 @@ results in the following output being returned:
      Y -> (A)
      Z -> (A B)
 ```
+
+
+
+#### shu-invert-alist-to-hash ####
+shu-invert-alist-to-hash *alist*
+[Function]
+
+*alist* is an alist in which the cdr of each item in the list and the car of
+each item is an associated list of values.  The function constructs two items to
+return.
+
+The first is a hash table that is an inversion of the alist.  If the input *alist*
+contains:
+
+```
+       A ->(G W)
+       B ->(X Y)
+```
+
+then the returned hash table would be:
+
+```
+       G->A
+       M->A
+       X->B
+       Y->B
+```
+
+But if the values contain duplicates, it is impossible to construct the complete
+hash table.  If *alist* contains
+
+```
+       A ->(X G W)
+       B ->(X Y)
+```
+
+then the returned hash table would have to contain
+
+```
+       G->A
+       M->A
+       X->A
+       X->B
+       Y->B
+```
+
+but you cannot have duplicate keys in a hash table.  In this latter case, this
+function constructs an alist that contains the duplicated keys.  The key of the
+alist is the value of what would be a duplicate key in the hash table.  The
+value of the alist is a list of all of the values to which the key maps.
+
+In the case illustrated above, the returned hash table would contain
+
+```
+       G->A
+       M->A
+       X->A
+       Y->B
+```
+
+and the returned alist would be
+
+```
+      X->(A B)
+```
+
+The return value of this function is a cons cell whose car is the hash table and
+whose cdr is the alist.  If the cdr of the return value is nil, then the entire
+hash table could be constructed.
 
 
 
@@ -468,6 +657,18 @@ Return the line number and column number of the point passed in as an argument.
 
 
 
+#### shu-line-number-at-pos ####
+shu-line-number-at-pos **&optional** *pos* *absolute*
+[Function]
+
+line-number-at-pos in simple.el takes two arguments as of emacs 26.  This
+allows the two argument version to run on older versions of emacs.  If
+*absolute* is specified, widen the buffer, then call the one argument version
+of line-number-at-pos, which is supported in emacs 24 and 25, and perhaps
+others.
+
+
+
 #### shu-load-library-files ####
 shu-load-library-files *path-to-libs*
 [Function]
@@ -481,12 +682,12 @@ Load all of the library files listed in *shu-library-files* using the path
 shu-minimum-leading-space *arg* **&optional** *white-space*
 [Function]
 
-Find the amount of white space in front of point and return either that
-count or *arg*, whichever is smaller.  Used by functions that wish to
-safely delete *arg* characters of white space from the current position
-without deleting any characters that are not white space.
-An optional second argument is a string that defines what is meant
-by white space.  The default definition is *shu-all-whitespace-regexp*.
+Find the amount of white space in front of point on the same line and return
+either that count or *arg*, whichever is smaller.  Used by functions that wish to
+safely delete *arg* characters of white space from the current position without
+deleting any characters that are not white space.  An optional second argument,
+*white-space*, is a string that defines what is meant by white space.  The default
+definition is *shu-all-whitespace-regexp*.
 
 
 
@@ -512,7 +713,7 @@ the left and right brackets in the class of characters to be skipped.
 
 #### shu-point-at-sexp ####
 shu-point-at-sexp *sos*
-[Command]
+[Function]
 
 Return the point of the sexp that matches the point at *sos*.
 
@@ -531,12 +732,41 @@ is used in place of the position of point.
 
 
 
+#### shu-random-letter ####
+[Function]
+
+Return a randomly selected lower case letter as a single character (not as
+a string).
+
+
+
+#### shu-random-range ####
+shu-random-range *x* *y*
+[Function]
+
+Return a random number that lies within the closed interval [*x*, Y].  If *y* < *x*, then the
+closed interval is [*y*, X].  If *y* is equal to *x*, then the returned value is *x*.
+
+
+
 #### shu-remove-trailing-all-whitespace ####
 shu-remove-trailing-all-whitespace *input-string*
 [Function]
 
 Return a copy of *input-string* with all trailing whitespace removed.  All control
 characters are considered whitespace.
+
+
+
+#### shu-replace-string ####
+shu-replace-string *original* *replacement* **&optional** *fixedcase* *literal*
+[Function]
+
+Go to the top of the current buffer and use SEARCH-FORWARD to find all
+instances of *original*, replacing each instance with *replacement*.  The optional
+arguments *fixedcase* and *literal* are passed through to the REPLACE-MATCH
+function.  Return the count of the number of instances that were replaced,
+if any.
 
 
 
@@ -564,6 +794,34 @@ two strings, which are "Hi" and "How are you?".
 
 
 
+#### shu-starts-with ####
+shu-starts-with *regexp*
+[Function]
+
+If the first non-whitespace on the current line matches *regexp*, return the position
+of the beginning of the matched *regexp*.  If the first non-whitespace does not match
+*regexp*, return nil.
+
+
+
+#### shu-string-starts-ends ####
+shu-string-starts-ends *string* *start-string* **&optional** *end-string*
+[Command]
+
+Return true if the given *string* starts with *start-string* and ends with
+*end-string*.  If *end-string* is omitted, *start-string* is used instead.
+An empty *start-string* matches anything.  An empty *end-string* matches anything.
+
+
+
+#### shu-swap ####
+shu-swap *x* *y*
+[Macro]
+
+Swap the contents of *x* and *y*.  *x* gets the value of *y*.  *y* gets the value of *x*.
+
+
+
 #### shu-the-column-at ####
 shu-the-column-at *arg*
 [Function]
@@ -578,6 +836,14 @@ shu-the-line-at *arg*
 
 Return the line number of the point passed in as an argument.  The line number is
 relative to the start of the buffer, whether or not narrowing is in effect.
+
+
+
+#### shu-trace-buffer ####
+[Constant]
+
+The name of the buffer into which some functions write debug trace
+information.
 
 
 
@@ -627,7 +893,17 @@ remains unmodified if it had no trailing whitespace.
 #### shu-unit-test-buffer ####
 [Constant]
 
-The name of the buffer into which unit tests place their output and debug trace.
+The name of the buffer into which unit tests place their output and
+debug trace.
+
+
+
+#### shu-upcase-first-letter ####
+shu-upcase-first-letter *string*
+[Function]
+
+Return the given string with the first character of the string converted
+to upper case
 
 
 
@@ -659,6 +935,38 @@ List of functions and variable definitions in this package.
 
 
 
+#### shu-batch-add-alexandria ####
+[Function]
+
+Call the *shu-add-alexandria* function in batch mode.  One required argument is
+the value for the custom variable *shu-internal-dev-url*.
+
+Invoke as:
+
+```
+     emacs --batch -l ~/emacs/shu-batch-mode.elc -f shu-batch-add-alexandria <dev-url>
+```
+
+where "<dev-url>" is the organization's internal web site that hosts its code
+and tools.  See the description of the custom variable *shu-internal-dev-url*.
+for more information.
+
+
+
+#### shu-batch-copy-trace ####
+[Function]
+
+Copy the contents of the *shu-trace-buffer* to stdout in batch mode.
+
+
+
+#### shu-batch-fail ####
+[Command]
+
+A test function to terminate emacs via ERROR.
+
+
+
 #### shu-batch-hello ####
 [Command]
 
@@ -684,6 +992,37 @@ Call rmv-using in batch mode.
 
 
 
+#### shu-batch-test-args ####
+[Function]
+
+A script to use in batch mode to demonstrate how to fetch command line arguments.
+
+When run from a batch script as the function that is the target of the "-f" option.
+For example
+
+```
+    emacs --batch -l shu-batch-mode.elc -f shu-batch-test-args hello world how are you
+```
+
+produces the following output:
+```
+    There are 5 arguments
+    arg: 0: "hello"
+    arg: 1: "world"
+    arg: 2: "how"
+    arg: 3: "are"
+    arg: 4: "you"
+```
+
+
+
+#### shu-generate-comdb2-code ####
+[Function]
+
+Generate the C++ code for a comdb2 row class
+
+
+
 #### shu-generate-component ####
 [Function]
 
@@ -697,6 +1036,15 @@ files.
 [Constant]
 
 List of standard namespaces and their associated classes
+
+
+
+#### shu-old-generate-component ####
+[Function]
+
+Fetch the arguments from environment variables and then call
+*shu-internal-gen-bde-component* to generate a set of three BDE component
+files.
 
 # shu-bde-cpp #
 
@@ -1024,6 +1372,18 @@ shu-gen-bde-component *class-name*
  (Alias: gen-bde-component)
 
 Generate the three files for a new component: .cpp, .h, and .t.cpp
+
+
+
+#### shu-gen-bde-create-prompt ####
+[Function]
+
+This function creates the prompt for the interactive special form of the
+function *shu-gen-bde-component*.  The prompt includes the namespace in which the
+new class will be created or the string "NO NAMESPACE" if there is no default
+namespace set.  If the name of the current directory does not match the default
+namespace, the prompt also includes the directory name to remind the user that
+the current directory name does not match the namespace.
 
 
 
@@ -2110,10 +2470,13 @@ Insert the doxygen author tag in an existing file.
  (Function: shu-binclude)
 
 If point is sitting on something that resembles a fully qualified class name,
-use the standard BDE algorithm to turn the class name into the name of an
-include file.  The standard BDE algorithm replaces the :: between namespace and
-class name with an underscore, makes all letters lower case, and appends ".h"
-to the end of the name.
+first check to see if it is in list of standard class names defined in
+*shu-cpp-include-names*.  If it is found there, that defines the name of the
+defining include file.  If it is not found there, then use the standard BDE
+algorithm to turn the class name into the name of an include file.  The standard
+BDE algorithm replaces the :: between namespace and class name with an
+underscore, makes all letters lower case, and appends ".h" to the end of the
+name.
 
 Thus "abcdef::MumbleFrotz" becomes "abcdef_mumblefrotz.h".
 
@@ -2199,6 +2562,7 @@ Place a skeleton class definition in the current buffer at point.
 
 
 #### creplace ####
+creplace *prefix*
 [Command]
  (Function: shu-creplace)
 
@@ -2210,8 +2574,8 @@ may have been split into smaller substrings in order to avoid long lines.
 Assume you have the sample string that is shown in *shu-csplit*
 
 ```
-     static const std::string x("This is a very long line of text that look"
-                                "s as though it will go on forever.");
+     static const std::string x("This is a very long line of text that looks "
+                                "as though it will go on forever.");
 ```
 
 You wish to replace it with a slightly different line of text, perhaps something
@@ -2223,10 +2587,10 @@ shorter lines as in the following example.  The string in the kill ring may have
 opening and closing quotes or not.
 
 ```
-     static const std::string x("This is a very long line of text that look"
-                                "s as though it will go on forever and prob"
-                                "ably already has done so or is threatening"
-                                " to do so.");
+     static const std::string x("This is a very long line of text that looks "
+                                "as though it will go on forever and probably "
+                                "already has done so or is threatening to do "
+                                "so.");
 ```
 
 This is especially useful if you have a a string constant in a unit test and you
@@ -2238,11 +2602,13 @@ string, place the cursor in the old string, and replace it with the new.
 
 
 #### csplit ####
+csplit *prefix*
 [Command]
  (Function: shu-csplit)
 
 Split a C++ string into multiple strings in order to keep the line length
-below a certain minimum length, currently hard coded to column 76.
+below a certain minimum length..  The line length used is defined by the custom
+variable *shu-cpp-line-end*.
 
 For example, you may copy a very long line of text into a section of code as
 follows:
@@ -2258,9 +2624,13 @@ text editors do not show code much beyond column 80 or so.  This is an example
 of the above line after csplit was invoked:
 
 ```
-     static const std::string x("This is a very long line of text that look"
-                                "s as though it will go on forever.");
+     static const std::string x("This is a very long line of text that looks "
+                                "as though it will go on forever.");
 ```
+
+This function normally splits lines on a word boundary.  If any prefix argument
+is present, the split will be composed of fixed length lines with no respect to
+word boundaries.
 
 
 
@@ -2427,6 +2797,52 @@ Place a skeleton Doxygen header definition at point.
 
 
 
+#### fill-area ####
+fill-area *start* *end*
+[Command]
+ (Function: shu-cpp-fill-test-area)
+
+For all lines between the marked start and end points, if a recognized data
+type has been declared on a line, fill it with random test data.
+
+For the benefit of unit tests, this function returns a a cons cell whose car is
+the number of unrecognized data types and whose cdr is the number of values
+generated.
+
+
+
+#### fill-data ####
+[Command]
+ (Function: shu-cpp-fill-test-data)
+
+If the data type at the beginning of the line is a recognized data type, then
+fill in a random value for that data type at point.  This allows someone writing
+a test to declare a data type and a name and then call this function.  If the
+author creates a line that looks like this and then invokes this function
+
+```
+     std::string   abc
+```
+
+The line will be transformed into one that looks something like this:
+
+```
+     std::string   abc("RDATZC");
+```
+
+The recognized data types are the ones that are defined by the custom variables
+shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
+shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
+shu-cpp-time-type plus many of the standard C++ types, such as int, bool, short,
+etc.
+
+The data types may optionally be preceded by "const".
+
+If the last character of the line is ";", it is deleted before a data type is
+filled in with a new semi-colon following it.
+
+
+
 #### fixp ####
 [Command]
  (Function: shu-cpp-fix-prototype)
@@ -2451,6 +2867,19 @@ would be transformed into
               const int  writes)
           const;
 ```
+
+
+
+#### gcc ####
+[Command]
+ (Function: shu-gcc)
+
+Get compile command command from current buffer.  While in a compile buffer,
+go to the top of the buffer, search for the end of the prompt line, collect the
+rest of the line and put it into the kill ring.  This takes the string that was
+used for the last compile command in the current buffer and puts it into the
+kill ring.  To compile again with the same command, kill the buffer, open a new
+shell, and yank.
 
 
 
@@ -2493,6 +2922,35 @@ While in a file buffer, wrap the file name in a C++ include directive and
 put it in the kill ring.  The file name is delimited by double quotes unless
 *shu-cpp-include-user-brackets* variable is true, in which case the file name
 is delimited by left and right angle brackets.
+
+
+
+#### make-datetime ####
+[Command]
+ (Function: shu-cpp-make-datetime)
+
+insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
+
+
+
+#### make-interval ####
+[Command]
+ (Function: shu-cpp-make-interval)
+
+insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds.
+
+
+
+#### make-tzdate ####
+[Command]
+ (Function: shu-cpp-tz-make-datetime)
+
+insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
 
 
 
@@ -2585,6 +3043,38 @@ Set the local namespace for C++ classes.
 
 
 
+#### set-modern ####
+[Command]
+ (Function: shu-set-modern)
+
+Unconditionally set shu-cpp-modern to true.
+
+
+
+#### set-no-modern ####
+[Command]
+ (Function: shu-set-no-modern)
+
+Unconditionally set shu-cpp-modern to false.
+
+
+
+#### sort-includes ####
+[Command]
+ (Function: shu-sort-includes)
+
+When positioned on a line that is an #include directive, find all of the
+#include directives above and below that line that are not separated by a blank
+line and sort them into alphabetical order with case ignored.  If not positioned
+on a line that is an #include directive, do nothing.  Case is ignored for the
+sort.  The return value is the number of lines sorted.  If no lines were sorted
+because (point) is not positioned on an #include directive, return nil.  The
+return value is for the benefit of the unit tests.
+Additionally, if there are spaces surrounding the "#" of the #include, they
+are removed.
+
+
+
 #### tciterate ####
 tciterate *type-name-1* *type-name-2* *var-name-1* *var-name-2*
 [Command]
@@ -2646,6 +3136,16 @@ variable shu-cpp-indent-length.
 
 The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace.
+
+
+
+#### to-camel ####
+[Command]
+ (Function: shu-to-camel)
+
+Convert the variable name at point from snake case to camel case.
+
+For example, "mumble_something_other" becomes "mumbleSomethingOther".
 
 
 
@@ -2713,10 +3213,13 @@ Insert the doxygen author tag in an existing file.
  (Alias: binclude)
 
 If point is sitting on something that resembles a fully qualified class name,
-use the standard BDE algorithm to turn the class name into the name of an
-include file.  The standard BDE algorithm replaces the :: between namespace and
-class name with an underscore, makes all letters lower case, and appends ".h"
-to the end of the name.
+first check to see if it is in list of standard class names defined in
+*shu-cpp-include-names*.  If it is found there, that defines the name of the
+defining include file.  If it is not found there, then use the standard BDE
+algorithm to turn the class name into the name of an include file.  The standard
+BDE algorithm replaces the :: between namespace and class name with an
+underscore, makes all letters lower case, and appends ".h" to the end of the
+name.
 
 Thus "abcdef::MumbleFrotz" becomes "abcdef_mumblefrotz.h".
 
@@ -2729,6 +3232,13 @@ angle brackets.
 
 Return true if a class name was found an an include generated.  This is for the
 benefit of unit tests.
+
+
+
+#### shu-bsl-include-list ####
+[Constant]
+
+An alist that maps include file names to class names when using BDE.
 
 
 
@@ -2834,6 +3344,13 @@ Place a skeleton Doxygen header definition at point.
 
 
 
+#### shu-cpp-allocator-type ####
+[Custom]
+
+The data type that represents an allocator.
+
+
+
 #### shu-cpp-base-types ####
 [Constant]
 
@@ -2849,6 +3366,73 @@ shu-cpp-check-streaming-op *start* *end*
 Check a streaming operation.   Mark a region that contains a set of streaming
 operators and invoke this function.  It will make sure that you have no unterminated
 strings and that you are not missing any occurrences of <<.
+
+
+
+#### shu-cpp-date-type ####
+[Custom]
+
+The data type that represents a date.
+
+
+
+#### shu-cpp-datetime-timezone-type ####
+[Custom]
+
+The data type that represents a date and time with an associated time zone.
+
+
+
+#### shu-cpp-datetime-type ####
+[Custom]
+
+The data type that represents a date and time.
+
+
+
+#### shu-cpp-fill-test-area ####
+shu-cpp-fill-test-area *start* *end*
+[Command]
+ (Alias: fill-area)
+
+For all lines between the marked start and end points, if a recognized data
+type has been declared on a line, fill it with random test data.
+
+For the benefit of unit tests, this function returns a a cons cell whose car is
+the number of unrecognized data types and whose cdr is the number of values
+generated.
+
+
+
+#### shu-cpp-fill-test-data ####
+[Command]
+ (Alias: fill-data)
+
+If the data type at the beginning of the line is a recognized data type, then
+fill in a random value for that data type at point.  This allows someone writing
+a test to declare a data type and a name and then call this function.  If the
+author creates a line that looks like this and then invokes this function
+
+```
+     std::string   abc
+```
+
+The line will be transformed into one that looks something like this:
+
+```
+     std::string   abc("RDATZC");
+```
+
+The recognized data types are the ones that are defined by the custom variables
+shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
+shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
+shu-cpp-time-type plus many of the standard C++ types, such as int, bool, short,
+etc.
+
+The data types may optionally be preceded by "const".
+
+If the last character of the line is ";", it is deleted before a data type is
+filled in with a new semi-colon following it.
 
 
 
@@ -2955,6 +3539,145 @@ otherwise, return nil.
 
 
 
+#### shu-cpp-include-names ####
+[Variable]
+
+A hash table that maps class names to include file names  This is the hash table
+inversion of shu-std-include-list or shu-bsl-include-list.
+
+
+
+#### shu-cpp-internal-fill-test-data ####
+[Function]
+
+If the data type at the beginning of the line is a recognized data type, then
+fill in a random value for that data type at point.  This allows someone writing
+a test to declare a data type and a name and then call this function.  If the
+author creates a line that looks like this and then invokes this function
+
+```
+     std::string   abc
+```
+
+The line will be transformed into one that looks something like this:
+
+```
+     std::string   abc("RDATZC");
+```
+
+The recognized data types are the ones that are defined by the custom variables
+shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
+shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
+shu-cpp-time-type plus many of the standard C++ types, such as int, bool, short,
+etc.
+
+The data types may optionally be preceded by "const".
+
+If the last character of the line is ";", it is deleted before a data type is
+filled in with a new semi-colon following it.
+
+Return t if a recognized data type was found and a value was filled in.
+
+
+
+#### shu-cpp-internal-make-bool ####
+[Function]
+
+Return  value for a bool type.
+
+
+
+#### shu-cpp-internal-make-char ####
+[Command]
+
+Return a string that can be used to initialize a test variable of type int.
+
+
+
+#### shu-cpp-internal-make-date ####
+[Function]
+
+Return a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
+
+
+
+#### shu-cpp-internal-make-datetime ####
+[Function]
+
+Return a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
+
+
+
+#### shu-cpp-internal-make-double ####
+[Command]
+
+Return a string that can be used to initialize a test variable of type double.
+
+
+
+#### shu-cpp-internal-make-float ####
+[Command]
+
+Return a string that can be used to initialize a test variable of type float.
+
+
+
+#### shu-cpp-internal-make-int ####
+[Command]
+
+Return a string that can be used to initialize a test variable of type lint.
+
+
+
+#### shu-cpp-internal-make-interval ####
+[Function]
+
+Return a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts days, hours, minutes, seconds, milliseconds, microseconds.
+
+
+
+#### shu-cpp-internal-make-long-long ####
+[Command]
+
+Return a string that can be used to initialize a test variable of type long long.
+
+
+
+#### shu-cpp-internal-make-short ####
+[Command]
+
+Return a string that can be used to initialize a test variable of type short.
+
+
+
+#### shu-cpp-internal-make-short-interval ####
+[Function]
+
+Return a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts seconds and nanoseconds.
+
+
+
+#### shu-cpp-internal-make-time ####
+[Function]
+
+Return a string that is the list of values to be passed to the constructor of
+ a time type that accepts hour, minute, second,  milliseconds, microseconds.
+
+
+
+#### shu-cpp-internal-make-unsigned-int ####
+[Command]
+
+Return a string that can be used to initialize a test variable of type lint.
+
+
+
 #### shu-cpp-internal-stream-check ####
 shu-cpp-internal-stream-check *token-list*
 [Function]
@@ -2966,12 +3689,93 @@ are not << represent a missing << operator.
 
 
 
+#### shu-cpp-internal-tz-make-datetime ####
+[Function]
+
+Return a string that is the list of values to be passed to the constructor of
+a timezone datetime type.
+
+
+
+#### shu-cpp-interval-type ####
+[Custom]
+
+The data type that represents a time interval type.
+
+
+
 #### shu-cpp-is-enclosing-op ####
 shu-cpp-is-enclosing-op *op*
 [Function]
 
 Return true if the single character in *op* is an enclosing character, a left
 or right parenthesis or a left or right square bracket.
+
+
+
+#### shu-cpp-long-long-type ####
+[Custom]
+
+The data type that represents a 64 bit integer.
+
+
+
+#### shu-cpp-make-date ####
+[Command]
+
+insert a string that is the list of values to be passed to the constructor of
+ a date type that accepts year, month, day.
+
+
+
+#### shu-cpp-make-datetime ####
+[Command]
+ (Alias: make-datetime)
+
+insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
+
+
+
+#### shu-cpp-make-interval ####
+[Command]
+ (Alias: make-interval)
+
+insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds.
+
+
+
+#### shu-cpp-make-short-interval ####
+[Command]
+
+insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds.
+
+
+
+#### shu-cpp-make-size-type ####
+[Function]
+
+insert a string that is a possible value for a size type.
+
+
+
+#### shu-cpp-make-time ####
+[Command]
+
+insert a string that is the list of values to be passed to the constructor of
+a time type that accepts hour, minute, second,  milliseconds, microseconds.
+
+
+
+#### shu-cpp-map-class-to-include ####
+shu-cpp-map-class-to-include *class-name*
+[Function]
+
+*class-name* is a fully qualified class name (std::string as an example).  This
+function returns the name of the include file that defines the class, if known.
 
 
 
@@ -3052,6 +3856,44 @@ NB: This version is deprecated.  See the new version in shu-match.el
 
 
 
+#### shu-cpp-short-interval-type ####
+[Custom]
+
+The data type that represents a short time interval type.
+
+
+
+#### shu-cpp-size-type ####
+[Custom]
+
+The data type that represents a size.
+
+
+
+#### shu-cpp-string-type ####
+[Custom]
+
+The data type that represents a string type.
+
+
+
+#### shu-cpp-time-type ####
+[Custom]
+
+The data type that represents a time.
+
+
+
+#### shu-cpp-tz-make-datetime ####
+[Command]
+ (Alias: make-tzdate)
+
+insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
+
+
+
 #### shu-cpp1-class ####
 shu-cpp1-class *class-name*
 [Command]
@@ -3071,6 +3913,7 @@ Place a skeleton class definition in the current buffer at point.
 
 
 #### shu-creplace ####
+shu-creplace *prefix*
 [Command]
  (Alias: creplace)
 
@@ -3082,8 +3925,8 @@ may have been split into smaller substrings in order to avoid long lines.
 Assume you have the sample string that is shown in *shu-csplit*
 
 ```
-     static const std::string x("This is a very long line of text that look"
-                                "s as though it will go on forever.");
+     static const std::string x("This is a very long line of text that looks "
+                                "as though it will go on forever.");
 ```
 
 You wish to replace it with a slightly different line of text, perhaps something
@@ -3095,10 +3938,10 @@ shorter lines as in the following example.  The string in the kill ring may have
 opening and closing quotes or not.
 
 ```
-     static const std::string x("This is a very long line of text that look"
-                                "s as though it will go on forever and prob"
-                                "ably already has done so or is threatening"
-                                " to do so.");
+     static const std::string x("This is a very long line of text that looks "
+                                "as though it will go on forever and probably "
+                                "already has done so or is threatening to do "
+                                "so.");
 ```
 
 This is especially useful if you have a a string constant in a unit test and you
@@ -3110,11 +3953,13 @@ string, place the cursor in the old string, and replace it with the new.
 
 
 #### shu-csplit ####
+shu-csplit *prefix*
 [Command]
  (Alias: csplit)
 
 Split a C++ string into multiple strings in order to keep the line length
-below a certain minimum length, currently hard coded to column 76.
+below a certain minimum length..  The line length used is defined by the custom
+variable *shu-cpp-line-end*.
 
 For example, you may copy a very long line of text into a section of code as
 follows:
@@ -3130,9 +3975,13 @@ text editors do not show code much beyond column 80 or so.  This is an example
 of the above line after csplit was invoked:
 
 ```
-     static const std::string x("This is a very long line of text that look"
-                                "s as though it will go on forever.");
+     static const std::string x("This is a very long line of text that looks "
+                                "as though it will go on forever.");
 ```
+
+This function normally splits lines on a word boundary.  If any prefix argument
+is present, the split will be composed of fixed length lines with no respect to
+word boundaries.
 
 
 
@@ -3321,6 +4170,31 @@ Undocumented
 
 
 
+#### shu-find-end-include ####
+shu-find-end-include *dir*
+[Function]
+
+On entry, (point) is positioned on an #include directive.  This function
+searches either backwards or forward for the next line that does not contain an
+include directive.  If *dir* is positive the search is forward, else backward.
+The return value is the (line-beginning-position) of the last line that contains
+an #include directive.
+
+
+
+#### shu-gcc ####
+[Command]
+ (Alias: gcc)
+
+Get compile command command from current buffer.  While in a compile buffer,
+go to the top of the buffer, search for the end of the prompt line, collect the
+rest of the line and put it into the kill ring.  This takes the string that was
+used for the last compile command in the current buffer and puts it into the
+kill ring.  To compile again with the same command, kill the buffer, open a new
+shell, and yank.
+
+
+
 #### shu-gen-return-ptr ####
 [Function]
 
@@ -3410,6 +4284,22 @@ Place a skeleton class definition in the current buffer at point.
 
 
 
+#### shu-internal-creplace ####
+shu-internal-creplace **&optional** *fixed-width*
+[Function]
+
+This is the internal implementation of *shu-creplace*.
+
+
+
+#### shu-internal-csplit ####
+shu-internal-csplit **&optional** *fixed-width*
+[Function]
+
+This is the internal implementation of *shu-csplit*.
+
+
+
 #### shu-internal-double-citerate ####
 shu-internal-double-citerate *type-name-1* *type-name-2* *var-name-1* *var-name-2* **&optional** *const*
 [Function]
@@ -3476,6 +4366,14 @@ Comment string with the first letter downcased.
 
 
 
+#### shu-line-is-include ####
+shu-line-is-include **&optional** *fix*
+[Function]
+
+Return true if the line on which (point) resides is an #include directive.
+
+
+
 #### shu-make-padded-line ####
 shu-make-padded-line *line* *tlen*
 [Function]
@@ -3508,7 +4406,7 @@ Generate a skeleton code file for a C or C++ file.
 
 
 #### shu-new-deallocate ####
-shu-new-deallocate *var-name* *class-name*
+shu-new-deallocate *var-name*
 [Command]
 
 Insert the code to do a standard deallocation of memory allocated by a
@@ -3521,17 +4419,25 @@ This generates a code sequence as follows:
 ```
         if (var-name)
         {
-            var-name->~class-name();
-            m_allocator->deallocate(var-name);
+            m_allocator->deleteObject(var-name);
             var-name = 0;
         }
 ```
 
-*var-name* and *class-name* are read from two prompts.  The number of spaces to
-indent inside that braces is defined in the custom variable
-shu-cpp-indent-length.  The name of the member variable that points to the
-allocator in use by the class comes from the custom variable
-shu-cpp-default-allocator-name
+If *shu-cpp-modern* is true, the code sequence is:
+
+```
+        if (var-name != nullptr)
+        {
+            m_allocator->deleteObject(var-name);
+            var-name = nullptr;
+        }
+```
+
+*var-name* is read from a prompt.  The number of spaces to indent inside that
+braces is defined in the custom variable shu-cpp-indent-length.  The name of the
+member variable that points to the allocator in use by the class comes from the
+custom variable shu-cpp-default-allocator-name
 
 
 
@@ -3688,6 +4594,22 @@ Set the local namespace for C++ classes.
 
 
 
+#### shu-set-modern ####
+[Command]
+ (Alias: set-modern)
+
+Unconditionally set shu-cpp-modern to true.
+
+
+
+#### shu-set-no-modern ####
+[Command]
+ (Alias: set-no-modern)
+
+Unconditionally set shu-cpp-modern to false.
+
+
+
 #### shu-set-obj ####
 [Function]
 
@@ -3710,6 +4632,29 @@ that is in the current buffer.  This version of the function creates the name of
 the .h file from the name of the file in the current buffer.  This is in contrast
 with the function shu-hother which finds the corresponding .h file from the list
 of files in the current project.
+
+
+
+#### shu-sort-includes ####
+[Command]
+ (Alias: sort-includes)
+
+When positioned on a line that is an #include directive, find all of the
+#include directives above and below that line that are not separated by a blank
+line and sort them into alphabetical order with case ignored.  If not positioned
+on a line that is an #include directive, do nothing.  Case is ignored for the
+sort.  The return value is the number of lines sorted.  If no lines were sorted
+because (point) is not positioned on an #include directive, return nil.  The
+return value is for the benefit of the unit tests.
+Additionally, if there are spaces surrounding the "#" of the #include, they
+are removed.
+
+
+
+#### shu-std-include-list ####
+[Constant]
+
+An alist that maps include file names to class names.
 
 
 
@@ -3774,6 +4719,16 @@ variable shu-cpp-indent-length.
 
 The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace.
+
+
+
+#### shu-to-camel ####
+[Command]
+ (Alias: to-camel)
+
+Convert the variable name at point from snake case to camel case.
+
+For example, "mumble_something_other" becomes "mumbleSomethingOther".
 
 
 
@@ -4225,17 +5180,49 @@ which is not a valid C++ name.
 
 
 
-#### shu-cpp-match-repeat-sub-list ####
-shu-cpp-match-repeat-sub-list *rlist* *token-list* *match-list*
+#### shu-cpp-match-repeat-list-once ####
+shu-cpp-match-repeat-list-once *rlist* *token-list* *match-info*
 [Function]
 
-Go through one iteration of the repeating list.  The iteration is considered
-a success if either of the following are true: 1. The first match fails, or
-2. All matches succeed.  If all matches succeed, the updated *rlist* and
-*token-list* are returned.  If the first match fails, the *rlist* and *token-list* are
-returned unaltered.  It is as though no match was ever attempted.  If some match
-other than the first fails, nil is returned.  If the *token-list* is nil on entry,
-this is the equivalent of a first match failure.
+*rlist* points to the current return value list, if any.  *token-list* points to
+the next token-info to match.  *match-info* is the head of the side list with
+which to match.  The match succeeds if the token-infos in *token-list* match all
+of the match-infos in MATCH-LIST zero or more times.  The token-infos are
+matched repeatedly against the match-infos.  If there is a failure matching any
+match-info, the match fails.
+
+This is useful when matching repeating patterns.  For example, a
+C++ qualified name could be any of the following:
+
+```
+     a::b
+     a::b::c
+```
+
+You can match this with a match list that requires an unquoted token that
+matches a C++ name, followed by a side list looking for operator "::" followed
+by an unquoted token.   If there is a match, you have a name with one level of qualification.
+
+fails in the middle, then you have found something that looks like "a::",
+which is not a valid C++ name.
+
+
+
+#### shu-cpp-match-repeat-sub-list ####
+shu-cpp-match-repeat-sub-list *rlist* *token-list* *match-list* *first-required*
+[Function]
+
+Go through one iteration of the repeating list.  If *first-required* is true,
+then the first match must succeed.  Otherwise, we are matching zero or more
+instances, so a first match failure is the same as a success.
+
+The iteration is considered a success if either of the following are true:
+1. The first match fails and *first-required* is false, or 2. All matches succeed.
+If all matches succeed, the updated *rlist* and *token-list* are returned.  If the
+first match fails, the *rlist* and *token-list* are returned unaltered.  It is as
+though no match was ever attempted.  If some match other than the first fails,
+nil is returned.  If the *token-list* is nil on entry, this is the equivalent of a
+first match failure.
 
 
 
@@ -4349,7 +5336,19 @@ not match, this is considered a success.  If the first item matches, then all
 items in the side list must match.  If all items in the side list match, we go
 back to the top of the side list and try again until we find a token that does
 not match the first item in the side list.  The match is considered a failure
-only of there is a partial match between the tokens and the side list.
+only if there is a partial match between the tokens and the side list.
+
+
+
+#### shu-cpp-token-match-type-side-loop-once ####
+[Constant]
+
+The match side constant that indicates a looping side list.  The token list
+must match the side list one or more times.  All items in the side list must
+match at least once.  If all items in the side list match, we go back to the top
+of the side list and try again until we find a token that does not match the
+first item in the side list.  The match is considered a failure if there is no
+match or only a a partial match between the tokens and the side list.
 
 
 
@@ -4388,7 +5387,7 @@ Show the data in an instance of match-info.
 shu-cpp-token-show-match-list *match-list* **&optional** *title*
 [Function]
 
-Show the data in an instance of match-info.
+Show the data in a list of match-info.
 
 
 
@@ -4396,7 +5395,7 @@ Show the data in an instance of match-info.
 shu-cpp-token-show-match-lists *match-lists* **&optional** *title*
 [Function]
 
-Show the data in an instance of match-info.
+Show the data in a list of match lists.
 
 # shu-cpp-misc #
 
@@ -4542,6 +5541,97 @@ Generate a skeleton class code generation at point.
 
 
 
+#### shu-cpp-decl-class-name ####
+shu-cpp-decl-class-name *class-name* *outline-character*
+[Function]
+
+Generate a comment which is the name of the class with a line of outline
+characters above and below it.  *class-name* is the name of the class.
+*outline-character* is a string containing the outline character (usually
+"=" or "-")
+
+
+
+#### shu-cpp-decl-cpp-class-name ####
+shu-cpp-decl-cpp-class-name *class-name*
+[Function]
+
+Generate a comment which is the name of the class with a line of dashes
+above and below it to set off the class name in a cpp file.
+*class-name* is the name of the containing C++ class.
+
+
+
+#### shu-cpp-decl-cpp-print-self ####
+shu-cpp-decl-cpp-print-self *class-name*
+[Function]
+
+Generate the skeleton code for the printSelf() function.
+*class-name* is the name of the containing C++ class.
+
+
+
+#### shu-cpp-decl-cpp-stream ####
+shu-cpp-decl-cpp-stream *class-name*
+[Function]
+
+Generate the code for the streaming operator (operator<<()).  *class-name* is the
+name of the containing C++ class.
+
+
+
+#### shu-cpp-decl-h-class-name ####
+shu-cpp-decl-h-class-name *class-name*
+[Function]
+
+Generate a comment which is the name of the class with a line of equal
+signs above and below it to set off the class name in a header file.
+*class-name* is the name of the containing C++ class.
+
+
+
+#### shu-cpp-decl-h-print-self ####
+[Function]
+
+Generate the declaration of the printSelf() function.
+
+
+
+#### shu-cpp-decl-h-stream ####
+shu-cpp-decl-h-stream *class-name*
+[Function]
+
+Generate the declaration for the streaming operator (operator<<()).
+*class-name* is the name of the containing C++ class.
+
+
+
+#### shu-cpp-gen-decl-h-private ####
+shu-cpp-gen-decl-h-private *class-name* **&optional** *copy-allowed*
+[Function]
+
+Generate the private section of the class declaration.  If *copy-allowed*
+is false, generate private an unimplemented copy constructor and operator=()
+
+
+
+#### shu-cpp-gen-h-class-intro ####
+shu-cpp-gen-h-class-intro *class-name*
+[Function]
+
+Generate the preamble to a class declaration in a header file.  This is all
+of the code that precedes the \\ DATA comment.  Return the position at which
+the class comment was placed.
+
+
+
+#### shu-cpp-gen-inline-template-header ####
+[Function]
+
+Doc string.
+
+
+
 #### shu-cpp-hcgen ####
 shu-cpp-hcgen *class-name*
 [Command]
@@ -4556,6 +5646,81 @@ shu-cpp-inner-cdecl *class-name* *copy-allowed* **&optional** *use-allocator*
 [Function]
 
 Generate a skeleton class declaration at point.
+
+
+
+#### shu-cpp-misc-gen-ctor-not-implemented ####
+shu-cpp-misc-gen-ctor-not-implemented *class-name*
+[Function]
+
+Generate a declaration of a non-implemented copy constructor and operator=().
+
+
+
+#### shu-cpp-misc-gen-h-ctor ####
+shu-cpp-misc-gen-h-ctor *class-name* **&optional** *use-allocator*
+[Function]
+
+Generate a declaration of a constructor for the given *class-name*.  If
+*use-allocator* is true, the constructor declaration includes an optional
+allocator.
+
+
+
+#### shu-cpp-misc-gen-h-dtor ####
+shu-cpp-misc-gen-h-dtor *class-name*
+[Function]
+
+Generate a commented out declaration of a destructor for the given *class-name*.
+
+
+
+#### shu-cpp-misc-gen-nested-traits ####
+shu-cpp-misc-gen-nested-traits *class-name*
+[Function]
+
+Generate a nested traits declaration.
+
+
+
+#### shu-cpp-misc-gen-not-implemented ####
+shu-cpp-misc-gen-not-implemented *class-name*
+[Function]
+
+Generate a declaration of a non-implemented copy constructor and operator=().
+
+
+
+#### shu-cpp-misc-gen-op-equal-not-implemented ####
+shu-cpp-misc-gen-op-equal-not-implemented *class-name*
+[Function]
+
+Generate a declaration of a non-implemented copy constructor and operator=().
+
+
+
+#### shu-cpp-misc-h-tail-gen ####
+shu-cpp-misc-h-tail-gen *class-name*
+[Function]
+
+Generate the tail code in a header file starting with
+"INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS"
+
+
+
+#### shu-cpp-misc-inline-template-label ####
+[Constant]
+
+The text of the header that starts inline and template functions in a
+C++ header file
+
+
+
+#### shu-cpp-misc-not-implemented-label ####
+[Constant]
+
+The label put in a header file for functions and operators that are
+deliberately not implemented.
 
 
 
@@ -4611,7 +5776,7 @@ Generate a skeleton header file
 
 #### shu-generate-tfile ####
 shu-generate-tfile *author* *namespace* *class-name*
-[Command]
+[Function]
 
 Generate a skeleton t.cpp file
 
@@ -4745,11 +5910,42 @@ Otherwise, it will assume that all files reside in the same directory.
 
 
 
+#### iother ####
+[Command]
+ (Function: shu-iother)
+
+Visit a i.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.i.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory.
+
+
+
 #### list-c-directories ####
 [Command]
  (Function: shu-list-c-directories)
 
 Insert into the current buffer the names of all of the directories in a project.
+
+
+
+#### list-c-duplicates ####
+[Command]
+ (Function: shu-list-c-duplicates)
+
+Insert into the current buffer a list of all of the duplicate files names.
+Under each duplicate file name, insert a list of the full paths to all of the
+duplicates.
+
+
+
+#### list-c-file-names ####
+[Command]
+ (Function: shu-list-c-file-names)
+
+Insert into the buffer a list of all of the unique file names in the project.
+This does not include the file path as it will be different for duplicate
+names.
 
 
 
@@ -4804,10 +6000,35 @@ make-c-project *proj-root*
 [Command]
  (Function: shu-make-c-project)
 
+Create a project file of all directories containing c or h files.  Starts at
+the specified root directory and searches all subdirectories for any that
+contain c or h files.  Top level directories whose names are found in
+*shu-project-exclude-list* are excluded from the search.  Typically
+*shu-project-exclude-list* is used to exclude CMake directories that include c or
+h files that have been created as part of the build process and are not members
+of the repository itself.  It then inserts all of the directory names into the
+current file at point.
+
+
+
+#### make-full-c-project ####
+make-full-c-project *proj-root*
+[Command]
+ (Function: shu-make-full-c-project)
+
 Create a project file of all directories containing c or h files.
 Starts at the specified root directory and searches all subdirectories for
 any that contain c or h files.  It then inserts all of the directory names
 into the current file at point.
+
+
+
+#### make-p-project ####
+make-p-project *proj-root*
+[Command]
+ (Function: shu-make-p-project)
+
+Create a Python project that is analogous to a c project.
 
 
 
@@ -4857,6 +6078,21 @@ something that resembles a file name.
 
 
 
+#### set-p-project ####
+set-p-project *start* *end*
+[Command]
+ (Function: shu-set-p-project)
+
+Mark a region in a file that contains one subdirectory name per line.  Then
+invoke set-c-project and it will find and remember all of the c and h files in
+those subdirectories.  You may then subsequently visit any of those files by
+invoking M-x vh which will allow you to type in the file name only (with auto
+completion) and will then visit the file in the appropriate subdirectory.  If
+this function is called interactively, it clears the project name that was
+established by either *shu-setup-project-and-tags* of *shu-visit-project-and-tags*.
+
+
+
 #### set-prefix ####
 set-prefix *prefix*
 [Command]
@@ -4875,6 +6111,19 @@ Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c
 or .cpp file, invoke this function and you will be taken to the corresponding
 .t.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory.
+
+
+
+#### vf ####
+[Command]
+ (Function: shu-vf)
+
+If point is on something that looks like a file name, visit the file.  If the
+file name is followed by a colon and a number, the number is interpreted as a
+line number within the file and point is moved to the beginning of that line.
+If the line number is followed by a colon and another number, then the second
+number is interpreted as a column number and point is moved to that column
+number.
 
 
 
@@ -4901,7 +6150,7 @@ shu-add-cpp-c-extensions *xtns*
 
 Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
-This modifies both shu-cpp-c-extensions and shu-cpp-extensions.
+This modifies both shu-cpp-c-extensions and shu-project-extensions.
 
 
 
@@ -4911,7 +6160,7 @@ shu-add-cpp-h-extensions *xtns*
 
 Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
-This modifies both shu-cpp-h-extensions and shu-cpp-extensions.
+This modifies both shu-cpp-h-extensions and shu-project-extensions.
 
 
 
@@ -5089,23 +6338,6 @@ current completion.
 
 
 
-#### shu-cpp-directory-prefix ####
-[Function]
-
-Get a directory based prefix, which is the last name in the current path.  If the current
-directory is "foo/blah/humbug", the value returned from this function is "humbug"
-
-
-
-#### shu-cpp-extensions ####
-[Constant]
-
-A list of file extensions for all of the file types we want to find.  This is defined
-as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions or
-shu-add-cpp-h-extensions.
-
-
-
 #### shu-cpp-final-list ####
 [Variable]
 
@@ -5133,7 +6365,7 @@ is wanted.
 [Variable]
 
 This is a list of all of the file extensions found in the current project.  While
-shu-cpp-extensions contains all of the extensions that we look for.  This variable
+shu-project-extensions contains all of the extensions that we look for.  This variable
 contains those that we actually found in building the current project.
 
 
@@ -5224,10 +6456,30 @@ then the returned list will contain
 
 
 
+#### shu-cpp-project-extract-base-name ####
+shu-cpp-project-extract-base-name *name*
+[Function]
+
+This is the implementation function of *shu-cpp-project-get-base-name* so that
+the logic of the function can be unit tested.
+
+
+
 #### shu-cpp-project-file ####
 [Variable]
 
 The name of the file from which the current project was read.
+
+
+
+#### shu-cpp-project-get-base-name ####
+[Command]
+
+When visiting a file within a project, the name might consist of two or three
+parts - the file name, the normal extension, such as .h or .cpp, and the
+intermediate extension, such as .i or .t when visiting .i.cpp or .t.cpp.  This
+function gets the buffer file name and removes the one or two extensions in
+order to get the name with no extensions at all.
 
 
 
@@ -5308,6 +6560,20 @@ source code.
 [Variable]
 
 This is the time at which the current project was created.
+
+
+
+#### shu-cpp-project-very-short-names ####
+[Custom]
+
+Set non-nil if shu-cpp-project creates very short names for files in a
+project.  A short name is an approximation of the file name that may be easier
+to type.  For example, if all of the files in a project begin with a common
+prefix (e.g., "my_own_server_mumble.cpp" and "my_own_server_stumble.cpp",
+then the short names for these two files would be "mumble.cpp" and
+"stumble.cpp".  This means that the user does not have to type the prefix in
+order to find the file.  If the user types "mumble.cpp" as the file name,
+emacs will open the file "my_own_server_mumble.cpp".
 
 
 
@@ -5466,6 +6732,54 @@ documentation is the string to put in the buffer to describe the operation.
 
 
 
+#### shu-global-search-replace ####
+shu-global-search-replace *file* *argument1* *argument2*
+[Function]
+
+This function is called once for each file in the project.  The first
+argument is the file name.  The second argument is a list holding lists of
+search and replace operations.  Each search and replace operation is defined by
+a list of arguments as follows:
+
+```
+     1. A boolean value, t means case sensitive search, nil means ignore case
+     2. The function to call to do the search.  This must be
+        'search-forward, 're-search-forward, or any function with the same
+        signature and behavior.
+     3. The string that is the target of the search
+     4. The string the is to replace the target whenever found
+     5. An optional second argument to be passed to replace-match
+        The default value is t
+     6. An optional third argument to be passed to replace-match
+        The default value is t
+```
+
+For example
+
+```
+     (list
+       (list t 'search-forward "Mumble" "Bumble")
+       (list nil 'search-forward "howdy" "doody"))
+```
+
+is a list that defines two search and replace operations.  Both operations use
+the search-forward function.  The first is a case sensitive search and replace to
+replace all instances of "Mumble" with "Bumble".  The second is a case
+insensitive search and replace to replace all instances of "howdy" with "doody".
+
+These operations may be performed on every file in the project as follows:
+
+```
+     (setq ops
+       (list
+         (list t 'search-forward "Mumble" "Bumble")
+         (list nil 'search-forward "howdy" "doody")))
+     (setq doc "Description of change")
+     (shu-global-operation doc 'shu-global-search-replace ops)
+```
+
+
+
 #### shu-hother ####
 [Command]
  (Alias: hother)
@@ -5474,6 +6788,22 @@ Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a
 .cpp or t.cpp file, invoke this function and you will be taken to the
 corresponding .h file.  This function will use a project if one is active.
 Otherwise, it will assume that all files reside in the same directory.
+
+
+
+#### shu-internal-list-c-duplicates ####
+shu-internal-list-c-duplicates *proj-list*
+[Function]
+
+Internal implementation of shu-list-c-duplicates.
+
+
+
+#### shu-internal-list-c-file-names ####
+shu-internal-list-c-file-names *proj-list*
+[Command]
+
+Doc string.
 
 
 
@@ -5515,11 +6845,42 @@ Undocumented
 
 
 
+#### shu-iother ####
+[Command]
+ (Alias: iother)
+
+Visit a i.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.i.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory.
+
+
+
 #### shu-list-c-directories ####
 [Command]
  (Alias: list-c-directories)
 
 Insert into the current buffer the names of all of the directories in a project.
+
+
+
+#### shu-list-c-duplicates ####
+[Command]
+ (Alias: list-c-duplicates)
+
+Insert into the current buffer a list of all of the duplicate files names.
+Under each duplicate file name, insert a list of the full paths to all of the
+duplicates.
+
+
+
+#### shu-list-c-file-names ####
+[Command]
+ (Alias: list-c-file-names)
+
+Insert into the buffer a list of all of the unique file names in the project.
+This does not include the file path as it will be different for duplicate
+names.
 
 
 
@@ -5555,10 +6916,35 @@ shu-make-c-project *proj-root*
 [Command]
  (Alias: make-c-project)
 
+Create a project file of all directories containing c or h files.  Starts at
+the specified root directory and searches all subdirectories for any that
+contain c or h files.  Top level directories whose names are found in
+*shu-project-exclude-list* are excluded from the search.  Typically
+*shu-project-exclude-list* is used to exclude CMake directories that include c or
+h files that have been created as part of the build process and are not members
+of the repository itself.  It then inserts all of the directory names into the
+current file at point.
+
+
+
+#### shu-make-full-c-project ####
+shu-make-full-c-project *proj-root*
+[Command]
+ (Alias: make-full-c-project)
+
 Create a project file of all directories containing c or h files.
 Starts at the specified root directory and searches all subdirectories for
 any that contain c or h files.  It then inserts all of the directory names
 into the current file at point.
+
+
+
+#### shu-make-p-project ####
+shu-make-p-project *proj-root*
+[Command]
+ (Alias: make-p-project)
+
+Create a Python project that is analogous to a c project.
 
 
 
@@ -5584,6 +6970,7 @@ Otherwise, it will assume that all files reside in the same directory.
 
 
 #### shu-possible-cpp-file-name ####
+shu-possible-cpp-file-name **&optional** *include-directory* *any-extension*
 [Function]
 
 Return a list containing a possible file name with a possible line number
@@ -5593,6 +6980,11 @@ shu-get-line-column-of-file to perhaps harvest a line number and column number
 within the file.  The return result is a list of length one if there is only
 a file name, a list of length two if there is a file name and line number, a
 list of length three if there is a file name, line number, and column number.
+If the optional argument *include-directory* is true, the file name may include
+the forward slash character, which means that the returned file name may also
+include directory names.  Normally, this function only looks for code files,
+but if the optional argument *any-extension* is true, then a file name with any
+extension will be returned.
 
 
 
@@ -5601,6 +6993,30 @@ list of length three if there is a file name, line number, and column number.
 
 The name of the buffer into which messages are placed as c and h files
 are being scanned.
+
+
+
+#### shu-project-exclude-hash ####
+[Variable]
+
+The hash table that holds the directory names from *shu-project-exclude-list*.
+
+
+
+#### shu-project-exclude-list ####
+[Constant]
+
+A list of top level directory names to exclude while creating a project via
+*shu-make-c-project*.  This list is ignored by *shu-make-full-c-project*
+
+
+
+#### shu-project-extensions ####
+[Constant]
+
+A list of file extensions for all of the file types we want to find.  This is defined
+as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions or
+shu-add-cpp-h-extensions.
 
 
 
@@ -5617,6 +7033,15 @@ shu-project-get-file-info *plist* *file-name* *full-name-list*
 [Macro]
 
 Extract the file information from one entry in shu-cpp-class-list.
+
+
+
+#### shu-project-make-exclude-hash ####
+[Command]
+
+Turn *shu-project-exclude-list* into the hash table *shu-project-exclude-hash*.
+If *shu-project-exclude-list* is nil or not a list or an empty list, then
+*shu-project-exclude-hash* is also set to nil.
 
 
 
@@ -5673,6 +7098,13 @@ Undocumented
 
 
 
+#### shu-py-extensions ####
+[Constant]
+
+A list of file extensions for Python projects
+
+
+
 #### shu-renew-c-project ####
 [Command]
  (Alias: renew-c-project)
@@ -5707,6 +7139,21 @@ something that resembles a file name.
 
 
 
+#### shu-set-p-project ####
+shu-set-p-project *start* *end*
+[Command]
+ (Alias: set-p-project)
+
+Mark a region in a file that contains one subdirectory name per line.  Then
+invoke set-c-project and it will find and remember all of the c and h files in
+those subdirectories.  You may then subsequently visit any of those files by
+invoking M-x vh which will allow you to type in the file name only (with auto
+completion) and will then visit the file in the appropriate subdirectory.  If
+this function is called interactively, it clears the project name that was
+established by either *shu-setup-project-and-tags* of *shu-visit-project-and-tags*.
+
+
+
 #### shu-set-prefix ####
 shu-set-prefix *prefix*
 [Command]
@@ -5729,6 +7176,17 @@ which the tags file is to be built.
 
 
 
+#### shu-sub-make-c-project ####
+shu-sub-make-c-project *proj-root*
+[Function]
+
+Create a project file of all directories containing c or h files.
+Starts at the specified root directory and searches all subdirectories for
+any that contain c or h files.  It then inserts all of the directory names
+into the current file at point.
+
+
+
 #### shu-tother ####
 [Command]
  (Alias: tother)
@@ -5737,6 +7195,19 @@ Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c
 or .cpp file, invoke this function and you will be taken to the corresponding
 .t.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory.
+
+
+
+#### shu-vf ####
+[Command]
+ (Alias: vf)
+
+If point is on something that looks like a file name, visit the file.  If the
+file name is followed by a colon and a number, the number is interpreted as a
+line number within the file and point is moved to the beginning of that line.
+If the line number is followed by a colon and another number, then the second
+number is interpreted as a column number and point is moved to that column
+number.
 
 
 
@@ -5931,7 +7402,7 @@ returns t if there are no occurrences of *open-char* and *close-char*
 #### shu-cpp-keywords ####
 [Constant]
 
-alist of C++ key words up to approximately C++17
+alist of C++ key words up to approximately C++20
 
 
 
@@ -6092,6 +7563,14 @@ Extract the information out of a token-info
 
 
 
+#### shu-cpp-token-extract-nesting-level ####
+shu-cpp-token-extract-nesting-level *token-info*
+[Function]
+
+Return the nesting level from an instance of token-info.
+
+
+
 #### shu-cpp-token-extract-spoint ####
 shu-cpp-token-extract-spoint *token-info*
 [Function]
@@ -6247,6 +7726,14 @@ and you will scan through the list without seeing any comments.
 Set the common alias names for the functions in shu-cpp-token.
 These are usually the same as the function names with the leading
 shu- prefix removed.
+
+
+
+#### shu-cpp-token-set-nesting-level ####
+shu-cpp-token-set-nesting-level *token-info* *nesting-level*
+[Function]
+
+Set the nesting level in an instance of token-info.
 
 
 
@@ -6507,6 +7994,14 @@ into a buffer or pasted into the application requesting it.
 
 
 
+#### krpps ####
+[Command]
+ (Function: shu-keyring-get-passphrase)
+
+Doc string.
+
+
+
 #### krpw ####
 [Command]
  (Function: shu-keyring-get-pw)
@@ -6540,6 +8035,15 @@ keyring file.  shu-keyring-get-file (alias krfn) displays the name of the
 keyring file.  This function parses the keyring file.  After the operation. look
 into the keyring buffer (`**shu-keyring**`) to see if there are any complaints
 about syntax errors in the file.
+
+
+
+#### set-passphrase ####
+set-passphrase *phrase*
+[Command]
+ (Function: shu-keyring-set-passphrase)
+
+Function to read and set the external pass phrase.
 
 ## List of functions and variables ##
 
@@ -6582,6 +8086,15 @@ The keyring index is built the first time it is needed and kept in memory therea
 must refresh the index if the keyring file is modified.  The easiest way to do this is to clear
 the index when the keyring file is modified.  The next time the index is needed it will be
 recreated.
+
+
+
+#### shu-keyring-external-passphrase ####
+[Variable]
+
+Holds the external passphrase for the keyring file.  This allows the user
+to type the passphrase at the beginning of an emacs session.  Once this is
+set it can then be put into kill ring by shu-keyring-get-passphrase.
 
 
 
@@ -6641,6 +8154,14 @@ using the wrong keyring file.
 Find the User Id for an entry in the keyring file.  This displays the entry
 in the message area and puts the user Id into the kill ring so that it can be
 yanked into a buffer or pasted into the application requesting it.
+
+
+
+#### shu-keyring-get-passphrase ####
+[Command]
+ (Alias: krpps)
+
+Doc string.
 
 
 
@@ -6741,6 +8262,15 @@ Set the common alias names for the functions in shu-keyring.
 These are generally the same as the function names with the leading
 shu- prefix removed.  But in this case the names are drastically shortened
 to make them easier to type.
+
+
+
+#### shu-keyring-set-passphrase ####
+shu-keyring-set-passphrase *phrase*
+[Command]
+ (Alias: set-passphrase)
+
+Function to read and set the external pass phrase.
 
 
 
@@ -6854,10 +8384,27 @@ duplicate class names.
 
 
 
+#### shu-cpp-match-classname-forms ####
+[Constant]
+
+Match name::name or name::name::name or name::name::name::name, etc.  The
+double colons make up the return value so that you can tell where one name
+ends and another starts.
+
+
+
 #### shu-cpp-match-colon-name ####
 [Constant]
 
 A repeating side list to match zero or more instances of {:: <name>}
+
+
+
+#### shu-cpp-match-colon-name-return ####
+[Constant]
+
+A repeating side list to match one or more instances of {:: <name>} with the
+double colons making up part of the return value.
 
 
 
@@ -7282,7 +8829,8 @@ diagnostic messages are placed into the log buffer and a nil value is returned.
 shu-match-make-count-alist-from-hash *class-ht*
 [Command]
 
-Doc string.
+Create an alist in which the key is a class name and the value is zero.  This alist
+will be used to generate a count of number of items changed per class name.
 
 
 
@@ -7434,6 +8982,31 @@ A list of aliases and associated function names.
 
 
 
+#### add-alexandria ####
+[Command]
+ (Function: shu-add-alexandria)
+
+Add Alexandria coverage to a git repository.
+This function first checks to ensure that a README.md file exists that does not
+contain an Alexandria badge and that a Doxyfile does not exist.  If those two
+conditions are met, an Alexandria badge is added to the bottom of the README.md
+file, a Doxyfile is created, and some of the tags in the Doxyfile are set to
+reasonable defaults.  An ALEXANDRIA_DOC_DEPENDENCIES tag is added to the end of
+the Doxyfile as a comment.
+If this function succeeds, it returns true, else nil.  The return value may
+be used by batch mode functions that want to call this function and report
+whether or not it succeeded.
+
+
+
+#### add-alexandria-badge ####
+[Command]
+ (Function: shu-add-alexandria-badge)
+
+Insert an Alexandria badge for the current project.
+
+
+
 #### add-prefix ####
 add-prefix *prefix*
 [Command]
@@ -7441,6 +9014,49 @@ add-prefix *prefix*
 
 Put a prefix and a space in front of each line in the region.  Prompt is issued
 for the prefix.
+
+
+
+#### af ####
+af *frame-no*
+[Command]
+ (Function: shu-adapt-frame)
+
+Adapt the current frame to the current display by stretching the frame to the
+full height of the display and putting the top of the frame at the top of the
+display.  This function makes some assumptions about the display geometry based
+on the current operating system.  It assumes that Windows loses five lines for
+top and bottom tool bars.  Mac OS X loses three lines for the top tool bar.
+Unix loses two lines for something.  These numbers should, at some point, be
+customizable.
+
+With a numeric prefix argument N, the emacs window is positioned N frames from
+the right hand side of the display.  For example, if you open three frames and
+type into the first frame C-u 1 M-x *shu-adapt-frame*, into the next frame
+C-u 2 M-x *shu-adapt-frame*, and into the third frame C-u 3 M-x *shu-adapt-frame*,
+then the three frames will be grouped together side by side at the right side of
+the display.
+
+If the prefix argument is large enough that the left side of the frame would be
+moved past the left side of the display, the window is positioned such that the
+left edge of the window is aligned with the left edge of the display.
+
+Implementation note:
+
+If this function is called when the left side of the frame is positioned to the
+left of the leftmost edge of the display, the function FRAME-POSITION returns a
+negative value for the x coordinate of the frame.  The function
+SET-FRAME-POSITION takes the x and y coordinates of the new position of the top
+left corner of the frame.
+
+But if x is negative, it specifies the coordinates of the right edge of the
+frame relative to the right edge of the display.  This puts a frame that is very
+close to the left edge of the display all the way over to the right edge of the
+display.
+
+The assumption is that a negative x frame position means that the user has
+positioned the frame just a bit past the left edge and that the desired frame
+position is actually the leftmost edge of the display.
 
 
 
@@ -7498,6 +9114,15 @@ simple, little function.
 In a list of names, change all occurrences
 of Lastname, Firstname to an empty Latex letter.
 Position to the start of the file and invoke once.
+
+
+
+#### copy-repo ####
+[Command]
+ (Function: shu-copy-repo)
+
+Call *shu-get-repo* to find the path to the repository and put the result in
+the kill ring.
 
 
 
@@ -7564,11 +9189,52 @@ Save and load the current file as a .el file.
 
 
 
+#### fixup-doxyfile ####
+[Command]
+ (Function: shu-fixup-doxyfile)
+
+The current directory is assumed to have the same name as the project for
+which the Doxyfile was created.  This function sets various default values in
+the Doxyfile.  The current buffer is the Doxyfile.
+
+
+
+#### gcm ####
+[Command]
+ (Function: shu-git-insert-git-commit)
+
+Insert at point the name the git command to commit with the commentary held
+in a file called "why.txt".
+
+
+
 #### gd ####
 [Command]
  (Function: shu-gd)
 
 While in dired, put the full path to the current directory in the kill ring
+
+
+
+#### get-pr-url ####
+[Command]
+ (Function: shu-git-get-pr-url)
+
+Put into the kill ring the path required to create a new pull request for
+the current branch of the current repository.
+
+
+
+#### get-repo ####
+[Function]
+ (Function: shu-get-repo)
+
+When positioned anywhere in a git repository, return the git path to the
+repository.  This is found in .git/config as the url of [remote "origin"].
+Return nil if the path cannot be found.
+
+The search is made from the current directory and upwards for the first
+directory called ".git".
 
 
 
@@ -7611,8 +9277,8 @@ While in a file buffer, put the name of the current file into the kill ring.
 [Command]
  (Function: shu-git-insert-pull-origin-branch)
 
-Insert at point the name the git command to pull the current branch out
-to origin.
+Insert at point the name the git command to pull the current branch from
+origin.
 
 
 
@@ -7620,8 +9286,10 @@ to origin.
 [Command]
  (Function: shu-git-insert-push-origin-branch)
 
-Insert at point the name the git command to push the current branch out
-to origin.
+Insert at point the git command to push the current branch out to origin.  If
+the current branch is the default branch (fka "master"), you are prompted to
+see if you want to proceed.  This is to prevent an accidental push to the
+default branch.
 
 
 
@@ -7650,6 +9318,14 @@ word "origin"..  This can be used as part of git push or pull.
 
 
 
+#### kill-system-name ####
+[Command]
+ (Function: shu-kill-system-name)
+
+Place the system name` (machine name) in the message area.
+
+
+
 #### loosen-lisp ####
 [Command]
  (Function: shu-loosen-lisp)
@@ -7660,6 +9336,28 @@ inside of them without having to worry about which line contains the closing
 parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run *shu-tighten-lisp* to put the
 parentheses back where they belong.
+
+
+
+#### make-md-toc ####
+[Command]
+ (Function: shu-tocify-markdown-file)
+
+Search the file starting at the current position for any markdown headings of
+the form "## This is a heading".  Add a tag to each heading and then insert a
+complete markdown table of contents at the current position.
+
+Pound signs that lie inside of markdown literal areas designated by "```" are
+ignored.  This prevents something such as an example of an #include directive
+from being treated as a level 1 heading.
+
+If a heading already has a tag, it is removed.  If a heading has trailing pound
+signs, they are also removed.
+
+The default maximum heading level is two, which means that heading levels
+greater than two are not included in the table of contents.  But a numeric
+prefix argument can change the maximum heading level.  The maximum heading level
+cannot be set to a value less than one.
 
 
 
@@ -7787,6 +9485,27 @@ at point and continues to the end of the buffer.
 
 
 
+#### obfuscate-region ####
+obfuscate-region *start* *end*
+[Command]
+ (Function: shu-obfuscate-region)
+
+Obfuscate a region of text by replacing every alphabetic character in the
+region with the next letter of the alphabet, staring with 'a'. For example, of
+the region contains
+
+  Now is the time for all good men to come to the aid of the Party 10 times.
+
+Then the obfuscated text would be:
+
+  Abc de fgh ijkl mno pqr stuv wxy za bcde fg hij klm no pqr Stuvw 10 xyzab.
+
+This is useful if you want to capture some text for later testing and
+manipulation that might contain confidential or proprietary information.  This
+is an encoding that cannot be reversed.
+
+
+
 #### of ####
 [Command]
  (Function: shu-of)
@@ -7823,6 +9542,20 @@ Position to the start of the file and invoke once.
 
 
 
+#### scan-grok ####
+[Command]
+ (Function: shu-extract-name-open-grok)
+
+The current buffer contains output from an OpenGrok search that has been
+copied from the web page and pasted into the buffer.  This function scans the
+buffer from the current point and harvests all of the file names that hold the
+references for which OpenGrok searched.  It puts the file names (including their
+top level directories) into the buffer "`**shu-open-grok**`".
+The number of file names found is returned, mostly for the benefit of unit
+tests.
+
+
+
 #### set-dos-eol ####
 [Command]
  (Function: shu-set-dos-eol)
@@ -7847,6 +9580,23 @@ Display the name of the current branch in a git repository.
 
 
 
+#### show-repo ####
+[Command]
+ (Function: shu-show-repo)
+
+Call *shu-get-repo* to find the path to the repository and show the result in
+the minibuffer.
+
+
+
+#### show-system-name ####
+[Command]
+ (Function: shu-show-system-name)
+
+Place the system name (machine name) in the message area.
+
+
+
 #### tighten-lisp ####
 [Command]
  (Function: shu-tighten-lisp)
@@ -7865,6 +9615,21 @@ Eliminate whitespace at ends of all lines in the current buffer.
 
 
 
+#### unbrace ####
+[Command]
+ (Function: shu-unbrace)
+
+When point is on an opening sexp, this function converts, within the scope of
+the sexp, all "{" to "(" and all "}" to ").".
+If the number of left braces does not match the number of right braces a warning
+message is emitted.
+
+For the benefit of unit tests, the count of left braces converted iff the count
+of left braces matches the count of right braces.  If the counts do not match,
+nil is returned.
+
+
+
 #### winpath ####
 winpath *start* *end*
 [Command]
@@ -7878,6 +9643,95 @@ This makes it a valid path on windows machines.
 List of functions and variable definitions in this package.
 
 
+
+
+
+#### shu-adapt-frame ####
+shu-adapt-frame *frame-no*
+[Command]
+ (Alias: af)
+
+Adapt the current frame to the current display by stretching the frame to the
+full height of the display and putting the top of the frame at the top of the
+display.  This function makes some assumptions about the display geometry based
+on the current operating system.  It assumes that Windows loses five lines for
+top and bottom tool bars.  Mac OS X loses three lines for the top tool bar.
+Unix loses two lines for something.  These numbers should, at some point, be
+customizable.
+
+With a numeric prefix argument N, the emacs window is positioned N frames from
+the right hand side of the display.  For example, if you open three frames and
+type into the first frame C-u 1 M-x *shu-adapt-frame*, into the next frame
+C-u 2 M-x *shu-adapt-frame*, and into the third frame C-u 3 M-x *shu-adapt-frame*,
+then the three frames will be grouped together side by side at the right side of
+the display.
+
+If the prefix argument is large enough that the left side of the frame would be
+moved past the left side of the display, the window is positioned such that the
+left edge of the window is aligned with the left edge of the display.
+
+Implementation note:
+
+If this function is called when the left side of the frame is positioned to the
+left of the leftmost edge of the display, the function FRAME-POSITION returns a
+negative value for the x coordinate of the frame.  The function
+SET-FRAME-POSITION takes the x and y coordinates of the new position of the top
+left corner of the frame.
+
+But if x is negative, it specifies the coordinates of the right edge of the
+frame relative to the right edge of the display.  This puts a frame that is very
+close to the left edge of the display all the way over to the right edge of the
+display.
+
+The assumption is that a negative x frame position means that the user has
+positioned the frame just a bit past the left edge and that the desired frame
+position is actually the leftmost edge of the display.
+
+
+
+#### shu-add-alexandria ####
+[Command]
+ (Alias: add-alexandria)
+
+Add Alexandria coverage to a git repository.
+This function first checks to ensure that a README.md file exists that does not
+contain an Alexandria badge and that a Doxyfile does not exist.  If those two
+conditions are met, an Alexandria badge is added to the bottom of the README.md
+file, a Doxyfile is created, and some of the tags in the Doxyfile are set to
+reasonable defaults.  An ALEXANDRIA_DOC_DEPENDENCIES tag is added to the end of
+the Doxyfile as a comment.
+If this function succeeds, it returns true, else nil.  The return value may
+be used by batch mode functions that want to call this function and report
+whether or not it succeeded.
+
+
+
+#### shu-add-alexandria-badge ####
+[Command]
+ (Alias: add-alexandria-badge)
+
+Insert an Alexandria badge for the current project.
+
+
+
+#### shu-add-alexandria-in-batch-mode ####
+[Function]
+
+Call the function *shu-add-alexandria* in batch mode.  The function
+*shu-add-alexandria* normally ends in edit mode in Doxyfile so that the user can
+do a final edit and save.  In batch mode, this function does a save of the
+Doxyfile since there is no interactive user.
+
+If the function succeeds, it returns true, else nil.  This allows the top level
+batch invoking function to terminate emacs with a zero or non-zero return code
+to indicate to an external script whether or not the add command worked.
+
+
+
+#### shu-add-doxyfile ####
+[Function]
+
+Call "doxygen -g" to create a Doxyfile.  Return the output from the doxygen command.
 
 
 
@@ -7966,6 +9820,15 @@ buffer when it is finished with it.
 
 
 
+#### shu-copy-repo ####
+[Command]
+ (Alias: copy-repo)
+
+Call *shu-get-repo* to find the path to the repository and put the result in
+the kill ring.
+
+
+
 #### shu-de-star ####
 [Command]
  (Alias: de-star)
@@ -8028,8 +9891,22 @@ shu-erase-region *start* *end*
 Replace everything in the region between *start* and *end* with blanks.  This is
 exactly like delete-region except that the deleted text is replaced with spaces.
 As with delete-region, the end point is not included in the delete.  It erases
-everything up but not including the end point.  The order of *start* and *end* does
-not matter.
+everything up to but not including the end point.  The order of *start* and *end*
+does not matter.
+
+
+
+#### shu-extract-name-open-grok ####
+[Command]
+ (Alias: scan-grok)
+
+The current buffer contains output from an OpenGrok search that has been
+copied from the web page and pasted into the buffer.  This function scans the
+buffer from the current point and harvests all of the file names that hold the
+references for which OpenGrok searched.  It puts the file names (including their
+top level directories) into the buffer "`**shu-open-grok**`".
+The number of file names found is returned, mostly for the benefit of unit
+tests.
 
 
 
@@ -8041,6 +9918,30 @@ Search through a numbered git commit log looking for the commit whose number is
 *commit-number*.  Return the SHA-1 hash of the commit if the commit number is found.
 Return nil if no commit with the given number is found.
 The commit log is assume to have been numbered by shu-git-number-commits.
+
+
+
+#### shu-fix-markdown-section ####
+shu-fix-markdown-section *max-depth*
+[Function]
+
+On entry, point is positioned after one or more pound signs that define the
+beginning of a markdown section heading.  If the number of pound signs is
+greater than *max-depth*, ignore the line and return nil.  If the number of
+pound signs is less than or equal to *max-depth*, fix the line as described
+below and return it.
+
+If the line ends with an expression that looks like
+
+```
+      "<a name=currentliveupdate></a>",
+```
+
+remove it.
+
+If the line ends with trailing pound signs, remove them as well.
+
+Then return the repaired line.
 
 
 
@@ -8059,11 +9960,41 @@ The latter is a format that Microsoft Excel can import.
 
 
 
+#### shu-fixup-doxyfile ####
+[Command]
+ (Alias: fixup-doxyfile)
+
+The current directory is assumed to have the same name as the project for
+which the Doxyfile was created.  This function sets various default values in
+the Doxyfile.  The current buffer is the Doxyfile.
+
+
+
+#### shu-fixup-project-doxyfile ####
+shu-fixup-project-doxyfile *project-name*
+[Command]
+
+*project-name* is the name of the project for which the Doxyfile has been created.
+This function sets standard default values.
+If this function succeeds, it return true, else nil.  The return value may be used
+in batch mode to determine if the fixup was successful.
+
+
+
 #### shu-forward-line ####
 [Function]
 
 Move forward by one line.  If there is a next line, point it moved into
 it.  If there are no more lines, a new one is created.
+
+
+
+#### shu-frame-width ####
+[Function]
+
+Return the width of an emacs frame.  Different operating systems appear to
+have slightly different windowing systems, which means that the
+FRAME-INNER-WIDTH function does not quite report the exact width.
 
 
 
@@ -8075,10 +10006,184 @@ While in dired, put the full path to the current directory in the kill ring
 
 
 
+#### shu-get-containing-function ####
+[Function]
+
+Search backwards from the current point to find the beginning of the enclosing
+function, macro, etc.  If such a beginning is found, return a cons cell whose car
+is the point that defines the point at the beginning of the function and whose cdr
+defines the point at the end of the function.  If not inside a function, macro, etc.,
+return nil
+
+
+
 #### shu-get-current-line ####
 [Function]
 
 Return the current line in the buffer as a string
+
+
+
+#### shu-get-debian-dependencies ####
+[Function]
+
+This function tries to find a Debian library dependency file in the current
+directory tree.  If such a file is found, this function returns a sorted list of
+the dependencies listed in the Debian dependency file.  If no such file exists,
+nil is returned.
+
+
+
+#### shu-get-debian-dependency-file ####
+[Function]
+
+Use the name of the current directory as the name of a debian library.
+Construct a dependency file name which is the name of the current directory with
+a file type of ".dep".  Search through the directory tree for such a file.  If
+the file is found return its fully qualified name, i.e., the full path to the
+file so that it may be opened.  If no such file exists, return nil.
+
+
+
+#### shu-get-debian-dependency-line ####
+[Function]
+
+This function tries to find a Debian library dependency file in the current
+directory tree.  If such a file is found, this function returns a single line of
+text that holds the space separated names of all of the dependencies.
+
+
+
+#### shu-get-git-name ####
+shu-get-git-name *path*
+[Function]
+
+*path* is the url of a git repository from the [remote "origin"] section of a
+.git/config file.  For example, the entry for this repository is
+
+```
+      https://github.com/codesinger/shu.git
+```
+
+This function extracts two pieces of information from the URL.  One is the name
+of the repository, which in this case is "shu".  The other is the path to the
+repository, which includes the owning group, which in this case is
+"codesinger/shu".
+
+Those two items are returned in a cons cell with the car of the cons cell
+holding the path (with owning group) and the cdr of the cons cell holding the
+repository name.
+
+The assumptions made by this function are as follows: The beginning of the
+owning group and repository name are preceded by a domain name followed by
+either a colon or a slash.  In the case of this repository, the owning group and
+repository name are preceded by "github.com/".  The repository name may or may
+not have a trailing ".git", which this function removes.
+
+
+
+#### shu-get-git-repo-name ####
+[Function]
+
+This function tries to get the name of the current git repository
+from the .git/config file.  Returns nil if it cannot open .git/config.
+
+
+
+#### shu-get-git-repo-path ####
+[Function]
+
+This function tries to get the host local path to the current git repository
+from the .git/config file if possible.  If it cannot find the .git/config file,
+the it uses the shu custom variable *shu-internal-group-name* as the group owner
+and uses the name of the current directory as the repository name and constructs
+a host local path that is the owning group name, a slash, and the putative
+repository name (the name of the current directory.
+
+
+
+#### shu-get-markdown-heading ####
+shu-get-markdown-heading *section-heading*
+[Function]
+
+Returns the heading text from a markdown section heading, *section-heading*.
+There must be at least one pound sign at the beginning of the string.  If a
+section heading is
+
+   "### This is a section heading"
+
+then the string "This is a section heading" is returned.  If the first
+character in the section heading is not a pound sign, nil is returned.
+
+
+
+#### shu-get-markdown-level ####
+shu-get-markdown-level *section-heading*
+[Function]
+
+Return the level of a markdown section heading.  The level is defined as
+the number of leading pound signs that start at the beginning of the string.
+A level 1 heading begins with "#".  A level 2 heading begins with "##".
+If there are no leading pound signs at the beginning of the string, a level of
+zero is returned.
+
+
+
+#### shu-get-markdown-prefix ####
+shu-get-markdown-prefix *section-heading*
+[Function]
+
+Returns the pound sign prefix from a markdown section heading,
+*section-heading*.  The string of pound signs must begin at the beginning of the
+string.  If a section heading is
+
+   "### This is a section heading"
+
+then the string "###" is returned.  If the first character in the section
+heading is not a pound sign, nil is returned.
+
+
+
+#### shu-get-md-boundaries ####
+[Function]
+
+Find all pairs of markdown literal text.  In markdown, the sequence ``` is
+used to bound literal text.  When creating a markdown table of contents, we do
+not want to look at pound signs contained in literal text.  This function finds
+the location of each pair of ``` sentinels.  It returns a list of cons sells,
+each of which has the start and end position of a ``` sequence.  If there is a
+start ``` with no companion ``` close, it is not included in the list.
+
+
+
+#### shu-get-repo ####
+[Function]
+ (Alias: get-repo)
+
+When positioned anywhere in a git repository, return the git path to the
+repository.  This is found in .git/config as the url of [remote "origin"].
+Return nil if the path cannot be found.
+
+The search is made from the current directory and upwards for the first
+directory called ".git".
+
+
+
+#### shu-get-url-repo ####
+[Function]
+
+Return the web URL for the current git repository.  If the URL cannot be
+found, nil is returned.
+
+The url for the git repository in .git/config is of the form
+
+```
+       git@web-address:repository-name.git
+```
+
+This function removes the trailing ".git", replaces the leading "git@" with
+"https://" and replaces the ":" between the web-address and repository-name
+with "/".
 
 
 
@@ -8164,6 +10269,14 @@ Return the name of the current branch in a git repository.
 
 
 
+#### shu-git-find-default-branch ####
+[Function]
+
+Return the name of the default branch in a git repository.  The default
+branch is the one branch that is created with a new repository.
+
+
+
 #### shu-git-find-short-hash ####
 shu-git-find-short-hash *hash*
 [Function]
@@ -8173,11 +10286,29 @@ if the given *hash* is not a valid git revision.
 
 
 
+#### shu-git-get-pr-url ####
+[Command]
+ (Alias: get-pr-url)
+
+Put into the kill ring the path required to create a new pull request for
+the current branch of the current repository.
+
+
+
 #### shu-git-insert-branch ####
 [Command]
  (Alias: insb)
 
 Insert at point the name of the current branch in a git repository
+
+
+
+#### shu-git-insert-git-commit ####
+[Command]
+ (Alias: gcm)
+
+Insert at point the name the git command to commit with the commentary held
+in a file called "why.txt".
 
 
 
@@ -8194,8 +10325,8 @@ word "origin"..  This can be used as part of git push or pull.
 [Command]
  (Alias: gpl)
 
-Insert at point the name the git command to pull the current branch out
-to origin.
+Insert at point the name the git command to pull the current branch from
+origin.
 
 
 
@@ -8203,8 +10334,10 @@ to origin.
 [Command]
  (Alias: gps)
 
-Insert at point the name the git command to push the current branch out
-to origin.
+Insert at point the git command to push the current branch out to origin.  If
+the current branch is the default branch (fka "master"), you are prompted to
+see if you want to proceed.  This is to prevent an accidental push to the
+default branch.
 
 
 
@@ -8244,6 +10377,30 @@ Insert a LaTeX quote environment and position the cursor for typing the quote.
 
 
 
+#### shu-insert-markdown-toc ####
+shu-insert-markdown-toc *entries*
+[Function]
+
+*entries* is a list of cons cells.  The car of each item on the list is the
+markdown heading line, which looks something like "## This is a heading".
+The cdr of each item on the list is the link name.  This function inserts a
+markdown table of contents in which each line in the table of contents
+consists of the heading text in brackets followed by the line name in
+parenthesis and preceded by a pound sign.  Each line that represents a heading
+level greater than one is also indented to indicate its heading level.
+
+
+
+#### shu-internal-get-repo ####
+[Function]
+
+The current buffer holds an instance of the ".git/config" file for the
+repository.  This function returns the git path to the repository, which is the
+url given after [remote "origin"].  nil is returned if the path cannot be
+found.
+
+
+
 #### shu-internal-new-lisp ####
 shu-internal-new-lisp *func-type* *func-name* **&optional** *doc-string* *interactive*
 [Command]
@@ -8259,6 +10416,27 @@ true, the function is interactive.
 [Command]
 
 Kills the current buffer.
+
+
+
+#### shu-kill-repo ####
+[Command]
+
+When positioned in the top level directory of a git repository, place into
+the kill ring the git path to the repository.  This is found in .git/config as
+the url of [remote "origin"]
+
+This should probably be extended to do a search for the .git directory anywhere
+above the current position, which would remove the requirement to be in the root
+of the repository.
+
+
+
+#### shu-kill-system-name ####
+[Command]
+ (Alias: kill-system-name)
+
+Place the system name` (machine name) in the message area.
 
 
 
@@ -8362,12 +10540,176 @@ of contents entry created and inserted at point will be
 
 
 
+#### shu-md-in-literal ####
+shu-md-in-literal *literals* *pt*
+[Function]
+
+*literals* is a list of markdown literal boundaries produced by
+*shu-get-md-boundaries*.  This function returns t if the point *pt* lies within a
+markdown literal boundary.
+
+
+
+#### shu-misc-get-chunk ####
+shu-misc-get-chunk *line-limit* **&optional** *escape*
+[Function]
+
+Return a string that consists of the first *line-limit* characters in the
+current buffer.  If *line-limit* is larger than the buffer size, return a
+string that is the entire contents of the buffer.  Before returning, delete
+from the buffer the returned string.
+
+
+
+#### shu-misc-get-phrase ####
+shu-misc-get-phrase *line-limit* **&optional** *escape*
+[Function]
+
+Remove from the front of the current buffer and return the longest possible
+string of whitespace separated things whose length does not exceed line-limit.
+If there is at least one whitespace character before *line-limit*, the string will
+end with one or more whitespace characters.  i.e., the string will end on a word
+boundary if that is possible.
+
+Words will not be split unless there is no whitespace character before
+*line-limit* characters have been scanned, in which case a string of exactly
+*line-limit* length will be removed and returned.
+
+This function is used to split a string of words into a set of smaller strings
+such that words are not split.
+
+
+
+#### shu-misc-internal-split-buffer ####
+shu-misc-internal-split-buffer *line-limit* *get-function* **&optional** *escape*
+[Function]
+
+Split an entire buffer into multiple strings and return a list of the
+strings.  *get-function* is the function to call to fetch each new string.
+*get-function* is set to either *shu-misc-get-chunk* or *shu-misc-get-phrase*.
+
+*shu-misc-get-chunk* returns each string as a fixed length string of *line-limit*
+characters, except for the last one, which may be shorter.
+
+*shu-misc-get-phrase* returns the longest possible string that ends on a word
+boundary and whose length is less than or equal to *line-limit*.
+
+
+
+#### shu-misc-make-unique-string ####
+shu-misc-make-unique-string *string* *suffix-length* *ht*
+[Function]
+
+Input is a hash table, *ht*, as well as a *string*.  If the string does not
+already exist in *ht*, add the string to the hash table and return the string.
+If the string already exists in *ht*, add a suffix to the string that is a
+random string of length *suffix-length*.  If the combination of the original
+*string* plus the random string added as a suffix, does not exist in the hash
+table, add the new string to the hash table and return it.  This provides the
+generation of a set of unique string names.
+
+
+
+#### shu-misc-random-internal-string ####
+shu-misc-random-internal-string *letters* *length*
+[Function]
+
+Return a string composed of random *letters* of length *length*.
+
+
+
+#### shu-misc-random-lad-string ####
+shu-misc-random-lad-string *length*
+[Function]
+
+Return a string composed of random lower case letters and digits of length
+ *length*.
+
+
+
+#### shu-misc-random-ua-string ####
+shu-misc-random-ua-string *length*
+[Function]
+
+Return a string composed of random upper case letters of length *length*.
+
+
+
+#### shu-misc-rx-conditionals ####
+[Constant]
+
+Regular expression to find the beginning of a function or macro that encloses
+a body.  Such functions usually require a future closing parenthesis that is
+likely not on the current line.  This is used by the functions *shu-tighten-lisp*
+and *shu-loosen-lisp*.
+
+
+
+#### shu-misc-rx-functions ####
+[Constant]
+
+Regular expression to find the beginning of a function, macro, etc.
+
+
+
+#### shu-misc-rx-lets ####
+[Constant]
+
+Regular expression to find the beginning of a let special form.
+This searches for "let" or "let*" followed by "(".
+
+
+
 #### shu-misc-set-alias ####
 [Function]
 
 Set the common alias names for the functions in shu-misc.
 These are generally the same as the function names with the leading
 shu- prefix removed.
+
+
+
+#### shu-misc-split-buffer ####
+shu-misc-split-buffer *line-limit* **&optional** *fixed-width* *escape*
+[Function]
+
+Split an entire buffer into multiple strings and return a list of the
+strings.  If *fixed-width* is true, then each returned string is *line-limit*
+characters in length, except for the last, which may be shorter.  If *fixed-width*
+is absent or nil, then each returned string is split on a word boundary and no
+string exceeds *line-limit* characters in length.
+
+
+
+#### shu-misc-split-chunk-buffer ####
+shu-misc-split-chunk-buffer *line-limit* **&optional** *escape*
+[Function]
+
+Split an entire buffer into multiple strings and return a list of the
+strings.  Each returned string is *line-limit* characters in length, except for
+the last one, which may be shorter.
+
+
+
+#### shu-misc-split-phrase-buffer ####
+shu-misc-split-phrase-buffer *line-limit*
+[Function]
+
+Split an entire buffer into multiple strings and return a list of the
+strings.  Each returned string is split on a word boundary and no string exceeds
+*line-limit* characters in length.
+
+
+
+#### shu-misc-split-string ####
+shu-misc-split-string *input* *line-limit* **&optional** *fixed-width* *escape*
+[Function]
+
+Split a string into multiple strings and return a list of the strings.  If
+*fixed-width* is true, then each returned string is *line-limit* characters in
+length, except for the last, which may be shorter.  If *fixed-width* is absent or
+nil, then each returned string is split on a word boundary and no string exceeds
+*line-limit* characters in length.
 
 
 
@@ -8442,12 +10784,44 @@ point is placed where the the first line of code in the loop belongs.
 
 
 
+#### shu-next-char-in-seq ####
+shu-next-char-in-seq *current-char*
+[Function]
+
+*current-char* is a character in the range a-z (or A-Z).  This function returns
+the next character, where next is the next character in the alphabet unless
+*current-char* is 'z', in which case the next character returned is 'a'.  If
+*current-char* is 'Z', then the next character returned is 'A'.
+
+
+
 #### shu-number-lines ####
 [Command]
  (Alias: number-lines)
 
 Insert in front of each line in the buffer its line number.  Starts
 at point and continues to the end of the buffer.
+
+
+
+#### shu-obfuscate-region ####
+shu-obfuscate-region *start* *end*
+[Command]
+ (Alias: obfuscate-region)
+
+Obfuscate a region of text by replacing every alphabetic character in the
+region with the next letter of the alphabet, staring with 'a'. For example, of
+the region contains
+
+  Now is the time for all good men to come to the aid of the Party 10 times.
+
+Then the obfuscated text would be:
+
+  Abc de fgh ijkl mno pqr stuv wxy za bcde fg hij klm no pqr Stuvw 10 xyzab.
+
+This is useful if you want to capture some text for later testing and
+manipulation that might contain confidential or proprietary information.  This
+is an encoding that cannot be reversed.
 
 
 
@@ -8497,6 +10871,23 @@ Remove from a file all lines that contain file names that end in .t.cpp
 In a list of names, change all occurrences
 of Lastname, Firstname to Firstname Lastname.
 Position to the start of the file and invoke once.
+
+
+
+#### shu-reverse2 ####
+[Command]
+
+When positioned in front of a pair of parenthesis that contains a pair of
+expressions separated by a comma, reverse the positions of the two expressions.
+The first becomes the second and the second becomes the first.
+i.e.,
+```
+      foo(mumble, bar);
+```
+becomes
+```
+      foo(bar, mumble);
+```
 
 
 
@@ -8581,6 +10972,23 @@ the host operating system.
 
 
 
+#### shu-show-repo ####
+[Command]
+ (Alias: show-repo)
+
+Call *shu-get-repo* to find the path to the repository and show the result in
+the minibuffer.
+
+
+
+#### shu-show-system-name ####
+[Command]
+ (Alias: show-system-name)
+
+Place the system name (machine name) in the message area.
+
+
+
 #### shu-split-range-string ####
 shu-split-range-string *range-string*
 [Function]
@@ -8601,6 +11009,40 @@ For example, "99+2" has start 99 and end 101.  "99-2" has start 99 and end 97.
 
 
 
+#### shu-system-name ####
+[Function]
+
+Return the machine name.  Prior to emacs 25.1, this was held in the variable
+system-name.  As of emacs 25.1, system-name is now a function.  Return nil if
+system-name is neither a function nor a variable.
+
+
+
+#### shu-system-name-string ####
+[Function]
+
+Return the machine name.  Prior to emacs 25.1, this was held in the variable
+system-name.  As of emacs 25.1, system-name is now a function.  Unlike
+*shu-system-name*, this function always returns a string, even if the machine
+name is not available for some reason.
+
+
+
+#### shu-tighten-hanging-paren ####
+shu-tighten-hanging-paren *eof*
+[Command]
+
+Call this function while point is on a left parenthesis.  This function will
+find the matching right parenthesis.  If the matching right parenthesis is on a line
+by itself and a previous line ends in another right parenthesis, the line and
+dangling right parenthesis will be moved up to the end of the line that also ends
+in a right parenthesis.  This is an internal part of the function *shu-tighten-lisp*.
+*eof* is the point at which the current function on which we are operating ends.
+This function removes some text from the current function.  It adjusts *eof* appropriately
+and returns the new value to the caller.
+
+
+
 #### shu-tighten-lisp ####
 [Command]
  (Alias: tighten-lisp)
@@ -8611,11 +11053,78 @@ the end of the previous line.  This function is the opposite of *shu-loosen-lisp
 
 
 
+#### shu-tocify-markdown-file ####
+[Command]
+ (Alias: make-md-toc)
+
+Search the file starting at the current position for any markdown headings of
+the form "## This is a heading".  Add a tag to each heading and then insert a
+complete markdown table of contents at the current position.
+
+Pound signs that lie inside of markdown literal areas designated by "```" are
+ignored.  This prevents something such as an example of an #include directive
+from being treated as a level 1 heading.
+
+If a heading already has a tag, it is removed.  If a heading has trailing pound
+signs, they are also removed.
+
+The default maximum heading level is two, which means that heading levels
+greater than two are not included in the table of contents.  But a numeric
+prefix argument can change the maximum heading level.  The maximum heading level
+cannot be set to a value less than one.
+
+
+
+#### shu-tocify-markdown-headings ####
+shu-tocify-markdown-headings *entries*
+[Function]
+
+*entries* is a list of cons cells.  The car of each item on the list is the
+markdown heading line, which looks something like "## This is a heading".
+The cdr of each item on the list is the link name.  This function searches for
+each markdown heading in the file and appends to the heading a tag of the form
+
+```
+     <a name=link name></a>
+```
+
+so that it may be referenced from the table of contents.
+
+
+
+#### shu-trim-git-end ####
+shu-trim-git-end *path*
+[Command]
+
+First trim leading and trailing spaces from *path*.  If *path* ends in ".git",
+trim the last four characters from the path.  If *path* does not end in ".git",
+do not trim the last four characters.
+
+Return the *path*, leading and trailing spaces trimmed, with perhaps ".git"
+removed from the end.
+
+
+
 #### shu-trim-trailing-blanks ####
 [Command]
  (Alias: trim-trailing-blanks)
 
 Eliminate whitespace at ends of all lines in the current buffer.
+
+
+
+#### shu-unbrace ####
+[Command]
+ (Alias: unbrace)
+
+When point is on an opening sexp, this function converts, within the scope of
+the sexp, all "{" to "(" and all "}" to ").".
+If the number of left braces does not match the number of right braces a warning
+message is emitted.
+
+For the benefit of unit tests, the count of left braces converted iff the count
+of left braces matches the count of right braces.  If the counts do not match,
+nil is returned.
 
 
 
@@ -8978,10 +11487,14 @@ within type.
 Associate a number with each type of variable
 
 
+
 # Index #
 
 * [acgen](#acgen)
+* [add-alexandria-badge](#add-alexandria-badge)
+* [add-alexandria](#add-alexandria)
 * [add-prefix](#add-prefix)
+* [af](#af)
 * [all-quit](#all-quit)
 * [author](#author)
 * [bde-add-guard](#bde-add-guard)
@@ -9008,6 +11521,7 @@ Associate a number with each type of variable
 * [clear-c-project](#clear-c-project)
 * [clear-prefix](#clear-prefix)
 * [comma-names-to-letter](#comma-names-to-letter)
+* [copy-repo](#copy-repo)
 * [cother](#cother)
 * [count-c-project](#count-c-project)
 * [cpp1-class](#cpp1-class)
@@ -9031,13 +11545,20 @@ Associate a number with each type of variable
 * [drc](#drc)
 * [dup](#dup)
 * [eld](#eld)
+* [fill-area](#fill-area)
+* [fill-data](#fill-data)
 * [find-all-variables](#find-all-variables)
 * [fixp](#fixp)
+* [fixup-doxyfile](#fixup-doxyfile)
 * [fline](#fline)
+* [gcc](#gcc)
+* [gcm](#gcm)
 * [gd](#gd)
 * [gen-bb-component](#gen-bb-component)
 * [gen-bde-component](#gen-bde-component)
 * [gen-component](#gen-component)
+* [get-pr-url](#get-pr-url)
+* [get-repo](#get-repo)
 * [get-set](#get-set)
 * [getdef](#getdef)
 * [getters](#getters)
@@ -9054,14 +11575,19 @@ Associate a number with each type of variable
 * [hother](#hother)
 * [insb](#insb)
 * [inso](#inso)
+* [iother](#iother)
+* [kill-system-name](#kill-system-name)
 * [kracct](#kracct)
 * [krfn](#krfn)
 * [krid](#krid)
 * [krpin](#krpin)
+* [krpps](#krpps)
 * [krpw](#krpw)
 * [krurl](#krurl)
 * [krvf](#krvf)
 * [list-c-directories](#list-c-directories)
+* [list-c-duplicates](#list-c-duplicates)
+* [list-c-file-names](#list-c-file-names)
 * [list-c-prefixes](#list-c-prefixes)
 * [list-c-project](#list-c-project)
 * [list-completing-names](#list-completing-names)
@@ -9069,6 +11595,12 @@ Associate a number with each type of variable
 * [list-short-names](#list-short-names)
 * [loosen-lisp](#loosen-lisp)
 * [make-c-project](#make-c-project)
+* [make-datetime](#make-datetime)
+* [make-full-c-project](#make-full-c-project)
+* [make-interval](#make-interval)
+* [make-md-toc](#make-md-toc)
+* [make-p-project](#make-p-project)
+* [make-tzdate](#make-tzdate)
 * [md-name](#md-name)
 * [md-toc](#md-toc)
 * [modified-buffers](#modified-buffers)
@@ -9082,6 +11614,7 @@ Associate a number with each type of variable
 * [new-x-file](#new-x-file)
 * [number-commits](#number-commits)
 * [number-lines](#number-lines)
+* [obfuscate-region](#obfuscate-region)
 * [of](#of)
 * [operators](#operators)
 * [os-name](#os-name)
@@ -9095,18 +11628,31 @@ Associate a number with each type of variable
 * [renew-c-project](#renew-c-project)
 * [reverse-comma-names](#reverse-comma-names)
 * [reverse-parse-region](#reverse-parse-region)
+* [scan-grok](#scan-grok)
 * [set-c-project](#set-c-project)
 * [set-default-namespace](#set-default-namespace)
 * [set-dir-prefix](#set-dir-prefix)
 * [set-dos-eol](#set-dos-eol)
+* [set-modern](#set-modern)
+* [set-no-modern](#set-no-modern)
+* [set-p-project](#set-p-project)
+* [set-passphrase](#set-passphrase)
 * [set-prefix](#set-prefix)
 * [set-unix-eol](#set-unix-eol)
 * [show-branch](#show-branch)
+* [show-repo](#show-repo)
+* [show-system-name](#show-system-name)
+* [shu-adapt-frame](#shu-adapt-frame)
+* [shu-add-alexandria-badge](#shu-add-alexandria-badge)
+* [shu-add-alexandria-in-batch-mode](#shu-add-alexandria-in-batch-mode)
+* [shu-add-alexandria](#shu-add-alexandria)
 * [shu-add-cpp-base-types](#shu-add-cpp-base-types)
 * [shu-add-cpp-c-extensions](#shu-add-cpp-c-extensions)
 * [shu-add-cpp-h-extensions](#shu-add-cpp-h-extensions)
 * [shu-add-cpp-package-line](#shu-add-cpp-package-line)
+* [shu-add-doxyfile](#shu-add-doxyfile)
 * [shu-add-prefix](#shu-add-prefix)
+* [shu-add-to-alist-list](#shu-add-to-alist-list)
 * [shu-add-to-alist](#shu-add-to-alist)
 * [shu-add-to-alist](#shu-add-to-alist)
 * [shu-aix-show-allocators](#shu-aix-show-allocators)
@@ -9118,9 +11664,13 @@ Associate a number with each type of variable
 * [shu-all-whitespace-regexp](#shu-all-whitespace-regexp)
 * [shu-attr-name](#shu-attr-name)
 * [shu-author](#shu-author)
+* [shu-batch-add-alexandria](#shu-batch-add-alexandria)
+* [shu-batch-copy-trace](#shu-batch-copy-trace)
+* [shu-batch-fail](#shu-batch-fail)
 * [shu-batch-hello](#shu-batch-hello)
 * [shu-batch-init](#shu-batch-init)
 * [shu-batch-rmv-using](#shu-batch-rmv-using)
+* [shu-batch-test-args](#shu-batch-test-args)
 * [shu-bb-cpp-set-alias](#shu-bb-cpp-set-alias)
 * [shu-bde-add-guard](#shu-bde-add-guard)
 * [shu-bde-all-guard](#shu-bde-all-guard)
@@ -9139,6 +11689,8 @@ Associate a number with each type of variable
 * [shu-bde-set-alias](#shu-bde-set-alias)
 * [shu-bde-sgen](#shu-bde-sgen)
 * [shu-binclude](#shu-binclude)
+* [shu-bool-to-string](#shu-bool-to-string)
+* [shu-bsl-include-list](#shu-bsl-include-list)
 * [shu-buffer-number-lines](#shu-buffer-number-lines)
 * [shu-capture-a-type-after](#shu-capture-a-type-after)
 * [shu-capture-a-type-arg](#shu-capture-a-type-arg)
@@ -9254,12 +11806,14 @@ Associate a number with each type of variable
 * [shu-completion-is-directory](#shu-completion-is-directory)
 * [shu-conditional-find-file](#shu-conditional-find-file)
 * [shu-conditional-load-library-files](#shu-conditional-load-library-files)
+* [shu-copy-repo](#shu-copy-repo)
 * [shu-cother](#shu-cother)
 * [shu-count-c-project](#shu-count-c-project)
 * [shu-count-in-cpp-directory](#shu-count-in-cpp-directory)
 * [shu-cpp-acgen](#shu-cpp-acgen)
 * [shu-cpp-adjust-template-parameters](#shu-cpp-adjust-template-parameters)
 * [shu-cpp-all-search-match-tokens](#shu-cpp-all-search-match-tokens)
+* [shu-cpp-allocator-type](#shu-cpp-allocator-type)
 * [shu-cpp-author](#shu-cpp-author)
 * [shu-cpp-base-types](#shu-cpp-base-types)
 * [shu-cpp-c-extensions](#shu-cpp-c-extensions)
@@ -9285,12 +11839,26 @@ Associate a number with each type of variable
 * [shu-cpp-completion-scratch](#shu-cpp-completion-scratch)
 * [shu-cpp-completion-target](#shu-cpp-completion-target)
 * [shu-cpp-copy-token-info](#shu-cpp-copy-token-info)
+* [shu-cpp-date-type](#shu-cpp-date-type)
+* [shu-cpp-datetime-timezone-type](#shu-cpp-datetime-timezone-type)
+* [shu-cpp-datetime-type](#shu-cpp-datetime-type)
+* [shu-cpp-decl-class-name](#shu-cpp-decl-class-name)
+* [shu-cpp-decl-cpp-class-name](#shu-cpp-decl-cpp-class-name)
+* [shu-cpp-decl-cpp-print-self](#shu-cpp-decl-cpp-print-self)
+* [shu-cpp-decl-cpp-stream](#shu-cpp-decl-cpp-stream)
+* [shu-cpp-decl-h-class-name](#shu-cpp-decl-h-class-name)
+* [shu-cpp-decl-h-print-self](#shu-cpp-decl-h-print-self)
+* [shu-cpp-decl-h-stream](#shu-cpp-decl-h-stream)
 * [shu-cpp-default-allocator-name](#shu-cpp-default-allocator-name)
+* [shu-cpp-default-allocator-type](#shu-cpp-default-allocator-type)
 * [shu-cpp-default-global-namespace](#shu-cpp-default-global-namespace)
+* [shu-cpp-default-member](#shu-cpp-default-member)
 * [shu-cpp-default-namespace](#shu-cpp-default-namespace)
-* [shu-cpp-directory-prefix](#shu-cpp-directory-prefix)
-* [shu-cpp-extensions](#shu-cpp-extensions)
+* [shu-cpp-file-directory-name](#shu-cpp-file-directory-name)
+* [shu-cpp-file-name-list](#shu-cpp-file-name-list)
 * [shu-cpp-file-name](#shu-cpp-file-name)
+* [shu-cpp-fill-test-area](#shu-cpp-fill-test-area)
+* [shu-cpp-fill-test-data](#shu-cpp-fill-test-data)
 * [shu-cpp-final-list](#shu-cpp-final-list)
 * [shu-cpp-find-h-definition](#shu-cpp-find-h-definition)
 * [shu-cpp-find-using](#shu-cpp-find-using)
@@ -9299,6 +11867,9 @@ Associate a number with each type of variable
 * [shu-cpp-finish-project](#shu-cpp-finish-project)
 * [shu-cpp-fix-prototype](#shu-cpp-fix-prototype)
 * [shu-cpp-found-extensions](#shu-cpp-found-extensions)
+* [shu-cpp-gen-decl-h-private](#shu-cpp-gen-decl-h-private)
+* [shu-cpp-gen-h-class-intro](#shu-cpp-gen-h-class-intro)
+* [shu-cpp-gen-inline-template-header](#shu-cpp-gen-inline-template-header)
 * [shu-cpp-general-set-alias](#shu-cpp-general-set-alias)
 * [shu-cpp-get-comment](#shu-cpp-get-comment)
 * [shu-cpp-get-operator-token](#shu-cpp-get-operator-token)
@@ -9309,22 +11880,50 @@ Associate a number with each type of variable
 * [shu-cpp-h-extensions](#shu-cpp-h-extensions)
 * [shu-cpp-h-file-count](#shu-cpp-h-file-count)
 * [shu-cpp-hcgen](#shu-cpp-hcgen)
+* [shu-cpp-include-names](#shu-cpp-include-names)
 * [shu-cpp-include-user-brackets](#shu-cpp-include-user-brackets)
 * [shu-cpp-indent-length](#shu-cpp-indent-length)
 * [shu-cpp-inner-cdecl](#shu-cpp-inner-cdecl)
+* [shu-cpp-internal-fill-test-data](#shu-cpp-internal-fill-test-data)
 * [shu-cpp-internal-list-names](#shu-cpp-internal-list-names)
+* [shu-cpp-internal-make-bool](#shu-cpp-internal-make-bool)
+* [shu-cpp-internal-make-char](#shu-cpp-internal-make-char)
+* [shu-cpp-internal-make-date](#shu-cpp-internal-make-date)
+* [shu-cpp-internal-make-datetime](#shu-cpp-internal-make-datetime)
+* [shu-cpp-internal-make-double](#shu-cpp-internal-make-double)
+* [shu-cpp-internal-make-float](#shu-cpp-internal-make-float)
+* [shu-cpp-internal-make-int](#shu-cpp-internal-make-int)
+* [shu-cpp-internal-make-interval](#shu-cpp-internal-make-interval)
+* [shu-cpp-internal-make-long-long](#shu-cpp-internal-make-long-long)
+* [shu-cpp-internal-make-short-interval](#shu-cpp-internal-make-short-interval)
+* [shu-cpp-internal-make-short](#shu-cpp-internal-make-short)
+* [shu-cpp-internal-make-time](#shu-cpp-internal-make-time)
+* [shu-cpp-internal-make-unsigned-int](#shu-cpp-internal-make-unsigned-int)
 * [shu-cpp-internal-stream-check](#shu-cpp-internal-stream-check)
 * [shu-cpp-internal-sub-match-tokens](#shu-cpp-internal-sub-match-tokens)
+* [shu-cpp-internal-tz-make-datetime](#shu-cpp-internal-tz-make-datetime)
+* [shu-cpp-interval-type](#shu-cpp-interval-type)
 * [shu-cpp-is-enclosing-op](#shu-cpp-is-enclosing-op)
 * [shu-cpp-is-reverse-token-list-balanced](#shu-cpp-is-reverse-token-list-balanced)
 * [shu-cpp-keywords-hash](#shu-cpp-keywords-hash)
 * [shu-cpp-keywords](#shu-cpp-keywords)
+* [shu-cpp-line-end](#shu-cpp-line-end)
 * [shu-cpp-list-completing-names](#shu-cpp-list-completing-names)
 * [shu-cpp-list-project-names](#shu-cpp-list-project-names)
 * [shu-cpp-list-short-names](#shu-cpp-list-short-names)
+* [shu-cpp-long-long-type](#shu-cpp-long-long-type)
+* [shu-cpp-make-date](#shu-cpp-make-date)
+* [shu-cpp-make-datetime](#shu-cpp-make-datetime)
+* [shu-cpp-make-interval](#shu-cpp-make-interval)
 * [shu-cpp-make-match-info](#shu-cpp-make-match-info)
 * [shu-cpp-make-match-side-list](#shu-cpp-make-match-side-list)
+* [shu-cpp-make-short-interval](#shu-cpp-make-short-interval)
+* [shu-cpp-make-size-type](#shu-cpp-make-size-type)
+* [shu-cpp-make-time](#shu-cpp-make-time)
 * [shu-cpp-make-token-info](#shu-cpp-make-token-info)
+* [shu-cpp-map-class-to-include](#shu-cpp-map-class-to-include)
+* [shu-cpp-match-classname-forms](#shu-cpp-match-classname-forms)
+* [shu-cpp-match-colon-name-return](#shu-cpp-match-colon-name-return)
 * [shu-cpp-match-colon-name](#shu-cpp-match-colon-name)
 * [shu-cpp-match-evaluate-side-list](#shu-cpp-match-evaluate-side-list)
 * [shu-cpp-match-extract-info](#shu-cpp-match-extract-info)
@@ -9341,6 +11940,7 @@ Associate a number with each type of variable
 * [shu-cpp-match-namespace-list](#shu-cpp-match-namespace-list)
 * [shu-cpp-match-op-code-name](#shu-cpp-match-op-code-name)
 * [shu-cpp-match-or-list](#shu-cpp-match-or-list)
+* [shu-cpp-match-repeat-list-once](#shu-cpp-match-repeat-list-once)
 * [shu-cpp-match-repeat-list](#shu-cpp-match-repeat-list)
 * [shu-cpp-match-repeat-sub-list](#shu-cpp-match-repeat-sub-list)
 * [shu-cpp-match-some-include](#shu-cpp-match-some-include)
@@ -9348,7 +11948,17 @@ Associate a number with each type of variable
 * [shu-cpp-match-using-forms](#shu-cpp-match-using-forms)
 * [shu-cpp-match-using-list-single](#shu-cpp-match-using-list-single)
 * [shu-cpp-member-prefix](#shu-cpp-member-prefix)
+* [shu-cpp-misc-gen-ctor-not-implemented](#shu-cpp-misc-gen-ctor-not-implemented)
+* [shu-cpp-misc-gen-h-ctor](#shu-cpp-misc-gen-h-ctor)
+* [shu-cpp-misc-gen-h-dtor](#shu-cpp-misc-gen-h-dtor)
+* [shu-cpp-misc-gen-nested-traits](#shu-cpp-misc-gen-nested-traits)
+* [shu-cpp-misc-gen-not-implemented](#shu-cpp-misc-gen-not-implemented)
+* [shu-cpp-misc-gen-op-equal-not-implemented](#shu-cpp-misc-gen-op-equal-not-implemented)
+* [shu-cpp-misc-h-tail-gen](#shu-cpp-misc-h-tail-gen)
+* [shu-cpp-misc-inline-template-label](#shu-cpp-misc-inline-template-label)
+* [shu-cpp-misc-not-implemented-label](#shu-cpp-misc-not-implemented-label)
 * [shu-cpp-misc-set-alias](#shu-cpp-misc-set-alias)
+* [shu-cpp-modern](#shu-cpp-modern)
 * [shu-cpp-name-list](#shu-cpp-name-list)
 * [shu-cpp-name](#shu-cpp-name)
 * [shu-cpp-operator-start-chars](#shu-cpp-operator-start-chars)
@@ -9359,7 +11969,9 @@ Associate a number with each type of variable
 * [shu-cpp-parse-region](#shu-cpp-parse-region)
 * [shu-cpp-prefix-list](#shu-cpp-prefix-list)
 * [shu-cpp-project-collapse-list](#shu-cpp-project-collapse-list)
+* [shu-cpp-project-extract-base-name](#shu-cpp-project-extract-base-name)
 * [shu-cpp-project-file](#shu-cpp-project-file)
+* [shu-cpp-project-get-base-name](#shu-cpp-project-get-base-name)
 * [shu-cpp-project-get-list-counts](#shu-cpp-project-get-list-counts)
 * [shu-cpp-project-invert-list](#shu-cpp-project-invert-list)
 * [shu-cpp-project-list](#shu-cpp-project-list)
@@ -9368,6 +11980,7 @@ Associate a number with each type of variable
 * [shu-cpp-project-short-names](#shu-cpp-project-short-names)
 * [shu-cpp-project-subdirs](#shu-cpp-project-subdirs)
 * [shu-cpp-project-time](#shu-cpp-project-time)
+* [shu-cpp-project-very-short-names](#shu-cpp-project-very-short-names)
 * [shu-cpp-qualify-classes](#shu-cpp-qualify-classes)
 * [shu-cpp-remove-template-parameters](#shu-cpp-remove-template-parameters)
 * [shu-cpp-replace-token-info](#shu-cpp-replace-token-info)
@@ -9379,16 +11992,21 @@ Associate a number with each type of variable
 * [shu-cpp-rmv-using-old](#shu-cpp-rmv-using-old)
 * [shu-cpp-rmv-using](#shu-cpp-rmv-using)
 * [shu-cpp-search-match-tokens](#shu-cpp-search-match-tokens)
+* [shu-cpp-short-interval-type](#shu-cpp-short-interval-type)
 * [shu-cpp-short-list](#shu-cpp-short-list)
 * [shu-cpp-side-list-functions](#shu-cpp-side-list-functions)
+* [shu-cpp-size-type](#shu-cpp-size-type)
 * [shu-cpp-std-namespace](#shu-cpp-std-namespace)
+* [shu-cpp-string-type](#shu-cpp-string-type)
 * [shu-cpp-subdir-for-package](#shu-cpp-subdir-for-package)
 * [shu-cpp-target-file-column](#shu-cpp-target-file-column)
 * [shu-cpp-target-file-line](#shu-cpp-target-file-line)
+* [shu-cpp-time-type](#shu-cpp-time-type)
 * [shu-cpp-token-delimiter-chars](#shu-cpp-token-delimiter-chars)
 * [shu-cpp-token-delimiter-end](#shu-cpp-token-delimiter-end)
 * [shu-cpp-token-extract-epoint](#shu-cpp-token-extract-epoint)
 * [shu-cpp-token-extract-info](#shu-cpp-token-extract-info)
+* [shu-cpp-token-extract-nesting-level](#shu-cpp-token-extract-nesting-level)
 * [shu-cpp-token-extract-spoint](#shu-cpp-token-extract-spoint)
 * [shu-cpp-token-extract-token](#shu-cpp-token-extract-token)
 * [shu-cpp-token-extract-type](#shu-cpp-token-extract-type)
@@ -9406,11 +12024,13 @@ Associate a number with each type of variable
 * [shu-cpp-token-match-type-same-rx](#shu-cpp-token-match-type-same-rx)
 * [shu-cpp-token-match-type-same](#shu-cpp-token-match-type-same)
 * [shu-cpp-token-match-type-side-choose](#shu-cpp-token-match-type-side-choose)
+* [shu-cpp-token-match-type-side-loop-once](#shu-cpp-token-match-type-side-loop-once)
 * [shu-cpp-token-match-type-side-loop](#shu-cpp-token-match-type-side-loop)
 * [shu-cpp-token-match-type-side-many](#shu-cpp-token-match-type-side-many)
 * [shu-cpp-token-match-type-skip](#shu-cpp-token-match-type-skip)
 * [shu-cpp-token-next-non-comment](#shu-cpp-token-next-non-comment)
 * [shu-cpp-token-set-alias](#shu-cpp-token-set-alias)
+* [shu-cpp-token-set-nesting-level](#shu-cpp-token-set-nesting-level)
 * [shu-cpp-token-show-match-info-buffer](#shu-cpp-token-show-match-info-buffer)
 * [shu-cpp-token-show-match-info](#shu-cpp-token-show-match-info)
 * [shu-cpp-token-show-match-list](#shu-cpp-token-show-match-list)
@@ -9430,6 +12050,7 @@ Associate a number with each type of variable
 * [shu-cpp-tokenize-region](#shu-cpp-tokenize-region)
 * [shu-cpp-tokenize-show-list-buffer](#shu-cpp-tokenize-show-list-buffer)
 * [shu-cpp-tokenize-show-list](#shu-cpp-tokenize-show-list)
+* [shu-cpp-tz-make-datetime](#shu-cpp-tz-make-datetime)
 * [shu-cpp-use-bde-library](#shu-cpp-use-bde-library)
 * [shu-cpp-visit-target](#shu-cpp-visit-target)
 * [shu-cpp1-class](#shu-cpp1-class)
@@ -9438,6 +12059,7 @@ Associate a number with each type of variable
 * [shu-csplit](#shu-csplit)
 * [shu-cunsplit](#shu-cunsplit)
 * [shu-current-line](#shu-current-line)
+* [shu-current-year](#shu-current-year)
 * [shu-cwhile](#shu-cwhile)
 * [shu-date](#shu-date)
 * [shu-dbx-summarize-malloc](#shu-dbx-summarize-malloc)
@@ -9453,6 +12075,7 @@ Associate a number with each type of variable
 * [shu-doc-internal-func-to-md](#shu-doc-internal-func-to-md)
 * [shu-doc-internal-to-md](#shu-doc-internal-to-md)
 * [shu-doc-sort-compare](#shu-doc-sort-compare)
+* [shu-downcase-first-letter](#shu-downcase-first-letter)
 * [shu-dox-brief](#shu-dox-brief)
 * [shu-dox-cbt](#shu-dox-cbt)
 * [shu-dox-cvt](#shu-dox-cvt)
@@ -9463,20 +12086,29 @@ Associate a number with each type of variable
 * [shu-dup](#shu-dup)
 * [shu-emit-get](#shu-emit-get)
 * [shu-emit-set](#shu-emit-set)
+* [shu-end-of-dq-string](#shu-end-of-dq-string)
 * [shu-end-of-string](#shu-end-of-string)
 * [shu-eob](#shu-eob)
 * [shu-erase-region](#shu-erase-region)
+* [shu-extract-name-open-grok](#shu-extract-name-open-grok)
 * [shu-find-default-cpp-name](#shu-find-default-cpp-name)
+* [shu-find-end-include](#shu-find-end-include)
 * [shu-find-line-and-file](#shu-find-line-and-file)
 * [shu-find-numbered-commit](#shu-find-numbered-commit)
+* [shu-fix-markdown-section](#shu-fix-markdown-section)
 * [shu-fix-times](#shu-fix-times)
 * [shu-fixed-format-num](#shu-fixed-format-num)
+* [shu-fixup-doxyfile](#shu-fixup-doxyfile)
+* [shu-fixup-project-doxyfile](#shu-fixup-project-doxyfile)
 * [shu-fline](#shu-fline)
 * [shu-format-num](#shu-format-num)
 * [shu-forward-line](#shu-forward-line)
+* [shu-frame-width](#shu-frame-width)
+* [shu-gcc](#shu-gcc)
 * [shu-gd](#shu-gd)
 * [shu-gen-bb-component](#shu-gen-bb-component)
 * [shu-gen-bde-component](#shu-gen-bde-component)
+* [shu-gen-bde-create-prompt](#shu-gen-bde-create-prompt)
 * [shu-gen-component](#shu-gen-component)
 * [shu-gen-return-ptr](#shu-gen-return-ptr)
 * [shu-generate-bb-cfile](#shu-generate-bb-cfile)
@@ -9486,17 +12118,32 @@ Associate a number with each type of variable
 * [shu-generate-bde-hfile](#shu-generate-bde-hfile)
 * [shu-generate-bde-tfile](#shu-generate-bde-tfile)
 * [shu-generate-cfile](#shu-generate-cfile)
+* [shu-generate-comdb2-code](#shu-generate-comdb2-code)
 * [shu-generate-component](#shu-generate-component)
 * [shu-generate-git-add](#shu-generate-git-add)
 * [shu-generate-hfile](#shu-generate-hfile)
 * [shu-generate-tfile](#shu-generate-tfile)
 * [shu-get-all-definitions](#shu-get-all-definitions)
+* [shu-get-containing-function](#shu-get-containing-function)
 * [shu-get-cpp-keywords-hash](#shu-get-cpp-keywords-hash)
 * [shu-get-current-line](#shu-get-current-line)
+* [shu-get-debian-dependencies](#shu-get-debian-dependencies)
+* [shu-get-debian-dependency-file](#shu-get-debian-dependency-file)
+* [shu-get-debian-dependency-line](#shu-get-debian-dependency-line)
+* [shu-get-directory-prefix](#shu-get-directory-prefix)
+* [shu-get-git-name](#shu-get-git-name)
+* [shu-get-git-repo-name](#shu-get-git-repo-name)
+* [shu-get-git-repo-path](#shu-get-git-repo-path)
 * [shu-get-item-nvplist](#shu-get-item-nvplist)
 * [shu-get-line-column-of-file](#shu-get-line-column-of-file)
+* [shu-get-markdown-heading](#shu-get-markdown-heading)
+* [shu-get-markdown-level](#shu-get-markdown-level)
+* [shu-get-markdown-prefix](#shu-get-markdown-prefix)
+* [shu-get-md-boundaries](#shu-get-md-boundaries)
 * [shu-get-real-this-command-name](#shu-get-real-this-command-name)
+* [shu-get-repo](#shu-get-repo)
 * [shu-get-set](#shu-get-set)
+* [shu-get-url-repo](#shu-get-url-repo)
 * [shu-getters](#shu-getters)
 * [shu-gf](#shu-gf)
 * [shu-gfc](#shu-gfc)
@@ -9507,8 +12154,11 @@ Associate a number with each type of variable
 * [shu-git-branch-to-kill-ring](#shu-git-branch-to-kill-ring)
 * [shu-git-diff-commits](#shu-git-diff-commits)
 * [shu-git-find-branch](#shu-git-find-branch)
+* [shu-git-find-default-branch](#shu-git-find-default-branch)
 * [shu-git-find-short-hash](#shu-git-find-short-hash)
+* [shu-git-get-pr-url](#shu-git-get-pr-url)
 * [shu-git-insert-branch](#shu-git-insert-branch)
+* [shu-git-insert-git-commit](#shu-git-insert-git-commit)
 * [shu-git-insert-origin-branch](#shu-git-insert-origin-branch)
 * [shu-git-insert-pull-origin-branch](#shu-git-insert-pull-origin-branch)
 * [shu-git-insert-push-origin-branch](#shu-git-insert-push-origin-branch)
@@ -9516,17 +12166,26 @@ Associate a number with each type of variable
 * [shu-git-show-branch](#shu-git-show-branch)
 * [shu-global-buffer-name](#shu-global-buffer-name)
 * [shu-global-operation](#shu-global-operation)
+* [shu-global-search-replace](#shu-global-search-replace)
 * [shu-goto-home-org-file](#shu-goto-home-org-file)
 * [shu-goto-line](#shu-goto-line)
 * [shu-gquote](#shu-gquote)
 * [shu-group-number](#shu-group-number)
 * [shu-hother](#shu-hother)
+* [shu-insert-markdown-toc](#shu-insert-markdown-toc)
 * [shu-interactive-qualify-class-name](#shu-interactive-qualify-class-name)
 * [shu-internal-citerate](#shu-internal-citerate)
 * [shu-internal-cpp2-class](#shu-internal-cpp2-class)
+* [shu-internal-creplace](#shu-internal-creplace)
+* [shu-internal-csplit](#shu-internal-csplit)
+* [shu-internal-dev-url](#shu-internal-dev-url)
 * [shu-internal-double-citerate](#shu-internal-double-citerate)
 * [shu-internal-gen-bde-component](#shu-internal-gen-bde-component)
+* [shu-internal-get-repo](#shu-internal-get-repo)
 * [shu-internal-get-set](#shu-internal-get-set)
+* [shu-internal-group-name](#shu-internal-group-name)
+* [shu-internal-list-c-duplicates](#shu-internal-list-c-duplicates)
+* [shu-internal-list-c-file-names](#shu-internal-list-c-file-names)
 * [shu-internal-list-c-project](#shu-internal-list-c-project)
 * [shu-internal-new-lisp](#shu-internal-new-lisp)
 * [shu-internal-replace-class-name](#shu-internal-replace-class-name)
@@ -9534,17 +12193,21 @@ Associate a number with each type of variable
 * [shu-internal-visit-project-file](#shu-internal-visit-project-file)
 * [shu-internal-which-c-project](#shu-internal-which-c-project)
 * [shu-invert-alist-list](#shu-invert-alist-list)
+* [shu-invert-alist-to-hash](#shu-invert-alist-to-hash)
+* [shu-iother](#shu-iother)
 * [shu-is-const](#shu-is-const)
 * [shu-keyring-account-name](#shu-keyring-account-name)
 * [shu-keyring-add-values-to-index](#shu-keyring-add-values-to-index)
 * [shu-keyring-buffer-name](#shu-keyring-buffer-name)
 * [shu-keyring-clear-index](#shu-keyring-clear-index)
+* [shu-keyring-external-passphrase](#shu-keyring-external-passphrase)
 * [shu-keyring-file](#shu-keyring-file)
 * [shu-keyring-find-index-duplicates](#shu-keyring-find-index-duplicates)
 * [shu-keyring-get-acct](#shu-keyring-get-acct)
 * [shu-keyring-get-field](#shu-keyring-get-field)
 * [shu-keyring-get-file](#shu-keyring-get-file)
 * [shu-keyring-get-id](#shu-keyring-get-id)
+* [shu-keyring-get-passphrase](#shu-keyring-get-passphrase)
 * [shu-keyring-get-pin](#shu-keyring-get-pin)
 * [shu-keyring-get-pw](#shu-keyring-get-pw)
 * [shu-keyring-get-url](#shu-keyring-get-url)
@@ -9557,6 +12220,7 @@ Associate a number with each type of variable
 * [shu-keyring-pin-name](#shu-keyring-pin-name)
 * [shu-keyring-pw-name](#shu-keyring-pw-name)
 * [shu-keyring-set-alias](#shu-keyring-set-alias)
+* [shu-keyring-set-passphrase](#shu-keyring-set-passphrase)
 * [shu-keyring-show-index](#shu-keyring-show-index)
 * [shu-keyring-show-name-url](#shu-keyring-show-name-url)
 * [shu-keyring-update-index](#shu-keyring-update-index)
@@ -9565,11 +12229,17 @@ Associate a number with each type of variable
 * [shu-keyring-verify-file](#shu-keyring-verify-file)
 * [shu-kill-current-buffer](#shu-kill-current-buffer)
 * [shu-kill-new](#shu-kill-new)
+* [shu-kill-repo](#shu-kill-repo)
+* [shu-kill-system-name](#shu-kill-system-name)
 * [shu-last-commit](#shu-last-commit)
 * [shu-lc-comment](#shu-lc-comment)
 * [shu-library-files](#shu-library-files)
 * [shu-line-and-column-at](#shu-line-and-column-at)
+* [shu-line-is-include](#shu-line-is-include)
+* [shu-line-number-at-pos](#shu-line-number-at-pos)
 * [shu-list-c-directories](#shu-list-c-directories)
+* [shu-list-c-duplicates](#shu-list-c-duplicates)
+* [shu-list-c-file-names](#shu-list-c-file-names)
 * [shu-list-c-prefixes](#shu-list-c-prefixes)
 * [shu-list-c-project](#shu-list-c-project)
 * [shu-list-in-cpp-directory](#shu-list-in-cpp-directory)
@@ -9578,10 +12248,12 @@ Associate a number with each type of variable
 * [shu-local-replace](#shu-local-replace)
 * [shu-loosen-lisp](#shu-loosen-lisp)
 * [shu-make-c-project](#shu-make-c-project)
+* [shu-make-full-c-project](#shu-make-full-c-project)
 * [shu-make-md-index-name](#shu-make-md-index-name)
 * [shu-make-md-name-entry](#shu-make-md-name-entry)
 * [shu-make-md-section-name](#shu-make-md-section-name)
 * [shu-make-md-toc-entry](#shu-make-md-toc-entry)
+* [shu-make-p-project](#shu-make-p-project)
 * [shu-make-padded-line](#shu-make-padded-line)
 * [shu-make-xref](#shu-make-xref)
 * [shu-match-add-names-to-class-list](#shu-match-add-names-to-class-list)
@@ -9608,8 +12280,23 @@ Associate a number with each type of variable
 * [shu-match-set-alias](#shu-match-set-alias)
 * [shu-match-using-namespace-string](#shu-match-using-namespace-string)
 * [shu-match-using-string](#shu-match-using-string)
+* [shu-md-in-literal](#shu-md-in-literal)
 * [shu-minimum-leading-space](#shu-minimum-leading-space)
+* [shu-misc-get-chunk](#shu-misc-get-chunk)
+* [shu-misc-get-phrase](#shu-misc-get-phrase)
+* [shu-misc-internal-split-buffer](#shu-misc-internal-split-buffer)
+* [shu-misc-make-unique-string](#shu-misc-make-unique-string)
+* [shu-misc-random-internal-string](#shu-misc-random-internal-string)
+* [shu-misc-random-lad-string](#shu-misc-random-lad-string)
+* [shu-misc-random-ua-string](#shu-misc-random-ua-string)
+* [shu-misc-rx-conditionals](#shu-misc-rx-conditionals)
+* [shu-misc-rx-functions](#shu-misc-rx-functions)
+* [shu-misc-rx-lets](#shu-misc-rx-lets)
 * [shu-misc-set-alias](#shu-misc-set-alias)
+* [shu-misc-split-buffer](#shu-misc-split-buffer)
+* [shu-misc-split-chunk-buffer](#shu-misc-split-chunk-buffer)
+* [shu-misc-split-phrase-buffer](#shu-misc-split-phrase-buffer)
+* [shu-misc-split-string](#shu-misc-split-string)
 * [shu-modified-buffers](#shu-modified-buffers)
 * [shu-move-down](#shu-move-down)
 * [shu-nc-vtype](#shu-nc-vtype)
@@ -9622,6 +12309,7 @@ Associate a number with each type of variable
 * [shu-new-lisp-while](#shu-new-lisp-while)
 * [shu-new-lisp](#shu-new-lisp)
 * [shu-new-x-file](#shu-new-x-file)
+* [shu-next-char-in-seq](#shu-next-char-in-seq)
 * [shu-non-cpp-name](#shu-non-cpp-name)
 * [shu-not-all-whitespace-regexp](#shu-not-all-whitespace-regexp)
 * [shu-number-lines](#shu-number-lines)
@@ -9634,7 +12322,9 @@ Associate a number with each type of variable
 * [shu-nvplist-parse-file](#shu-nvplist-parse-file)
 * [shu-nvplist-show-item-list](#shu-nvplist-show-item-list)
 * [shu-nvplist-show-item](#shu-nvplist-show-item)
+* [shu-obfuscate-region](#shu-obfuscate-region)
 * [shu-of](#shu-of)
+* [shu-old-generate-component](#shu-old-generate-component)
 * [shu-on-the-word-line](#shu-on-the-word-line)
 * [shu-operators](#shu-operators)
 * [shu-org-archive-done-tasks](#shu-org-archive-done-tasks)
@@ -9652,25 +12342,34 @@ Associate a number with each type of variable
 * [shu-point-in-string](#shu-point-in-string)
 * [shu-possible-cpp-file-name](#shu-possible-cpp-file-name)
 * [shu-project-cpp-buffer-name](#shu-project-cpp-buffer-name)
+* [shu-project-exclude-hash](#shu-project-exclude-hash)
+* [shu-project-exclude-list](#shu-project-exclude-list)
+* [shu-project-extensions](#shu-project-extensions)
 * [shu-project-file-list](#shu-project-file-list)
 * [shu-project-get-file-info](#shu-project-get-file-info)
+* [shu-project-make-exclude-hash](#shu-project-make-exclude-hash)
 * [shu-project-make-short-key-list](#shu-project-make-short-key-list)
 * [shu-project-split-file-name](#shu-project-split-file-name)
 * [shu-project-user-class-count](#shu-project-user-class-count)
 * [shu-put-line-near-top](#shu-put-line-near-top)
+* [shu-py-extensions](#shu-py-extensions)
 * [shu-qualify-class-fun](#shu-qualify-class-fun)
 * [shu-qualify-class-name](#shu-qualify-class-name)
 * [shu-qualify-namespace-bsl](#shu-qualify-namespace-bsl)
 * [shu-qualify-namespace-std](#shu-qualify-namespace-std)
 * [shu-quit](#shu-quit)
+* [shu-random-letter](#shu-random-letter)
+* [shu-random-range](#shu-random-range)
 * [shu-remove-test-names](#shu-remove-test-names)
 * [shu-remove-trailing-all-whitespace](#shu-remove-trailing-all-whitespace)
 * [shu-renew-c-project](#shu-renew-c-project)
 * [shu-replace-class-fun](#shu-replace-class-fun)
 * [shu-replace-class-name](#shu-replace-class-name)
+* [shu-replace-string](#shu-replace-string)
 * [shu-return-ptr](#shu-return-ptr)
 * [shu-return-ref](#shu-return-ref)
 * [shu-reverse-comma-names](#shu-reverse-comma-names)
+* [shu-reverse2](#shu-reverse2)
 * [shu-rmv-classes](#shu-rmv-classes)
 * [shu-s-mode-find-long-line](#shu-s-mode-find-long-line)
 * [shu-save-and-load](#shu-save-and-load)
@@ -9682,7 +12381,10 @@ Associate a number with each type of variable
 * [shu-set-dir-prefix](#shu-set-dir-prefix)
 * [shu-set-dos-eol](#shu-set-dos-eol)
 * [shu-set-mac-eol](#shu-set-mac-eol)
+* [shu-set-modern](#shu-set-modern)
+* [shu-set-no-modern](#shu-set-no-modern)
 * [shu-set-obj](#shu-set-obj)
+* [shu-set-p-project](#shu-set-p-project)
 * [shu-set-prefix](#shu-set-prefix)
 * [shu-set-ptr](#shu-set-ptr)
 * [shu-set-unix-eol](#shu-set-unix-eol)
@@ -9691,25 +12393,44 @@ Associate a number with each type of variable
 * [shu-shift-region-of-text](#shu-shift-region-of-text)
 * [shu-shift-single-line](#shu-shift-single-line)
 * [shu-show-os-name](#shu-show-os-name)
+* [shu-show-repo](#shu-show-repo)
+* [shu-show-system-name](#shu-show-system-name)
 * [shu-simple-hother-file](#shu-simple-hother-file)
+* [shu-sort-includes](#shu-sort-includes)
 * [shu-split-new-lines](#shu-split-new-lines)
 * [shu-split-range-string](#shu-split-range-string)
+* [shu-starts-with](#shu-starts-with)
+* [shu-std-include-list](#shu-std-include-list)
+* [shu-string-starts-ends](#shu-string-starts-ends)
+* [shu-sub-make-c-project](#shu-sub-make-c-project)
+* [shu-swap](#shu-swap)
+* [shu-system-name-string](#shu-system-name-string)
+* [shu-system-name](#shu-system-name)
 * [shu-tciterate](#shu-tciterate)
 * [shu-the-column-at](#shu-the-column-at)
 * [shu-the-line-at](#shu-the-line-at)
+* [shu-tighten-hanging-paren](#shu-tighten-hanging-paren)
 * [shu-tighten-lisp](#shu-tighten-lisp)
 * [shu-titerate](#shu-titerate)
+* [shu-to-camel](#shu-to-camel)
 * [shu-to-snake](#shu-to-snake)
+* [shu-tocify-markdown-file](#shu-tocify-markdown-file)
+* [shu-tocify-markdown-headings](#shu-tocify-markdown-headings)
 * [shu-tother](#shu-tother)
+* [shu-trace-buffer](#shu-trace-buffer)
 * [shu-trim-file-hook](#shu-trim-file-hook)
 * [shu-trim-file](#shu-trim-file)
+* [shu-trim-git-end](#shu-trim-git-end)
 * [shu-trim-leading](#shu-trim-leading)
 * [shu-trim-trailing-blanks](#shu-trim-trailing-blanks)
 * [shu-trim-trailing](#shu-trim-trailing)
 * [shu-trim](#shu-trim)
+* [shu-unbrace](#shu-unbrace)
 * [shu-unit-test-buffer](#shu-unit-test-buffer)
+* [shu-upcase-first-letter](#shu-upcase-first-letter)
 * [shu-var-name](#shu-var-name)
 * [shu-version](#shu-version)
+* [shu-vf](#shu-vf)
 * [shu-vh](#shu-vh)
 * [shu-visit-project-and-tags](#shu-visit-project-and-tags)
 * [shu-vj](#shu-vj)
@@ -9726,15 +12447,18 @@ Associate a number with each type of variable
 * [shu-xref-lisp-name](#shu-xref-lisp-name)
 * [shu-xref-type-compare](#shu-xref-type-compare)
 * [shu-xref-var-types](#shu-xref-var-types)
+* [sort-includes](#sort-includes)
 * [tciterate](#tciterate)
 * [tighten-lisp](#tighten-lisp)
 * [titerate](#titerate)
+* [to-camel](#to-camel)
 * [to-snake](#to-snake)
 * [tother](#tother)
 * [trim-trailing-blanks](#trim-trailing-blanks)
+* [unbrace](#unbrace)
+* [vf](#vf)
 * [which-c-project](#which-c-project)
 * [winpath](#winpath)
-
 
 
 <!--
@@ -9759,6 +12483,12 @@ LocalWords:  ginclude newfile fixp hitRatio getdef mumbleSomethingOther cciterat
 LocalWords:  citerate dealloacation nreverse rlist eval infos rx kw tokenized de un
 LocalWords:  proc rlists ht unresolvable uns clist thisistheoverview NB spoints np
 LocalWords:  thisisanoverview incl ns dciterate diterate ThingLoader thingloader os
-LocalWords:  myproject autocomplete Ctl tciterate titerate libs nThere nHow init
-LocalWords:  elc HEAPCACHE Nov inline insb inso stmt spos gpl gps gorg
+LocalWords:  myproject autocomplete Ctl tciterate titerate libs nThere nHow init dq
+LocalWords:  elc HEAPCACHE Nov inline insb inso stmt spos gpl gps gorg paren bool
+LocalWords:  downcase fixedcase upcase alexandria stdout comdb RDATZC datetime gcc
+LocalWords:  timezone tzdate tz deleteObject nullptr printSelf ctor dtor iother vf
+LocalWords:  CMake doody ops py krpps Doxyfile af repo fixup doxyfile gcm config za
+LocalWords:  tocify fgh ijkl mno pqr stuv wxy bcde fg hij klm Stuvw xyzab OpenGrok
+LocalWords:  unbrace iff currentliveupdate debian dep codesinger github pt ua seq
+LocalWords:  dev abc pr fka https classname
 -->

@@ -38,6 +38,8 @@
       (goto-char (point-min))
       (forward-char 2)
       (setq result (shu-possible-cpp-file-name))
+      (should result)
+      (should (listp result))
       (should (= 1 (length result)))
       (should (string= file (car result))))
 ))
@@ -55,6 +57,8 @@
       (goto-char (point-min))
       (forward-char 6)
       (setq result (shu-possible-cpp-file-name))
+      (should result)
+      (should (listp result))
       (should (= 1 (length result)))
       (should (string= file (car result))))
 ))
@@ -75,6 +79,8 @@
       (goto-char (point-min))
       (forward-char 6)
       (setq result (shu-possible-cpp-file-name))
+      (should result)
+      (should (listp result))
       (should (= 2 (length result)))
       (should (string= file (car result)))
       (should (= line (cadr result))))
@@ -101,6 +107,8 @@
       (goto-char (point-min))
       (forward-char 6)
       (setq result (shu-possible-cpp-file-name))
+      (should result)
+      (should (listp result))
       (should (= 3 (length result)))
       (should (string= file (car result)))
       (should (= line (cadr result)))
@@ -139,10 +147,170 @@
       (goto-char (point-min))
       (forward-char 10)
       (setq result (shu-possible-cpp-file-name))
+      (should result)
+      (should (listp result))
       (should (= 2 (length result)))
       (should (string= file (car result)))
       (should (= line (cadr result))))
 ))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-7
+;;
+(ert-deftest shu-test-possible-cpp-file-name-7 ()
+  (let ((result)
+        (file "/aa/bb/cc/brumble.cpp"))
+  (with-temp-buffer
+      (insert file)
+      (goto-char (point-min))
+      (forward-char 2)
+      (setq result (shu-possible-cpp-file-name t))
+      (should result)
+      (should (listp result))
+      (should (= 1 (length result)))
+      (should (string= file (car result))))
+))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-8
+;;
+(ert-deftest shu-test-possible-cpp-file-name-8 ()
+  (let* ((result)
+        (file "aa/bb/cc/brumble.cpp")
+        (target (concat "Hi!\n" file "\nthere")))
+  (with-temp-buffer
+      (insert target)
+      (goto-char (point-min))
+      (forward-char 6)
+      (setq result (shu-possible-cpp-file-name t))
+      (should result)
+      (should (listp result))
+      (should (= 1 (length result)))
+      (should (string= file (car result))))
+))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-9
+;;
+(ert-deftest shu-test-possible-cpp-file-name-9 ()
+  (let* ((result)
+        (file "aa/bb/cc/brumble.cpp")
+        (line 1234)
+        (target (concat "Hi!\n" file ":"
+                        (number-to-string line)
+                        "\nthere")))
+  (with-temp-buffer
+      (insert target)
+      (goto-char (point-min))
+      (forward-char 6)
+      (setq result (shu-possible-cpp-file-name t))
+      (should result)
+      (should (listp result))
+      (should (= 2 (length result)))
+      (should (string= file (car result)))
+      (should (= line (cadr result))))
+))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-10
+;;
+(ert-deftest shu-test-possible-cpp-file-name-10 ()
+  (let* ((result)
+         (file "/aaaaaa/bb/cc/dd/ee/ff/brumble.cpp")
+         (line 1234)
+         (column 52)
+         (target
+          (concat
+           "Hi!\n" file ":"
+           (number-to-string line) ":"
+           (number-to-string column) ":"
+           "\nthere"))
+         (colc))
+    (with-temp-buffer
+      (insert target)
+      (goto-char (point-min))
+      (forward-char 6)
+      (setq result (shu-possible-cpp-file-name t))
+      (should result)
+      (should (listp result))
+      (should (= 3 (length result)))
+      (should (string= file (car result)))
+      (should (= line (cadr result)))
+      (setq colc (cddr result))
+      (should (= column (car colc))))
+    ))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-11
+;;
+(ert-deftest shu-test-possible-cpp-file-name-11 ()
+  (let ((result)
+        (file "/aa/bb/cc/brumble.chasm"))
+  (with-temp-buffer
+      (insert file)
+      (goto-char (point-min))
+      (forward-char 2)
+      (setq result (shu-possible-cpp-file-name t))
+      (should (not result)))
+))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-12
+;;
+(ert-deftest shu-test-possible-cpp-file-name-12 ()
+  (let* ((result)
+        (file "aa/bb/cc/dddddd/eeeeee/brumble.cpp")
+        (line 4231)
+        (target (concat "[file = " file "] "
+                        "[line = " (number-to-string line) "] "
+                        "\nthere")))
+  (with-temp-buffer
+      (insert target)
+      (goto-char (point-min))
+      (forward-char 10)
+      (setq result (shu-possible-cpp-file-name t))
+      (should result)
+      (should (listp result))
+      (should (= 2 (length result)))
+      (should (string= file (car result)))
+      (should (= line (cadr result))))
+))
+
+
+;;
+;;  shu-test-possible-cpp-file-name-13
+;;
+(ert-deftest shu-test-possible-cpp-file-name-13 ()
+  (let* ((result)
+         (file "/aaaaaa/bb/cc/dd/ee/ff/brumble.txt")
+         (line 1234)
+         (column 52)
+         (target
+          (concat
+           "Hi!\n" file ":"
+           (number-to-string line) ":"
+           (number-to-string column) ":"
+           "\nthere"))
+         (colc))
+    (with-temp-buffer
+      (insert target)
+      (goto-char (point-min))
+      (forward-char 6)
+      (setq result (shu-possible-cpp-file-name t t))
+      (should result)
+      (should (listp result))
+      (should (= 3 (length result)))
+      (should (string= file (car result)))
+      (should (= line (cadr result)))
+      (setq colc (cddr result))
+      (should (= column (car colc))))
+    ))
 
 
 
@@ -277,6 +445,45 @@
             (setq actual-line (car actual))
             (should (= expected-line actual-line)))
         (should nil)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-find-line-and-file-1
+;;
+(ert-deftest shu-test-shu-find-line-and-file-1 ()
+  (let ((gb (get-buffer-create "**boo**"))
+        (data " filename.cpp:122:14 \n")
+        (ret-val)
+        (x))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 8)
+      (setq ret-val (shu-find-line-and-file))
+      (should ret-val)
+      (should (listp ret-val))
+      (should (= 3 (length ret-val)))
+      (setq x (car ret-val))
+      (should x)
+      (should (stringp x))
+      (should (string= "filename.cpp" x))
+      (setq ret-val (cdr ret-val))
+      (should ret-val)
+      (should (listp ret-val))
+      (should (= 2 (length ret-val)))
+      (setq x (car ret-val))
+      (should x)
+      (should (numberp x))
+      (should (= 122 x))
+      (setq ret-val (cdr ret-val))
+      (should ret-val)
+      (should (listp ret-val))
+      (should (= 1 (length ret-val)))
+      (setq x (car ret-val))
+      (should x)
+      (should (numberp x))
+      (should (= 14 x)))
     ))
 
 
@@ -521,7 +728,8 @@
         (expected-short-name "and_wonderful.cpp")
         (actual-prefix)
         (actual-short-name)
-        (ps))
+        (ps)
+        (shu-cpp-project-very-short-names nil))
     (setq ps (shu-project-split-file-name file-name))
     (should ps)
     (should (consp ps))
@@ -563,7 +771,8 @@
         (expected-short-name "and_wonderful.cpp")
         (actual-prefix)
         (actual-short-name)
-        (ps))
+        (ps)
+        (shu-cpp-project-very-short-names nil))
     (setq ps (shu-project-split-file-name file-name))
     (should ps)
     (should (consp ps))
@@ -584,7 +793,52 @@
         (expected-short-name "and_wonderful.cpp")
         (actual-prefix)
         (actual-short-name)
-        (ps))
+        (ps)
+        (shu-cpp-project-very-short-names nil))
+    (setq ps (shu-project-split-file-name file-name))
+    (should ps)
+    (should (consp ps))
+    (setq actual-prefix (car ps))
+    (setq actual-short-name (cdr ps))
+    (should (string= expected-prefix actual-prefix))
+    (should (string= expected-short-name actual-short-name))
+    ))
+
+
+
+;;
+;;  shu-test-shu-project-split-file-name-7
+;;
+(ert-deftest shu-test-shu-project-split-file-name-7 ()
+  (let ((file-name "lovely_AND_Wonderful.cpp")
+        (expected-prefix "lovely_AND")
+        (expected-short-name "wonderful.cpp")
+        (actual-prefix)
+        (actual-short-name)
+        (ps)
+        (shu-cpp-project-very-short-names t))
+    (setq ps (shu-project-split-file-name file-name))
+    (should ps)
+    (should (consp ps))
+    (setq actual-prefix (car ps))
+    (setq actual-short-name (cdr ps))
+    (should (string= expected-prefix actual-prefix))
+    (should (string= expected-short-name actual-short-name))
+    ))
+
+
+
+;;
+;;  shu-test-shu-project-split-file-name-8
+;;
+(ert-deftest shu-test-shu-project-split-file-name-8 ()
+  (let ((file-name "lovely_and_truly_very_much_wonderful.cpp")
+        (expected-prefix "lovely_and_truly_very_much")
+        (expected-short-name "wonderful.cpp")
+        (actual-prefix)
+        (actual-short-name)
+        (ps)
+        (shu-cpp-project-very-short-names t))
     (setq ps (shu-project-split-file-name file-name))
     (should ps)
     (should (consp ps))
@@ -700,6 +954,70 @@
     (setq actual-shorts (cdr ps))
     (should (not actual-prefixes))
     (should (not actual-shorts))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-project-extract-base-name-1
+;;
+(ert-deftest shu-test-shu-cpp-project-extract-base-name-1 ()
+  (let (
+        (base-name "brumble_mumble.h")
+        (actual)
+        (expected "brumble_mumble")
+        )
+    (setq actual (shu-cpp-project-extract-base-name base-name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-project-extract-base-name-2
+;;
+(ert-deftest shu-test-shu-cpp-project-extract-base-name-2 ()
+  (let (
+        (base-name "brumble_mumble.cpp")
+        (actual)
+        (expected "brumble_mumble")
+        )
+    (setq actual (shu-cpp-project-extract-base-name base-name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-project-extract-base-name-3
+;;
+(ert-deftest shu-test-shu-cpp-project-extract-base-name-3 ()
+  (let (
+        (base-name "brumble_mumble.i.cpp")
+        (actual)
+        (expected "brumble_mumble")
+        )
+    (setq actual (shu-cpp-project-extract-base-name base-name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-project-extract-base-name-4
+;;
+(ert-deftest shu-test-shu-cpp-project-extract-base-name-4 ()
+  (let (
+        (base-name "brumble_mumble.t.cpp")
+        (actual)
+        (expected "brumble_mumble")
+        )
+    (setq actual (shu-cpp-project-extract-base-name base-name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
     ))
 
 ;;; shu-cpp-project.t.el ends here

@@ -38,7 +38,6 @@
 
 ;;; Code:
 
-(provide 'shu-cpp-token)
 (require 'shu-base)
 ;;
 ;;  token-info:
@@ -93,7 +92,7 @@
 ;;        |       |
 ;;        |       +-----> point-pair
 ;;        |
-;;        +-------------> error message
+;;        +-------------> info-pair
 ;;
 ;;
 ;;  point-pair:
@@ -107,6 +106,19 @@
 ;;        |       +-----> End point
 ;;        |
 ;;        +-------------> Start point
+;;
+;;
+;;  info-pair
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> nesting level
+;;        |
+;;        +-------------> error message
 ;;
 ;;
 
@@ -206,6 +218,7 @@ template parameter \"int\"")
    (cons "const" 0)
    (cons "consteval" 0)
    (cons "constexpr" 0)
+   (cons "constinit" 0)
    (cons "const_cast" 0)
    (cons "continue" 0)
    (cons "co_await" 0)
@@ -279,7 +292,7 @@ template parameter \"int\"")
    (cons "while" 0)
    (cons "xor" 0)
    (cons "xor_eq" 0))
-  "alist of C++ key words up to approximately C++17")
+  "alist of C++ key words up to approximately C++20")
 
 
 ;;
@@ -304,12 +317,18 @@ template parameter \"int\"")
 ;;
 (defmacro shu-cpp-token-extract-info (token-info token token-type spoint epoint error-message)
   "Extract the information out of a token-info"
-  (let ((tinfo (make-symbol "info"))
+  (let (
+        (tinfo (make-symbol "info"))
         (text-info (make-symbol "ext-info"))
-        (tpoint-pair (make-symbol "point-pair")))
-    `(let ((,tinfo)
+        (tpoint-pair (make-symbol "point-pair"))
+        (tinfo-pair (make-symbol "info-pair"))
+        )
+    `(let (
+           (,tinfo)
            (,text-info)
-           (,tpoint-pair))
+           (,tpoint-pair)
+           (,tinfo-pair)
+           )
        (setq ,tinfo (car ,token-info))
        (setq ,token (cdr ,token-info))
        (setq ,token-type (car ,tinfo))
@@ -317,7 +336,11 @@ template parameter \"int\"")
        (setq ,error-message (car ,text-info))
        (setq ,tpoint-pair (cdr ,text-info))
        (setq ,spoint (car ,tpoint-pair))
-       (setq ,epoint (cdr ,tpoint-pair)))
+       (setq ,epoint (cdr ,tpoint-pair))
+       (setq ,tinfo-pair (car ,text-info))
+       (setq ,error-message (car ,tinfo-pair))
+;;;       (setq ,nesting-level (cdr ,tinfo-pair))
+       )
     ))
 
 
@@ -366,6 +389,36 @@ template parameter \"int\"")
     (setq ext-info (cdr info))
     (setq point-pair (cdr ext-info))
     (cdr point-pair)
+    ))
+
+
+;;
+;;  shu-cpp-token-extract-nesting-level
+;;
+(defsubst shu-cpp-token-extract-nesting-level (token-info)
+  "Return the nesting level from an instance of token-info."
+  (let ((info)
+        (ext-info)
+        (info-pair))
+    (setq info (car token-info))
+    (setq ext-info (cdr info))
+    (setq info-pair (car ext-info))
+    (cdr info-pair)
+    ))
+
+
+;;
+;;  shu-cpp-token-set-nesting-level
+;;
+(defsubst shu-cpp-token-set-nesting-level (token-info nesting-level)
+  "Set the nesting level in an instance of token-info."
+  (let ((info)
+        (ext-info)
+        (info-pair))
+    (setq info (car token-info))
+    (setq ext-info (cdr info))
+    (setq info-pair (car ext-info))
+    (setcdr info-pair nesting-level)
     ))
 
 
@@ -883,11 +936,15 @@ line.  If it starts with /*, skip to terminating */.  If there is no terminating
 ;;
 (defun shu-cpp-make-token-info (token token-type spoint epoint &optional error-message)
   "Pack the supplied arguments into a TOKEN-INFO and return the TOKEN-INFO."
-  (cons
-   (cons token-type
-         (cons error-message
-               (cons spoint epoint))) token)
-  )
+  (let (
+        (nesting-level 0)
+        )
+    (cons
+     (cons token-type
+           (cons
+            (cons error-message nesting-level)
+            (cons spoint epoint))) token)
+    ))
 
 
 ;;
@@ -1313,14 +1370,15 @@ of reverse parsed code have the same suffix."
 (defun shu-cpp-token-show-token-info-buffer (token-info gb &optional title)
   "Show the data returned by one of the functions in this file that scans for tokens."
   (let
-      (
-       (info)
+      ((info)
        (token-type)
        (token-type-name)
        (ext-info)
        (error-message)
        (emsg "")
        (point-pair)
+       (info-pair)
+       (nesting-level)
        (spoint)
        (epoint)
        (token)
@@ -1351,7 +1409,6 @@ of reverse parsed code have the same suffix."
                   (if (not (consp ext-info))
                       (progn (princ "shu-cpp-token-show-token-info, ext-info not cons: " gb)
                              (princ ext-info gb) (princ "\n" gb))
-                    (setq error-message (car ext-info))
                     (setq point-pair (cdr ext-info))
                     (if (not point-pair)
                         (princ "shu-cpp-token-show-token-info, point-pair is nil\n" gb)
@@ -1366,12 +1423,18 @@ of reverse parsed code have the same suffix."
                           (if (not (numberp epoint))
                               (progn (princ "shu-cpp-token-show-token-info, epoint not number: " gb)
                                      (princ epoint gb) (princ "\n" gb))
-                            (when error-message
-                              (setq emsg (concat ", Error = \"" error-message "\".")))
-                            (setq token (cdr token-info))
-                            (when token
-                              (setq tok token))
-                            (princ (format "%d : %d = [%s](%d (%s))%s\n" spoint epoint tok token-type token-type-name emsg) gb)))))))))))))
+                            (setq info-pair (car ext-info))
+                            (if (not (consp info-pair))
+                                (progn (princ "shu-cpp-token-show-token-info, info-pair not cons: " gb)
+                                       (princ info-pair gb)(princ "\n" gb))
+                              (setq error-message (car info-pair))
+                              (setq nesting-level (cdr info-pair))
+                              (when error-message
+                                (setq emsg (concat ", Error = \"" error-message "\".")))
+                              (setq token (cdr token-info))
+                              (when token
+                                (setq tok token))
+                              (princ (format "%d : %d = [%s](%d (%s)){%d}%s\n" spoint epoint tok token-type token-type-name nesting-level emsg) gb))))))))))))))
     ))
 
 
@@ -1412,5 +1475,7 @@ shu- prefix removed."
   (defalias 'parse-region 'shu-cpp-parse-region)
   (defalias 'reverse-parse-region 'shu-cpp-reverse-parse-region)
   )
+
+(provide 'shu-cpp-token)
 
 ;;; shu-cpp-token.el ends here

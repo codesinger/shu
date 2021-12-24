@@ -1,3 +1,32 @@
+;;; notes.txt --- Shu project code for dealing wth C++ in Emacs
+;;
+;; Copyright (C) 2020 Stewart L. Palmer
+;;
+;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
+;;
+;; This file is NOT part of GNU Emacs.
+;;
+;; This is free software: you can redistribute it and/or modify it
+;; under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This software is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; There is a copy of the Gnu General Public license in the file
+;; LICENSE in this repository.  You should also have received a copy
+;; of the GNU General Public License along with GNU Emacs.  If not,
+;; see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Some personal notes about things I might or might not be planning
+;; to do in the future.
+;;
+;;
 
 
 In the current shu-project, shu-cpp-class-list is only used for the completing read
@@ -117,3 +146,26 @@ one of the three forms of using namespace.
 Scan through the tokens until you find keyword "using".  Try to match the above
 pattern.  If it matches you have found an occurrence of "using namespace".  If it
 does not match, advance the token list by one and start again.
+
+=================================================================
+
+See
+https://stackoverflow.com/questions/12999530/is-there-a-function-that-joins-a-string-into-a-delimited-string
+
+New library subr-x.el for misc helper functions
+
+hash-table-keys
+hash-table-values
+string-blank-p
+string-empty-p
+string-join
+string-reverse
+string-trim-left
+string-trim-right
+string-trim
+string-remove-prefix
+string-remove-suffix
+
+=======================================================================
+
+Useful resource: http://joelmccracken.github.io/entries/reading-writing-data-in-emacs-batch-via-stdin-stdout/

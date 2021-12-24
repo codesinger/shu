@@ -55,7 +55,8 @@ searches in the local \"~/emacs\" directory."
          (list
           "rmv-using.elc"
           "slp-comment-hooks.elc"
-          "slp-bb-comment-hooks.elc"))
+          "slp-bb-comment-hooks.elc"
+          "shu-attributes.elc"))
         (ln)
         (no-error nil)
         (no-message t)
@@ -102,54 +103,54 @@ searches in the local \"~/emacs\" directory."
   (list
    (cons "bsl"
          (list
-               "boolalpha"
-               "cout"
-               "dec"
-               "endl"
-               "exception"
-               "fixed"
-               "hex"
-               "ifstream"
-               "ios_base"
-               "map"
-               "noboolalpha"
-               "ostream"
-               "ostringstream"
-               "pair"
-               "runtime_error"
-               "set"
-               "setfill"
-               "setprecision"
-               "setw"
-               "sort"
-               "string"
-               "stringstream"
-               "vector"))
+          "boolalpha"
+          "cout"
+          "dec"
+          "endl"
+          "exception"
+          "fixed"
+          "hex"
+          "ifstream"
+          "ios_base"
+          "map"
+          "noboolalpha"
+          "ostream"
+          "ostringstream"
+          "pair"
+          "runtime_error"
+          "set"
+          "setfill"
+          "setprecision"
+          "setw"
+          "sort"
+          "string"
+          "stringstream"
+          "vector"))
    (cons "std"
          (list
-               "boolalpha"
-               "cout"
-               "dec"
-               "endl"
-               "exception"
-               "fixed"
-               "hex"
-               "ifstream"
-               "ios_base"
-               "map"
-               "noboolalpha"
-               "ostream"
-               "ostringstream"
-               "pair"
-               "runtime_error"
-               "set"
-               "setfill"
-               "setprecision"
-               "setw"
-               "sort"
-               "string"
-               "stringstream"
-               "vector"))
+          "boolalpha"
+          "cout"
+          "dec"
+          "endl"
+          "exception"
+          "fixed"
+          "hex"
+          "ifstream"
+          "ios_base"
+          "map"
+          "noboolalpha"
+          "ostream"
+          "ostringstream"
+          "pair"
+          "runtime_error"
+          "set"
+          "setfill"
+          "setprecision"
+          "setw"
+          "sort"
+          "string"
+          "stringstream"
+          "vector"))
    )
   "List of standard namespaces and their associated classes")
 
@@ -185,9 +186,9 @@ searches in the local \"~/emacs\" directory."
 
 
 ;;
-;;  shu-generate-component
+;;  shu-old-generate-component
 ;;
-(defun shu-generate-component ()
+(defun shu-old-generate-component ()
   "Fetch the arguments from environment variables and then call
 SHU-INTERNAL-GEN-BDE-COMPONENT to generate a set of three BDE component
 files."
@@ -212,6 +213,167 @@ files."
     (setq shu-cpp-use-bde-library t)
     (shu-internal-gen-bde-component class-name author namespace file-prefix)
     ))
+
+
+
+;;
+;;  shu-generate-component
+;;
+(defun shu-generate-component ()
+  "Fetch the arguments from environment variables and then call
+SHU-INTERNAL-GEN-BDE-COMPONENT to generate a set of three BDE component
+files."
+  (let ((global-namespace)
+        (namespace)
+        (class-name)
+        (author)
+        (modern "False")
+        (file-prefix)
+        (nargs (length command-line-args-left)))
+    (shu-batch-init)
+    (slp-bb-set-comment-hooks)
+    (if (and (/= nargs 4) (/= nargs 5))
+        (progn
+          (message "%s" "Require 4 or 5 args: global-namespace namespace class-name author, optional 'modern'"))
+      (setq global-namespace (pop command-line-args-left))
+      (setq namespace (pop command-line-args-left))
+      (setq class-name (pop command-line-args-left))
+      (setq author (pop command-line-args-left))
+      (when (= nargs 5)
+        (setq modern (pop command-line-args-left)))
+      (when (string= modern "True")
+        (setq shu-cpp-modern t))
+      (setq file-prefix (concat namespace "_"))
+      (message "global-namespace: %s" global-namespace)
+      (message "namespace: %s" namespace)
+      (message "class-name: %s" class-name)
+      (message "author: %s" author)
+      (setq shu-cpp-use-bde-library t)
+      (setq shu-cpp-include-user-brackets t)
+      (setq shu-cpp-std-namespace "bsl")
+      (setq shu-cpp-default-allocator-type "bslma::Allocator")
+      (setq shu-cpp-default-global-namespace global-namespace)
+      (shu-internal-gen-bde-component class-name author namespace file-prefix))
+    ))
+
+
+
+;;
+;;  shu-batch-add-alexandria
+;;
+(defun shu-batch-add-alexandria ()
+  "Call the SHU-ADD-ALEXANDRIA function in batch mode.  One required argument is
+the value for the custom variable SHU-INTERNAL-DEV-URL.
+
+Invoke as:
+
+     emacs --batch -l ~/emacs/shu-batch-mode.elc -f shu-batch-add-alexandria <dev-url>
+
+where \"<dev-url>\" is the organization's internal web site that hosts its code
+and tools.  See the description of the custom variable SHU-INTERNAL-DEV-URL.
+for more information."
+  (let ((nargs (length command-line-args-left))
+        (done))
+    (shu-batch-init)
+    (if (/= nargs 1)
+        (progn
+          (message "Require one argument, internal-dev-url.  Called with %d args." nargs)
+          (error "Wrong number of command line arguments"))
+      (setq shu-internal-dev-url (pop command-line-args-left))
+      (setq done (shu-add-alexandria-in-batch-mode))
+      (when (not done)
+        (shu-batch-copy-trace)
+        (error "Alexandria add failed")))
+    ))
+
+
+
+;;
+;;  shu-generate-comdb2-code
+;;
+(defun shu-generate-comdb2-code ()
+  "Generate the C++ code for a comdb2 row class"
+  (let ((input-file)
+        (output-file)
+        (nargs (length command-line-args-left)))
+    (shu-batch-init)
+    (if (/= nargs 2)
+        (progn
+          (message "%s" "Require 2 args: input-file output-file"))
+      (setq input-file (pop command-line-args-left))
+      (setq output-file (pop command-line-args-left))
+      (setq shu-cpp-use-bde-library t)
+      (setq shu-cpp-include-user-brackets t)
+      (setq shu-cpp-std-namespace "bsl")
+      (setq shu-cpp-default-allocator-type "bslma::Allocator")
+      (shu-attributes-internal-gen input-file output-file)
+      (save-buffer))
+    ))
+
+
+
+;;
+;;  shu-batch-copy-trace
+;;
+(defun shu-batch-copy-trace ()
+  "Copy the contents of the SHU-TRACE-BUFFER to stdout in batch mode."
+  (let ((gb (get-buffer-create shu-trace-buffer))
+        (line-diff 0)
+        (line))
+    (save-current-buffer
+      (set-buffer gb)
+      (when (> (buffer-size) 0)
+        (princ "*** Trace buffer ***\n")
+        (goto-char (point-min))
+        (while (and (= line-diff 0)
+                    (not (= (point) (point-max))))
+          (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+          (princ (concat line "\n"))
+          (setq line-diff (forward-line 1)))))
+    ))
+
+
+
+
+;;
+;;  shu-batch-test-args
+;;
+(defun shu-batch-test-args ()
+  "A script to use in batch mode to demonstrate how to fetch command line arguments.
+
+When run from a batch script as the function that is the target of the \"-f\" option.
+For example
+
+    emacs --batch -l shu-batch-mode.elc -f shu-batch-test-args hello world how are you
+
+produces the following output:
+    There are 5 arguments
+    arg: 0: \"hello\"
+    arg: 1: \"world\"
+    arg: 2: \"how\"
+    arg: 3: \"are\"
+    arg: 4: \"you\""
+  (let ((i 0)
+        (arg))
+    (princ (format "There are %d arguments\n" (length command-line-args-left)))
+    (while command-line-args-left
+      (setq arg (pop command-line-args-left))
+      (princ (format "arg: %d: \"%s\"\n" i arg))
+      (setq i (1+ i)))
+    ))
+
+
+
+;;
+;;  shu-batch-fail
+;;
+(defun shu-batch-fail ()
+  "A test function to terminate emacs via ERROR."
+  (interactive)
+  (error "Shu batch failure")
+  )
+
+
 
 
 ;;; shu-batch-mode.el ends here

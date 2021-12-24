@@ -1,4 +1,4 @@
-;;; shu-cpp-project.el --- Shu project code for dealing wth C++ in Emacs
+;; shu-cpp-project.el --- Shu project code for dealing wth C++ in Emacs
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
@@ -93,7 +93,6 @@
 
 ;;; Code:
 
-(provide 'shu-cpp-project)
 (require 'shu-base)
 
 
@@ -105,10 +104,20 @@ as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions."
   "A list of file extensions for all of the H file types we want to find.  This is defined
 as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-h-extensions")
 
-(defconst shu-cpp-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions)
+(defconst shu-py-extensions (list "py")
+  "A list of file extensions for Python projects")
+
+(defconst shu-project-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions)
   "A list of file extensions for all of the file types we want to find.  This is defined
 as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions or
 shu-add-cpp-h-extensions.")
+
+(defconst shu-project-exclude-list (list "cmake-build" "cmake-distro-dev" "dists")
+  "A list of top level directory names to exclude while creating a project via
+SHU-MAKE-C-PROJECT.  This list is ignored by SHU-MAKE-FULL-C-PROJECT")
+
+(defvar shu-project-exclude-hash nil
+  "The hash table that holds the directory names from SHU-PROJECT-EXCLUDE-LIST.")
 
 (defvar shu-cpp-project-file nil
   "The name of the file from which the current project was read.")
@@ -145,7 +154,7 @@ names as well.")
 
 (defvar shu-cpp-found-extensions (list)
   "This is a list of all of the file extensions found in the current project.  While
-shu-cpp-extensions contains all of the extensions that we look for.  This variable
+shu-project-extensions contains all of the extensions that we look for.  This variable
 contains those that we actually found in building the current project.")
 
 (defvar shu-cpp-project-time nil
@@ -226,7 +235,7 @@ It is used when a global change needs to visit every file in the project.")
 ;; says use the last part of the current directory as the prefix.  The
 ;; current directory is held in the variable default-directory.  Consider
 ;; using something like the f.el package to extract the last part of the
-;; path to use as the prefis
+;; path to use as the prefix
 
 
 (defcustom shu-cpp-project-short-names nil
@@ -238,6 +247,19 @@ these two files would be \"mumble.cpp\" and \"stumble.cpp\".  This means that
 the user does not have to type the prefix in order to find the file.  If the
 user types \"mumble.cpp\" as the file name, emacs will open the file
 \"x_server_mumble.cpp\"."
+  :type '(number)
+  :group 'shu-cpp-project)
+
+
+(defcustom shu-cpp-project-very-short-names t
+  "Set non-nil if shu-cpp-project creates very short names for files in a
+project.  A short name is an approximation of the file name that may be easier
+to type.  For example, if all of the files in a project begin with a common
+prefix (e.g., \"my_own_server_mumble.cpp\" and \"my_own_server_stumble.cpp\",
+then the short names for these two files would be \"mumble.cpp\" and
+\"stumble.cpp\".  This means that the user does not have to type the prefix in
+order to find the file.  If the user types \"mumble.cpp\" as the file name,
+emacs will open the file \"my_own_server_mumble.cpp\"."
   :type '(number)
   :group 'shu-cpp-project)
 
@@ -280,14 +302,12 @@ a project file and point is not sitting on something that resembles a file name.
 (defun shu-add-cpp-c-extensions (xtns)
   "Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
-This modifies both shu-cpp-c-extensions and shu-cpp-extensions."
-  (let (
-        (nx xtns)
-        )
+This modifies both shu-cpp-c-extensions and shu-project-extensions."
+  (let ((nx xtns))
     (when (not (listp nx))
       (setq nx (list nx)))
     (setq shu-cpp-c-extensions (append shu-cpp-c-extensions nx))
-    (setq shu-cpp-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions))
+    (setq shu-project-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions))
     ))
 
 ;;
@@ -296,26 +316,66 @@ This modifies both shu-cpp-c-extensions and shu-cpp-extensions."
 (defun shu-add-cpp-h-extensions (xtns)
   "Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
-This modifies both shu-cpp-h-extensions and shu-cpp-extensions."
-  (let (
-        (nx xtns)
-        )
+This modifies both shu-cpp-h-extensions and shu-project-extensions."
+  (let ((nx xtns))
     (when (not (listp nx))
       (setq nx (list nx)))
     (setq shu-cpp-h-extensions (append shu-cpp-h-extensions nx))
-    (setq shu-cpp-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions))
+    (setq shu-project-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions))
     ))
+
+
+;;
+;;  shu-make-p-project
+;;
+(defun shu-make-p-project (proj-root)
+  "Create a Python project that is analogous to a c project."
+  (interactive "DRoot?: ")
+  (setq shu-project-extensions shu-py-extensions)
+  (shu-sub-make-c-project proj-root)
+  )
 
 
 ;;
 ;;  shu-make-c-project
 ;;
 (defun shu-make-c-project (proj-root)
+  "Create a project file of all directories containing c or h files.  Starts at
+the specified root directory and searches all subdirectories for any that
+contain c or h files.  Top level directories whose names are found in
+SHU-PROJECT-EXCLUDE-LIST are excluded from the search.  Typically
+SHU-PROJECT-EXCLUDE-LIST is used to exclude CMake directories that include c or
+h files that have been created as part of the build process and are not members
+of the repository itself.  It then inserts all of the directory names into the
+current file at point."
+  (interactive "DRoot?: ")
+  (shu-project-make-exclude-hash)
+  (shu-sub-make-c-project proj-root)
+  )
+
+
+;;
+;;  shu-make-full-c-project
+;;
+(defun shu-make-full-c-project (proj-root)
   "Create a project file of all directories containing c or h files.
 Starts at the specified root directory and searches all subdirectories for
 any that contain c or h files.  It then inserts all of the directory names
 into the current file at point."
   (interactive "DRoot?: ")
+  (setq shu-project-exclude-hash nil)
+  (shu-sub-make-c-project proj-root)
+  )
+
+
+;;
+;;  shu-sub-make-c-project
+;;
+(defun shu-sub-make-c-project (proj-root)
+  "Create a project file of all directories containing c or h files.
+Starts at the specified root directory and searches all subdirectories for
+any that contain c or h files.  It then inserts all of the directory names
+into the current file at point."
   (let ((level     1)
         (dtop)
         (tlist)
@@ -357,10 +417,13 @@ source code."
           (progn
             (unless (or (string= sname  ".")
                         (string= sname ".."))
-              (setq dir-list (cons cname dir-list))))
+              (unless (and (= level 1)
+                           shu-project-exclude-hash
+                           (gethash sname shu-project-exclude-hash))
+                (setq dir-list (cons cname dir-list)))))
         (when (not got-interest)
           (setq extension (file-name-extension sname))
-          (when (member extension shu-cpp-extensions)
+          (when (member extension shu-project-extensions)
             (setq got-interest t))))
       (setq tlist (cdr tlist)))
     (when got-interest
@@ -370,6 +433,25 @@ source code."
       (shu-cpp-project-subdirs dname (1+ level))
       (setq dir-list (cdr dir-list)))
     ))
+
+
+
+;;
+;;  shu-set-p-project
+;;
+(defun shu-set-p-project (start end)
+  "Mark a region in a file that contains one subdirectory name per line.  Then
+invoke set-c-project and it will find and remember all of the c and h files in
+those subdirectories.  You may then subsequently visit any of those files by
+invoking M-x vh which will allow you to type in the file name only (with auto
+completion) and will then visit the file in the appropriate subdirectory.  If
+this function is called interactively, it clears the project name that was
+established by either SHU-SETUP-PROJECT-AND-TAGS of SHU-VISIT-PROJECT-AND-TAGS."
+  (interactive "r")
+  (setq shu-project-extensions shu-py-extensions)
+  (setq shu-cpp-project-name nil)
+  (shu-internal-set-c-project start end)
+  )
 
 
 
@@ -442,8 +524,7 @@ appropriate subdirectory."
         (ps)
         (short-keys)
         (all-keys)
-        (plist)
-        )
+        (plist))
     (setq shu-project-user-class-count 0)
     (setq shu-project-file-list nil)
     (setq tlist shu-cpp-project-list)
@@ -483,8 +564,7 @@ appropriate subdirectory."
         (setq shu-cpp-short-list (shu-cpp-project-collapse-list short-keys))
         (setq all-keys (append key-list short-keys))
         (setq shu-cpp-completing-list (shu-cpp-project-collapse-list all-keys))
-        (shu-cpp-finish-project))
-      )
+        (shu-cpp-finish-project)))
     ))
 
 
@@ -510,8 +590,7 @@ is wanted."
         (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name))
         (plist)
         (file-name)
-        (full-name-list)
-        )
+        (full-name-list))
     (setq counts (shu-cpp-project-get-list-counts shu-cpp-class-list))
     (setq c-count (car counts))
     (setq counts (cdr counts))
@@ -526,8 +605,7 @@ is wanted."
       (princ (concat file-name ":\n      ") shu-cpp-buffer)
       (princ full-name-list shu-cpp-buffer)
       (princ "\n" shu-cpp-buffer)
-      (setq plist (cdr plist))
-      )
+      (setq plist (cdr plist)))
     (when (> dup-count 1)
       (setq name-name "names")
       (setq occur-name "occur"))
@@ -546,8 +624,7 @@ is wanted."
   "Called with point at the beginning of the line.  Take the whole line as the
 name of a directory, look into the directory, and create an alist of all of the
 files in the directory as described in shu-cpp-subdir-for-package."
-  (let
-      ((key-list))
+  (let ((key-list))
     (setq key-list (shu-cpp-subdir-for-package dir-name))
     key-list
     ))
@@ -572,7 +649,7 @@ name \"/u/foo/bar/thing.c\"."
        (xtn-name )
        (item nil)
        (key-list nil)
-       (target-extensions (regexp-opt shu-cpp-extensions t))
+       (target-extensions (regexp-opt shu-project-extensions t))
        (target-name (concat "[^.]\\." target-extensions "$"))
        (directory-list (directory-files directory-name t target-name)))
     (while directory-list
@@ -606,6 +683,31 @@ name \"/u/foo/bar/thing.c\"."
 
 
 ;;
+;;  shu-project-make-exclude-hash
+;;
+(defun shu-project-make-exclude-hash ()
+  "Turn SHU-PROJECT-EXCLUDE-LIST into the hash table SHU-PROJECT-EXCLUDE-HASH.
+If SHU-PROJECT-EXCLUDE-LIST is nil or not a list or an empty list, then
+SHU-PROJECT-EXCLUDE-HASH is also set to nil."
+  (interactive)
+  (let ((ht)
+        (xl shu-project-exclude-list)
+        (xd))
+    (setq shu-project-exclude-hash nil)
+    (when shu-project-exclude-list
+      (when (listp shu-project-exclude-list)
+        (when (> (length shu-project-exclude-list) 0)
+          (setq ht (make-hash-table :test 'equal :size (length shu-project-exclude-list)))
+          (while xl
+            (setq xd (car xl))
+            (puthash xd xd ht)
+            (setq xl (cdr xl)))
+          (setq shu-project-exclude-hash ht))))
+    ))
+
+
+
+;;
 ;;  shu-vh - Visit a c or h file in a project
 ;;
 ;;
@@ -633,9 +735,51 @@ file typed in the completion buffer."
 
 
 
+;;
+;;  shu-vf
+;;
+(defun shu-vf ()
+  "If point is on something that looks like a file name, visit the file.  If the
+file name is followed by a colon and a number, the number is interpreted as a
+line number within the file and point is moved to the beginning of that line.
+If the line number is followed by a colon and another number, then the second
+number is interpreted as a column number and point is moved to that column
+number."
+  (interactive)
+  (let ((gb (get-buffer-create "**boo**"))
+        (ret)
+        (x)
+        (file)
+        (line)
+        (column))
+    (setq debug-on-error t)
+    (setq ret (shu-possible-cpp-file-name t t))
+    (princ ret gb)(princ "\n" gb)
+    (if (not ret)
+        (progn
+          (ding)
+          (message "%s" "No file name found."))
+      (setq file (car ret))
+      (princ "file: '" gb)(princ file gb)(princ "'\n" gb)
+      (setq ret (cdr ret))
+      (when ret
+        (setq line (car ret))
+        (setq ret (cdr ret))
+        (when ret
+          (setq column (car ret))))
+      (find-file file)
+      (when line
+        (goto-char (point-min))
+        (forward-line (1- line))
+        (when column
+          (move-to-column (1- column)))))
+    ))
+
+
+
 
 ;;
-;;  shu-vh - Visit a c or h file in a project
+;;  shu-internal-visit-project-file
 ;;
 ;;    Note: At some point there seemed to be a bug in
 ;;          completing-read.  Even when require-match is t
@@ -656,7 +800,7 @@ file typed in the completion buffer."
        (completion-prefix)
        (default-file-string))
     (when shu-completion-is-directory
-      (setq completion-prefix (shu-cpp-directory-prefix)))
+      (setq completion-prefix (shu-get-directory-prefix)))
     (when shu-cpp-completion-prefix
       (setq completion-prefix shu-cpp-completion-prefix)
       (when shu-cpp-project-short-names
@@ -705,22 +849,6 @@ file typed in the completion buffer."
 
 
 ;;
-;;  shu-cpp-directory-prefix
-;;
-(defun shu-cpp-directory-prefix ()
-  "Get a directory based prefix, which is the last name in the current path.  If the current
-directory is \"foo/blah/humbug\", the value returned from this function is \"humbug\""
-  (let*
-      ((gbuf (get-buffer-create shu-unit-test-buffer))
-       (sep-char (substring default-directory -1))
-       (rr (split-string default-directory sep-char t))
-       (prefix-name ))
-    (setq prefix-name (nth (1- (length rr)) rr))
-    prefix-name
-    ))
-
-
-;;
 ;;  shu-find-default-cpp-name - If point is sitting on something that looks like
 ;;    a file name then return it as a default candidate for the file name
 ;;    we wish to visit.
@@ -766,7 +894,7 @@ with one entry.  If file name and line number, a list with two entries.  If file
 name, line number, and column number, a list with three entries."
   (let*
       ((case-fold-search t)           ;; Searches ignore case
-       (target-extensions (regexp-opt shu-cpp-extensions t))
+       (target-extensions (regexp-opt shu-project-extensions t))
        (target-name (concat shu-cpp-file-name "*\\." target-extensions))
        (target-char shu-cpp-file-name)
        (target-line-file (concat "line\\s-+\\([0-9]+\\)\\s-+\\(?:in\\|of\\)*\\s-+" "\\(" target-name "\\)"))
@@ -830,23 +958,34 @@ anywhere on the word \"line\".  This is used pick up file positions of the form:
     ))
 
 
+
 ;;
 ;;  shu-possible-cpp-file-name
 ;;
-(defun shu-possible-cpp-file-name ()
+(defun shu-possible-cpp-file-name (&optional include-directory any-extension)
   "Return a list containing a possible file name with a possible line number
 and a possible column number.  If the thing on point does not resemble a file
 name, return nil.  If it looks like a file name, save it and call
 shu-get-line-column-of-file to perhaps harvest a line number and column number
 within the file.  The return result is a list of length one if there is only
 a file name, a list of length two if there is a file name and line number, a
-list of length three if there is a file name, line number, and column number."
-  (let* ((target-extensions (regexp-opt shu-cpp-extensions t))
-         (target-name (concat shu-cpp-file-name "*\\." target-extensions))
-         (target-char shu-cpp-file-name)
+list of length three if there is a file name, line number, and column number.
+If the optional argument INCLUDE-DIRECTORY is true, the file name may include
+the forward slash character, which means that the returned file name may also
+include directory names.  Normally, this function only looks for code files,
+but if the optional argument ANY-EXTENSION is true, then a file name with any
+extension will be returned."
+  (let* ((local-file-name (if include-directory
+                              shu-cpp-file-directory-name
+                            shu-cpp-file-name))
+         (target-extensions (regexp-opt shu-project-extensions t))
+         (target-name (if any-extension
+                          (concat local-file-name "+")
+                        (concat local-file-name "*\\." target-extensions)))
+         (target-char local-file-name)
          (numbers "[0-9]+")
-         (bol (save-excursion (beginning-of-line) (point)))
-         (eol (save-excursion (end-of-line) (point)))
+         (bol (line-beginning-position))
+         (eol (line-end-position))
          (file-name )     ;; This will contain the name or nil
          (line-number )   ;; Line number or nil
          (column-number ) ;; Column number or nil
@@ -870,6 +1009,7 @@ list of length three if there is a file name, line number, and column number."
         (setq ret-list (cons file-name line-col))))
     ret-list
     ))
+
 
 
 ;;
@@ -1141,7 +1281,7 @@ temporary buffer *shu-project-count*"
 the message in the minibuffer and passing the totals back to the caller."
   (let*
       ((full-name "")
-       (target-extensions (regexp-opt shu-cpp-extensions t))
+       (target-extensions (regexp-opt shu-project-extensions t))
        (target-name (concat "[^.]\\." target-extensions "$"))
        (directory-list (directory-files directory-name t target-name))
        (xf)
@@ -1188,6 +1328,48 @@ the message in the minibuffer and passing the totals back to the caller."
     ))
 
 
+
+;;
+;;  shu-list-c-file-names
+;;
+(defun shu-list-c-file-names ()
+  "Insert into the buffer a list of all of the unique file names in the project.
+This does not include the file path as it will be different for duplicate
+names."
+  (interactive)
+  (if (not shu-cpp-class-list)
+      (progn
+        (message "There is no project to list.")
+        (ding))
+    (shu-internal-list-c-file-names shu-cpp-class-list))
+  )
+
+
+
+
+;;
+;;  shu-internal-list-c-file-names
+;;
+(defun shu-internal-list-c-file-names (proj-list)
+  "Doc string."
+  (interactive)
+  (let ((plist proj-list)
+        (file-name)
+        (full-name-list)
+        (file-names))
+    (while plist
+      (shu-project-get-file-info plist file-name full-name-list)
+      (push file-name file-names)
+      (setq plist (cdr plist)))
+    (setq file-names (sort file-names `string<))
+    (while file-names
+      (setq file-name (car file-names))
+      (insert (concat file-name "\n"))
+      (setq file-names (cdr file-names)))
+    ))
+
+
+
 ;;
 ;;  shu-list-c-project
 ;;
@@ -1220,6 +1402,83 @@ project whose files are in PROJ-LIST."
     ))
 
 
+
+;;
+;;  shu-list-c-duplicates
+;;
+(defun shu-list-c-duplicates ()
+  "Insert into the current buffer a list of all of the duplicate files names.
+Under each duplicate file name, insert a list of the full paths to all of the
+duplicates."
+  (interactive)
+  (if (not shu-cpp-class-list)
+      (progn
+        (message "There is no project to list.")
+        (ding))
+    (shu-internal-list-c-duplicates shu-cpp-class-list))
+  )
+
+
+
+;;
+;;  shu-internal-list-c-duplicates
+;;
+(defun shu-internal-list-c-duplicates (proj-list)
+  "Internal implementation of shu-list-c-duplicates."
+  (let ((plist proj-list)
+        (file-name)
+        (dup-name)
+        (flist)
+        (full-name-list)
+        (dlist)
+        (proj-dups)
+        (dups)
+        (entry)
+        (nl "")
+        (name1)
+        (name2))
+    (while plist
+      (shu-project-get-file-info plist file-name full-name-list)
+      (when (> (length full-name-list) 1)
+        (setq dlist (cons file-name full-name-list))
+        (push dlist proj-dups))
+      (setq plist (cdr plist)))
+    (if (not proj-dups)
+        (message "%s" "Project has no duplicates")
+      (setq dlist (sort proj-dups
+                        (lambda(lhs rhs)
+                          (string< (car lhs) (car rhs))
+                          )))
+      (setq proj-dups dlist)
+      (while dlist
+        (setq entry (car dlist))
+        (setq file-name (car entry))
+        (setq full-name-list (cdr entry))
+        (setq flist (sort full-name-list 'string<))
+        (insert (concat nl file-name "\n\n"))
+        (setq nl "\n")
+        (while flist
+          (setq dup-name (car flist))
+          (insert (concat "    " dup-name "\n"))
+          (setq flist (cdr flist)))
+        (setq dlist (cdr dlist)))
+      (setq dlist proj-dups)
+      (insert "\n")
+      (while dlist
+        (setq entry (car dlist))
+        (setq full-name-list (cdr entry))
+        (setq flist (sort full-name-list 'string<))
+        (setq name1 (car flist))
+        (setq flist (cdr flist))
+        (while flist
+          (setq name2 (car flist))
+          (insert (concat "diff -b " name1 "  " name2 "\n"))
+          (setq flist (cdr flist)))
+        (setq dlist (cdr dlist))))
+    ))
+
+
+
 ;;
 ;;  shu-list-c-prefixes
 ;;
@@ -1233,6 +1492,7 @@ about extracted file prefixes."
         (np 0)
         (item)
         (prefix)
+        (prefix-name)
         (count)
         (pad-length)
         (pad))
@@ -1260,14 +1520,17 @@ about extracted file prefixes."
         (while pl
           (setq item (car pl))
           (setq prefix (car item))
+          (if (= (length prefix) 0)
+              (setq prefix-name "**none**")
+            (setq prefix-name prefix))
           (setq count (cdr item))
           (setq pad "")
-          (when (< (length prefix) max-prefix)
-            (setq pad-length (- max-prefix (length prefix)))
+          (when (< (length prefix-name) max-prefix)
+            (setq pad-length (- max-prefix (length prefix-name)))
             (setq pad (make-string pad-length ? )))
           (insert
            (concat
-            prefix pad (shu-fixed-format-num count 11) "\n"))
+            prefix-name pad (shu-fixed-format-num count 11) "\n"))
           (setq pl (cdr pl)))))
     ))
 
@@ -1386,14 +1649,14 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
   "Insert into the current buffer the names of all of the code files in a directory."
   (let*
       ((full-name "")
-       (target-extensions (regexp-opt shu-cpp-extensions t))
+       (target-extensions (regexp-opt shu-project-extensions t))
        (target-name (concat "[^.]\\." target-extensions "$"))
        (directory-list (directory-files directory-name t target-name))
        (extension))
     (while directory-list
       (setq full-name (car directory-list))
       (setq extension (file-name-extension full-name))
-      (when (member extension shu-cpp-extensions)
+      (when (member extension shu-project-extensions)
         (insert (concat full-name "\n")))
       (setq directory-list (cdr directory-list)))
     ))
@@ -1507,7 +1770,7 @@ which the tags file is to be built."
 If not defined, return the string \"**unknown**\".  Some older versions of emacs
 do not support real-this-command."
   (if (version< emacs-version "24.3.1") "**unknown**" (symbol-name real-this-command))
-    )
+  )
 
 
 
@@ -1570,8 +1833,7 @@ creates a new tags table."
                                            &optional search-target replace)
   "Invoke a function on every file in the project.
 documentation is the string to put in the buffer to describe the operation."
-  (let (
-        (gbuf      (get-buffer-create shu-global-buffer-name))
+  (let ((gbuf      (get-buffer-create shu-global-buffer-name))
         (spoint)
         (tlist     shu-project-file-list)
         (file)
@@ -1582,8 +1844,7 @@ documentation is the string to put in the buffer to describe the operation."
         (sstring)
         (estring)
         (fcount 0)
-        (ccount 0)
-        )
+        (ccount 0))
     (save-excursion
       (setq spoint (with-current-buffer gbuf (point)))
       (setq sstring (format-time-string "on %a, %e %b %Y at %k:%M:%S" stime))
@@ -1607,17 +1868,91 @@ documentation is the string to put in the buffer to describe the operation."
         (when (not fbuf)  ; We created the file buffer
           (kill-buffer file-buf))
         (setq fcount (1+ fcount))
-        (setq tlist (cdr tlist))
-        )
+        (setq tlist (cdr tlist)))
       (setq etime (current-time))
       (setq estring (format-time-string "on %a, %e %b %Y at %k:%M:%S" etime))
       (print (concat "***end " documentation " at " estring "\n") gbuf)
-      (princ (format "%d files changed of %d files scanned.\n" ccount fcount) gbuf)
-      )
+      (princ (format "%d files changed of %d files scanned.\n" ccount fcount) gbuf))
     (switch-to-buffer gbuf)
     (goto-char spoint)
-    )
-  )
+    ))
+
+
+
+
+;;
+;;  shu-global-search-replace
+;;
+(defun shu-global-search-replace (file argument1 argument2)
+  "This function is called once for each file in the project.  The first
+argument is the file name.  The second argument is a list holding lists of
+search and replace operations.  Each search and replace operation is defined by
+a list of arguments as follows:
+
+     1. A boolean value, t means case sensitive search, nil means ignore case
+     2. The function to call to do the search.  This must be
+        'search-forward, 're-search-forward, or any function with the same
+        signature and behavior.
+     3. The string that is the target of the search
+     4. The string the is to replace the target whenever found
+     5. An optional second argument to be passed to replace-match
+        The default value is t
+     6. An optional third argument to be passed to replace-match
+        The default value is t
+
+For example
+
+     (list
+       (list t 'search-forward \"Mumble\" \"Bumble\")
+       (list nil 'search-forward \"howdy\" \"doody\"))
+
+is a list that defines two search and replace operations.  Both operations use
+the search-forward function.  The first is a case sensitive search and replace to
+replace all instances of \"Mumble\" with \"Bumble\".  The second is a case
+insensitive search and replace to replace all instances of \"howdy\" with \"doody\".
+
+These operations may be performed on every file in the project as follows:
+
+     (setq ops
+       (list
+         (list t 'search-forward \"Mumble\" \"Bumble\")
+         (list nil 'search-forward \"howdy\" \"doody\")))
+     (setq doc \"Description of change\")
+     (shu-global-operation doc 'shu-global-search-replace ops)"
+  (let ((gb (get-buffer-create shu-global-buffer-name))
+        (rlist)
+        (tlist)
+        (case-sensitive)
+        (search-function)
+        (target)
+        (replacment)
+        (rm1 t)
+        (rm2 t)
+        (debug-on-error t))
+    (princ (concat "\n    IN: " file "\n") gb)
+    (setq tlist argument1)
+    (save-excursion
+      (save-restriction
+        (widen)
+        (while tlist
+          (setq rlist (car tlist))
+          (setq case-sensitive (pop rlist))
+          (setq search-function (pop rlist))
+          (setq target (pop rlist))
+          (setq replacment (pop rlist))
+          (when (cdr rlist)
+            (setq rm1 (pop rlist)))
+          (when (cdr rlist)
+            (setq rm2 (pop rlist)))
+          (goto-char (point-min))
+          (setq case-fold-search (not case-sensitive))
+          (while (funcall search-function target nil t)
+            (princ (concat file ":" (number-to-string (line-number-at-pos (match-beginning 0) t))
+                           ":\nFound \"" (match-string 0) "\"\n") gb)
+            (princ (concat "Replacing with: \"" replacment "\"\n") gb)
+            (replace-match replacment rm1 rm2))
+          (setq tlist (cdr tlist)))))
+    ))
 
 
 ;;
@@ -1789,16 +2124,21 @@ Return a cons cell of the form (prefix . short-name)"
       (setq pfx (car nlist))
       (setq short (cadr nlist)))
      (t        ;; At least two underscores in name
-      (setq pfx (car nlist))
-      (setq nlist (cdr nlist))
-      (when (= 1 (length pfx))
-        (setq pfx (concat pfx "_" (car nlist)))
-        (setq nlist (cdr nlist)))
-      (setq short (car nlist))
-      (setq nlist (cdr nlist))
-      (while nlist
-        (setq short (concat short "_" (car nlist)))
-        (setq nlist (cdr nlist)))))
+      (if shu-cpp-project-very-short-names
+          (progn
+            (setq short (car (last nlist)))
+            (setq nlist (nbutlast nlist))
+            (setq pfx (string-join nlist "_")))
+        (setq pfx (car nlist))
+        (setq nlist (cdr nlist))
+        (when (= 1 (length pfx))
+          (setq pfx (concat pfx "_" (car nlist)))
+          (setq nlist (cdr nlist)))
+        (setq short (car nlist))
+        (setq nlist (cdr nlist))
+        (while nlist
+          (setq short (concat short "_" (car nlist)))
+          (setq nlist (cdr nlist))))))
     (setq short (downcase short))
     (cons pfx short)
     ))
@@ -1820,8 +2160,7 @@ list of short names.
 
 Return is a cons cell whose car is the prefix list and whose cdr is the short
 name list."
-  (let (
-        (kl (copy-tree key-list))
+  (let ((kl (copy-tree key-list))
         (file-name)
         (full-name-list)
         (ps)
@@ -1887,11 +2226,9 @@ t.cpp or .h file, invoke this function and you will be taken to the
 corresponding .cpp or .c file.  This function will use a project if one is
 active.  Otherwise, it will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+  (let ((base-name (shu-cpp-project-get-base-name))
         (newfile)
         (found))
-    (when (string= (file-name-extension base-name) "t")
-      (setq base-name (file-name-sans-extension base-name)))
     (setq newfile (concat base-name ".cpp"))
     (setq found (shu-cpp-choose-other-file newfile))
     (when (not found)
@@ -1911,13 +2248,28 @@ active.  Otherwise, it will assume that all files reside in the same directory."
 corresponding .h file.  This function will use a project if one is active.
 Otherwise, it will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+  (let ((base-name (shu-cpp-project-get-base-name))
         (newfile ))
-    (when (string= (file-name-extension base-name) "t")
-      (setq base-name (file-name-sans-extension base-name)))
     (setq newfile (concat base-name ".h"))
     (when (not (shu-cpp-choose-other-file newfile))
       (message "Cannot find H file for %s" base-name))
+    ))
+
+
+;;
+;;  shu-iother
+;;
+(defun shu-iother ()
+  "Visit a i.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.i.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory."
+  (interactive)
+  (let ((base-name (shu-cpp-project-get-base-name))
+        (newfile))
+    (setq newfile (concat base-name ".i.cpp"))
+    (when (not (shu-cpp-choose-other-file newfile))
+      (message "Cannot find integration test file for %s" base-name))
     ))
 
 
@@ -1930,11 +2282,43 @@ or .cpp file, invoke this function and you will be taken to the corresponding
 .t.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (file-name-sans-extension (buffer-file-name)))
+  (let ((base-name (shu-cpp-project-get-base-name))
         (newfile))
     (setq newfile (concat base-name ".t.cpp"))
     (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot find test file for %s" base-name))
+      (message "Cannot find unit test file for %s" base-name))
+    ))
+
+
+
+;;
+;;  shu-cpp-project-get-base-name
+;;
+(defun shu-cpp-project-get-base-name ()
+  "When visiting a file within a project, the name might consist of two or three
+parts - the file name, the normal extension, such as .h or .cpp, and the
+intermediate extension, such as .i or .t when visiting .i.cpp or .t.cpp.  This
+function gets the buffer file name and removes the one or two extensions in
+order to get the name with no extensions at all."
+  (interactive)
+  (let ((base-name (buffer-file-name)))
+    (shu-cpp-project-extract-base-name base-name)
+    ))
+
+
+
+;;
+;;  shu-cpp-project-extract-base-name
+;;
+(defun shu-cpp-project-extract-base-name (name)
+  "This is the implementation function of SHU-CPP-PROJECT-GET-BASE-NAME so that
+the logic of the function can be unit tested."
+  (let ((base-name (file-name-sans-extension name)))
+    (if (string= (file-name-extension base-name) "t")
+        (setq base-name (file-name-sans-extension base-name))
+      (when (string= (file-name-extension base-name) "i")
+        (setq base-name (file-name-sans-extension base-name))))
+    base-name
     ))
 
 
@@ -1989,11 +2373,16 @@ shu- prefix removed."
   (defalias 'set-prefix 'shu-set-prefix)
   (defalias 'set-dir-prefix 'shu-set-dir-prefix)
   (defalias 'clear-prefix 'shu-clear-prefix)
+  (defalias 'make-p-project 'shu-make-p-project)
   (defalias 'make-c-project 'shu-make-c-project)
+  (defalias 'make-full-c-project 'shu-make-full-c-project)
+  (defalias 'set-p-project 'shu-set-p-project)
   (defalias 'set-c-project 'shu-set-c-project)
   (defalias 'renew-c-project 'shu-renew-c-project)
   (defalias 'clear-c-project 'shu-clear-c-project)
   (defalias 'count-c-project 'shu-count-c-project)
+  (defalias 'list-c-duplicates 'shu-list-c-duplicates)
+  (defalias 'list-c-file-names 'shu-list-c-file-names)
   (defalias 'list-c-project 'shu-list-c-project)
   (defalias 'list-c-prefixes 'shu-list-c-prefixes)
   (defalias 'list-short-names 'shu-cpp-list-short-names)
@@ -2001,10 +2390,14 @@ shu- prefix removed."
   (defalias 'list-completing-names 'shu-cpp-list-completing-names)
   (defalias 'list-c-directories 'shu-list-c-directories)
   (defalias 'which-c-project 'shu-which-c-project)
+  (defalias 'vf 'shu-vf)
   (defalias 'other 'shu-other)
   (defalias 'cother 'shu-cother)
   (defalias 'hother 'shu-hother)
+  (defalias 'iother 'shu-iother)
   (defalias 'tother 'shu-tother)
   )
+
+(provide 'shu-cpp-project)
 
 ;;; shu-cpp-project.el ends here

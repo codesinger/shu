@@ -30,7 +30,6 @@
 
 ;;; Code:
 
-(provide 'shu-bde-cpp)
 (require 'shu-base)
 
 
@@ -149,7 +148,7 @@
       "//\n"
       "//@AUTHOR: " author "\n"
       "\n"
-      "#include <bsl_iostream.h>\n"
+      "#include <bsl_ostream.h>\n"
       "#include <bslmf_nestedtraitdeclaration.h>\n"
       "\n"
       "\n"
@@ -358,5 +357,7 @@ These are generally the same as the function names with the leading
 shu- prefix removed."
   (defalias 'gen-bb-component 'shu-gen-bb-component)
   )
+
+(provide 'shu-bde-cpp)
 
 ;;; shu-bde-cpp.el ends here

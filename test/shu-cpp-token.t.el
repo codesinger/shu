@@ -26,6 +26,65 @@
 ;;; Code
 
 
+
+;;
+;;  shu-test-shu-cpp-make-token-info-1
+;;
+(ert-deftest shu-test-shu-cpp-make-token-info-1 ()
+  (let (
+        (token "TOKEN")
+        (token-type shu-cpp-token-type-qt)
+        (spoint 123)
+        (epoint 456)
+        (error-message "This is an error message")
+        (token-info)
+        (token2)
+        (token-type2)
+        (spoint2)
+        (epoint2)
+        (error-message2)
+        (token3)
+        (token-type3)
+        (spoint3)
+        (epoint3)
+        (error-message3)
+        )
+    (setq token-info (shu-cpp-make-token-info token token-type spoint epoint error-message))
+    (shu-cpp-token-extract-info token-info token2 token-type2 spoint2 epoint2 error-message2)
+    (should token2)
+    (should (stringp token2))
+    (should (string= token token2))
+    (should token-type2)
+    (should (numberp token-type2))
+    (should (= token-type token-type2))
+    (should spoint2)
+    (should (numberp spoint2))
+    (should (= spoint spoint2))
+    (should epoint2)
+    (should (numberp epoint2))
+    (should (= epoint epoint2))
+    (should error-message2)
+    (should (stringp error-message2))
+    (should (string= error-message error-message2))
+    (setq token-type3 (shu-cpp-token-extract-type token-info))
+    (should token-type3)
+    (should (numberp token-type3))
+    (should (= token-type token-type3))
+    (setq token3 (shu-cpp-token-extract-token token-info))
+    (should token3)
+    (should (stringp token3))
+    (should (string= token token3))
+    (setq spoint3 (shu-cpp-token-extract-spoint token-info))
+    (should spoint3)
+    (should (numberp spoint3))
+    (should (= spoint spoint3))
+    (setq epoint3 (shu-cpp-token-extract-epoint token-info))
+    (should epoint3)
+    (should (numberp epoint3))
+    (should (= epoint epoint3))
+    ))
+
+
 ;;
 ;;  shu-test-shu-cpp-token-token-type-name
 ;;
@@ -1562,6 +1621,8 @@ me anything.  It is printed on test failure to identify the test that failed."
        (error-message)
        (emsg "")
        (point-pair)
+       (info-pair)
+       (nesting-level)
        (spoint)
        (epoint)
        (token)
@@ -1597,7 +1658,6 @@ me anything.  It is printed on test failure to identify the test that failed."
                         (if (not (consp ext-info))
                             (progn (princ "shu-test-check-shu-cpp-get-token, ext-info not cons: " gb)
                                    (princ ext-info gb) (princ "\n" gb))
-                          (setq error-message (car ext-info))
                           (setq point-pair (cdr ext-info))
                           (if (not point-pair)
                               (princ "shu-test-check-shu-cpp-get-token, point-pair is nil\n" gb)
@@ -1618,19 +1678,25 @@ me anything.  It is printed on test failure to identify the test that failed."
                                         (princ (format "Expected spoint (%d) not = spoint (%d)\n" xspoint spoint) gb)
                                       (if (and xepoint (/= xepoint epoint))
                                           (princ (format "Expected epoint (%d) not = epoint (%d)\n" xepoint epoint) gb)
-                                        (if (and xerror-message (not error-message))
-                                            (princ (concat "Expected error-message = [" xerror-message "].  Actual error-message nil") gb)
-                                          (if (and error-message (not (stringp error-message)))
-                                              (progn (princ "Error-Message is not string [" gb) (princ error-message gb) (princ "]\n" gb))
-                                            (if (and xerror-message (not (string= xerror-message error-message)))
-                                                (princ (concat "Expected error-message [" xerror-message "] not equal actual [" error-message "]") gb)
-                                              (when error-message
-                                                (setq emsg (concat ", Error = \"" error-message "\".")))
-                                              (when token
-                                                (setq tok token))
-                                              (princ "\"" gb) (princ test-id gb) (princ "\": " gb)
-                                              (princ (format "%d : %d = [%s](%d)%s\n" spoint epoint tok token-type emsg) gb)
-                                              (setq result t)      )))))))))))))))))))))
+                                        (setq info-pair (car ext-info))
+                                        (if (not (consp info-pair))
+                                            (progn (princ "shu-test-check-shu-cpp-get-token, info-pair not cons: " gb)
+                                                   (princ info-pair gb) (princ "\n" gb))
+                                          (setq error-message (car info-pair))
+                                          (setq nesting-level (cdr info-pair))
+                                          (if (and xerror-message (not error-message))
+                                              (princ (concat "Expected error-message = [" xerror-message "].  Actual error-message nil") gb)
+                                            (if (and error-message (not (stringp error-message)))
+                                                (progn (princ "Error-Message is not string [" gb) (princ error-message gb) (princ "]\n" gb))
+                                              (if (and xerror-message (not (string= xerror-message error-message)))
+                                                  (princ (concat "Expected error-message [" xerror-message "] not equal actual [" error-message "]") gb)
+                                                (when error-message
+                                                  (setq emsg (concat ", Error = \"" error-message "\".")))
+                                                (when token
+                                                  (setq tok token))
+                                                (princ "\"" gb) (princ test-id gb) (princ "\": " gb)
+                                                (princ (format "%d : %d = [%s](%d)%s\n" spoint epoint tok token-type emsg) gb)
+                                                (setq result t)))))))))))))))))))))))
     (when (not result)
       (princ ": shu-test-check-shu-cpp-get-token, test \"" gb)
       (princ test-id gb)
@@ -2142,6 +2208,28 @@ me anything.  It is printed on test failure to identify the test that failed."
       (setq nkw (concat kw "something-or-other"))
       (should (not (gethash nkw ht)))
       (setq kl (cdr kl)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-token-set-nesting-level
+;;
+(ert-deftest shu-test-shu-cpp-token-set-nesting-level ()
+  (let ((token-info)
+        (token "TOKEN")
+        (token-type shu-cpp-token-type-qt)
+        (spoint 123)
+        (epoint 456)
+        (error-message "Hi there")
+        (nesting-level 12)
+        (xnesting-level))
+    (setq token-info (shu-cpp-make-token-info token token-type spoint epoint error-message))
+    (shu-cpp-token-set-nesting-level token-info nesting-level)
+    (setq xnesting-level (shu-cpp-token-extract-nesting-level token-info))
+    (should xnesting-level)
+    (should (numberp xnesting-level))
+    (should (= nesting-level nesting-level))
     ))
 
 

@@ -161,6 +161,25 @@ of every visited file.  Makes a useful history of all files visited."
 
 
 ;;
+;;  tap
+;;
+(defun tap ()
+  "Insert a BALL_LOG_INFO_BLOCK at point."
+  (interactive)
+  (let ((pad)
+        (ipad)
+        (pad-count (current-column)))
+    (setq pad (make-string pad-count ? ))
+    (insert
+     (concat
+      "const char             *const allocatorName(\"TestAllocator\");\n"
+      pad "const bool              verboseFlag(false);\n"
+      pad "bslma::TestAllocator    ta(allocatorName, verboseFlag, 0);\n"
+      pad "bslma::TestAllocator   *const tap = &ta;\n"))
+    ))
+
+
+;;
 ;;  blos
 ;;
 (defun blos ()
@@ -196,6 +215,39 @@ of every visited file.  Makes a useful history of all files visited."
     )
 
 
+;;
+;;  tai
+;;
+(defun tai ()
+  "Insert \"#include <bslma_testallocator.h>\" at point."
+  (interactive)
+    (insert "#include <bslma_testallocator.h>")
+    )
+
+
+
+;;
+;;  make-jrun
+;;
+(defun make-jrun (start end)
+  "Mark the beginning and end of a task name and then invoke this function
+interactively.  It will create a file called \"jrun\" that will run the
+given task as a Google test."
+  (interactive "r")
+  (let ((task-name (buffer-substring-no-properties start end))
+        (file-name "jrun"))
+    (find-file file-name)
+    (insert
+     (concat
+      "#!/bin/ksh -x\n"
+      "time ./" task-name " "
+      "--gtest_filter=*.* --bael-log-on-success --baem-metrics   --bael-level INFO --bael-format \"%d %p:%t %s %f:%l %c %m %u\\n\"\n"))
+    (when (buffer-modified-p)
+      (basic-save-buffer)
+      (set-file-modes file-name #o755))
+    ))
+
+
 
 ;;
 ;;  cassert
@@ -207,8 +259,8 @@ of every visited file.  Makes a useful history of all files visited."
    ((pad-count (current-column))
     (start ))
     (setq start (save-excursion (beginning-of-line) (point)))
-    (insert "BSLS_ASSERT();\n")
-    (goto-char (+ start pad-count 12))))
+    (insert "BSLS_ASSERT_OPT();\n")
+    (goto-char (+ start pad-count 16))))
 
 
 ;;
@@ -629,6 +681,23 @@ argument is used, a prompt is placed in the mini-buffer."
 
 
 ;;
+;;  insert-tap
+;;
+(defun insert-tap ()
+  "Insert the code required to create an instance of bslma::TestAllocator"
+  (interactive)
+    (beginning-of-line)
+    (insert
+     (concat
+      "    const char            *const allocatorName = \"TestAllocator\";\n"
+      "    const bool                   verboseFlag(false);\n"
+      "    bslma::TestAllocator         ta(allocatorName, verboseFlag, 0);\n"
+      "    bslma::TestAllocator  *const tap = &ta;\n"
+      ))
+    )
+
+
+;;
 ;;  cite-bib - Turn a BibTex file into a list of @nocite
 ;;             for all entries in the file.
 ;;
@@ -760,7 +829,18 @@ files reside."
    )
    (message (concat "Converted " ccount " occurrences."))
   )
-)
+  )
+
+
+;;
+;;  shu-code
+;;
+(defun shu-code ()
+  "Move to the shu code directory."
+  (interactive)
+    (dired "~/emacs/external/shu")
+    )
+
 
 ;;
 ;;  Get the names of a set of Java files with the directory
@@ -910,3 +990,6 @@ of the individial Java files."
     (princ (format "%s%d: %s\n" pad line-no modified-line) log-buffer)
   (setq show-list (cdr show-list)))
 ))
+
+
+;;; useful.el ends here

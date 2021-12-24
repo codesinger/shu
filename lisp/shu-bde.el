@@ -457,19 +457,39 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
 
 
 
+;;
+;;  shu-gen-bde-create-prompt
+;;
+(defun shu-gen-bde-create-prompt ()
+  "This function creates the prompt for the interactive special form of the
+function SHU-GEN-BDE-COMPONENT.  The prompt includes the namespace in which the
+new class will be created or the string \"NO NAMESPACE\" if there is no default
+namespace set.  If the name of the current directory does not match the default
+namespace, the prompt also includes the directory name to remind the user that
+the current directory name does not match the namespace."
+  (let ((query)
+        (namespace (if shu-cpp-default-namespace shu-cpp-default-namespace "NO NAMESPACE"))
+        (prefix (shu-get-directory-prefix))
+        (debug-on-error t))
+    (setq query (concat "Class name in " namespace "? "))
+    (when (and shu-cpp-default-namespace (not (string= prefix namespace)))
+      (setq query (concat "Class name in " namespace  " in directory '" prefix "'? ")))
+    (read-string query)
+    ))
+
+
 
 ;;
 ;;  shu-gen-bde-component
 ;;
 (defun shu-gen-bde-component (class-name)
   "Generate the three files for a new component: .cpp, .h, and .t.cpp"
-  (interactive "sClass name?: ")
+  (interactive (list (shu-gen-bde-create-prompt)))
   (let ((author shu-cpp-author)
-         (namespace shu-cpp-default-namespace)
-         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix "")))
+        (namespace shu-cpp-default-namespace)
+        (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix "")))
     (shu-internal-gen-bde-component class-name author namespace file-prefix)
     ))
-
 
 
 
@@ -482,7 +502,7 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
   (let* ((gitbuf (get-buffer-create "**git-add**"))
          (debug-on-error t)
          (base-class-name (downcase class-name))
-;;         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix (concat namespace "_")))
+         ;;         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix (concat namespace "_")))
          (base-name (concat file-prefix base-class-name))
          (hfile-name (concat base-name ".h"))
          (cfile-name (concat base-name ".cpp"))
@@ -540,6 +560,14 @@ returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
       (princ (concat "git reset HEAD " hfile-name "\n") gitbuf)
       (princ (concat "git reset HEAD " cfile-name "\n") gitbuf)
       (princ (concat "git reset HEAD " tfile-name "\n") gitbuf)
+
+      (princ (concat "git restore --staged " hfile-name "\n") gitbuf)
+      (princ (concat "git restore --staged " cfile-name "\n") gitbuf)
+      (princ (concat "git restore --staged " tfile-name "\n") gitbuf)
+
+      (princ (concat "rm " hfile-name "\n") gitbuf)
+      (princ (concat "rm " cfile-name "\n") gitbuf)
+      (princ (concat "rm " tfile-name "\n") gitbuf)
 
       (shu-generate-git-add hfile-name gitbuf)
       (shu-generate-git-add cfile-name gitbuf)
@@ -675,11 +703,14 @@ the buffer GITBUF."
       " * \\author " author "\n"
       " */\n"
       "\n"
-      "#include "left-include-delim hfile-name right-include-delim "\n"
+      "#include " left-include-delim hfile-name right-include-delim "\n"
       "\n"))
     (run-hooks 'shu-bde-gen-file-identifier-hook)
     (insert
      (concat
+      "\n"
+      "#include <bslma_default.h>\n"
+      "\n"
       "\n"
       "\n"
       outer-namespace
@@ -689,7 +720,7 @@ the buffer GITBUF."
     (save-excursion
       (beginning-of-line)
       (setq cgen-point (point))
-)
+      )
     (insert
      (concat
       "\n"

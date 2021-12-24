@@ -34,6 +34,23 @@
 
 
 
+(defvar shu-org-home nil
+  "Home directory of the org data files.")
+
+(defvar shu-org-home-file nil
+  "Main agenda org data file.")
+
+(defvar shu-org-home-name nil
+  "Name of the home agenda file sans directory")
+
+(defvar shu-org-home-archive-file nil
+  "Main agenda org archive file.")
+
+(defvar shu-org-home-archive-buffer nil
+  "Main agenda org archive buffer.")
+
+
+
 ;;
 ;;  shu-setup-org-mode
 ;;
@@ -48,7 +65,8 @@ I work and play.  It is not part of the Shu elisp package."
         (progn
           (princ "On Mac OSX\n" gb)
           (setq shu-org-home "~/data/org")
-          (setq shu-org-home-file (concat shu-org-home "/home.org"))
+          (setq shu-org-home-name "home.org")
+          (setq shu-org-home-file (concat shu-org-home "/" shu-org-home-name))
           (princ (concat "Looking for: \"" shu-org-home-file "\"\n") gb)
           (when (file-readable-p shu-org-home-file)
             (princ (concat "Found file: \"" shu-org-home-file "\"\n") gb)
@@ -58,20 +76,27 @@ I work and play.  It is not part of the Shu elisp package."
             (add-to-list 'org-modules 'org-habit)
             (setq org-mac-mail-account "mail.stewartpalmer.com")
             ;; Alias to insert link to currently selected Apple Mail message
-            (defalias 'imail 'org-mac-message-insert-selected)))
+            (defalias 'imail 'org-mac-message-insert-selected)
+            ))
       (when (shu-system-type-is-unix)
         (progn
           (princ "On Unix\n" gb)
           (setq shu-org-home "~/mbig/2019-11-16-work/work")
-          (setq shu-org-home-file (concat shu-org-home "/work.org"))
+          (setq shu-org-home-name "work.org")
+          (setq shu-org-home-file (concat shu-org-home "/" shu-org-home-name))
           (princ (concat "Looking for: \"" shu-org-home-file "\"\n") gb)
           (when (file-readable-p shu-org-home-file)
             (princ (concat "Found file: \"" shu-org-home-file "\"\n") gb)
-            (setq enable-org-mode t)))))
+            (setq enable-org-mode t)
+            ))))
     (when (not enable-org-mode)
       (princ "enable-org-mode is false\n" gb))
     (when enable-org-mode
       (princ "enable-org-mode is true\n" gb)
+      (setq shu-org-home-archive-file (concat shu-org-home-file "_archive"))
+      (when (file-readable-p shu-org-home-archive-file)
+        (princ (concat "Found archive file: \"" shu-org-home-archive-file "\"\n") gb))
+      (setq shu-org-home-archive-buffer (concat shu-org-home-name "_archive"))
       (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
       (define-key global-map "\C-cl" 'org-store-link)
       (define-key global-map "\C-ca" 'org-agenda)
@@ -82,10 +107,12 @@ I work and play.  It is not part of the Shu elisp package."
       (global-set-key "\C-c\C-c" 'org-capture)
 
       (setq org-todo-keywords
-            '((sequence "TODO(t!)" "WAITING(w@)" "|" "CANCELLED(c!)" "DONE(d!)")))
-      ;; These are the keywords that represent the " notdone" state in the above list
+            '(
+              (sequence "TODO(t!)" "WAITING(w@)" "|" "CANCELLED(c!)" "DEFERRED(f!)" "DONE(d!)")
+                ))
+      ;; These are the keywords that represent the " not done" state in the above list
       (setq shu-org-todo-keywords
-            (list "TODO" "WAITING"))
+            (list "TODO" "WAITING" "DEFERRED"))
       ;; These are the keywords that represent the "done" state in the above list
       ;; Used to identify "stuck" projects, which are ones which are not done
       (setq shu-org-done-keywords
@@ -118,9 +145,4 @@ I work and play.  It is not part of the Shu elisp package."
     ))
 
 
-;;; shu-misc.el ends here
-
-
-;;; shu-system-type-is-unix
-
-;;; ~/mbig/2019-11-16-work
+;;; shu-setup-org-mode.el ends here

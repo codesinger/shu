@@ -1,4 +1,4 @@
-;;; shu-cpp-general.el --- Shu project code for dealing wth C++ in Emacs
+`;;; shu-cpp-general.el --- Shu project code for dealing wth C++ in Emacs
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
 ;;
@@ -7,7 +7,7 @@
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
-;; This is free software: you can redistribute it and/or modify it
+;; This is free software: you can redistrcibute it and/or modify it
 ;; under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or
 ;; (at your option) any later version.
@@ -41,9 +41,68 @@
 ;;; Code:
 
 
-(provide 'shu-cpp-general)
 (require 'shu-base)
 (require 'shu-cpp-token)
+
+
+(defcustom shu-cpp-allocator-type "bslma::Allocator"
+  "The data type that represents an allocator."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-date-type "bdlt::Date"
+  "The data type that represents a date."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-datetime-type "bdlt::Datetime"
+  "The data type that represents a date and time."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-datetime-timezone-type "bdlt::DatetimeTz"
+  "The data type that represents a date and time with an associated time zone."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-interval-type "bdlt::DatetimeInterval"
+  "The data type that represents a time interval type."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-short-interval-type "bsls::TimeInterval"
+  "The data type that represents a short time interval type."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-long-long-type "bsls::Types::Int64"
+  "The data type that represents a 64 bit integer."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-size-type "bsl::size_t"
+  "The data type that represents a size."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-string-type "bsl::string"
+  "The data type that represents a string type."
+  :type '(string)
+  :group 'shu-cpp-general)
+
+
+(defcustom shu-cpp-time-type "bdlt::Time"
+  "The data type that represents a time."
+  :type '(string)
+  :group 'shu-cpp-general)
 
 
 (defconst shu-cpp-base-types
@@ -90,6 +149,1441 @@ This is used by shu-internal-get-set when generating getters and setters for a c
   "An alist of \"using namespace\" directives and their line numbers where first declared.
 Used to filter duplicates.")
 
+(defvar shu-cpp-include-names nil
+  "A hash table that maps class names to include file names  This is the hash table
+inversion of shu-std-include-list or shu-bsl-include-list.")
+
+;;
+;;  shu-std-include-list
+;;
+(defconst shu-std-include-list
+  (list
+   (cons "algorithm"    (list
+                         "std::all_of"
+                         "std::any_of"
+                         "std::none_of"
+                         "std::for_each"
+                         "std::for_each_n"
+                         "std::count"
+                         "std::count_if"
+                         "std::mismatch"
+                         "std::find"
+                         "std::find_if"
+                         "std::find_if_not"
+                         "std::find_end"
+                         "std::find_first_of"
+                         "std::adjacent_find"
+                         "std::search"
+                         "std::search_n"
+                         "std::copy"
+                         "std::copy_if"
+                         "std::copy_n"
+                         "std::copy_backward"
+                         "std::move"
+                         "std::move_backward"
+                         "std::fill"
+                         "std::fill_n"
+                         "std::transform"
+                         "std::generate"
+                         "std::generate_n"
+                         "std::remove"
+                         "std::remove_if"
+                         "std::remove_copy"
+                         "std::remove_copy_if"
+                         "std::replace"
+                         "std::replace_if"
+                         "std::replace_copy"
+                         "std::replace_copy_if"
+                         "std::swap"
+                         "std::swap_ranges"
+                         "std::iter_swap"
+                         "std::reverse"
+                         "std::reverse_copy"
+                         "std::rotate"
+                         "std::rotate_copy"
+                         "std::shift_left"
+                         "std::shift_right"
+                         "std::random_shuffle"
+                         "std::shuffle"
+                         "std::sample"
+                         "std::unique"
+                         "std::unique_copy"
+                         "std::is_partitioned"
+                         "std::partition"
+                         "std::partition_copy"
+                         "std::stable_partition"
+                         "std::partition_point"
+                         "std::is_sorted"
+                         "std::is_sorted_until"
+                         "std::sort"
+                         "std::partial_sort"
+                         "std::partial_sort_copy"
+                         "std::stable_sort"
+                         "std::nth_element"
+                         "std::lower_bound"
+                         "std::upper_bound"
+                         "std::binary_search"
+                         "std::equal_range"
+                         "std::merge"
+                         "std::inplace_merge"
+                         "std::includes"
+                         "std::set_difference"
+                         "std::set_intersection"
+                         "std::set_symmetric_difference"
+                         "std::set_union"
+                         "std::is_heap"
+                         "std::is_heap_until"
+                         "std::make_heap"
+                         "std::push_heap"
+                         "std::pop_heap"
+                         "std::sort_heap"
+                         "std::max"
+                         "std::max_element"
+                         "std::min"
+                         "std::min_element"
+                         "std::minmax"
+                         "std::minmax_element"
+                         "std::clamp"
+                         "std::equal"
+                         "std::lexicographical_compare"
+                         "std::lexicographical_compare_three_way"
+                         "std::is_permutation"
+                         "std::next_permutation"
+                         "std::prev_permutation"
+                         ))
+   (cons "atomic"    (list
+                      "std::atomic"
+                      "std::atomic_ref"
+                      "std::atomic_flag"
+                      "std::memory_order"
+                      "std::atomic_bool"
+                      "std::atomic_char"
+                      "std::atomic_schar"
+                      "std::atomic_uchar"
+                      "std::atomic_short"
+                      "std::atomic_ushort"
+                      "std::atomic_int"
+                      "std::atomic_uint"
+                      "std::atomic_long"
+                      "std::atomic_ulong"
+                      "std::atomic_llong"
+                      "std::atomic_ullong"
+                      "std::atomic_char8_t"
+                      "std::atomic_char16_t"
+                      "std::atomic_char32_t"
+                      "std::atomic_wchar_t"
+                      "std::atomic_int8_t"
+                      "std::atomic_uint8_t"
+                      "std::atomic_int16_t"
+                      "std::atomic_uint16_t"
+                      "std::atomic_int32_t"
+                      "std::atomic_uint32_t"
+                      "std::atomic_int64_t"
+                      "std::atomic_uint64_t"
+                      "std::atomic_int_least8_t"
+                      "std::atomic_uint_least8_t"
+                      "std::atomic_int_least16_t"
+                      "std::atomic_uint_least16_t"
+                      "std::atomic_int_least32_t"
+                      "std::atomic_uint_least32_t"
+                      "std::atomic_int_least64_t"
+                      "std::atomic_uint_least64_t"
+                      "std::atomic_int_fast8_t"
+                      "std::atomic_uint_fast8_t"
+                      "std::atomic_int_fast16_t"
+                      "std::atomic_uint_fast16_t"
+                      "std::atomic_int_fast32_t"
+                      "std::atomic_uint_fast32_t"
+                      "std::atomic_int_fast64_t"
+                      "std::atomic_uint_fast64_t"
+                      "std::atomic_intptr_t"
+                      "std::atomic_uintptr_t"
+                      "std::atomic_size_t"
+                      "std::atomic_ptrdiff_t"
+                      "std::atomic_intmax_t"
+                      "std::atomic_uintmax_t"
+                      "std::atomic_signed_lock_free"
+                      "std::atomic_unsigned_lock_free"
+                      "std::atomic_is_lock_free"
+                      "std::atomic_store"
+                      "std::atomic_store_explicit"
+                      "std::atomic_load"
+                      "std::atomic_load_explicit"
+                      "std::atomic_exchange"
+                      "std::atomic_exchange_explicit"
+                      "std::atomic_compare_exchange_weak"
+                      "std::atomic_compare_exchange_weak_explicit"
+                      "std::atomic_compare_exchange_strong"
+                      "std::atomic_compare_exchange_strong_explicit"
+                      "std::atomic_fetch_add"
+                      "std::atomic_fetch_add_explicit"
+                      "std::atomic_fetch_sub"
+                      "std::atomic_fetch_sub_explicit"
+                      "std::atomic_fetch_and"
+                      "std::atomic_fetch_and_explicit"
+                      "std::atomic_fetch_or"
+                      "std::atomic_fetch_or_explicit"
+                      "std::atomic_fetch_xor"
+                      "std::atomic_fetch_xor_explicit"
+                      "std::atomic_wait"
+                      "std::atomic_wait_explicit"
+                      "std::atomic_notify_one"
+                      "std::atomic_notify_all"
+                      "std::atomic_flag_test"
+                      "std::atomic_flag_test_explicit"
+                      "std::atomic_flag_test_and_set"
+                      "std::atomic_flag_test_and_set_explicit"
+                      "std::atomic_flag_clear"
+                      "std::atomic_flag_clear_explicit"
+                      "std::atomic_flag_wait"
+                      "std::atomic_flag_wait_explicit"
+                      "std::atomic_flag_notify_one"
+                      "std::atomic_flag_notify_all"
+                      "std::atomic_init"
+                      "std::kill_dependency"
+                      "std::atomic_thread_fence"
+                      "std::atomic_signal_fence"
+                      ))
+   (cons "bitset"    (list
+                      "std::bitset"
+                      ))
+   (cons "chrono"    (list
+                      "std::time_point"
+                      "std::system_clock"
+                      "std::steady_clock"
+                      "std::high_resolution_clock"
+                      "std::time_point_cast"
+                      "std::is_am"
+                      "std::is_pm"
+                      "std::get_tzdb"
+                      "std::get_tzdb_list"
+                      "std::reload_tzdb"
+                      "std::remote_version"
+                      ))
+   (cons "condition_variable" (list
+                               "std::condition_variable"
+                               "std::condition_variable_any"
+                               "std::cv_status"
+                               "std::notify_all_at_thread_exit"
+                               ))
+   (cons "cstddef"    (list
+                       "std::size_t"
+                       "std::ptrdiff_t"
+                       "std::max_align_t"
+                       "std::nullptr_t"
+                       ))
+   (cons "cstring" (list
+                    "std::memcpy"
+                    "std::memmove"
+                    "std::strcpy"
+                    "std::strncpy"
+                    "std::strcat"
+                    "std::strncat"
+                    "std::memcmp"
+                    "std::strcmp"
+                    "std::strcoll"
+                    "std::strncmp"
+                    "std::strxfrm"
+                    "std::memchr"
+                    "std::strchr"
+                    "std::strcspn"
+                    "std::strpbrk"
+                    "std::strrchr"
+                    "std::strspn"
+                    "std::strstr"
+                    "std::strtok"
+                    "std::memset"
+                    "std::strerror"
+                    "std::strlen"
+                    ))
+   (cons "fstream"   (list
+                      "std::basic_ifstream"
+                      "std::basic_ofstream"
+                      "std::basic_fstream"
+                      "std::basic_filebuf"
+                      "std::ifstream"
+                      "std::ofstream"
+                      "std::fstream"
+                      "std::filebuf"
+                      "std::wifstream"
+                      "std::wofstream"
+                      "std::wfstream"
+                      "std::wfilebuf"
+                      ))
+   (cons "future"    (list
+                      "std::promise"
+                      "std::packaged_task"
+                      "std::future"
+                      "std::shared_future"
+                      "std::launch"
+                      "std::future_status"
+                      "std::future_error"
+                      "std::future_errc"
+                      "std::async"
+                      "std::future_category"
+                      ))
+   (cons "functional"    (list
+                          "std::function"
+                          "std::mem_fn"
+                          "std::bad_function_call"
+                          "std::is_bind_expression"
+                          "std::is_placeholder"
+                          "std::reference_wrapper"
+                          ))
+   (cons "iomanip"    (list
+                       "std::resetiosflags"
+                       "std::setiosflags"
+                       "std::setbase"
+                       "std::setfill"
+                       "std::setprecision"
+                       "std::setw"
+                       "std::get_money"
+                       "std::put_money"
+                       "std::get_time"
+                       "std::put_time"
+                       "std::quoted"
+                       ))
+   (cons "iostream"    (list
+                        "std::cin"
+                        "std::wcin"
+                        "std::cout"
+                        "std::wcout"
+                        "std::cerr"
+                        "std::wcerr"
+                        "std::clog"
+                        "std::wclog"
+                        ))
+   (cons "ios"    (list
+                   "std::basic_ios"
+                   "std::fpos"
+                   "std::ios"
+                   "std::ios_base"
+                   "std::wios"
+                   "std::io_errc"
+                   "std::streamoff"
+                   "std::streampos"
+                   "std::streamsize"
+                   "std::wstreampos"
+                   "std::boolalpha"
+                   "std::showbase"
+                   "std::showpoint"
+                   "std::showpos"
+                   "std::skipws"
+                   "std::unitbuf"
+                   "std::uppercase"
+                   "std::noboolalpha"
+                   "std::noshowbase"
+                   "std::noshowpoint"
+                   "std::noshowpos"
+                   "std::noskipws"
+                   "std::nounitbuf"
+                   "std::nouppercase"
+                   "std::dec"
+                   "std::hex"
+                   "std::oct"
+                   "std::fixed"
+                   "std::scientific"
+                   "std::internal"
+                   "std::left"
+                   "std::right"
+                   ))
+   (cons "istream"    (list
+                       "std::basic_istream"
+                       "std::istream"
+                       "std::wistream"
+                       "std::basic_iostream"
+                       "std::iostream"
+                       "std::wiostream"
+                       "std::ws"
+                       ))
+   (cons "locale"    (list
+                      "std::narrow"
+                      "std::tolower"
+                      "std::toupper"
+                      "std::widen"
+                      ))
+   (cons "limits"    (list
+                      "std::numeric_limits"
+                      ))
+   (cons "map"    (list
+                   "std::map"
+                   "std::multimap"
+                   ))
+   (cons "memory"    (list
+                      "std::allocator"
+                      "std::allocator_arg"
+                      "std::allocator_arg_t"
+                      "std::allocator_traits"
+                      "std::auto_ptr"
+                      "std::auto_ptr_ref"
+                      "std::shared_ptr"
+                      "std::weak_ptr"
+                      "std::unique_ptr"
+                      "std::default_delete"
+                      "std::make_shared"
+                      "std::allocate_shared"
+                      "std::static_pointer_cast"
+                      "std::dynamic_pointer_cast"
+                      "std::const_pointer_cast"
+                      "std::get_deleter"
+                      "std::owner_less"
+                      "std::enable_shared_from_this"
+                      "std::raw_storage_iterator"
+                      "std::get_temporary_buffer"
+                      "std::return_temporary_buffer"
+                      "std::uninitialized_copy"
+                      "std::uninitialized_copy_n"
+                      "std::uninitialized_fill"
+                      "std::uninitialized_fill_n"
+                      "std::uninitialized_move"
+                      "std::uninitialized_move_n"
+                      "std::uninitialized_default_construct"
+                      "std::uninitialized_default_construct_n"
+                      "std::uninitialized_value_construct"
+                      "std::uninitialized_value_construct_n"
+                      "std::destroy"
+                      "std::destroy_at"
+                      "std::destroy_n"
+                      "std::make_unique"
+                      "std::pointer_traits"
+                      "std::pointer_safety"
+                      "std::declare_reachable"
+                      "std::undeclare_reachable"
+                      "std::declare_no_pointers"
+                      "std::undeclare_no_pointers"
+                      "std::get_pointer_safety"
+                      "std::align"
+                      "std::addressof"
+                      "std::reinterpret_pointer_cast"
+                      ))
+   (cons "mutex" (list
+                  "std::mutex"
+                  "std::recursive_mutex"
+                  "std::timed_mutex"
+                  "std::recursive_timed_mutex"
+                  "std::lock_guard"
+                  "std::unique_lock"
+                  "std::once_flag"
+                  "std::adopt_lock_t"
+                  "std::defer_lock_t"
+                  "std::try_to_lock_t"
+                  "std::try_lock"
+                  "std::lock"
+                  "std::call_once"
+                  ))
+   (cons "new"   (list
+                  "std::bad_alloc"
+                  "std::bad_array_new_length"
+                  "std::nothrow_t"
+                  "std::align_val_t"
+                  "std::new_handler"
+                  "std::hardware_destructive_interference_size"
+                  "std::hardware_constructive_interference_size"
+                  "std::get_new_handler"
+                  "std::set_new_handler"
+                  "std::launder"
+                  ))
+   (cons "optional"   (list
+                       "std::optional"
+                       "std::bad_optional_access"
+                       "std::nullopt_t"
+                       "std::nullopt"
+                       "std::make_optional"
+                       ))
+   (cons "ostream"   (list
+                      "std::basic_ostream"
+                      "std::ostream"
+                      "std::wostream"
+                      "std::endl"
+                      "std::ends"
+                      "std::flush"
+                      "std::emit_on_flush"
+                      "std::noemit_on_flush"
+                      "std::flush_emit"
+                      ))
+   (cons "queue"   (list
+                    "std::queue"
+                    "std::priority_queue"
+                    ))
+   (cons "set"   (list
+                  "std::set"
+                  "std::multiset"
+                  ))
+   (cons "regex"   (list
+                    "std::basic_regex"
+                    "std::sub_match"
+                    "std::match_results"
+                    "std::regex_iterator"
+                    "std::regex_token_iterator"
+                    "std::regex_error"
+                    "std::regex_traits"
+                    "std::regex_match"
+                    "std::regex_search"
+                    "std::regex_replace"
+                    ))
+   (cons "sstream"   (list
+                      "std::istringstream"
+                      "std::ostringstream"
+                      "std::stringbuf"
+                      "std::stringstream"
+                      "std::wistringstream"
+                      "std::wostringstream"
+                      "std::wstringbuf"
+                      "std::wstringstream"
+                      ))
+   (cons "stdexcept"    (list
+                         "std::domain_error"
+                         "std::invalid_argument"
+                         "std::length_error"
+                         "std::logic_error"
+                         "std::out_of_range"
+                         "std::overflow_error"
+                         "std::range_error"
+                         "std::runtime_error"
+                         "std::underflow_error"
+                         ))
+   (cons "string"   (list
+                     "std::basic_string"
+                     "std::char_traits"
+                     "std::string"
+                     "std::u16string"
+                     "std::wstring"
+                     "std::stoi"
+                     "std::stol"
+                     "std::stoul"
+                     "std::stoll"
+                     "std::stoull"
+                     "std::stof"
+                     "std::stod"
+                     "std::stold"
+                     "std::to_string"
+                     "std::to_wstring"
+                     "std::getline"
+                     ))
+   (cons "string_view"   (list
+                          "std::string_view"
+                          "std::u8string_view"
+                          "std::u16string_view"
+                          "std::u32string_view"
+                          "std::wstring_view"
+                          ))
+   (cons "thread" (list
+                   "std::thread"
+                   "std::this_thread"
+                   ))
+   (cons "tuple"    (list
+                     "std::tuple"
+                     "std::tuple_size"
+                     "std::tuple_element"
+                     "std::make_tuple"
+                     "std::forward_as_tuple"
+                     "std::tie"
+                     "std::tuple_cat"
+                     "std::get"
+                     "std::ignore"
+                     ))
+   (cons "type_traits"    (list
+                           "std::integral_constant"
+                           "std::bool_constant"
+                           "std::true_type"
+                           "std::false_type"
+                           "std::is_void"
+                           "std::is_null_pointer"
+                           "std::is_integral"
+                           "std::is_floating_point"
+                           "std::is_array"
+                           "std::is_enum"
+                           "std::is_union"
+                           "std::is_class"
+                           "std::is_function"
+                           "std::is_pointer"
+                           "std::is_lvalue_reference"
+                           "std::is_rvalue_reference"
+                           "std::is_member_object_pointer"
+                           "std::is_member_function_pointer"
+                           "std::is_fundamental"
+                           "std::is_arithmetic"
+                           "std::is_scalar"
+                           "std::is_object"
+                           "std::is_compound"
+                           "std::is_reference"
+                           "std::is_member_pointer"
+                           "std::is_const"
+                           "std::is_volatile"
+                           "std::is_trivial"
+                           "std::is_trivially_copyable"
+                           "std::is_standard_layout"
+                           "std::is_pod"
+                           "std::has_unique_object_representations"
+                           "std::is_empty"
+                           "std::is_polymorphic"
+                           "std::is_abstract"
+                           "std::is_final"
+                           "std::is_aggregate"
+                           "std::is_signed"
+                           "std::is_unsigned"
+                           "std::is_bounded_array"
+                           "std::is_unbounded_array"
+                           "std::is_scoped_enum"
+                           "std::is_constructible"
+                           "std::is_trivially_constructible"
+                           "std::is_nothrow_constructible"
+                           "std::is_default_constructible"
+                           "std::is_trivially_default_constructible"
+                           "std::is_nothrow_default_constructible"
+                           "std::is_copy_constructible"
+                           "std::is_trivially_copy_constructible"
+                           "std::is_nothrow_copy_constructible"
+                           "std::is_move_constructible"
+                           "std::is_trivially_move_constructible"
+                           "std::is_nothrow_move_constructible"
+                           "std::is_assignable"
+                           "std::is_trivially_assignable"
+                           "std::is_nothrow_assignable"
+                           "std::is_copy_assignable"
+                           "std::is_trivially_copy_assignable"
+                           "std::is_nothrow_copy_assignable"
+                           "std::is_move_assignable"
+                           "std::is_trivially_move_assignable"
+                           "std::is_nothrow_move_assignable"
+                           "std::is_destructible"
+                           "std::is_trivially_destructible"
+                           "std::is_nothrow_destructible"
+                           "std::has_virtual_destructor"
+                           "std::is_swappable_with"
+                           "std::is_swappable"
+                           "std::is_nothrow_swappable_with"
+                           "std::is_nothrow_swappable"
+                           "std::alignment_of"
+                           "std::rank"
+                           "std::extent"
+                           "std::is_same"
+                           "std::is_base_of"
+                           "std::is_convertible"
+                           "std::is_nothrow_convertible"
+                           "std::is_layout_compatible"
+                           "std::is_pointer_interconvertible_base_of"
+                           "std::is_invocable"
+                           "std::is_invocable_r"
+                           "std::is_nothrow_invocable"
+                           "std::is_nothrow_invocable_r"
+                           "std::remove_cv"
+                           "std::remove_const"
+                           "std::remove_volatile"
+                           "std::add_cv"
+                           "std::add_const"
+                           "std::add_volatile"
+                           "std::remove_reference"
+                           "std::add_lvalue_reference"
+                           "std::add_rvalue_reference"
+                           "std::remove_pointer"
+                           "std::add_pointer"
+                           "std::make_signed"
+                           "std::make_unsigned"
+                           "std::remove_extent"
+                           "std::remove_all_extents"
+                           "std::aligned_storage"
+                           "std::aligned_union"
+                           "std::decay"
+                           "std::remove_cvref"
+                           "std::enable_if"
+                           "std::conditional"
+                           "std::common_type"
+                           "std::common_reference"
+                           "std::basic_common_reference"
+                           "std::underlying_type"
+                           "std::result_of"
+                           "std::invoke_result"
+                           "std::void_t"
+                           "std::type_identity"
+                           "std::conjunction"
+                           "std::disjunction"
+                           "std::negation"
+                           "std::is_pointer_interconvertible_with_class"
+                           "std::is_corresponding_member"
+                           "std::is_constant_evaluated"
+                           ))
+   (cons "unordered_map"    (list
+                             "std::unordered_map"
+                             "std::unordered_multimap"
+                             ))
+   (cons "unordered_set"    (list
+                             "std::unordered_set"
+                             "std::unordered_multiset"
+                             ))
+   (cons "utility"    (list
+                       "std::exchange"
+                       "std::forward"
+                       "std::move_if_noexcept"
+                       "std::as_const"
+                       "std::declval"
+                       "std::cmp_equal"
+                       "std::cmp_not_equal"
+                       "std::cmp_less"
+                       "std::cmp_greater"
+                       "std::cmp_less_equal"
+                       "std::cmp_greater_equal"
+                       "std::in_range"
+                       "std::make_pair"
+                       "std::pair"
+                       "std::integer_sequence"
+                       "std::piecewise_construct_t"
+                       "std::piecewise_construct"
+                       "std::in_place"
+                       "std::in_place_type"
+                       "std::in_place_index"
+                       "std::in_place_t"
+                       "std::in_place_type_t"
+                       "std::in_place_index_t"
+                       ))
+
+   (cons "variant"    (list
+                       "std::variant"
+                       "std::monostate"
+                       "std::bad_variant_access"
+                       "std::variant_size"
+                       "std::variant_size_v"
+                       "std::variant_alternative"
+                       "std::variant_alternative_t"
+                       "std::variant_npos"
+                       "std::visit"
+                       "std::holds_alternative"
+                       "std::get_if"
+                       ))
+   )
+  "An alist that maps include file names to class names.")
+
+
+
+;;
+;;  shu-bsl-include-list
+;;
+(defconst shu-bsl-include-list
+  (list
+   (cons "bsl_algrithm.h"    (list
+                              "bsl::all_of"
+                              "bsl::any_of"
+                              "bsl::none_of"
+                              "bsl::for_each"
+                              "bsl::for_each_n"
+                              "bsl::count"
+                              "bsl::count_if"
+                              "bsl::mismatch"
+                              "bsl::find"
+                              "bsl::find_if"
+                              "bsl::find_if_not"
+                              "bsl::find_end"
+                              "bsl::find_first_of"
+                              "bsl::adjacent_find"
+                              "bsl::search"
+                              "bsl::search_n"
+                              "bsl::copy"
+                              "bsl::copy_if"
+                              "bsl::copy_n"
+                              "bsl::copy_backward"
+                              "bsl::move"
+                              "bsl::move_backward"
+                              "bsl::fill"
+                              "bsl::fill_n"
+                              "bsl::transform"
+                              "bsl::generate"
+                              "bsl::generate_n"
+                              "bsl::remove"
+                              "bsl::remove_if"
+                              "bsl::remove_copy"
+                              "bsl::remove_copy_if"
+                              "bsl::replace"
+                              "bsl::replace_if"
+                              "bsl::replace_copy"
+                              "bsl::replace_copy_if"
+                              "bsl::swap"
+                              "bsl::swap_ranges"
+                              "bsl::iter_swap"
+                              "bsl::reverse"
+                              "bsl::reverse_copy"
+                              "bsl::rotate"
+                              "bsl::rotate_copy"
+                              "bsl::shift_left"
+                              "bsl::shift_right"
+                              "bsl::random_shuffle"
+                              "bsl::shuffle"
+                              "bsl::sample"
+                              "bsl::unique"
+                              "bsl::unique_copy"
+                              "bsl::is_partitioned"
+                              "bsl::partition"
+                              "bsl::partition_copy"
+                              "bsl::stable_partition"
+                              "bsl::partition_point"
+                              "bsl::is_sorted"
+                              "bsl::is_sorted_until"
+                              "bsl::sort"
+                              "bsl::partial_sort"
+                              "bsl::partial_sort_copy"
+                              "bsl::stable_sort"
+                              "bsl::nth_element"
+                              "bsl::lower_bound"
+                              "bsl::upper_bound"
+                              "bsl::binary_search"
+                              "bsl::equal_range"
+                              "bsl::merge"
+                              "bsl::inplace_merge"
+                              "bsl::includes"
+                              "bsl::set_difference"
+                              "bsl::set_intersection"
+                              "bsl::set_symmetric_difference"
+                              "bsl::set_union"
+                              "bsl::is_heap"
+                              "bsl::is_heap_until"
+                              "bsl::make_heap"
+                              "bsl::push_heap"
+                              "bsl::pop_heap"
+                              "bsl::sort_heap"
+                              "bsl::max"
+                              "bsl::max_element"
+                              "bsl::min"
+                              "bsl::min_element"
+                              "bsl::minmax"
+                              "bsl::minmax_element"
+                              "bsl::clamp"
+                              "bsl::equal"
+                              "bsl::lexicographical_compare"
+                              "bsl::lexicographical_compare_three_way"
+                              "bsl::is_permutation"
+                              "bsl::next_permutation"
+                              "bsl::prev_permutation"
+                              ))
+   (cons "bsl_atomic.h"    (list
+                            "bsl::atomic"
+                            "bsl::atomic_ref"
+                            "bsl::atomic_flag"
+                            "bsl::memory_order"
+                            "bsl::atomic_bool"
+                            "bsl::atomic_char"
+                            "bsl::atomic_schar"
+                            "bsl::atomic_uchar"
+                            "bsl::atomic_short"
+                            "bsl::atomic_ushort"
+                            "bsl::atomic_int"
+                            "bsl::atomic_uint"
+                            "bsl::atomic_long"
+                            "bsl::atomic_ulong"
+                            "bsl::atomic_llong"
+                            "bsl::atomic_ullong"
+                            "bsl::atomic_char8_t"
+                            "bsl::atomic_char16_t"
+                            "bsl::atomic_char32_t"
+                            "bsl::atomic_wchar_t"
+                            "bsl::atomic_int8_t"
+                            "bsl::atomic_uint8_t"
+                            "bsl::atomic_int16_t"
+                            "bsl::atomic_uint16_t"
+                            "bsl::atomic_int32_t"
+                            "bsl::atomic_uint32_t"
+                            "bsl::atomic_int64_t"
+                            "bsl::atomic_uint64_t"
+                            "bsl::atomic_int_least8_t"
+                            "bsl::atomic_uint_least8_t"
+                            "bsl::atomic_int_least16_t"
+                            "bsl::atomic_uint_least16_t"
+                            "bsl::atomic_int_least32_t"
+                            "bsl::atomic_uint_least32_t"
+                            "bsl::atomic_int_least64_t"
+                            "bsl::atomic_uint_least64_t"
+                            "bsl::atomic_int_fast8_t"
+                            "bsl::atomic_uint_fast8_t"
+                            "bsl::atomic_int_fast16_t"
+                            "bsl::atomic_uint_fast16_t"
+                            "bsl::atomic_int_fast32_t"
+                            "bsl::atomic_uint_fast32_t"
+                            "bsl::atomic_int_fast64_t"
+                            "bsl::atomic_uint_fast64_t"
+                            "bsl::atomic_intptr_t"
+                            "bsl::atomic_uintptr_t"
+                            "bsl::atomic_size_t"
+                            "bsl::atomic_ptrdiff_t"
+                            "bsl::atomic_intmax_t"
+                            "bsl::atomic_uintmax_t"
+                            "bsl::atomic_signed_lock_free"
+                            "bsl::atomic_unsigned_lock_free"
+                            "bsl::atomic_is_lock_free"
+                            "bsl::atomic_store"
+                            "bsl::atomic_store_explicit"
+                            "bsl::atomic_load"
+                            "bsl::atomic_load_explicit"
+                            "bsl::atomic_exchange"
+                            "bsl::atomic_exchange_explicit"
+                            "bsl::atomic_compare_exchange_weak"
+                            "bsl::atomic_compare_exchange_weak_explicit"
+                            "bsl::atomic_compare_exchange_strong"
+                            "bsl::atomic_compare_exchange_strong_explicit"
+                            "bsl::atomic_fetch_add"
+                            "bsl::atomic_fetch_add_explicit"
+                            "bsl::atomic_fetch_sub"
+                            "bsl::atomic_fetch_sub_explicit"
+                            "bsl::atomic_fetch_and"
+                            "bsl::atomic_fetch_and_explicit"
+                            "bsl::atomic_fetch_or"
+                            "bsl::atomic_fetch_or_explicit"
+                            "bsl::atomic_fetch_xor"
+                            "bsl::atomic_fetch_xor_explicit"
+                            "bsl::atomic_wait"
+                            "bsl::atomic_wait_explicit"
+                            "bsl::atomic_notify_one"
+                            "bsl::atomic_notify_all"
+                            "bsl::atomic_flag_test"
+                            "bsl::atomic_flag_test_explicit"
+                            "bsl::atomic_flag_test_and_set"
+                            "bsl::atomic_flag_test_and_set_explicit"
+                            "bsl::atomic_flag_clear"
+                            "bsl::atomic_flag_clear_explicit"
+                            "bsl::atomic_flag_wait"
+                            "bsl::atomic_flag_wait_explicit"
+                            "bsl::atomic_flag_notify_one"
+                            "bsl::atomic_flag_notify_all"
+                            "bsl::atomic_init"
+                            "bsl::kill_dependency"
+                            "bsl::atomic_thread_fence"
+                            "bsl::atomic_signal_fence"
+                            ))
+   (cons "bsl_bitset.h"    (list
+                            "bsl::bitset"
+                            ))
+   (cons "bdlf_bind.h"   (list
+                          "bdlf::BindUtil"
+                          "bdlf::BindWrapper"
+                          ))
+   (cons "bdlf_placeholder.h"    (list
+                                  "bdlf::Placeholders"
+                                  ))
+   (cons "bsl_chrono.h"    (list
+                            "bsl::time_point"
+                            "bsl::system_clock"
+                            "bsl::steady_clock"
+                            "bsl::high_resolution_clock"
+                            "bsl::time_point_cast"
+                            "bsl::is_am"
+                            "bsl::is_pm"
+                            "bsl::get_tzdb"
+                            "bsl::get_tzdb_list"
+                            "bsl::reload_tzdb"
+                            "bsl::remote_version"
+                            ))
+   (cons "bsl_condition_variable.h" (list
+                               "bsl::condition_variable"
+                               "bsl::condition_variable_any"
+                               "bsl::cv_status"
+                               "bsl::notify_all_at_thread_exit"
+                               ))
+   (cons "bsl_cstddef.h"    (list
+                             "bsl::size_t"
+                             "bsl::ptrdiff_t"
+                             "bsl::max_align_t"
+                             "bsl::nullptr_t"
+                             ))
+   (cons "bsl_cstring.h" (list
+                          "bsl::memcpy"
+                          "bsl::memmove"
+                          "bsl::strcpy"
+                          "bsl::strncpy"
+                          "bsl::strcat"
+                          "bsl::strncat"
+                          "bsl::memcmp"
+                          "bsl::strcmp"
+                          "bsl::strcoll"
+                          "bsl::strncmp"
+                          "bsl::strxfrm"
+                          "bsl::memchr"
+                          "bsl::strchr"
+                          "bsl::strcspn"
+                          "bsl::strpbrk"
+                          "bsl::strrchr"
+                          "bsl::strspn"
+                          "bsl::strstr"
+                          "bsl::strtok"
+                          "bsl::memset"
+                          "bsl::strerror"
+                          "bsl::strlen"
+                          ))
+   (cons "bsl_fstream.h"   (list
+                            "bsl::basic_ifstream"
+                            "bsl::basic_ofstream"
+                            "bsl::basic_fstream"
+                            "bsl::basic_filebuf"
+                            "bsl::ifstream"
+                            "bsl::ofstream"
+                            "bsl::fstream"
+                            "bsl::filebuf"
+                            "bsl::wifstream"
+                            "bsl::wofstream"
+                            "bsl::wfstream"
+                            "bsl::wfilebuf"
+                            ))
+   (cons "bsl_functional.h"    (list
+                                "bsl::function"
+                                "bsl::mem_fn"
+                                "bsl::bad_function_call"
+                                "bsl::is_bind_expression"
+                                "bsl::is_placeholder"
+                                "bsl::reference_wrapper"
+                                ))
+   (cons "bsl_future.h"    (list
+                            "bsl::promise"
+                            "bsl::packaged_task"
+                            "bsl::future"
+                            "bsl::shared_future"
+                            "bsl::launch"
+                            "bsl::future_status"
+                            "bsl::future_error"
+                            "bsl::future_errc"
+                            "bsl::async"
+                            "bsl::future_category"
+                            ))
+   (cons "bsl_iomanip.h"    (list
+                             "bsl::resetiosflags"
+                             "bsl::setiosflags"
+                             "bsl::setbase"
+                             "bsl::setfill"
+                             "bsl::setprecision"
+                             "bsl::setw"
+                             "bsl::get_money"
+                             "bsl::put_money"
+                             "bsl::get_time"
+                             "bsl::put_time"
+                             "bsl::quoted"
+                             ))
+   (cons "bsl_iostream.h"    (list
+                              "bsl::cin"
+                              "bsl::wcin"
+                              "bsl::cout"
+                              "bsl::wcout"
+                              "bsl::cerr"
+                              "bsl::wcerr"
+                              "bsl::clog"
+                              "bsl::wclog"
+                              ))
+   (cons "bsl_ios.h"    (list
+                         "bsl::basic_ios"
+                         "bsl::fpos"
+                         "bsl::ios"
+                         "bsl::ios_base"
+                         "bsl::wios"
+                         "bsl::io_errc"
+                         "bsl::streamoff"
+                         "bsl::streampos"
+                         "bsl::streamsize"
+                         "bsl::wstreampos"
+                         "bsl::boolalpha"
+                         "bsl::showbase"
+                         "bsl::showpoint"
+                         "bsl::showpos"
+                         "bsl::skipws"
+                         "bsl::unitbuf"
+                         "bsl::uppercase"
+                         "bsl::noboolalpha"
+                         "bsl::noshowbase"
+                         "bsl::noshowpoint"
+                         "bsl::noshowpos"
+                         "bsl::noskipws"
+                         "bsl::nounitbuf"
+                         "bsl::nouppercase"
+                         "bsl::dec"
+                         "bsl::hex"
+                         "bsl::oct"
+                         "bsl::fixed"
+                         "bsl::scientific"
+                         "bsl::internal"
+                         "bsl::left"
+                         "bsl::right"
+                         ))
+   (cons "bsl_istream.h"    (list
+                             "bsl::basic_istream"
+                             "bsl::istream"
+                             "bsl::wistream"
+                             "bsl::basic_iostream"
+                             "bsl::iostream"
+                             "bsl::wiostream"
+                             "bsl::ws"
+                             ))
+   (cons "bsl_locale.h"    (list
+                            "bsl::narrow"
+                            "bsl::tolower"
+                            "bsl::toupper"
+                            "bsl::widen"
+                            ))
+   (cons "bsl_limits.h"    (list
+                            "bsl::numeric_limits"
+                            ))
+   (cons "bsl_map.h"    (list
+                         "bsl::map"
+                         "bsl::multimap"
+                         ))
+   (cons "bsl_memory.h"    (list
+                            "bsl::allocator"
+                            "bsl::allocator_arg"
+                            "bsl::allocator_arg_t"
+                            "bsl::allocator_traits"
+                            "bsl::auto_ptr"
+                            "bsl::auto_ptr_ref"
+                            "bsl::shared_ptr"
+                            "bsl::weak_ptr"
+                            "bsl::unique_ptr"
+                            "bsl::default_delete"
+                            "bsl::make_shared"
+                            "bsl::allocate_shared"
+                            "bsl::static_pointer_cast"
+                            "bsl::dynamic_pointer_cast"
+                            "bsl::const_pointer_cast"
+                            "bsl::get_deleter"
+                            "bsl::owner_less"
+                            "bsl::enable_shared_from_this"
+                            "bsl::raw_storage_iterator"
+                            "bsl::get_temporary_buffer"
+                            "bsl::return_temporary_buffer"
+                            "bsl::uninitialized_copy"
+                            "bsl::uninitialized_copy_n"
+                            "bsl::uninitialized_fill"
+                            "bsl::uninitialized_fill_n"
+                            "bsl::uninitialized_move"
+                            "bsl::uninitialized_move_n"
+                            "bsl::uninitialized_default_construct"
+                            "bsl::uninitialized_default_construct_n"
+                            "bsl::uninitialized_value_construct"
+                            "bsl::uninitialized_value_construct_n"
+                            "bsl::destroy"
+                            "bsl::destroy_at"
+                            "bsl::destroy_n"
+                            "bsl::make_unique"
+                            "bsl::pointer_traits"
+                            "bsl::pointer_safety"
+                            "bsl::declare_reachable"
+                            "bsl::undeclare_reachable"
+                            "bsl::declare_no_pointers"
+                            "bsl::undeclare_no_pointers"
+                            "bsl::get_pointer_safety"
+                            "bsl::align"
+                            "bsl::addressof"
+                            "bsl::reinterpret_pointer_cast"
+                            ))
+   (cons "bsl_mutex.h" (list
+                  "bsl::mutex"
+                  "bsl::recursive_mutex"
+                  "bsl::timed_mutex"
+                  "bsl::recursive_timed_mutex"
+                  "bsl::lock_guard"
+                  "bsl::unique_lock"
+                  "bsl::once_flag"
+                  "bsl::adopt_lock_t"
+                  "bsl::defer_lock_t"
+                  "bsl::try_to_lock_t"
+                  "bsl::try_lock"
+                  "bsl::lock"
+                  "bsl::call_once"
+                  ))
+   (cons "bsl_new.h"   (list
+                        "bsl::bad_alloc"
+                        "bsl::bad_array_new_length"
+                        "bsl::nothrow_t"
+                        "bsl::align_val_t"
+                        "bsl::new_handler"
+                        "bsl::hardware_destructive_interference_size"
+                        "bsl::hardware_constructive_interference_size"
+                        "bsl::get_new_handler"
+                        "bsl::set_new_handler"
+                        "bsl::launder"
+                        ))
+   (cons "bsl_optional.h"   (list
+                             "bsl::optional"
+                             "bsl::bad_optional_access"
+                             "bsl::nullopt_t"
+                             "bsl::nullopt"
+                             "bsl::make_optional"
+                             ))
+   (cons "bsl_ostream.h"   (list
+                            "bsl::basic_ostream"
+                            "bsl::ostream"
+                            "bsl::wostream"
+                            "bsl::endl"
+                            "bsl::ends"
+                            "bsl::flush"
+                            "bsl::emit_on_flush"
+                            "bsl::noemit_on_flush"
+                            "bsl::flush_emit"
+                            ))
+   (cons "bsl_queue.h"   (list
+                          "bsl::queue"
+                          "bsl::priority_queue"
+                          ))
+   (cons "bsl_regex.h"   (list
+                          "bsl::basic_regex"
+                          "bsl::sub_match"
+                          "bsl::match_results"
+                          "bsl::regex_iterator"
+                          "bsl::regex_token_iterator"
+                          "bsl::regex_error"
+                          "bsl::regex_traits"
+                          "bsl::regex_match"
+                          "bsl::regex_search"
+                          "bsl::regex_replace"
+                          ))
+   (cons "bsl_set.h"   (list
+                        "bsl::set"
+                        "bsl::multiset"
+                        ))
+   (cons "bsl_sstream.h"   (list
+                            "bsl::istringstream"
+                            "bsl::ostringstream"
+                            "bsl::stringbuf"
+                            "bsl::stringstream"
+                            "bsl::wistringstream"
+                            "bsl::wostringstream"
+                            "bsl::wstringbuf"
+                            "bsl::wstringstream"
+                            ))
+   (cons "bsl_stdexcept.h"    (list
+                               "bsl::domain_error"
+                               "bsl::invalid_argument"
+                               "bsl::length_error"
+                               "bsl::logic_error"
+                               "bsl::out_of_range"
+                               "bsl::overflow_error"
+                               "bsl::range_error"
+                               "bsl::runtime_error"
+                               "bsl::underflow_error"
+                               ))
+   (cons "bsl_string.h"   (list
+                           "bsl::basic_string"
+                           "bsl::char_traits"
+                           "bsl::string"
+                           "bsl::u16string"
+                           "bsl::wstring"
+                           "bsl::stoi"
+                           "bsl::stol"
+                           "bsl::stoul"
+                           "bsl::stoll"
+                           "bsl::stoull"
+                           "bsl::stof"
+                           "bsl::stod"
+                           "bsl::stold"
+                           "bsl::to_string"
+                           "bsl::to_wstring"
+                           "bsl::getline"
+                           ))
+   (cons "bsl_string_view.h"   (list
+                                "bsl::string_view"
+                                "bsl::u8string_view"
+                                "bsl::u16string_view"
+                                "bsl::u32string_view"
+                                "bsl::wstring_view"
+                                ))
+   (cons "bsl_thread.h" (list
+                   "bsl::thread"
+                   "bsl::this_thread"
+                   ))
+   (cons "bsl_tuple.h"    (list
+                           "bsl::tuple"
+                           "bsl::tuple_size"
+                           "bsl::tuple_element"
+                           "bsl::make_tuple"
+                           "bsl::forward_as_tuple"
+                           "bsl::tie"
+                           "bsl::tuple_cat"
+                           "bsl::get"
+                           "bsl::ignore"
+                           ))
+   (cons "bsl_type_traits.h"    (list
+                                 "bsl::integral_constant"
+                                 "bsl::bool_constant"
+                                 "bsl::true_type"
+                                 "bsl::false_type"
+                                 "bsl::is_void"
+                                 "bsl::is_null_pointer"
+                                 "bsl::is_integral"
+                                 "bsl::is_floating_point"
+                                 "bsl::is_array"
+                                 "bsl::is_enum"
+                                 "bsl::is_union"
+                                 "bsl::is_class"
+                                 "bsl::is_function"
+                                 "bsl::is_pointer"
+                                 "bsl::is_lvalue_reference"
+                                 "bsl::is_rvalue_reference"
+                                 "bsl::is_member_object_pointer"
+                                 "bsl::is_member_function_pointer"
+                                 "bsl::is_fundamental"
+                                 "bsl::is_arithmetic"
+                                 "bsl::is_scalar"
+                                 "bsl::is_object"
+                                 "bsl::is_compound"
+                                 "bsl::is_reference"
+                                 "bsl::is_member_pointer"
+                                 "bsl::is_const"
+                                 "bsl::is_volatile"
+                                 "bsl::is_trivial"
+                                 "bsl::is_trivially_copyable"
+                                 "bsl::is_standard_layout"
+                                 "bsl::is_pod"
+                                 "bsl::has_unique_object_representations"
+                                 "bsl::is_empty"
+                                 "bsl::is_polymorphic"
+                                 "bsl::is_abstract"
+                                 "bsl::is_final"
+                                 "bsl::is_aggregate"
+                                 "bsl::is_signed"
+                                 "bsl::is_unsigned"
+                                 "bsl::is_bounded_array"
+                                 "bsl::is_unbounded_array"
+                                 "bsl::is_scoped_enum"
+                                 "bsl::is_constructible"
+                                 "bsl::is_trivially_constructible"
+                                 "bsl::is_nothrow_constructible"
+                                 "bsl::is_default_constructible"
+                                 "bsl::is_trivially_default_constructible"
+                                 "bsl::is_nothrow_default_constructible"
+                                 "bsl::is_copy_constructible"
+                                 "bsl::is_trivially_copy_constructible"
+                                 "bsl::is_nothrow_copy_constructible"
+                                 "bsl::is_move_constructible"
+                                 "bsl::is_trivially_move_constructible"
+                                 "bsl::is_nothrow_move_constructible"
+                                 "bsl::is_assignable"
+                                 "bsl::is_trivially_assignable"
+                                 "bsl::is_nothrow_assignable"
+                                 "bsl::is_copy_assignable"
+                                 "bsl::is_trivially_copy_assignable"
+                                 "bsl::is_nothrow_copy_assignable"
+                                 "bsl::is_move_assignable"
+                                 "bsl::is_trivially_move_assignable"
+                                 "bsl::is_nothrow_move_assignable"
+                                 "bsl::is_destructible"
+                                 "bsl::is_trivially_destructible"
+                                 "bsl::is_nothrow_destructible"
+                                 "bsl::has_virtual_destructor"
+                                 "bsl::is_swappable_with"
+                                 "bsl::is_swappable"
+                                 "bsl::is_nothrow_swappable_with"
+                                 "bsl::is_nothrow_swappable"
+                                 "bsl::alignment_of"
+                                 "bsl::rank"
+                                 "bsl::extent"
+                                 "bsl::is_same"
+                                 "bsl::is_base_of"
+                                 "bsl::is_convertible"
+                                 "bsl::is_nothrow_convertible"
+                                 "bsl::is_layout_compatible"
+                                 "bsl::is_pointer_interconvertible_base_of"
+                                 "bsl::is_invocable"
+                                 "bsl::is_invocable_r"
+                                 "bsl::is_nothrow_invocable"
+                                 "bsl::is_nothrow_invocable_r"
+                                 "bsl::remove_cv"
+                                 "bsl::remove_const"
+                                 "bsl::remove_volatile"
+                                 "bsl::add_cv"
+                                 "bsl::add_const"
+                                 "bsl::add_volatile"
+                                 "bsl::remove_reference"
+                                 "bsl::add_lvalue_reference"
+                                 "bsl::add_rvalue_reference"
+                                 "bsl::remove_pointer"
+                                 "bsl::add_pointer"
+                                 "bsl::make_signed"
+                                 "bsl::make_unsigned"
+                                 "bsl::remove_extent"
+                                 "bsl::remove_all_extents"
+                                 "bsl::aligned_storage"
+                                 "bsl::aligned_union"
+                                 "bsl::decay"
+                                 "bsl::remove_cvref"
+                                 "bsl::enable_if"
+                                 "bsl::conditional"
+                                 "bsl::common_type"
+                                 "bsl::common_reference"
+                                 "bsl::basic_common_reference"
+                                 "bsl::underlying_type"
+                                 "bsl::result_of"
+                                 "bsl::invoke_result"
+                                 "bsl::void_t"
+                                 "bsl::type_identity"
+                                 "bsl::conjunction"
+                                 "bsl::disjunction"
+                                 "bsl::negation"
+                                 "bsl::is_pointer_interconvertible_with_class"
+                                 "bsl::is_corresponding_member"
+                                 "bsl::is_constant_evaluated"
+                                 ))
+   (cons "bsl_unordered_map.h"    (list
+                                   "bsl::unordered_map"
+                                   "bsl::unordered_multimap"
+                                   ))
+   (cons "bsl_unordered_set.h"    (list
+                                   "bsl::unordered_set"
+                                   "bsl::unordered_multiset"
+                                   ))
+   (cons "bsl_utility.h"    (list
+                             "bsl::exchange"
+                             "bsl::forward"
+                             "bsl::move_if_noexcept"
+                             "bsl::as_const"
+                             "bsl::declval"
+                             "bsl::cmp_equal"
+                             "bsl::cmp_not_equal"
+                             "bsl::cmp_less"
+                             "bsl::cmp_greater"
+                             "bsl::cmp_less_equal"
+                             "bsl::cmp_greater_equal"
+                             "bsl::in_range"
+                             "bsl::make_pair"
+                             "bsl::pair"
+                             "bsl::integer_sequence"
+                             "bsl::piecewise_construct_t"
+                             "bsl::piecewise_construct"
+                             "bsl::in_place"
+                             "bsl::in_place_type"
+                             "bsl::in_place_index"
+                             "bsl::in_place_t"
+                             "bsl::in_place_type_t"
+                             "bsl::in_place_index_t"
+                             ))
+
+   (cons "bsl_variant.h"    (list
+                             "bsl::variant"
+                             "bsl::monostate"
+                             "bsl::bad_variant_access"
+                             "bsl::variant_size"
+                             "bsl::variant_size_v"
+                             "bsl::variant_alternative"
+                             "bsl::variant_alternative_t"
+                             "bsl::variant_npos"
+                             "bsl::visit"
+                             "bsl::holds_alternative"
+                             "bsl::get_if"
+                             ))
+
+   (cons "bsls_atomic.h"   (list
+                            "bsls::AtomicBool"
+                            "bsls::AtomicInt"
+                            "bsls::AtomicInt64"
+                            "bsls::AtomicUint"
+                            "bsls::AtomicUint64"
+                            "bsls::AtomicPointer"
+                            ))
+   (cons "bdldfp_decimal.h"   (list
+                               "bdldfp::Decimal32"
+                               "bdldfp::Decimal64"
+                               "bdldfp::Decimal128"
+                               "bdldfp::DecimalNumGet"
+                               ))
+   (cons "mbsa_session.h"    (list
+                              "mbsa::Session"
+                              "mbsa::SessionEventHandler"
+                              ))
+   )
+  "An alist that maps include file names to class names when using BDE.")
+
+
+
+
 ;;
 ;;  Functions for customzing
 ;;
@@ -106,6 +1600,25 @@ This modifies shu-cpp-base-types."
     (when (not (listp nt))
       (setq nt (list nt)))
     (setq shu-cpp-base-types (append shu-cpp-base-types nt))
+    ))
+
+
+
+;;
+;;  shu-cpp-map-class-to-include
+;;
+(defun shu-cpp-map-class-to-include (class-name)
+  "CLASS-NAME is a fully qualified class name (std::string as an example).  This
+function returns the name of the include file that defines the class, if known."
+  (let ((ret-val)
+        (file-name))
+    (when (not shu-cpp-include-names)
+      (if shu-cpp-use-bde-library
+          (setq ret-val (shu-invert-alist-to-hash shu-bsl-include-list))
+        (setq ret-val (shu-invert-alist-to-hash shu-std-include-list)))
+      (setq shu-cpp-include-names (car ret-val)))
+    (setq file-name (gethash class-name shu-cpp-include-names))
+    file-name
     ))
 
 
@@ -467,6 +1980,39 @@ This modifies shu-cpp-base-types."
   (setq shu-cpp-author name))
 
 
+
+;;
+;;  shu-set-modern
+;;
+(defun shu-set-modern ()
+  "Unconditionally set shu-cpp-modern to true."
+  (interactive)
+  (let ((msg))
+    (if shu-cpp-modern
+        (setq msg "shu-cpp-modern already true")
+      (setq shu-cpp-modern t)
+      (setq msg "shu-cpp-modern set to true"))
+    (message "%s" msg)
+    ))
+
+
+
+;;
+;;  shu-set-no-modern
+;;
+(defun shu-set-no-modern ()
+  "Unconditionally set shu-cpp-modern to false."
+  (interactive)
+  (let ((msg))
+    (if (not shu-cpp-modern)
+        (setq msg "shu-cpp-modern already false")
+      (setq shu-cpp-modern nil)
+      (setq msg "shu-cpp-modern set to false"))
+    (message "%s" msg)
+    ))
+
+
+
 ;;
 ;;  shu-set-default-global-namespace
 ;;
@@ -656,10 +2202,13 @@ This modifies shu-cpp-base-types."
 ;;
 (defun shu-binclude ()
   "If point is sitting on something that resembles a fully qualified class name,
-use the standard BDE algorithm to turn the class name into the name of an
-include file.  The standard BDE algorithm replaces the :: between namespace and
-class name with an underscore, makes all letters lower case, and appends \".h\"
-to the end of the name.
+first check to see if it is in list of standard class names defined in
+SHU-CPP-INCLUDE-NAMES.  If it is found there, that defines the name of the
+defining include file.  If it is not found there, then use the standard BDE
+algorithm to turn the class name into the name of an include file.  The standard
+BDE algorithm replaces the :: between namespace and class name with an
+underscore, makes all letters lower case, and appends \".h\" to the end of the
+name.
 
 Thus \"abcdef::MumbleFrotz\" becomes \"abcdef_mumblefrotz.h\".
 
@@ -673,22 +2222,24 @@ angle brackets.
 Return true if a class name was found an an include generated.  This is for the
 benefit of unit tests."
   (interactive)
-  (let* ((bol (line-beginning-position))
-        (eol (line-end-position))
-        (target-list (append shu-cpp-name-list (list ":")))
-        (target-char (regexp-opt target-list nil))
-        (target-name
-         (concat
-          "\\(" shu-cpp-name "+\\)"
-          "::"
-          "\\(" shu-cpp-name "+\\)"))
-        (namespace)
-        (class-name)
-        (file-name)
-        (include-name)
-        (left-delim (if shu-cpp-include-user-brackets "<" "\""))
-        (right-delim (if shu-cpp-include-user-brackets ">" "\""))
-        (got-it))
+  (let* ((gb (get-buffer-create "**foo**"))
+         (bol (line-beginning-position))
+         (eol (line-end-position))
+         (target-list (append shu-cpp-name-list (list ":")))
+         (target-char (regexp-opt target-list nil))
+         (target-name
+          (concat
+           "\\(" shu-cpp-name "+\\)"
+           "::"
+           "\\(" shu-cpp-name "+\\)"))
+         (namespace)
+         (class-name)
+         (qualified-name)
+         (file-name)
+         (include-name)
+         (left-delim (if shu-cpp-include-user-brackets "<" "\""))
+         (right-delim (if shu-cpp-include-user-brackets ">" "\""))
+         (got-it))
     (save-excursion
       (if (not (looking-at target-char)) ;; Looking at a legal class name character
           (message "%s" "Not a properly formed class name")
@@ -702,9 +2253,13 @@ benefit of unit tests."
             (message "%s" "Not a properly formed class name")
           (setq namespace (match-string 1)) ;; Have something that matches file name syntax
           (setq class-name (match-string 2))
-          (setq file-name (concat
-                           (downcase namespace) "_"
-                           (downcase class-name) ".h"))
+          (setq qualified-name (concat namespace "::" class-name))
+          (princ (concat "qualified-name: " qualified-name "\n") gb)
+          (setq file-name (shu-cpp-map-class-to-include qualified-name))
+          (when (not file-name)
+            (setq file-name (concat
+                             (downcase namespace) "_"
+                             (downcase class-name) ".h")))
           (setq include-name (concat
                               "#include "
                               left-delim file-name right-delim))
@@ -728,11 +2283,11 @@ is delimited by left and right angle brackets."
   (let ((name  (file-name-nondirectory (buffer-file-name)))
         (ext)
         (left-delim (if shu-cpp-include-user-brackets
-                   "<"
-                 "\""))
+                        "<"
+                      "\""))
         (right-delim (if shu-cpp-include-user-brackets
-                   ">"
-                   "\""))
+                         ">"
+                       "\""))
         (incl))
     (if (not name)
         (ding)
@@ -741,10 +2296,10 @@ is delimited by left and right angle brackets."
           (progn
             (ding)
             (message "%s" "THIS IS NOT A HEADER FILE"))
-      (setq incl (concat "#include "
-                         left-delim name right-delim "\n"))
-      (shu-kill-new incl)
-      (message "%s" incl)))
+        (setq incl (concat "#include "
+                           left-delim name right-delim "\n"))
+        (shu-kill-new incl)
+        (message "%s" incl)))
     ))
 
 
@@ -881,7 +2436,7 @@ is delimited by left and right angle brackets."
     (insert " * \\author " shu-cpp-author " \n")
     (insert " */\n")
     (insert "\n")
-    (insert "#include <iostream>\n")
+    (insert "#include <ostream>\n")
     (insert "\n")
     (insert "\n")
     (insert "\n")
@@ -1283,9 +2838,10 @@ and set functions will be placed in the buffer *get-set*."
 ;;
 ;;  shu-csplit
 ;;
-(defun shu-csplit ()
+(defun shu-csplit (prefix)
   "Split a C++ string into multiple strings in order to keep the line length
-below a certain minimum length, currently hard coded to column 76.
+below a certain minimum length..  The line length used is defined by the custom
+variable SHU-CPP-LINE-END.
 
 For example, you may copy a very long line of text into a section of code as
 follows:
@@ -1298,34 +2854,66 @@ text at a somewhat arbitrary boundary so that it can be read by others whose
 text editors do not show code much beyond column 80 or so.  This is an example
 of the above line after csplit was invoked:
 
-     static const std::string x(\"This is a very long line of text that look\"
-                                \"s as though it will go on forever.\");"
-  (interactive)
+     static const std::string x(\"This is a very long line of text that looks \"
+                                \"as though it will go on forever.\");
+
+This function normally splits lines on a word boundary.  If any prefix argument
+is present, the split will be composed of fixed length lines with no respect to
+word boundaries."
+  (interactive "*P")
+  (shu-internal-csplit prefix)
+  )
+
+
+;;
+;;  shu-internal-csplit
+;;
+(defun shu-internal-csplit (&optional fixed-width)
+  "This is the internal implementation of SHU-CSPLIT."
   (let ((xquote "[^\\]\"") ;; quote not preceded by escape
-        (pad-count )
-        (pad )
-        (tstart )
-        (previous-char )
-        (line-min 76)
-        (debug-on-error t))
-    ;; Ensure that we are positioned between two non-escaped quotes
-    (setq tstart (shu-point-in-string))
+        (tstart (shu-point-in-string))
+        (tend)
+        (cc)
+        (pad-count 0)
+        (bpad "")
+        (npad "")
+        (line-limit 10)
+        (original)
+        (escape)
+        (lines)
+        (line)
+        (nl ""))
     (if (not tstart)
         (progn
           (ding)
-          (message "%s" "Not in a string."))
-      ;; We appear to be inside a string
+          (message "%s" "Not in string"))
       (goto-char tstart)
-      (setq pad-count (1- (current-column))) ;; Build pad string
-      (setq pad (concat "\"\n" (make-string pad-count ? ) "\""))
-      (while (not (looking-at xquote))
-        (setq previous-char (buffer-substring-no-properties (point) (1+ (point))))
-        (forward-char 1)
-        (when (>= (1+ (current-column)) line-min)
-          (when (string= previous-char "\\")
-            (forward-char -1))
-          (insert pad)))
-      (forward-char 2))
+      (setq cc (current-column))
+      (when (> cc 0)
+        (setq pad-count (1- cc))
+        (setq bpad (make-string pad-count ? )))
+      (when (< pad-count shu-cpp-line-end)
+        (setq line-limit (- shu-cpp-line-end pad-count 1))
+        (when (< line-limit 10)
+          (setq line-limit 10)))
+      (setq line-limit (1- line-limit))
+      (setq tend (re-search-forward xquote nil t))
+      (if (not tend)
+          (progn
+            (ding)
+            (message "%s" "No string end"))
+        (setq original (buffer-substring-no-properties tstart (1- tend)))
+        (when fixed-width
+          (setq escape t))
+        (setq lines (shu-misc-split-string original line-limit fixed-width escape))
+        (goto-char (1- tstart))
+        (delete-region (1- tstart) tend)
+        (while lines
+          (setq line (car lines))
+          (insert (concat nl npad "\"" line "\""))
+          (setq nl "\n")
+          (setq npad bpad)
+          (setq lines (cdr lines)))))
     ))
 
 
@@ -1346,7 +2934,8 @@ in any of the strings and invoke this function."
         (bos)       ;; Beginning of first string
         (cend)      ;; End of current string
         (del-count) ;; Number of characters to delete
-        (pbegin))   ;; Beginning of previous string
+        (pbegin)
+        )   ;; Beginning of previous string
     (if (not x)
         (progn
           (ding)
@@ -1354,7 +2943,7 @@ in any of the strings and invoke this function."
       ;;; Search forward for last string in the group
       (setq going t)
       (while going
-        (setq x (shu-end-of-string "\""))
+        (setq x (shu-end-of-dq-string))
         (if (not x)
             (setq going nil)
           (setq eos (- x 2))
@@ -1403,7 +2992,7 @@ in any of the strings and invoke this function."
 ;;
 ;;  shu-creplace
 ;;
-(defun shu-creplace ()
+(defun shu-creplace (prefix)
   "This function will replace the C++ string in which point is placed with the
 C++ string in the kill ring.  The C++ string in the kill ring is expected to be
 a single string with or without quotes.  The C++ string in which point is placed
@@ -1411,8 +3000,8 @@ may have been split into smaller substrings in order to avoid long lines.
 
 Assume you have the sample string that is shown in SHU-CSPLIT
 
-     static const std::string x(\"This is a very long line of text that look\"
-                                \"s as though it will go on forever.\");
+     static const std::string x(\"This is a very long line of text that looks \"
+                                \"as though it will go on forever.\");
 
 You wish to replace it with a slightly different line of text, perhaps something
 that came from the output of a program.  Copy the new string into the kill ring.
@@ -1422,17 +3011,27 @@ with the contents of the string in the kill ring, and then split it up into
 shorter lines as in the following example.  The string in the kill ring may have
 opening and closing quotes or not.
 
-     static const std::string x(\"This is a very long line of text that look\"
-                                \"s as though it will go on forever and prob\"
-                                \"ably already has done so or is threatening\"
-                                \" to do so.\");
+     static const std::string x(\"This is a very long line of text that looks \"
+                                \"as though it will go on forever and probably \"
+                                \"already has done so or is threatening to do \"
+                                \"so.\");
 
 This is especially useful if you have a a string constant in a unit test and you
 have modified the code that creates the string.  gtest will complain that the
 expected string did not match the actual string.  If the actual string is
 correct, copy it into the kill ring, go into your unit test, find the old
 string, place the cursor in the old string, and replace it with the new."
-  (interactive)
+  (interactive "*P")
+  (shu-internal-creplace prefix)
+  )
+
+
+
+;;
+;;  shu-internal-creplace
+;;
+(defun shu-internal-creplace (&optional fixed-width)
+  "This is the internal implementation of SHU-CREPLACE."
   (let
       ((xquote "[^\\]\"") ;; quote not preceded by escape
        (start-quote-present)  ;; True if start quote in kill ring
@@ -1488,7 +3087,7 @@ string, place the cursor in the old string, and replace it with the new."
           (delete-char del-count)
           (save-excursion (yank))
           (when have-quotes (forward-char 1))
-          (shu-csplit))))
+          (shu-internal-csplit fixed-width))))
     ))
 
 
@@ -1624,7 +3223,7 @@ characters in length."
 ;;
 ;;  shu-new-deallocate
 ;;
-(defun shu-new-deallocate (var-name class-name)
+(defun shu-new-deallocate (var-name)
   "Insert the code to do a standard deallocation of memory allocated by a
 specific allocator.  First prompt reads the variable name that points to the
 memory to be deallocated.  Second prompt reads the name of the class whose
@@ -1634,29 +3233,36 @@ This generates a code sequence as follows:
 
         if (var-name)
         {
-            var-name->~class-name();
-            m_allocator->deallocate(var-name);
+            m_allocator->deleteObject(var-name);
             var-name = 0;
         }
 
-VAR-NAME and CLASS-NAME are read from two prompts.  The number of spaces to
-indent inside that braces is defined in the custom variable
-shu-cpp-indent-length.  The name of the member variable that points to the
-allocator in use by the class comes from the custom variable
-shu-cpp-default-allocator-name"
-  (interactive "*sVariable name?: \nsClass name?: ")
+If SHU-CPP-MODERN is true, the code sequence is:
+
+        if (var-name != nullptr)
+        {
+            m_allocator->deleteObject(var-name);
+            var-name = nullptr;
+        }
+
+VAR-NAME is read from a prompt.  The number of spaces to indent inside that
+braces is defined in the custom variable shu-cpp-indent-length.  The name of the
+member variable that points to the allocator in use by the class comes from the
+custom variable shu-cpp-default-allocator-name"
+  (interactive "*sVariable name?: ")
   (let ((pad)
         (pad-count (current-column))
         (start)
-        (ipad (make-string shu-cpp-indent-length ? )))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (equal-test (if shu-cpp-modern " != nullptr" ""))
+        (null-value (if shu-cpp-modern "nullptr" "0")))
     (setq pad (make-string pad-count ? ))
     (insert
      (concat
-      "if (" var-name ")\n"
+      "if (" var-name equal-test ")\n"
       pad "{\n"
-      pad ipad var-name "->~" class-name "();\n"
-      pad ipad shu-cpp-default-allocator-name "->deallocate(" var-name ");\n"
-      pad ipad var-name " = 0;\n"
+      pad ipad shu-cpp-default-allocator-name "->deleteObject(" var-name ");\n"
+      pad ipad var-name " = " null-value ";\n"
       pad "}\n"))
     ))
 
@@ -1681,7 +3287,7 @@ The number of spaces to indent inside the braces is defined in the custom
 variable shu-cpp-indent-length."
   (interactive "*sType name?: \nsVariable name?: ")
   (shu-internal-citerate type-name var-name)
-    )
+  )
 
 
 
@@ -1704,7 +3310,7 @@ The number of spaces to indent inside the braces is defined in the custom
 variable shu-cpp-indent-length."
   (interactive "*sType name?: \nsVariable name?: ")
   (shu-internal-citerate type-name var-name t)
-    )
+  )
 
 
 
@@ -1777,7 +3383,7 @@ The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace."
   (interactive "*sType name?: \nsFirst variable name?:  \nsSecond variable name?: ")
   (shu-internal-double-citerate type-name type-name var-name-1 var-name-2)
-    )
+  )
 
 
 
@@ -1810,7 +3416,7 @@ The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace."
   (interactive "*sType name?: \nsFirst variable name?:  \nsSecond variable name?: ")
   (shu-internal-double-citerate type-name type-name var-name-1 var-name-2 t)
-    )
+  )
 
 
 
@@ -1843,7 +3449,7 @@ The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace."
   (interactive "*sFirst type name?: \nsSecond type name?: \nsFirst variable name?:  \nsSecond variable name?: ")
   (shu-internal-double-citerate type-name-1 type-name-2 var-name-1 var-name-2)
-    )
+  )
 
 
 
@@ -1876,7 +3482,7 @@ The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace."
   (interactive "*sFirst type name?: \nsSecond type name?: \nsFirst variable name?:  \nsSecond variable name?: ")
   (shu-internal-double-citerate type-name-1 type-name-2 var-name-1 var-name-2 t)
-    )
+  )
 
 
 
@@ -1931,7 +3537,7 @@ If optional CONST is true, a const iterator is generated."
     (setq rpoint (point))
     (insert
      (concat "\n"
-      pad "}\n"))
+             pad "}\n"))
     (goto-char rpoint)
     ))
 
@@ -2344,8 +3950,8 @@ instances of the class name found inside a comment are replaced."
   "This is the replacement function for SHU-REPLACE-CLASS-NAME.  It is called
 with the NEW-NAME to replace the class NAME.  It calls replace-match to replace
 NAME with NEW-NAME."
-    (replace-match new-name t t)
-    )
+  (replace-match new-name t t)
+  )
 
 
 
@@ -2661,11 +4267,11 @@ is placed in a separate buffer called **shu-aix-malloc**."
       (puthash allocator count aht)
       (setq line-no (1+ line-no))
       (when (= 0 (% line-no 100000))
-        (setq elapsed (time-subtract nil start-time))
+        (setq elapsed (time-subtract (current-time) start-time))
         (setq ptime (format-time-string tformat elapsed))
         (setq pline (shu-group-number line-no))
         (message "Line: %s  Elapsed: %s" pline ptime)))
-    (setq elapsed (time-subtract nil start-time))
+    (setq elapsed (time-subtract (current-time) start-time))
     (setq ptime (format-time-string tformat elapsed))
     (setq pline (shu-group-number line-no))
     (message "Line: %s  Elapsed: %s  **done**" pline ptime)
@@ -3033,14 +4639,651 @@ For example, \"mumbleSomethingOther\" becomes \"mumble_something_other\"."
           (ding)
           (message "%s" "Not sitting on a variable name"))
       (save-excursion
-      (setq start-pos (car pos))
-      (setq end-pos (cdr pos))
-      (goto-char start-pos)
-      (while (re-search-forward "\\([A-Z]\\)" end-pos t)
-        (replace-match (concat "_" (downcase (match-string 1))) t t)
-        (setq end-pos (1+ end-pos)))))
+        (setq start-pos (car pos))
+        (setq end-pos (cdr pos))
+        (goto-char start-pos)
+        (while (re-search-forward "\\([A-Z]\\)" end-pos t)
+          (replace-match (concat "_" (downcase (match-string 1))) t t)
+          (setq end-pos (1+ end-pos)))))
     ))
 
+
+
+
+;;
+;;  shu-to-camel
+;;
+(defun shu-to-camel ()
+  "Convert the variable name at point from snake case to camel case.
+
+For example, \"mumble_something_other\" becomes \"mumbleSomethingOther\"."
+  (interactive)
+  (let ((gb (get-buffer-create "**boo**"))
+        (pos (shu-cpp-get-variable-name-position))
+        (start-pos)
+        (end-pos)
+        (looking)
+        (i)
+        (c)
+        (case-fold-search nil))
+    (if (not pos)
+        (progn
+          (ding)
+          (message "%s" "Not sitting on a variable name"))
+      (save-excursion
+        (setq start-pos (car pos))
+        (setq end-pos (cdr pos))
+        (goto-char start-pos)
+        (while (< (point) end-pos)
+          (setq c (buffer-substring-no-properties (point) (1+ (point))))
+          (princ (concat "c: '" c "'\n") gb)
+          (if (string= c "_")
+              (progn
+                (setq looking t)
+                (delete-region (point) (1+ (point)))
+                (setq end-pos (1- end-pos)))
+            (when looking
+              (setq c (upcase c))
+              (delete-region (point) (1+ (point)))
+              (insert c)
+              (setq looking nil)))
+          (when (not looking)
+            (forward-char 1)))))
+    ))
+
+
+
+;;
+;;  shu-cpp-make-date
+;;
+(defun shu-cpp-make-date ()
+  "insert a string that is the list of values to be passed to the constructor of
+ a date type that accepts year, month, day."
+  (interactive)
+  (insert (concat (shu-cpp-internal-make-date) ";"))
+  )
+
+
+
+;;
+;;  shu-cpp-make-datetime
+;;
+(defun shu-cpp-make-datetime ()
+  "insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds."
+  (interactive)
+  (insert (concat (shu-cpp-internal-make-datetime) ";"))
+  )
+
+
+
+;;
+;;  shu-cpp-internal-make-bool
+;;
+(defun shu-cpp-internal-make-bool ()
+  "Return  value for a bool type."
+  "(false)"
+  )
+
+
+
+;;
+;;  shu-cpp-internal-make-char
+;;
+(defun shu-cpp-internal-make-char ()
+  "Return a string that can be used to initialize a test variable of type int."
+  (interactive)
+  (let ((min 0)
+        (max 126))
+    (concat "(" (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-internal-make-date
+;;
+(defun shu-cpp-internal-make-date ()
+  "Return a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds."
+  (let ((year (number-to-string (shu-random-range (- (shu-current-year) 8) (shu-current-year))))
+        (month (number-to-string (shu-random-range 1 12)))
+        (day (number-to-string (shu-random-range 1 27))))
+    (concat "(" year ", " month ", " day ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-internal-make-datetime
+;;
+(defun shu-cpp-internal-make-datetime ()
+  "Return a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds."
+  (let ((year (number-to-string (shu-random-range (- (shu-current-year) 8) (shu-current-year))))
+        (month (number-to-string (shu-random-range 1 12)))
+        (day (number-to-string (shu-random-range 1 27)))
+        (hour (number-to-string (shu-random-range 0 23)))
+        (minute (number-to-string (shu-random-range 0 59)))
+        (second (number-to-string (shu-random-range 0 59)))
+        (milli (number-to-string (shu-random-range 0 999)))
+        (micro (number-to-string (shu-random-range 0 999))))
+    (concat "(" year ", " month ", " day ", " hour ", " minute ", " second ", " milli ", " micro ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-tz-make-datetime
+;;
+(defun shu-cpp-tz-make-datetime ()
+  "insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds."
+  (interactive)
+  (insert (concat (shu-cpp-internal-tz-make-datetime) ";"))
+  )
+
+
+
+;;
+;;  shu-cpp-internal-tz-make-datetime
+;;
+(defun shu-cpp-internal-tz-make-datetime ()
+  "Return a string that is the list of values to be passed to the constructor of
+a timezone datetime type."
+  (concat "(" shu-cpp-datetime-type (shu-cpp-internal-make-datetime) ", 0)")
+  )
+
+
+
+;;
+;;  shu-cpp-internal-make-double
+;;
+(defun shu-cpp-internal-make-double ()
+  "Return a string that can be used to initialize a test variable of type double."
+  (interactive)
+  (let ((min 0)
+        (max 12345678))
+    (concat "(" (number-to-string (shu-random-range min max)) "."
+            (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-internal-make-float
+;;
+(defun shu-cpp-internal-make-float ()
+  "Return a string that can be used to initialize a test variable of type float."
+  (interactive)
+  (let ((min 0)
+        (max 12345))
+    (concat "(" (number-to-string (shu-random-range min max)) "."
+            (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-internal-make-int
+;;
+(defun shu-cpp-internal-make-int ()
+  "Return a string that can be used to initialize a test variable of type lint."
+  (interactive)
+  (let ((min 102)
+        (max 2147483647))
+    (concat "(" (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-make-interval
+;;
+(defun shu-cpp-make-interval ()
+  "insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
+  (interactive)
+  (insert (concat (shu-cpp-internal-make-interval) ";"))
+  )
+
+
+
+;;
+;;  shu-cpp-internal-make-interval
+;;
+(defun shu-cpp-internal-make-interval ()
+  "Return a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts days, hours, minutes, seconds, milliseconds, microseconds."
+  (let ((days "0")
+        (hours (number-to-string (shu-random-range 0 23)))
+        (minutes (number-to-string (shu-random-range 0 59)))
+        (seconds (number-to-string (shu-random-range 0 59)))
+        (millis (number-to-string (shu-random-range 0 999)))
+        (micros (number-to-string (shu-random-range 0 999))))
+    (concat "(" days ", " hours ", " minutes ", " seconds ", " millis ", " micros ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-make-short-interval
+;;
+(defun shu-cpp-make-short-interval ()
+  "insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
+  (interactive)
+  (insert (concat (shu-cpp-internal-make-short-interval) ";"))
+  )
+
+
+
+;;
+;;  shu-cpp-internal-make-short-interval
+;;
+(defun shu-cpp-internal-make-short-interval ()
+  "Return a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts seconds and nanoseconds."
+  (let ((days "0")
+        (seconds (number-to-string (shu-random-range 0 999999)))
+        (nanos (number-to-string (shu-random-range 0 999999))))
+    (concat "(" seconds ", " nanos ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-internal-make-long-long
+;;
+(defun shu-cpp-internal-make-long-long ()
+  "Return a string that can be used to initialize a test variable of type long long."
+  (interactive)
+  (let ((min 12345678901)
+        (max 123456789012345678))
+    (concat "(" (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-internal-make-short
+;;
+(defun shu-cpp-internal-make-short ()
+  "Return a string that can be used to initialize a test variable of type short."
+  (interactive)
+  (let ((min 102)
+        (max 32768))
+    (concat "(" (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-make-size-type
+;;
+(defun shu-cpp-make-size-type ()
+  "insert a string that is a possible value for a size type."
+  (shu-cpp-internal-make-unsigned-int)
+  )
+
+
+
+;;
+;;  shu-cpp-make-time
+;;
+(defun shu-cpp-make-time ()
+  "insert a string that is the list of values to be passed to the constructor of
+a time type that accepts hour, minute, second,  milliseconds, microseconds."
+  (interactive)
+  (insert (concat (shu-cpp-internal-make-time) ";"))
+  )
+
+
+
+;;
+;;  shu-cpp-internal-make-time
+;;
+(defun shu-cpp-internal-make-time ()
+  "Return a string that is the list of values to be passed to the constructor of
+ a time type that accepts hour, minute, second,  milliseconds, microseconds."
+  (let ((hour (number-to-string (shu-random-range 0 23)))
+        (minute (number-to-string (shu-random-range 0 59)))
+        (second (number-to-string (shu-random-range 0 59)))
+        (milli (number-to-string (shu-random-range 0 999)))
+        (micro (number-to-string (shu-random-range 0 999))))
+    (concat "(" hour ", " minute ", " second ", " milli ", " micro ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-internal-make-unsigned-int
+;;
+(defun shu-cpp-internal-make-unsigned-int ()
+  "Return a string that can be used to initialize a test variable of type lint."
+  (interactive)
+  (let ((min 102)
+        (max 4294967295))
+    (concat "(" (number-to-string (shu-random-range min max)) ")")
+    ))
+
+
+
+;;
+;;  shu-cpp-fill-test-data
+;;
+(defun shu-cpp-fill-test-data ()
+  "If the data type at the beginning of the line is a recognized data type, then
+fill in a random value for that data type at point.  This allows someone writing
+a test to declare a data type and a name and then call this function.  If the
+author creates a line that looks like this and then invokes this function
+
+     std::string   abc
+
+The line will be transformed into one that looks something like this:
+
+     std::string   abc(\"RDATZC\");
+
+The recognized data types are the ones that are defined by the custom variables
+shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
+shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
+shu-cpp-time-type plus many of the standard C++ types, such as int, bool, short,
+etc.
+
+The data types may optionally be preceded by \"const\".
+
+If the last character of the line is \";\", it is deleted before a data type is
+filled in with a new semi-colon following it."
+  (interactive)
+  (let ((did-fill (shu-cpp-internal-fill-test-data)))
+    (when (not did-fill)
+      (ding)
+      (message "%s" "Unrecognized data type"))
+    ))
+
+
+
+
+
+;;
+;;  shu-cpp-internal-fill-test-data
+;;
+(defun shu-cpp-internal-fill-test-data ()
+  "If the data type at the beginning of the line is a recognized data type, then
+fill in a random value for that data type at point.  This allows someone writing
+a test to declare a data type and a name and then call this function.  If the
+author creates a line that looks like this and then invokes this function
+
+     std::string   abc
+
+The line will be transformed into one that looks something like this:
+
+     std::string   abc(\"RDATZC\");
+
+The recognized data types are the ones that are defined by the custom variables
+shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
+shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
+shu-cpp-time-type plus many of the standard C++ types, such as int, bool, short,
+etc.
+
+The data types may optionally be preceded by \"const\".
+
+If the last character of the line is \";\", it is deleted before a data type is
+filled in with a new semi-colon following it.
+
+Return t if a recognized data type was found and a value was filled in."
+  (let* ((gb (get-buffer-create "**foo**"))
+         (bool-type "bool")
+         (char-type "char")
+         (double-type "double")
+         (float-type "float")
+         (int-type "int")
+         (short-type "short")
+         (xx)
+         (data)
+         (fail-type)
+         (bol (line-beginning-position))
+         (eol (line-end-position))
+         (semi "")
+         (ss
+          (concat
+           "\\s-*"
+           "[const ]*"
+           "\\s-*"
+           "\\("
+           "["
+           shu-cpp-datetime-timezone-type "\\|"
+           shu-cpp-interval-type "\\|"
+           shu-cpp-datetime-type "\\|"
+           shu-cpp-size-type "\\|"
+           shu-cpp-string-type "\\|"
+           shu-cpp-time-type "\\|"
+           shu-cpp-long-long-type "\\|"
+           char-type "\\|"
+           bool-type "\\|"
+           double-type "\\|"
+           float-type "\\|"
+           int-type "\\|"
+           short-type
+           "]+"
+           "\\)"))
+         (did-fill))
+    (princ (concat ss "\n\n") gb)
+    (save-excursion
+      (beginning-of-line)
+      (when (re-search-forward ss eol t)
+        (setq xx (match-string 1))
+        (princ (concat "xx: [" xx "]\n") gb)
+        (cond
+         ((string= xx shu-cpp-datetime-timezone-type)
+          (setq data (shu-cpp-internal-tz-make-datetime)))
+         ((string= xx shu-cpp-interval-type)
+          (setq data (shu-cpp-internal-make-interval)))
+         ((string= xx shu-cpp-short-interval-type)
+          (setq data (shu-cpp-internal-make-short-interval)))
+         ((string= xx shu-cpp-date-type)
+          (setq data (shu-cpp-internal-make-date)))
+         ((string= xx shu-cpp-datetime-type)
+          (setq data (shu-cpp-internal-make-datetime)))
+         ((string= xx shu-cpp-size-type)
+          (setq data (shu-cpp-make-size-type)))
+         ((string= xx shu-cpp-string-type)
+          (setq data (concat "(\"" (shu-misc-random-ua-string 6) "\")")))
+         ((string= xx shu-cpp-time-type)
+          (setq data (shu-cpp-internal-make-time)))
+         ((string= xx shu-cpp-long-long-type)
+          (setq data (shu-cpp-internal-make-long-long)))
+         ((string= xx bool-type)
+          (setq data (shu-cpp-internal-make-bool)))
+         ((string= xx "har")
+          (setq data (shu-cpp-internal-make-char)))
+         ((string= xx double-type)
+          (setq data (shu-cpp-internal-make-double)))
+         ((string= xx float-type)
+          (setq data (shu-cpp-internal-make-float)))
+         ((string= xx int-type)
+          (setq data (shu-cpp-internal-make-int)))
+         ((string= xx "hort")
+          (setq data (shu-cpp-internal-make-short)))
+         )))
+    (if data
+        (progn
+          (end-of-line)
+          (backward-char 1)
+          (if (looking-at ";")
+              (setq semi "")
+            (setq semi ";")
+            (end-of-line)
+            )
+          (insert (concat data semi))
+          (setq did-fill t))
+      (ding)
+      (message "%s" "Unrecognized data type"))
+    did-fill
+    ))
+
+
+
+;;
+;;  shu-cpp-fill-test-area
+;;
+(defun shu-cpp-fill-test-area (start end)
+  "For all lines between the marked start and end points, if a recognized data
+type has been declared on a line, fill it with random test data.
+
+For the benefit of unit tests, this function returns a a cons cell whose car is
+the number of unrecognized data types and whose cdr is the number of values
+generated."
+  (interactive "r")
+  (let ((sline (shu-the-line-at start))
+        (eline (shu-the-line-at end))
+        (line-diff 0)
+        (eol)
+        (did-fill)
+        (fill-count 0)
+        (skip-count 0)
+        (count 0))
+    (save-excursion
+      (goto-char start)
+      (while (and (<= (shu-current-line) eline)
+                  (= line-diff 0)
+                  )
+        (end-of-line)
+        (when (> (- (line-end-position) (line-beginning-position)) 5)
+          (setq did-fill (shu-cpp-internal-fill-test-data))
+          (if did-fill
+              (setq fill-count (1+ fill-count))
+            (setq skip-count (1+ skip-count))))
+        (setq line-diff (forward-line 1))))
+    (if (= skip-count 0)
+        (message "%d values filled in" fill-count)
+      (message "%d values filled in, %d data types unrecognized" fill-count skip-count))
+    (cons skip-count fill-count)
+    ))
+
+
+
+
+;;
+;;  shu-gcc
+;;
+(defun shu-gcc ()
+  "Get compile command command from current buffer.  While in a compile buffer,
+go to the top of the buffer, search for the end of the prompt line, collect the
+rest of the line and put it into the kill ring.  This takes the string that was
+used for the last compile command in the current buffer and puts it into the
+kill ring.  To compile again with the same command, kill the buffer, open a new
+shell, and yank."
+  (interactive)
+  (let ((eol)
+        (cc))
+    (save-excursion
+      (goto-char (point-min))
+      (setq eol (save-excursion (move-end-of-line nil) (point)))
+      (if (search-forward "$" eol t)
+          (progn
+            (forward-char 1)
+            (copy-region-as-kill (point) eol)
+            (with-temp-buffer
+              (yank)
+              (setq cc (buffer-substring-no-properties (point-min) (point-max))))
+            (message "%s" cc))
+        (ding)
+        (message "%s" "*** Not found ***")))
+    ))
+
+
+
+;;
+;;  shu-sort-includes
+;;
+(defun shu-sort-includes ()
+  "When positioned on a line that is an #include directive, find all of the
+#include directives above and below that line that are not separated by a blank
+line and sort them into alphabetical order with case ignored.  If not positioned
+on a line that is an #include directive, do nothing.  Case is ignored for the
+sort.  The return value is the number of lines sorted.  If no lines were sorted
+because (point) is not positioned on an #include directive, return nil.  The
+return value is for the benefit of the unit tests.
+Additionally, if there are spaces surrounding the \"#\" of the #include, they
+are removed."
+  (interactive)
+  (let ((here (point))
+        (top1)
+        (bot1)
+        (line-count)
+        (sort-fold-case t))
+    (if (not (shu-line-is-include))
+        (progn
+          (ding)
+          (message "%s" "Not on an #include line"))
+      (setq top1 (shu-find-end-include -1))
+      (goto-char here)
+      (setq bot1 (shu-find-end-include 1))
+      (goto-char bot1)
+      (setq bot1 (line-end-position))
+      (setq line-count (1+ (- (shu-the-line-at bot1) (shu-the-line-at top1))))
+      (sort-lines nil top1 bot1)
+      (message "Sorted %d lines" line-count))
+    line-count
+    ))
+
+
+
+
+;;
+;;  shu-find-end-include
+;;
+(defun shu-find-end-include (dir)
+  "On entry, (point) is positioned on an #include directive.  This function
+searches either backwards or forward for the next line that does not contain an
+include directive.  If DIR is positive the search is forward, else backward.
+The return value is the (line-beginning-position) of the last line that contains
+an #include directive."
+  (let ((mc (if (< dir 0) -1 1))
+        (something t)
+        (last1)
+        (n))
+    (when (shu-line-is-include)
+      (goto-char (line-beginning-position))
+      (setq last1 (point))
+      (while something
+        (setq n (forward-line mc))
+        (if (= n 0)
+            (progn
+              (if (shu-line-is-include t)
+                  (setq last1 (line-beginning-position))
+                (setq something nil)))
+          (setq something nil))))
+    last1
+    ))
+
+
+
+
+;;
+;;  shu-line-is-include
+;;
+(defun shu-line-is-include (&optional fix)
+  "Return true if the line on which (point) resides is an #include directive."
+  (let ((ss "\\s-*#\\s-*include\\s-+")
+        (min-length (length "#include <a>"))
+        (include-length (length "#include "))
+        (line-length)
+        (line-start)
+        (is-inc nil))
+    (save-excursion
+      (goto-char (line-beginning-position))
+      (when (re-search-forward ss (line-end-position) t)
+        (setq is-inc t)
+        (when fix
+          (replace-match "#include " t t))))
+    is-inc
+    ))
 
 
 
@@ -3075,6 +5318,8 @@ shu- prefix removed."
   (defalias 'csplit 'shu-csplit)
   (defalias 'cunsplit 'shu-cunsplit)
   (defalias 'creplace 'shu-creplace)
+  (defalias 'set-modern 'shu-set-modern)
+  (defalias 'set-no-modern 'shu-set-no-modern)
   (defalias 'cif 'shu-cif)
   (defalias 'celse 'shu-celse)
   (defalias 'cfor 'shu-cfor)
@@ -3096,6 +5341,16 @@ shu- prefix removed."
   (defalias 'fixp 'shu-cpp-fix-prototype)
   (defalias 'getdef 'shu-cpp-find-h-definition)
   (defalias 'to-snake 'shu-to-snake)
+  (defalias 'to-camel 'shu-to-camel)
+  (defalias 'make-datetime 'shu-cpp-make-datetime)
+  (defalias 'make-tzdate 'shu-cpp-tz-make-datetime)
+  (defalias 'make-interval 'shu-cpp-make-interval)
+  (defalias 'fill-data 'shu-cpp-fill-test-data)
+  (defalias 'fill-area 'shu-cpp-fill-test-area)
+  (defalias 'gcc 'shu-gcc)
+  (defalias 'sort-includes 'shu-sort-includes)
   )
+
+(provide 'shu-cpp-general)
 
 ;;; shu-cpp-general.el ends here

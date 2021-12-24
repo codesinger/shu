@@ -29,7 +29,7 @@
 
 ;;; Code:
 
-(provide 'shu-misc)
+(require 'subr-x)
 
 
 (defconst shu-dired-mode-name "Dired by date"
@@ -357,6 +357,97 @@ point is placed where the the first line of code in the loop belongs."
 
 
 ;;
+;;  shu-misc-rx-functions
+;;
+(defconst shu-misc-rx-functions
+  (concat
+   "("
+   "\\s-*"
+   "\\(defun"
+   "\\|defsubst"
+   "\\|defmacro"
+   "\\|ert-deftest"
+   "\\|defvar"
+   "\\|defconst"
+   ")"
+   "\\)")
+  "Regular expression to find the beginning of a function, macro, etc.")
+
+
+
+;;
+;;  shu-misc-rx-conditionals
+;;
+(defconst shu-misc-rx-conditionals
+  (concat
+   "("
+   "\\s-*"
+   "\\(cond"
+   "\\|if"
+   "\\|ignore-errors"
+   "\\|progn"
+   "\\|save-current-buffer"
+   "\\|save-excursion"
+   "\\|save-mark-and-excursion"
+   "\\|save-match-data"
+   "\\|save-restriction"
+   "\\|unless"
+   "\\|when"
+   "\\|while"
+   "\\|with-demoted-errors"
+   "\\|with-temp-buffer"
+   "\\)")
+  "Regular expression to find the beginning of a function or macro that encloses
+a body.  Such functions usually require a future closing parenthesis that is
+likely not on the current line.  This is used by the functions SHU-TIGHTEN-LISP
+and SHU-LOOSEN-LISP.")
+
+
+
+;;
+;;  shu-misc-rx-lets
+;;
+(defconst shu-misc-rx-lets
+  (concat
+   "("
+   "\\s-*"
+   "\\(let"
+   "\\|let\\*"
+   "\\)"
+   shu-all-whitespace-regexp "*"
+   "\\((\\)"
+   )
+  "Regular expression to find the beginning of a let special form.
+This searches for \"let\" or \"let*\" followed by \"(\".")
+
+
+
+;;
+;;  shu-get-containing-function
+;;
+(defun shu-get-containing-function ()
+  "Search backwards from the current point to find the beginning of the enclosing
+function, macro, etc.  If such a beginning is found, return a cons cell whose car
+is the point that defines the point at the beginning of the function and whose cdr
+defines the point at the end of the function.  If not inside a function, macro, etc.,
+return nil"
+  (let ((ret-val)
+        (bof)
+        (eof))
+    (save-excursion
+      (if (not (re-search-backward shu-misc-rx-functions nil t))
+          (progn
+            (ding)
+            (message "%s" "Not inside a macro or function"))
+        (setq bof (match-beginning 0))
+        (setq eof (shu-point-at-sexp bof))
+        (setq ret-val (cons bof eof))))
+    ret-val
+    ))
+
+
+
+;;
 ;;  shu-tighten-lisp
 ;;
 (defun shu-tighten-lisp ()
@@ -364,42 +455,83 @@ point is placed where the the first line of code in the loop belongs."
 Look for any single right parenthesis that is on its own line and move it up to
 the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
   (interactive)
-  (let ((ssfun
-         (concat
-          "("
-          "\\s-*"
-          "\\(defun\\|defsubst\\|defmacro\\|ert-deftest\\|defconst\\)"))
+  (let ((ret-val)
         (bof)
         (eof)
-        (ss "\\s-+)$")
-        (ss2 "\\s-+($")
-        (bob)
-        (eob)
-        (del-count))
+        (doing t)
+        (p)
+        (start-pos)
+        (end-pos)
+        (length)
+        (pad)
+        (pad-length)
+        (start-col)
+        (let-begin)
+        (sp)
+        (xx (concat shu-all-whitespace-regexp "*" ")"))
+        (zz (concat shu-all-whitespace-regexp "*" "(")))
     (save-excursion
-      (if (not (re-search-backward ssfun nil t))
-          (progn
-            (ding)
-            (message "%s" "Not inside a macro or function"))
-        (setq bof (match-beginning 0))
-        (setq eof (shu-point-at-sexp bof))
+      (setq ret-val (shu-get-containing-function))
+      (when ret-val
+        (setq bof (car ret-val))
+        (setq eof (cdr ret-val))
+        ;; Handle all containing functions other than "let"
         (goto-char bof)
-        (while (re-search-forward ss eof t)
-          (setq eob (1- (point)))
-          (forward-line -1)
-          (end-of-line)
-          (setq bob (point))
-          (delete-region bob eob)
-          (setq eof (shu-point-at-sexp bof)))
+        (while doing
+          (if (not (re-search-forward shu-misc-rx-conditionals eof t))
+              (setq doing nil)
+            (setq p (1- (point)))
+            (when (search-backward "(" nil t)
+              (setq eof (shu-tighten-hanging-paren eof))
+              (goto-char p))))
+        ;; Handle "let" and "let*"
         (goto-char bof)
-        (while (re-search-forward ss2 eof t)
-          (setq bob (point))
-          (forward-line 1)
-          (when (re-search-forward "^\\s-+(")
-            (setq eob (1- (point)))
-            (delete-region bob eob)
-            (setq del-count (1+ (- eob bob)))
-            (setq eof (- eof del-count))))))
+        (while (re-search-forward shu-misc-rx-lets eof t)
+          (setq start-pos (point))
+          (backward-char 1)
+          (setq eof (shu-tighten-hanging-paren eof))
+          (goto-char start-pos)
+          (when (re-search-forward zz eof t)
+            (setq end-pos (1- (point)))
+            (setq length (- end-pos start-pos))
+            (when (> length 0)
+              (delete-region start-pos end-pos)
+              (setq eof (- eof length)))))))
+    ))
+
+
+
+
+;;
+;;  shu-tighten-hanging-paren
+;;
+(defun shu-tighten-hanging-paren (eof)
+  "Call this function while point is on a left parenthesis.  This function will
+find the matching right parenthesis.  If the matching right parenthesis is on a line
+by itself and a previous line ends in another right parenthesis, the line and
+dangling right parenthesis will be moved up to the end of the line that also ends
+in a right parenthesis.  This is an internal part of the function SHU-TIGHTEN-LISP.
+EOF is the point at which the current function on which we are operating ends.
+This function removes some text from the current function.  It adjusts EOF appropriately
+and returns the new value to the caller."
+  (interactive)
+  (let ((sp)
+        (end-pos)
+        (start-pos)
+        (xx (concat shu-all-whitespace-regexp "*" ")"))
+        (p)
+        (length))
+    (forward-sexp)
+    (backward-char 1)
+    (setq sp (shu-starts-with ")"))
+    (when sp
+      (setq end-pos sp)
+      (when (re-search-backward xx p t)
+        (setq start-pos (1+ (point)))
+        (setq length (- end-pos start-pos))
+        (delete-region start-pos end-pos)
+        (setq eof (- eof length))))
+    eof
     ))
 
 
@@ -415,39 +547,9 @@ parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run SHU-TIGHTEN-LISP to put the
 parentheses back where they belong."
   (interactive)
-  (let ((bof)
+  (let ((ret-val)
+        (bof)
         (eof)
-        (ssfun
-         (concat
-          "("
-          "\\s-*"
-          "\\(defun"
-          "\\|defsubst"
-          "\\|defmacro"
-          "\\|ert-deftest"
-          "\\|defconst"
-          ")"
-          "\\)"))
-        (ss (concat
-             "("
-             "\\s-*"
-             "\\(if"
-             "\\|save-excursion"
-             "\\|save-match-data"
-             "\\|save-restriction"
-             "\\|unless"
-             "\\|when"
-             "\\|while"
-             "\\|with-temp-buffer"
-             "\\)"))
-        (sslet
-         (concat
-          "("
-          "\\s-*"
-          "\\(if"
-          "\\|let"
-          "\\|let\\*"
-          "\\)"))
         (doing t)
         (p)
         (pad)
@@ -455,16 +557,14 @@ parentheses back where they belong."
         (start-col)
         (let-begin))
     (save-excursion
-      (if (not (re-search-backward ssfun nil t))
-          (progn
-            (ding)
-            (message "%s" "Not inside a macro or function"))
-        (setq bof (match-beginning 0))
-        (setq eof (shu-point-at-sexp bof))
+      (setq ret-val (shu-get-containing-function))
+      (when ret-val
+        (setq bof (car ret-val))
+        (setq eof (cdr ret-val))
         ;; Handle all containing functions other than "let"
         (goto-char bof)
         (while doing
-          (if (not (re-search-forward ss eof t))
+          (if (not (re-search-forward shu-misc-rx-conditionals eof t))
               (setq doing nil)
             (setq p (1- (point)))
             (goto-char (match-beginning 0))
@@ -479,24 +579,22 @@ parentheses back where they belong."
             (goto-char p)))
         ;; Handle "let" and "let*"
         (goto-char bof)
-        (while (re-search-forward sslet eof t)
-          (when (re-search-forward "(\\s-*(" eof t)
-            (setq let-begin (match-beginning 0))
+        (while (re-search-forward shu-misc-rx-lets eof t)
+          (setq let-begin (match-beginning 0))
+          (setq p (point))
+          (setq start-col (current-column))
+          (setq pad-length start-col)
+          (setq pad (concat "\n" (make-string pad-length ? )))
+          (insert pad)
+          (setq eof (+ eof (length pad)))
+          (goto-char p)
+          (when (re-search-backward "(\\s-*" let-begin t)
+            (forward-sexp)
             (backward-char 1)
-            (setq p (point))
-            (setq start-col (current-column))
-            (setq pad-length start-col)
+            (setq pad-length (+ start-col 2))
             (setq pad (concat "\n" (make-string pad-length ? )))
             (insert pad)
-            (setq eof (+ eof (length pad)))
-            (goto-char p)
-            (when (re-search-backward "(\\s-*" let-begin t)
-              (forward-sexp)
-              (backward-char 1)
-              (setq pad-length (+ start-col 2))
-              (setq pad (concat "\n" (make-string pad-length ? )))
-              (insert pad)
-              (setq eof (+ eof (length pad))))))))
+            (setq eof (+ eof (length pad)))))))
     ))
 
 
@@ -995,7 +1093,10 @@ return git error message."
     (with-temp-buffer
       (call-process "git" nil (current-buffer) nil "add" filename)
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
-    (shu-trim-trailing result)
+    (setq result (shu-trim-trailing result))
+    (when (not (string= result ""))
+      (setq result (concat "After git add " filename ":\n" result)))
+    result
     ))
 
 
@@ -1011,6 +1112,39 @@ return git error message."
       (call-process "git" nil (current-buffer) nil "rev-parse" "--abbrev-ref" "HEAD")
       (setq branch (buffer-substring-no-properties (point-min) (1- (point-max)))))
     branch
+    ))
+
+
+
+
+;;
+;;  shu-git-find-default-branch
+;;
+(defun shu-git-find-default-branch ()
+  "Return the name of the default branch in a git repository.  The default
+branch is the one branch that is created with a new repository."
+  (let ((branch)
+        (fset (length "origin/")))
+    (with-temp-buffer
+      (call-process "git" nil (current-buffer) nil "rev-parse" "--abbrev-ref" "origin/HEAD")
+      (setq branch (buffer-substring-no-properties (+ (point-min) fset) (1- (point-max)))))
+    branch
+    ))
+
+
+
+;;
+;;  shu-git-get-pr-url
+;;
+(defun shu-git-get-pr-url ()
+  "Put into the kill ring the path required to create a new pull request for
+the current branch of the current repository."
+  (interactive)
+  (let ((url-repo (shu-get-url-repo))
+        (branch (shu-git-find-branch))
+        (url))
+    (setq url (concat url-repo "/pull/new/" branch))
+    (shu-kill-new url)
     ))
 
 
@@ -1073,11 +1207,18 @@ word \"origin\"..  This can be used as part of git push or pull."
 ;;  shu-git-insert-push-origin-branch
 ;;
 (defun shu-git-insert-push-origin-branch ()
-  "Insert at point the name the git command to push the current branch out
-to origin."
+  "Insert at point the git command to push the current branch out to origin.  If
+the current branch is the default branch (fka \"master\"), you are prompted to
+see if you want to proceed.  This is to prevent an accidental push to the
+default branch."
   (interactive)
-  (let ((branch (shu-git-find-branch)))
-    (insert (concat "git push origin " branch))
+  (let ((branch (shu-git-find-branch))
+        (insert-push t)
+        (default-branch (shu-git-find-default-branch)))
+    (when (string= branch default-branch)
+      (setq insert-push (yes-or-no-p (concat "Really push to " branch " branch? "))))
+    (when insert-push
+      (insert (concat "git push origin " branch)))
     ))
 
 
@@ -1087,12 +1228,25 @@ to origin."
 ;;  shu-git-insert-pull-origin-branch
 ;;
 (defun shu-git-insert-pull-origin-branch ()
-  "Insert at point the name the git command to pull the current branch out
-to origin."
+  "Insert at point the name the git command to pull the current branch from
+origin."
   (interactive)
   (let ((branch (shu-git-find-branch)))
     (insert (concat "git pull origin " branch))
     ))
+
+
+
+
+;;
+;;  shu-git-insert-git-commit
+;;
+(defun shu-git-insert-git-commit ()
+  "Insert at point the name the git command to commit with the commentary held
+in a file called \"why.txt\"."
+  (interactive)
+  (insert "git commit -F why.txt")
+  )
 
 
 
@@ -1367,8 +1521,8 @@ project."
   "Replace everything in the region between START and END with blanks.  This is
 exactly like delete-region except that the deleted text is replaced with spaces.
 As with delete-region, the end point is not included in the delete.  It erases
-everything up but not including the end point.  The order of START and END does
-not matter."
+everything up to but not including the end point.  The order of START and END
+does not matter."
   (let ((spoint start)
         (epoint end)
         (len 0)
@@ -1404,6 +1558,7 @@ of contents entry created and inserted at point will be
         (toc-name))
     (setq toc-name (shu-make-md-section-name section-name))
     (setq index-name (shu-make-md-index-name toc-name))
+    (beginning-of-line)
     (insert
      (concat
       " * [" toc-name "]"
@@ -1485,13 +1640,328 @@ For example, if the input string is
 The returned string would be
 
      This is an Overview"
-    (with-temp-buffer
-      (insert section-name)
-      (goto-char (point-min))
-      (while (search-forward "#" nil t)
-        (replace-match ""))
-      (setq section-name (shu-trim (buffer-substring-no-properties (point-min) (point-max)))))
-    section-name)
+  (with-temp-buffer
+    (insert section-name)
+    (goto-char (point-min))
+    (while (search-forward "#" nil t)
+      (replace-match ""))
+    (setq section-name (shu-trim (buffer-substring-no-properties (point-min) (point-max)))))
+  section-name)
+
+
+
+;;
+;;  shu-get-markdown-prefix
+;;
+(defun shu-get-markdown-prefix (section-heading)
+  "Returns the pound sign prefix from a markdown section heading,
+SECTION-HEADING.  The string of pound signs must begin at the beginning of the
+string.  If a section heading is
+
+   \"### This is a section heading\"
+
+then the string \"###\" is returned.  If the first character in the section
+heading is not a pound sign, nil is returned."
+  (let ((ss "\\`\\([#]+\\)")
+        (prefix))
+    (when (string-match ss section-heading)
+      (setq prefix (match-string 1 section-heading)))
+    prefix
+    ))
+
+
+
+;;
+;;  shu-get-markdown-heading
+;;
+(defun shu-get-markdown-heading (section-heading)
+  "Returns the heading text from a markdown section heading, SECTION-HEADING.
+There must be at least one pound sign at the beginning of the string.  If a
+section heading is
+
+   \"### This is a section heading\"
+
+then the string \"This is a section heading\" is returned.  If the first
+character in the section heading is not a pound sign, nil is returned."
+  (let ((sh section-heading)
+        (nsh)
+        (ss "\\`[#]+")
+        (heading))
+    (when (string-match ss sh)
+      (setq nsh (replace-match "" t t sh))
+      (setq heading (shu-trim nsh)))
+    heading
+    ))
+
+
+
+;;
+;;  shu-get-markdown-level
+;;
+(defun shu-get-markdown-level (section-heading)
+  "Return the level of a markdown section heading.  The level is defined as
+the number of leading pound signs that start at the beginning of the string.
+A level 1 heading begins with \"#\".  A level 2 heading begins with \"##\".
+If there are no leading pound signs at the beginning of the string, a level of
+zero is returned."
+  (let ((prefix (shu-get-markdown-prefix section-heading))
+        (level 0))
+    (when prefix
+      (setq level (length prefix)))
+    level
+    ))
+
+
+
+;;
+;;  shu-fix-markdown-section
+;;
+(defun shu-fix-markdown-section (max-depth)
+  "On entry, point is positioned after one or more pound signs that define the
+beginning of a markdown section heading.  If the number of pound signs is
+greater than MAX-DEPTH, ignore the line and return nil.  If the number of
+pound signs is less than or equal to MAX-DEPTH, fix the line as described
+below and return it.
+
+If the line ends with an expression that looks like
+
+      \"<a name=currentliveupdate></a>\",
+
+remove it.
+
+If the line ends with trailing pound signs, remove them as well.
+
+Then return the repaired line."
+  (let* ((gb (get-buffer-create shu-trace-buffer))
+         (ssa "\\s-*<a\s-*name")
+         (sot (1+ (point)))
+         (bol (line-beginning-position))
+         (eol (line-end-position))
+         (line (buffer-substring-no-properties bol eol))
+         (level (shu-get-markdown-level line))
+         (use-line (and (/= level 0) (<= level max-depth)))
+         (son)
+         (eon))
+    (if (not use-line)
+        (setq line nil)
+      (if (re-search-forward ssa eol t)
+          (progn
+            (princ (concat "found [" (match-string 0) "]\n") gb)
+            (setq son (match-beginning 0))
+            (setq eol (line-end-position))
+            (while (search-forward "</a>" eol t)
+              (princ (concat "found [" (match-string 0) "]\n") gb)
+              (setq eon (match-end 0))
+              (delete-region son eon)
+              (setq eol (line-end-position)))
+            (setq line (buffer-substring-no-properties bol eol)))
+        (goto-char eol)
+        (while (search-backward "#" sot t)
+          (replace-match ""))
+        (setq eol (line-end-position))
+        (setq line (shu-trim (buffer-substring-no-properties bol eol)))))
+    line
+    ))
+
+
+
+;;
+;;  shu-get-md-boundaries
+;;
+(defun shu-get-md-boundaries ()
+  "Find all pairs of markdown literal text.  In markdown, the sequence ``` is
+used to bound literal text.  When creating a markdown table of contents, we do
+not want to look at pound signs contained in literal text.  This function finds
+the location of each pair of ``` sentinels.  It returns a list of cons sells,
+each of which has the start and end position of a ``` sequence.  If there is a
+start ``` with no companion ``` close, it is not included in the list."
+  (let ((sentinel "```")
+        (looking-for-open t)
+        (open)
+        (close)
+        (pair)
+        (literals)
+        (last-open)
+        (msg)
+        (balanced))
+    (save-excursion
+      (save-restriction
+        (goto-char (point-min))
+        (while (search-forward sentinel nil t)
+          (if looking-for-open
+              (progn
+                (setq open (1- (point)))
+                (setq last-open open)
+                (setq looking-for-open nil))
+            (setq close  (match-beginning 0))
+            (setq pair (cons open close))
+            (setq open nil)
+            (setq close nil)
+            (push pair literals)
+            (setq looking-for-open t)))
+        (if looking-for-open
+            (setq balanced t)
+          (setq msg (format "open literal (```) at line %d has no matching close"
+                            (shu-the-line-at last-open)))
+          (message "%s" msg))))
+    (when literals
+      (setq literals (sort literals (lambda(lhs rhs) (< (car lhs) (car rhs))))))
+    literals
+    ))
+
+
+
+;;
+;;  shu-md-in-literal
+;;
+(defun shu-md-in-literal (literals pt)
+  "LITERALS is a list of markdown literal boundaries produced by
+SHU-GET-MD-BOUNDARIES.  This function returns t if the point PT lies within a
+markdown literal boundary."
+  (let ((lits literals)
+        (inside)
+        (pair)
+        (open)
+        (close)
+        (looking t))
+    (when lits
+      (while (and lits looking)
+        (setq pair (car lits))
+        (setq open (car pair))
+        (setq close (cdr pair))
+        (when  (and (> pt open) (< pt close))
+          (setq inside t)
+          (setq looking nil))
+        (when (> close pt)
+          (setq looking nil))
+        (setq lits (cdr lits))))
+    inside
+    ))
+
+
+
+;;
+;;  shu-tocify-markdown-file
+;;
+(defun shu-tocify-markdown-file ()
+  "Search the file starting at the current position for any markdown headings of
+the form \"## This is a heading\".  Add a tag to each heading and then insert a
+complete markdown table of contents at the current position.
+
+Pound signs that lie inside of markdown literal areas designated by \"```\" are
+ignored.  This prevents something such as an example of an #include directive
+from being treated as a level 1 heading.
+
+If a heading already has a tag, it is removed.  If a heading has trailing pound
+signs, they are also removed.
+
+The default maximum heading level is two, which means that heading levels
+greater than two are not included in the table of contents.  But a numeric
+prefix argument can change the maximum heading level.  The maximum heading level
+cannot be set to a value less than one."
+  (interactive)
+  (let ((literals (shu-get-md-boundaries))
+        (default-max-depth 2)
+        (max-depth  current-prefix-arg)
+        (ht (make-hash-table :test 'equal :size 500))
+        (ss "^[#]+")
+        (index-name-max 15)
+        (suffix-length 6)
+        (line)
+        (heading)
+        (index-name)
+        (entry)
+        (entries)
+        (toc))
+    (setq toc (point))
+    (when (not max-depth)
+      (setq max-depth default-max-depth))
+    (when (< max-depth 1)
+      (setq max-depth 1))
+    (save-excursion
+      (while (re-search-forward ss nil t)
+        (when (not (shu-md-in-literal literals (point)))
+          (setq line (shu-fix-markdown-section max-depth))
+          (when line
+            (setq heading (shu-get-markdown-heading line))
+            (setq index-name (shu-make-md-index-name heading))
+            (when (> (length index-name) index-name-max)
+              (setq index-name (substring index-name 0 index-name-max)))
+            (setq index-name (shu-misc-make-unique-string index-name suffix-length ht))
+            (setq entry (cons line index-name))
+            (push entry entries)))))
+    (setq entries (nreverse entries))
+    (insert "\n")
+    (shu-insert-markdown-toc entries)
+    (shu-tocify-markdown-headings entries)
+    (goto-char toc)
+    ))
+
+
+
+
+;;
+;;  shu-tocify-markdown-headings
+;;
+(defun shu-tocify-markdown-headings (entries)
+  "ENTRIES is a list of cons cells.  The car of each item on the list is the
+markdown heading line, which looks something like \"## This is a heading\".
+The cdr of each item on the list is the link name.  This function searches for
+each markdown heading in the file and appends to the heading a tag of the form
+
+     <a name=link name></a>
+
+so that it may be referenced from the table of contents."
+  (let ((ents entries)
+        (entry)
+        (line)
+        (index-name)
+        (actual))
+    (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+    (while ents
+      (setq entry (car ents))
+      (setq line (car entry))
+      (setq index-name (cdr entry))
+      (search-forward line nil)
+      (insert (concat " <a name=" index-name "></a>"))
+      (setq ents (cdr ents)))
+    ))
+
+
+
+;;
+;;  shu-insert-markdown-toc
+;;
+(defun shu-insert-markdown-toc (entries)
+  "ENTRIES is a list of cons cells.  The car of each item on the list is the
+markdown heading line, which looks something like \"## This is a heading\".
+The cdr of each item on the list is the link name.  This function inserts a
+markdown table of contents in which each line in the table of contents
+consists of the heading text in brackets followed by the line name in
+parenthesis and preceded by a pound sign.  Each line that represents a heading
+level greater than one is also indented to indicate its heading level."
+  (let ((ents entries)
+        (entry)
+        (line)
+        (index-name)
+        (level)
+        (x)
+        (pad-count)
+        (pad)
+        (heading))
+    (while ents
+      (setq entry (car ents))
+      (setq line (car entry))
+      (setq index-name (cdr entry))
+      (setq level (shu-get-markdown-level line))
+      (setq x (1- level))
+      (setq pad-count (1+ (* 4 x)))
+      (setq pad (make-string pad-count ? ))
+      (setq heading (shu-get-markdown-heading line))
+      (insert (concat pad "- [" heading "](#" index-name ")\n"))
+      (setq ents (cdr ents)))
+    ))
+
 
 
 ;;
@@ -1526,8 +1996,1198 @@ The returned string would be
 function for the various functions defined in .emacs to determine the type of
 the host operating system."
   (interactive)
-    (message "%s" (shu-os-name))
-    )
+  (message "%s" (shu-os-name))
+  )
+
+
+
+;;
+;;  shu-system-name
+;;
+(defun shu-system-name ()
+  "Return the machine name.  Prior to emacs 25.1, this was held in the variable
+system-name.  As of emacs 25.1, system-name is now a function.  Return nil if
+system-name is neither a function nor a variable."
+  (let (
+        (sys-name)
+        )
+    (if (fboundp 'system-name)
+        (setq sys-name (system-name))
+      (when (boundp 'system-name)
+        (setq sys-name system-name)
+        )
+      )
+    sys-name
+    ))
+
+
+
+;;
+;;  shu-system-name-string
+;;
+(defun shu-system-name-string ()
+  "Return the machine name.  Prior to emacs 25.1, this was held in the variable
+system-name.  As of emacs 25.1, system-name is now a function.  Unlike
+SHU-SYSTEM-NAME, this function always returns a string, even if the machine
+name is not available for some reason."
+  (let ((sys-name (shu-system-name)))
+    (when (not sys-name)
+      (setq sys-name "??????"))
+    sys-name
+    ))
+
+
+
+;;
+;;  shu-show-system-name
+;;
+(defun shu-show-system-name ()
+  "Place the system name (machine name) in the message area."
+  (interactive)
+  (message "%s" (shu-system-name-string))
+  )
+
+
+
+;;
+;;  shu-kill-system-name
+;;
+(defun shu-kill-system-name ()
+  "Place the system name` (machine name) in the message area."
+  (interactive)
+  (setq debug-on-error t)
+  (shu-kill-new (shu-system-name-string))
+  )
+
+
+
+;;
+;;  shu-misc-split-string
+;;
+(defun shu-misc-split-string (input line-limit &optional fixed-width escape)
+  "Split a string into multiple strings and return a list of the strings.  If
+FIXED-WIDTH is true, then each returned string is LINE-LIMIT characters in
+length, except for the last, which may be shorter.  If FIXED-WIDTH is absent or
+nil, then each returned string is split on a word boundary and no string exceeds
+LINE-LIMIT characters in length."
+  (let ((lines))
+    (with-temp-buffer
+      (insert input)
+      (setq lines (shu-misc-split-buffer line-limit fixed-width escape)))
+    lines
+    ))
+
+
+
+;;
+;;  shu-misc-split-buffer
+;;
+(defun shu-misc-split-buffer (line-limit &optional fixed-width escape)
+  "Split an entire buffer into multiple strings and return a list of the
+strings.  If FIXED-WIDTH is true, then each returned string is LINE-LIMIT
+characters in length, except for the last, which may be shorter.  If FIXED-WIDTH
+is absent or nil, then each returned string is split on a word boundary and no
+string exceeds LINE-LIMIT characters in length."
+  (let ((lines))
+    (if fixed-width
+        (setq lines (shu-misc-split-chunk-buffer line-limit escape))
+      (setq lines (shu-misc-split-phrase-buffer line-limit)))
+    ))
+
+
+
+;;
+;;  shu-misc-split-phrase-buffer
+;;
+(defun shu-misc-split-phrase-buffer (line-limit)
+  "Split an entire buffer into multiple strings and return a list of the
+strings.  Each returned string is split on a word boundary and no string exceeds
+LINE-LIMIT characters in length."
+  (shu-misc-internal-split-buffer line-limit 'shu-misc-get-phrase)
+  )
+
+
+
+;;
+;;  shu-misc-split-chunk-buffer
+;;
+(defun shu-misc-split-chunk-buffer (line-limit &optional escape)
+  "Split an entire buffer into multiple strings and return a list of the
+strings.  Each returned string is LINE-LIMIT characters in length, except for
+the last one, which may be shorter."
+  (shu-misc-internal-split-buffer line-limit 'shu-misc-get-chunk escape)
+  )
+
+
+
+;;
+;;  shu-misc-internal-split-buffer
+;;
+(defun shu-misc-internal-split-buffer (line-limit get-function &optional escape)
+  "Split an entire buffer into multiple strings and return a list of the
+strings.  GET-FUNCTION is the function to call to fetch each new string.
+GET-FUNCTION is set to either SHU-MISC-GET-CHUNK or SHU-MISC-GET-PHRASE.
+
+SHU-MISC-GET-CHUNK returns each string as a fixed length string of LINE-LIMIT
+characters, except for the last one, which may be shorter.
+
+SHU-MISC-GET-PHRASE returns the longest possible string that ends on a word
+boundary and whose length is less than or equal to LINE-LIMIT."
+  (let ((something t)
+        (line)
+        (lines))
+    (while something
+      (setq line (funcall get-function line-limit escape))
+      (if (string= line "")
+          (setq something nil)
+        (push line lines)))
+    (setq lines (nreverse lines))
+    lines
+    ))
+
+
+
+
+;;
+;;  shu-misc-get-phrase
+;;
+(defun shu-misc-get-phrase (line-limit &optional escape)
+  "Remove from the front of the current buffer and return the longest possible
+string of whitespace separated things whose length does not exceed line-limit.
+If there is at least one whitespace character before LINE-LIMIT, the string will
+end with one or more whitespace characters.  i.e., the string will end on a word
+boundary if that is possible.
+
+Words will not be split unless there is no whitespace character before
+LINE-LIMIT characters have been scanned, in which case a string of exactly
+LINE-LIMIT length will be removed and returned.
+
+This function is used to split a string of words into a set of smaller strings
+such that words are not split."
+  (let ((ss (concat shu-all-whitespace-regexp "+"))
+        (sn (concat shu-not-all-whitespace-regexp "+"))
+        (something t)
+        (tpoint)
+        (lpoint)
+        (rpoint)
+        (epoint)
+        (part))
+    (goto-char (point-min))
+    (while something
+      (setq tpoint (re-search-forward ss nil t))
+      (if (not tpoint)
+          (progn
+            (if (and lpoint (> (point-max) line-limit))
+                (setq epoint lpoint)
+              (setq epoint line-limit))
+            (setq part (shu-misc-get-chunk epoint))
+            (setq something nil))
+        (setq tpoint (1- tpoint))
+        (when (> tpoint line-limit)
+          (setq rpoint (re-search-backward sn nil t))
+          (if (not rpoint)
+              (setq epoint line-limit)
+            (setq rpoint (1+ rpoint))
+            (if (< rpoint line-limit)
+                (setq epoint line-limit)
+              (if lpoint
+                  (setq epoint lpoint)
+                (setq epoint line-limit))))
+          (setq part (shu-misc-get-chunk epoint))
+          (setq something nil)))
+      (setq lpoint tpoint))
+    part
+    ))
+
+
+
+
+;;
+;;  shu-misc-get-chunk
+;;
+(defun shu-misc-get-chunk (line-limit &optional escape)
+  "Return a string that consists of the first LINE-LIMIT characters in the
+current buffer.  If LINE-LIMIT is larger than the buffer size, return a
+string that is the entire contents of the buffer.  Before returning, delete
+from the buffer the returned string."
+  (let* ((spoint (point-min))
+         (xpoint (+ line-limit spoint))
+         (epoint (if (< (point-max) xpoint) (point-max) xpoint))
+         (last-char)
+         (part)
+         (esc (if escape "t" "nil")))
+    ;;    (goto-char (1- epoint))
+    (when (and (> (point-max) 3) (> line-limit 3))
+      (setq last-char (buffer-substring-no-properties (1- epoint) epoint))
+      (when (and escape (string= last-char "\\"))
+        (setq epoint (1- epoint))
+        (setq last-char (buffer-substring-no-properties (1- epoint) epoint))
+        (when (string= last-char "\\")
+          (setq epoint (1- epoint)))))
+    (setq part (buffer-substring-no-properties spoint epoint))
+    (delete-region spoint epoint)
+    part
+    ))
+
+
+
+
+;;
+;;  shu-obfuscate-region
+;;
+(defun shu-obfuscate-region (start end)
+  "Obfuscate a region of text by replacing every alphabetic character in the
+region with the next letter of the alphabet, staring with 'a'. For example, of
+the region contains
+
+  Now is the time for all good men to come to the aid of the Party 10 times.
+
+Then the obfuscated text would be:
+
+  Abc de fgh ijkl mno pqr stuv wxy za bcde fg hij klm no pqr Stuvw 10 xyzab.
+
+This is useful if you want to capture some text for later testing and
+manipulation that might contain confidential or proprietary information.  This
+is an encoding that cannot be reversed."
+  (interactive "*r")
+  (let ((current-char ?z)
+        (new-char)
+        (case-fold-search nil)
+        (advance))
+    (goto-char start)
+    (while (/= (point) end)
+      (setq advance nil)
+      (if (looking-at "[a-z]")
+          (progn
+            (setq current-char (shu-next-char-in-seq current-char))
+            (delete-char 1)
+            (insert-char current-char))
+        (if (looking-at "[A-Z]")
+            (progn
+              (setq current-char (shu-next-char-in-seq current-char))
+              (delete-char 1)
+              (setq new-char (upcase current-char))
+              (insert-char new-char))
+          (setq advance t)))
+      (when advance
+        (forward-char 1)))
+    ))
+
+
+
+;;
+;;  shu-next-char-in-seq
+;;
+(defun shu-next-char-in-seq (current-char)
+  "CURRENT-CHAR is a character in the range a-z (or A-Z).  This function returns
+the next character, where next is the next character in the alphabet unless
+CURRENT-CHAR is 'z', in which case the next character returned is 'a'.  If
+CURRENT-CHAR is 'Z', then the next character returned is 'A'."
+  (let ((next-char)
+        (case-fold-search nil))
+    (cond
+     ((char-equal current-char ?z)
+      (setq next-char ?a))
+     ((char-equal current-char ?Z)
+      (setq next-char ?A))
+     (t
+      (setq next-char (1+ current-char))))
+    next-char
+    ))
+
+
+
+;;
+;;  shu-reverse2
+;;
+(defun shu-reverse2 ()
+  "When positioned in front of a pair of parenthesis that contains a pair of
+expressions separated by a comma, reverse the positions of the two expressions.
+The first becomes the second and the second becomes the first.
+i.e.,
+      foo(mumble, bar);
+becomes
+      foo(bar, mumble);"
+  (interactive)
+  (let ((eol (line-end-position))
+        (rxnc "\\([^,]+\\),\\s-*")
+        (spos)
+        (epos)
+        (arg1)
+        (arg2))
+    (save-excursion
+      (if (not (search-forward "(" nil t))
+          (progn
+            (ding)
+            (message "%s" "No opening parenthesis on this line"))
+        (setq spos (point))
+        (backward-char 1)
+        (forward-sexp)
+        (backward-char 1)
+        (setq epos (point))
+        (goto-char spos)
+        (if (not (re-search-forward rxnc eol t))
+            (progn
+              (ding)
+              (message "%s" "No first expression found inside parenthesis"))
+          (setq arg1 (match-string 1))
+          (setq arg2 (buffer-substring-no-properties (point) epos))
+          (delete-region (point) epos)
+          (insert arg1)
+          (replace-match arg2 t t nil 1))))
+    ))
+
+
+
+;;
+;;  shu-frame-width
+;;
+(defun shu-frame-width ()
+  "Return the width of an emacs frame.  Different operating systems appear to
+have slightly different windowing systems, which means that the
+FRAME-INNER-WIDTH function does not quite report the exact width."
+  (let ((frame-width (frame-inner-width))
+        (fudge
+         (if (shu-system-type-is-unix)
+             8
+           (if (shu-system-type-is-mac-osx)
+               4
+             0))))
+    (+ frame-width fudge)
+    ))
+
+
+
+
+;;
+;;  shu-adapt-frame
+;;
+(defun shu-adapt-frame (frame-no)
+  "Adapt the current frame to the current display by stretching the frame to the
+full height of the display and putting the top of the frame at the top of the
+display.  This function makes some assumptions about the display geometry based
+on the current operating system.  It assumes that Windows loses five lines for
+top and bottom tool bars.  Mac OS X loses three lines for the top tool bar.
+Unix loses two lines for something.  These numbers should, at some point, be
+customizable.
+
+With a numeric prefix argument N, the emacs window is positioned N frames from
+the right hand side of the display.  For example, if you open three frames and
+type into the first frame C-u 1 M-x SHU-ADAPT-FRAME, into the next frame
+C-u 2 M-x SHU-ADAPT-FRAME, and into the third frame C-u 3 M-x SHU-ADAPT-FRAME,
+then the three frames will be grouped together side by side at the right side of
+the display.
+
+If the prefix argument is large enough that the left side of the frame would be
+moved past the left side of the display, the window is positioned such that the
+left edge of the window is aligned with the left edge of the display.
+
+Implementation note:
+
+If this function is called when the left side of the frame is positioned to the
+left of the leftmost edge of the display, the function FRAME-POSITION returns a
+negative value for the x coordinate of the frame.  The function
+SET-FRAME-POSITION takes the x and y coordinates of the new position of the top
+left corner of the frame.
+
+But if x is negative, it specifies the coordinates of the right edge of the
+frame relative to the right edge of the display.  This puts a frame that is very
+close to the left edge of the display all the way over to the right edge of the
+display.
+
+The assumption is that a negative x frame position means that the user has
+positioned the frame just a bit past the left edge and that the desired frame
+position is actually the leftmost edge of the display."
+  (interactive "P")
+  (let* (
+         (lost-lines
+          (if (shu-system-type-is-windows)
+              5
+            (if (shu-system-type-is-mac-osx)
+                3
+              (if (shu-system-type-is-unix)
+                  2
+                2))))
+         (width-fudge (if (shu-system-type-is-unix) 10 0))
+         (top-y 0)
+         (hpx (- (x-display-pixel-height) (* lost-lines (frame-char-height))))
+         (hpl (/ hpx (frame-char-height)))
+         (fp)
+         (actual-x)
+         (calc-x)
+         (y)
+         (frame-pixel-width (shu-frame-width))
+         (display-pixel-width (x-display-pixel-width))
+         (offset 0))
+    (setq fp (frame-position))
+    (setq actual-x (car fp))
+    (setq calc-x actual-x)
+    (setq y (cdr fp))
+    (when frame-no
+      (if (= frame-no 1)
+          (setq offset frame-pixel-width)
+        (setq offset (+ (* (1- frame-no) (- frame-pixel-width width-fudge)) frame-pixel-width)))
+      (setq calc-x (- display-pixel-width offset)))
+    (when (< calc-x 0)
+      (setq calc-x 0))
+    (set-frame-height (selected-frame) hpl)
+    (set-frame-position (selected-frame) calc-x top-y)
+    (setq fp (frame-position))
+    (setq actual-x (car fp))
+    (message "frame-width: %d, display-wid: %d, calc-x: %d, actual-x: %d"
+             frame-pixel-width display-pixel-width calc-x actual-x)
+    ))
+
+
+
+;;
+;;  shu-misc-random-ua-string
+;;
+(defun shu-misc-random-ua-string (length)
+  "Return a string composed of random upper case letters of length LENGTH."
+  (let ((letters "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+    (shu-misc-random-internal-string letters length)
+    ))
+
+
+
+;;
+;;  shu-misc-random-lad-string
+;;
+(defun shu-misc-random-lad-string (length)
+  "Return a string composed of random lower case letters and digits of length
+ LENGTH."
+  (let ((letters "abcdefghijklmnopqrstuvwxyz0123456789"))
+    (shu-misc-random-internal-string letters length)
+    ))
+
+
+
+;;
+;;  shu-misc-random-internal-string
+;;
+(defun shu-misc-random-internal-string (letters length)
+  "Return a string composed of random LETTERS of length LENGTH."
+  (let ((nletters (length letters))
+        (rs "")
+        (count 0))
+    (while (< count length)
+      (setq rs (concat rs (char-to-string (elt letters (random nletters)))))
+      (setq count (1+ count)))
+    rs
+    ))
+
+
+;;
+;;  shu-misc-make-unique-string
+;;
+(defun shu-misc-make-unique-string (string suffix-length ht)
+  "Input is a hash table, HT, as well as a STRING.  If the string does not
+already exist in HT, add the string to the hash table and return the string.
+If the string already exists in HT, add a suffix to the string that is a
+random string of length SUFFIX-LENGTH.  If the combination of the original
+STRING plus the random string added as a suffix, does not exist in the hash
+table, add the new string to the hash table and return it.  This provides the
+generation of a set of unique string names."
+  (let ((nstring string)
+        (value)
+        (something t))
+    (while something
+      (setq value (gethash nstring ht))
+      (if value
+          (progn
+            (setq nstring (concat string (shu-misc-random-lad-string suffix-length)))
+            (setq value (gethash nstring ht)))
+        (puthash nstring 1 ht)
+        (setq something nil)))
+    nstring
+    ))
+
+
+
+;;
+;;  shu-extract-name-open-grok
+;;
+(defun shu-extract-name-open-grok ()
+  "The current buffer contains output from an OpenGrok search that has been
+copied from the web page and pasted into the buffer.  This function scans the
+buffer from the current point and harvests all of the file names that hold the
+references for which OpenGrok searched.  It puts the file names (including their
+top level directories) into the buffer \"**shu-open-grok**\".
+The number of file names found is returned, mostly for the benefit of unit
+tests."
+  (interactive)
+  (let ((gb (get-buffer-create "**shu-open-grok**"))
+        (ss "H A D	")
+        (son)
+        (eon)
+        (eol)
+        (file-name)
+        (file-path)
+        (prev-file-path "")
+        (full-name)
+        (count 0))
+    (while (search-forward ss nil t)
+      (setq son (point))
+      (setq eol (line-end-position))
+      (re-search-forward shu-all-whitespace-regexp eol t)
+      (setq eon (point))
+      (setq file-name (shu-trim (buffer-substring-no-properties son eon)))
+      (forward-line -1)
+      (setq file-path (shu-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+      (if (shu-string-starts-ends file-path "/")
+          (setq prev-file-path file-path)
+        (setq file-path prev-file-path))
+      (setq full-name (concat file-path file-name))
+      (goto-char eon)
+      (princ (concat full-name "\n") gb)
+      (setq count (1+ count)))
+    (if (= count 0)
+        (message "%s" "No file names found")
+      (message "%d file names placed in buffer **shu-open-grok**" count))
+    count
+    ))
+
+
+
+;;
+;;  shu-add-alexandria-in-batch-mode
+;;
+(defun shu-add-alexandria-in-batch-mode ()
+  "Call the function SHU-ADD-ALEXANDRIA in batch mode.  The function
+SHU-ADD-ALEXANDRIA normally ends in edit mode in Doxyfile so that the user can
+do a final edit and save.  In batch mode, this function does a save of the
+Doxyfile since there is no interactive user.
+
+If the function succeeds, it returns true, else nil.  This allows the top level
+batch invoking function to terminate emacs with a zero or non-zero return code
+to indicate to an external script whether or not the add command worked."
+  (let ((done))
+    (setq done (shu-add-alexandria))
+    (when done
+      (basic-save-buffer)
+      (shu-kill-current-buffer))
+    done
+    ))
+
+
+
+
+;;
+;;  shu-add-alexandria
+;;
+(defun shu-add-alexandria ()
+  "Add Alexandria coverage to a git repository.
+This function first checks to ensure that a README.md file exists that does not
+contain an Alexandria badge and that a Doxyfile does not exist.  If those two
+conditions are met, an Alexandria badge is added to the bottom of the README.md
+file, a Doxyfile is created, and some of the tags in the Doxyfile are set to
+reasonable defaults.  An ALEXANDRIA_DOC_DEPENDENCIES tag is added to the end of
+the Doxyfile as a comment.
+If this function succeeds, it returns true, else nil.  The return value may
+be used by batch mode functions that want to call this function and report
+whether or not it succeeded."
+  (interactive)
+  (let ((readme-name "README.md")
+        (doxyfile-name "Doxyfile")
+        (have-badge)
+        (fbuf)
+        (file-buf)
+        (badge-added)
+        (done))
+    (if (not (file-readable-p readme-name))
+        (progn
+          (ding)
+          (message "%s file does not exist." readme-name))
+      (if (file-readable-p doxyfile-name)
+          (progn
+            (ding)
+            (message "%s file already exists." doxyfile-name))
+        (setq fbuf (get-file-buffer readme-name))
+        (if (and fbuf (buffer-modified-p fbuf))
+            (progn
+              (ding)
+              (message "%s file is already open and modified" readme-name))
+          (find-file readme-name)
+          (goto-char (point-min))
+          (setq have-badge (search-forward "[![Alexandria doxygen]" nil t))
+          (if have-badge
+              (progn
+                (ding)
+                (message "Alexandria badge already exists in %s file." readme-name)
+                (when (not fbuf)
+                  (shu-kill-current-buffer)))
+            (goto-char (point-max))
+            (insert "\n")
+            (setq badge-added (shu-add-alexandria-badge))
+            (basic-save-buffer)
+            (when (not fbuf)
+              (shu-kill-current-buffer))
+            (if (not badge-added)
+                (progn
+                  (ding))
+              (shu-add-doxyfile)
+              (shu-git-add-file doxyfile-name)
+              (find-file doxyfile-name)
+              (setq done (shu-fixup-doxyfile)))))))
+    done
+    ))
+
+
+
+;;
+;;  shu-get-git-name
+;;
+(defun shu-get-git-name (path)
+  "PATH is the url of a git repository from the [remote \"origin\"] section of a
+.git/config file.  For example, the entry for this repository is
+
+      https://github.com/codesinger/shu.git
+
+This function extracts two pieces of information from the URL.  One is the name
+of the repository, which in this case is \"shu\".  The other is the path to the
+repository, which includes the owning group, which in this case is
+\"codesinger/shu\".
+
+Those two items are returned in a cons cell with the car of the cons cell
+holding the path (with owning group) and the cdr of the cons cell holding the
+repository name.
+
+The assumptions made by this function are as follows: The beginning of the
+owning group and repository name are preceded by a domain name followed by
+either a colon or a slash.  In the case of this repository, the owning group and
+repository name are preceded by \"github.com/\".  The repository name may or may
+not have a trailing \".git\", which this function removes."
+  (let ((tpath (shu-trim-git-end path))
+        (sep-char "/")
+        (ss1 "\\.[com|net|edu]+[:/]+")
+        (pstart)
+        (pend)
+        (fpath)
+        (plist)
+        (repository-name))
+    (with-temp-buffer
+      (insert tpath)
+      (setq pstart (point-min))
+      (goto-char (point-min))
+      (when (re-search-forward ss1 nil t)
+        (setq pstart (point)))
+      (setq fpath (buffer-substring-no-properties pstart (point-max))))
+    (setq plist (split-string fpath sep-char t))
+    (setq repository-name (nth (1- (length plist)) plist))
+    (cons fpath repository-name)
+    ))
+
+
+
+
+;;
+;;  shu-trim-git-end
+;;
+(defun shu-trim-git-end (path)
+  "First trim leading and trailing spaces from PATH.  If PATH ends in \".git\",
+trim the last four characters from the path.  If PATH does not end in \".git\",
+do not trim the last four characters.
+
+Return the PATH, leading and trailing spaces trimmed, with perhaps \".git\"
+removed from the end."
+  (interactive)
+  (let ((git-end ".git")
+        (tpath (shu-trim path))
+        (ending))
+    (setq ending (substring tpath (- (length tpath) (length git-end))))
+    (when (string= ending git-end)
+      (setq tpath (substring tpath 0 (- (length tpath) (length git-end)))))
+    tpath
+    ))
+
+
+
+;;
+;;  shu-copy-repo
+;;
+(defun shu-copy-repo ()
+  "Call SHU-GET-REPO to find the path to the repository and put the result in
+the kill ring."
+  (interactive)
+  (let ((repo (shu-get-repo)))
+    (if repo
+        (progn
+          (message "%s" repo)
+          (shu-kill-new repo))
+      (message "%s" "*** Not found ***"))
+    ))
+
+
+
+;;
+;;  shu-show-repo
+;;
+(defun shu-show-repo ()
+  "Call SHU-GET-REPO to find the path to the repository and show the result in
+the minibuffer."
+  (interactive)
+  (let ((repo (shu-get-repo)))
+    (if repo
+        (message "%s" repo)
+      (message "%s" "*** Not found ***"))
+    ))
+
+
+
+;;
+;;  shu-get-repo
+;;
+(defun shu-get-repo ()
+  "When positioned anywhere in a git repository, return the git path to the
+repository.  This is found in .git/config as the url of [remote \"origin\"].
+Return nil if the path cannot be found.
+
+The search is made from the current directory and upwards for the first
+directory called \".git\"."
+  (let ((config)
+        (path)
+        (dom-path (locate-dominating-file "." ".git"))
+        (git-path))
+    (when dom-path
+      (setq git-path (concat dom-path ".git/config"))
+      (with-temp-buffer
+        (setq config (insert-file-contents-literally git-path))
+        (if (not config)
+            (progn
+              (ding)
+              (message "%s" "Cannot open .git/config"))
+          (setq path (shu-internal-get-repo)))))
+    path
+    ))
+
+
+
+;;
+;;  shu-get-url-repo
+;;
+(defun shu-get-url-repo ()
+  "Return the web URL for the current git repository.  If the URL cannot be
+found, nil is returned.
+
+The url for the git repository in .git/config is of the form
+
+       git@web-address:repository-name.git
+
+This function removes the trailing \".git\", replaces the leading \"git@\" with
+\"https://\" and replaces the \":\" between the web-address and repository-name
+with \"/\"."
+  (let ((repo (shu-get-repo))
+        (prefix)
+        (postfix)
+        (url-repo)
+        (ss ".[com|net|edu]\\(:\\)"))
+    (setq prefix (substring repo 0 4))
+    (if (not (string= prefix "git@"))
+        (progn
+          (ding)
+          (message "Unknown repository prefix.  Expected 'git@', found '%s'" prefix))
+      (setq postfix (substring repo (- (length repo) 4)))
+      (if (not (string= postfix ".git"))
+          (progn
+            (ding)
+            (message "Unknown repository postfix.  Expected '.git', found '%s'" postfix))
+        (setq url-repo (concat "https://" (substring repo 4 (- (length repo) 4)))))
+      (with-temp-buffer
+        (insert url-repo)
+        (goto-char (point-min))
+        (if (re-search-forward ss nil t)
+            (progn
+              (replace-match "/" t t nil 1)
+              (setq url-repo (buffer-substring-no-properties (point-min) (point-max))))
+          (ding)
+          (message "Cannot find ':' in git url (%s)" url-repo)
+          (setq url-repo nil))))
+    url-repo
+    ))
+
+
+
+
+;;
+;;  shu-internal-get-repo
+;;
+(defun shu-internal-get-repo ()
+  "The current buffer holds an instance of the \".git/config\" file for the
+repository.  This function returns the git path to the repository, which is the
+url given after [remote \"origin\"].  nil is returned if the path cannot be
+found."
+  (let ((ss1 "remote\\s-*\"origin\"")
+        (ss2 "url\\s-*=\\s-*")
+        (pstart)
+        (pend)
+        (path))
+    (goto-char (point-min))
+    (if (not (re-search-forward ss1 nil t))
+        (progn
+          (ding)
+          (message "%s" "Cannot find [remote \"origin\"] in .git/config"))
+      (if (not (re-search-forward ss2 nil t))
+          (progn
+            (ding)
+            (message "%s" "Cannot find \"url = \" following [remote \"origin\"] in .git/config"))
+        (setq pstart (point))
+        (setq pend (line-end-position))
+        (setq path (buffer-substring-no-properties pstart pend))))
+    ))
+
+
+
+
+;;
+;;  shu-kill-repo
+;;
+(defun shu-kill-repo ()
+  "When positioned in the top level directory of a git repository, place into
+the kill ring the git path to the repository.  This is found in .git/config as
+the url of [remote \"origin\"]
+
+This should probably be extended to do a search for the .git directory anywhere
+above the current position, which would remove the requirement to be in the root
+of the repository."
+  (interactive)
+  (let ((path (shu-get-repo)))
+    (when path
+      (shu-kill-new path))
+    ))
+
+
+
+;;
+;;  shu-add-alexandria-badge
+;;
+(defun shu-add-alexandria-badge ()
+  "Insert an Alexandria badge for the current project."
+  (interactive)
+  (let ((library-name (shu-get-directory-prefix))
+        (repo-path (shu-get-git-repo-path))
+        (badge-added))
+    (if (not shu-internal-dev-url)
+        (progn
+          (ding)
+          (message "%s" "SHU-INTERNAL-DEV-URL custom variable is not set."))
+      (when repo-path
+        (insert
+         (concat
+          "[![Alexandria doxygen](https://badges." shu-internal-dev-url "/badge"
+          "//Alexandria%20|%20Doxygen/blue?icon=fa-book-open)]"
+          "(http://alexandria-doc.stacker." shu-internal-dev-url "/" repo-path
+          "/master/)"))
+        (setq badge-added t)))
+    badge-added
+    ))
+
+
+
+;;
+;;  shu-get-git-repo-name
+;;
+(defun shu-get-git-repo-name ()
+  "This function tries to get the name of the current git repository
+from the .git/config file.  Returns nil if it cannot open .git/config."
+  (let (
+        (gb (get-buffer-create shu-trace-buffer))
+        (git-url)
+        (ret-val)
+        (repo-name)
+        (git-url (shu-get-repo))
+        )
+    (when git-url
+      (princ (concat "git-url: " git-url "\n") gb)
+      (setq ret-val (shu-get-git-name git-url))
+      (setq repo-name (cdr ret-val))
+      )
+    repo-name
+    ))
+
+
+
+;;
+;;  shu-get-git-repo-path
+;;
+(defun shu-get-git-repo-path ()
+  "This function tries to get the host local path to the current git repository
+from the .git/config file if possible.  If it cannot find the .git/config file,
+the it uses the shu custom variable SHU-INTERNAL-GROUP-NAME as the group owner
+and uses the name of the current directory as the repository name and constructs
+a host local path that is the owning group name, a slash, and the putative
+repository name (the name of the current directory."
+  (let ((git-url)
+        (ret-val)
+        (repo-name)
+        (repo-path))
+    (setq git-url (shu-get-repo))
+    (if git-url
+        (progn
+          (setq ret-val (shu-get-git-name git-url))
+          (setq repo-path (car ret-val)))
+      (if (not shu-internal-group-name)
+          (progn
+            (ding)
+            (message "%s" "SHU-INTERNAL-GROUP-NAME custom variable is not set."))
+        (setq repo-name (shu-get-directory-prefix))
+        (setq repo-path (concat shu-internal-group-name "/" repo-name))))
+    repo-path
+    ))
+
+
+
+
+;;
+;;  shu-fixup-doxyfile
+;;
+(defun shu-fixup-doxyfile ()
+  "The current directory is assumed to have the same name as the project for
+which the Doxyfile was created.  This function sets various default values in
+the Doxyfile.  The current buffer is the Doxyfile."
+  (interactive)
+  (shu-fixup-project-doxyfile (shu-get-directory-prefix))
+  )
+
+
+
+
+;;
+;;  shu-fixup-project-doxyfile
+;;
+(defun shu-fixup-project-doxyfile (project-name)
+  "PROJECT-NAME is the name of the project for which the Doxyfile has been created.
+This function sets standard default values.
+If this function succeeds, it return true, else nil.  The return value may be used
+in batch mode to determine if the fixup was successful."
+  (interactive "sProject name? ")
+  (let ((gb (get-buffer-create shu-trace-buffer))
+        (library-name (shu-get-git-repo-name))
+        (extract-private "EXTRACT_PRIVATE\\s-*=")
+        (extract-static "EXTRACT_STATIC\\s-*=")
+        (generate-latex "GENERATE_LATEX\\s-*=")
+        (have-dot "HAVE_DOT\\s-*=")
+        (project-name-tag "PROJECT_NAME\\s-*=")
+        (gen-latex "GENERATE_LATEX\\s-*=")
+        (input "INPUT\\s-*=")
+        (project-brief "PROJECT_BRIEF\\s-*=")
+        (dep-line (shu-get-debian-dependency-line))
+        (now (format-time-string "%Y-%m-%dT%T"))
+        (fixed))
+    (princ (concat "shu-fixup-project-doxyfile: dep-line: '" dep-line "'\n") gb)
+    (goto-char (point-min))
+    (if (not (re-search-forward extract-private nil t))
+        (progn
+          (ding)
+          (message "%s" "Cannot find EXTRACT_PRIVATE tag."))
+      (when (search-forward "NO" (line-end-position)  t)
+        (replace-match "YES" t t))
+      (goto-char (point-min))
+      (if (not (re-search-forward extract-static nil t))
+          (progn
+            (ding)
+            (message "%s" "Cannot find EXTRACT_STATIC tag."))
+        (when (search-forward "NO" (line-end-position)  t)
+          (replace-match "YES" t t))
+        (goto-char (point-min))
+        (if (not (re-search-forward generate-latex nil t))
+            (progn
+              (ding)
+              (message "%s" "Cannot find GENERATE_LATEX tag."))
+          (when (search-forward "NO" (line-end-position)  t)
+            (replace-match "YES" t t))
+          (goto-char (point-min))
+          (if (not (re-search-forward have-dot nil t))
+              (progn
+                (ding)
+                (message "%s" "Cannot find HAVE_DOT tag."))
+            (when (search-forward "NO" (line-end-position)  t)
+              (replace-match "YES" t t))
+            (goto-char (point-min))
+            (if (not (re-search-forward project-name-tag nil t))
+                (progn
+                  (ding)
+                  (message "%s" "Cannot find PROJECT_NAME tag."))
+              (when (search-forward "\"My Project\"" (line-end-position)  t)
+                (replace-match (concat "\"" project-name "\"")t t))
+              (goto-char (point-min))
+              (if (not (re-search-forward input nil t))
+                  (progn
+                    (ding)
+                    (message "%s" "Cannot find INPUT tag."))
+                (end-of-line)
+                (insert (concat " ./" project-name))
+                (goto-char (point-min))
+                (if (not (re-search-forward gen-latex nil t))
+                    (progn
+                      (ding)
+                      (message "%s" "Cannot find GENERATE_LATEX tag."))
+                  (when (search-forward "YES" (line-end-position)  t)
+                    (replace-match "NO" t t))
+                  (goto-char (point-max))
+                  (insert
+                   (concat
+                    "\n"
+                    "# The ALEXANDRIA_DOC_DEPENDENCIES tag is used to list other repositories that\n"
+                    "# this repository references.  If you have other referenced repositories, uncomment\n"
+                    "# the line below and list the repository names in a line, space separated.  The\n"
+                    "# repository name is the name of the owning group followed by a slash followed\n"
+                    "# the repository name.\n"
+                    "#\n"
+                    ))
+                  (when dep-line
+                    (insert
+                     (concat
+                      "# As of " now "\n"
+                      "# Dependencies of this repository: " dep-line "\n"
+                      "#\n")))
+                  (insert "# ALEXANDRIA_DOC_DEPENDENCIES = group1/repo1 group2/repo2\n")
+                  (goto-char (point-min))
+                  (if (not (re-search-forward project-brief nil t))
+                      (progn
+                        (ding)
+                        (message "%s" "Cannot find PROJECT_BRIEF tag."))
+                    (setq fixed t)))))))))
+    fixed
+    ))
+
+
+
+;;
+;;  shu-get-debian-dependency-line
+;;
+(defun shu-get-debian-dependency-line ()
+  "This function tries to find a Debian library dependency file in the current
+directory tree.  If such a file is found, this function returns a single line of
+text that holds the space separated names of all of the dependencies."
+  (let ((deps (shu-get-debian-dependencies))
+        (dep-line))
+    (when deps
+      (setq dep-line (string-join deps " ")))
+    dep-line
+    ))
+
+
+
+;;
+;;  shu-get-debian-dependencies
+;;
+(defun shu-get-debian-dependencies ()
+  "This function tries to find a Debian library dependency file in the current
+directory tree.  If such a file is found, this function returns a sorted list of
+the dependencies listed in the Debian dependency file.  If no such file exists,
+nil is returned."
+  (let (
+        (gb (get-buffer-create shu-trace-buffer))
+        (dep-file (shu-get-debian-dependency-file))
+        (dep)
+        (deps)
+        (line-diff 0)
+        (df "***NONE***")
+        )
+    (when dep-file
+      (setq df dep-file)
+      )
+    (princ (concat "shu-get-debian-dependencies: dep-file: '" df "'\n") gb)
+    (when dep-file
+      (with-temp-buffer
+        (insert-file-contents dep-file)
+        (goto-char (point-min))
+        (while (and (= line-diff 0)
+                    (not (= (point) (point-max))))
+          (setq dep (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+          (push dep deps)
+          (princ (concat "    dep: " dep "\n") gb)
+          (setq line-diff (forward-line 1))
+          )
+        )
+      (setq deps (sort deps 'string<))
+      )
+    deps
+    ))
+
+
+
+
+;;
+;;  shu-get-debian-dependency-file
+;;
+(defun shu-get-debian-dependency-file ()
+  "Use the name of the current directory as the name of a debian library.
+Construct a dependency file name which is the name of the current directory with
+a file type of \".dep\".  Search through the directory tree for such a file.  If
+the file is found return its fully qualified name, i.e., the full path to the
+file so that it may be opened.  If no such file exists, return nil."
+  (let (
+        (gb (get-buffer-create shu-trace-buffer))
+        (dep-name (concat (shu-get-directory-prefix) "\\.dep$"))
+        (dep-list)
+        (dep-file)
+        )
+    (princ (concat "shu-get-debian-dependency-file: dep-name: '" dep-name "'\n") gb)
+    (setq dep-list (directory-files-recursively "." dep-name))
+    (princ "dep-list: " gb)(princ dep-list gb)(princ "\n" gb)
+    (princ (format "(length dep-list): %d\n" (length dep-list)) gb)
+    (when (and dep-list (= (length dep-list) 1))
+      (setq dep-file (car dep-list))
+      (princ (concat "dep-file: '" dep-file "'\n") gb)
+      )
+    dep-file
+    ))
+
+
+
+;;
+;;  shu-add-doxyfile
+;;
+(defun shu-add-doxyfile ()
+  "Call \"doxygen -g\" to create a Doxyfile.  Return the output from the doxygen command."
+  (let ((result))
+    (with-temp-buffer
+      (process-file "doxygen" nil nil nil "-g")
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
+    (shu-trim-trailing result)
+    ))
+
+
+
+;;
+;;  shu-unbrace
+;;
+(defun shu-unbrace ()
+  "When point is on an opening sexp, this function converts, within the scope of
+the sexp, all \"{\" to \"(\" and all \"}\" to \").\".
+If the number of left braces does not match the number of right braces a warning
+message is emitted.
+
+For the benefit of unit tests, the count of left braces converted iff the count
+of left braces matches the count of right braces.  If the counts do not match,
+nil is returned."
+  (interactive)
+  (let ((spoint (1+ (point)))
+        (epoint)
+        (left-count 0)
+        (right-count 0)
+        (ccount nil))
+    (forward-sexp)
+    (setq epoint (1- (point)))
+    (goto-char spoint)
+    (while (search-forward "{" epoint t)
+      (setq left-count (1+ left-count))
+      (replace-match "(" t t))
+    (goto-char spoint)
+    (while (search-forward "}" epoint t)
+      (setq right-count (1+ right-count))
+      (replace-match ")" t t))
+    (if (= left-count right-count)
+        (progn
+          (message "%d braces converted" left-count)
+          (setq ccount left-count))
+      (ding)
+      (message "Found %d { and %d }" left-count right-count))
+    ccount
+    ))
+
 
 
 
@@ -1562,11 +3222,13 @@ shu- prefix removed."
   (defalias 'remove-test-names 'shu-remove-test-names)
   (defalias 'number-commits 'shu-git-number-commits)
   (defalias 'diff-commits 'shu-git-diff-commits)
+  (defalias 'get-pr-url 'shu-git-get-pr-url)
   (defalias 'show-branch 'shu-git-show-branch)
   (defalias 'insb 'shu-git-insert-branch)
   (defalias 'inso 'shu-git-insert-origin-branch)
   (defalias 'gpl 'shu-git-insert-pull-origin-branch)
   (defalias 'gps 'shu-git-insert-push-origin-branch)
+  (defalias 'gcm 'shu-git-insert-git-commit)
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
   (defalias 'number-lines 'shu-number-lines)
@@ -1577,7 +3239,22 @@ shu- prefix removed."
   (defalias 'all-quit 'shu-all-quit)
   (defalias 'md-toc 'shu-make-md-toc-entry)
   (defalias 'md-name 'shu-make-md-name-entry)
+  (defalias 'make-md-toc 'shu-tocify-markdown-file)
   (defalias 'os-name 'shu-show-os-name)
+  (defalias 'show-system-name 'shu-show-system-name)
+  (defalias 'kill-system-name 'shu-kill-system-name)
+  (defalias 'obfuscate-region 'shu-obfuscate-region)
+  (defalias 'af 'shu-adapt-frame)
+  (defalias 'scan-grok 'shu-extract-name-open-grok)
+  (defalias 'add-alexandria 'shu-add-alexandria)
+  (defalias 'get-repo 'shu-get-repo)
+  (defalias 'add-alexandria-badge 'shu-add-alexandria-badge)
+  (defalias 'fixup-doxyfile 'shu-fixup-doxyfile)
+  (defalias 'copy-repo 'shu-copy-repo)
+  (defalias 'show-repo 'shu-show-repo)
+  (defalias 'unbrace 'shu-unbrace)
   )
+
+(provide 'shu-misc)
 
 ;;; shu-misc.el ends here

@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.0
+;; Version: 1.6.108
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -33,12 +33,11 @@
 
 ;;; Code:
 
-(provide 'shu-base)
 
-(defconst shu-version "1.6.0"
+(defconst shu-version "1.6.108"
   "The version number of the Shu elisp package.")
 
-(defconst shu-date "2019 Aug 18"
+(defconst shu-date "2019 Nov 18"
   "Date of the most recent merge with the master branch.")
 
 (defconst shu-all-commits
@@ -48,6 +47,7 @@
    (cons "1.4"   "479a129fedba8a7f95d60b38de3383ab22575389")
    (cons "1.5"   "821beb4ace51edbae436f7ac1da67873cc5925c2")
    (cons "1.6"   "dcfe32ef84a3d4ca54b0ac43e754249f1e21f35e")
+   (cons "1.6.108"  "UNKNOWN")
    (cons "1.7"   "UNKNOWN"))
   "A list of all commits by version starting with version 1.2")
 
@@ -77,14 +77,24 @@ here.")
   "A regular expression to match a character not valid in a variable name
 in a C or C++ program.")
 
+(defconst shu-cpp-file-name-list
+  (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
+        "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
+        "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M"
+        "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
+        "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+        "_" "$" "." "-")
+  "List of all characters that can be present in a C++ file name.")
+
 (defconst shu-cpp-file-name (regexp-opt
-                             (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
-                                   "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
-                                   "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M"
-                                   "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
-                                   "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
-                                   "_" "$" "." "-") nil)
+                             shu-cpp-file-name-list nil)
   "A regular expression to match the name of a C or C++ file in the file system.")
+
+(defconst shu-cpp-file-directory-name (regexp-opt
+                                       (append shu-cpp-file-name-list (list "/")) nil)
+  "A regular expression to match the name of a C or C++ file in the file system
+including directory names.  This is the same regular expression as
+SHU-CPP-FILE-NAME-LIST with a \"/\" included.")
 
 
 (defgroup shu-base nil
@@ -110,6 +120,11 @@ this point is assumed to be a block comment."
 
 (defcustom shu-cpp-comment-end 78
   "Standard end point (right hand margin) for C style comments."
+  :type '(number)
+  :group 'shu-base)
+
+(defcustom shu-cpp-line-end 80
+  "Standard end point (right hand margin) for a line of code."
   :type '(number)
   :group 'shu-base)
 
@@ -143,9 +158,22 @@ by angle brackets and an include of \"myclass.h\" would be written as
   :group 'shu-base)
 
 
+(defcustom shu-cpp-default-member_prefix "m_"
+  "The prefix used to indicate that a variable in a class is a member variable of
+that class."
+  :type '(string)
+  :group 'shu-base)
+
+
 (defcustom shu-cpp-default-allocator-name "m_allocator"
   "The name of the class member variable that holds the pointer to the allocator
 used by the class."
+  :type '(string)
+  :group 'shu-base)
+
+
+(defcustom shu-cpp-default-allocator-type "std::allocator"
+  "The class name of the standard abstract allocator."
   :type '(string)
   :group 'shu-base)
 
@@ -166,6 +194,24 @@ namespace with the global namespace encompassing the local one"
 
 (defcustom shu-cpp-default-namespace nil
   "The string that defines the default C++ namepace, if any."
+  :type '(string)
+  :group 'shu-base)
+
+(defcustom shu-cpp-modern nil
+  "Set to true if using the features of C++ 11/14 such as auto and explicitly
+deleted copy / move constructors."
+  :type '(string)
+  :group 'shu-base)
+
+(defcustom shu-internal-dev-url nil
+  "A string that identifies the internal development URL of an organization
+(if any)."
+  :type '(string)
+  :group 'shu-base)
+
+(defcustom shu-internal-group-name nil
+  "A string that identifies the group name of which an individual is a member
+(if any)."
   :type '(string)
   :group 'shu-base)
 
@@ -206,7 +252,12 @@ the left and right brackets in the class of characters to be skipped.")
 a comment.")
 
 (defconst shu-unit-test-buffer "**shu-unit-tests**"
-  "The name of the buffer into which unit tests place their output and debug trace.")
+  "The name of the buffer into which unit tests place their output and
+debug trace.")
+
+(defconst shu-trace-buffer "**shu-trace**"
+  "The name of the buffer into which some functions write debug trace
+information.")
 
 (defconst shu-global-buffer-name "**shu-global-operations**"
   "The name of the buffer into which shu-global-operation places its output.")
@@ -323,7 +374,7 @@ in a place from which other programs running on Linux and Windows can
 do a paste."
   (with-temp-buffer
     (insert string)
-    (kill-ring-save (point-min) (point-max))))
+    (copy-region-as-kill (point-min) (point-max))))
 
 
 
@@ -480,6 +531,29 @@ functions depend on this frankly strange behavior."
     ))
 
 
+
+
+;;
+;;  shu-end-of-dq-string
+;;
+(defun shu-end-of-dq-string ()
+  "Return the point that represents the end of the current quoted string in the
+buffer.  The quote character is the double quote character (\").  Escaped quotes
+are skipped.  If the current string is not terminated by a double quote
+character, nil is returned.  If the current string is terminated by a double
+quote character, the position following the quote is returned and point is set
+to that position."
+  (let ((nequote "[^\\]\\\"")  ;; Non-escaped quote
+        (epoint))
+    (save-excursion
+      (setq epoint (re-search-forward nequote nil t)))
+    (when epoint
+      (goto-char epoint))
+    epoint
+    ))
+
+
+
 ;;
 ;;  shu-line-and-column-at
 ;;
@@ -529,19 +603,23 @@ characters are considered whitespace."
 ;;  shu-minimum-leading-space
 ;;
 (defun shu-minimum-leading-space (arg &optional white-space)
-  "Find the amount of white space in front of point and return either that
-count or ARG, whichever is smaller.  Used by functions that wish to
-safely delete ARG characters of white space from the current position
-without deleting any characters that are not white space.
-An optional second argument is a string that defines what is meant
-by white space.  The default definition is SHU-ALL-WHITESPACE-REGEXP."
+  "Find the amount of white space in front of point on the same line and return
+either that count or ARG, whichever is smaller.  Used by functions that wish to
+safely delete ARG characters of white space from the current position without
+deleting any characters that are not white space.  An optional second argument,
+WHITE-SPACE, is a string that defines what is meant by white space.  The default
+definition is SHU-ALL-WHITESPACE-REGEXP."
   (let ((bos (point))
         (bspace (or shu-all-whitespace-regexp-scf white-space))
+        (bol (line-beginning-position))
+        (eol (line-end-position))
+        (llen)
         (wspace 0))
+    (setq llen (- eol bol))
     (save-excursion
       (skip-chars-forward bspace)
       (setq wspace (- (point) bos))
-      (min wspace arg))
+      (min wspace llen arg))
     ))
 
 
@@ -696,6 +774,120 @@ results in the following output being returned:
 
 
 
+;;
+;;  shu-invert-alist-to-hash
+;;
+(defun shu-invert-alist-to-hash (alist)
+  "ALIST is an alist in which the cdr of each item in the list and the car of
+each item is an associated list of values.  The function constructs two items to
+return.
+
+The first is a hash table that is an inversion of the alist.  If the input ALIST
+contains:
+
+       A ->(G W)
+       B ->(X Y)
+
+then the returned hash table would be:
+
+       G->A
+       M->A
+       X->B
+       Y->B
+
+But if the values contain duplicates, it is impossible to construct the complete
+hash table.  If ALIST contains
+
+       A ->(X G W)
+       B ->(X Y)
+
+then the returned hash table would have to contain
+
+       G->A
+       M->A
+       X->A
+       X->B
+       Y->B
+
+but you cannot have duplicate keys in a hash table.  In this latter case, this
+function constructs an alist that contains the duplicated keys.  The key of the
+alist is the value of what would be a duplicate key in the hash table.  The
+value of the alist is a list of all of the values to which the key maps.
+
+In the case illustrated above, the returned hash table would contain
+
+       G->A
+       M->A
+       X->A
+       Y->B
+
+and the returned alist would be
+
+      X->(A B)
+
+The return value of this function is a cons cell whose car is the hash table and
+whose cdr is the alist.  If the cdr of the return value is nil, then the entire
+hash table could be constructed."
+  (let ((al alist)
+        (ht)
+        (count 0)
+        (dup-alist)
+        (item)
+        (key)
+        (value-list)
+        (value)
+        (hv)
+        (ret-val))
+    (while al
+      (setq item (car al))
+      (setq key (car item))
+      (setq value-list (cdr item))
+      (setq count (+ count (length value-list)))
+      (setq al (cdr al)))
+    (setq ht (make-hash-table :test 'equal :size count))
+    (setq al alist)
+    (while al
+      (setq item (car al))
+      (setq key (car item))
+      (setq value-list (cdr item))
+      (while value-list
+        (setq value (car value-list))
+        (setq hv (gethash value ht))
+        (if (not hv)
+            (puthash value key ht)
+          (setq dup-alist (shu-add-to-alist-list value key dup-alist))
+          (setq dup-alist (shu-add-to-alist-list value hv dup-alist)))
+        (setq value-list (cdr value-list)))
+      (setq al (cdr al)))
+    (setq ret-val (cons ht dup-alist))
+    ret-val
+    ))
+
+
+
+
+;;
+;;  shu-add-to-alist-list
+;;
+(defun shu-add-to-alist-list (key value alist)
+  "ALIST is an alist in which each element has a car that is the key and a cdr
+that is a list of values associated with that key.  If the given KEY does not
+already exist in ALIST, it is added to ALIST with a list of length one
+containing VALUE.  If the KEY exists in ALIST, VALUE is pushed onto the list of
+values associated with KEY.  The return value is the modified ALIST."
+  (let ((xkey)
+        (vlist))
+    (setq xkey (assoc key alist))
+    (if (not xkey)
+        (push (cons key (list value)) alist)
+      (setq vlist (cdr xkey))
+      (push value vlist)
+      (setcdr xkey vlist))
+    alist
+    ))
+
+
+
 
 ;;
 ;;  shu-split-new-lines
@@ -726,7 +918,7 @@ two strings, which are \"Hi\" and \"How are you?\"."
          (new-lines)
          (empty ""))
     (if (= 0 (length data))
-          (push empty new-lines)
+        (push empty new-lines)
       (while lines
         (setq count (1+ count))
         (setq line (car lines))
@@ -744,7 +936,6 @@ two strings, which are \"Hi\" and \"How are you?\"."
 ;;
 (defsubst shu-point-at-sexp (sos)
   "Return the point of the sexp that matches the point at SOS."
-  (interactive)
   (let ((eos))
     (save-excursion
       (goto-char sos)
@@ -754,15 +945,215 @@ two strings, which are \"Hi\" and \"How are you?\"."
     ))
 
 
+
+;;
+;;  shu-starts-with
+;;
+(defun shu-starts-with (regexp)
+  "If the first non-whitespace on the current line matches REGEXP, return the position
+of the beginning of the matched REGEXP.  If the first non-whitespace does not match
+REGEXP, return nil."
+  (let ((isit))
+    (save-excursion
+      (goto-char (line-beginning-position))
+      (when (re-search-forward shu-not-all-whitespace-regexp (line-end-position) t)
+        (backward-char 1)
+        (when (looking-at regexp)
+          (setq isit (point)))))
+    isit
+    ))
+
+
 ;;
 ;;  shu-trim-file-hook
 ;;
 (defun shu-trim-file-hook ()
   "Run as a before-save-hook to trim trailing whitespace from the end of lines and
 to trim blank lines from the end of a file if SHU-TRIM-FILE is true."
-    (when shu-trim-file
-      (delete-trailing-whitespace))
-    )
+  (when shu-trim-file
+    (delete-trailing-whitespace))
+  )
 
+
+
+;;
+;;  shu-line-number-at-pos
+;;
+(defun shu-line-number-at-pos (&optional pos absolute)
+  "line-number-at-pos in simple.el takes two arguments as of emacs 26.  This
+allows the two argument version to run on older versions of emacs.  If
+ABSOLUTE is specified, widen the buffer, then call the one argument version
+of line-number-at-pos, which is supported in emacs 24 and 25, and perhaps
+others."
+  (let ((p))
+    (save-restriction
+      (when absolute
+        (widen))
+      (setq p (line-number-at-pos pos)))
+    p
+    ))
+
+
+;;
+;;  shu-replace-string
+;;
+(defun shu-replace-string (original replacement &optional fixedcase literal)
+  "Go to the top of the current buffer and use SEARCH-FORWARD to find all
+instances of ORIGINAL, replacing each instance with REPLACEMENT.  The optional
+arguments FIXEDCASE and LITERAL are passed through to the REPLACE-MATCH
+function.  Return the count of the number of instances that were replaced,
+if any."
+  (let ((count 0))
+    (goto-char (point-min))
+    (while (search-forward original nil t)
+      (replace-match replacement fixedcase literal)
+      (setq count (1+ count)))
+    count
+    ))
+
+
+
+;;
+;;  shu-bool-to-string
+;;
+(defun shu-bool-to-string (arg)
+  "Convert a boolean value to its string representation and return the string."
+  (let ((sval "nil"))
+    (when arg
+      (if (stringp arg)
+          (setq sval arg)
+        (setq sval "t")))
+    sval
+    ))
+
+
+
+;;
+;;  shu-upcase-first-letter
+;;
+(defun shu-upcase-first-letter (string)
+  "Return the given string with the first character of the string converted
+to upper case"
+  (let ((first-letter (substring string 0 1))
+        (remainder (substring string 1)))
+    (concat (upcase first-letter) remainder)
+    ))
+
+
+
+;;
+;;  shu-downcase-first-letter
+;;
+(defun shu-downcase-first-letter (string)
+  "Return the given string with the first character of the string converted
+to lower case"
+  (let ((first-letter (substring string 0 1))
+        (remainder (substring string 1)))
+    (concat (downcase first-letter) remainder)
+    ))
+
+
+
+;;
+;;  shu-swap
+;;
+(defmacro shu-swap (x y)
+  "Swap the contents of X and Y.  X gets the value of Y.  Y gets the value of X."
+  `(setq ,x (prog1 ,y (setq ,y ,x)))
+  )
+
+
+
+
+
+;;
+;;  shu-random-range
+;;
+(defun shu-random-range (x y)
+  "Return a random number that lies within the closed interval [X, Y].  If Y < X, then the
+closed interval is [Y, X].  If Y is equal to X, then the returned value is X."
+  (let ((lower x)
+        (upper y)
+        (range)
+        (value)
+        (r1))
+    (when (< upper lower)
+      (shu-swap lower upper))
+    (setq value lower)
+    (when (< lower upper)
+      (setq range (1+ (- upper lower)))
+      (setq r1 (random range))
+      (setq value (+ lower r1)))
+    value
+    ))
+
+
+
+;;
+;;  shu-random-letter
+;;
+(defun shu-random-letter ()
+  "Return a randomly selected lower case letter as a single character (not as
+a string)."
+  (let* ((letters "abcdefghijklmnopqrstuvwxyz")
+         (nletters (length letters)))
+    (elt letters (random nletters))
+    ))
+
+
+
+;;
+;;  shu-current-year
+;;
+(defun shu-current-year ()
+  "Return an integer that represents the four digit current year."
+  (string-to-number (format-time-string "%Y"))
+  )
+
+
+
+;;
+;;  shu-string-starts-ends
+;;
+(defun shu-string-starts-ends (string start-string &optional end-string)
+  "Return true if the given STRING starts with START-STRING and ends with
+END-STRING.  If END-STRING is omitted, START-STRING is used instead.
+An empty START-STRING matches anything.  An empty END-STRING matches anything."
+  (interactive)
+  (let ((is-true)
+        (slen (length string))
+        (prefix)
+        (suffix))
+    (when (not end-string)
+      (setq end-string start-string))
+    (when (and (>= slen (length start-string))
+               (>= slen (length end-string)))
+      (setq prefix (substring string 0 (length start-string)))
+      (setq suffix (substring string (- (length string) (length end-string))))
+      (when (and (string= prefix start-string)
+                 (string= suffix end-string))
+        (setq is-true t)))
+    is-true
+    ))
+
+
+
+;;
+;;  shu-get-directory-prefix
+;;
+(defun shu-get-directory-prefix ()
+  "Get a directory based prefix, which is the last name in the current path.  If the current
+directory is \"foo/blah/humbug\", the value returned from this function is \"humbug\""
+  (let*
+      ((gbuf (get-buffer-create shu-unit-test-buffer))
+       (sep-char (substring default-directory -1))
+       (rr (split-string default-directory sep-char t))
+       (prefix-name ))
+    (setq prefix-name (nth (1- (length rr)) rr))
+    prefix-name
+    ))
+
+
+(provide 'shu-base)
 
 ;;; shu-base.el ends here

@@ -23,6 +23,9 @@
 %%
 
 
+
+
+
 \section{Overview}
 
 
@@ -43,7 +46,9 @@ Version 1.5 was merged with the master branch on 18 August 2019.
 
 Version 1.6 was merged with the master branch on 16 November 2019.
 
-This is Version 1.6.0 of the Shu elisp repository.
+Version 1.6.108 was merged with the master branch on 24 December 2021
+
+This is Version 1.6.108 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -115,6 +120,20 @@ released on May 28, 2018
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-add-to-alist-list }}
+\usebox{\funcname}\emph{key} \emph{value} \emph{alist}
+\index{shu-add-to-alist-list} \hfill [Function]
+
+\begin{doc-string}
+\emph{alist} is an alist in which each element has a car that is the key and a cdr
+that is a list of values associated with that key.  If the given \emph{key} does not
+already exist in \emph{alist}, it is added to \emph{alist} with a list of length one
+containing \emph{value}.  If the \emph{key} exists in \emph{alist}, \emph{value} is pushed onto the list of
+values associated with \emph{key}.  The return value is the modified \emph{alist}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-all-commits }}
 \usebox{\funcname}
 \index{shu-all-commits} \hfill [Constant]
@@ -162,6 +181,16 @@ This is the regular expression contained in shu-all-whitespace-regexp but with
 the enclosing left and right square brackets removed.  skip-chars-forward does
 not expect character alternatives to be enclosed in square brackets and thus
 will include the brackets as characters to be skipped.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-bool-to-string }}
+\usebox{\funcname}\emph{arg}
+\index{shu-bool-to-string} \hfill [Function]
+
+\begin{doc-string}
+Convert a boolean value to its string representation and return the string.
 \end{doc-string}
 
 \vspace{1em}
@@ -233,6 +262,16 @@ used by the class.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-default-allocator-type }}
+\usebox{\funcname}
+\index{shu-cpp-default-allocator-type} \hfill [Custom]
+
+\begin{doc-string}
+The class name of the standard abstract allocator.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-default-global-namespace }}
 \usebox{\funcname}
 \index{shu-cpp-default-global-namespace} \hfill [Custom]
@@ -241,6 +280,17 @@ used by the class.
 The string that defines the default global C++ namepace, if any.
 If this has a value, then C++ classes are declared with a two level
 namespace with the global namespace encompassing the local one
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-default-member }}
+\usebox{\funcname}
+\index{shu-cpp-default-member} \hfill [Custom]
+
+\begin{doc-string}
+The prefix used to indicate that a variable in a class is a member variable of
+that class.
 \end{doc-string}
 
 \vspace{1em}
@@ -255,12 +305,34 @@ The string that defines the default C++ namepace, if any.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-file-directory-name }}
+\usebox{\funcname}
+\index{shu-cpp-file-directory-name} \hfill [Constant]
+
+\begin{doc-string}
+A regular expression to match the name of a C or C++ file in the file system
+including directory names.  This is the same regular expression as
+\emph{shu-cpp-file-name-list} with a ``/'' included.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-file-name }}
 \usebox{\funcname}
 \index{shu-cpp-file-name} \hfill [Constant]
 
 \begin{doc-string}
 A regular expression to match the name of a C or C++ file in the file system.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-file-name-list }}
+\usebox{\funcname}
+\index{shu-cpp-file-name-list} \hfill [Constant]
+
+\begin{doc-string}
+List of all characters that can be present in a C++ file name.
 \end{doc-string}
 
 \vspace{1em}
@@ -301,6 +373,27 @@ by angle brackets and an include of ``myclass.h'' would be written as
 
 \begin{doc-string}
 Size of the standard indent for names within class declarations, etc.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-line-end }}
+\usebox{\funcname}
+\index{shu-cpp-line-end} \hfill [Custom]
+
+\begin{doc-string}
+Standard end point (right hand margin) for a line of code.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-modern }}
+\usebox{\funcname}
+\index{shu-cpp-modern} \hfill [Custom]
+
+\begin{doc-string}
+Set to true if using the features of C++ 11/14 such as auto and explicitly
+deleted copy / move constructors.
 \end{doc-string}
 
 \vspace{1em}
@@ -356,6 +449,16 @@ Return the line number of the current line relative to the start of the buffer.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-current-year }}
+\usebox{\funcname}
+\index{shu-current-year} \hfill [Function]
+
+\begin{doc-string}
+Return an integer that represents the four digit current year.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-date }}
 \usebox{\funcname}
 \index{shu-date} \hfill [Constant]
@@ -374,6 +477,32 @@ Date of the most recent merge with the master branch.
 Return the string \emph{input} with the last character removed if the last character
 is equal to the string \emph{test-char}.  If the last character is not equal to the
 string \emph{test-char}, return the input string unmodified.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-downcase-first-letter }}
+\usebox{\funcname}\emph{string}
+\index{shu-downcase-first-letter} \hfill [Function]
+
+\begin{doc-string}
+Return the given string with the first character of the string converted
+to lower case
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-end-of-dq-string }}
+\usebox{\funcname}
+\index{shu-end-of-dq-string} \hfill [Function]
+
+\begin{doc-string}
+Return the point that represents the end of the current quoted string in the
+buffer.  The quote character is the double quote character (``).  Escaped quotes
+are skipped.  If the current string is not terminated by a double quote
+character, nil is returned.  If the current string is terminated by a double
+quote character, the position following the quote is returned and point is set
+to that position.
 \end{doc-string}
 
 \vspace{1em}
@@ -423,6 +552,17 @@ pad character of ?0.  Do not use a pad character of ``0''
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-directory-prefix }}
+\usebox{\funcname}
+\index{shu-get-directory-prefix} \hfill [Function]
+
+\begin{doc-string}
+Get a directory based prefix, which is the last name in the current path.  If the current
+directory is ``foo/blah/humbug'', the value returned from this function is ``humbug''
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-global-buffer-name }}
 \usebox{\funcname}
 \index{shu-global-buffer-name} \hfill [Constant]
@@ -451,6 +591,28 @@ Move point to line \emph{line-number}.
 Format \emph{num} as string grouped to \emph{size} with \emph{char}.  Default \emph{size} if 3.  Default \emph{char}
 is ','.  e.g., 1234567 is formatted as 1,234,567.  Argument to be formatted may be
 either a string or a number.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-dev-url }}
+\usebox{\funcname}
+\index{shu-internal-dev-url} \hfill [Custom]
+
+\begin{doc-string}
+A string that identifies the internal development URL of an organization
+(if any).
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-group-name }}
+\usebox{\funcname}
+\index{shu-internal-group-name} \hfill [Custom]
+
+\begin{doc-string}
+A string that identifies the group name of which an individual is a member
+(if any).
 \end{doc-string}
 
 \vspace{1em}
@@ -486,6 +648,77 @@ results in the following output being returned:
      Y -> (A)
      Z -> (A B)
 \end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-invert-alist-to-hash }}
+\usebox{\funcname}\emph{alist}
+\index{shu-invert-alist-to-hash} \hfill [Function]
+
+\begin{doc-string}
+\emph{alist} is an alist in which the cdr of each item in the list and the car of
+each item is an associated list of values.  The function constructs two items to
+return.
+
+The first is a hash table that is an inversion of the alist.  If the input \emph{alist}
+contains:
+
+\small{\begin{verbatim}
+       A ->(G W)
+       B ->(X Y)
+\end{verbatim}}
+
+then the returned hash table would be:
+
+\small{\begin{verbatim}
+       G->A
+       M->A
+       X->B
+       Y->B
+\end{verbatim}}
+
+But if the values contain duplicates, it is impossible to construct the complete
+hash table.  If \emph{alist} contains
+
+\small{\begin{verbatim}
+       A ->(X G W)
+       B ->(X Y)
+\end{verbatim}}
+
+then the returned hash table would have to contain
+
+\small{\begin{verbatim}
+       G->A
+       M->A
+       X->A
+       X->B
+       Y->B
+\end{verbatim}}
+
+but you cannot have duplicate keys in a hash table.  In this latter case, this
+function constructs an alist that contains the duplicated keys.  The key of the
+alist is the value of what would be a duplicate key in the hash table.  The
+value of the alist is a list of all of the values to which the key maps.
+
+In the case illustrated above, the returned hash table would contain
+
+\small{\begin{verbatim}
+       G->A
+       M->A
+       X->A
+       Y->B
+\end{verbatim}}
+
+and the returned alist would be
+
+\small{\begin{verbatim}
+      X->(A B)
+\end{verbatim}}
+
+The return value of this function is a cons cell whose car is the hash table and
+whose cdr is the alist.  If the cdr of the return value is nil, then the entire
+hash table could be constructed.
 \end{doc-string}
 
 \vspace{1em}
@@ -539,6 +772,20 @@ Return the line number and column number of the point passed in as an argument.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-line-number-at-pos }}
+\usebox{\funcname}\textbf{\&optional} \emph{pos} \emph{absolute}
+\index{shu-line-number-at-pos} \hfill [Function]
+
+\begin{doc-string}
+line-number-at-pos in simple.el takes two arguments as of emacs 26.  This
+allows the two argument version to run on older versions of emacs.  If
+\emph{absolute} is specified, widen the buffer, then call the one argument version
+of line-number-at-pos, which is supported in emacs 24 and 25, and perhaps
+others.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-load-library-files }}
 \usebox{\funcname}\emph{path-to-libs}
 \index{shu-load-library-files} \hfill [Function]
@@ -556,12 +803,12 @@ Load all of the library files listed in \emph{shu-library-files} using the path
 \hspace*{\wd\funcname}
 
 \begin{doc-string}
-Find the amount of white space in front of point and return either that
-count or \emph{arg}, whichever is smaller.  Used by functions that wish to
-safely delete \emph{arg} characters of white space from the current position
-without deleting any characters that are not white space.
-An optional second argument is a string that defines what is meant
-by white space.  The default definition is \emph{shu-all-whitespace-regexp}.
+Find the amount of white space in front of point on the same line and return
+either that count or \emph{arg}, whichever is smaller.  Used by functions that wish to
+safely delete \emph{arg} characters of white space from the current position without
+deleting any characters that are not white space.  An optional second argument,
+\emph{white-space}, is a string that defines what is meant by white space.  The default
+definition is \emph{shu-all-whitespace-regexp}.
 \end{doc-string}
 
 \vspace{1em}
@@ -594,7 +841,7 @@ the left and right brackets in the class of characters to be skipped.
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-point-at-sexp }}
 \usebox{\funcname}\emph{sos}
-\index{shu-point-at-sexp} \hfill [Command]
+\index{shu-point-at-sexp} \hfill [Function]
 
 \begin{doc-string}
 Return the point of the sexp that matches the point at \emph{sos}.
@@ -617,6 +864,28 @@ is used in place of the position of point.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-random-letter }}
+\usebox{\funcname}
+\index{shu-random-letter} \hfill [Function]
+
+\begin{doc-string}
+Return a randomly selected lower case letter as a single character (not as
+a string).
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-random-range }}
+\usebox{\funcname}\emph{x} \emph{y}
+\index{shu-random-range} \hfill [Function]
+
+\begin{doc-string}
+Return a random number that lies within the closed interval [\emph{x}, Y].  If \emph{y} $<$ \emph{x}, then the
+closed interval is [\emph{y}, X].  If \emph{y} is equal to \emph{x}, then the returned value is \emph{x}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-remove-trailing-all-whitespace }}
 \usebox{\funcname}\emph{input-string}
 \index{shu-remove-trailing-all-whitespace} \hfill [Function]
@@ -624,6 +893,21 @@ is used in place of the position of point.
 \begin{doc-string}
 Return a copy of \emph{input-string} with all trailing whitespace removed.  All control
 characters are considered whitespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-replace-string }}
+\usebox{\funcname}\emph{original} \emph{replacement} \textbf{\&optional}
+\index{shu-replace-string} \hfill [Function]
+\hspace*{\wd\funcname}\emph{literal}
+
+\begin{doc-string}
+Go to the top of the current buffer and use SEARCH-FORWARD to find all
+instances of \emph{original}, replacing each instance with \emph{replacement}.  The optional
+arguments \emph{fixedcase} and \emph{literal} are passed through to the REPLACE-MATCH
+function.  Return the count of the number of instances that were replaced,
+if any.
 \end{doc-string}
 
 \vspace{1em}
@@ -654,6 +938,41 @@ two strings, which are ``Hi'' and ``How are you?''.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-starts-with }}
+\usebox{\funcname}\emph{regexp}
+\index{shu-starts-with} \hfill [Function]
+
+\begin{doc-string}
+If the first non-whitespace on the current line matches \emph{regexp}, return the position
+of the beginning of the matched \emph{regexp}.  If the first non-whitespace does not match
+\emph{regexp}, return nil.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-string-starts-ends }}
+\usebox{\funcname}\emph{string} \emph{start-string}
+\index{shu-string-starts-ends} \hfill [Command]
+\hspace*{\wd\funcname}\emph{end-string}
+
+\begin{doc-string}
+Return true if the given \emph{string} starts with \emph{start-string} and ends with
+\emph{end-string}.  If \emph{end-string} is omitted, \emph{start-string} is used instead.
+An empty \emph{start-string} matches anything.  An empty \emph{end-string} matches anything.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-swap }}
+\usebox{\funcname}\emph{x} \emph{y}
+\index{shu-swap} \hfill [Macro]
+
+\begin{doc-string}
+Swap the contents of \emph{x} and \emph{y}.  \emph{x} gets the value of \emph{y}.  \emph{y} gets the value of \emph{x}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-the-column-at }}
 \usebox{\funcname}\emph{arg}
 \index{shu-the-column-at} \hfill [Function]
@@ -671,6 +990,17 @@ Return the column number of the point passed in as an argument.
 \begin{doc-string}
 Return the line number of the point passed in as an argument.  The line number is
 relative to the start of the buffer, whether or not narrowing is in effect.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-trace-buffer }}
+\usebox{\funcname}
+\index{shu-trace-buffer} \hfill [Constant]
+
+\begin{doc-string}
+The name of the buffer into which some functions write debug trace
+information.
 \end{doc-string}
 
 \vspace{1em}
@@ -735,7 +1065,19 @@ remains unmodified if it had no trailing whitespace.
 \index{shu-unit-test-buffer} \hfill [Constant]
 
 \begin{doc-string}
-The name of the buffer into which unit tests place their output and debug trace.
+The name of the buffer into which unit tests place their output and
+debug trace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-upcase-first-letter }}
+\usebox{\funcname}\emph{string}
+\index{shu-upcase-first-letter} \hfill [Function]
+
+\begin{doc-string}
+Return the given string with the first character of the string converted
+to upper case
 \end{doc-string}
 
 \vspace{1em}
@@ -769,6 +1111,47 @@ the --eval comment line option of emacs running in batch.
 List of functions and variable definitions in this package.
 
 
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-batch-add-alexandria }}
+\usebox{\funcname}
+\index{shu-batch-add-alexandria} \hfill [Function]
+
+\begin{doc-string}
+Call the \emph{shu-add-alexandria} function in batch mode.  One required argument is
+the value for the custom variable \emph{shu-internal-dev-url}.
+
+Invoke as:
+
+\small{\begin{verbatim}
+     emacs --batch -l ~/emacs/shu-batch-mode.elc -f shu-batch-add-alexandria <dev-url>
+\end{verbatim}}
+
+where ``$<$dev-url$>$`` is the organization's internal web site that hosts its code
+and tools.  See the description of the custom variable \emph{shu-internal-dev-url}.
+for more information.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-batch-copy-trace }}
+\usebox{\funcname}
+\index{shu-batch-copy-trace} \hfill [Function]
+
+\begin{doc-string}
+Copy the contents of the \emph{shu-trace-buffer} to stdout in batch mode.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-batch-fail }}
+\usebox{\funcname}
+\index{shu-batch-fail} \hfill [Command]
+
+\begin{doc-string}
+A test function to terminate emacs via ERROR.
+\end{doc-string}
 
 \vspace{1em}
 \noindent
@@ -806,6 +1189,43 @@ Call rmv-using in batch mode.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-batch-test-args }}
+\usebox{\funcname}
+\index{shu-batch-test-args} \hfill [Function]
+
+\begin{doc-string}
+A script to use in batch mode to demonstrate how to fetch command line arguments.
+
+When run from a batch script as the function that is the target of the ``-f'' option.
+For example
+
+\small{\begin{verbatim}
+    emacs --batch -l shu-batch-mode.elc -f shu-batch-test-args hello world how are you
+\end{verbatim}}
+
+produces the following output:
+\small{\begin{verbatim}
+    There are 5 arguments
+    arg: 0: ``hello''
+    arg: 1: ``world''
+    arg: 2: ``how''
+    arg: 3: ``are''
+    arg: 4: ``you''
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-generate-comdb2-code }}
+\usebox{\funcname}
+\index{shu-generate-comdb2-code} \hfill [Function]
+
+\begin{doc-string}
+Generate the C++ code for a comdb2 row class
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-generate-component }}
 \usebox{\funcname}
 \index{shu-generate-component} \hfill [Function]
@@ -824,6 +1244,18 @@ files.
 
 \begin{doc-string}
 List of standard namespaces and their associated classes
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-old-generate-component }}
+\usebox{\funcname}
+\index{shu-old-generate-component} \hfill [Function]
+
+\begin{doc-string}
+Fetch the arguments from environment variables and then call
+\emph{shu-internal-gen-bde-component} to generate a set of three BDE component
+files.
 \end{doc-string}
 
 \eject
@@ -1226,6 +1658,21 @@ Generate a skeleton BDE struct code generation at point.
 
 \begin{doc-string}
 Generate the three files for a new component: .cpp, .h, and .t.cpp
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-gen-bde-create-prompt }}
+\usebox{\funcname}
+\index{shu-gen-bde-create-prompt} \hfill [Function]
+
+\begin{doc-string}
+This function creates the prompt for the interactive special form of the
+function \emph{shu-gen-bde-component}.  The prompt includes the namespace in which the
+new class will be created or the string ``NO NAMESPACE'' if there is no default
+namespace set.  If the name of the current directory does not match the default
+namespace, the prompt also includes the directory name to remind the user that
+the current directory name does not match the namespace.
 \end{doc-string}
 
 \vspace{1em}
@@ -2604,10 +3051,13 @@ Insert the doxygen author tag in an existing file.
 
 \begin{doc-string}
 If point is sitting on something that resembles a fully qualified class name,
-use the standard BDE algorithm to turn the class name into the name of an
-include file.  The standard BDE algorithm replaces the :: between namespace and
-class name with an underscore, makes all letters lower case, and appends ``.h''
-to the end of the name.
+first check to see if it is in list of standard class names defined in
+\emph{shu-cpp-include-names}.  If it is found there, that defines the name of the
+defining include file.  If it is not found there, then use the standard BDE
+algorithm to turn the class name into the name of an include file.  The standard
+BDE algorithm replaces the :: between namespace and class name with an
+underscore, makes all letters lower case, and appends ``.h'' to the end of the
+name.
 
 Thus ``abcdef::MumbleFrotz'' becomes ``abcdef\_mumblefrotz.h''.
 
@@ -2715,7 +3165,7 @@ Place a skeleton class definition in the current buffer at point.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{creplace }}
-\usebox{\funcname}
+\usebox{\funcname}\emph{prefix}
 \index{creplace} \hfill [Command]\\%
  (Function: shu-creplace)
 
@@ -2728,8 +3178,8 @@ may have been split into smaller substrings in order to avoid long lines.
 Assume you have the sample string that is shown in \emph{shu-csplit}
 
 \small{\begin{verbatim}
-     static const std::string x(``This is a very long line of text that look''
-                                ``s as though it will go on forever.'');
+     static const std::string x(``This is a very long line of text that looks ``
+                                ``as though it will go on forever.'');
 \end{verbatim}}
 
 You wish to replace it with a slightly different line of text, perhaps something
@@ -2741,10 +3191,10 @@ shorter lines as in the following example.  The string in the kill ring may have
 opening and closing quotes or not.
 
 \small{\begin{verbatim}
-     static const std::string x(``This is a very long line of text that look''
-                                ``s as though it will go on forever and prob''
-                                ``ably already has done so or is threatening''
-                                `` to do so.'');
+     static const std::string x(``This is a very long line of text that looks ``
+                                ``as though it will go on forever and probably ``
+                                ``already has done so or is threatening to do ``
+                                ``so.'');
 \end{verbatim}}
 
 This is especially useful if you have a a string constant in a unit test and you
@@ -2757,13 +3207,14 @@ string, place the cursor in the old string, and replace it with the new.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{csplit }}
-\usebox{\funcname}
+\usebox{\funcname}\emph{prefix}
 \index{csplit} \hfill [Command]\\%
  (Function: shu-csplit)
 
 \begin{doc-string}
 Split a C++ string into multiple strings in order to keep the line length
-below a certain minimum length, currently hard coded to column 76.
+below a certain minimum length..  The line length used is defined by the custom
+variable \emph{shu-cpp-line-end}.
 
 For example, you may copy a very long line of text into a section of code as
 follows:
@@ -2779,9 +3230,13 @@ text editors do not show code much beyond column 80 or so.  This is an example
 of the above line after csplit was invoked:
 
 \small{\begin{verbatim}
-     static const std::string x(``This is a very long line of text that look''
-                                ``s as though it will go on forever.'');
+     static const std::string x(``This is a very long line of text that looks ``
+                                ``as though it will go on forever.'');
 \end{verbatim}}
+
+This function normally splits lines on a word boundary.  If any prefix argument
+is present, the split will be composed of fixed length lines with no respect to
+word boundaries.
 \end{doc-string}
 
 \vspace{1em}
@@ -2983,6 +3438,57 @@ Place a skeleton Doxygen header definition at point.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{fill-area }}
+\usebox{\funcname}\emph{start} \emph{end}
+\index{fill-area} \hfill [Command]\\%
+ (Function: shu-cpp-fill-test-area)
+
+\begin{doc-string}
+For all lines between the marked start and end points, if a recognized data
+type has been declared on a line, fill it with random test data.
+
+For the benefit of unit tests, this function returns a a cons cell whose car is
+the number of unrecognized data types and whose cdr is the number of values
+generated.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{fill-data }}
+\usebox{\funcname}
+\index{fill-data} \hfill [Command]\\%
+ (Function: shu-cpp-fill-test-data)
+
+\begin{doc-string}
+If the data type at the beginning of the line is a recognized data type, then
+fill in a random value for that data type at point.  This allows someone writing
+a test to declare a data type and a name and then call this function.  If the
+author creates a line that looks like this and then invokes this function
+
+\small{\begin{verbatim}
+     std::string   abc
+\end{verbatim}}
+
+The line will be transformed into one that looks something like this:
+
+\small{\begin{verbatim}
+     std::string   abc(``RDATZC'');
+\end{verbatim}}
+
+The recognized data types are the ones that are defined by the custom variables
+shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
+shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
+shu-cpp-time-type plus many of the standard C++ types, such as int, bool, short,
+etc.
+
+The data types may optionally be preceded by ``const''.
+
+If the last character of the line is ``;'', it is deleted before a data type is
+filled in with a new semi-colon following it.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{fixp }}
 \usebox{\funcname}
 \index{fixp} \hfill [Command]\\%
@@ -3009,6 +3515,22 @@ would be transformed into
               const int  writes)
           const;
 \end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{gcc }}
+\usebox{\funcname}
+\index{gcc} \hfill [Command]\\%
+ (Function: shu-gcc)
+
+\begin{doc-string}
+Get compile command command from current buffer.  While in a compile buffer,
+go to the top of the buffer, search for the end of the prompt line, collect the
+rest of the line and put it into the kill ring.  This takes the string that was
+used for the last compile command in the current buffer and puts it into the
+kill ring.  To compile again with the same command, kill the buffer, open a new
+shell, and yank.
 \end{doc-string}
 
 \vspace{1em}
@@ -3062,6 +3584,44 @@ While in a file buffer, wrap the file name in a C++ include directive and
 put it in the kill ring.  The file name is delimited by double quotes unless
 \emph{shu-cpp-include-user-brackets} variable is true, in which case the file name
 is delimited by left and right angle brackets.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{make-datetime }}
+\usebox{\funcname}
+\index{make-datetime} \hfill [Command]\\%
+ (Function: shu-cpp-make-datetime)
+
+\begin{doc-string}
+insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{make-interval }}
+\usebox{\funcname}
+\index{make-interval} \hfill [Command]\\%
+ (Function: shu-cpp-make-interval)
+
+\begin{doc-string}
+insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{make-tzdate }}
+\usebox{\funcname}
+\index{make-tzdate} \hfill [Command]\\%
+ (Function: shu-cpp-tz-make-datetime)
+
+\begin{doc-string}
+insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
 \end{doc-string}
 
 \vspace{1em}
@@ -3180,6 +3740,47 @@ Set the local namespace for C++ classes.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{set-modern }}
+\usebox{\funcname}
+\index{set-modern} \hfill [Command]\\%
+ (Function: shu-set-modern)
+
+\begin{doc-string}
+Unconditionally set shu-cpp-modern to true.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{set-no-modern }}
+\usebox{\funcname}
+\index{set-no-modern} \hfill [Command]\\%
+ (Function: shu-set-no-modern)
+
+\begin{doc-string}
+Unconditionally set shu-cpp-modern to false.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{sort-includes }}
+\usebox{\funcname}
+\index{sort-includes} \hfill [Command]\\%
+ (Function: shu-sort-includes)
+
+\begin{doc-string}
+When positioned on a line that is an \#include directive, find all of the
+\#include directives above and below that line that are not separated by a blank
+line and sort them into alphabetical order with case ignored.  If not positioned
+on a line that is an \#include directive, do nothing.  Case is ignored for the
+sort.  The return value is the number of lines sorted.  If no lines were sorted
+because (point) is not positioned on an \#include directive, return nil.  The
+return value is for the benefit of the unit tests.
+Additionally, if there are spaces surrounding the ``\#'' of the \#include, they
+are removed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{tciterate }}
 \usebox{\funcname}\emph{type-name-1} \emph{type-name-2} \emph{var-name-1}
 \index{tciterate} \hfill [Command]
@@ -3246,6 +3847,19 @@ variable shu-cpp-indent-length.
 
 The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{to-camel }}
+\usebox{\funcname}
+\index{to-camel} \hfill [Command]\\%
+ (Function: shu-to-camel)
+
+\begin{doc-string}
+Convert the variable name at point from snake case to camel case.
+
+For example, ``mumble\_something\_other'' becomes ``mumbleSomethingOther''.
 \end{doc-string}
 
 \vspace{1em}
@@ -3331,10 +3945,13 @@ Insert the doxygen author tag in an existing file.
 
 \begin{doc-string}
 If point is sitting on something that resembles a fully qualified class name,
-use the standard BDE algorithm to turn the class name into the name of an
-include file.  The standard BDE algorithm replaces the :: between namespace and
-class name with an underscore, makes all letters lower case, and appends ``.h''
-to the end of the name.
+first check to see if it is in list of standard class names defined in
+\emph{shu-cpp-include-names}.  If it is found there, that defines the name of the
+defining include file.  If it is not found there, then use the standard BDE
+algorithm to turn the class name into the name of an include file.  The standard
+BDE algorithm replaces the :: between namespace and class name with an
+underscore, makes all letters lower case, and appends ``.h'' to the end of the
+name.
 
 Thus ``abcdef::MumbleFrotz'' becomes ``abcdef\_mumblefrotz.h''.
 
@@ -3347,6 +3964,16 @@ angle brackets.
 
 Return true if a class name was found an an include generated.  This is for the
 benefit of unit tests.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-bsl-include-list }}
+\usebox{\funcname}
+\index{shu-bsl-include-list} \hfill [Constant]
+
+\begin{doc-string}
+An alist that maps include file names to class names when using BDE.
 \end{doc-string}
 
 \vspace{1em}
@@ -3475,6 +4102,16 @@ Place a skeleton Doxygen header definition at point.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-allocator-type }}
+\usebox{\funcname}
+\index{shu-cpp-allocator-type} \hfill [Custom]
+
+\begin{doc-string}
+The data type that represents an allocator.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-base-types }}
 \usebox{\funcname}
 \index{shu-cpp-base-types} \hfill [Constant]
@@ -3494,6 +4131,87 @@ A list of all of the base types in C and C++.  This may be modified by shu-add-c
 Check a streaming operation.   Mark a region that contains a set of streaming
 operators and invoke this function.  It will make sure that you have no unterminated
 strings and that you are not missing any occurrences of $<$$<$.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-date-type }}
+\usebox{\funcname}
+\index{shu-cpp-date-type} \hfill [Custom]
+
+\begin{doc-string}
+The data type that represents a date.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-datetime-timezone-type }}
+\usebox{\funcname}
+\index{shu-cpp-datetime-timezone-type} \hfill [Custom]
+
+\begin{doc-string}
+The data type that represents a date and time with an associated time zone.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-datetime-type }}
+\usebox{\funcname}
+\index{shu-cpp-datetime-type} \hfill [Custom]
+
+\begin{doc-string}
+The data type that represents a date and time.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-fill-test-area }}
+\usebox{\funcname}\emph{start} \emph{end}
+\index{shu-cpp-fill-test-area} \hfill [Command]\\%
+ (Alias: fill-area)
+
+\begin{doc-string}
+For all lines between the marked start and end points, if a recognized data
+type has been declared on a line, fill it with random test data.
+
+For the benefit of unit tests, this function returns a a cons cell whose car is
+the number of unrecognized data types and whose cdr is the number of values
+generated.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-fill-test-data }}
+\usebox{\funcname}
+\index{shu-cpp-fill-test-data} \hfill [Command]\\%
+ (Alias: fill-data)
+
+\begin{doc-string}
+If the data type at the beginning of the line is a recognized data type, then
+fill in a random value for that data type at point.  This allows someone writing
+a test to declare a data type and a name and then call this function.  If the
+author creates a line that looks like this and then invokes this function
+
+\small{\begin{verbatim}
+     std::string   abc
+\end{verbatim}}
+
+The line will be transformed into one that looks something like this:
+
+\small{\begin{verbatim}
+     std::string   abc(``RDATZC'');
+\end{verbatim}}
+
+The recognized data types are the ones that are defined by the custom variables
+shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
+shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
+shu-cpp-time-type plus many of the standard C++ types, such as int, bool, short,
+etc.
+
+The data types may optionally be preceded by ``const''.
+
+If the last character of the line is ``;'', it is deleted before a data type is
+filled in with a new semi-colon following it.
 \end{doc-string}
 
 \vspace{1em}
@@ -3622,6 +4340,190 @@ otherwise, return nil.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-include-names }}
+\usebox{\funcname}
+\index{shu-cpp-include-names} \hfill [Variable]
+
+\begin{doc-string}
+A hash table that maps class names to include file names  This is the hash table
+inversion of shu-std-include-list or shu-bsl-include-list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-fill-test-data }}
+\usebox{\funcname}
+\index{shu-cpp-internal-fill-test-data} \hfill [Function]
+
+\begin{doc-string}
+If the data type at the beginning of the line is a recognized data type, then
+fill in a random value for that data type at point.  This allows someone writing
+a test to declare a data type and a name and then call this function.  If the
+author creates a line that looks like this and then invokes this function
+
+\small{\begin{verbatim}
+     std::string   abc
+\end{verbatim}}
+
+The line will be transformed into one that looks something like this:
+
+\small{\begin{verbatim}
+     std::string   abc(``RDATZC'');
+\end{verbatim}}
+
+The recognized data types are the ones that are defined by the custom variables
+shu-cpp-date-type, shu-cpp-datetime-timezone-type, shu-cpp-datetime-type,
+shu-cpp-interval-type, shu-cpp-long-long-type, shu-cpp-string-type, or
+shu-cpp-time-type plus many of the standard C++ types, such as int, bool, short,
+etc.
+
+The data types may optionally be preceded by ``const''.
+
+If the last character of the line is ``;'', it is deleted before a data type is
+filled in with a new semi-colon following it.
+
+Return t if a recognized data type was found and a value was filled in.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-bool }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-bool} \hfill [Function]
+
+\begin{doc-string}
+Return  value for a bool type.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-char }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-char} \hfill [Command]
+
+\begin{doc-string}
+Return a string that can be used to initialize a test variable of type int.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-date }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-date} \hfill [Function]
+
+\begin{doc-string}
+Return a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-datetime }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-datetime} \hfill [Function]
+
+\begin{doc-string}
+Return a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-double }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-double} \hfill [Command]
+
+\begin{doc-string}
+Return a string that can be used to initialize a test variable of type double.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-float }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-float} \hfill [Command]
+
+\begin{doc-string}
+Return a string that can be used to initialize a test variable of type float.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-int }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-int} \hfill [Command]
+
+\begin{doc-string}
+Return a string that can be used to initialize a test variable of type lint.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-interval }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-interval} \hfill [Function]
+
+\begin{doc-string}
+Return a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts days, hours, minutes, seconds, milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-long-long }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-long-long} \hfill [Command]
+
+\begin{doc-string}
+Return a string that can be used to initialize a test variable of type long long.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-short }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-short} \hfill [Command]
+
+\begin{doc-string}
+Return a string that can be used to initialize a test variable of type short.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-short-interval }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-short-interval} \hfill [Function]
+
+\begin{doc-string}
+Return a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts seconds and nanoseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-time }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-time} \hfill [Function]
+
+\begin{doc-string}
+Return a string that is the list of values to be passed to the constructor of
+ a time type that accepts hour, minute, second,  milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-make-unsigned-int }}
+\usebox{\funcname}
+\index{shu-cpp-internal-make-unsigned-int} \hfill [Command]
+
+\begin{doc-string}
+Return a string that can be used to initialize a test variable of type lint.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-internal-stream-check }}
 \usebox{\funcname}\emph{token-list}
 \index{shu-cpp-internal-stream-check} \hfill [Function]
@@ -3635,6 +4537,27 @@ are not $<$$<$ represent a missing $<$$<$ operator.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-internal-tz-make-datetime }}
+\usebox{\funcname}
+\index{shu-cpp-internal-tz-make-datetime} \hfill [Function]
+
+\begin{doc-string}
+Return a string that is the list of values to be passed to the constructor of
+a timezone datetime type.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-interval-type }}
+\usebox{\funcname}
+\index{shu-cpp-interval-type} \hfill [Custom]
+
+\begin{doc-string}
+The data type that represents a time interval type.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-is-enclosing-op }}
 \usebox{\funcname}\emph{op}
 \index{shu-cpp-is-enclosing-op} \hfill [Function]
@@ -3642,6 +4565,95 @@ are not $<$$<$ represent a missing $<$$<$ operator.
 \begin{doc-string}
 Return true if the single character in \emph{op} is an enclosing character, a left
 or right parenthesis or a left or right square bracket.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-long-long-type }}
+\usebox{\funcname}
+\index{shu-cpp-long-long-type} \hfill [Custom]
+
+\begin{doc-string}
+The data type that represents a 64 bit integer.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-make-date }}
+\usebox{\funcname}
+\index{shu-cpp-make-date} \hfill [Command]
+
+\begin{doc-string}
+insert a string that is the list of values to be passed to the constructor of
+ a date type that accepts year, month, day.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-make-datetime }}
+\usebox{\funcname}
+\index{shu-cpp-make-datetime} \hfill [Command]\\%
+ (Alias: make-datetime)
+
+\begin{doc-string}
+insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-make-interval }}
+\usebox{\funcname}
+\index{shu-cpp-make-interval} \hfill [Command]\\%
+ (Alias: make-interval)
+
+\begin{doc-string}
+insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-make-short-interval }}
+\usebox{\funcname}
+\index{shu-cpp-make-short-interval} \hfill [Command]
+
+\begin{doc-string}
+insert a string that is the list of values to be passed to the constructor of a datetime
+ type that accepts year, month, day, hour, minute, second, milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-make-size-type }}
+\usebox{\funcname}
+\index{shu-cpp-make-size-type} \hfill [Function]
+
+\begin{doc-string}
+insert a string that is a possible value for a size type.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-make-time }}
+\usebox{\funcname}
+\index{shu-cpp-make-time} \hfill [Command]
+
+\begin{doc-string}
+insert a string that is the list of values to be passed to the constructor of
+a time type that accepts hour, minute, second,  milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-map-class-to-include }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-map-class-to-include} \hfill [Function]
+
+\begin{doc-string}
+\emph{class-name} is a fully qualified class name (std::string as an example).  This
+function returns the name of the include file that defines the class, if known.
 \end{doc-string}
 
 \vspace{1em}
@@ -3734,6 +4746,59 @@ NB: This version is deprecated.  See the new version in shu-match.el
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-short-interval-type }}
+\usebox{\funcname}
+\index{shu-cpp-short-interval-type} \hfill [Custom]
+
+\begin{doc-string}
+The data type that represents a short time interval type.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-size-type }}
+\usebox{\funcname}
+\index{shu-cpp-size-type} \hfill [Custom]
+
+\begin{doc-string}
+The data type that represents a size.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-string-type }}
+\usebox{\funcname}
+\index{shu-cpp-string-type} \hfill [Custom]
+
+\begin{doc-string}
+The data type that represents a string type.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-time-type }}
+\usebox{\funcname}
+\index{shu-cpp-time-type} \hfill [Custom]
+
+\begin{doc-string}
+The data type that represents a time.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-tz-make-datetime }}
+\usebox{\funcname}
+\index{shu-cpp-tz-make-datetime} \hfill [Command]\\%
+ (Alias: make-tzdate)
+
+\begin{doc-string}
+insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp1-class }}
 \usebox{\funcname}\emph{class-name}
 \index{shu-cpp1-class} \hfill [Command]\\%
@@ -3757,7 +4822,7 @@ Place a skeleton class definition in the current buffer at point.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-creplace }}
-\usebox{\funcname}
+\usebox{\funcname}\emph{prefix}
 \index{shu-creplace} \hfill [Command]\\%
  (Alias: creplace)
 
@@ -3770,8 +4835,8 @@ may have been split into smaller substrings in order to avoid long lines.
 Assume you have the sample string that is shown in \emph{shu-csplit}
 
 \small{\begin{verbatim}
-     static const std::string x(``This is a very long line of text that look''
-                                ``s as though it will go on forever.'');
+     static const std::string x(``This is a very long line of text that looks ``
+                                ``as though it will go on forever.'');
 \end{verbatim}}
 
 You wish to replace it with a slightly different line of text, perhaps something
@@ -3783,10 +4848,10 @@ shorter lines as in the following example.  The string in the kill ring may have
 opening and closing quotes or not.
 
 \small{\begin{verbatim}
-     static const std::string x(``This is a very long line of text that look''
-                                ``s as though it will go on forever and prob''
-                                ``ably already has done so or is threatening''
-                                `` to do so.'');
+     static const std::string x(``This is a very long line of text that looks ``
+                                ``as though it will go on forever and probably ``
+                                ``already has done so or is threatening to do ``
+                                ``so.'');
 \end{verbatim}}
 
 This is especially useful if you have a a string constant in a unit test and you
@@ -3799,13 +4864,14 @@ string, place the cursor in the old string, and replace it with the new.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-csplit }}
-\usebox{\funcname}
+\usebox{\funcname}\emph{prefix}
 \index{shu-csplit} \hfill [Command]\\%
  (Alias: csplit)
 
 \begin{doc-string}
 Split a C++ string into multiple strings in order to keep the line length
-below a certain minimum length, currently hard coded to column 76.
+below a certain minimum length..  The line length used is defined by the custom
+variable \emph{shu-cpp-line-end}.
 
 For example, you may copy a very long line of text into a section of code as
 follows:
@@ -3821,9 +4887,13 @@ text editors do not show code much beyond column 80 or so.  This is an example
 of the above line after csplit was invoked:
 
 \small{\begin{verbatim}
-     static const std::string x(``This is a very long line of text that look''
-                                ``s as though it will go on forever.'');
+     static const std::string x(``This is a very long line of text that looks ``
+                                ``as though it will go on forever.'');
 \end{verbatim}}
+
+This function normally splits lines on a word boundary.  If any prefix argument
+is present, the split will be composed of fixed length lines with no respect to
+word boundaries.
 \end{doc-string}
 
 \vspace{1em}
@@ -4055,6 +5125,36 @@ Undocumented
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-find-end-include }}
+\usebox{\funcname}\emph{dir}
+\index{shu-find-end-include} \hfill [Function]
+
+\begin{doc-string}
+On entry, (point) is positioned on an \#include directive.  This function
+searches either backwards or forward for the next line that does not contain an
+include directive.  If \emph{dir} is positive the search is forward, else backward.
+The return value is the (line-beginning-position) of the last line that contains
+an \#include directive.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-gcc }}
+\usebox{\funcname}
+\index{shu-gcc} \hfill [Command]\\%
+ (Alias: gcc)
+
+\begin{doc-string}
+Get compile command command from current buffer.  While in a compile buffer,
+go to the top of the buffer, search for the end of the prompt line, collect the
+rest of the line and put it into the kill ring.  This takes the string that was
+used for the last compile command in the current buffer and puts it into the
+kill ring.  To compile again with the same command, kill the buffer, open a new
+shell, and yank.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-gen-return-ptr }}
 \usebox{\funcname}
 \index{shu-gen-return-ptr} \hfill [Function]
@@ -4163,6 +5263,26 @@ Place a skeleton class definition in the current buffer at point.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-creplace }}
+\usebox{\funcname}\textbf{\&optional} \emph{fixed-width}
+\index{shu-internal-creplace} \hfill [Function]
+
+\begin{doc-string}
+This is the internal implementation of \emph{shu-creplace}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-csplit }}
+\usebox{\funcname}\textbf{\&optional} \emph{fixed-width}
+\index{shu-internal-csplit} \hfill [Function]
+
+\begin{doc-string}
+This is the internal implementation of \emph{shu-csplit}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-internal-double-citerate }}
 \usebox{\funcname}\emph{type-name-1}
 \index{shu-internal-double-citerate} \hfill [Function]
@@ -4246,6 +5366,16 @@ Comment string with the first letter downcased.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-line-is-include }}
+\usebox{\funcname}\textbf{\&optional} \emph{fix}
+\index{shu-line-is-include} \hfill [Function]
+
+\begin{doc-string}
+Return true if the line on which (point) resides is an \#include directive.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-make-padded-line }}
 \usebox{\funcname}\emph{line} \emph{tlen}
 \index{shu-make-padded-line} \hfill [Function]
@@ -4289,7 +5419,7 @@ Generate a skeleton code file for a C or C++ file.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-new-deallocate }}
-\usebox{\funcname}\emph{var-name} \emph{class-name}
+\usebox{\funcname}\emph{var-name}
 \index{shu-new-deallocate} \hfill [Command]
 
 \begin{doc-string}
@@ -4303,17 +5433,25 @@ This generates a code sequence as follows:
 \small{\begin{verbatim}
         if (var-name)
         {
-            var-name->~class-name();
-            m_allocator->deallocate(var-name);
+            m_allocator->deleteObject(var-name);
             var-name = 0;
         }
 \end{verbatim}}
 
-\emph{var-name} and \emph{class-name} are read from two prompts.  The number of spaces to
-indent inside that braces is defined in the custom variable
-shu-cpp-indent-length.  The name of the member variable that points to the
-allocator in use by the class comes from the custom variable
-shu-cpp-default-allocator-name
+If \emph{shu-cpp-modern} is true, the code sequence is:
+
+\small{\begin{verbatim}
+        if (var-name != nullptr)
+        {
+            m_allocator->deleteObject(var-name);
+            var-name = nullptr;
+        }
+\end{verbatim}}
+
+\emph{var-name} is read from a prompt.  The number of spaces to indent inside that
+braces is defined in the custom variable shu-cpp-indent-length.  The name of the
+member variable that points to the allocator in use by the class comes from the
+custom variable shu-cpp-default-allocator-name
 \end{doc-string}
 
 \vspace{1em}
@@ -4512,6 +5650,28 @@ Set the local namespace for C++ classes.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-set-modern }}
+\usebox{\funcname}
+\index{shu-set-modern} \hfill [Command]\\%
+ (Alias: set-modern)
+
+\begin{doc-string}
+Unconditionally set shu-cpp-modern to true.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-set-no-modern }}
+\usebox{\funcname}
+\index{shu-set-no-modern} \hfill [Command]\\%
+ (Alias: set-no-modern)
+
+\begin{doc-string}
+Unconditionally set shu-cpp-modern to false.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-set-obj }}
 \usebox{\funcname}
 \index{shu-set-obj} \hfill [Function]
@@ -4542,6 +5702,35 @@ that is in the current buffer.  This version of the function creates the name of
 the .h file from the name of the file in the current buffer.  This is in contrast
 with the function shu-hother which finds the corresponding .h file from the list
 of files in the current project.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-sort-includes }}
+\usebox{\funcname}
+\index{shu-sort-includes} \hfill [Command]\\%
+ (Alias: sort-includes)
+
+\begin{doc-string}
+When positioned on a line that is an \#include directive, find all of the
+\#include directives above and below that line that are not separated by a blank
+line and sort them into alphabetical order with case ignored.  If not positioned
+on a line that is an \#include directive, do nothing.  Case is ignored for the
+sort.  The return value is the number of lines sorted.  If no lines were sorted
+because (point) is not positioned on an \#include directive, return nil.  The
+return value is for the benefit of the unit tests.
+Additionally, if there are spaces surrounding the ``\#'' of the \#include, they
+are removed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-std-include-list }}
+\usebox{\funcname}
+\index{shu-std-include-list} \hfill [Constant]
+
+\begin{doc-string}
+An alist that maps include file names to class names.
 \end{doc-string}
 
 \vspace{1em}
@@ -4612,6 +5801,19 @@ variable shu-cpp-indent-length.
 
 The name of the namespace used for the standard library is defined in the custom
 variable shu-cpp-std-namespace.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-to-camel }}
+\usebox{\funcname}
+\index{shu-to-camel} \hfill [Command]\\%
+ (Alias: to-camel)
+
+\begin{doc-string}
+Convert the variable name at point from snake case to camel case.
+
+For example, ``mumble\_something\_other'' becomes ``mumbleSomethingOther''.
 \end{doc-string}
 
 \vspace{1em}
@@ -5114,19 +6316,54 @@ which is not a valid C++ name.
 
 \vspace{1em}
 \noindent
-\savebox{\funcname}{\noindent\texttt{shu-cpp-match-repeat-sub-list }}
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-repeat-list-once }}
 \usebox{\funcname}\emph{rlist} \emph{token-list}
-\index{shu-cpp-match-repeat-sub-list} \hfill [Function]
+\index{shu-cpp-match-repeat-list-once} \hfill [Function]
 \hspace*{\wd\funcname}
 
 \begin{doc-string}
-Go through one iteration of the repeating list.  The iteration is considered
-a success if either of the following are true: 1. The first match fails, or
-2. All matches succeed.  If all matches succeed, the updated \emph{rlist} and
-\emph{token-list} are returned.  If the first match fails, the \emph{rlist} and \emph{token-list} are
-returned unaltered.  It is as though no match was ever attempted.  If some match
-other than the first fails, nil is returned.  If the \emph{token-list} is nil on entry,
-this is the equivalent of a first match failure.
+\emph{rlist} points to the current return value list, if any.  \emph{token-list} points to
+the next token-info to match.  \emph{match-info} is the head of the side list with
+which to match.  The match succeeds if the token-infos in \emph{token-list} match all
+of the match-infos in MATCH-LIST zero or more times.  The token-infos are
+matched repeatedly against the match-infos.  If there is a failure matching any
+match-info, the match fails.
+
+This is useful when matching repeating patterns.  For example, a
+C++ qualified name could be any of the following:
+
+\small{\begin{verbatim}
+     a::b
+     a::b::c
+\end{verbatim}}
+
+You can match this with a match list that requires an unquoted token that
+matches a C++ name, followed by a side list looking for operator ``::'' followed
+by an unquoted token.   If there is a match, you have a name with one level of qualification.
+
+fails in the middle, then you have found something that looks like ``a::'',
+which is not a valid C++ name.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-repeat-sub-list }}
+\usebox{\funcname}\emph{rlist} \emph{token-list}
+\index{shu-cpp-match-repeat-sub-list} \hfill [Function]
+\hspace*{\wd\funcname}\emph{first-required}
+
+\begin{doc-string}
+Go through one iteration of the repeating list.  If \emph{first-required} is true,
+then the first match must succeed.  Otherwise, we are matching zero or more
+instances, so a first match failure is the same as a success.
+
+The iteration is considered a success if either of the following are true:
+1. The first match fails and \emph{first-required} is false, or 2. All matches succeed.
+If all matches succeed, the updated \emph{rlist} and \emph{token-list} are returned.  If the
+first match fails, the \emph{rlist} and \emph{token-list} are returned unaltered.  It is as
+though no match was ever attempted.  If some match other than the first fails,
+nil is returned.  If the \emph{token-list} is nil on entry, this is the equivalent of a
+first match failure.
 \end{doc-string}
 
 \vspace{1em}
@@ -5269,7 +6506,22 @@ not match, this is considered a success.  If the first item matches, then all
 items in the side list must match.  If all items in the side list match, we go
 back to the top of the side list and try again until we find a token that does
 not match the first item in the side list.  The match is considered a failure
-only of there is a partial match between the tokens and the side list.
+only if there is a partial match between the tokens and the side list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-match-type-side-loop-once }}
+\usebox{\funcname}
+\index{shu-cpp-token-match-type-side-loop-once} \hfill [Constant]
+
+\begin{doc-string}
+The match side constant that indicates a looping side list.  The token list
+must match the side list one or more times.  All items in the side list must
+match at least once.  If all items in the side list match, we go back to the top
+of the side list and try again until we find a token that does not match the
+first item in the side list.  The match is considered a failure if there is no
+match or only a a partial match between the tokens and the side list.
 \end{doc-string}
 
 \vspace{1em}
@@ -5321,7 +6573,7 @@ Show the data in an instance of match-info.
 \hspace*{\wd\funcname}
 
 \begin{doc-string}
-Show the data in an instance of match-info.
+Show the data in a list of match-info.
 \end{doc-string}
 
 \vspace{1em}
@@ -5332,7 +6584,7 @@ Show the data in an instance of match-info.
 \hspace*{\wd\funcname}\emph{title}
 
 \begin{doc-string}
-Show the data in an instance of match-info.
+Show the data in a list of match lists.
 \end{doc-string}
 
 \eject
@@ -5510,6 +6762,121 @@ Generate a skeleton class code generation at point.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-decl-class-name }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-decl-class-name} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Generate a comment which is the name of the class with a line of outline
+characters above and below it.  \emph{class-name} is the name of the class.
+\emph{outline-character} is a string containing the outline character (usually
+``='' or ``-'')
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-decl-cpp-class-name }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-decl-cpp-class-name} \hfill [Function]
+
+\begin{doc-string}
+Generate a comment which is the name of the class with a line of dashes
+above and below it to set off the class name in a cpp file.
+\emph{class-name} is the name of the containing C++ class.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-decl-cpp-print-self }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-decl-cpp-print-self} \hfill [Function]
+
+\begin{doc-string}
+Generate the skeleton code for the printSelf() function.
+\emph{class-name} is the name of the containing C++ class.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-decl-cpp-stream }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-decl-cpp-stream} \hfill [Function]
+
+\begin{doc-string}
+Generate the code for the streaming operator (operator$<$$<$()).  \emph{class-name} is the
+name of the containing C++ class.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-decl-h-class-name }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-decl-h-class-name} \hfill [Function]
+
+\begin{doc-string}
+Generate a comment which is the name of the class with a line of equal
+signs above and below it to set off the class name in a header file.
+\emph{class-name} is the name of the containing C++ class.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-decl-h-print-self }}
+\usebox{\funcname}
+\index{shu-cpp-decl-h-print-self} \hfill [Function]
+
+\begin{doc-string}
+Generate the declaration of the printSelf() function.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-decl-h-stream }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-decl-h-stream} \hfill [Function]
+
+\begin{doc-string}
+Generate the declaration for the streaming operator (operator$<$$<$()).
+\emph{class-name} is the name of the containing C++ class.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-gen-decl-h-private }}
+\usebox{\funcname}\emph{class-name} \textbf{\&optional}
+\index{shu-cpp-gen-decl-h-private} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Generate the private section of the class declaration.  If \emph{copy-allowed}
+is false, generate private an unimplemented copy constructor and operator=()
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-gen-h-class-intro }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-gen-h-class-intro} \hfill [Function]
+
+\begin{doc-string}
+Generate the preamble to a class declaration in a header file.  This is all
+of the code that precedes the \\ DATA comment.  Return the position at which
+the class comment was placed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-gen-inline-template-header }}
+\usebox{\funcname}
+\index{shu-cpp-gen-inline-template-header} \hfill [Function]
+
+\begin{doc-string}
+Doc string.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-hcgen }}
 \usebox{\funcname}\emph{class-name}
 \index{shu-cpp-hcgen} \hfill [Command]\\%
@@ -5528,6 +6895,102 @@ Generate a skeleton class code generation at point.
 
 \begin{doc-string}
 Generate a skeleton class declaration at point.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-misc-gen-ctor-not-implemented }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-misc-gen-ctor-not-implemented} \hfill [Function]
+
+\begin{doc-string}
+Generate a declaration of a non-implemented copy constructor and operator=().
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-misc-gen-h-ctor }}
+\usebox{\funcname}\emph{class-name} \textbf{\&optional}
+\index{shu-cpp-misc-gen-h-ctor} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Generate a declaration of a constructor for the given \emph{class-name}.  If
+\emph{use-allocator} is true, the constructor declaration includes an optional
+allocator.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-misc-gen-h-dtor }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-misc-gen-h-dtor} \hfill [Function]
+
+\begin{doc-string}
+Generate a commented out declaration of a destructor for the given \emph{class-name}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-misc-gen-nested-traits }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-misc-gen-nested-traits} \hfill [Function]
+
+\begin{doc-string}
+Generate a nested traits declaration.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-misc-gen-not-implemented }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-misc-gen-not-implemented} \hfill [Function]
+
+\begin{doc-string}
+Generate a declaration of a non-implemented copy constructor and operator=().
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-misc-gen-op-equal-not-implemented }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-misc-gen-op-equal-not-implemented} \hfill [Function]
+
+\begin{doc-string}
+Generate a declaration of a non-implemented copy constructor and operator=().
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-misc-h-tail-gen }}
+\usebox{\funcname}\emph{class-name}
+\index{shu-cpp-misc-h-tail-gen} \hfill [Function]
+
+\begin{doc-string}
+Generate the tail code in a header file starting with
+``INLINE AND TEMPLATE FUNCTION IMPLEMENTATIONS''
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-misc-inline-template-label }}
+\usebox{\funcname}
+\index{shu-cpp-misc-inline-template-label} \hfill [Constant]
+
+\begin{doc-string}
+The text of the header that starts inline and template functions in a
+C++ header file
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-misc-not-implemented-label }}
+\usebox{\funcname}
+\index{shu-cpp-misc-not-implemented-label} \hfill [Constant]
+
+\begin{doc-string}
+The label put in a header file for functions and operators that are
+deliberately not implemented.
 \end{doc-string}
 
 \vspace{1em}
@@ -5599,7 +7062,7 @@ Generate a skeleton header file
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-generate-tfile }}
 \usebox{\funcname}\emph{author} \emph{namespace} \emph{class-name}
-\index{shu-generate-tfile} \hfill [Command]
+\index{shu-generate-tfile} \hfill [Function]
 
 \begin{doc-string}
 Generate a skeleton t.cpp file
@@ -5751,6 +7214,20 @@ Otherwise, it will assume that all files reside in the same directory.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{iother }}
+\usebox{\funcname}
+\index{iother} \hfill [Command]\\%
+ (Function: shu-iother)
+
+\begin{doc-string}
+Visit a i.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.i.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{list-c-directories }}
 \usebox{\funcname}
 \index{list-c-directories} \hfill [Command]\\%
@@ -5758,6 +7235,32 @@ Otherwise, it will assume that all files reside in the same directory.
 
 \begin{doc-string}
 Insert into the current buffer the names of all of the directories in a project.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{list-c-duplicates }}
+\usebox{\funcname}
+\index{list-c-duplicates} \hfill [Command]\\%
+ (Function: shu-list-c-duplicates)
+
+\begin{doc-string}
+Insert into the current buffer a list of all of the duplicate files names.
+Under each duplicate file name, insert a list of the full paths to all of the
+duplicates.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{list-c-file-names }}
+\usebox{\funcname}
+\index{list-c-file-names} \hfill [Command]\\%
+ (Function: shu-list-c-file-names)
+
+\begin{doc-string}
+Insert into the buffer a list of all of the unique file names in the project.
+This does not include the file path as it will be different for duplicate
+names.
 \end{doc-string}
 
 \vspace{1em}
@@ -5829,10 +7332,39 @@ which they map.
  (Function: shu-make-c-project)
 
 \begin{doc-string}
+Create a project file of all directories containing c or h files.  Starts at
+the specified root directory and searches all subdirectories for any that
+contain c or h files.  Top level directories whose names are found in
+\emph{shu-project-exclude-list} are excluded from the search.  Typically
+\emph{shu-project-exclude-list} is used to exclude CMake directories that include c or
+h files that have been created as part of the build process and are not members
+of the repository itself.  It then inserts all of the directory names into the
+current file at point.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{make-full-c-project }}
+\usebox{\funcname}\emph{proj-root}
+\index{make-full-c-project} \hfill [Command]\\%
+ (Function: shu-make-full-c-project)
+
+\begin{doc-string}
 Create a project file of all directories containing c or h files.
 Starts at the specified root directory and searches all subdirectories for
 any that contain c or h files.  It then inserts all of the directory names
 into the current file at point.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{make-p-project }}
+\usebox{\funcname}\emph{proj-root}
+\index{make-p-project} \hfill [Command]\\%
+ (Function: shu-make-p-project)
+
+\begin{doc-string}
+Create a Python project that is analogous to a c project.
 \end{doc-string}
 
 \vspace{1em}
@@ -5893,6 +7425,23 @@ something that resembles a file name.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{set-p-project }}
+\usebox{\funcname}\emph{start} \emph{end}
+\index{set-p-project} \hfill [Command]\\%
+ (Function: shu-set-p-project)
+
+\begin{doc-string}
+Mark a region in a file that contains one subdirectory name per line.  Then
+invoke set-c-project and it will find and remember all of the c and h files in
+those subdirectories.  You may then subsequently visit any of those files by
+invoking M-x vh which will allow you to type in the file name only (with auto
+completion) and will then visit the file in the appropriate subdirectory.  If
+this function is called interactively, it clears the project name that was
+established by either \emph{shu-setup-project-and-tags} of \emph{shu-visit-project-and-tags}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{set-prefix }}
 \usebox{\funcname}\emph{prefix}
 \index{set-prefix} \hfill [Command]\\%
@@ -5915,6 +7464,22 @@ Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c
 or .cpp file, invoke this function and you will be taken to the corresponding
 .t.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{vf }}
+\usebox{\funcname}
+\index{vf} \hfill [Command]\\%
+ (Function: shu-vf)
+
+\begin{doc-string}
+If point is on something that looks like a file name, visit the file.  If the
+file name is followed by a colon and a number, the number is interpreted as a
+line number within the file and point is moved to the beginning of that line.
+If the line number is followed by a colon and another number, then the second
+number is interpreted as a column number and point is moved to that column
+number.
 \end{doc-string}
 
 \vspace{1em}
@@ -5946,7 +7511,7 @@ List of functions and variable definitions in this package.
 \begin{doc-string}
 Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
-This modifies both shu-cpp-c-extensions and shu-cpp-extensions.
+This modifies both shu-cpp-c-extensions and shu-project-extensions.
 \end{doc-string}
 
 \vspace{1em}
@@ -5958,7 +7523,7 @@ This modifies both shu-cpp-c-extensions and shu-cpp-extensions.
 \begin{doc-string}
 Add one or more file extensions to the list of C and C++ extensions recognized by the
 C package functions.  Argument may be a single extension in a string or a list of strings.
-This modifies both shu-cpp-h-extensions and shu-cpp-extensions.
+This modifies both shu-cpp-h-extensions and shu-project-extensions.
 \end{doc-string}
 
 \vspace{1em}
@@ -6191,29 +7756,6 @@ current completion.
 
 \vspace{1em}
 \noindent
-\savebox{\funcname}{\noindent\texttt{shu-cpp-directory-prefix }}
-\usebox{\funcname}
-\index{shu-cpp-directory-prefix} \hfill [Function]
-
-\begin{doc-string}
-Get a directory based prefix, which is the last name in the current path.  If the current
-directory is ``foo/blah/humbug'', the value returned from this function is ``humbug''
-\end{doc-string}
-
-\vspace{1em}
-\noindent
-\savebox{\funcname}{\noindent\texttt{shu-cpp-extensions }}
-\usebox{\funcname}
-\index{shu-cpp-extensions} \hfill [Constant]
-
-\begin{doc-string}
-A list of file extensions for all of the file types we want to find.  This is defined
-as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions or
-shu-add-cpp-h-extensions.
-\end{doc-string}
-
-\vspace{1em}
-\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-final-list }}
 \usebox{\funcname}
 \index{shu-cpp-final-list} \hfill [Variable]
@@ -6249,7 +7791,7 @@ is wanted.
 
 \begin{doc-string}
 This is a list of all of the file extensions found in the current project.  While
-shu-cpp-extensions contains all of the extensions that we look for.  This variable
+shu-project-extensions contains all of the extensions that we look for.  This variable
 contains those that we actually found in building the current project.
 \end{doc-string}
 
@@ -6363,12 +7905,37 @@ then the returned list will contain
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-project-extract-base-name }}
+\usebox{\funcname}\emph{name}
+\index{shu-cpp-project-extract-base-name} \hfill [Function]
+
+\begin{doc-string}
+This is the implementation function of \emph{shu-cpp-project-get-base-name} so that
+the logic of the function can be unit tested.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-project-file }}
 \usebox{\funcname}
 \index{shu-cpp-project-file} \hfill [Variable]
 
 \begin{doc-string}
 The name of the file from which the current project was read.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-project-get-base-name }}
+\usebox{\funcname}
+\index{shu-cpp-project-get-base-name} \hfill [Command]
+
+\begin{doc-string}
+When visiting a file within a project, the name might consist of two or three
+parts - the file name, the normal extension, such as .h or .cpp, and the
+intermediate extension, such as .i or .t when visiting .i.cpp or .t.cpp.  This
+function gets the buffer file name and removes the one or two extensions in
+order to get the name with no extensions at all.
 \end{doc-string}
 
 \vspace{1em}
@@ -6470,6 +8037,23 @@ source code.
 
 \begin{doc-string}
 This is the time at which the current project was created.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-project-very-short-names }}
+\usebox{\funcname}
+\index{shu-cpp-project-very-short-names} \hfill [Custom]
+
+\begin{doc-string}
+Set non-nil if shu-cpp-project creates very short names for files in a
+project.  A short name is an approximation of the file name that may be easier
+to type.  For example, if all of the files in a project begin with a common
+prefix (e.g., ``my\_own\_server\_mumble.cpp'' and ``my\_own\_server\_stumble.cpp'',
+then the short names for these two files would be ``mumble.cpp'' and
+``stumble.cpp''.  This means that the user does not have to type the prefix in
+order to find the file.  If the user types ``mumble.cpp'' as the file name,
+emacs will open the file ``my\_own\_server\_mumble.cpp''.
 \end{doc-string}
 
 \vspace{1em}
@@ -6663,6 +8247,56 @@ documentation is the string to put in the buffer to describe the operation.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-global-search-replace }}
+\usebox{\funcname}\emph{file} \emph{argument1} \emph{argument2}
+\index{shu-global-search-replace} \hfill [Function]
+
+\begin{doc-string}
+This function is called once for each file in the project.  The first
+argument is the file name.  The second argument is a list holding lists of
+search and replace operations.  Each search and replace operation is defined by
+a list of arguments as follows:
+
+\small{\begin{verbatim}
+     1. A boolean value, t means case sensitive search, nil means ignore case
+     2. The function to call to do the search.  This must be
+        'search-forward, 're-search-forward, or any function with the same
+        signature and behavior.
+     3. The string that is the target of the search
+     4. The string the is to replace the target whenever found
+     5. An optional second argument to be passed to replace-match
+        The default value is t
+     6. An optional third argument to be passed to replace-match
+        The default value is t
+\end{verbatim}}
+
+For example
+
+\small{\begin{verbatim}
+     (list
+       (list t 'search-forward ``Mumble'' ``Bumble'')
+       (list nil 'search-forward ``howdy'' ``doody''))
+\end{verbatim}}
+
+is a list that defines two search and replace operations.  Both operations use
+the search-forward function.  The first is a case sensitive search and replace to
+replace all instances of ``Mumble'' with ``Bumble''.  The second is a case
+insensitive search and replace to replace all instances of ``howdy'' with ``doody''.
+
+These operations may be performed on every file in the project as follows:
+
+\small{\begin{verbatim}
+     (setq ops
+       (list
+         (list t 'search-forward ``Mumble'' ``Bumble'')
+         (list nil 'search-forward ``howdy'' ``doody'')))
+     (setq doc ``Description of change'')
+     (shu-global-operation doc 'shu-global-search-replace ops)
+\end{verbatim}}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-hother }}
 \usebox{\funcname}
 \index{shu-hother} \hfill [Command]\\%
@@ -6673,6 +8307,26 @@ Visit a .h file from the corresponding .cpp or t.cpp file.  If visiting a
 .cpp or t.cpp file, invoke this function and you will be taken to the
 corresponding .h file.  This function will use a project if one is active.
 Otherwise, it will assume that all files reside in the same directory.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-list-c-duplicates }}
+\usebox{\funcname}\emph{proj-list}
+\index{shu-internal-list-c-duplicates} \hfill [Function]
+
+\begin{doc-string}
+Internal implementation of shu-list-c-duplicates.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-list-c-file-names }}
+\usebox{\funcname}\emph{proj-list}
+\index{shu-internal-list-c-file-names} \hfill [Command]
+
+\begin{doc-string}
+Doc string.
 \end{doc-string}
 
 \vspace{1em}
@@ -6723,6 +8377,20 @@ Undocumented
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-iother }}
+\usebox{\funcname}
+\index{shu-iother} \hfill [Command]\\%
+ (Alias: iother)
+
+\begin{doc-string}
+Visit a i.cpp file from the corresponding .cpp or .h file.  If visiting a .c
+or .cpp file, invoke this function and you will be taken to the corresponding
+.i.cpp file.  This function will use a project if one is active.  Otherwise, it
+will assume that all files reside in the same directory.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-list-c-directories }}
 \usebox{\funcname}
 \index{shu-list-c-directories} \hfill [Command]\\%
@@ -6730,6 +8398,32 @@ Undocumented
 
 \begin{doc-string}
 Insert into the current buffer the names of all of the directories in a project.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-list-c-duplicates }}
+\usebox{\funcname}
+\index{shu-list-c-duplicates} \hfill [Command]\\%
+ (Alias: list-c-duplicates)
+
+\begin{doc-string}
+Insert into the current buffer a list of all of the duplicate files names.
+Under each duplicate file name, insert a list of the full paths to all of the
+duplicates.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-list-c-file-names }}
+\usebox{\funcname}
+\index{shu-list-c-file-names} \hfill [Command]\\%
+ (Alias: list-c-file-names)
+
+\begin{doc-string}
+Insert into the buffer a list of all of the unique file names in the project.
+This does not include the file path as it will be different for duplicate
+names.
 \end{doc-string}
 
 \vspace{1em}
@@ -6775,10 +8469,39 @@ Insert into the current buffer the names of all of the code files in a directory
  (Alias: make-c-project)
 
 \begin{doc-string}
+Create a project file of all directories containing c or h files.  Starts at
+the specified root directory and searches all subdirectories for any that
+contain c or h files.  Top level directories whose names are found in
+\emph{shu-project-exclude-list} are excluded from the search.  Typically
+\emph{shu-project-exclude-list} is used to exclude CMake directories that include c or
+h files that have been created as part of the build process and are not members
+of the repository itself.  It then inserts all of the directory names into the
+current file at point.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-make-full-c-project }}
+\usebox{\funcname}\emph{proj-root}
+\index{shu-make-full-c-project} \hfill [Command]\\%
+ (Alias: make-full-c-project)
+
+\begin{doc-string}
 Create a project file of all directories containing c or h files.
 Starts at the specified root directory and searches all subdirectories for
 any that contain c or h files.  It then inserts all of the directory names
 into the current file at point.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-make-p-project }}
+\usebox{\funcname}\emph{proj-root}
+\index{shu-make-p-project} \hfill [Command]\\%
+ (Alias: make-p-project)
+
+\begin{doc-string}
+Create a Python project that is analogous to a c project.
 \end{doc-string}
 
 \vspace{1em}
@@ -6811,8 +8534,9 @@ Otherwise, it will assume that all files reside in the same directory.
 \vspace{1em}
 \noindent
 \savebox{\funcname}{\noindent\texttt{shu-possible-cpp-file-name }}
-\usebox{\funcname}
+\usebox{\funcname}\textbf{\&optional}
 \index{shu-possible-cpp-file-name} \hfill [Function]
+\hspace*{\wd\funcname}\emph{any-extension}
 
 \begin{doc-string}
 Return a list containing a possible file name with a possible line number
@@ -6822,6 +8546,11 @@ shu-get-line-column-of-file to perhaps harvest a line number and column number
 within the file.  The return result is a list of length one if there is only
 a file name, a list of length two if there is a file name and line number, a
 list of length three if there is a file name, line number, and column number.
+If the optional argument \emph{include-directory} is true, the file name may include
+the forward slash character, which means that the returned file name may also
+include directory names.  Normally, this function only looks for code files,
+but if the optional argument \emph{any-extension} is true, then a file name with any
+extension will be returned.
 \end{doc-string}
 
 \vspace{1em}
@@ -6833,6 +8562,39 @@ list of length three if there is a file name, line number, and column number.
 \begin{doc-string}
 The name of the buffer into which messages are placed as c and h files
 are being scanned.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-project-exclude-hash }}
+\usebox{\funcname}
+\index{shu-project-exclude-hash} \hfill [Variable]
+
+\begin{doc-string}
+The hash table that holds the directory names from \emph{shu-project-exclude-list}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-project-exclude-list }}
+\usebox{\funcname}
+\index{shu-project-exclude-list} \hfill [Constant]
+
+\begin{doc-string}
+A list of top level directory names to exclude while creating a project via
+\emph{shu-make-c-project}.  This list is ignored by \emph{shu-make-full-c-project}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-project-extensions }}
+\usebox{\funcname}
+\index{shu-project-extensions} \hfill [Constant]
+
+\begin{doc-string}
+A list of file extensions for all of the file types we want to find.  This is defined
+as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions or
+shu-add-cpp-h-extensions.
 \end{doc-string}
 
 \vspace{1em}
@@ -6855,6 +8617,18 @@ It is used when a global change needs to visit every file in the project.
 
 \begin{doc-string}
 Extract the file information from one entry in shu-cpp-class-list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-project-make-exclude-hash }}
+\usebox{\funcname}
+\index{shu-project-make-exclude-hash} \hfill [Command]
+
+\begin{doc-string}
+Turn \emph{shu-project-exclude-list} into the hash table \emph{shu-project-exclude-hash}.
+If \emph{shu-project-exclude-list} is nil or not a list or an empty list, then
+\emph{shu-project-exclude-hash} is also set to nil.
 \end{doc-string}
 
 \vspace{1em}
@@ -6919,6 +8693,16 @@ Undocumented
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-py-extensions }}
+\usebox{\funcname}
+\index{shu-py-extensions} \hfill [Constant]
+
+\begin{doc-string}
+A list of file extensions for Python projects
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-renew-c-project }}
 \usebox{\funcname}
 \index{shu-renew-c-project} \hfill [Command]\\%
@@ -6960,6 +8744,23 @@ something that resembles a file name.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-set-p-project }}
+\usebox{\funcname}\emph{start} \emph{end}
+\index{shu-set-p-project} \hfill [Command]\\%
+ (Alias: set-p-project)
+
+\begin{doc-string}
+Mark a region in a file that contains one subdirectory name per line.  Then
+invoke set-c-project and it will find and remember all of the c and h files in
+those subdirectories.  You may then subsequently visit any of those files by
+invoking M-x vh which will allow you to type in the file name only (with auto
+completion) and will then visit the file in the appropriate subdirectory.  If
+this function is called interactively, it clears the project name that was
+established by either \emph{shu-setup-project-and-tags} of \emph{shu-visit-project-and-tags}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-set-prefix }}
 \usebox{\funcname}\emph{prefix}
 \index{shu-set-prefix} \hfill [Command]\\%
@@ -6986,6 +8787,19 @@ which the tags file is to be built.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-sub-make-c-project }}
+\usebox{\funcname}\emph{proj-root}
+\index{shu-sub-make-c-project} \hfill [Function]
+
+\begin{doc-string}
+Create a project file of all directories containing c or h files.
+Starts at the specified root directory and searches all subdirectories for
+any that contain c or h files.  It then inserts all of the directory names
+into the current file at point.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-tother }}
 \usebox{\funcname}
 \index{shu-tother} \hfill [Command]\\%
@@ -6996,6 +8810,22 @@ Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c
 or .cpp file, invoke this function and you will be taken to the corresponding
 .t.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-vf }}
+\usebox{\funcname}
+\index{shu-vf} \hfill [Command]\\%
+ (Alias: vf)
+
+\begin{doc-string}
+If point is on something that looks like a file name, visit the file.  If the
+file name is followed by a colon and a number, the number is interpreted as a
+line number within the file and point is moved to the beginning of that line.
+If the line number is followed by a colon and another number, then the second
+number is interpreted as a column number and point is moved to that column
+number.
 \end{doc-string}
 
 \vspace{1em}
@@ -7232,7 +9062,7 @@ returns t if there are no occurrences of \emph{open-char} and \emph{close-char}
 \index{shu-cpp-keywords} \hfill [Constant]
 
 \begin{doc-string}
-alist of C++ key words up to approximately C++17
+alist of C++ key words up to approximately C++20
 \end{doc-string}
 
 \vspace{1em}
@@ -7445,6 +9275,16 @@ Extract the information out of a token-info
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-extract-nesting-level }}
+\usebox{\funcname}\emph{token-info}
+\index{shu-cpp-token-extract-nesting-level} \hfill [Function]
+
+\begin{doc-string}
+Return the nesting level from an instance of token-info.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-token-extract-spoint }}
 \usebox{\funcname}\emph{token-info}
 \index{shu-cpp-token-extract-spoint} \hfill [Function]
@@ -7629,6 +9469,17 @@ and you will scan through the list without seeing any comments.
 Set the common alias names for the functions in shu-cpp-token.
 These are usually the same as the function names with the leading
 shu- prefix removed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-token-set-nesting-level }}
+\usebox{\funcname}\emph{token-info}
+\index{shu-cpp-token-set-nesting-level} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Set the nesting level in an instance of token-info.
 \end{doc-string}
 
 \vspace{1em}
@@ -7948,6 +9799,17 @@ into a buffer or pasted into the application requesting it.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{krpps }}
+\usebox{\funcname}
+\index{krpps} \hfill [Command]\\%
+ (Function: shu-keyring-get-passphrase)
+
+\begin{doc-string}
+Doc string.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{krpw }}
 \usebox{\funcname}
 \index{krpw} \hfill [Command]\\%
@@ -7989,6 +9851,17 @@ keyring file.  shu-keyring-get-file (alias krfn) displays the name of the
 keyring file.  This function parses the keyring file.  After the operation. look
 into the keyring buffer (\emph\{**shu-keyring**\}) to see if there are any complaints
 about syntax errors in the file.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{set-passphrase }}
+\usebox{\funcname}\emph{phrase}
+\index{set-passphrase} \hfill [Command]\\%
+ (Function: shu-keyring-set-passphrase)
+
+\begin{doc-string}
+Function to read and set the external pass phrase.
 \end{doc-string}
 
 \subsection{List of functions and variables}
@@ -8042,6 +9915,18 @@ The keyring index is built the first time it is needed and kept in memory therea
 must refresh the index if the keyring file is modified.  The easiest way to do this is to clear
 the index when the keyring file is modified.  The next time the index is needed it will be
 recreated.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-keyring-external-passphrase }}
+\usebox{\funcname}
+\index{shu-keyring-external-passphrase} \hfill [Variable]
+
+\begin{doc-string}
+Holds the external passphrase for the keyring file.  This allows the user
+to type the passphrase at the beginning of an emacs session.  Once this is
+set it can then be put into kill ring by shu-keyring-get-passphrase.
 \end{doc-string}
 
 \vspace{1em}
@@ -8117,6 +10002,17 @@ using the wrong keyring file.
 Find the User Id for an entry in the keyring file.  This displays the entry
 in the message area and puts the user Id into the kill ring so that it can be
 yanked into a buffer or pasted into the application requesting it.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-keyring-get-passphrase }}
+\usebox{\funcname}
+\index{shu-keyring-get-passphrase} \hfill [Command]\\%
+ (Alias: krpps)
+
+\begin{doc-string}
+Doc string.
 \end{doc-string}
 
 \vspace{1em}
@@ -8256,6 +10152,17 @@ to make them easier to type.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-keyring-set-passphrase }}
+\usebox{\funcname}\emph{phrase}
+\index{shu-keyring-set-passphrase} \hfill [Command]\\%
+ (Alias: set-passphrase)
+
+\begin{doc-string}
+Function to read and set the external pass phrase.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-keyring-show-index }}
 \usebox{\funcname}\emph{index}
 \index{shu-keyring-show-index} \hfill [Function]
@@ -8386,12 +10293,35 @@ duplicate class names.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-classname-forms }}
+\usebox{\funcname}
+\index{shu-cpp-match-classname-forms} \hfill [Constant]
+
+\begin{doc-string}
+Match name::name or name::name::name or name::name::name::name, etc.  The
+double colons make up the return value so that you can tell where one name
+ends and another starts.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-cpp-match-colon-name }}
 \usebox{\funcname}
 \index{shu-cpp-match-colon-name} \hfill [Constant]
 
 \begin{doc-string}
 A repeating side list to match zero or more instances of \{:: $<$name$>$\}
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-cpp-match-colon-name-return }}
+\usebox{\funcname}
+\index{shu-cpp-match-colon-name-return} \hfill [Constant]
+
+\begin{doc-string}
+A repeating side list to match one or more instances of \{:: $<$name$>$\} with the
+double colons making up part of the return value.
 \end{doc-string}
 
 \vspace{1em}
@@ -8879,7 +10809,8 @@ diagnostic messages are placed into the log buffer and a nil value is returned.
 \index{shu-match-make-count-alist-from-hash} \hfill [Command]
 
 \begin{doc-string}
-Doc string.
+Create an alist in which the key is a class name and the value is zero.  This alist
+will be used to generate a count of number of items changed per class name.
 \end{doc-string}
 
 \vspace{1em}
@@ -9063,6 +10994,37 @@ A list of aliases and associated function names.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{add-alexandria }}
+\usebox{\funcname}
+\index{add-alexandria} \hfill [Command]\\%
+ (Function: shu-add-alexandria)
+
+\begin{doc-string}
+Add Alexandria coverage to a git repository.
+This function first checks to ensure that a README.md file exists that does not
+contain an Alexandria badge and that a Doxyfile does not exist.  If those two
+conditions are met, an Alexandria badge is added to the bottom of the README.md
+file, a Doxyfile is created, and some of the tags in the Doxyfile are set to
+reasonable defaults.  An ALEXANDRIA\_DOC\_DEPENDENCIES tag is added to the end of
+the Doxyfile as a comment.
+If this function succeeds, it returns true, else nil.  The return value may
+be used by batch mode functions that want to call this function and report
+whether or not it succeeded.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{add-alexandria-badge }}
+\usebox{\funcname}
+\index{add-alexandria-badge} \hfill [Command]\\%
+ (Function: shu-add-alexandria-badge)
+
+\begin{doc-string}
+Insert an Alexandria badge for the current project.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{add-prefix }}
 \usebox{\funcname}\emph{prefix}
 \index{add-prefix} \hfill [Command]\\%
@@ -9071,6 +11033,51 @@ A list of aliases and associated function names.
 \begin{doc-string}
 Put a prefix and a space in front of each line in the region.  Prompt is issued
 for the prefix.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{af }}
+\usebox{\funcname}\emph{frame-no}
+\index{af} \hfill [Command]\\%
+ (Function: shu-adapt-frame)
+
+\begin{doc-string}
+Adapt the current frame to the current display by stretching the frame to the
+full height of the display and putting the top of the frame at the top of the
+display.  This function makes some assumptions about the display geometry based
+on the current operating system.  It assumes that Windows loses five lines for
+top and bottom tool bars.  Mac OS X loses three lines for the top tool bar.
+Unix loses two lines for something.  These numbers should, at some point, be
+customizable.
+
+With a numeric prefix argument N, the emacs window is positioned N frames from
+the right hand side of the display.  For example, if you open three frames and
+type into the first frame C-u 1 M-x \emph{shu-adapt-frame}, into the next frame
+C-u 2 M-x \emph{shu-adapt-frame}, and into the third frame C-u 3 M-x \emph{shu-adapt-frame},
+then the three frames will be grouped together side by side at the right side of
+the display.
+
+If the prefix argument is large enough that the left side of the frame would be
+moved past the left side of the display, the window is positioned such that the
+left edge of the window is aligned with the left edge of the display.
+
+Implementation note:
+
+If this function is called when the left side of the frame is positioned to the
+left of the leftmost edge of the display, the function FRAME-POSITION returns a
+negative value for the x coordinate of the frame.  The function
+SET-FRAME-POSITION takes the x and y coordinates of the new position of the top
+left corner of the frame.
+
+But if x is negative, it specifies the coordinates of the right edge of the
+frame relative to the right edge of the display.  This puts a frame that is very
+close to the left edge of the display all the way over to the right edge of the
+display.
+
+The assumption is that a negative x frame position means that the user has
+positioned the frame just a bit past the left edge and that the desired frame
+position is actually the leftmost edge of the display.
 \end{doc-string}
 
 \vspace{1em}
@@ -9143,6 +11150,18 @@ simple, little function.
 In a list of names, change all occurrences
 of Lastname, Firstname to an empty Latex letter.
 Position to the start of the file and invoke once.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{copy-repo }}
+\usebox{\funcname}
+\index{copy-repo} \hfill [Command]\\%
+ (Function: shu-copy-repo)
+
+\begin{doc-string}
+Call \emph{shu-get-repo} to find the path to the repository and put the result in
+the kill ring.
 \end{doc-string}
 
 \vspace{1em}
@@ -9221,6 +11240,31 @@ Save and load the current file as a .el file.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{fixup-doxyfile }}
+\usebox{\funcname}
+\index{fixup-doxyfile} \hfill [Command]\\%
+ (Function: shu-fixup-doxyfile)
+
+\begin{doc-string}
+The current directory is assumed to have the same name as the project for
+which the Doxyfile was created.  This function sets various default values in
+the Doxyfile.  The current buffer is the Doxyfile.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{gcm }}
+\usebox{\funcname}
+\index{gcm} \hfill [Command]\\%
+ (Function: shu-git-insert-git-commit)
+
+\begin{doc-string}
+Insert at point the name the git command to commit with the commentary held
+in a file called ``why.txt''.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{gd }}
 \usebox{\funcname}
 \index{gd} \hfill [Command]\\%
@@ -9228,6 +11272,34 @@ Save and load the current file as a .el file.
 
 \begin{doc-string}
 While in dired, put the full path to the current directory in the kill ring
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{get-pr-url }}
+\usebox{\funcname}
+\index{get-pr-url} \hfill [Command]\\%
+ (Function: shu-git-get-pr-url)
+
+\begin{doc-string}
+Put into the kill ring the path required to create a new pull request for
+the current branch of the current repository.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{get-repo }}
+\usebox{\funcname}
+\index{get-repo} \hfill [Function]\\%
+ (Function: shu-get-repo)
+
+\begin{doc-string}
+When positioned anywhere in a git repository, return the git path to the
+repository.  This is found in .git/config as the url of [remote ``origin''].
+Return nil if the path cannot be found.
+
+The search is made from the current directory and upwards for the first
+directory called ``.git''.
 \end{doc-string}
 
 \vspace{1em}
@@ -9285,8 +11357,8 @@ While in a file buffer, put the name of the current file into the kill ring.
  (Function: shu-git-insert-pull-origin-branch)
 
 \begin{doc-string}
-Insert at point the name the git command to pull the current branch out
-to origin.
+Insert at point the name the git command to pull the current branch from
+origin.
 \end{doc-string}
 
 \vspace{1em}
@@ -9297,8 +11369,10 @@ to origin.
  (Function: shu-git-insert-push-origin-branch)
 
 \begin{doc-string}
-Insert at point the name the git command to push the current branch out
-to origin.
+Insert at point the git command to push the current branch out to origin.  If
+the current branch is the default branch (fka ``master''), you are prompted to
+see if you want to proceed.  This is to prevent an accidental push to the
+default branch.
 \end{doc-string}
 
 \vspace{1em}
@@ -9337,6 +11411,17 @@ word ``origin''..  This can be used as part of git push or pull.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{kill-system-name }}
+\usebox{\funcname}
+\index{kill-system-name} \hfill [Command]\\%
+ (Function: shu-kill-system-name)
+
+\begin{doc-string}
+Place the system name` (machine name) in the message area.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{loosen-lisp }}
 \usebox{\funcname}
 \index{loosen-lisp} \hfill [Command]\\%
@@ -9349,6 +11434,31 @@ inside of them without having to worry about which line contains the closing
 parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run \emph{shu-tighten-lisp} to put the
 parentheses back where they belong.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{make-md-toc }}
+\usebox{\funcname}
+\index{make-md-toc} \hfill [Command]\\%
+ (Function: shu-tocify-markdown-file)
+
+\begin{doc-string}
+Search the file starting at the current position for any markdown headings of
+the form ``\#\# This is a heading''.  Add a tag to each heading and then insert a
+complete markdown table of contents at the current position.
+
+Pound signs that lie inside of markdown literal areas designated by `````'' are
+ignored.  This prevents something such as an example of an \#include directive
+from being treated as a level 1 heading.
+
+If a heading already has a tag, it is removed.  If a heading has trailing pound
+signs, they are also removed.
+
+The default maximum heading level is two, which means that heading levels
+greater than two are not included in the table of contents.  But a numeric
+prefix argument can change the maximum heading level.  The maximum heading level
+cannot be set to a value less than one.
 \end{doc-string}
 
 \vspace{1em}
@@ -9501,6 +11611,29 @@ at point and continues to the end of the buffer.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{obfuscate-region }}
+\usebox{\funcname}\emph{start} \emph{end}
+\index{obfuscate-region} \hfill [Command]\\%
+ (Function: shu-obfuscate-region)
+
+\begin{doc-string}
+Obfuscate a region of text by replacing every alphabetic character in the
+region with the next letter of the alphabet, staring with 'a'. For example, of
+the region contains
+
+  Now is the time for all good men to come to the aid of the Party 10 times.
+
+Then the obfuscated text would be:
+
+  Abc de fgh ijkl mno pqr stuv wxy za bcde fg hij klm no pqr Stuvw 10 xyzab.
+
+This is useful if you want to capture some text for later testing and
+manipulation that might contain confidential or proprietary information.  This
+is an encoding that cannot be reversed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{of }}
 \usebox{\funcname}
 \index{of} \hfill [Command]\\%
@@ -9549,6 +11682,23 @@ Position to the start of the file and invoke once.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{scan-grok }}
+\usebox{\funcname}
+\index{scan-grok} \hfill [Command]\\%
+ (Function: shu-extract-name-open-grok)
+
+\begin{doc-string}
+The current buffer contains output from an OpenGrok search that has been
+copied from the web page and pasted into the buffer.  This function scans the
+buffer from the current point and harvests all of the file names that hold the
+references for which OpenGrok searched.  It puts the file names (including their
+top level directories) into the buffer ``\emph\{**shu-open-grok**\}''.
+The number of file names found is returned, mostly for the benefit of unit
+tests.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{set-dos-eol }}
 \usebox{\funcname}
 \index{set-dos-eol} \hfill [Command]\\%
@@ -9582,6 +11732,29 @@ Display the name of the current branch in a git repository.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{show-repo }}
+\usebox{\funcname}
+\index{show-repo} \hfill [Command]\\%
+ (Function: shu-show-repo)
+
+\begin{doc-string}
+Call \emph{shu-get-repo} to find the path to the repository and show the result in
+the minibuffer.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{show-system-name }}
+\usebox{\funcname}
+\index{show-system-name} \hfill [Command]\\%
+ (Function: shu-show-system-name)
+
+\begin{doc-string}
+Place the system name (machine name) in the message area.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{tighten-lisp }}
 \usebox{\funcname}
 \index{tighten-lisp} \hfill [Command]\\%
@@ -9606,6 +11779,24 @@ Eliminate whitespace at ends of all lines in the current buffer.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{unbrace }}
+\usebox{\funcname}
+\index{unbrace} \hfill [Command]\\%
+ (Function: shu-unbrace)
+
+\begin{doc-string}
+When point is on an opening sexp, this function converts, within the scope of
+the sexp, all ``\{'' to ``(`` and all ``\}'' to ``).''.
+If the number of left braces does not match the number of right braces a warning
+message is emitted.
+
+For the benefit of unit tests, the count of left braces converted iff the count
+of left braces matches the count of right braces.  If the counts do not match,
+nil is returned.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{winpath }}
 \usebox{\funcname}\emph{start} \emph{end}
 \index{winpath} \hfill [Command]\\%
@@ -9621,6 +11812,109 @@ This makes it a valid path on windows machines.
 List of functions and variable definitions in this package.
 
 
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-adapt-frame }}
+\usebox{\funcname}\emph{frame-no}
+\index{shu-adapt-frame} \hfill [Command]\\%
+ (Alias: af)
+
+\begin{doc-string}
+Adapt the current frame to the current display by stretching the frame to the
+full height of the display and putting the top of the frame at the top of the
+display.  This function makes some assumptions about the display geometry based
+on the current operating system.  It assumes that Windows loses five lines for
+top and bottom tool bars.  Mac OS X loses three lines for the top tool bar.
+Unix loses two lines for something.  These numbers should, at some point, be
+customizable.
+
+With a numeric prefix argument N, the emacs window is positioned N frames from
+the right hand side of the display.  For example, if you open three frames and
+type into the first frame C-u 1 M-x \emph{shu-adapt-frame}, into the next frame
+C-u 2 M-x \emph{shu-adapt-frame}, and into the third frame C-u 3 M-x \emph{shu-adapt-frame},
+then the three frames will be grouped together side by side at the right side of
+the display.
+
+If the prefix argument is large enough that the left side of the frame would be
+moved past the left side of the display, the window is positioned such that the
+left edge of the window is aligned with the left edge of the display.
+
+Implementation note:
+
+If this function is called when the left side of the frame is positioned to the
+left of the leftmost edge of the display, the function FRAME-POSITION returns a
+negative value for the x coordinate of the frame.  The function
+SET-FRAME-POSITION takes the x and y coordinates of the new position of the top
+left corner of the frame.
+
+But if x is negative, it specifies the coordinates of the right edge of the
+frame relative to the right edge of the display.  This puts a frame that is very
+close to the left edge of the display all the way over to the right edge of the
+display.
+
+The assumption is that a negative x frame position means that the user has
+positioned the frame just a bit past the left edge and that the desired frame
+position is actually the leftmost edge of the display.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-add-alexandria }}
+\usebox{\funcname}
+\index{shu-add-alexandria} \hfill [Command]\\%
+ (Alias: add-alexandria)
+
+\begin{doc-string}
+Add Alexandria coverage to a git repository.
+This function first checks to ensure that a README.md file exists that does not
+contain an Alexandria badge and that a Doxyfile does not exist.  If those two
+conditions are met, an Alexandria badge is added to the bottom of the README.md
+file, a Doxyfile is created, and some of the tags in the Doxyfile are set to
+reasonable defaults.  An ALEXANDRIA\_DOC\_DEPENDENCIES tag is added to the end of
+the Doxyfile as a comment.
+If this function succeeds, it returns true, else nil.  The return value may
+be used by batch mode functions that want to call this function and report
+whether or not it succeeded.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-add-alexandria-badge }}
+\usebox{\funcname}
+\index{shu-add-alexandria-badge} \hfill [Command]\\%
+ (Alias: add-alexandria-badge)
+
+\begin{doc-string}
+Insert an Alexandria badge for the current project.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-add-alexandria-in-batch-mode }}
+\usebox{\funcname}
+\index{shu-add-alexandria-in-batch-mode} \hfill [Function]
+
+\begin{doc-string}
+Call the function \emph{shu-add-alexandria} in batch mode.  The function
+\emph{shu-add-alexandria} normally ends in edit mode in Doxyfile so that the user can
+do a final edit and save.  In batch mode, this function does a save of the
+Doxyfile since there is no interactive user.
+
+If the function succeeds, it returns true, else nil.  This allows the top level
+batch invoking function to terminate emacs with a zero or non-zero return code
+to indicate to an external script whether or not the add command worked.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-add-doxyfile }}
+\usebox{\funcname}
+\index{shu-add-doxyfile} \hfill [Function]
+
+\begin{doc-string}
+Call ``doxygen -g'' to create a Doxyfile.  Return the output from the doxygen command.
+\end{doc-string}
 
 \vspace{1em}
 \noindent
@@ -9728,6 +12022,18 @@ buffer when it is finished with it.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-copy-repo }}
+\usebox{\funcname}
+\index{shu-copy-repo} \hfill [Command]\\%
+ (Alias: copy-repo)
+
+\begin{doc-string}
+Call \emph{shu-get-repo} to find the path to the repository and put the result in
+the kill ring.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-de-star }}
 \usebox{\funcname}
 \index{shu-de-star} \hfill [Command]\\%
@@ -9806,8 +12112,25 @@ but does not set mark - just goes there.
 Replace everything in the region between \emph{start} and \emph{end} with blanks.  This is
 exactly like delete-region except that the deleted text is replaced with spaces.
 As with delete-region, the end point is not included in the delete.  It erases
-everything up but not including the end point.  The order of \emph{start} and \emph{end} does
-not matter.
+everything up to but not including the end point.  The order of \emph{start} and \emph{end}
+does not matter.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-extract-name-open-grok }}
+\usebox{\funcname}
+\index{shu-extract-name-open-grok} \hfill [Command]\\%
+ (Alias: scan-grok)
+
+\begin{doc-string}
+The current buffer contains output from an OpenGrok search that has been
+copied from the web page and pasted into the buffer.  This function scans the
+buffer from the current point and harvests all of the file names that hold the
+references for which OpenGrok searched.  It puts the file names (including their
+top level directories) into the buffer ``\emph\{**shu-open-grok**\}''.
+The number of file names found is returned, mostly for the benefit of unit
+tests.
 \end{doc-string}
 
 \vspace{1em}
@@ -9821,6 +12144,32 @@ Search through a numbered git commit log looking for the commit whose number is
 \emph{commit-number}.  Return the SHA-1 hash of the commit if the commit number is found.
 Return nil if no commit with the given number is found.
 The commit log is assume to have been numbered by shu-git-number-commits.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-fix-markdown-section }}
+\usebox{\funcname}\emph{max-depth}
+\index{shu-fix-markdown-section} \hfill [Function]
+
+\begin{doc-string}
+On entry, point is positioned after one or more pound signs that define the
+beginning of a markdown section heading.  If the number of pound signs is
+greater than \emph{max-depth}, ignore the line and return nil.  If the number of
+pound signs is less than or equal to \emph{max-depth}, fix the line as described
+below and return it.
+
+If the line ends with an expression that looks like
+
+\small{\begin{verbatim}
+      ``<a name=currentliveupdate></a>``,
+\end{verbatim}}
+
+remove it.
+
+If the line ends with trailing pound signs, remove them as well.
+
+Then return the repaired line.
 \end{doc-string}
 
 \vspace{1em}
@@ -9843,6 +12192,32 @@ The latter is a format that Microsoft Excel can import.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-fixup-doxyfile }}
+\usebox{\funcname}
+\index{shu-fixup-doxyfile} \hfill [Command]\\%
+ (Alias: fixup-doxyfile)
+
+\begin{doc-string}
+The current directory is assumed to have the same name as the project for
+which the Doxyfile was created.  This function sets various default values in
+the Doxyfile.  The current buffer is the Doxyfile.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-fixup-project-doxyfile }}
+\usebox{\funcname}\emph{project-name}
+\index{shu-fixup-project-doxyfile} \hfill [Command]
+
+\begin{doc-string}
+\emph{project-name} is the name of the project for which the Doxyfile has been created.
+This function sets standard default values.
+If this function succeeds, it return true, else nil.  The return value may be used
+in batch mode to determine if the fixup was successful.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-forward-line }}
 \usebox{\funcname}
 \index{shu-forward-line} \hfill [Function]
@@ -9850,6 +12225,18 @@ The latter is a format that Microsoft Excel can import.
 \begin{doc-string}
 Move forward by one line.  If there is a next line, point it moved into
 it.  If there are no more lines, a new one is created.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-frame-width }}
+\usebox{\funcname}
+\index{shu-frame-width} \hfill [Function]
+
+\begin{doc-string}
+Return the width of an emacs frame.  Different operating systems appear to
+have slightly different windowing systems, which means that the
+FRAME-INNER-WIDTH function does not quite report the exact width.
 \end{doc-string}
 
 \vspace{1em}
@@ -9865,12 +12252,221 @@ While in dired, put the full path to the current directory in the kill ring
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-containing-function }}
+\usebox{\funcname}
+\index{shu-get-containing-function} \hfill [Function]
+
+\begin{doc-string}
+Search backwards from the current point to find the beginning of the enclosing
+function, macro, etc.  If such a beginning is found, return a cons cell whose car
+is the point that defines the point at the beginning of the function and whose cdr
+defines the point at the end of the function.  If not inside a function, macro, etc.,
+return nil
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-get-current-line }}
 \usebox{\funcname}
 \index{shu-get-current-line} \hfill [Function]
 
 \begin{doc-string}
 Return the current line in the buffer as a string
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-debian-dependencies }}
+\usebox{\funcname}
+\index{shu-get-debian-dependencies} \hfill [Function]
+
+\begin{doc-string}
+This function tries to find a Debian library dependency file in the current
+directory tree.  If such a file is found, this function returns a sorted list of
+the dependencies listed in the Debian dependency file.  If no such file exists,
+nil is returned.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-debian-dependency-file }}
+\usebox{\funcname}
+\index{shu-get-debian-dependency-file} \hfill [Function]
+
+\begin{doc-string}
+Use the name of the current directory as the name of a debian library.
+Construct a dependency file name which is the name of the current directory with
+a file type of ``.dep''.  Search through the directory tree for such a file.  If
+the file is found return its fully qualified name, i.e., the full path to the
+file so that it may be opened.  If no such file exists, return nil.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-debian-dependency-line }}
+\usebox{\funcname}
+\index{shu-get-debian-dependency-line} \hfill [Function]
+
+\begin{doc-string}
+This function tries to find a Debian library dependency file in the current
+directory tree.  If such a file is found, this function returns a single line of
+text that holds the space separated names of all of the dependencies.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-git-name }}
+\usebox{\funcname}\emph{path}
+\index{shu-get-git-name} \hfill [Function]
+
+\begin{doc-string}
+\emph{path} is the url of a git repository from the [remote ``origin''] section of a
+.git/config file.  For example, the entry for this repository is
+
+\small{\begin{verbatim}
+      https://github.com/codesinger/shu.git
+\end{verbatim}}
+
+This function extracts two pieces of information from the URL.  One is the name
+of the repository, which in this case is ``shu''.  The other is the path to the
+repository, which includes the owning group, which in this case is
+``codesinger/shu''.
+
+Those two items are returned in a cons cell with the car of the cons cell
+holding the path (with owning group) and the cdr of the cons cell holding the
+repository name.
+
+The assumptions made by this function are as follows: The beginning of the
+owning group and repository name are preceded by a domain name followed by
+either a colon or a slash.  In the case of this repository, the owning group and
+repository name are preceded by ``github.com/''.  The repository name may or may
+not have a trailing ``.git'', which this function removes.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-git-repo-name }}
+\usebox{\funcname}
+\index{shu-get-git-repo-name} \hfill [Function]
+
+\begin{doc-string}
+This function tries to get the name of the current git repository
+from the .git/config file.  Returns nil if it cannot open .git/config.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-git-repo-path }}
+\usebox{\funcname}
+\index{shu-get-git-repo-path} \hfill [Function]
+
+\begin{doc-string}
+This function tries to get the host local path to the current git repository
+from the .git/config file if possible.  If it cannot find the .git/config file,
+the it uses the shu custom variable \emph{shu-internal-group-name} as the group owner
+and uses the name of the current directory as the repository name and constructs
+a host local path that is the owning group name, a slash, and the putative
+repository name (the name of the current directory.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-markdown-heading }}
+\usebox{\funcname}\emph{section-heading}
+\index{shu-get-markdown-heading} \hfill [Function]
+
+\begin{doc-string}
+Returns the heading text from a markdown section heading, \emph{section-heading}.
+There must be at least one pound sign at the beginning of the string.  If a
+section heading is
+
+   ``\#\#\# This is a section heading''
+
+then the string ``This is a section heading'' is returned.  If the first
+character in the section heading is not a pound sign, nil is returned.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-markdown-level }}
+\usebox{\funcname}\emph{section-heading}
+\index{shu-get-markdown-level} \hfill [Function]
+
+\begin{doc-string}
+Return the level of a markdown section heading.  The level is defined as
+the number of leading pound signs that start at the beginning of the string.
+A level 1 heading begins with ``\#''.  A level 2 heading begins with ``\#\#''.
+If there are no leading pound signs at the beginning of the string, a level of
+zero is returned.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-markdown-prefix }}
+\usebox{\funcname}\emph{section-heading}
+\index{shu-get-markdown-prefix} \hfill [Function]
+
+\begin{doc-string}
+Returns the pound sign prefix from a markdown section heading,
+\emph{section-heading}.  The string of pound signs must begin at the beginning of the
+string.  If a section heading is
+
+   ``\#\#\# This is a section heading''
+
+then the string ``\#\#\#'' is returned.  If the first character in the section
+heading is not a pound sign, nil is returned.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-md-boundaries }}
+\usebox{\funcname}
+\index{shu-get-md-boundaries} \hfill [Function]
+
+\begin{doc-string}
+Find all pairs of markdown literal text.  In markdown, the sequence ``` is
+used to bound literal text.  When creating a markdown table of contents, we do
+not want to look at pound signs contained in literal text.  This function finds
+the location of each pair of ``` sentinels.  It returns a list of cons sells,
+each of which has the start and end position of a ``` sequence.  If there is a
+start ``` with no companion ``` close, it is not included in the list.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-repo }}
+\usebox{\funcname}
+\index{shu-get-repo} \hfill [Function]\\%
+ (Alias: get-repo)
+
+\begin{doc-string}
+When positioned anywhere in a git repository, return the git path to the
+repository.  This is found in .git/config as the url of [remote ``origin''].
+Return nil if the path cannot be found.
+
+The search is made from the current directory and upwards for the first
+directory called ``.git''.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-get-url-repo }}
+\usebox{\funcname}
+\index{shu-get-url-repo} \hfill [Function]
+
+\begin{doc-string}
+Return the web URL for the current git repository.  If the URL cannot be
+found, nil is returned.
+
+The url for the git repository in .git/config is of the form
+
+\small{\begin{verbatim}
+       git@web-address:repository-name.git
+\end{verbatim}}
+
+This function removes the trailing ``.git'', replaces the leading ``git@'' with
+``https://'' and replaces the ``:'' between the web-address and repository-name
+with ``/''.
 \end{doc-string}
 
 \vspace{1em}
@@ -9979,6 +12575,17 @@ Return the name of the current branch in a git repository.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-find-default-branch }}
+\usebox{\funcname}
+\index{shu-git-find-default-branch} \hfill [Function]
+
+\begin{doc-string}
+Return the name of the default branch in a git repository.  The default
+branch is the one branch that is created with a new repository.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-git-find-short-hash }}
 \usebox{\funcname}\emph{hash}
 \index{shu-git-find-short-hash} \hfill [Function]
@@ -9990,6 +12597,18 @@ if the given \emph{hash} is not a valid git revision.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-get-pr-url }}
+\usebox{\funcname}
+\index{shu-git-get-pr-url} \hfill [Command]\\%
+ (Alias: get-pr-url)
+
+\begin{doc-string}
+Put into the kill ring the path required to create a new pull request for
+the current branch of the current repository.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-git-insert-branch }}
 \usebox{\funcname}
 \index{shu-git-insert-branch} \hfill [Command]\\%
@@ -9997,6 +12616,18 @@ if the given \emph{hash} is not a valid git revision.
 
 \begin{doc-string}
 Insert at point the name of the current branch in a git repository
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-git-insert-git-commit }}
+\usebox{\funcname}
+\index{shu-git-insert-git-commit} \hfill [Command]\\%
+ (Alias: gcm)
+
+\begin{doc-string}
+Insert at point the name the git command to commit with the commentary held
+in a file called ``why.txt''.
 \end{doc-string}
 
 \vspace{1em}
@@ -10019,8 +12650,8 @@ word ``origin''..  This can be used as part of git push or pull.
  (Alias: gpl)
 
 \begin{doc-string}
-Insert at point the name the git command to pull the current branch out
-to origin.
+Insert at point the name the git command to pull the current branch from
+origin.
 \end{doc-string}
 
 \vspace{1em}
@@ -10031,8 +12662,10 @@ to origin.
  (Alias: gps)
 
 \begin{doc-string}
-Insert at point the name the git command to push the current branch out
-to origin.
+Insert at point the git command to push the current branch out to origin.  If
+the current branch is the default branch (fka ``master''), you are prompted to
+see if you want to proceed.  This is to prevent an accidental push to the
+default branch.
 \end{doc-string}
 
 \vspace{1em}
@@ -10082,6 +12715,35 @@ Insert a LaTeX quote environment and position the cursor for typing the quote.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-insert-markdown-toc }}
+\usebox{\funcname}\emph{entries}
+\index{shu-insert-markdown-toc} \hfill [Function]
+
+\begin{doc-string}
+\emph{entries} is a list of cons cells.  The car of each item on the list is the
+markdown heading line, which looks something like ``\#\# This is a heading''.
+The cdr of each item on the list is the link name.  This function inserts a
+markdown table of contents in which each line in the table of contents
+consists of the heading text in brackets followed by the line name in
+parenthesis and preceded by a pound sign.  Each line that represents a heading
+level greater than one is also indented to indicate its heading level.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-internal-get-repo }}
+\usebox{\funcname}
+\index{shu-internal-get-repo} \hfill [Function]
+
+\begin{doc-string}
+The current buffer holds an instance of the ``.git/config'' file for the
+repository.  This function returns the git path to the repository, which is the
+url given after [remote ``origin''].  nil is returned if the path cannot be
+found.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-internal-new-lisp }}
 \usebox{\funcname}\emph{func-type} \emph{func-name}
 \index{shu-internal-new-lisp} \hfill [Command]
@@ -10102,6 +12764,33 @@ true, the function is interactive.
 
 \begin{doc-string}
 Kills the current buffer.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-kill-repo }}
+\usebox{\funcname}
+\index{shu-kill-repo} \hfill [Command]
+
+\begin{doc-string}
+When positioned in the top level directory of a git repository, place into
+the kill ring the git path to the repository.  This is found in .git/config as
+the url of [remote ``origin'']
+
+This should probably be extended to do a search for the .git directory anywhere
+above the current position, which would remove the requirement to be in the root
+of the repository.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-kill-system-name }}
+\usebox{\funcname}
+\index{shu-kill-system-name} \hfill [Command]\\%
+ (Alias: kill-system-name)
+
+\begin{doc-string}
+Place the system name` (machine name) in the message area.
 \end{doc-string}
 
 \vspace{1em}
@@ -10221,6 +12910,153 @@ of contents entry created and inserted at point will be
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-md-in-literal }}
+\usebox{\funcname}\emph{literals} \emph{pt}
+\index{shu-md-in-literal} \hfill [Function]
+
+\begin{doc-string}
+\emph{literals} is a list of markdown literal boundaries produced by
+\emph{shu-get-md-boundaries}.  This function returns t if the point \emph{pt} lies within a
+markdown literal boundary.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-get-chunk }}
+\usebox{\funcname}\emph{line-limit} \textbf{\&optional} \emph{escape}
+\index{shu-misc-get-chunk} \hfill [Function]
+
+\begin{doc-string}
+Return a string that consists of the first \emph{line-limit} characters in the
+current buffer.  If \emph{line-limit} is larger than the buffer size, return a
+string that is the entire contents of the buffer.  Before returning, delete
+from the buffer the returned string.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-get-phrase }}
+\usebox{\funcname}\emph{line-limit} \textbf{\&optional} \emph{escape}
+\index{shu-misc-get-phrase} \hfill [Function]
+
+\begin{doc-string}
+Remove from the front of the current buffer and return the longest possible
+string of whitespace separated things whose length does not exceed line-limit.
+If there is at least one whitespace character before \emph{line-limit}, the string will
+end with one or more whitespace characters.  i.e., the string will end on a word
+boundary if that is possible.
+
+Words will not be split unless there is no whitespace character before
+\emph{line-limit} characters have been scanned, in which case a string of exactly
+\emph{line-limit} length will be removed and returned.
+
+This function is used to split a string of words into a set of smaller strings
+such that words are not split.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-internal-split-buffer }}
+\usebox{\funcname}\emph{line-limit}
+\index{shu-misc-internal-split-buffer} \hfill [Function]
+\hspace*{\wd\funcname}\textbf{\&optional} \emph{escape}
+
+\begin{doc-string}
+Split an entire buffer into multiple strings and return a list of the
+strings.  \emph{get-function} is the function to call to fetch each new string.
+\emph{get-function} is set to either \emph{shu-misc-get-chunk} or \emph{shu-misc-get-phrase}.
+
+\emph{shu-misc-get-chunk} returns each string as a fixed length string of \emph{line-limit}
+characters, except for the last one, which may be shorter.
+
+\emph{shu-misc-get-phrase} returns the longest possible string that ends on a word
+boundary and whose length is less than or equal to \emph{line-limit}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-make-unique-string }}
+\usebox{\funcname}\emph{string} \emph{suffix-length}
+\index{shu-misc-make-unique-string} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Input is a hash table, \emph{ht}, as well as a \emph{string}.  If the string does not
+already exist in \emph{ht}, add the string to the hash table and return the string.
+If the string already exists in \emph{ht}, add a suffix to the string that is a
+random string of length \emph{suffix-length}.  If the combination of the original
+\emph{string} plus the random string added as a suffix, does not exist in the hash
+table, add the new string to the hash table and return it.  This provides the
+generation of a set of unique string names.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-random-internal-string }}
+\usebox{\funcname}\emph{letters} \emph{length}
+\index{shu-misc-random-internal-string} \hfill [Function]
+
+\begin{doc-string}
+Return a string composed of random \emph{letters} of length \emph{length}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-random-lad-string }}
+\usebox{\funcname}\emph{length}
+\index{shu-misc-random-lad-string} \hfill [Function]
+
+\begin{doc-string}
+Return a string composed of random lower case letters and digits of length
+ \emph{length}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-random-ua-string }}
+\usebox{\funcname}\emph{length}
+\index{shu-misc-random-ua-string} \hfill [Function]
+
+\begin{doc-string}
+Return a string composed of random upper case letters of length \emph{length}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-rx-conditionals }}
+\usebox{\funcname}
+\index{shu-misc-rx-conditionals} \hfill [Constant]
+
+\begin{doc-string}
+Regular expression to find the beginning of a function or macro that encloses
+a body.  Such functions usually require a future closing parenthesis that is
+likely not on the current line.  This is used by the functions \emph{shu-tighten-lisp}
+and \emph{shu-loosen-lisp}.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-rx-functions }}
+\usebox{\funcname}
+\index{shu-misc-rx-functions} \hfill [Constant]
+
+\begin{doc-string}
+Regular expression to find the beginning of a function, macro, etc.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-rx-lets }}
+\usebox{\funcname}
+\index{shu-misc-rx-lets} \hfill [Constant]
+
+\begin{doc-string}
+Regular expression to find the beginning of a let special form.
+This searches for ``let'' or ``let*'' followed by ``(``.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-misc-set-alias }}
 \usebox{\funcname}
 \index{shu-misc-set-alias} \hfill [Function]
@@ -10229,6 +13065,61 @@ of contents entry created and inserted at point will be
 Set the common alias names for the functions in shu-misc.
 These are generally the same as the function names with the leading
 shu- prefix removed.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-split-buffer }}
+\usebox{\funcname}\emph{line-limit} \textbf{\&optional}
+\index{shu-misc-split-buffer} \hfill [Function]
+\hspace*{\wd\funcname}\emph{escape}
+
+\begin{doc-string}
+Split an entire buffer into multiple strings and return a list of the
+strings.  If \emph{fixed-width} is true, then each returned string is \emph{line-limit}
+characters in length, except for the last, which may be shorter.  If \emph{fixed-width}
+is absent or nil, then each returned string is split on a word boundary and no
+string exceeds \emph{line-limit} characters in length.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-split-chunk-buffer }}
+\usebox{\funcname}\emph{line-limit} \textbf{\&optional}
+\index{shu-misc-split-chunk-buffer} \hfill [Function]
+\hspace*{\wd\funcname}
+
+\begin{doc-string}
+Split an entire buffer into multiple strings and return a list of the
+strings.  Each returned string is \emph{line-limit} characters in length, except for
+the last one, which may be shorter.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-split-phrase-buffer }}
+\usebox{\funcname}\emph{line-limit}
+\index{shu-misc-split-phrase-buffer} \hfill [Function]
+
+\begin{doc-string}
+Split an entire buffer into multiple strings and return a list of the
+strings.  Each returned string is split on a word boundary and no string exceeds
+\emph{line-limit} characters in length.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-misc-split-string }}
+\usebox{\funcname}\emph{input} \emph{line-limit} \textbf{\&optional}
+\index{shu-misc-split-string} \hfill [Function]
+\hspace*{\wd\funcname}\emph{escape}
+
+\begin{doc-string}
+Split a string into multiple strings and return a list of the strings.  If
+\emph{fixed-width} is true, then each returned string is \emph{line-limit} characters in
+length, except for the last, which may be shorter.  If \emph{fixed-width} is absent or
+nil, then each returned string is split on a word boundary and no string exceeds
+\emph{line-limit} characters in length.
 \end{doc-string}
 
 \vspace{1em}
@@ -10318,6 +13209,19 @@ point is placed where the the first line of code in the loop belongs.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-next-char-in-seq }}
+\usebox{\funcname}\emph{current-char}
+\index{shu-next-char-in-seq} \hfill [Function]
+
+\begin{doc-string}
+\emph{current-char} is a character in the range a-z (or A-Z).  This function returns
+the next character, where next is the next character in the alphabet unless
+\emph{current-char} is 'z', in which case the next character returned is 'a'.  If
+\emph{current-char} is 'Z', then the next character returned is 'A'.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-number-lines }}
 \usebox{\funcname}
 \index{shu-number-lines} \hfill [Command]\\%
@@ -10326,6 +13230,29 @@ point is placed where the the first line of code in the loop belongs.
 \begin{doc-string}
 Insert in front of each line in the buffer its line number.  Starts
 at point and continues to the end of the buffer.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-obfuscate-region }}
+\usebox{\funcname}\emph{start} \emph{end}
+\index{shu-obfuscate-region} \hfill [Command]\\%
+ (Alias: obfuscate-region)
+
+\begin{doc-string}
+Obfuscate a region of text by replacing every alphabetic character in the
+region with the next letter of the alphabet, staring with 'a'. For example, of
+the region contains
+
+  Now is the time for all good men to come to the aid of the Party 10 times.
+
+Then the obfuscated text would be:
+
+  Abc de fgh ijkl mno pqr stuv wxy za bcde fg hij klm no pqr Stuvw 10 xyzab.
+
+This is useful if you want to capture some text for later testing and
+manipulation that might contain confidential or proprietary information.  This
+is an encoding that cannot be reversed.
 \end{doc-string}
 
 \vspace{1em}
@@ -10393,6 +13320,26 @@ Remove from a file all lines that contain file names that end in .t.cpp
 In a list of names, change all occurrences
 of Lastname, Firstname to Firstname Lastname.
 Position to the start of the file and invoke once.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-reverse2 }}
+\usebox{\funcname}
+\index{shu-reverse2} \hfill [Command]
+
+\begin{doc-string}
+When positioned in front of a pair of parenthesis that contains a pair of
+expressions separated by a comma, reverse the positions of the two expressions.
+The first becomes the second and the second becomes the first.
+i.e.,
+\small{\begin{verbatim}
+      foo(mumble, bar);
+\end{verbatim}}
+becomes
+\small{\begin{verbatim}
+      foo(bar, mumble);
+\end{verbatim}}
 \end{doc-string}
 
 \vspace{1em}
@@ -10501,6 +13448,29 @@ the host operating system.
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-show-repo }}
+\usebox{\funcname}
+\index{shu-show-repo} \hfill [Command]\\%
+ (Alias: show-repo)
+
+\begin{doc-string}
+Call \emph{shu-get-repo} to find the path to the repository and show the result in
+the minibuffer.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-show-system-name }}
+\usebox{\funcname}
+\index{shu-show-system-name} \hfill [Command]\\%
+ (Alias: show-system-name)
+
+\begin{doc-string}
+Place the system name (machine name) in the message area.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-split-range-string }}
 \usebox{\funcname}\emph{range-string}
 \index{shu-split-range-string} \hfill [Function]
@@ -10523,6 +13493,48 @@ For example, ``99+2'' has start 99 and end 101.  ``99-2'' has start 99 and end 9
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-system-name }}
+\usebox{\funcname}
+\index{shu-system-name} \hfill [Function]
+
+\begin{doc-string}
+Return the machine name.  Prior to emacs 25.1, this was held in the variable
+system-name.  As of emacs 25.1, system-name is now a function.  Return nil if
+system-name is neither a function nor a variable.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-system-name-string }}
+\usebox{\funcname}
+\index{shu-system-name-string} \hfill [Function]
+
+\begin{doc-string}
+Return the machine name.  Prior to emacs 25.1, this was held in the variable
+system-name.  As of emacs 25.1, system-name is now a function.  Unlike
+\emph{shu-system-name}, this function always returns a string, even if the machine
+name is not available for some reason.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-tighten-hanging-paren }}
+\usebox{\funcname}\emph{eof}
+\index{shu-tighten-hanging-paren} \hfill [Command]
+
+\begin{doc-string}
+Call this function while point is on a left parenthesis.  This function will
+find the matching right parenthesis.  If the matching right parenthesis is on a line
+by itself and a previous line ends in another right parenthesis, the line and
+dangling right parenthesis will be moved up to the end of the line that also ends
+in a right parenthesis.  This is an internal part of the function \emph{shu-tighten-lisp}.
+\emph{eof} is the point at which the current function on which we are operating ends.
+This function removes some text from the current function.  It adjusts \emph{eof} appropriately
+and returns the new value to the caller.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-tighten-lisp }}
 \usebox{\funcname}
 \index{shu-tighten-lisp} \hfill [Command]\\%
@@ -10536,6 +13548,65 @@ the end of the previous line.  This function is the opposite of \emph{shu-loosen
 
 \vspace{1em}
 \noindent
+\savebox{\funcname}{\noindent\texttt{shu-tocify-markdown-file }}
+\usebox{\funcname}
+\index{shu-tocify-markdown-file} \hfill [Command]\\%
+ (Alias: make-md-toc)
+
+\begin{doc-string}
+Search the file starting at the current position for any markdown headings of
+the form ``\#\# This is a heading''.  Add a tag to each heading and then insert a
+complete markdown table of contents at the current position.
+
+Pound signs that lie inside of markdown literal areas designated by `````'' are
+ignored.  This prevents something such as an example of an \#include directive
+from being treated as a level 1 heading.
+
+If a heading already has a tag, it is removed.  If a heading has trailing pound
+signs, they are also removed.
+
+The default maximum heading level is two, which means that heading levels
+greater than two are not included in the table of contents.  But a numeric
+prefix argument can change the maximum heading level.  The maximum heading level
+cannot be set to a value less than one.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-tocify-markdown-headings }}
+\usebox{\funcname}\emph{entries}
+\index{shu-tocify-markdown-headings} \hfill [Function]
+
+\begin{doc-string}
+\emph{entries} is a list of cons cells.  The car of each item on the list is the
+markdown heading line, which looks something like ``\#\# This is a heading''.
+The cdr of each item on the list is the link name.  This function searches for
+each markdown heading in the file and appends to the heading a tag of the form
+
+\small{\begin{verbatim}
+     <a name=link name></a>
+\end{verbatim}}
+
+so that it may be referenced from the table of contents.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-trim-git-end }}
+\usebox{\funcname}\emph{path}
+\index{shu-trim-git-end} \hfill [Command]
+
+\begin{doc-string}
+First trim leading and trailing spaces from \emph{path}.  If \emph{path} ends in ``.git'',
+trim the last four characters from the path.  If \emph{path} does not end in ``.git'',
+do not trim the last four characters.
+
+Return the \emph{path}, leading and trailing spaces trimmed, with perhaps ``.git''
+removed from the end.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
 \savebox{\funcname}{\noindent\texttt{shu-trim-trailing-blanks }}
 \usebox{\funcname}
 \index{shu-trim-trailing-blanks} \hfill [Command]\\%
@@ -10543,6 +13614,24 @@ the end of the previous line.  This function is the opposite of \emph{shu-loosen
 
 \begin{doc-string}
 Eliminate whitespace at ends of all lines in the current buffer.
+\end{doc-string}
+
+\vspace{1em}
+\noindent
+\savebox{\funcname}{\noindent\texttt{shu-unbrace }}
+\usebox{\funcname}
+\index{shu-unbrace} \hfill [Command]\\%
+ (Alias: unbrace)
+
+\begin{doc-string}
+When point is on an opening sexp, this function converts, within the scope of
+the sexp, all ``\{'' to ``(`` and all ``\}'' to ``).''.
+If the number of left braces does not match the number of right braces a warning
+message is emitted.
+
+For the benefit of unit tests, the count of left braces converted iff the count
+of left braces matches the count of right braces.  If the counts do not match,
+nil is returned.
 \end{doc-string}
 
 \vspace{1em}

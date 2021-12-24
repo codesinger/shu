@@ -1,6 +1,6 @@
 ;;; .emacs - My personal .emacs file
 ;;
-;; Copyright (C) 201D85 Stewart L. Palmer
+;; Copyright (C) 2015 Stewart L. Palmer
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -19,10 +19,27 @@
 ;; of the GNU General Public License along with GNU Emacs.  If not,
 ;; see <http://www.gnu.org/licenses/>.
 
-;; This is my oersonal .emacs file.
+;; This is my personal .emacs file.
 ;;
 ;; It is not part of the shu package
 
+
+
+
+;;
+;;  shu-show-load-path
+;;
+(defun shu-show-load-path (ident)
+  "Doc string."
+  (let ((lp load-path)
+        (path)
+        (gb (get-buffer-create "**shu-load-path**")))
+    (princ (concat "\n\n" ident ":\n") gb)
+    (princ load-path gb)
+    (princ "\n" gb)
+    ))
+
+(shu-show-load-path "INITIAL")
 
 ;;
 ;;  shu-system-type-is-unix
@@ -68,21 +85,31 @@
     type
     ))
 
-
-(setq home (getenv "HOME"))
+(setq shu-home (getenv "HOME"))
   (setq load-path
-        (append (list (concat home "/emacs"))
+        (append (list (concat shu-home "/emacs"))
           (append load-path))
   )
 
-;;;(setq slp-org-location "~/emacs/org-7.8.09")
-;;;(when (file-readable-p (concat slp-org-location "/lisp/org-install.el"))
-;;;  (setq load-path (cons (concat slp-org-location "/lisp/") load-path))
-;;;  (setq load-path (cons (concat slp-org-location "/contrib/lisp/") load-path))
-;;;  (load-file (concat slp-org-location "/lisp/org.elc"))
-;;;  (load-file (concat slp-org-location "/lisp/org-agenda.elc"))
-;;;  )
-(require 'org)
+(shu-show-load-path "AFTER-HOME")
+
+
+(if (shu-system-type-is-mac-osx)
+    (progn
+      (setq slp-org-location "~/emacs/org-7.8.09")
+      (when (file-readable-p (concat slp-org-location "/lisp/org-install.el"))
+        (setq load-path (cons (concat slp-org-location "/lisp/") load-path))
+        (setq load-path (cons (concat slp-org-location "/contrib/lisp/") load-path))
+        (load-file (concat slp-org-location "/lisp/org.elc"))
+        (load-file (concat slp-org-location "/lisp/org-agenda.elc"))
+        )
+      )
+  (require 'org)
+  )
+
+(shu-show-load-path "AFTER-ORG")
+
+
 (defvar shu-org-home nil
   "Home directory of the org data files.")
 
@@ -139,8 +166,9 @@
 ;;
 (defun shu-set-frame-size-full-height ()
   "Set to full screen height"
-  (let* ((hpx (- (x-display-pixel-height) (* 2 (frame-char-height))))
-        (hpl (/ hpx (frame-char-height))))
+  (let* ((lost-lines (if (not (shu-system-type-is-windows)) 2 5))
+         (hpx (- (x-display-pixel-height) (* lost-lines (frame-char-height))))
+         (hpl (/ hpx (frame-char-height))))
     (when (display-graphic-p)
       (setq default-frame-alist '((tool-bar-lines . 0) (menu-bar-lines . 0) (width . 115)))
       (add-to-list 'default-frame-alist (cons 'height hpl)))
@@ -167,6 +195,10 @@
 ;;(load-file "~/emacs/s-mode.elc")
 (when (file-readable-p "~/emacs/useful.elc")
   (load-file "~/emacs/useful.elc"))
+(when (file-readable-p "~/emacs/shu-attributes.elc")
+  (load-file "~/emacs/shu-attributes.elc"))
+(when (file-readable-p "~/emacs/shu-new-attributes.elc")
+  (load-file "~/emacs/shu-new-attributes.elc"))
 (load-file "~/emacs/macros.elc")
 ;;(load-file "~/emacs/clearcase.elc");;Incompatible with Emacs 24
 ;;(load-file "~/emacs/visible.elc")
@@ -205,12 +237,17 @@
 (if (shu-system-type-is-mac-osx)
     (progn
       (shu-set-author "Stewart L. Palmer (stewart@stewartpalmer.com)")
+      (setq shu-cpp-modern t)
       (slp-set-comment-hooks))
   (shu-set-author "Stewart Palmer (spalmer62@bloomberg.net)")
   (shu-set-default-global-namespace "BloombergLP")
+  (setq shu-internal-dev-url "dev.bloomberg.com")
+  (setq shu-internal-group-name "drqs1011")
   (setq shu-cpp-use-bde-library t)
   (setq shu-cpp-include-user-brackets t)
   (setq shu-cpp-std-namespace "bsl")
+  (setq shu-cpp-default-allocator-type "bslma::Allocator")
+  (setq shu-cpp-modern t)
   (slp-bb-set-comment-hooks))
 
 ;;
@@ -290,8 +327,6 @@
 
 (menu-bar-mode -1)
 
-(setq explicit-shell-file-name "/bin/bash")
-
 (fset 'rs 'replace-string)            ; Make rs a synonym for replace-string
 
 (fset 'xyank 'shu-yank-x-primary)     ; Similar to middle mouse button
@@ -366,14 +401,17 @@ text))
     text))
 )
 
-(setq shu-git-path "C:/Program Files/Git/usr/bin/sh.exe")
-(setq shu-git-windows-shell-file (concat shu-git-path "/sh.exe"))
-(when (and (shu-system-type-is-windows) (file-readable-p shu-git-windows-shell-file))
-  (setq explicit-shell-file-name shu-git-windows-shell-file)
-  ;; shell.el forms a variable name from the shell name.  In this case the shell
-  ;; name sans-directory is sh.exe.  So the variable name is explicit-sh.exe-args.
-  (setq explicit-sh.exe-args '("--login" "-i"))
-  (add-to-list 'exec-path shu-git-path))
+(when (shu-system-type-is-windows)
+  (setq shu-git-path "c:/Program Files/Git/usr/bin")
+  (setq shu-git-windows-shell-file (concat shu-git-path "/bash.exe"))
+  (when (file-readable-p shu-git-windows-shell-file)
+    (setq explicit-shell-file-name shu-git-windows-shell-file)
+    ;; shell.el forms a variable name from the shell name.  In this case the shell
+    ;; name sans-directory is bash.exe.  So the variable name is explicit-bash.exe-args.
+    (setq explicit-bash.exe-args '("--login" "-i"))
+    ;;(add-to-list 'exec-path shu-git-path)
+    ))
+
 
 ;; Projects enable short names
 (setq shu-cpp-project-short-names t)
