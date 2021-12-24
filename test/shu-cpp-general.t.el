@@ -3880,4 +3880,46 @@ class names."
 
 
 
+;;
+;;  shu-test-shu-sort-includes-8
+;;
+(ert-deftest shu-test-shu-sort-includes-8 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <gg>\n"
+          "#include <aa>\n"
+          "#include <zz>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "#include <aa>\n"
+          "#include <gg>\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <aa>\n"
+          "#include <gg>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 5 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
 ;;; shu-cpp-general.t.el ends here

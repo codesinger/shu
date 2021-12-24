@@ -5203,19 +5203,21 @@ shell, and yank."
 ;;
 (defun shu-sort-includes ()
   "When positioned on a line that is an #include directive, find all of the
-#include directives above and below that line that are not separated by a blank
-line and sort them into alphabetical order with case ignored.  If not positioned
-on a line that is an #include directive, do nothing.  Case is ignored for the
-sort.  The return value is the number of lines sorted.  If no lines were sorted
-because (point) is not positioned on an #include directive, return nil.  The
-return value is for the benefit of the unit tests.
-Additionally, if there are spaces surrounding the \"#\" of the #include, they
-are removed."
+#include directives above and below that line that are not separated by a line
+that is not an #include directive and sort them into alphabetical order with
+case ignored.  If not positioned on a line that is an #include directive, do
+nothing.  The return value is the number of lines sorted.  If no lines were
+sorted because (point) is not positioned on an #include directive, return nil.
+The return value is for the benefit of the unit tests.  Additionally, if there
+are spaces surrounding the \"#\" of the #include, they are removed.  After the
+sort, any duplicate #include directives are removed."
   (interactive)
   (let ((here (point))
         (top1)
         (bot1)
         (line-count)
+        (del-count)
+        (dup-name "duplicates")
         (sort-fold-case t))
     (if (not (shu-line-is-include))
         (progn
@@ -5228,7 +5230,13 @@ are removed."
       (setq bot1 (line-end-position))
       (setq line-count (1+ (- (shu-the-line-at bot1) (shu-the-line-at top1))))
       (sort-lines nil top1 bot1)
-      (message "Sorted %d lines" line-count))
+      (setq del-count (delete-duplicate-lines top1 bot1 nil t nil nil))
+      (setq line-count (- line-count del-count))
+      (if (= del-count 0)
+          (message "Sorted %d lines" line-count)
+        (when (= del-count 1)
+          (setq dup-name "duplicate"))
+        (message "Sorted %d lines (after deleting %d %s)" line-count del-count dup-name)))
     line-count
     ))
 
