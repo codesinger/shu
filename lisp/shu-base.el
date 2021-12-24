@@ -1153,7 +1153,6 @@ directory is \"foo/blah/humbug\", the value returned from this function is \"hum
     prefix-name
     ))
 
-
 (provide 'shu-base)
 
 ;;; shu-base.el ends here
