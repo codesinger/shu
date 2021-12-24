@@ -30,7 +30,6 @@
 ;;; Code:
 
 
-(provide 'shu-nvplist)
 (require 'shu-base)
 
 ;;
@@ -362,5 +361,7 @@ is positioned immediately after the end delimiter (\"/>\")."
         (setq tlist (cdr tlist))))
     tlist
     ))
+
+(provide 'shu-nvplist)
 
 ;;; shu-nvplist.el ends here

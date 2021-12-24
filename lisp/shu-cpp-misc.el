@@ -29,7 +29,6 @@
 ;;; Code:
 
 
-(provide 'shu-cpp-misc)
 (require 'shu-base)
 
 ;;
@@ -1115,5 +1114,7 @@ shu- prefix removed."
   (defalias 'fline 'shu-fline)
   (defalias 'dox-file 'shu-dox-file)
   )
+
+(provide 'shu-cpp-misc)
 
 ;;; shu-cpp-misc.el ends here

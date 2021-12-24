@@ -29,7 +29,6 @@
 
 ;;; Code:
 
-(provide 'shu-match)
 (require 'shu-cpp-match)
 
 
@@ -1661,5 +1660,6 @@ shu- prefix removed."
   (defalias 'find-all-variables 'shu-match-find-variables)
   )
 
+(provide 'shu-match)
 
 ;;; shu-match.el ends here

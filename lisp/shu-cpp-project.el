@@ -93,7 +93,6 @@
 
 ;;; Code:
 
-(provide 'shu-cpp-project)
 (require 'shu-base)
 
 
@@ -2398,5 +2397,7 @@ shu- prefix removed."
   (defalias 'iother 'shu-iother)
   (defalias 'tother 'shu-tother)
   )
+
+(provide 'shu-cpp-project)
 
 ;;; shu-cpp-project.el ends here

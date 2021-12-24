@@ -29,7 +29,6 @@
 
 ;;; Code:
 
-(provide 'shu-misc)
 (require 'subr-x)
 
 
@@ -3255,5 +3254,7 @@ shu- prefix removed."
   (defalias 'show-repo 'shu-show-repo)
   (defalias 'unbrace 'shu-unbrace)
   )
+
+(provide 'shu-misc)
 
 ;;; shu-misc.el ends here

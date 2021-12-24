@@ -41,7 +41,6 @@
 ;;; Code:
 
 
-(provide 'shu-cpp-general)
 (require 'shu-base)
 (require 'shu-cpp-token)
 
@@ -5351,5 +5350,7 @@ shu- prefix removed."
   (defalias 'gcc 'shu-gcc)
   (defalias 'sort-includes 'shu-sort-includes)
   )
+
+(provide 'shu-cpp-general)
 
 ;;; shu-cpp-general.el ends here

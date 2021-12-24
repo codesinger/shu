@@ -38,7 +38,6 @@
 
 ;;; Code:
 
-(provide 'shu-cpp-token)
 (require 'shu-base)
 ;;
 ;;  token-info:
@@ -1476,5 +1475,7 @@ shu- prefix removed."
   (defalias 'parse-region 'shu-cpp-parse-region)
   (defalias 'reverse-parse-region 'shu-cpp-reverse-parse-region)
   )
+
+(provide 'shu-cpp-token)
 
 ;;; shu-cpp-token.el ends here

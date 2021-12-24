@@ -36,7 +36,6 @@
 ;;; Code:
 
 
-(provide 'shu-capture-doc)
 (require 'shu-base)
 
 
@@ -2060,5 +2059,8 @@ above described cons cell."
         (setq name function-name))))
     name
     ))
+
+
+(provide 'shu-capture-doc)
 
 ;;; shu-capture-doc.el ends here

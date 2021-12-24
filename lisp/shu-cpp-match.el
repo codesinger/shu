@@ -259,7 +259,6 @@
 
 ;;; Code:
 
-(provide 'shu-cpp-match)
 (require 'shu-cpp-token)
 
 
@@ -1301,5 +1300,6 @@ match (via string-match) the token in the token list."
     ))
 
 
+(provide 'shu-cpp-match)
 
 ;;; shu-cpp-match.el ends here
