@@ -48,7 +48,6 @@
 
 
 
-
 # Overview #
 
 
@@ -69,7 +68,9 @@ Version 1.5 was merged with the master branch on 18 August 2019.
 
 Version 1.6 was merged with the master branch on 16 November 2019.
 
-This is Version 1.6.0 of the Shu elisp repository.
+Version 1.6.108 was merged with the master branch on 24 December 2021
+
+This is Version 1.6.108 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -11485,6 +11486,8 @@ within type.
 
 Associate a number with each type of variable
 
+
+
 # Index #
 
 * [acgen](#acgen)
@@ -12458,7 +12461,6 @@ Associate a number with each type of variable
 * [winpath](#winpath)
 
 
-
 <!--
 LocalWords:  shu regexp scf cpp doxygen namepace bde num arg cp Bloomberg gen bb fn
 LocalWords:  cfile hfile tfile decl ifndef endif sdecl struct sgen foo doc elisp md
@@ -12488,5 +12490,5 @@ LocalWords:  timezone tzdate tz deleteObject nullptr printSelf ctor dtor iother 
 LocalWords:  CMake doody ops py krpps Doxyfile af repo fixup doxyfile gcm config za
 LocalWords:  tocify fgh ijkl mno pqr stuv wxy bcde fg hij klm Stuvw xyzab OpenGrok
 LocalWords:  unbrace iff currentliveupdate debian dep codesinger github pt ua seq
+LocalWords:  dev abc pr fka https classname
 -->
-LocalWords:  dev abc pr fka https
