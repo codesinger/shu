@@ -42,7 +42,6 @@
 
 
 (require 'shu-base)
-(require 'shu-cpp-token)
 
 
 (defcustom shu-cpp-allocator-type "bslma::Allocator"
