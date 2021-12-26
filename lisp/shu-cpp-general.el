@@ -125,6 +125,9 @@
    "unsigned")
   "A list of all of the base types in C and C++.  This may be modified by shu-add-cpp-base-types")
 
+(defvar shu-cpp-keywords-hash nil
+  "The hash table of C++ key words")
+
 (defvar shu-cpp-member-prefix "_"
   "The character string that is used as the prefix to member variables of a C++ class.
 This is used by shu-internal-get-set when generating getters and setters for a class.")
@@ -1689,10 +1692,49 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
 
 
 
+;;
+;;  shu-get-cpp-keywords-hash
+;;
+(defun shu-get-cpp-keywords-hash ()
+  "Return a hash table containing all of the C++ key words."
+  (let ((ht (make-hash-table :test 'equal :size (length shu-cpp-keywords)))
+        (kl shu-cpp-keywords)
+        (kc))
+    (while kl
+      (setq kc (car kl))
+      (puthash (car kc) (cdr kc) ht)
+      (setq kl (cdr kl)))
+    ht
+    ))
+
 
 ;;
-;;  Functions for customzing
+;;  shu-cpp-is-keyword
 ;;
+(defun shu-cpp-is-keyword (word)
+  "Doc string."
+    (unless shu-cpp-keywords-hash
+      (setq shu-cpp-keywords-hash (shu-get-cpp-keywords-hash)))
+    (gethash word shu-cpp-keywords-hash)
+    )
+
+
+
+;;
+;;  shu-cpp-sitting-on-keyword
+;;
+(defun shu-cpp-sitting-on-keyword ()
+  "If (point) is sitting on a C++ key word, return that key word, else return
+ nil."
+  (let ((is-maybe-key (shu-sitting-on shu-cpp-keyword))
+        (is-key))
+    (when is-maybe-key
+      (setq is-key (shu-cpp-is-keyword is-maybe-key))
+      (when (not is-key)
+        (setq is-maybe-key nil)))
+    is-maybe-key
+    ))
+
 
 
 ;;

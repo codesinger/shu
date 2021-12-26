@@ -125,9 +125,6 @@
 ;;
 
 
-(defvar shu-cpp-keywords-hash nil
-  "The hash table of C++ key words")
-
 (defconst shu-cpp-operators-three
   (regexp-opt (list "->*" "<<=" ">>=") nil)
   "Define the set of three character C++ operators")
@@ -188,23 +185,6 @@ template parameter \"int\"")
 (defconst shu-cpp-token-delimiter-end
   (regexp-opt shu-cpp-token-delimiter-chars  nil)
   "Regular expression to define that which terminates an unquoted token in C++")
-
-
-;;
-;;  shu-get-cpp-keywords-hash
-;;
-(defun shu-get-cpp-keywords-hash ()
-  "Return a hash table containing all of the C++ key words."
-  (interactive)
-  (let ((ht (make-hash-table :test 'equal :size (length shu-cpp-keywords)))
-        (kl shu-cpp-keywords)
-        (kc))
-    (while kl
-      (setq kc (car kl))
-      (puthash (car kc) (cdr kc) ht)
-      (setq kl (cdr kl)))
-    ht
-    ))
 
 
 ;;

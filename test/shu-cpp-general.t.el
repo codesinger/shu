@@ -3922,4 +3922,84 @@ class names."
 
 
 
+;;
+;;  shu-test-shu-cpp-is-keyword-1
+;;
+(ert-deftest shu-test-shu-cpp-is-keyword-1 ()
+    (should (shu-cpp-is-keyword "register"))
+    )
+
+
+;;
+;;  shu-test-shu-cpp-is-keyword-2
+;;
+(ert-deftest shu-test-shu-cpp-is-keyword-2 ()
+    (should (shu-cpp-is-keyword "static_cast"))
+    )
+
+
+;;
+;;  shu-test-shu-cpp-is-keyword-3
+;;
+(ert-deftest shu-test-shu-cpp-is-keyword-3 ()
+    (should (not (shu-cpp-is-keyword "ztatic_cast")))
+    )
+
+
+;;
+;;  shu-test-shu-cpp-sitting-on-keyword-1
+;;
+(ert-deftest shu-test-shu-cpp-sitting-on-keyword-1 ()
+  (let ((data "  static_cast  ")
+        (found)
+        (actual)
+        (expected "static_cast"))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "stat" nil t))
+      (should found)
+      (setq actual (shu-cpp-sitting-on-keyword))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-sitting-on-keyword-2
+;;
+(ert-deftest shu-test-shu-cpp-sitting-on-keyword-2 ()
+  (let ((data "  dynamic_cast  ")
+        (found)
+        (actual)
+        (expected "dynamic_cast"))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "dyna" nil t))
+      (should found)
+      (setq actual (shu-cpp-sitting-on-keyword))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-sitting-on-keyword-3
+;;
+(ert-deftest shu-test-shu-cpp-sitting-on-keyword-3 ()
+  (let ((data "  static_bast  ")
+        (found)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "stat" nil t))
+      (should found)
+      (should (not actual))
+      )
+    ))
+
 ;;; shu-cpp-general.t.el ends here
