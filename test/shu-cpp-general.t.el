@@ -3141,7 +3141,7 @@ This is most likely the name of an include file and not the name of a class."
 (ert-deftest shu-test-shu-cpp-map-class-to-include-1 ()
   (let* ((namespace (if shu-cpp-use-bde-library "bsl" "std"))
          (class-name (concat namespace "::make_shared"))
-         (expected-name (if shu-cpp-use-bde-library "bsl_memory.h?" "memory"))
+         (expected-name (if shu-cpp-use-bde-library "bsl_memory.h" "memory"))
          (actual-name))
     (setq actual-name (shu-cpp-map-class-to-include class-name))
     (should actual-name)
