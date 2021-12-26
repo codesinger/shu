@@ -1736,6 +1736,30 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
     ))
 
 
+;;
+;;  shu-is-keyword
+;;
+(defun shu-is-keyword ()
+  "Do a COMPLETING-READ from the minibuffer of a string that may or may not be a
+C++ key word.  If the string is a C++ key word, display the key word, else
+display \"no\".  If (point) is sitting on a C++ key word, that is the default
+initial input to the completing read."
+  (interactive)
+  (let ((maybe-key (shu-cpp-sitting-on-keyword))
+        (x)
+        (completion-ignore-case nil))
+    (setq x (completing-read
+             "Word? "            ;;; prompt
+             shu-cpp-keywords    ;;; collection
+             nil                 ;;; predicate
+             nil                 ;;; require-match
+             maybe-key))         ;;; initial-input
+    (if x
+        (message "%s" x)
+      (message "%s" "no"))
+    ))
+
+
 
 ;;
 ;;  shu-add-cpp-base-types
@@ -5450,6 +5474,7 @@ an #include directive."
   "Set the common alias names for the functions in shu-cpp-general.
 These are generally the same as the function names with the leading
 shu- prefix removed."
+  (defalias 'is-keyword 'shu-is-keyword)
   (defalias 'cpp1-class 'shu-cpp1-class)
   (defalias 'cpp2-class 'shu-cpp2-class)
   (defalias 'new-c-class 'shu-new-c-class)
