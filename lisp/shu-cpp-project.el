@@ -929,7 +929,7 @@ anywhere on the word \"line\".  This is used pick up file positions of the form:
       ((case-fold-search t)           ;; Searches ignore case
        (bol (save-excursion (beginning-of-line) (point)))
        (eol (save-excursion (forward-line 1) (end-of-line) (point)))
-       (x )                           ;; Set to character position if siting on
+       (x )                           ;; Set to character position if sitting on
        ;;  "l", "i", "n", or "e"
        (y )
        (z )

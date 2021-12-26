@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.108
+;; Version: 1.6.109
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -34,7 +34,7 @@
 ;;; Code:
 
 
-(defconst shu-version "1.6.108"
+(defconst shu-version "1.6.109"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2019 Nov 18"
@@ -47,7 +47,7 @@
    (cons "1.4"   "479a129fedba8a7f95d60b38de3383ab22575389")
    (cons "1.5"   "821beb4ace51edbae436f7ac1da67873cc5925c2")
    (cons "1.6"   "dcfe32ef84a3d4ca54b0ac43e754249f1e21f35e")
-   (cons "1.6.108"  "cd5a1de0a7d9ec611bbd46f8d043d5ae6b631d5a")
+   (cons "1.6.109"  "cd5a1de0a7d9ec611bbd46f8d043d5ae6b631d5a")
    (cons "1.7"   "UNKNOWN"))
   "A list of all commits by version starting with version 1.2")
 
@@ -71,6 +71,17 @@ here.")
 (defconst shu-cpp-name (regexp-opt
                         shu-cpp-name-list  nil)
   "A regular expression to match a variable name in a C or C++ program.")
+
+(defconst shu-cpp-keyword-list
+  (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
+        "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
+        "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+        "_")
+  "List of all characters that can be present in a C++ key word.")
+
+(defconst shu-cpp-keyword (regexp-opt
+                           shu-cpp-keyword-list  nil)
+  "A regular expression to match a key word in a C++ program.")
 
 (defconst shu-non-cpp-name
   (concat "[^" (substring shu-cpp-name 1))
@@ -827,7 +838,7 @@ and the returned alist would be
 
 The return value of this function is a cons cell whose car is the hash table and
 whose cdr is the alist.  If the cdr of the return value is nil, then the entire
-hash table could be constructed."
+hash table could not be constructed."
   (let ((al alist)
         (ht)
         (count 0)

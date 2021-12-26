@@ -2384,4 +2384,229 @@
 
 
 
+;;
+;;  shu-test-shu-sitting-end-1
+;;
+(ert-deftest shu-test-shu-sitting-end-1 ()
+  (let ((data "  something  \n")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 11)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-2
+;;
+(ert-deftest shu-test-shu-sitting-end-2 ()
+  (let ((data "  something  \n")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq fpos (shu-sitting-end shu-cpp-keyword -1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 3)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-3
+;;
+(ert-deftest shu-test-shu-sitting-end-3 ()
+  (let ((data "something  \n")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq fpos (shu-sitting-end shu-cpp-keyword -1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 1)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-4
+;;
+(ert-deftest shu-test-shu-sitting-end-4 ()
+  (let ((data " something")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 10)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-5
+;;
+(ert-deftest shu-test-shu-sitting-end-5 ()
+  (let ((data "  s ")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 3)
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 3)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-6
+;;
+(ert-deftest shu-test-shu-sitting-end-6 ()
+  (let ((data "s")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 1)
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 1)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-7
+;;
+(ert-deftest shu-test-shu-sitting-end-7 ()
+  (let ((data "s")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 1)
+      (setq fpos (shu-sitting-end shu-cpp-keyword -1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 1)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-8
+;;
+(ert-deftest shu-test-shu-sitting-end-8 ()
+  (let ((data " somethingBIG ")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should (not fpos)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-9
+;;
+(ert-deftest shu-test-shu-sitting-end-9 ()
+  (let ((fpos))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should (not fpos)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-on-1
+;;
+(ert-deftest shu-test-shu-sitting-on-1 ()
+  (let ((data "  something  \n")
+        (found)
+        (actual)
+        (expected "something"))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq actual (shu-sitting-on shu-cpp-keyword))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-on-2
+;;
+(ert-deftest shu-test-shu-sitting-on-2 ()
+  (let ((data "something")
+        (found)
+        (actual)
+        (expected "something"))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq actual (shu-sitting-on shu-cpp-keyword))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-on-3
+;;
+(ert-deftest shu-test-shu-sitting-on-3 ()
+  (let ((data "somethingBIG")
+        (found)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq actual (shu-sitting-on shu-cpp-keyword))
+      (should (not actual)))
+    ))
+
+
+
 ;;; shu-misc.t.el ends here

@@ -3190,6 +3190,65 @@ nil is returned."
 
 
 
+;;
+;;  shu-sitting-on
+;;
+(defun shu-sitting-on (regex)
+  "If the contiguous string of characters at (point) all match REGEX bounded by
+either whitespace or the begin / end of the line, return the matched string.  If
+any characters are found that do not match REGEX, return nil."
+  (let ((here (point))
+        (begin)
+        (end)
+        (result))
+    (save-excursion
+      (setq begin (shu-sitting-end regex -1))
+      (when begin
+        (setq end (shu-sitting-end regex 1))
+        (when end
+          (setq result (buffer-substring-no-properties begin (1+ end))))))
+    result
+    ))
+
+
+
+;;
+;;  shu-sitting-end
+;;
+(defun shu-sitting-end (regex dir)
+  "If the text at (point) is a character that matches REGEX, scan until either
+whitespace or the beginning / end of the line is reached.  If all characters
+scanned match REGEX, return the point of the last matching character, otherwise
+return nil.  DIR indicates the direction of the scan.  Negative does a backward
+scan.  Non-negative does a forward scan."
+  (let ((something t)
+        (mc (if (< dir 0) -1 1))
+        (end-adjust (if (< dir 0) +1 -1))
+        (epos (if (< dir 0)  (line-beginning-position) (1- (line-end-position))))
+        (fpos)
+        (count 0)
+        (case-fold-search nil)
+        (c))
+    (save-excursion
+      (when (looking-at regex)
+        (setq count 1)
+        (while something
+          (if (= (point) epos)
+              (progn
+                (setq something nil)
+                (when (/= count 0)
+                  (setq fpos (point))))
+            (forward-char mc)
+            (setq count (1+ count))
+            (when (not (looking-at regex))
+              (setq something nil)
+              (when (looking-at shu-all-whitespace-regexp)
+                (setq fpos (+ (point) end-adjust))))))))
+    fpos
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias
