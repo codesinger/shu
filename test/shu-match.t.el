@@ -3719,6 +3719,63 @@ be in place."
 
 
 
+;;
+;;  shu-test-shu-match-find-all-general-include-1
+;;
+(ert-deftest shu-test-shu-match-find-all-general-include-1 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "# include <mumble>\n"
+          "#include <bob>\n"
+          "// Goodbye\n"
+          ))
+        (tlist)
+        (token-info)
+        (spoint))
+    (with-temp-buffer
+      (insert data)
+      (setq tlist (shu-match-find-all-general-include))
+      (should tlist)
+      (should (listp tlist))
+      (should (= 2 (length tlist)))
+      (setq token-info (car tlist))
+      (should token-info)
+      (setq spoint (shu-cpp-token-extract-spoint token-info))
+      (should spoint)
+      (should (numberp spoint))
+      (should (= 29 spoint))
+      (setq tlist (cdr tlist))
+      (should tlist)
+      (should (listp tlist))
+      (setq token-info (car tlist))
+      (should token-info)
+      (setq spoint (shu-cpp-token-extract-spoint token-info))
+      (should spoint)
+      (should (numberp spoint))
+      (should (= 10 spoint)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-match-find-all-general-include-2
+;;
+(ert-deftest shu-test-shu-match-find-all-general-include-2 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "// Goodbye\n"
+          ))
+        (tlist))
+    (with-temp-buffer
+      (insert data)
+      (setq tlist (shu-match-find-all-general-include))
+      (should (not tlist)))
+    ))
+
+
+
 
 ;;
 ;;  shu-test-shu-show-rlists

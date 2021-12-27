@@ -1033,7 +1033,9 @@ if any."
     (when arg
       (if (stringp arg)
           (setq sval arg)
-        (setq sval "t")))
+        (if (numberp arg)
+            (setq sval (number-to-string arg))
+          (setq sval "t"))))
     sval
     ))
 
