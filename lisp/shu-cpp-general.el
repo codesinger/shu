@@ -5385,8 +5385,30 @@ The return value is for the benefit of the unit tests.  Additionally, if there
 are spaces surrounding the \"#\" of the #include, they are removed.  After the
 sort, any duplicate #include directives are removed."
   (interactive)
+  (let ((pl (shu-cpp-find-current-include-block))
+        (ret-val)
+        (line-count)
+        (del-count))
+    (setq ret-val (shu-internal-sort-includes pl))
+    (setq line-count (car ret-val))
+    (shu-announce-sort-counts ret-val)
+    line-count
+    ))
+
+
+
+
+;;
+;;  shu-internal-sort-includes
+;;
+(defun shu-internal-sort-includes (pl)
+  "PL is a cons cell that defines the start and end position of a block one or
+more contiguous #include directives.  Any lines that have extra spacing in them,
+such as \" # include \" have the extra spacing removed and then the entire block
+is sorted into alphabetical order with any duplicate lines removed.  The return
+value is a cons cell whose car holds the number of lines sorted and whose cdr
+holds the number of duplicates removed."
   (let ((ss "\\s-*#\\s-*include\\s-+")
-        (pl (shu-cpp-find-current-include-block))
         (spoint)
         (epoint)
         (line-count 0)
@@ -5418,15 +5440,30 @@ sort, any duplicate #include directives are removed."
         (setq epoint (- epoint total))
         (sort-lines nil spoint epoint)
         (setq del-count (delete-duplicate-lines spoint epoint nil t nil nil))
-        (setq line-count (- line-count del-count))
-        (when (= line-count 1)
-          (setq line-name "line"))
-        (if (= del-count 0)
-            (message "Sorted %d %s" line-count line-name)
-          (when (= del-count 1)
-            (setq dup-name "duplicate"))
-          (message "Sorted %d %s (after deleting %d %s)" line-count line-name del-count dup-name))))
-    line-count
+        (setq line-count (- line-count del-count))))
+    (cons line-count del-count)
+    ))
+
+
+
+;;
+;;  shu-announce-sort-counts
+;;
+(defun shu-announce-sort-counts (ret-val)
+  "RET-VAL is a cons cell whose car is the count of lines sorted by
+SHU-INTERNAL-SORT-INCLUDES and whose cdr is the number of duplicate lines
+removed.  Display the appropriate message in the minibuffer with those counts."
+  (let ((line-count (car ret-val))
+        (del-count (cdr ret-val))
+        (dup-name "duplicates")
+        (line-name "lines"))
+    (when (= line-count 1)
+      (setq line-name "line"))
+    (if (= del-count 0)
+        (message "Sorted %d %s" line-count line-name)
+      (when (= del-count 1)
+        (setq dup-name "duplicate"))
+      (message "Sorted %d %s (after deleting %d %s)" line-count line-name del-count dup-name))
     ))
 
 
