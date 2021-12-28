@@ -1559,16 +1559,18 @@ are no #include directives."
         (token-info)
         (incl-list))
     (save-excursion
-      (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
-      (setq tlist token-list)
-      (while ret-val
-        (setq ret-val (shu-cpp-search-match-tokens rlist shu-cpp-match-general-include tlist))
-        (when ret-val
-          (setq tlist (car ret-val))
-          (setq rlist (cdr ret-val))
-          (setq token-info (car rlist))
-          (push token-info incl-list)
-          (setq rlist nil))))
+      (save-restriction
+        (widen)
+        (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+        (setq tlist token-list)
+        (while ret-val
+          (setq ret-val (shu-cpp-search-match-tokens rlist shu-cpp-match-general-include tlist))
+          (when ret-val
+            (setq tlist (car ret-val))
+            (setq rlist (cdr ret-val))
+            (setq token-info (car rlist))
+            (push token-info incl-list)
+            (setq rlist nil)))))
     incl-list
     ))
 

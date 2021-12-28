@@ -5468,6 +5468,145 @@ an #include directive."
 
 
 ;;
+;;  shu-cpp-find-include-blocks
+;;
+(defun shu-cpp-find-include-blocks ()
+  "This function returns a list of cons cells, each of which holds the point of
+the start and end of a contiguous block of #include directives.
+
+For example, if a buffer contains
+
+      #include <able>
+      #include <charlie>
+      // Hello
+      #include <delta>
+
+this function will return a list of two cons cells.  The first one holds the
+point of the \"#\" of #include <delta> and the point of the \">\" of #include
+<delta>.  The second holds the point of the \"#\" of #include <able> and the
+point of the \">\" of #include <charlie>."
+  (let ((pllist)
+        (first-line)
+        (last-line)
+        (first-line)
+        (llist)
+        (ilist)
+        (line-diff 1)
+        (pl)
+        (line)
+        (lcount 0)
+        (new-list))
+    (setq pllist (shu-cpp-find-include-locations))
+    (setq line-diff (shu-cpp-find-include-direction pllist))
+    (when pllist
+      (if (< (length pllist) 2)
+          (progn
+            (setq pl (car pllist))
+            (push (shu-make-include-block pl) new-list))
+        (setq llist pllist)
+        (while llist
+          (setq pl (car llist))
+          (setq lcount (1+ lcount))
+          (setq line (cdr pl))
+          (if (not first-line)
+              (progn
+                (setq first-line pl)
+                (setq last-line pl))
+            (if (= (+ (cdr last-line) line-diff) line)
+                (setq last-line pl)
+              (push (shu-make-include-block first-line last-line) new-list)
+              (setq first-line pl)
+              (setq last-line pl)
+              (setq lcount 1)))
+          (setq llist (cdr llist)))
+        (when (/= lcount 0)
+          (push (shu-make-include-block first-line last-line) new-list))
+        (when (< line-diff 0)
+          (setq new-list (nreverse new-list)))))
+    new-list
+    ))
+
+
+;;
+;;  shu-make-include-block
+;;
+(defun shu-make-include-block (first-line &optional last-line)
+  "FIRST-LINE is a cons cell that holds the point and line of an #include
+directive.  LAST-LINE optionally holds the point and line of another #include
+directive.  FIRST-LINE and LAST-LINE may be in any order.  This function returns
+a cons cell whose car holds the point of the start of the first #include
+directive and whose cdr holds the point of the end of the last #include."
+  (let ((gb (get-buffer-create "**foo**"))
+        (spoint (car first-line))
+        (epoint))
+    (if last-line
+        (setq epoint (car last-line))
+      (setq epoint (1+ spoint)))
+    (when (> spoint epoint)
+      (shu-swap spoint epoint))
+    (save-excursion
+      (goto-char epoint)
+      (setq epoint (line-end-position)))
+    (cons spoint epoint)
+    ))
+
+
+
+;;
+;;  shu-cpp-find-include-direction
+;;
+(defun shu-cpp-find-include-direction (pllist)
+  "PLLIST is a list returned from SHU-CPP-FIND-INCLUDE-LOCATIONS.  Each entry in
+the list is a cons cell whose car is the point of the \"#\" sign and whose cdr
+is the line number on which the \"#\" was found.  The list may have been
+produced by either a forward or backward tokenization.  i.e., The first item on
+the list may be the last #include in the buffer or the first.  This function
+returns +1 if the list is in order by ascending location or -1 if the list is in
+order by descending location.  If the list has no order because it only has one
+entry, +1 is returned."
+  (let ((line-diff 1)
+        (pl)
+        (pl2))
+    (when pllist
+      (when (> (length pllist) 1)
+        (setq pl (car pllist))
+        (setq pl2 (cadr pllist))
+        (when (> (car pl) (car pl2))
+          (setq line-diff -1))))
+    line-diff
+    ))
+
+
+;;
+;;  shu-cpp-find-include-locations
+;;
+(defun shu-cpp-find-include-locations ()
+  "Return a list of the locations of all #include directives in the current
+buffer.  Each entry in the list is a cons cell whose car is the point of the
+\"#\" sign and whose cdr is the line number on which the \"#\" was found."
+  (let ((token-list (shu-match-find-all-general-include))
+        (tlist)
+        (token-info)
+        (spoint)
+        (line)
+        (pl)
+        (pllist))
+    (when token-list
+      (setq tlist token-list)
+      (while tlist
+        (setq token-info (car tlist))
+        (setq spoint (shu-cpp-token-extract-spoint token-info))
+        (setq line (shu-the-line-at spoint))
+        (setq pl (cons spoint line))
+        (push pl pllist)
+        (setq tlist (cdr tlist)))
+      (setq pllist (nreverse pllist)))
+    pllist
+    ))
+
+
+
+;;
 ;;  shu-cpp-general-set-alias
 ;;
 (defun shu-cpp-general-set-alias ()

@@ -3923,6 +3923,327 @@ class names."
 
 
 ;;
+;;  shu-test-shu-cpp-find-include-blocks-1
+;;
+(ert-deftest shu-test-shu-cpp-find-include-blocks-1 ()
+  (let ((data
+         (concat
+          "#include <a>\n"
+          "#include <b>\n"
+          "#include <c>\n"
+          "\\ Hello\n"
+          "#include <d>\n"
+          "#include <e>\n"
+          "#include <f>\n"
+          "\\ Bye\n"))
+        (pllist)
+        (pl)
+        (spoint)
+        (epoint))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-blocks))
+      (should pllist)
+      (should (listp pllist))
+      (should (= 2 (length pllist)))
+
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 48))
+      (should (= epoint 86))
+
+      (setq pllist (cdr pllist))
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 1))
+      (should (= epoint 39)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-find-include-blocks-2
+;;
+(ert-deftest shu-test-shu-cpp-find-include-blocks-2 ()
+  (let ((data
+         (concat
+          "#include <a>\n"
+          "#include <b>\n"
+          "\\ Hello\n"
+          "#include <c>\n"
+          "\\ Bye\n"
+          "#include <d>\n"
+          "#include <e>\n"
+          "#include <f>\n"
+          "\\ Bye\n"))
+        (pllist)
+        (pl)
+        (spoint)
+        (epoint))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-blocks))
+      (should pllist)
+      (should (listp pllist))
+      (should (= 3 (length pllist)))
+
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 54))
+      (should (= epoint 92))
+
+      (setq pllist (cdr pllist))
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 35))
+      (should (= epoint 47))
+
+      (setq pllist (cdr pllist))
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 1))
+      (should (= epoint 26)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-find-include-blocks-3
+;;
+(ert-deftest shu-test-shu-cpp-find-include-blocks-3 ()
+  (let ((data
+         (concat
+          "\\ Hello\n"
+          "#include <c>\n"
+          "\\ Bye\n"))
+        (pllist)
+        (pl)
+        (spoint)
+        (epoint))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-blocks))
+      (should pllist)
+      (should (listp pllist))
+      (should (= 1 (length pllist)))
+
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 9))
+      (should (= epoint 21)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-find-include-blocks-4
+;;
+(ert-deftest shu-test-shu-cpp-find-include-blocks-4 ()
+  (let ((data
+         (concat
+          "\\ Hello\n"
+          "\\ Bye\n"))
+        (pllist))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-blocks))
+      (should (not pllist)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-locations-1
+;;
+(ert-deftest shu-test-shu-cpp-find-include-locations-1 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "# include <mumble>\n"
+          "#include <bob>\n"
+          "// Goodbye\n"
+          "#include <bumble>\n"))
+        (pllist)
+        (pl)
+        (spoint)
+        (line))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-locations)))
+    (should pllist)
+    (should (listp pllist))
+    (should (= 3 (length pllist)))
+    (setq pl (car pllist))
+    (should pl)
+    (should (consp pl))
+    (setq spoint (car pl))
+    (should spoint)
+    (should (numberp spoint))
+    (should (= 55 spoint))
+    (setq line (cdr pl))
+    (should line)
+    (should (numberp line))
+    (should (= 5 line))
+
+    (setq pllist (cdr pllist))
+    (should pllist)
+    (should (listp pllist))
+    (setq pl (car pllist))
+    (should pl)
+    (should (consp pl))
+    (setq spoint (car pl))
+    (should spoint)
+    (should (numberp spoint))
+    (should (= 29 spoint))
+    (setq line (cdr pl))
+    (should line)
+    (should (numberp line))
+    (should (= 3 line))
+
+    (setq pllist (cdr pllist))
+    (should pllist)
+    (should (listp pllist))
+    (setq pl (car pllist))
+    (should pl)
+    (should (consp pl))
+    (setq spoint (car pl))
+    (should spoint)
+    (should (numberp spoint))
+    (should (= 10 spoint))
+    (setq line (cdr pl))
+    (should line)
+    (should (numberp line))
+    (should (= 2 line))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-locations-2
+;;
+(ert-deftest shu-test-shu-cpp-find-include-locations-2 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "// Goodbye\n"))
+        (pllist))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-locations)))
+    (should (not pllist))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-find-include-direction-1
+;;
+(ert-deftest shu-test-shu-cpp-find-include-direction-1 ()
+  (let ((pllist
+         (list
+          (cons 15 2)
+          (cons 30 4)))
+        (actual)
+        (expected 1))
+    (setq actual (shu-cpp-find-include-direction pllist))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-direction-2
+;;
+(ert-deftest shu-test-shu-cpp-find-include-direction-2 ()
+  (let ((pllist
+         (list
+          (cons 30 4)
+          (cons 15 2)))
+        (actual)
+        (expected -1))
+    (setq actual (shu-cpp-find-include-direction pllist))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-direction-3
+;;
+(ert-deftest shu-test-shu-cpp-find-include-direction-3 ()
+  (let ((pllist
+         (list
+          (cons 30 4)))
+        (actual)
+        (expected 1))
+    (setq actual (shu-cpp-find-include-direction pllist))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-direction-4
+;;
+(ert-deftest shu-test-shu-cpp-find-include-direction-4 ()
+  (let ((pllist)
+        (actual)
+        (expected 1))
+    (setq actual (shu-cpp-find-include-direction pllist))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-cpp-is-keyword-1
 ;;
 (ert-deftest shu-test-shu-cpp-is-keyword-1 ()
