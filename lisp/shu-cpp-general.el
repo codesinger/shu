@@ -1179,11 +1179,11 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsl::remote_version"
                             ))
    (cons "bsl_condition_variable.h" (list
-                               "bsl::condition_variable"
-                               "bsl::condition_variable_any"
-                               "bsl::cv_status"
-                               "bsl::notify_all_at_thread_exit"
-                               ))
+                                     "bsl::condition_variable"
+                                     "bsl::condition_variable_any"
+                                     "bsl::cv_status"
+                                     "bsl::notify_all_at_thread_exit"
+                                     ))
    (cons "bsl_cstddef.h"    (list
                              "bsl::size_t"
                              "bsl::ptrdiff_t"
@@ -1375,20 +1375,20 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsl::reinterpret_pointer_cast"
                             ))
    (cons "bsl_mutex.h" (list
-                  "bsl::mutex"
-                  "bsl::recursive_mutex"
-                  "bsl::timed_mutex"
-                  "bsl::recursive_timed_mutex"
-                  "bsl::lock_guard"
-                  "bsl::unique_lock"
-                  "bsl::once_flag"
-                  "bsl::adopt_lock_t"
-                  "bsl::defer_lock_t"
-                  "bsl::try_to_lock_t"
-                  "bsl::try_lock"
-                  "bsl::lock"
-                  "bsl::call_once"
-                  ))
+                        "bsl::mutex"
+                        "bsl::recursive_mutex"
+                        "bsl::timed_mutex"
+                        "bsl::recursive_timed_mutex"
+                        "bsl::lock_guard"
+                        "bsl::unique_lock"
+                        "bsl::once_flag"
+                        "bsl::adopt_lock_t"
+                        "bsl::defer_lock_t"
+                        "bsl::try_to_lock_t"
+                        "bsl::try_lock"
+                        "bsl::lock"
+                        "bsl::call_once"
+                        ))
    (cons "bsl_new.h"   (list
                         "bsl::bad_alloc"
                         "bsl::bad_array_new_length"
@@ -1486,9 +1486,9 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                 "bsl::wstring_view"
                                 ))
    (cons "bsl_thread.h" (list
-                   "bsl::thread"
-                   "bsl::this_thread"
-                   ))
+                         "bsl::thread"
+                         "bsl::this_thread"
+                         ))
    (cons "bsl_tuple.h"    (list
                            "bsl::tuple"
                            "bsl::tuple_size"
@@ -1713,10 +1713,10 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
 ;;
 (defun shu-cpp-is-keyword (word)
   "Doc string."
-    (unless shu-cpp-keywords-hash
-      (setq shu-cpp-keywords-hash (shu-get-cpp-keywords-hash)))
-    (gethash word shu-cpp-keywords-hash)
-    )
+  (unless shu-cpp-keywords-hash
+    (setq shu-cpp-keywords-hash (shu-get-cpp-keywords-hash)))
+  (gethash word shu-cpp-keywords-hash)
+  )
 
 
 
@@ -5370,6 +5370,7 @@ shell, and yank."
 
 
 
+
 ;;
 ;;  shu-sort-includes
 ;;
@@ -5384,87 +5385,84 @@ The return value is for the benefit of the unit tests.  Additionally, if there
 are spaces surrounding the \"#\" of the #include, they are removed.  After the
 sort, any duplicate #include directives are removed."
   (interactive)
-  (let ((here (point))
-        (top1)
-        (bot1)
-        (line-count)
-        (del-count)
+  (let ((ss "\\s-*#\\s-*include\\s-+")
+        (pl (shu-cpp-find-current-include-block))
+        (spoint)
+        (epoint)
+        (line-count 0)
+        (del-count 0)
+        (count 0)
         (dup-name "duplicates")
+        (line-name "lines")
+        (len1)
+        (len2)
+        (diff)
+        (total 0)
         (sort-fold-case t))
-    (if (not (shu-line-is-include))
-        (progn
-          (ding)
-          (message "%s" "Not on an #include line"))
-      (setq top1 (shu-find-end-include -1))
-      (goto-char here)
-      (setq bot1 (shu-find-end-include 1))
-      (goto-char bot1)
-      (setq bot1 (line-end-position))
-      (setq line-count (1+ (- (shu-the-line-at bot1) (shu-the-line-at top1))))
-      (sort-lines nil top1 bot1)
-      (setq del-count (delete-duplicate-lines top1 bot1 nil t nil nil))
-      (setq line-count (- line-count del-count))
-      (if (= del-count 0)
-          (message "Sorted %d lines" line-count)
-        (when (= del-count 1)
-          (setq dup-name "duplicate"))
-        (message "Sorted %d lines (after deleting %d %s)" line-count del-count dup-name)))
+    (when pl
+      (save-excursion
+        (setq spoint (car pl))
+        (setq epoint (cdr pl))
+        (setq line-count (1+ (- (shu-the-line-at epoint) (shu-the-line-at spoint))))
+        (goto-char spoint)
+        (while (< count line-count)
+          (beginning-of-line)
+          (setq len1 (- (line-end-position) (line-beginning-position)))
+          (when (re-search-forward ss (line-end-position) t)
+            (replace-match "#include " t t)
+            (setq len2 (- (line-end-position) (line-beginning-position)))
+            (setq diff (- len1 len2))
+            (setq total (+ total diff)))
+          (setq count (1+ count))
+          (forward-line 1))
+        (setq epoint (- epoint total))
+        (sort-lines nil spoint epoint)
+        (setq del-count (delete-duplicate-lines spoint epoint nil t nil nil))
+        (setq line-count (- line-count del-count))
+        (when (= line-count 1)
+          (setq line-name "line"))
+        (if (= del-count 0)
+            (message "Sorted %d %s" line-count line-name)
+          (when (= del-count 1)
+            (setq dup-name "duplicate"))
+          (message "Sorted %d %s (after deleting %d %s)" line-count line-name del-count dup-name))))
     line-count
     ))
 
 
 
-
 ;;
-;;  shu-find-end-include
+;;  shu-cpp-find-current-include-block
 ;;
-(defun shu-find-end-include (dir)
-  "On entry, (point) is positioned on an #include directive.  This function
-searches either backwards or forward for the next line that does not contain an
-include directive.  If DIR is positive the search is forward, else backward.
-The return value is the (line-beginning-position) of the last line that contains
-an #include directive."
-  (let ((mc (if (< dir 0) -1 1))
-        (something t)
-        (last1)
-        (n))
-    (when (shu-line-is-include)
-      (goto-char (line-beginning-position))
-      (setq last1 (point))
-      (while something
-        (setq n (forward-line mc))
-        (if (= n 0)
-            (progn
-              (if (shu-line-is-include t)
-                  (setq last1 (line-beginning-position))
-                (setq something nil)))
-          (setq something nil))))
-    last1
+(defun shu-cpp-find-current-include-block ()
+  "This function returns a cons cell that defines the upper and lower bounds of
+the contiguous block of #include directives in which point it sitting.  If point
+is not sitting in a contiguous block of one or more #include directives, return
+nil."
+  (let ((here (point))
+        (blist (shu-cpp-find-include-blocks))
+        (found)
+        (pl)
+        (spoint)
+        (epoint))
+    (if (not blist)
+        (progn
+          (ding)
+          (message "%s" "There are no #includes in the buffer"))
+      (while (and blist (not found))
+        (setq pl (car blist))
+        (setq spoint (car pl))
+        (setq epoint (cdr pl))
+        (when (and
+               (>= here spoint)
+               (<= here epoint))
+          (setq found pl))
+        (setq blist (cdr blist)))
+      (when (not found)
+        (ding)
+        (message "%s" "Not sitting on an #include")))
+    found
     ))
-
-
-
-
-;;
-;;  shu-line-is-include
-;;
-(defun shu-line-is-include (&optional fix)
-  "Return true if the line on which (point) resides is an #include directive."
-  (let ((ss "\\s-*#\\s-*include\\s-+")
-        (min-length (length "#include <a>"))
-        (include-length (length "#include "))
-        (line-length)
-        (line-start)
-        (is-inc nil))
-    (save-excursion
-      (goto-char (line-beginning-position))
-      (when (re-search-forward ss (line-end-position) t)
-        (setq is-inc t)
-        (when fix
-          (replace-match "#include " t t))))
-    is-inc
-    ))
-
 
 
 ;;
