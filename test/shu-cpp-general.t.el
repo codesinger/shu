@@ -3922,6 +3922,43 @@ class names."
 
 
 ;;
+;;  shu-test-shu-sort-all-includes-1
+;;
+(ert-deftest shu-test-shu-sort-all-includes-1 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <z1>\n"
+          "#include <c1>\n"
+          "#include <a1>\n"
+          "// Goodbye\n"
+          "#include <z2>\n"
+          "#include <c2>\n"
+          "#include <a2>\n"
+          "// Again\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <a1>\n"
+          "#include <c1>\n"
+          "#include <z1>\n"
+          "// Goodbye\n"
+          "#include <a2>\n"
+          "#include <c2>\n"
+          "#include <z2>\n"
+          "// Again\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (shu-sort-all-includes)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-cpp-find-include-blocks-1
 ;;
 (ert-deftest shu-test-shu-cpp-find-include-blocks-1 ()
