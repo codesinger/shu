@@ -5397,6 +5397,37 @@ sort, any duplicate #include directives are removed."
 
 
 
+;;
+;;  shu-sort-all-includes
+;;
+(defun shu-sort-all-includes ()
+  "Sort each contiguous block of #include directives in the entire buffer.  This
+is similar to SHU-SORT-INCLUDES but instead of restricting the sort to the
+current block of contiguous #include directives, it finds all of the blocks of
+contiguous #include directives and sorts each block."
+  (interactive)
+  (let ((blist (shu-cpp-find-include-blocks))
+        (ret-val)
+        (pl)
+        (line-count 0)
+        (del-count 0)
+        (group-count 0)
+        (total-line 0)
+        (total-del 0))
+    (while blist
+      (setq pl (car blist))
+      (setq ret-val (shu-internal-sort-includes pl))
+      (setq line-count (car ret-val))
+      (setq del-count (cdr ret-val))
+      (setq total-line (+ total-line line-count))
+      (setq total-del (+ total-del del-count))
+      (setq group-count (1+ group-count))
+      (setq blist (cdr blist)))
+    (shu-announce-sort-counts (cons total-line total-del) group-count)
+    ))
+
+
+
 
 ;;
 ;;  shu-internal-sort-includes
@@ -5414,8 +5445,6 @@ holds the number of duplicates removed."
         (line-count 0)
         (del-count 0)
         (count 0)
-        (dup-name "duplicates")
-        (line-name "lines")
         (len1)
         (len2)
         (diff)
@@ -5449,21 +5478,47 @@ holds the number of duplicates removed."
 ;;
 ;;  shu-announce-sort-counts
 ;;
-(defun shu-announce-sort-counts (ret-val)
+(defun shu-announce-sort-counts (ret-val &optional group-count)
   "RET-VAL is a cons cell whose car is the count of lines sorted by
 SHU-INTERNAL-SORT-INCLUDES and whose cdr is the number of duplicate lines
-removed.  Display the appropriate message in the minibuffer with those counts."
+removed.  The optional GROUP-COUNT is the number of groups sorted, if present.
+Display the appropriate message in the minibuffer with those counts."
+  (let ((announcement (shu-make-sort-announcement ret-val group-count)))
+    (message "%s" announcement)
+    ))
+
+
+
+;;
+;;  shu-make-sort-announcement
+;;
+(defun shu-make-sort-announcement (ret-val &optional group-count)
+  "RET-VAL is a cons cell whose car is the count of lines sorted by
+SHU-INTERNAL-SORT-INCLUDES and whose cdr is the number of duplicate lines
+removed.  The optional GROUP-COUNT is the number of groups sorted, if present.
+Return an appropriately formatted message with these counts.  This is a separate
+function in order to allow it to be unit tested."
   (let ((line-count (car ret-val))
         (del-count (cdr ret-val))
         (dup-name "duplicates")
-        (line-name "lines"))
+        (line-name "lines")
+        (tgroups "")
+        (group-name "groups")
+        (announcement ""))
+    (when group-count
+      (when (numberp group-count)
+        (when (= group-count 1)
+          (setq group-name "group"))
+        (setq tgroups (format " in %d %s" group-count group-name))))
     (when (= line-count 1)
       (setq line-name "line"))
     (if (= del-count 0)
-        (message "Sorted %d %s" line-count line-name)
+        (setq announcement (format "Sorted %d %s%s" line-count line-name tgroups))
       (when (= del-count 1)
         (setq dup-name "duplicate"))
-      (message "Sorted %d %s (after deleting %d %s)" line-count line-name del-count dup-name))
+      (setq announcement (format "Sorted %d %s%s (after deleting %d %s)"
+                                 line-count line-name tgroups del-count dup-name)))
+    announcement
     ))
 
 
@@ -5704,6 +5759,7 @@ shu- prefix removed."
   (defalias 'fill-area 'shu-cpp-fill-test-area)
   (defalias 'gcc 'shu-gcc)
   (defalias 'sort-includes 'shu-sort-includes)
+  (defalias 'sort-all-includes 'shu-sort-all-includes)
   )
 
 (provide 'shu-cpp-general)

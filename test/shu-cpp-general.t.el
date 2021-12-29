@@ -4243,6 +4243,180 @@ class names."
 
 
 ;;
+;;  shu-test-shu-make-sort-announcement-1
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-1 ()
+  (let ((ret-val (cons 0 0))
+        (group-count)
+        (actual)
+        (expected "Sorted 0 lines"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-2
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-2 ()
+  (let ((ret-val (cons 1 0))
+        (group-count)
+        (actual)
+        (expected "Sorted 1 line"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-3
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-3 ()
+  (let ((ret-val (cons 2 0))
+        (group-count)
+        (actual)
+        (expected "Sorted 2 lines"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-4
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-4 ()
+  (let ((ret-val (cons 0 1))
+        (group-count)
+        (actual)
+        (expected "Sorted 0 lines (after deleting 1 duplicate)"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-5
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-5 ()
+  (let ((ret-val (cons 1 2))
+        (group-count)
+        (actual)
+        (expected "Sorted 1 line (after deleting 2 duplicates)"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-6
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-6 ()
+  (let ((ret-val (cons 0 0))
+        (group-count 0)
+        (actual)
+        (expected "Sorted 0 lines in 0 groups"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-7
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-7 ()
+  (let ((ret-val (cons 0 0))
+        (group-count 1)
+        (actual)
+        (expected "Sorted 0 lines in 1 group"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-8
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-8 ()
+  (let ((ret-val (cons 1 0))
+        (group-count 1)
+        (actual)
+        (expected "Sorted 1 line in 1 group"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-9
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-9 ()
+  (let ((ret-val (cons 2 0))
+        (group-count 2)
+        (actual)
+        (expected "Sorted 2 lines in 2 groups"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-10
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-10 ()
+  (let ((ret-val (cons 0 1))
+        (group-count 2)
+        (actual)
+        (expected "Sorted 0 lines in 2 groups (after deleting 1 duplicate)"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-11
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-11 ()
+  (let ((ret-val (cons 1 2))
+        (group-count 2)
+        (actual)
+        (expected "Sorted 1 line in 2 groups (after deleting 2 duplicates)"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-cpp-is-keyword-1
 ;;
 (ert-deftest shu-test-shu-cpp-is-keyword-1 ()
