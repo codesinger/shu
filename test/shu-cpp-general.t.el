@@ -3802,7 +3802,7 @@ class names."
       (setq count (shu-sort-includes))
       (should count)
       (should (numberp count))
-      (should (= 1 count))
+      (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     ))
@@ -3947,11 +3947,74 @@ class names."
           "#include <c2>\n"
           "#include <z2>\n"
           "// Again\n"))
-        (actual))
+        (actual)
+        (ret-val)
+        (line-count)
+        (del-count))
     (with-temp-buffer
       (insert data)
       (goto-char (point-min))
-      (shu-sort-all-includes)
+      (setq ret-val (shu-sort-all-includes))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq line-count (car ret-val))
+      (setq del-count (cdr ret-val))
+      (should line-count)
+      (should (numberp line-count))
+      (should del-count)
+      (should (numberp del-count))
+      (should (= 6 line-count))
+      (should (= 0 del-count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-all-includes-2
+;;
+(ert-deftest shu-test-shu-sort-all-includes-2 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <a1>\n"
+          "#include <c1>\n"
+          "#include <z1>\n"
+          "// Goodbye\n"
+          "#include <a2>\n"
+          "#include <c2>\n"
+          "#include <z2>\n"
+          "// Again\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <a1>\n"
+          "#include <c1>\n"
+          "#include <z1>\n"
+          "// Goodbye\n"
+          "#include <a2>\n"
+          "#include <c2>\n"
+          "#include <z2>\n"
+          "// Again\n"))
+        (actual)
+        (ret-val)
+        (line-count)
+        (del-count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq ret-val (shu-sort-all-includes))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq line-count (car ret-val))
+      (setq del-count (cdr ret-val))
+      (should line-count)
+      (should (numberp line-count))
+      (should del-count)
+      (should (numberp del-count))
+      (should (= 0 line-count))
+      (should (= 0 del-count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     ))

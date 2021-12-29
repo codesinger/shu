@@ -5424,8 +5424,8 @@ contiguous #include directives and sorts each block."
       (setq group-count (1+ group-count))
       (setq blist (cdr blist)))
     (shu-announce-sort-counts (cons total-line total-del) group-count)
+    (cons total-line total-del)
     ))
-
 
 
 
@@ -5433,6 +5433,43 @@ contiguous #include directives and sorts each block."
 ;;  shu-internal-sort-includes
 ;;
 (defun shu-internal-sort-includes (pl)
+  "There are times when SHU-SUB-SORT-INCLUDES does not actually change anything
+in the buffer.  After it has done its transformation and sorting, nothing in the
+#include block has changed because the #includes were already in sorted order.
+But emacs still marks the buffer as modified, which can be confusing.
+
+This function copies the include block into a temporary buffer, calls
+SHU-SUB-SORT-INCLUDES, checks to see if the temporary buffer contents are
+unchanged.  If the temporary buffer contents remain unchanged, then
+SHU-SUB-SORT-INCLUDES is not called at all on the real buffer and its sort and
+delete counts are set to zero."
+  (let ((spoint)
+        (epoint)
+        (ret-val (cons 0 0))
+        (original)
+        (copy))
+    (when pl
+      (save-excursion
+        (setq spoint (car pl))
+        (setq epoint (cdr pl))
+        (setq original (buffer-substring-no-properties spoint epoint))
+        (with-temp-buffer
+          (insert original)
+          (setq ret-val (shu-sub-sort-includes (cons (point-min) (point-max))))
+          (setq copy (buffer-substring-no-properties (point-min) (point-max))))
+        (if (string= copy original)
+            (setq ret-val (cons 0 0))
+          (setq ret-val (shu-sub-sort-includes pl)))))
+    ret-val
+    ))
+
+
+
+
+;;
+;;  shu-sub-sort-includes
+;;
+(defun shu-sub-sort-includes (pl)
   "PL is a cons cell that defines the start and end position of a block one or
 more contiguous #include directives.  Any lines that have extra spacing in them,
 such as \" # include \" have the extra spacing removed and then the entire block
@@ -5472,6 +5509,7 @@ holds the number of duplicates removed."
         (setq line-count (- line-count del-count))))
     (cons line-count del-count)
     ))
+
 
 
 
