@@ -2609,4 +2609,241 @@
 
 
 
+;;
+;;  shu-test-shu-is-common-substring-1
+;;
+(ert-deftest shu-test-shu-is-common-substring-1 ()
+  (let ((data
+         (list
+          "aaaa_bumble"
+          "aaaa_stumble"
+          "aaaa_mumble"
+          ))
+        (substring "aaaa")
+        (expected "aaaa")
+        (actual))
+    (setq actual (shu-is-common-substring substring data))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-is-common-substring-2
+;;
+(ert-deftest shu-test-shu-is-common-substring-2 ()
+  (let ((data
+         (list
+          "aaaa_bumble"
+          "aaab_stumble"
+          "aaaa_mumble"))
+        (substring "aaaa")
+        (expected "aaaa")
+        (actual))
+    (setq actual (shu-is-common-substring substring data))
+    (should (not actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-is-common-prefix-1
+;;
+(ert-deftest shu-test-shu-is-common-prefix-1 ()
+  (let ((data
+         (list
+          "abcwqlohfa"
+          "abcjfqoeriih"
+          "abchqper"))
+          (prefix "abc")
+          (expected "abc")
+          (actual))
+    (setq actual (shu-is-common-prefix prefix data))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-is-common-prefix-2
+;;
+(ert-deftest shu-test-shu-is-common-prefix-2 ()
+  (let ((data
+         (list
+          "wqlohfa"
+          "abcjfqoeriih"
+          "abchqper"))
+          (prefix "abc")
+          (actual))
+    (setq actual (shu-is-common-prefix prefix data))
+    (should (not actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-common-substring-1
+;;
+(ert-deftest shu-test-shu-longest-common-substring-1 ()
+  (let (
+        (strings
+         (list
+          "abcdemumb"
+          "abcdebumb"
+          "abcdestumb"))
+        (expected "abcde")
+        (actual)
+        )
+    (setq actual (shu-longest-common-substring strings))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-longest-common-substring-2
+;;
+(ert-deftest shu-test-shu-longest-common-substring-2 ()
+  (let (
+        (strings
+         (list
+          "abcd"
+          "effghi"
+          "jklmn"))
+        (expected "abcde")
+        (actual)
+        )
+    (setq actual (shu-longest-common-substring strings))
+    (should (not actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-prepare-for-rename-1
+;;
+(ert-deftest shu-test-shu-prepare-for-rename-1 ()
+  (let ((data
+         (concat
+          "aaaa_fooble.cpp\n"
+          "aaaa_fooble.h\n"
+          "aaaa_fooble.t.cpp\n"))
+        (expected
+         (concat
+          "mv aaaa_fooble.cpp    abcdef_fooble.cpp\n"
+          "mv aaaa_fooble.h      abcdef_fooble.h\n"
+          "mv aaaa_fooble.t.cpp  abcdef_fooble.t.cpp\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-prepare-for-rename "aaaa" "abcdef")
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-prepare-for-rename-2
+;;
+(ert-deftest shu-test-shu-prepare-for-rename-2 ()
+  (let ((data
+         (concat
+          "aaaa_fooble.cpp\n"
+          "aaaa_fooble.h\n"
+          "aaaa_fooble.t.cpp\n"
+          "\n"
+          "\n"))
+        (expected
+         (concat
+          "mv aaaa_fooble.cpp    abcdef_fooble.cpp\n"
+          "mv aaaa_fooble.h      abcdef_fooble.h\n"
+          "mv aaaa_fooble.t.cpp  abcdef_fooble.t.cpp\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-prepare-for-rename "aaaa" "abcdef")
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-prepare-for-rename-3
+;;
+(ert-deftest shu-test-shu-prepare-for-rename-3 ()
+  (let ((data
+         (concat
+          "aaaa_fooble.h\n"
+          "aaaa_fooble.cpp\n"
+          "aaaa_fooble.t.cpp\n"))
+        (expected
+         (concat
+          "mv aaaa_fooble.h      abcdef_fooble.h\n"
+          "mv aaaa_fooble.cpp    abcdef_fooble.cpp\n"
+          "mv aaaa_fooble.t.cpp  abcdef_fooble.t.cpp\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-prepare-for-rename "aaaa" "abcdef")
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-prepare-for-rename-4
+;;
+(ert-deftest shu-test-shu-prepare-for-rename-4 ()
+  (let ((data
+         (concat
+          "aaaa_fooble.t.cpp\n"
+          "aaaa_fooble.h\n"
+          "aaaa_fooble.cpp\n"))
+        (expected
+         (concat
+          "mv aaaa_fooble.t.cpp  abcdef_fooble.t.cpp\n"
+          "mv aaaa_fooble.h      abcdef_fooble.h\n"
+          "mv aaaa_fooble.cpp    abcdef_fooble.cpp\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-prepare-for-rename "aaaa" "abcdef")
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-prepare-for-rename-5
+;;
+(ert-deftest shu-test-shu-prepare-for-rename-5 ()
+  (let ((data
+         (concat
+          "aaaa_fooble.t.cpp\n"
+          "aaaa_fooble.h\n"
+          "aaaa_fooble.cpp\n"))
+        (expected
+         (concat
+          "mv aaaa_fooble.t.cpp  abc_fooble.t.cpp\n"
+          "mv aaaa_fooble.h      abc_fooble.h\n"
+          "mv aaaa_fooble.cpp    abc_fooble.cpp\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-prepare-for-rename "aaaa" "abc")
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (string= expected actual))
+    ))
+
 ;;; shu-misc.t.el ends here

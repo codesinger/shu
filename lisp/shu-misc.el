@@ -3249,6 +3249,198 @@ scan.  Non-negative does a forward scan."
 
 
 
+;;
+;;  shu-longest-common-substring
+;;
+(defun shu-longest-common-substring (strings)
+  "Return the longest common substring of the list of STRINGS.  Return nil if
+there is no common substring."
+  (interactive)
+  (let ((strs strings)
+        (ref (car strings))
+        (i)
+        (j)
+        (s)
+        (lcs ""))
+    (setq i 0)
+    (while (< i (length ref))
+      (setq j (1+ i))
+      (while (< j (length ref))
+        (setq s (substring ref i j))
+        (when (shu-is-common-substring s strings)
+          (when (> (length s) (length lcs))
+            (setq lcs s)))
+        (setq j (1+ j)))
+      (setq i (1+ i)))
+    (when (string= lcs "")
+      (setq lcs nil))
+    lcs
+    ))
+
+
+
+;;
+;;  shu-longest-common-prefix
+;;
+(defun shu-longest-common-prefix (strings)
+  "Return the longest common prefix of the list of STRINGS.  Return nil if there
+is no common prefix."
+  (interactive)
+  (let ((strs strings)
+        (ref (car strings))
+        (i)
+        (s)
+        (lcs ""))
+      (setq i 1)
+      (while (< i (length ref))
+        (setq s (substring ref 0 i))
+        (when (shu-is-common-substring s strings)
+          (when (> (length s) (length lcs))
+            (setq lcs s)))
+        (setq i (1+ i)))
+    (when (string= lcs "")
+      (setq lcs nil))
+    lcs
+    ))
+
+
+
+
+;;
+;;  shu-is-common-substring
+;;
+(defun shu-is-common-substring (substring strings)
+  "If SUBSTRING is a common substring in the list of STRINGS, return SUBSTRING,
+else, return nil."
+  (let ((strs strings)
+        (excluded)
+        (string)
+        (sstring (regexp-quote substring))
+        (common))
+    (while (and strs (not excluded))
+      (setq string (car strs))
+      (when (not (string-match-p sstring string))
+        (setq excluded t))
+      (setq strs (cdr strs)))
+    (when (not excluded)
+      (setq common substring))
+    common
+    ))
+
+
+
+
+;;
+;;  shu-is-common-prefix
+;;
+(defun shu-is-common-prefix (prefix strings)
+  "If PREFIX is a common prefix in the list of STRINGS, return PREFIX,
+else, return nil."
+  (let ((strs strings)
+        (excluded)
+        (string)
+        (prefix-length (length prefix))
+        (common))
+    (while (and strs (not excluded))
+      (setq string (car strs))
+      (when (not (string= prefix (substring string 0 prefix-length)))
+        (setq excluded t))
+      (setq strs (cdr strs)))
+    (when (not excluded)
+      (setq common prefix))
+    common
+    ))
+
+
+
+;;
+;;  shu-prepare-for-rename
+;;
+(defun shu-prepare-for-rename (old-namespace new-namespace)
+  "This is a function that helps to rename a list of files that share one common
+part of a name to a list of files that have a different common part of the name.
+For example, given the following set of files:
+
+      aaaa_mumble.cpp
+      aaaa_mumble.h
+      aaaa_mumble.t.cpp
+
+it is not uncommon to want to change those file names to something like
+
+      abcdef_mumble.cpp
+      abcdef_mumble.h
+      abcdef_mumble.t.cpp
+
+This can be done with the following work flow:
+
+      1. ls \"aaaa*\" >cf.txt
+
+      2. Edit cf.txt to turn it into a script that renames the files from
+         \"aaaa*\ to \"abcdef*\".
+
+The editing steps are relatively straightforward, but take a small number of
+minutes.
+
+This function automates the editing steps.
+
+When invoked interactively, it first prompts for the old common part and then
+for the new common part."
+  (interactive "*sOld common part?: \nsNew common part?: ")
+  (let ((line)
+        (line-length)
+        (max-line-length 0)
+        (line-diff 0)
+        (pad-length 0)
+        (pad "")
+        (all-lines)
+        (spoint))
+    (when (> (buffer-size) 0)
+      (delete-trailing-whitespace (point-min))
+      (goto-char (point-min))
+      (while (and (= line-diff 0)
+                  (not (= (point) (point-max))))
+        (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+        (setq line-length (length line))
+        (when (> line-length max-line-length)
+          (setq max-line-length line-length))
+        (setq line-diff (forward-line 1)))
+      (when (> max-line-length line-length)
+        (setq pad-length (- max-line-length line-length)))
+      (setq pad-length (+ pad-length 2))
+      (setq pad (make-string pad-length ? ))
+      (setq all-lines (concat (buffer-substring-no-properties (point-min) (1- (point-max))) pad))
+      (setq spoint (point-max))
+      (goto-char spoint)
+      (insert all-lines)
+      (goto-char spoint)
+      (while (search-forward old-namespace nil t)
+        (replace-match new-namespace t t))
+      (kill-rectangle spoint (point-max))
+      (goto-char (point-min))
+      (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+      (setq line-length (length line))
+      (setq pad-length 0)
+      (when (> max-line-length line-length)
+        (setq pad-length (- max-line-length line-length)))
+      (setq pad-length (+ pad-length 2))
+      (setq pad (make-string pad-length ? ))
+      (end-of-line)
+      (insert pad)
+      (yank-rectangle)
+      (goto-char (point-min))
+      (delete-trailing-whitespace (point-min))
+      (goto-char (point-min))
+      (while (and (= line-diff 0)
+                  (not (= (point) (point-max))))
+        (beginning-of-line)
+        (insert "mv ")
+        (setq line-diff (forward-line 1)))
+      (goto-char (point-min)))
+    ))
+
+
+
+
 
 ;;
 ;;  shu-misc-set-alias
@@ -3312,6 +3504,7 @@ shu- prefix removed."
   (defalias 'copy-repo 'shu-copy-repo)
   (defalias 'show-repo 'shu-show-repo)
   (defalias 'unbrace 'shu-unbrace)
+  (defalias 'prepare-for-rename 'shu-prepare-for-rename)
   )
 
 (provide 'shu-misc)
