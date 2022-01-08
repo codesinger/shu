@@ -5412,6 +5412,7 @@ contiguous #include directives and sorts each block."
         (line-count 0)
         (del-count 0)
         (group-count 0)
+        (changed-group-count 0)
         (total-line 0)
         (total-del 0))
     (while blist
@@ -5422,8 +5423,10 @@ contiguous #include directives and sorts each block."
       (setq total-line (+ total-line line-count))
       (setq total-del (+ total-del del-count))
       (setq group-count (1+ group-count))
+      (when (or (/= del-count 0) (/= line-count 0))
+        (setq changed-group-count (1+ changed-group-count)))
       (setq blist (cdr blist)))
-    (shu-announce-sort-counts (cons total-line total-del) group-count)
+    (shu-announce-sort-counts (cons total-line total-del) group-count changed-group-count)
     (cons total-line total-del)
     ))
 
@@ -5516,12 +5519,13 @@ holds the number of duplicates removed."
 ;;
 ;;  shu-announce-sort-counts
 ;;
-(defun shu-announce-sort-counts (ret-val &optional group-count)
+(defun shu-announce-sort-counts (ret-val &optional group-count changed-group-count)
   "RET-VAL is a cons cell whose car is the count of lines sorted by
 SHU-INTERNAL-SORT-INCLUDES and whose cdr is the number of duplicate lines
 removed.  The optional GROUP-COUNT is the number of groups sorted, if present.
-Display the appropriate message in the minibuffer with those counts."
-  (let ((announcement (shu-make-sort-announcement ret-val group-count)))
+The optional CHANGED-GROUP-COUNT is the number of groups that were actually
+changed.  Display the appropriate message in the minibuffer with those counts."
+  (let ((announcement (shu-make-sort-announcement ret-val group-count changed-group-count)))
     (message "%s" announcement)
     ))
 
@@ -5530,24 +5534,33 @@ Display the appropriate message in the minibuffer with those counts."
 ;;
 ;;  shu-make-sort-announcement
 ;;
-(defun shu-make-sort-announcement (ret-val &optional group-count)
+(defun shu-make-sort-announcement (ret-val &optional group-count changed-group-count)
   "RET-VAL is a cons cell whose car is the count of lines sorted by
 SHU-INTERNAL-SORT-INCLUDES and whose cdr is the number of duplicate lines
 removed.  The optional GROUP-COUNT is the number of groups sorted, if present.
-Return an appropriately formatted message with these counts.  This is a separate
-function in order to allow it to be unit tested."
+The optional CHANGED-GROUP-COUNT is the number of groups that were actually
+changed.  Return an appropriately formatted message with these counts.  This is
+a separate function in order to allow it to be unit tested."
   (let ((line-count (car ret-val))
         (del-count (cdr ret-val))
         (dup-name "duplicates")
         (line-name "lines")
         (tgroups "")
         (group-name "groups")
+        (changed-group-name "groups")
+        (have-changed)
         (announcement ""))
     (when group-count
       (when (numberp group-count)
+        (when changed-group-count
+          (when (numberp changed-group-count)
+            (when (/= group-count changed-group-count)
+              (setq have-changed t))))
         (when (= group-count 1)
           (setq group-name "group"))
-        (setq tgroups (format " in %d %s" group-count group-name))))
+        (if have-changed
+            (setq tgroups (format " in %d of %d %s" changed-group-count group-count group-name))
+          (setq tgroups (format " in %d %s" group-count group-name)))))
     (when (= line-count 1)
       (setq line-name "line"))
     (if (= del-count 0)

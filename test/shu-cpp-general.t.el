@@ -4515,6 +4515,54 @@ class names."
     ))
 
 
+;;
+;;  Shu-test-shu-make-sort-announcement-12
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-12 ()
+  (let ((ret-val (cons 0 0))
+        (group-count 1)
+        (changed-group-count 1)
+        (actual)
+        (expected "Sorted 0 lines in 1 group"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  Shu-test-shu-make-sort-announcement-13
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-13 ()
+  (let ((ret-val (cons 0 0))
+        (group-count 2)
+        (changed-group-count 2)
+        (actual)
+        (expected "Sorted 0 lines in 2 groups"))
+    (setq actual (shu-make-sort-announcement ret-val group-count changed-group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  Shu-test-shu-make-sort-announcement-14
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-14 ()
+  (let ((ret-val (cons 0 0))
+        (group-count 3)
+        (changed-group-count 2)
+        (actual)
+        (expected "Sorted 0 lines in 2 of 3 groups"))
+    (setq actual (shu-make-sort-announcement ret-val group-count changed-group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
 
 ;;
 ;;  shu-test-shu-cpp-is-keyword-1

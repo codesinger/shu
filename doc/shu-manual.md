@@ -12490,5 +12490,6 @@ LocalWords:  timezone tzdate tz deleteObject nullptr printSelf ctor dtor iother 
 LocalWords:  CMake doody ops py krpps Doxyfile af repo fixup doxyfile gcm config za
 LocalWords:  tocify fgh ijkl mno pqr stuv wxy bcde fg hij klm Stuvw xyzab OpenGrok
 LocalWords:  unbrace iff currentliveupdate debian dep codesinger github pt ua seq
-LocalWords:  dev abc pr fka https classname
+LocalWords:  dev abc pr fka https classname val charlie pllist tokenization pl aaaa
+LocalWords:  ls cf regex
 -->
