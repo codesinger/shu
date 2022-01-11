@@ -241,7 +241,7 @@ given task as a Google test."
      (concat
       "#!/bin/ksh -x\n"
       "time ./" task-name " "
-      "--gtest_filter=*.* --bael-log-on-success --baem-metrics   --bael-level INFO --bael-format \"%d %p:%t %s %f:%l %c %m %u\\n\"\n"))
+      "--gtest_filter=*.* --bsls-review-throws --bael-log-on-success --baem-metrics  --bael-level INFO --bael-format \"%d %p:%t %s %f:%l %c %m %u\\n\"\n"))
     (when (buffer-modified-p)
       (basic-save-buffer)
       (set-file-modes file-name #o755))

@@ -5547,7 +5547,6 @@ a separate function in order to allow it to be unit tested."
         (line-name "lines")
         (tgroups "")
         (group-name "groups")
-        (changed-group-name "groups")
         (have-changed)
         (announcement ""))
     (when group-count
