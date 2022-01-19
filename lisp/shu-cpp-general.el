@@ -463,6 +463,7 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                       "std::bitset"
                       ))
    (cons "chrono"    (list
+                      "std::chrono"
                       "std::time_point"
                       "std::system_clock"
                       "std::steady_clock"
@@ -1178,6 +1179,7 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                   "bdlf::Placeholders"
                                   ))
    (cons "bsl_chrono.h"    (list
+                            "bsl::chrono"
                             "bsl::time_point"
                             "bsl::system_clock"
                             "bsl::steady_clock"
