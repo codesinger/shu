@@ -5384,6 +5384,21 @@ shell, and yank."
 
 
 
+;;
+;;  shu-add-include
+;;
+(defun shu-add-include ()
+  "When positioned on a line below an include block, this function yanks the
+contents of the kill buffer (which is assumed to contain an #include statement)
+and then sorts all of the lines in the current include block."
+  (interactive)
+    (goto-char (line-beginning-position))
+    (yank)
+    (goto-char (line-beginning-position))
+    (shu-sort-includes)
+    )
+
+
 
 ;;
 ;;  shu-sort-includes
@@ -5822,6 +5837,7 @@ shu- prefix removed."
   (defalias 'fill-data 'shu-cpp-fill-test-data)
   (defalias 'fill-area 'shu-cpp-fill-test-area)
   (defalias 'gcc 'shu-gcc)
+  (defalias 'add-include 'shu-add-include)
   (defalias 'sort-includes 'shu-sort-includes)
   (defalias 'sort-all-includes 'shu-sort-all-includes)
   )
