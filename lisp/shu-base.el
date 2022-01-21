@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.117
+;; Version: 1.6.118
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -34,7 +34,7 @@
 ;;; Code:
 
 
-(defconst shu-version "1.6.117"
+(defconst shu-version "1.6.118"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2021 Dec 23"
@@ -276,8 +276,8 @@ information.")
 (defconst shu-library-files
   (list
    "shu-misc.elc"
-   "shu-cpp-token.elc"
    "shu-cpp-general.elc"
+   "shu-cpp-token.elc"
    "shu-cpp-misc.elc"
    "shu-cpp-match.elc"
    "shu-match.elc"
@@ -1165,6 +1165,16 @@ directory is \"foo/blah/humbug\", the value returned from this function is \"hum
     (setq prefix-name (nth (1- (length rr)) rr))
     prefix-name
     ))
+
+
+
+;;
+;;  shu-append-to-file
+;;
+(defun shu-append-to-file (file line)
+  "Append LINE to FILE."
+    (write-region line nil file 'append)
+    )
 
 (provide 'shu-base)
 
