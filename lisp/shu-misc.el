@@ -1,3 +1,4 @@
+
 ;;; shu-cpp-misc.el --- Shu project code for dealing wth C++ in Emacs
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
@@ -144,7 +145,9 @@ This makes it a valid path on windows machines."
   "While in dired, put the full path to the current file in the kill ring"
   (interactive)
   (let ((name   (dired-get-filename)))
-    (shu-kill-new name)))
+    (shu-kill-new name)
+    (message "%s" name)
+    ))
 
 ;;
 ;;  shu-of
@@ -163,7 +166,9 @@ This makes it a valid path on windows machines."
   "While in dired, put the full path to the current directory in the kill ring"
   (interactive)
   (let ((name   (dired-current-directory)))
-    (shu-kill-new name)))
+    (shu-kill-new name)
+    (message "%s" name)
+    ))
 
 
 ;;
@@ -173,10 +178,11 @@ This makes it a valid path on windows machines."
   "While in a file buffer, put the name of the current file into the kill ring."
   (interactive)
   (let ((name  (file-name-nondirectory (buffer-file-name))))
-    (if name
-        (shu-kill-new name)
-      ;;
-      (ding))))
+    (if (not name)
+        (ding)
+      (shu-kill-new name)
+      (message "%s" name))
+    ))
 
 
 ;;
@@ -191,9 +197,10 @@ file into the kill ring in the form of \"line 1234 of foo.cpp\"."
        (fline))
     (if (not name)
         (ding)
-      ;;
       (setq fline (format "line %d of %s" (shu-current-line) name))
-      (shu-kill-new fline))))
+      (shu-kill-new fline)
+      (message "%s" fline))
+    ))
 
 
 ;;
@@ -205,15 +212,15 @@ column number and the name of the current file into the kill ring
 in the form of \"foo.cpp:123:2\"."
   (interactive)
   (let
-      ((debug-on-error t)
-       (name  (file-name-nondirectory (buffer-file-name)))
+      ((name  (file-name-nondirectory (buffer-file-name)))
        (curpos (1+ (current-column)))
        (fline))
     (if (not name)
         (ding)
-      ;;
       (setq fline (format "%s:%d:%d" name (shu-current-line) curpos))
-      (shu-kill-new fline))))
+      (shu-kill-new fline)
+      (message "%s" fline))
+    ))
 
 
 ;;
@@ -222,9 +229,7 @@ in the form of \"foo.cpp:123:2\"."
 (defun shu-gquote ()
   "Insert a LaTeX quote environment and position the cursor for typing the quote."
   (interactive)
-  (let (
-        (ip     )
-        )
+  (let ((ip))
     (insert "\\begin{quote}\n\n")
     (setq ip (point))
     (insert "\n\n\\end{quote}\n")
