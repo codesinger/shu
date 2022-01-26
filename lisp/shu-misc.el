@@ -1169,13 +1169,14 @@ the current branch of the current repository."
 
 
 ;;
-;;  shu-git-branch-to-kill-ring
+;;  shu-git-copy-branch
 ;;
-(defun shu-git-branch-to-kill-ring ()
+(defun shu-git-copy-branch ()
   "Put the name of the current branch in a git repository into the kill ring."
   (interactive)
   (let ((branch (shu-git-find-branch)))
     (shu-kill-new branch)
+    (message "%s" branch)
     ))
 
 
@@ -3480,6 +3481,7 @@ shu- prefix removed."
   (defalias 'diff-commits 'shu-git-diff-commits)
   (defalias 'get-pr-url 'shu-git-get-pr-url)
   (defalias 'show-branch 'shu-git-show-branch)
+  (defalias 'copy-branch 'shu-git-copy-branch)
   (defalias 'insb 'shu-git-insert-branch)
   (defalias 'inso 'shu-git-insert-origin-branch)
   (defalias 'gpl 'shu-git-insert-pull-origin-branch)
