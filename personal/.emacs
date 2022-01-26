@@ -119,6 +119,11 @@
 
 (tool-bar-mode 0)
 
+(when (shu-system-type-is-mac-osx)
+  (require 'epa-file)
+  (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
+  (epa-file-enable))
+
 ;;;
 (global-set-key "" 'buffer-menu)
 (global-set-key "" 'shell)
