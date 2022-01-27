@@ -2252,7 +2252,7 @@ Otherwise, it will assume that all files reside in the same directory."
         (newfile ))
     (setq newfile (concat base-name ".h"))
     (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot find H file for %s" base-name))
+      (message "Cannot '%s' file for %s" (file-name-nondirectory newfile) base-name))
     ))
 
 
@@ -2269,7 +2269,7 @@ will assume that all files reside in the same directory."
         (newfile))
     (setq newfile (concat base-name ".i.cpp"))
     (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot find integration test file for %s" base-name))
+      (message "Cannot '%s' file for %s" (file-name-nondirectory newfile) base-name))
     ))
 
 
@@ -2286,7 +2286,7 @@ will assume that all files reside in the same directory."
         (newfile))
     (setq newfile (concat base-name ".t.cpp"))
     (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot find unit test file for %s" base-name))
+      (message "Cannot '%s' file for %s" (file-name-nondirectory newfile) base-name))
     ))
 
 
