@@ -263,6 +263,29 @@ given task as a Google test."
     (goto-char (+ start pad-count 16))))
 
 
+
+;;
+;;  ddb
+;;
+(defun ddb ()
+  "Insert \"dpkg-distro-dev build \" at point."
+  (interactive)
+    (insert "dpkg-distro-dev build ")
+    )
+
+
+
+;;
+;;  ddi
+;;
+(defun ddi ()
+  "Insert \"dpkg-distro-dev init \" at point."
+  (interactive)
+    (insert "dpkg-distro-dev init ")
+    )
+
+
+
 ;;
 ;;  yfall - Visit the course directory for Fall 2013
 ;;
