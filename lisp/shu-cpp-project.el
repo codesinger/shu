@@ -591,7 +591,7 @@ is wanted."
         (plist)
         (file-name)
         (full-name-list))
-    (setq counts (shu-cpp-project-get-list-counts shu-cpp-class-list))
+    (setq counts (shu-cpp-project-get-list-counts shu-cpp-short-list))
     (setq c-count (car counts))
     (setq counts (cdr counts))
     (setq h-count (car counts))
@@ -1392,8 +1392,7 @@ current project."
 (defun shu-internal-list-c-project (proj-list)
   "Insert into the current buffer the names of all of the code files in the
 project whose files are in PROJ-LIST."
-  (let
-      ((plist (shu-cpp-project-invert-list proj-list))
+  (let ((plist (shu-cpp-project-invert-list proj-list))
        (full-name))
     (while plist
       (setq full-name (car plist))
@@ -1415,7 +1414,7 @@ duplicates."
       (progn
         (message "There is no project to list.")
         (ding))
-    (shu-internal-list-c-duplicates shu-cpp-class-list))
+    (shu-internal-list-c-duplicates shu-cpp-short-list))
   )
 
 
@@ -1447,8 +1446,7 @@ duplicates."
         (message "%s" "Project has no duplicates")
       (setq dlist (sort proj-dups
                         (lambda(lhs rhs)
-                          (string< (car lhs) (car rhs))
-                          )))
+                          (string< (car lhs) (car rhs)))))
       (setq proj-dups dlist)
       (while dlist
         (setq entry (car dlist))
@@ -1514,8 +1512,8 @@ about extracted file prefixes."
         (insert
          (concat
           "\n"
-          "prefix name               count\n"
-          "-----------               -----\n"))
+          "prefix name                count\n"
+          "-----------                -----\n"))
         (setq pl shu-cpp-prefix-list)
         (while pl
           (setq item (car pl))
