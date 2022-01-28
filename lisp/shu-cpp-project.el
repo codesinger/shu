@@ -1393,7 +1393,7 @@ current project."
   "Insert into the current buffer the names of all of the code files in the
 project whose files are in PROJ-LIST."
   (let ((plist (shu-cpp-project-invert-list proj-list))
-       (full-name))
+        (full-name))
     (while plist
       (setq full-name (car plist))
       (insert (concat full-name "\n"))
@@ -1578,6 +1578,7 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
   (let ((sl (when name-list (copy-tree name-list)))
         (sll)
         (pos (point))
+        (lpos)
         (pad)
         (pad1)
         (item)
@@ -1589,7 +1590,8 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
         (file-count 0)
         (max-len 0)
         (ncount)
-        (pad-count))
+        (pad-count)
+        (header))
     (if (not shu-cpp-class-list)
         (progn
           (message "There is no project in use.")
@@ -1631,15 +1633,15 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
             (setq full-name (car full-names))
             (setq full-name-list (cdr full-name-list)))
           (setq sl (cdr sl)))
+        (setq header (concat
+                      (shu-group-number name-count)
+                      " " type-name " map to "
+                      (shu-group-number file-count)
+                      " files:\n\n"))
+        (setq lpos (+ (point) (length header)))
         (goto-char pos)
-        (insert
-         (concat
-          "\n"
-          (shu-group-number name-count)
-          " " type-name " map to "
-          (shu-group-number file-count)
-          " files:\n\n"))
-        (goto-char pos)))
+        (insert header))
+      (goto-char lpos))
     ))
 
 
@@ -1680,6 +1682,96 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
         (insert (concat full-name "\n")))
       (setq directory-list (cdr directory-list)))
     ))
+
+
+
+
+;;
+;;  shu-list-c-all-project
+;;
+(defun shu-list-c-all-project ()
+  "Insert into the current buffer everything that is known about the files,
+prefixes, short names, long names, and duplicate names within the current
+project."
+  (interactive)
+  (if (not shu-cpp-class-list)
+      (progn
+        (message "There is no project to list.")
+        (ding))
+      (shu-internal-list-c-all-project)))
+
+
+
+
+;;
+;;  shu-internal-list-c-all-project
+;;
+(defun shu-internal-list-c-all-project ()
+  "The internal implementation function for SHU-LIST-C-ALL-PROJECT."
+  (let ((pos (point))
+        (prefix "*** ")
+        (suffix " ***")
+        (pad    "    "))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-c-prefixes" suffix "\n"
+      pad    "(All prefixes removed to form short names)\n"
+      "\n"))
+      (shu-list-c-prefixes)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-c-directories" suffix "\n"
+      pad    "(All directories in the project)\n"
+      "\n"))
+      (shu-list-c-directories)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-c-file-names" suffix "\n"
+      pad    "(All unique file names within the project)\n"
+      "\n"))
+      (shu-list-c-file-names)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-c-project" suffix "\n"
+      pad    "(Full path to all files in the project)\n"
+      "\n"))
+      (shu-list-c-project)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-short-names" suffix "\n"
+      pad    "(All the short names and their corresponding full names)\n"
+      "\n"))
+    (shu-cpp-list-short-names)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-c-duplicates" suffix "\n"
+      pad    "(Full path to all files whose short names are duplicates)\n"
+      "\n"))
+      (shu-list-c-duplicates)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-completing-names" suffix "\n"
+      pad    "(All recognized file names of all forms)\n"
+      "\n"))
+    (shu-cpp-list-completing-names)
+    (goto-char pos)
+    ))
+
+
 
 ;;
 ;;  shu-which-c-project
@@ -2409,6 +2501,7 @@ shu- prefix removed."
   (defalias 'list-project-names 'shu-cpp-list-project-names)
   (defalias 'list-completing-names 'shu-cpp-list-completing-names)
   (defalias 'list-c-directories 'shu-list-c-directories)
+  (defalias 'list-c-all-project 'shu-list-c-all-project)
   (defalias 'which-c-project 'shu-which-c-project)
   (defalias 'vf 'shu-vf)
   (defalias 'other 'shu-other)
