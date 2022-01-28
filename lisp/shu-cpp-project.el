@@ -1351,8 +1351,7 @@ names."
 ;;  shu-internal-list-c-file-names
 ;;
 (defun shu-internal-list-c-file-names (proj-list)
-  "Doc string."
-  (interactive)
+  "Internal implementation function of SHU-LIST-C-FILE-NAMES."
   (let ((plist proj-list)
         (file-name)
         (full-name-list)
@@ -1362,6 +1361,7 @@ names."
       (push file-name file-names)
       (setq plist (cdr plist)))
     (setq file-names (sort file-names `string<))
+    (insert (concat (shu-group-number (length file-names)) " unique file names:\n\n"))
     (while file-names
       (setq file-name (car file-names))
       (insert (concat file-name "\n"))
@@ -1394,6 +1394,7 @@ current project."
 project whose files are in PROJ-LIST."
   (let ((plist (shu-cpp-project-invert-list proj-list))
         (full-name))
+    (insert (concat (shu-group-number (length plist)) " files:\n\n"))
     (while plist
       (setq full-name (car plist))
       (insert (concat full-name "\n"))
@@ -1448,6 +1449,7 @@ duplicates."
                         (lambda(lhs rhs)
                           (string< (car lhs) (car rhs)))))
       (setq proj-dups dlist)
+      (insert (concat (shu-group-number (length dlist)) " duplicates:\n\n"))
       (while dlist
         (setq entry (car dlist))
         (setq file-name (car entry))
@@ -1493,7 +1495,8 @@ about extracted file prefixes."
         (prefix-name)
         (count)
         (pad-length)
-        (pad))
+        (pad)
+        (ess "es"))
     (if (not shu-cpp-class-list)
         (progn
           (message "There is no project in use.")
@@ -1509,12 +1512,14 @@ about extracted file prefixes."
           (progn
             (message "Current project has no prefixes.")
             (ding))
+        (setq pl shu-cpp-prefix-list)
+        (when (= 1 (length pl))
+          (setq ess ""))
+        (insert (concat (shu-group-number (length pl)) " prefix" ess "\n\n"))
         (insert
          (concat
-          "\n"
-          "prefix name                count\n"
-          "-----------                -----\n"))
-        (setq pl shu-cpp-prefix-list)
+          "prefix name               count\n"
+          "-----------               -----\n"))
         (while pl
           (setq item (car pl))
           (setq prefix (car item))
@@ -1658,6 +1663,7 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
         (progn
           (message "There is no project to list.")
           (ding))
+      (insert (concat (shu-group-number (length tlist)) " directories:\n\n"))
       (while tlist
         (setq dir-name (car tlist))
         (insert (concat dir-name "\n"))
