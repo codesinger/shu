@@ -597,9 +597,12 @@ placed in the clipboard, (PW, ID, etc.)"
 (defun shu-keyring-get-passphrase ()
   "Doc string."
   (interactive)
-  (let ((phrase "**unknown**"))
+  (let ((phrase "**unknown**")
+        (displaypw ".........."))
     (if shu-keyring-external-passphrase
-        (setq phrase shu-keyring-external-passphrase)
+        (progn
+          (setq phrase shu-keyring-external-passphrase)
+          (message "Pass phrase: %s" displaypw))
       (ding)
       (message "%s" "Pass phrase is not set."))
     (shu-kill-new phrase)
