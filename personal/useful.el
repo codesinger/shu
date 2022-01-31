@@ -290,7 +290,7 @@ given task as a Google test."
 ;;  dds
 ;;
 (defun dds ()
-  "Insert \"dig diff --stat master..<branch> >ss.diff\""
+  "Insert \"git diff --stat master..<branch> >ss.diff\""
   (interactive)
   (let ((branch (shu-git-find-branch)))
     (insert (concat "git diff --stat master.." branch " >ss.diff"))
