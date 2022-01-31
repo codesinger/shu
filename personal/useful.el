@@ -287,6 +287,18 @@ given task as a Google test."
 
 
 ;;
+;;  dds
+;;
+(defun dds ()
+  "Insert \"dig diff --stat master..<branch> >ss.diff\""
+  (interactive)
+  (let ((branch (shu-git-find-branch)))
+    (insert (concat "git diff --stat master.." branch " >ss.diff"))
+    ))
+
+
+
+;;
 ;;  yfall - Visit the course directory for Fall 2013
 ;;
 (defun yfall ()
