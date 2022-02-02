@@ -287,6 +287,18 @@ given task as a Google test."
 
 
 ;;
+;;  ddm
+;;
+(defun ddm ()
+  "Insert \"git diff master..<branch> >mm.diff\""
+  (interactive)
+  (let ((branch (shu-git-find-branch)))
+    (insert (concat "git diff master.." branch " >mm.diff"))
+    ))
+
+
+
+;;
 ;;  dds
 ;;
 (defun dds ()
