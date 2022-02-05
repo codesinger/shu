@@ -1704,7 +1704,7 @@ project."
       (progn
         (message "There is no project to list.")
         (ding))
-      (shu-internal-list-c-all-project)))
+    (shu-internal-list-c-all-project)))
 
 
 
@@ -1725,7 +1725,7 @@ project."
       prefix "list-c-prefixes" suffix "\n"
       pad    "(All prefixes removed to form short names)\n"
       "\n"))
-      (shu-list-c-prefixes)
+    (shu-list-c-prefixes)
     (insert
      (concat
       "\n"
@@ -1733,7 +1733,7 @@ project."
       prefix "list-c-directories" suffix "\n"
       pad    "(All directories in the project)\n"
       "\n"))
-      (shu-list-c-directories)
+    (shu-list-c-directories)
     (insert
      (concat
       "\n"
@@ -1741,7 +1741,7 @@ project."
       prefix "list-c-file-names" suffix "\n"
       pad    "(All unique file names within the project)\n"
       "\n"))
-      (shu-list-c-file-names)
+    (shu-list-c-file-names)
     (insert
      (concat
       "\n"
@@ -1749,7 +1749,7 @@ project."
       prefix "list-c-project" suffix "\n"
       pad    "(Full path to all files in the project)\n"
       "\n"))
-      (shu-list-c-project)
+    (shu-list-c-project)
     (insert
      (concat
       "\n"
@@ -1765,7 +1765,7 @@ project."
       prefix "list-c-duplicates" suffix "\n"
       pad    "(Full path to all files whose short names are duplicates)\n"
       "\n"))
-      (shu-list-c-duplicates)
+    (shu-list-c-duplicates)
     (insert
      (concat
       "\n"
@@ -2445,10 +2445,68 @@ the logic of the function can be unit tested."
 ;;  shu-cpp-choose-other-file
 ;;
 (defun shu-cpp-choose-other-file (newfile)
-  "Try to visit a file first within a project and, it not successful, in the
-current directory.  If no project is in use or if the file does not belong to
-the project, try to find the file in the current directory.  If a file was found
-and visited, return true."
+  "NEWFILE is a fully qualified file name that has been formed by changing the
+file suffix, perhaps from .cpp to .h or .h to .t.cpp.  We want to try to open
+the file either in the current directory or in the project.
+
+Up until 5 February 2022, we first looked for the file in the project, then in
+the local directory.  But if two .h files were duplicate names and two .cpp
+files were duplicate names, a request to visit the \"other\" file would bring up
+a choice of the duplicate names.  It seems logical that if you are in a .h file
+and you want to visit the associated .cpp file, the one that you want to visit
+is the one in the current directory.
+
+As of 5 February 2022, we first look for the file in the current directory and
+then in the project.  The local variable LOCAL-DIRECTORY-FIRST can be used to
+invert that choice and return to the original behavior of first looking in the
+project for the file.
+
+If a file was found and visited, return true."
+  (let ((found)
+        (local-directory-first t))
+    (if local-directory-first
+        (setq found (shu-cpp-project-visit-prefer-local newfile))
+      (setq found (shu-cpp-project-visit-prefer-project newfile)))
+    found
+    ))
+
+
+
+;;
+;;  shu-cpp-project-visit-prefer-local
+;;
+(defun shu-cpp-project-visit-prefer-local (newfile)
+  "NEWFILE is a fully qualified file name that has been formed by changing the
+file suffix, perhaps from .cpp to .h or .h to .t.cpp.  We want to try to open
+the file either in the current directory or in the project.
+
+First try to visit the file in the local directory.  If not found in the local
+directory, try to find and visit it within the project.
+
+If a file was found and visited, return true."
+  (let ((nfile (file-name-nondirectory newfile))
+        (found))
+    (if (not (file-readable-p newfile))
+        (setq found (shu-cpp-choose-project-file nfile))
+      (setq found t)
+      (find-file newfile))
+    found
+    ))
+
+
+
+;;
+;;  shu-cpp-project-visit-prefer-project
+;;
+(defun shu-cpp-project-visit-prefer-project (newfile)
+  "NEWFILE is a fully qualified file name that has been formed by changing the
+file suffix, perhaps from .cpp to .h or .h to .t.cpp.  We want to try to open
+the file either in the current directory or in the project.
+
+First try to visit the file in the project.  If not found in the project, try to
+visit the file in the local directory.
+
+If a file was found and visited, return true."
   (let ((nfile (file-name-nondirectory newfile))
         (found))
     (setq found (shu-cpp-choose-project-file nfile))
