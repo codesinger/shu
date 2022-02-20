@@ -49,7 +49,7 @@
   (insert
    (concat
       "\n"
-      "#include <iostream>\n"
+      "#include <ostream>\n"
       ))
   )
 
