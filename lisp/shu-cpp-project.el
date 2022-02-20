@@ -137,6 +137,10 @@ contain a list of the fully qualified files with the same unqualified name.  if
 SHU-CPP-PROJECT-SHORT-NAMES is nil, this list is identical to the one stored in
 SHU-CPP-COMPLETING-LIST.")
 
+(defvar shu-cpp-inverted-class-list nil
+  "This is the inversion of SHU-CPP-CLASS-LIST.  It is a list of all of the
+fully qualified file names found in SHU-CPP-CLASS-LIST.")
+
 (defvar shu-cpp-prefix-list nil
   "This is the list of prefixes removed from the short names if
 SHU-CPP-PROJECT-SHORT-NAMES is non-nil.")
@@ -554,6 +558,7 @@ appropriate subdirectory."
         (setq shu-project-user-class-count (1+ shu-project-user-class-count))
         (setq ilist (cdr ilist)))
       (setq shu-cpp-class-list (shu-cpp-project-collapse-list key-list))
+      (setq shu-cpp-inverted-class-list nil)
       (setq shu-cpp-prefix-list nil)
       (setq shu-cpp-short-list nil)
       (if (not shu-cpp-project-short-names)
@@ -676,6 +681,7 @@ name \"/u/foo/bar/thing.c\"."
   (setq shu-cpp-project-file nil)
   (setq shu-cpp-project-list nil)
   (setq shu-cpp-class-list nil)
+  (setq shu-cpp-inverted-class-list nil)
   (setq shu-cpp-prefix-list nil)
   (setq shu-cpp-short-list nil)
   (setq shu-cpp-completing-list nil)
@@ -2344,17 +2350,8 @@ t.cpp or .h file, invoke this function and you will be taken to the
 corresponding .cpp or .c file.  This function will use a project if one is
 active.  Otherwise, it will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (shu-cpp-project-get-base-name))
-        (newfile)
-        (found))
-    (setq newfile (concat base-name ".cpp"))
-    (setq found (shu-cpp-choose-other-file newfile))
-    (when (not found)
-      (setq newfile (concat base-name ".c"))
-      (setq found (shu-cpp-choose-other-file newfile))
-      (when (not found)
-        (message (concat "Cannot find C file for " base-name))))
-    ))
+    (shu-project-some-other ".cpp")
+    )
 
 
 ;;
@@ -2366,12 +2363,8 @@ active.  Otherwise, it will assume that all files reside in the same directory."
 corresponding .h file.  This function will use a project if one is active.
 Otherwise, it will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (shu-cpp-project-get-base-name))
-        (newfile ))
-    (setq newfile (concat base-name ".h"))
-    (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot '%s' file for %s" (file-name-nondirectory newfile) base-name))
-    ))
+    (shu-project-some-other ".h")
+    )
 
 
 ;;
@@ -2383,12 +2376,8 @@ or .cpp file, invoke this function and you will be taken to the corresponding
 .i.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (shu-cpp-project-get-base-name))
-        (newfile))
-    (setq newfile (concat base-name ".i.cpp"))
-    (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot '%s' file for %s" (file-name-nondirectory newfile) base-name))
-    ))
+    (shu-project-some-other ".i.cpp")
+    )
 
 
 ;;
@@ -2400,11 +2389,62 @@ or .cpp file, invoke this function and you will be taken to the corresponding
 .t.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory."
   (interactive)
+    (shu-project-some-other ".t.cpp")
+    )
+
+
+
+;;
+;;  shu-project-some-other
+;;
+(defun shu-project-some-other (extension)
+  "Visit a related file within a project.  If you are in a \".h\" file and you
+wish to go to the corresponding \".t.cpp\" file, this function will form the new
+file name and then look it up within the project to find the location of the
+related file and then visit that file, if possible."
   (let ((base-name (shu-cpp-project-get-base-name))
         (newfile))
-    (setq newfile (concat base-name ".t.cpp"))
-    (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot '%s' file for %s" (file-name-nondirectory newfile) base-name))
+    (when (shu-validate-file-in-project)
+      (setq newfile (concat base-name extension))
+      (when (not (shu-cpp-choose-other-file newfile))
+        (message "Cannot '%s' file for %s" (file-name-nondirectory newfile) base-name)))
+    ))
+
+
+
+;;
+;;  shu-validate-file-in-project
+;;
+(defun shu-validate-file-in-project ()
+  "Validate that the current file is a member of the current project.
+
+If you are in a project and then visit some file in another directory tree whose
+FILE-NAME-NONDIRECTORY matches a file name in the current project, an attempt to
+visit a related file by using the project primitives will take you back into the
+project tree, when you might have thought that you were going to some other part
+of the directory tree you were in.
+
+For example, suppose you are in a project file \"a/b/src/foo/foo.h\" and you
+then visit another file in \"x/y/src/foo/foo.h.\" If you then try to go to the
+unit test file for \"x/y/src/foo/foo.h,\" instead of visiting
+\"x/y/test/unit/foo.t.cpp,\" you will, instead, silently be taken to
+\"a/b/test/unit/foo.t.cpp,\" which is not the unit test file for
+\"x/y/src/foo/foo.h.\"
+
+When visiting related files within a project, this function verifies that the
+current file is actually a member of the current project.  If there exists a
+project and the current file is not a member of that project, you are probably
+about to be taken silently to the wrong file."
+  (let ((local-name (buffer-file-name))
+        (plist)
+        (file-in-project))
+    (when shu-cpp-class-list
+      (setq plist (shu-cpp-get-inverted-class-list))
+      (if (member local-name plist)
+          (setq file-in-project t)
+        (ding)
+        (message "%s" "current file is not in current project")))
+    file-in-project
     ))
 
 
@@ -2537,6 +2577,17 @@ file was found and visited, return true."
         (shu-cpp-choose-file tfile)))
     found
     ))
+
+
+;;
+;;  shu-cpp-get-inverted-class-list
+;;
+(defun shu-cpp-get-inverted-class-list ()
+  "Return SHU-CPP-INVERTED-CLASS-LIST, creating it if it is currently nil."
+    (when (not shu-cpp-inverted-class-list)
+      (setq shu-cpp-inverted-class-list (shu-cpp-project-invert-list shu-cpp-class-list)))
+    shu-cpp-inverted-class-list
+    )
 
 
 ;;
