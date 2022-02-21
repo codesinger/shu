@@ -2438,7 +2438,8 @@ about to be taken silently to the wrong file."
   (let ((local-name (buffer-file-name))
         (plist)
         (file-in-project))
-    (when shu-cpp-class-list
+    (if (not shu-cpp-class-list)
+        (setq file-in-project t)
       (setq plist (shu-cpp-get-inverted-class-list))
       (if (member local-name plist)
           (setq file-in-project t)
