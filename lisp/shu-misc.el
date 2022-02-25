@@ -1499,6 +1499,8 @@ project."
     (while buf-list
       (setq buf (car buf-list))
       (setq mode-name (with-current-buffer buf mode-name))
+      (when (listp mode-name)
+        (setq mode-name (car mode-name)))
       (if (string= mode-name shu-dired-mode-name)
           (push buf mod-list)
         (setq buf-fn (buffer-file-name buf))
@@ -1509,8 +1511,11 @@ project."
     (while mod-list
       (setq buf (car mod-list))
       (setq mode-name (with-current-buffer buf mode-name))
+      (when (listp mode-name)
+        (setq mode-name (car mode-name)))
       (setq buf-name (buffer-name buf))
-      (princ (concat "Killing " buf-name " (" mode-name ")\n") gb)
+      (princ "Killing buffer: " gb)(princ buf-name gb)
+      (princ " (" gb)(princ mode-name gb)(princ ")\n" gb)
       (kill-buffer buf)
       (setq mod-list (cdr mod-list)))
     (when (fboundp 'shu-clear-c-project)
