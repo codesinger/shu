@@ -2390,6 +2390,10 @@ If the prefix argument is large enough that the left side of the frame would be
 moved past the left side of the display, the window is positioned such that the
 left edge of the window is aligned with the left edge of the display.
 
+Prefix arguments greater than 10 assume a two display system.  Prefix arguments
+of 11 and 12 put two frames on the right diaplay.  Prefix arguments of 13 and
+14 put two frames on the left display.
+
 Implementation note:
 
 If this function is called when the left side of the frame is positioned to the
@@ -2407,8 +2411,7 @@ The assumption is that a negative x frame position means that the user has
 positioned the frame just a bit past the left edge and that the desired frame
 position is actually the leftmost edge of the display."
   (interactive "P")
-  (let* (
-         (lost-lines
+  (let* ((lost-lines
           (if (shu-system-type-is-windows)
               5
             (if (shu-system-type-is-mac-osx)
@@ -2426,16 +2429,29 @@ position is actually the leftmost edge of the display."
          (y)
          (frame-pixel-width (shu-frame-width))
          (display-pixel-width (x-display-pixel-width))
-         (offset 0))
+         (offset 0)
+         (right-panel-x 2553)
+         (left-panel-x 2547))
     (setq fp (frame-position))
     (setq actual-x (car fp))
     (setq calc-x actual-x)
     (setq y (cdr fp))
     (when frame-no
-      (if (= frame-no 1)
-          (setq offset frame-pixel-width)
-        (setq offset (+ (* (1- frame-no) (- frame-pixel-width width-fudge)) frame-pixel-width)))
-      (setq calc-x (- display-pixel-width offset)))
+      (if (< frame-no 11)
+          (progn
+            (if (= frame-no 1)
+                (setq offset frame-pixel-width)
+              (setq offset (+ (* (1- frame-no) (- frame-pixel-width width-fudge)) frame-pixel-width)))
+            (setq calc-x (- display-pixel-width offset)))
+        (cond
+         ((= frame-no 11)
+          (setq calc-x (- (+ right-panel-x frame-pixel-width) width-fudge)))
+         ((= frame-no 12)
+          (setq calc-x right-panel-x))
+         ((= frame-no 13)
+          (setq calc-x (+ (- left-panel-x frame-pixel-width) width-fudge)))
+         ((= frame-no 14)
+          (setq calc-x (+ (- left-panel-x (+ frame-pixel-width frame-pixel-width)) width-fudge width-fudge))))))
     (when (< calc-x 0)
       (setq calc-x 0))
     (set-frame-height (selected-frame) hpl)
