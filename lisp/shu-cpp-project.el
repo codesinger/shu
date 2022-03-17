@@ -1824,6 +1824,22 @@ results in that buffer, and then quit out of the buffer."
       (switch-to-buffer pbuf))
     ))
 
+
+
+
+;;
+;;  shu-record-visited-project
+;;
+(defun shu-record-visited-project (name proj-dir)
+  "Record a project visit in the file \"~/visited-projects.log\"."
+  (let ((fnow (format-time-string "%Y-%m-%d-%T-(%a)"))
+        (line))
+    (setq line (concat fnow ": " name "  " proj-dir "\n"))
+    (write-region line nil "~/visited-projects.log" 'append)
+    ))
+
+
+
 ;;
 ;;  shu-setup-project-and-tags
 ;;
@@ -1832,7 +1848,8 @@ results in that buffer, and then quit out of the buffer."
 create a file called \"files.txt\" with the name of every file found, invoke
 ctags on that file to build a new tags file, and then visit the tags file.
 PROJ-DIR is the name of the directory in which the project file exists and in
-which the tags file is to be built."
+which the tags file is to be built.
+Record the visit in the file \"~/visited-projects.log\"."
   (let
       ((tags-add-tables nil)
        (gbuf (get-buffer-create "*setup project*"))
@@ -1848,8 +1865,7 @@ which the tags file is to be built."
        (etime)
        (c-count)
        (h-count)
-       (pname))
-    (setq pname (shu-get-real-this-command-name))
+       (pname (shu-get-real-this-command-name)))
     (setq shu-cpp-project-name pname)
     (setq sstring (format-time-string "on %a, %e %b %Y at %k:%M:%S" stime))
     (princ (format "\nStart project (%s) setup in %s %s.\n\n" shu-cpp-project-name proj-dir sstring) gbuf)
@@ -1881,6 +1897,7 @@ which the tags file is to be built."
     (princ (format "\n  End project setup in %s %s.\n" proj-dir sstring) gbuf)
     (princ "\nThe current project is:\n\n" gbuf)
     (shu-internal-which-c-project gbuf)
+    (shu-record-visited-project pname proj-dir)
     (switch-to-buffer gbuf)
     ))
 
