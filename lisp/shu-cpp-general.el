@@ -488,6 +488,36 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                        "std::max_align_t"
                        "std::nullptr_t"
                        ))
+   (cons "cstdint"    (list
+                       "std::int8_t"
+                       "std::int16_t"
+                       "std::int32_t"
+                       "std::int64_t"
+                       "std::int_fast8_t"
+                       "std::int_fast16_t"
+                       "std::int_fast32_t"
+                       "std::int_fast64_t"
+                       "std::int_least8_t"
+                       "std::int_least16_t"
+                       "std::int_least32_t"
+                       "std::int_least64_t"
+                       "std::intmax_t"
+                       "std::intptr_t"
+                       "std::uint8_t"
+                       "std::uint16_t"
+                       "std::uint32_t"
+                       "std::uint64_t"
+                       "std::uint_fast8_t"
+                       "std::uint_fast16_t"
+                       "std::uint_fast32_t"
+                       "std::uint_fast64_t"
+                       "std::uint_least8_t"
+                       "std::uint_least16_t"
+                       "std::uint_least32_t"
+                       "std::uint_least64_t"
+                       "std::uintmax_t"
+                       "std::uintptr_t"
+                       ))
    (cons "cstring" (list
                     "std::memcpy"
                     "std::memmove"
@@ -1203,6 +1233,36 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                              "bsl::ptrdiff_t"
                              "bsl::max_align_t"
                              "bsl::nullptr_t"
+                             ))
+   (cons "bsl_cstdint.h"    (list
+                             "bsl::int8_t"
+                             "bsl::int16_t"
+                             "bsl::int32_t"
+                             "bsl::int64_t"
+                             "bsl::int_fast8_t"
+                             "bsl::int_fast16_t"
+                             "bsl::int_fast32_t"
+                             "bsl::int_fast64_t"
+                             "bsl::int_least8_t"
+                             "bsl::int_least16_t"
+                             "bsl::int_least32_t"
+                             "bsl::int_least64_t"
+                             "bsl::intmax_t"
+                             "bsl::intptr_t"
+                             "bsl::uint8_t"
+                             "bsl::uint16_t"
+                             "bsl::uint32_t"
+                             "bsl::uint64_t"
+                             "bsl::uint_fast8_t"
+                             "bsl::uint_fast16_t"
+                             "bsl::uint_fast32_t"
+                             "bsl::uint_fast64_t"
+                             "bsl::uint_least8_t"
+                             "bsl::uint_least16_t"
+                             "bsl::uint_least32_t"
+                             "bsl::uint_least64_t"
+                             "bsl::uintmax_t"
+                             "bsl::uintptr_t"
                              ))
    (cons "bsl_cstring.h" (list
                           "bsl::memcpy"
@@ -5392,11 +5452,11 @@ shell, and yank."
 contents of the kill buffer (which is assumed to contain an #include statement)
 and then sorts all of the lines in the current include block."
   (interactive)
-    (goto-char (line-beginning-position))
-    (yank)
-    (goto-char (line-beginning-position))
-    (shu-sort-includes)
-    )
+  (goto-char (line-beginning-position))
+  (yank)
+  (goto-char (line-beginning-position))
+  (shu-sort-includes)
+  )
 
 
 
