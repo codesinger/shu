@@ -292,8 +292,9 @@ given task as a Google test."
 (defun ddm ()
   "Insert \"git diff master..<branch> >mm.diff\""
   (interactive)
-  (let ((branch (shu-git-find-branch)))
-    (insert (concat "git diff master.." branch " >mm.diff"))
+  (let ((branch (shu-git-find-branch))
+        (default-branch (shu-git-find-default-branch)))
+    (insert (concat "git diff " default-branch ".." branch " >mm.diff"))
     ))
 
 
@@ -304,8 +305,9 @@ given task as a Google test."
 (defun dds ()
   "Insert \"git diff --stat master..<branch> >ss.diff\""
   (interactive)
-  (let ((branch (shu-git-find-branch)))
-    (insert (concat "git diff --stat master.." branch " >ss.diff"))
+  (let ((branch (shu-git-find-branch))
+        (default-branch (shu-git-find-default-branch)))
+    (insert (concat "git diff --stat " default-branch ".." branch " >ss.diff"))
     ))
 
 

@@ -2888,21 +2888,27 @@ of the repository."
 (defun shu-add-alexandria-badge ()
   "Insert an Alexandria badge for the current project."
   (interactive)
-  (let ((library-name (shu-get-directory-prefix))
+  (let (
+        (library-name (shu-get-directory-prefix))
         (repo-path (shu-get-git-repo-path))
-        (badge-added))
+        (default-branch (shu-git-find-default-branch))
+        (badge-added)
+          )
     (if (not shu-internal-dev-url)
         (progn
           (ding)
-          (message "%s" "SHU-INTERNAL-DEV-URL custom variable is not set."))
+          (message "%s" "SHU-INTERNAL-DEV-URL custom variable is not set.")
+          )
       (when repo-path
         (insert
          (concat
           "[![Alexandria doxygen](https://badges." shu-internal-dev-url "/badge"
           "//Alexandria%20|%20Doxygen/blue?icon=fa-book-open)]"
           "(http://alexandria-doc.stacker." shu-internal-dev-url "/" repo-path
-          "/master/)"))
-        (setq badge-added t)))
+          "/" default-branch "/)"))
+        (setq badge-added t)
+        )
+      )
     badge-added
     ))
 
