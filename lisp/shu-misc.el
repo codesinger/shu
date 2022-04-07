@@ -1245,6 +1245,19 @@ origin."
 
 
 ;;
+;;  shu-git-insert-checkout-default
+;;
+(defun shu-git-insert-checkout-default ()
+  "Insert at point the git command to cheeck out the current default branch."
+  (interactive)
+  (let ((default-branch (shu-git-find-default-branch)))
+      (insert (concat "git checkout " default-branch))
+    ))
+
+
+
+
+;;
 ;;  shu-git-insert-git-commit
 ;;
 (defun shu-git-insert-git-commit ()
@@ -3508,6 +3521,7 @@ shu- prefix removed."
   (defalias 'copy-branch 'shu-git-copy-branch)
   (defalias 'insb 'shu-git-insert-branch)
   (defalias 'inso 'shu-git-insert-origin-branch)
+  (defalias 'gco 'shu-git-insert-checkout-default)
   (defalias 'gpl 'shu-git-insert-pull-origin-branch)
   (defalias 'gps 'shu-git-insert-push-origin-branch)
   (defalias 'gcm 'shu-git-insert-git-commit)
