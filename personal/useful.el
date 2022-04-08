@@ -320,7 +320,7 @@ given task as a Google test."
   (interactive)
   (let* (
          (p1 "find . -name \"*\" -type f -exec grep -H ")
-         (p2 " {} \;")
+         (p2 " {} \\;")
         (f (concat p1 p2))
         )
     (insert f)
