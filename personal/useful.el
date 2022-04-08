@@ -313,6 +313,24 @@ given task as a Google test."
 
 
 ;;
+;;  fall
+;;
+(defun fall ()
+  "Insert at point a find command to grep all files."
+  (interactive)
+  (let* (
+         (p1 "find . -name \"*\" -type f -exec grep -H ")
+         (p2 " {} \;")
+        (f (concat p1 p2))
+        )
+    (insert f)
+    (backward-char (length p2))
+    ))
+
+
+
+
+;;
 ;;  yfall - Visit the course directory for Fall 2013
 ;;
 (defun yfall ()
