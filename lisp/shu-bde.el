@@ -471,9 +471,9 @@ the current directory name does not match the namespace."
         (namespace (if shu-cpp-default-namespace shu-cpp-default-namespace "NO NAMESPACE"))
         (prefix (shu-get-directory-prefix))
         (debug-on-error t))
-    (setq query (concat "Class name in " namespace "? "))
+    (setq query (concat "Class name in namespace " namespace "? "))
     (when (and shu-cpp-default-namespace (not (string= prefix namespace)))
-      (setq query (concat "Class name in " namespace  " in directory '" prefix "'? ")))
+      (setq query (concat "Class name in namespace " namespace  " in directory '" prefix "'? ")))
     (read-string query)
     ))
 
