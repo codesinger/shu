@@ -117,19 +117,23 @@ from the list of template parameter names"
 
         <A, B>
 
-from the list of template parameter names"
-  (let (
-        (pname)
+from the list of template parameter names.
+An empty string is returned if TEMPLATE-LIST is nil or empty."
+  (let ((pname)
+        (count 0)
         (tlist "<")
         (sep "")
-        )
-    (while template-list
-      (setq pname (car template-list))
-      (setq tlist (concat tlist sep pname))
-      (setq sep ", ")
-      (setq template-list (cdr template-list))
-      )
-    (concat tlist ">")
+        (result ""))
+    (when template-list
+      (while template-list
+        (setq pname (car template-list))
+        (setq tlist (concat tlist sep pname))
+        (setq sep ", ")
+        (setq count (1+ count))
+        (setq template-list (cdr template-list)))
+      (when (/= count 0)
+        (setq result (concat tlist ">"))))
+    result
     ))
 
 
@@ -139,11 +143,9 @@ from the list of template parameter names"
 ;;  shu-test-shu-cpp-make-decl-template-1
 ;;
 (ert-deftest shu-test-shu-cpp-make-decl-template-1 ()
-  (let (
-        (template-list (list "T"))
+  (let ((template-list (list "T"))
         (actual)
-        (expected "template<typename T>")
-        )
+        (expected "template<typename T>"))
     (setq actual (shu-cpp-make-decl-template template-list))
     (should actual)
     (should (stringp actual))
@@ -156,11 +158,9 @@ from the list of template parameter names"
 ;;  shu-test-shu-cpp-make-decl-template-2
 ;;
 (ert-deftest shu-test-shu-cpp-make-decl-template-2 ()
-  (let (
-        (template-list (list "T" "P" "Q"))
+  (let ((template-list (list "T" "P" "Q"))
         (actual)
-        (expected "template<typename T, typename P, typename Q>")
-        )
+        (expected "template<typename T, typename P, typename Q>"))
     (setq actual (shu-cpp-make-decl-template template-list))
     (should actual)
     (should (stringp actual))
@@ -174,11 +174,9 @@ from the list of template parameter names"
 ;;  shu-test-shu-cpp-make-template-list-1
 ;;
 (ert-deftest shu-test-shu-cpp-make-template-list-1 ()
-  (let (
-        (template-list (list "T"))
+  (let ((template-list (list "T"))
         (actual)
-        (expected "<T>")
-        )
+        (expected "<T>"))
     (setq actual (shu-cpp-make-template-list template-list))
     (should actual)
     (should (stringp actual))
@@ -192,11 +190,41 @@ from the list of template parameter names"
 ;;  shu-test-shu-cpp-make-template-list-2
 ;;
 (ert-deftest shu-test-shu-cpp-make-template-list-2 ()
-  (let (
-        (template-list (list "T" "P" "Q"))
+  (let ((template-list (list "T" "P" "Q"))
         (actual)
-        (expected "<T, P, Q>")
-        )
+        (expected "<T, P, Q>"))
+    (setq actual (shu-cpp-make-template-list template-list))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-make-template-list-3
+;;
+(ert-deftest shu-test-shu-cpp-make-template-list-3 ()
+  (let ((template-list (list))
+        (actual)
+        (expected ""))
+    (setq actual (shu-cpp-make-template-list template-list))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-make-template-list-4
+;;
+(ert-deftest shu-test-shu-cpp-make-template-list-4 ()
+  (let ((template-list)
+        (actual)
+        (expected ""))
     (setq actual (shu-cpp-make-template-list template-list))
     (should actual)
     (should (stringp actual))
