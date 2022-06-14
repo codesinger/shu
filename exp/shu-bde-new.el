@@ -154,19 +154,407 @@ the current directory name does not match the namespace."
 
 
 
+;;
+;;  shu-gen-bde-template
+;;
+(defun shu-gen-bde-template (class-name template-list)
+  "Generate the three files for a new component: .cpp, .h, and .t.cpp"
+  (interactive (list (shu-gen-bde-create-prompt-template)))
+  (let ((author shu-cpp-author)
+        (namespace shu-cpp-default-namespace)
+        (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix "")))
+    (shu-internal-gen-bde-template class-name template-list author namespace file-prefix)
+    ))
+
+
+
 
 ;;
-;;  shu-cpp-decl-cpp-print-self
+;;  shu-internal-gen-bde-template
 ;;
-(defun shu-cpp-decl-cpp-print-self (class-name template-list)
+(defun shu-internal-gen-bde-template (class-name template-list author namespace file-prefix)
+  "Generate the three files for a new component: .cpp, .h, and .t.cpp"
+  (let* ((gitbuf (get-buffer-create "**git-add**"))
+         (debug-on-error t)
+         (base-class-name (downcase class-name))
+         ;;         (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix (concat namespace "_")))
+         (base-name (concat file-prefix base-class-name))
+         (hfile-name (concat base-name ".h"))
+         (cfile-name (concat base-name ".cpp"))
+         (tfile-name (concat base-name ".t.cpp"))
+         (got-files )
+         (found-files "")
+         (file-comma "")
+         (got-count 0)
+         (file-file "File"))
+    (when (not namespace)
+      (setq base-name base-class-name)
+      (setq hfile-name (concat base-name ".h"))
+      (setq cfile-name (concat base-name ".cpp"))
+      (setq tfile-name (concat base-name ".t.cpp")))
+    (when (file-readable-p hfile-name)
+      (setq got-files t)
+      (setq found-files (concat found-files file-comma hfile-name))
+      (setq got-count (1+ got-count))
+      (setq file-comma ", "))
+    (when (file-readable-p cfile-name)
+      (setq got-files t)
+      (setq found-files (concat found-files file-comma cfile-name))
+      (setq got-count (1+ got-count))
+      (setq file-comma ", "))
+    (when (file-readable-p tfile-name)
+      (setq got-files t)
+      (setq found-files (concat found-files file-comma tfile-name))
+      (setq got-count (1+ got-count))
+      (setq file-comma ", "))
+
+    (if got-files
+        (progn
+          (when (> got-count 1)
+            (setq file-file "Files"))
+          (message "%s already here: %s" file-file found-files))
+      (when (not namespace)
+        (message "%s" "Warning: No namespace set.  See shu-det-default-namespace"))
+      (find-file cfile-name)
+      (shu-generate-bde-cfile author namespace class-name)
+      (save-buffer)
+      (goto-char (point-min))
+      (find-file tfile-name)
+      (shu-generate-bde-tfile author namespace class-name)
+      (save-buffer)
+      (find-file hfile-name)
+      (goto-char (point-min))
+      (shu-generate-bde-hfile author namespace class-name)
+      (save-buffer)
+      (goto-char (point-min))
+
+      (princ (concat "git add " hfile-name "\n") gitbuf)
+      (princ (concat "git add " cfile-name "\n") gitbuf)
+      (princ (concat "git add " tfile-name "\n") gitbuf)
+
+      (princ (concat "git reset HEAD " hfile-name "\n") gitbuf)
+      (princ (concat "git reset HEAD " cfile-name "\n") gitbuf)
+      (princ (concat "git reset HEAD " tfile-name "\n") gitbuf)
+
+      (princ (concat "git restore --staged " hfile-name "\n") gitbuf)
+      (princ (concat "git restore --staged " cfile-name "\n") gitbuf)
+      (princ (concat "git restore --staged " tfile-name "\n") gitbuf)
+
+      (princ (concat "rm " hfile-name "\n") gitbuf)
+      (princ (concat "rm " cfile-name "\n") gitbuf)
+      (princ (concat "rm " tfile-name "\n") gitbuf)
+
+      (shu-generate-git-add hfile-name gitbuf)
+      (shu-generate-git-add cfile-name gitbuf)
+      (shu-generate-git-add tfile-name gitbuf)
+      )))
+
+
+
+;;
+;;  shu-generate-bde-hfile-template
+;;
+(defun shu-generate-bde-hfile-template (author namespace class-name template-list)
+  "Generate a skeleton header file"
+  (let* (
+         (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
+         (hfile-name (file-name-nondirectory (buffer-file-name)))
+         (guard-name (shu-bde-include-guard hfile-name))
+         (open-line (concat (shu-make-padded-line (concat "// " hfile-name) 70) "-*-C++-*-"))
+         (namespace-name namespace)
+         (namespace-sep "::")
+         (inner-close "}  // close package namespace\n")
+         (outer-namespace)
+         (outer-close "}  // close enterprise namespace\n")
+         (inner-namespace "")
+         (decl-point)
+           )
+
+    (if shu-cpp-default-global-namespace
+        (setq outer-namespace (concat "namespace " shu-cpp-default-global-namespace " {\n"))
+      (setq outer-close "")
+      )
+    (if namespace
+        (setq inner-namespace (concat "namespace " namespace-name " {\n"))
+      (setq namespace-sep "")
+      (setq namespace-name "")
+      (setq inner-close "")
+      )
+
+    (insert
+     (concat
+      open-line "\n"
+      "#ifndef " guard-name "\n"
+      "#define " guard-name "\n"
+      "\n"
+      "/*!\n"
+      " * \\file " hfile-name "\n"
+      " *\n"
+      " * \\brief Declaration of " class-name "\n"
+      " *\n"
+      " * \\author " author "\n"
+      " */\n"
+      "\n"))
+    (run-hooks 'shu-bde-gen-file-identifier-hook)
+    (run-hooks 'shu-bde-gen-h-includes-hook)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      outer-namespace
+      inner-namespace
+      "\n"
+      "\n"))
+
+    (setq decl-point (point))
+
+    (insert
+     (concat
+      "\n"
+      "\n"
+      inner-close
+      outer-close
+      "\n"
+      "#endif  // " guard-name "\n"
+      "\n"))
+    (run-hooks 'shu-bde-gen-hfile-copyright-hook)
+    (insert
+     (concat
+      "// ----------------------------- END-OF-FILE ---------------------------------\n"))
+
+    (goto-char decl-point)
+    (beginning-of-line)
+    (shu-cpp-cdecl class-name)
+    ))
+
+
+
+;;
+;;  shu-generate-bde-cfile-template
+;;
+(defun shu-generate-bde-cfile-template (author namespace class-name template-list)
+  "Generate a skeleton cpp file"
+  (let* (
+         (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
+         (cfile-name (file-name-nondirectory (buffer-file-name)))
+         (hfile-name (concat (file-name-sans-extension cfile-name) ".h"))
+         (rcs-file-name (concat (file-name-sans-extension cfile-name) "_cpp"))
+         (guard-name (shu-bde-include-guard cfile-name))
+         (open-line (concat (shu-make-padded-line (concat "// " cfile-name) 70) "-*-C++-*-"))
+         (inner-namespace "")
+         (inner-close-namespace "")
+         (outer-namespace)
+         (outer-close "}  // close enterprise namespace\n")
+         (left-include-delim "\"")
+         (right-include-delim "\"")
+         (cgen-point)
+           )
+    (when shu-cpp-include-user-brackets
+      (setq left-include-delim "<")
+      (setq right-include-delim ">")
+      )
+    (when namespace
+      (setq inner-namespace (concat "namespace " namespace " {\n"))
+      (setq inner-close-namespace (concat "}  // close package namespace\n"))
+      )
+    (if shu-cpp-default-global-namespace
+        (setq outer-namespace (concat "namespace " shu-cpp-default-global-namespace " {\n"))
+      (setq outer-close "")
+      )
+
+    (insert
+     (concat
+      open-line "\n"
+      "\n"
+      "/*!\n"
+      " * \\file " cfile-name "\n"
+      " *\n"
+      " * \\brief Compilation file for " class-name "\n"
+      " *\n"
+      " * \\author " author "\n"
+      " */\n"
+      "\n"
+      "#include " left-include-delim hfile-name right-include-delim "\n"
+      "\n"))
+    (run-hooks 'shu-bde-gen-file-identifier-hook)
+    (insert
+     (concat
+      "\n"
+      "#include <bslma_default.h>\n"
+      "\n"
+      "\n"
+      "\n"
+      outer-namespace
+      inner-namespace
+      "\n"
+      "\n"))
+    (save-excursion
+      (beginning-of-line)
+      (setq cgen-point (point))
+
+      )
+    (insert
+     (concat
+      "\n"
+      "\n"
+      inner-close-namespace
+      outer-close
+      "\n"
+      "\n"))
+    (insert
+     (concat
+      (run-hooks 'shu-bde-gen-cfile-copyright-hook)
+      "// ----------------------------- END-OF-FILE ---------------------------------\n"))
+    (goto-char cgen-point)
+    (shu-cpp-acgen class-name)
+    ))
+
+
+
+
+;;
+;;  shu-cpp-cdecl-template - Skeleton class that may not be copied
+;;
+(defun shu-cpp-cdecl-template (class-name template-list)
+  "Generate a skeleton class declaration at point."
+  (interactive "*sClass name?: ")
+  (let (
+        (use-allocator shu-cpp-use-bde-library)
+        )
+    (shu-cpp-inner-cdecl-template class-name nil use-allocator)))
+
+
+
+
+;;
+;;  shu-cpp-ccdecl - Skeleton class that may be copied
+;;
+(defun shu-cpp-ccdecl-template (class-name template-list)
+  "Generate a skeleton class declaration at point."
+  (interactive "*sClass name?: ")
+  (shu-cpp-inner-cdecl-template class-name template-list t))
+
+
+
+
+;; TODO: Honor the column in which point is located for generating
+;;       nested class declarations?
+;;
+;; TODO: Allow a template class spec.  Something like a class name of
+;;       FooBar<DataType, thingType>
+;;
+;;      This would generate
+;;
+;;      template<class DataType, class thingType>
+;;      class FooBar
+;;
+;;  shu-cpp-inner-cdecl
+;;
+(defun shu-cpp-inner-cdecl-template (class-name template-list copy-allowed &optional use-allocator)
+  "Generate a skeleton class declaration at point."
+  (let ((ipad (make-string shu-cpp-indent-length ? ))
+        (header-pos (point))
+        (have-include )
+        (start-pos ))
+    (setq start-pos (shu-cpp-gen-h-class-intro class-name))
+    (insert (concat "\n" ipad "// DATA\n\n"))
+    (when use-allocator
+      (insert
+       (concat
+        ipad "bslma::Allocator                 *" shu-cpp-default-allocator-name ";\n"
+        )))
+    (insert
+     (concat
+      "\n"
+      "  public:\n"))
+    (when use-allocator
+      (shu-cpp-misc-gen-nested-traits class-name))
+    (insert
+     (concat
+      "\n"
+      ipad "// CREATORS\n"))
+    (shu-cpp-misc-gen-h-ctor class-name use-allocator)
+    (when (and shu-cpp-modern (not copy-allowed))
+      (shu-cpp-misc-gen-ctor-not-implemented class-name))
+    (shu-cpp-misc-gen-h-dtor class-name)
+    (insert
+     (concat
+      "\n"
+      ipad "// MANIPULATORS\n"))
+    (when (and shu-cpp-modern (not copy-allowed))
+      (shu-cpp-misc-gen-op-equal-not-implemented class-name))
+    (insert
+     (concat
+      "\n"
+      ipad "// ACCESSORS\n"))
+    (shu-cpp-decl-h-print-self)
+    (shu-cpp-gen-decl-h-private class-name copy-allowed)
+    (insert
+     (concat
+      "\n"
+      "// FREE OPERATORS\n"))
+    (shu-cpp-decl-h-stream class-name)
+    (insert
+     (concat
+      "\n"
+      "\n"))
+    (shu-cpp-hcgen class-name)
+    (when use-allocator
+      (save-excursion
+        (save-restriction
+          (widen)
+          (goto-char (point-min))
+          (when (search-forward "#include <bslma_allocator.h>" nil t)
+            (setq have-include t))))
+      (when (not have-include)
+        (goto-char header-pos)
+        (beginning-of-line)
+        (insert
+         (concat
+          "\n"
+          "#include <bslma_allocator.h>\n"))))
+    (goto-char start-pos)
+    ))
+
+
+
+
+;;
+;;  shu-cpp-impl-cpp-constructor
+;;
+(defun shu-cpp-impl-cpp-constructor (class-name template-list &optional use-allocator)
+  "Insert the skeleton constructor implementation."
+  (let (
+        (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        )
+    (shu-cpp-insert-template-decl template-list)
+    (insert
+     qualified-class-name "::" class-name "(")
+    (if use-allocator
+        (progn
+          (insert
+           (concat
+            "bslma::Allocator    *allocator)\n"
+            ":\n"
+            shu-cpp-default-allocator-name "(bslma::Default::allocator(allocator))\n")))
+      (insert ")\n"))
+    ))
+
+
+
+
+;;
+;;  shu-cpp-impl-cpp-print-self
+;;
+(defun shu-cpp-impl-cpp-print-self (class-name template-list)
   "Generate the skeleton code for the printSelf() function.
 CLASS-NAME is the name of the containing C++ class."
   (let (
         (std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
         (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
         (ipad (make-string shu-cpp-indent-length ? ))
-        )
-    (insert "\n")
+          )
     (shu-cpp-insert-template-decl template-list)
     (insert
      (concat
@@ -179,6 +567,89 @@ CLASS-NAME is the name of the containing C++ class."
       ipad "return os;\n"
       "}\n"))
     ))
+
+
+
+;;
+;;  shu-cpp-decl-h-stream-template
+;;
+(defun shu-cpp-decl-h-stream-template (class-name template-list)
+  "Generate the declaration for the streaming operator (operator<<()).
+CLASS-NAME is the name of the containing C++ class."
+  (let* (
+        (std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
+        (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (ostream-length (length "std::ostream  "))
+        (ostream-class-length (+ (length "const ") (length qualified-class-name) 2))
+        (ostream-pad "")
+        (ostream-class-pad "")
+          )
+    (if (> ostream-length ostream-class-length)
+        (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
+      (when (> ostream-class-length ostream-length)
+        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))
+        )
+      )
+    (insert
+     (concat
+      "\n"
+      "/*!\n"
+      " *  \\brief Stream an instance of " class-name " to the stream `os`\n"
+      " */\n"))
+    (when template-list
+      (insert
+       (concat
+        (shu-cpp-make-decl-template template-list)
+        "\n"
+        ))
+        )
+    (insert
+     (concat
+      std-name "::ostream &operator<<(\n"
+      ipad std-name "::ostream" ostream-pad "  &os,\n"
+      ipad  "const " qualified-class-name ostream-class-pad "  &cn);\n"))
+    ))
+
+
+
+;;
+;;  shu-cpp-decl-cpp-stream-template
+;;
+(defun shu-cpp-decl-cpp-stream-template (class-name template-list)
+  "Generate the code for the streaming operator (operator<<()).  CLASS-NAME is the
+name of the containing C++ class."
+  (let* (
+         (std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
+        (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (ostream-length (length "std::ostream  "))
+        (ostream-class-length (+ (length "const ") (length qualified-class-name) 2))
+        (ostream-pad "")
+        (ostream-class-pad "")
+        (inline "")
+           )
+    (if (> ostream-length ostream-class-length)
+        (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
+      (when (> ostream-class-length ostream-length)
+        (setq ostream-pad (make-string (- ostream-class-length ostream-length) ? ))
+        )
+      )
+    (shu-cpp-insert-template-decl template-list)
+    (when (not template-list)
+      (setq inline "inline\n")
+      )
+    (insert
+     (concat
+      inline
+      std-name "::ostream &operator<<(\n"
+      ipad std-name "::ostream" ostream-pad "  &os,\n"
+      ipad  "const " qualified-class-name ostream-class-pad "  &cn)\n"
+      "{\n"
+      ipad "return cn.printSelf(os);\n"
+      "}\n"))
+
+                     ))
 
 
 
