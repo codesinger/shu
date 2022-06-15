@@ -161,7 +161,7 @@ the current directory name does not match the namespace."
 ;;  shu-gen-bde-template
 ;;
 (defun shu-gen-bde-template (class-name template-string)
-  "Generate the threep files for a new component: .cpp, .h, and .t.cpp"
+  "Generate the three files for a new component: .cpp, .h, and .t.cpp"
   (interactive (shu-gen-bde-create-prompt-template))
   (let (
         (gb (get-buffer-create "**boo**"))
@@ -183,7 +183,7 @@ the current directory name does not match the namespace."
 ;;  shu-internal-gen-bde-template
 ;;
 (defun shu-internal-gen-bde-template (class-name template-list author namespace file-prefix)
-  "Generate the threeg files for a new component: .cpp, .h, and .t.cpp"
+  "Generate the three files for a new component: .cpp, .h, and .t.cpp"
   (let* ((gitbuf (get-buffer-create "**git-add**"))
          (debug-on-error t)
          (base-class-name (downcase class-name))
@@ -416,7 +416,69 @@ the current directory name does not match the namespace."
       (run-hooks 'shu-bde-gen-cfile-copyright-hook)
       "// ----------------------------- END-OF-FILE ---------------------------------\n"))
     (goto-char cgen-point)
-    (shu-cpp-acgen class-name)
+    (shu-cpp-acgen-template class-name template-list)
+    ))
+
+
+
+;;
+;;  shu-cpp-acgen-template
+;;
+(defun shu-cpp-acgen-template (class-name template-list)
+  "Generate a skeleton class code generation at point."
+  (interactive "*sClass name?: ")
+  (let
+      (
+       (use-allocator t)
+       (start-pos )
+       (header-pos (point))
+       (have-include )
+       (include-line )
+       (ipad (make-string shu-cpp-indent-length ? ))
+       )
+    (shu-cpp-decl-cpp-class-name class-name)
+    (insert (concat
+             "\n"
+             "// CREATORS\n\n"))
+    (setq start-pos (point))
+    (when (not template-list)
+      (shu-cpp-impl-cpp-constructor class-name template-list use-allocator)
+               )
+    (insert
+     (concat
+      "\n"
+      "// MANIPULATORS\n"
+      "\n"
+      "// ACCESSORS\n"
+      "\n"))
+    (when (not template-list)
+      (shu-cpp-decl-cpp-print-self class-name)
+      )
+    (insert
+     (concat
+      "\n"
+      "// FREE OPERATORS\n\n\n"
+      ))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (goto-char (point-min))
+        (when (search-forward "#include <bslma_default.h>" nil t)
+          (setq have-include t)
+          )
+        )
+      )
+    (when (not have-include)
+      (goto-char header-pos)
+      (beginning-of-line)
+      (setq include-line
+            (concat
+             "\n"
+             "#include <bslma_default.h>\n"))
+      (setq start-pos (+ start-pos (length include-line)))
+      (insert include-line)
+      )
+    (goto-char start-pos)
     ))
 
 
@@ -466,7 +528,7 @@ the current directory name does not match the namespace."
         (header-pos (point))
         (have-include )
         (start-pos ))
-    (setq start-pos (shu-cpp-gen-h-class-intro class-name))
+    (setq start-pos (shu-cpp-gen-h-class-intro-template class-name template-list))
     (insert (concat "\n" ipad "// DATA\n\n"))
     (when use-allocator
       (insert
@@ -508,7 +570,7 @@ the current directory name does not match the namespace."
      (concat
       "\n"
       "\n"))
-    (shu-cpp-hcgen class-name)
+    (shu-cpp-hcgen-template class-name template-list use-allocator)
     (when use-allocator
       (save-excursion
         (save-restriction
@@ -523,6 +585,90 @@ the current directory name does not match the namespace."
          (concat
           "\n"
           "#include <bslma_allocator.h>\n"))))
+    (goto-char start-pos)
+    ))
+
+
+
+
+;;
+;;  shu-cpp-gen-h-class-intro-template
+;;
+(defun shu-cpp-gen-h-class-intro-template (class-name template-list)
+  "Generate the preamble to a class declaration in a header file.  This is all
+of the code that precedes the \\ DATA comment.  Return the position at which
+the class comment was placed."
+  (let ((start-pos))
+    (insert "\n")
+    (shu-cpp-decl-h-class-name class-name)
+    (insert
+     (concat
+      "\n"
+      "/*!\n"
+      " * \\brief "))
+    (setq start-pos (point))
+    (insert
+     (concat
+      "Description of " class-name " FIXME!  FIXME!  FIXME!  FIXME!\n"
+      " */\n"))
+    (when template-list
+      (insert
+       (concat
+        (shu-cpp-make-decl-template template-list) "\n"))
+      )
+    (insert
+     (concat
+      "class " class-name "\n"
+      "{\n"))
+    start-pos
+    ))
+
+
+
+;;
+;;  shu-cpp-hcgen-template
+;;
+(defun shu-cpp-hcgen-template (class-name template-list use-allocator)
+  "Generate a skeleton class code generation at point."
+  (interactive "*sClass name?: ")
+  (let (
+        (start-pos )
+        (ipad (make-string shu-cpp-indent-length ? ))
+        (have-header))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (setq have-header (search-backward shu-cpp-misc-inline-template-label nil t))))
+    (insert "\n")
+    (when (not have-header)
+      (shu-cpp-gen-inline-template-header)
+      )
+    (shu-cpp-decl-cpp-class-name class-name)
+    (insert (concat
+             "\n"
+             "// CREATORS\n"))
+    (setq start-pos (save-excursion (forward-line -1) (end-of-line) (forward-char -1) (point)))
+    (when template-list
+      (insert "\n")
+      (shu-cpp-impl-cpp-constructor class-name template-list use-allocator)
+      )
+    (insert
+     (concat
+      "\n"
+      "// MANIPULATORS\n"
+      "\n"
+      "// ACCESSORS\n"))
+    (when template-list
+    (insert "\n")
+    (shu-cpp-impl-cpp-print-self class-name template-list)
+    )
+    (insert
+     (concat
+      "\n"
+      "// FREE OPERATORS\n"
+      "\n"
+      ))
+    (shu-cpp-decl-cpp-stream-template class-name template-list)
     (goto-char start-pos)
     ))
 
@@ -548,7 +694,10 @@ the current directory name does not match the namespace."
             "bslma::Allocator    *allocator)\n"
             ":\n"
             shu-cpp-default-allocator-name "(bslma::Default::allocator(allocator))\n")))
-      (insert ")\n"))
+      (insert ")\n"
+              "{\n"
+              "}\n"
+              ))
     ))
 
 
