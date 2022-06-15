@@ -226,7 +226,7 @@ the current directory name does not match the namespace."
       (when (not namespace)
         (message "%s" "Warning: No namespace set.  See shu-det-default-namespace"))
       (find-file cfile-name)
-      (shu-generate-bde-cfile author namespace class-name)
+      (shu-generate-bde-cfile-template author namespace class-name template-list)
       (save-buffer)
       (goto-char (point-min))
       (find-file tfile-name)
@@ -234,7 +234,7 @@ the current directory name does not match the namespace."
       (save-buffer)
       (find-file hfile-name)
       (goto-char (point-min))
-      (shu-generate-bde-hfile author namespace class-name)
+      (shu-generate-bde-hfile-template author namespace class-name template-list)
       (save-buffer)
       (goto-char (point-min))
 
@@ -334,7 +334,7 @@ the current directory name does not match the namespace."
 
     (goto-char decl-point)
     (beginning-of-line)
-    (shu-cpp-cdecl class-name)
+    (shu-cpp-cdecl-template class-name template-list)
     ))
 
 
@@ -431,7 +431,7 @@ the current directory name does not match the namespace."
   (let (
         (use-allocator shu-cpp-use-bde-library)
         )
-    (shu-cpp-inner-cdecl-template class-name nil use-allocator)))
+    (shu-cpp-inner-cdecl-template class-name template-list nil use-allocator)))
 
 
 
@@ -503,7 +503,7 @@ the current directory name does not match the namespace."
      (concat
       "\n"
       "// FREE OPERATORS\n"))
-    (shu-cpp-decl-h-stream class-name)
+    (shu-cpp-decl-h-stream-template class-name template-list)
     (insert
      (concat
       "\n"
