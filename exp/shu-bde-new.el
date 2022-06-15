@@ -104,6 +104,7 @@ template parameter names.  It returns a list with twoitens on it:
 If the comma separated list of template parameter names is empty, the list of
 template parameter names (Item 2 above) is nil"
   (let (
+        (gb (get-buffer-create "**boo**"))
         (query (shu-gen-bde-make-prompt-string))
         (tquery "Comma separated template parameter names? ")
         (a1)
@@ -112,10 +113,12 @@ template parameter names (Item 2 above) is nil"
         (answers)
         )
     (setq a1 (read-string query))
+    (princ (concat "a1: '" a1 "'\n") gb)
     (setq a2 (read-string tquery))
-    (setq plist (shu-cpp-split-template-parameter-list a2))
-    (push plist answers)
+    (princ (concat "a2: '" a2 "'\n") gb)
+    (push a2 answers)
     (push a1 answers)
+    (princ "answers: " gb)(princ answers gb)(princ "\n" gb)
     answers
     ))
 
@@ -157,12 +160,19 @@ the current directory name does not match the namespace."
 ;;
 ;;  shu-gen-bde-template
 ;;
-(defun shu-gen-bde-template (class-name template-list)
-  "Generate the three files for a new component: .cpp, .h, and .t.cpp"
-  (interactive (list (shu-gen-bde-create-prompt-template)))
-  (let ((author shu-cpp-author)
+(defun shu-gen-bde-template (class-name template-string)
+  "Generate the threep files for a new component: .cpp, .h, and .t.cpp"
+  (interactive (shu-gen-bde-create-prompt-template))
+  (let (
+        (gb (get-buffer-create "**boo**"))
+        (template-list (shu-cpp-split-template-parameter-list template-string))
+        (author shu-cpp-author)
         (namespace shu-cpp-default-namespace)
-        (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix "")))
+        (file-prefix (if shu-cpp-completion-prefix shu-cpp-completion-prefix "")
+                       )
+        )
+    (princ (concat "class-name: " class-name "\n") gb)
+    (princ "template-list: " gb)(princ template-list gb)(princ "\n" gb)
     (shu-internal-gen-bde-template class-name template-list author namespace file-prefix)
     ))
 
@@ -173,7 +183,7 @@ the current directory name does not match the namespace."
 ;;  shu-internal-gen-bde-template
 ;;
 (defun shu-internal-gen-bde-template (class-name template-list author namespace file-prefix)
-  "Generate the three files for a new component: .cpp, .h, and .t.cpp"
+  "Generate the threeg files for a new component: .cpp, .h, and .t.cpp"
   (let* ((gitbuf (get-buffer-create "**git-add**"))
          (debug-on-error t)
          (base-class-name (downcase class-name))
