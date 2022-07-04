@@ -449,7 +449,7 @@ the current directory name does not match the namespace."
       "\n"
       "// MANIPULATORS\n"
       "\n"
-      "// ACCESSORS\n"
+      "// ACCESSORS"
       "\n"))
     (when (not template-list)
       (shu-cpp-decl-cpp-print-self class-name)
@@ -695,12 +695,12 @@ the class comment was placed."
         (progn
           (insert
            (concat
-            "bslma::Allocator    *allocator)\n"
+            "\n"
+            ipad "bslma::Allocator    *allocator)\n"
             ":\n"
             shu-cpp-default-allocator-name "(bslma::Default::allocator(allocator))\n")))
       )
-    (insert ")\n"
-            "{\n"
+    (insert "{\n"
             "}\n"
             )
     ))
