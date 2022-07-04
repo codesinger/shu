@@ -429,7 +429,7 @@ the current directory name does not match the namespace."
   (interactive "*sClass name?: ")
   (let
       (
-       (use-allocator t)
+       (use-allocator shu-cpp-use-bde-library)
        (start-pos )
        (header-pos (point))
        (have-include )
@@ -504,7 +504,11 @@ the current directory name does not match the namespace."
 (defun shu-cpp-ccdecl-template (class-name template-list)
   "Generate a skeleton class declaration at point."
   (interactive "*sClass name?: ")
-  (shu-cpp-inner-cdecl-template class-name template-list t))
+  (let (
+        (use-allocator shu-cpp-use-bde-library)
+        )
+  (shu-cpp-inner-cdecl-template class-name template-list t use-allocator)
+  ))
 
 
 
@@ -522,7 +526,7 @@ the current directory name does not match the namespace."
 ;;
 ;;  shu-cpp-inner-cdecl
 ;;
-(defun shu-cpp-inner-cdecl-template (class-name template-list copy-allowed &optional use-allocator)
+(defun shu-cpp-inner-cdecl-template (class-name template-list copy-allowed use-allocator)
   "Generate a skeleton class declaration at point."
   (let ((ipad (make-string shu-cpp-indent-length ? ))
         (header-pos (point))
@@ -678,7 +682,7 @@ the class comment was placed."
 ;;
 ;;  shu-cpp-impl-cpp-constructor
 ;;
-(defun shu-cpp-impl-cpp-constructor (class-name template-list &optional use-allocator)
+(defun shu-cpp-impl-cpp-constructor (class-name template-list use-allocator)
   "Insert the skeleton constructor implementation."
   (let (
         (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
@@ -694,10 +698,11 @@ the class comment was placed."
             "bslma::Allocator    *allocator)\n"
             ":\n"
             shu-cpp-default-allocator-name "(bslma::Default::allocator(allocator))\n")))
-      (insert ")\n"
-              "{\n"
-              "}\n"
-              ))
+      )
+    (insert ")\n"
+            "{\n"
+            "}\n"
+            )
     ))
 
 
