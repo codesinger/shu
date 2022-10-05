@@ -51,6 +51,7 @@
 ;;;         "macros.t.elc"
 ;;;         "s-mode.t.elc"
          "shu-base.t.elc"
+         "shu-bde.t.el"
          "shu-capture-doc.t.elc"
          "shu-cpp-general.t.elc"
          "shu-cpp-match.t.elc"
