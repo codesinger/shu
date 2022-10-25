@@ -3484,6 +3484,53 @@ for the new common part."
 
 
 
+;;
+;;  shu-get-name-and-version
+;;
+(defun shu-get-name-and-version ()
+  "When positioned anywhere on a line that looks like
+
+        Published version 1.2.9 of library
+
+return a string of the form \"library=1.2.9\".  If the current line does not
+match the required pattern, return nil."
+  (let ((ss "Published version\\s-+\\([.0-9]+\\)\\s-+of\\s-+\\([_-0-9a-zA-Z]+\\)")
+        (line)
+        (name)
+        (version)
+        (nv))
+    (save-excursion
+      (beginning-of-line)
+      (if (not (re-search-forward ss (line-end-position) t))
+          (progn
+            (ding)
+            (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+            (message "Library name and version not found in '%s'/'" line))
+        (setq version (match-string 1))
+        (setq name (match-string 2))
+        (setq nv (concat name "=" version))))
+    nv
+    ))
+
+
+
+;;
+;;  shu-getnv
+;;
+(defun shu-getnv ()
+  "When positioned anywhere on a line that looks like
+
+        Published version 1.2.9 of library
+
+put into the kill ring  a string of the form \"library=1.2.9\"."
+  (interactive)
+  (let ((nv (shu-get-name-and-version)))
+    (when nv
+        (message "%s" nv)
+        (shu-kill-new nv))
+    ))
+
+
 
 ;;
 ;;  shu-misc-set-alias
@@ -3550,6 +3597,7 @@ shu- prefix removed."
   (defalias 'show-repo 'shu-show-repo)
   (defalias 'unbrace 'shu-unbrace)
   (defalias 'prepare-for-rename 'shu-prepare-for-rename)
+  (defalias 'getnv 'shu-getnv)
   )
 
 (provide 'shu-misc)

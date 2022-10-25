@@ -2846,4 +2846,52 @@
     (should (string= expected actual))
     ))
 
+
+
+;;
+;;  shu-test-shu-get-name-and-version-1
+;;
+(ert-deftest shu-test-shu-get-name-and-version-1 ()
+  (let ((actual)
+        (actual)
+        (expected "library=1.2.9"))
+    (with-temp-buffer
+      (insert "Published version 1.2.9 of library\n")
+      (goto-char 8)
+      (setq actual (shu-get-name-and-version))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-get-name-and-version-2
+;;
+(ert-deftest shu-test-shu-get-name-and-version-2 ()
+  (let ((actual))
+    (with-temp-buffer
+      (insert "April is the cruellest month\n")
+      (goto-char 8)
+      (setq actual (shu-get-name-and-version))
+      (should (not actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-get-name-and-version-3
+;;
+(ert-deftest shu-test-shu-get-name-and-version-3 ()
+  (let ((actual))
+    (with-temp-buffer
+      (insert "\n")
+      (goto-char (point-min))
+      (setq actual (shu-get-name-and-version))
+      (should (not actual)))
+    ))
+
 ;;; shu-misc.t.el ends here
