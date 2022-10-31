@@ -3533,6 +3533,92 @@ put into the kill ring  a string of the form \"library=1.2.9\"."
 
 
 ;;
+;;  shu-srs
+;;
+(defun shu-srs (rstring)
+  (interactive "*s/x/y?: ")
+  "A sed-like version of REPLACE-STRING.  REPLACE-STRING requires two arguments,
+which are read interactively, one at a time.  This works well for normal
+interactive use.
+
+But sometimes you actually create the search and replacement strings in another
+buffer to be fed to REPLACE-STRING.  To use these two strings you have to do the
+following:
+
+     1. Invoke REPLACE-STRING
+     2. Switch to the other buffer
+     3. Copy the search string from the other buffer
+     4. Switch back to the main buffer
+     5. Paste the search string from the kill ring
+     6. Hit enter
+     7. Switch to the other buffer
+     8. Copy the replacement string from the other buffer
+     9. Switch back to the main buffer
+    10. Paste the replacement string from the kill ring
+    11. Hit enter
+
+This function allows you to enter both strings at one prompt using a sed-like
+syntax, such as
+
+     /abc/defg
+
+This specifies a search string of \"abc\ and a replacement string of \"defg\".
+
+The work flow now becomes
+
+     1. Invoke SHU-SRS
+     2. Switch to the other buffer
+     3. Copy the search and replacement string from the other buffer
+     4. Switch back to the main buffer
+     5. Paste the search and replacement string from the kill ring
+     6. Hit enter
+
+You only have to go through six steps instead of eleven."
+  (let ((rval (shu-extract-replacement-strings rstring))
+        (p1)
+        (p2))
+    (if (not rval)
+        (progn
+          (ding)
+          (message "Cannot parse '%s' to find the two replacement strings" rstring))
+      (setq p1 (match-string 1 rstring))
+      (setq p2 (match-string 2 rstring))
+      (message "'%s' '%s'" p1 p2)
+      (while (search-forward p1 nil t)
+        (replace-match p2 nil t)))
+    ))
+
+
+
+;;
+;;  shu-extract-replacement-strings
+;;
+(defun shu-extract-replacement-strings (rstring)
+  "Parse a sed-like search and replacement string such as \"/abc/defg\".
+
+This function parses such a string.  The first character in the string is the
+delimiter.  The delimiter character is used to break the string into two
+strings, in this case \"abc\" and \"defg\".  If this can be done successfully,
+the two strings are returned in a cons cell.  If the string cannot be parsed,
+nil is returned."
+  (let ((sc)
+        (ss)
+        (p1)
+        (p2)
+        (rval)
+        (case-fold-search nil))
+    (setq sc (substring rstring 0 1))
+    (setq ss (concat sc "\\([^" sc "]+\\)" sc "\\([^" sc "]+\\)" sc "*"))
+    (when (string-match ss rstring)
+      (setq p1 (match-string 1 rstring))
+      (setq p2 (match-string 2 rstring))
+      (setq rval (cons p1 p2)))
+    rval
+    ))
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -3598,6 +3684,7 @@ shu- prefix removed."
   (defalias 'unbrace 'shu-unbrace)
   (defalias 'prepare-for-rename 'shu-prepare-for-rename)
   (defalias 'getnv 'shu-getnv)
+  (defalias 'srs 'shu-srs)
   )
 
 (provide 'shu-misc)

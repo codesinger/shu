@@ -2894,4 +2894,122 @@
       (should (not actual)))
     ))
 
+
+
+;;
+;;  shu-test-shu-extract-replacement-strings-1
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-1 ()
+  (let* ((expected1 "abc")
+         (expected2 "defg")
+         (dc "/")
+         (data (concat dc expected1 dc expected2))
+         (rval)
+         (actual1)
+         (actual2)
+         (debug-on-error t))
+    (setq rval (shu-extract-replacement-strings data))
+    (should rval)
+    (should (consp rval))
+    (setq actual1 (car rval))
+    (setq actual2 (cdr rval))
+    (should actual1)
+    (should (stringp actual1))
+    (should actual2)
+    (should (stringp actual2))
+    (should (string= expected1 actual1))
+    (should (string= expected2 actual2))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-strings-2
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-2 ()
+  (let* ((expected1 "abc")
+         (expected2 "defg")
+         (dc "/")
+         (data (concat dc expected1 dc expected2 dc))
+         (rval)
+         (actual1)
+         (actual2))
+    (setq rval (shu-extract-replacement-strings data))
+    (should rval)
+    (should (consp rval))
+    (setq actual1 (car rval))
+    (setq actual2 (cdr rval))
+    (should actual1)
+    (should (stringp actual1))
+    (should actual2)
+    (should (stringp actual2))
+    (should (string= expected1 actual1))
+    (should (string= expected2 actual2))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-strings-3
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-3 ()
+  (let* ((expected1 "abc")
+         (expected2 "defg")
+         (dc "$")
+         (data (concat dc expected1 dc expected2))
+         (rval)
+         (actual1)
+         (actual2))
+    (setq rval (shu-extract-replacement-strings data))
+    (should rval)
+    (should (consp rval))
+    (setq actual1 (car rval))
+    (setq actual2 (cdr rval))
+    (should actual1)
+    (should (stringp actual1))
+    (should actual2)
+    (should (stringp actual2))
+    (should (string= expected1 actual1))
+    (should (string= expected2 actual2))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-strings-4
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-4 ()
+  (let* ((expected1 "abc")
+         (expected2 "defg")
+         (dc "$")
+         (data (concat dc expected1 dc expected2 dc))
+         (rval)
+         (actual1)
+         (actual2))
+    (setq rval (shu-extract-replacement-strings data))
+    (should rval)
+    (should (consp rval))
+    (setq actual1 (car rval))
+    (setq actual2 (cdr rval))
+    (should actual1)
+    (should (stringp actual1))
+    (should actual2)
+    (should (stringp actual2))
+    (should (string= expected1 actual1))
+    (should (string= expected2 actual2))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-strings-5
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-5 ()
+  (let* ((dc "$")
+         (data "Just the worst time of year for a journey")
+         (rval))
+    (setq rval (shu-extract-replacement-strings data))
+    (should (not rval))
+    ))
+
 ;;; shu-misc.t.el ends here
