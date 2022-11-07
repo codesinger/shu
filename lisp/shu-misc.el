@@ -3536,7 +3536,6 @@ put into the kill ring  a string of the form \"library=1.2.9\"."
 ;;  shu-srs
 ;;
 (defun shu-srs (rstring)
-  (interactive "*s/x/y?: ")
   "A sed-like version of REPLACE-STRING.  REPLACE-STRING requires two arguments,
 which are read interactively, one at a time.  This works well for normal
 interactive use.
@@ -3574,18 +3573,24 @@ The work flow now becomes
      6. Hit enter
 
 You only have to go through six steps instead of eleven."
+  (interactive "*s/x/y?: ")
   (let ((rval (shu-extract-replacement-strings rstring))
         (p1)
-        (p2))
+        (p2)
+        (count 0)
+        (ess "s"))
     (if (not rval)
         (progn
           (ding)
           (message "Cannot parse '%s' to find the two replacement strings" rstring))
-      (setq p1 (match-string 1 rstring))
-      (setq p2 (match-string 2 rstring))
-      (message "'%s' '%s'" p1 p2)
+      (setq p1 (car rval))
+      (setq p2 (cdr rval))
       (while (search-forward p1 nil t)
-        (replace-match p2 nil t)))
+        (replace-match p2 nil t)
+        (setq count (1+ count)))
+      (when (= count 1)
+        (setq ess ""))
+      (message "shu-srs: Replaced %d occurrence%s" count ess))
     ))
 
 
