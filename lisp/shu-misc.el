@@ -36,6 +36,12 @@
 (defconst shu-dired-mode-name "Dired by date"
   "The name of the mode for a dired buffer")
 
+(defvar shu-srs-last-replace nil
+  "Ths holds the last string that was passed to shu-srs.  It is remembered here and used as the
+prompt for subsequent invocations of shu-srs")
+
+
+
 
 ;;
 ;;  Control the EOL terminator
@@ -3532,6 +3538,38 @@ put into the kill ring  a string of the form \"library=1.2.9\"."
 
 
 
+
+;;
+;;  shu-srs-create-prompt
+;;
+(defun shu-srs-create-prompt ()
+  "This function creates the prompt for the shu-srs replacement function.
+SHU-SRS-LAST-REPLACE is nil, this function prints the default prompt and returns
+whatever the user types in.  If SHU-SRS-LAST-REPLACE is non-nil, the prompt
+offers to replicate the last change made by SHU-SRS.  If the user types nothing,
+the last replacement string is returned.  If the user types something, that is
+returned instead."
+  (let* ((default-prompt "/x/y?")
+         (new-prompt (concat default-prompt ": "))
+         (initial-contents)
+         (keymap)
+         (read)
+         (hist)
+         (input)
+         (retval))
+    (barf-if-buffer-read-only)
+    (when shu-srs-last-replace
+      (setq retval (shu-extract-replacement-strings shu-srs-last-replace))
+      (when retval
+        (setq new-prompt (concat default-prompt " (default " (car retval) " -> " (cdr retval) "): "))))
+    (setq input (read-from-minibuffer new-prompt initial-contents keymap read hist shu-srs-last-replace))
+    (when (and (= (length input) 0) shu-srs-last-replace)
+      (setq input shu-srs-last-replace))
+    input
+    ))
+
+
+
 ;;
 ;;  shu-srs
 ;;
@@ -3573,7 +3611,7 @@ The work flow now becomes
      6. Hit enter
 
 You only have to go through six steps instead of eleven."
-  (interactive "*s/x/y?: ")
+  (interactive (list (shu-srs-create-prompt)))
   (let ((rval (shu-extract-replacement-strings rstring))
         (p1)
         (p2)
@@ -3590,7 +3628,8 @@ You only have to go through six steps instead of eleven."
         (setq count (1+ count)))
       (when (= count 1)
         (setq ess ""))
-      (message "shu-srs: Replaced %d occurrence%s" count ess))
+      (message "shu-srs: Replaced %d occurrence%s" count ess)
+      (setq shu-srs-last-replace rstring))
     ))
 
 
@@ -3612,12 +3651,13 @@ nil is returned."
         (p2)
         (rval)
         (case-fold-search nil))
-    (setq sc (substring rstring 0 1))
-    (setq ss (concat sc "\\([^" sc "]+\\)" sc "\\([^" sc "]+\\)" sc "*"))
-    (when (string-match ss rstring)
-      (setq p1 (match-string 1 rstring))
-      (setq p2 (match-string 2 rstring))
-      (setq rval (cons p1 p2)))
+    (when (> (length rstring) 3)
+      (setq sc (substring rstring 0 1))
+      (setq ss (concat sc "\\([^" sc "]+\\)" sc "\\([^" sc "]+\\)" sc "*"))
+      (when (string-match ss rstring)
+        (setq p1 (match-string 1 rstring))
+        (setq p2 (match-string 2 rstring))
+        (setq rval (cons p1 p2))))
     rval
     ))
 
