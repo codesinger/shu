@@ -210,6 +210,15 @@ by shu-make-c-project")
 
 (defvar shu-project-user-class-count 0)
 
+(defvar shu-project-file-list
+  "This is a list of the full path and name of every file in the project.
+It is used when a global change needs to visit every file in the project.")
+
+(defvar shu-cpp-fetch-list nil
+  "The name of the shared variable that contains the list of directories assembled
+by shu-make-c-project")
+
+
 
 ;;
 ;;  shu-project-get-file-info
@@ -226,10 +235,6 @@ by shu-make-c-project")
        (setq ,full-name-list (car ,tflist)))
     ))
 
-
-(defvar shu-project-file-list
-  "This is a list of the full path and name of every file in the project.
-It is used when a global change needs to visit every file in the project.")
 
 ;;
 ;;  Functions for customzing
@@ -326,6 +331,62 @@ This modifies both shu-cpp-h-extensions and shu-project-extensions."
       (setq nx (list nx)))
     (setq shu-cpp-h-extensions (append shu-cpp-h-extensions nx))
     (setq shu-project-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions))
+    ))
+
+
+
+;;
+;;  shu-project-directory-is-excluded
+;;
+(defun shu-project-directory-is-excluded (directory-name)
+  "Return t if the directory name is among those that should be ignored when
+looking for files within a project.  Typically, these are the names of
+CMake directories that hold generated code."
+  (when (not shu-project-exclude-hash)
+    (shu-project-make-exclude-hash))
+  (gethash directory-name shu-project-exclude-hash)
+  )
+
+
+
+;;
+;;  shu-cpp-project-is-type-wanted
+;;
+(defun shu-cpp-project-is-type-wanted (sname cpp-type)
+  "Determine if a file should be included based on its file type and on the
+argument CPP-TYPE.  If CPP-TYPE is t then we only want files of type C++.
+
+If CPP-TYPE is nil, we want any file of any type..
+
+If CPP-TYPE is nil, this function returns true.  If CPP-TYPE is t, this function
+returns true iff the file eftension of SNAME id one that holds C++ code."
+  (let ((is-wanted t)
+        (extension))
+    (when cpp-type
+      (setq is-wanted nil)
+      (setq extension (file-name-extension sname))
+      (when (member extension shu-project-extensions)
+        (setq is-wanted t)))
+    is-wanted
+    ))
+
+
+
+
+;;
+;;  shu-project-file-pattern-match
+;;
+(defun shu-project-file-pattern-match (name pattern)
+  "If PATTERN is nil, then all names qualify and this function returns t.
+If PATTERN is non-nil, it is a regular expression that must match NAME.  If
+PATTERN matches NAME, this function returns true.
+
+This function returns true if PATTERN is nil (all names wanted) ir if
+PATTERN is not nil and is a regular expression that is matched by NAME."
+  (let ((wanted t))
+    (when pattern
+      (setq wanted (string-match pattern name)))
+    wanted
     ))
 
 
@@ -2606,6 +2667,90 @@ file was found and visited, return true."
       (setq shu-cpp-inverted-class-list (shu-cpp-project-invert-list shu-cpp-class-list)))
     shu-cpp-inverted-class-list
     )
+
+
+
+;;
+;;  shu-project-get-specific-files
+;;
+(defun shu-project-get-specific-files (root pattern cpp-type)
+  "Starting at ROOT, search for all files that meet the following criteria:
+
+      - If PATTERN is non-nil, it is a regular expression that the file name
+        must match.  If PATTERN is nil, then the file names are ignored and all
+        files are potentially returned.
+
+      - If CPP-TYPE is nil, then file type is ignored and all files are
+        potentially returned subject to constraints of PATTERN described above.
+
+If PATTERN and CPP-TYPE are both nil, then all files are returned.
+
+If you wish to find all files that are of type C++, then set PATTERN to nil and
+CPP-TYPE to t.
+
+If you wish to find all files with similar names that are of type C++, then set
+CPP-TYPE to t and PATTERN to some regular expression that will filter the files
+appropriately, such as \"mumble_bar*\".
+
+The directories excluded by project search are also excluded here.  There are
+typically CMake directories that are populated with temporary files.  See
+SHU-PROJECT-EXCLUDE-LIST for a list of excluded directories.
+
+The files are returned as a list of files with paths relative to ROOT."
+  (let ((level 0)
+        (flist)
+        (dir-name))
+    (shu-project-make-exclude-hash)
+    (setq shu-cpp-fetch-list nil)
+    (shu-project-sub-specific-files root level pattern cpp-type)
+    (setq shu-cpp-fetch-list (sort shu-cpp-fetch-list 'string<))
+    shu-cpp-fetch-list
+    ))
+
+
+
+
+;;
+;;  shu-project-sub-specific-files
+;;
+(defun shu-project-sub-specific-files (dir-name level pattern cpp-type)
+  "Recursively search for all files as described in
+SHU-PROJECT-GET-SPECIFIC-FILES.
+
+Two lists are accumulated.  DIR-LIST is a list of all directories encountered.
+This function calls itself recursively to search all of them for the desired
+files.
+
+The global variable SHU-CPP-FETCH-LIST is used to accumulate the list of
+qualified files found."
+  (let ((dlist)
+        (tlist)
+        (cname)
+        (sname)
+        (dname)
+        (dir-list)
+        (got-interest)
+        (extension))
+    (setq dlist (directory-files dir-name t nil t))
+    (setq tlist dlist)
+    (while tlist
+      (setq cname (car tlist))
+      (setq sname (file-name-nondirectory cname))
+      (if (file-directory-p cname)
+          (progn
+            (unless (or (string= sname  ".")
+                        (string= sname ".."))
+              (unless (shu-project-directory-is-excluded sname)
+                (push cname dir-list))))
+        (when (and (shu-cpp-project-is-type-wanted sname cpp-type)
+                  (shu-project-file-pattern-match sname pattern))
+          (push (file-relative-name cname) shu-cpp-fetch-list)))
+      (setq tlist (cdr tlist)))
+    (while dir-list
+      (setq dname (car dir-list))
+      (shu-project-sub-specific-files dname (1+ level) pattern cpp-type)
+      (setq dir-list (cdr dir-list)))
+    ))
 
 
 ;;

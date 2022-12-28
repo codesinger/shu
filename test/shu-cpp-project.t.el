@@ -1020,4 +1020,112 @@
     (should (string= expected actual))
     ))
 
+
+
+
+;;
+;;  shu-test-shu-project-file-pattern-match-1
+;;
+(ert-deftest shu-test-shu-project-file-pattern-match-1 ()
+  (let ((pattern)
+        (name "Happy Birthday")
+        (result))
+    (setq result (shu-project-file-pattern-match name pattern))
+    (should result)
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-project-file-pattern-match-2
+;;
+(ert-deftest shu-test-shu-project-file-pattern-match-2 ()
+  (let ((pattern "mumble_bar*")
+        (name "Happy Birthday")
+        (result))
+    (setq result (shu-project-file-pattern-match name pattern))
+    (should (not result))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-project-file-pattern-match-3
+;;
+(ert-deftest shu-test-shu-project-file-pattern-match-3 ()
+  (let ((pattern "mumble_bar*")
+        (name "mumble_bar.i.cpp")
+        (result))
+    (setq result (shu-project-file-pattern-match name pattern))
+    (should result)
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-cpp-project-is-type-wanted-1
+;;
+(ert-deftest shu-test-shu-cpp-project-is-type-wanted-1 ()
+  (let ((sname "mumblebar_foo.cpp")
+        (cpp-type t)
+        (result))
+    (setq result (shu-cpp-project-is-type-wanted sname cpp-type))
+    (should result)
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-project-is-type-wanted-2
+;;
+(ert-deftest shu-test-shu-cpp-project-is-type-wanted-2 ()
+  (let ((sname "mumblebar_foo.i.cpp")
+        (cpp-type t)
+        (result))
+    (setq result (shu-cpp-project-is-type-wanted sname cpp-type))
+    (should result)
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-project-is-type-wanted-3
+;;
+(ert-deftest shu-test-shu-cpp-project-is-type-wanted-3 ()
+  (let ((sname "mumblebar_foo.h")
+        (cpp-type t)
+        (result))
+    (setq result (shu-cpp-project-is-type-wanted sname cpp-type))
+    (should result)
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-project-is-type-wanted-4
+;;
+(ert-deftest shu-test-shu-cpp-project-is-type-wanted-4 ()
+  (let ((sname "thing.el")
+        (cpp-type nil)
+        (result))
+    (setq result (shu-cpp-project-is-type-wanted sname cpp-type))
+    (should result)
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-project-is-type-wanted-5
+;;
+(ert-deftest shu-test-shu-cpp-project-is-type-wanted-5 ()
+  (let ((sname "thing.el")
+        (cpp-type t)
+        (result))
+    (setq result (shu-cpp-project-is-type-wanted sname cpp-type))
+    (should (not result))
+    ))
+
 ;;; shu-cpp-project.t.el ends here
