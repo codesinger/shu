@@ -47,8 +47,8 @@ Return the number of spaces actually removed."
          (end-pos)
          (something t)
          (count 0))
-    (goto-char (point-min))
     (save-excursion
+      (goto-char (point-min))
       (when (search-forward sentinel (line-end-position) t)
         (while something
           (if (= count trim-count)
@@ -60,6 +60,91 @@ Return the number of spaces actually removed."
               (setq count (1+ count)))))))
     count
     ))
+
+
+
+
+;;
+;;  shu-expand-header-line
+;;
+(defun shu-expand-header-line (expand-count)
+  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", add
+EXPAND-COUnt spaces in front of it.
+
+If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
+do nothing.
+
+Return the number of spaces actually added."
+  (let* ((pad (make-string expand-count ? ))
+        (sentinel " -*-C++-*-")
+        (new-sentinel (concat pad sentinel))
+        (count 0))
+    (save-excursion
+      (goto-char (point-min))
+      (when (search-forward sentinel (line-end-position) t)
+        (replace-match new-sentinel t t)
+        (setq count expand-count)))
+    count
+    ))
+
+
+
+;;
+;;  shu-test-shu-expand-header-line-1
+;;
+(ert-deftest shu-test-shu-expand-header-line-1 ()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of TickTime\n"
+          " */\n"))
+        (end-pos 0)
+        (new-end-pos 0)
+        (expand-count 0)
+        (diff))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq expand-count (shu-expand-header-line 8))
+      (should expand-count)
+      (should (numberp expand-count))
+      (should (= expand-count 8))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> new-end-pos end-pos))
+      (setq diff (- new-end-pos end-pos))
+      (should (= diff expand-count)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-expand-header-line-2
+;;
+(ert-deftest shu-test-shu-expand-header-line-2 ()
+  (let ((data
+         (concat
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of TickTime\n"
+          " */\n"))
+        (expand-count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq expand-count (shu-expand-header-line 8))
+      (should expand-count)
+      (should (numberp expand-count))
+      (should (= expand-count 0)))
+    ))
+
 
 
 
