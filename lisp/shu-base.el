@@ -226,6 +226,12 @@ deleted copy / move constructors."
   :type '(string)
   :group 'shu-base)
 
+(defcustom shu-cpp-edit-sentinel "-*-C++-*-"
+  "The sentinel that appears in a comment in the beginning of a file to indicate
+to a text editor that this file contains C++ code."
+  :type '(string)
+  :group 'shu-base)
+
 (defconst shu-all-whitespace-chars
   (list " " "\b" "\t" "\n" "\v" "\f" "\r")
   "List of all whitespace characters.
