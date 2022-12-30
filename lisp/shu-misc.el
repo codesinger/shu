@@ -3664,6 +3664,103 @@ nil is returned."
 
 
 ;;
+;;  shu-fix-header-line
+;;
+(defun shu-fix-header-line ()
+  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", adjust
+the line length to be SHU-CPP-COMMENT-END in length, adding or removing
+internal space as necessary.
+
+If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
+do nothing.
+
+Return the number of spaces actually adjusted.  0 means no adjustment made.
+A positive number represents the number of spaces added.  A negative number
+represents the number of spaces removed."
+  (interactive)
+  (let ((right-end (1+ shu-cpp-comment-end))
+        (sentinel (concat " " shu-cpp-edit-sentinel))
+        (count 0)
+        (end-pos 0)
+        (diff 0))
+    (save-excursion
+      (goto-char (point-min))
+      (when (search-forward sentinel (line-end-position) t)
+        (setq end-pos (match-end 0))
+        (if (< end-pos right-end)
+            (progn
+              (setq diff (- right-end end-pos))
+              (setq count (shu-expand-header-line diff)))
+          (when (> end-pos right-end)
+            (setq diff (- end-pos right-end))
+            (setq count (- (shu-trim-header-line diff)))))))
+    count
+    ))
+
+
+
+;;
+;;  shu-trim-header-line
+;;
+(defun shu-trim-header-line (trim-count)
+  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", remove
+TRIM-COUNT number of spaces from in front of the sentinel.
+
+If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
+do nothing.
+
+If there do not exist enough spaces to remove TRIM-COUNT of them, remove
+as many as possible.
+
+Return the number of spaces actually removed."
+  (let* ((sentinel (concat " " shu-cpp-edit-sentinel))
+         (new-sentinel (concat " " sentinel))
+         (end-pos)
+         (something t)
+         (count 0))
+    (save-excursion
+      (goto-char (point-min))
+      (when (search-forward sentinel (line-end-position) t)
+        (while something
+          (if (= count trim-count)
+              (setq something nil)
+            (goto-char (point-min))
+            (if (not (search-forward new-sentinel (line-end-position) t))
+                (setq something nil)
+              (replace-match sentinel t t)
+              (setq count (1+ count)))))))
+    count
+    ))
+
+
+
+
+;;
+;;  shu-expand-header-line
+;;
+(defun shu-expand-header-line (expand-count)
+  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", add
+EXPAND-COUnt spaces in front of it.
+
+If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
+do nothing.
+
+Return the number of spaces actually added."
+  (let* ((pad (make-string expand-count ? ))
+         (sentinel (concat " " shu-cpp-edit-sentinel))
+         (new-sentinel (concat pad sentinel))
+         (count 0))
+    (save-excursion
+      (goto-char (point-min))
+      (when (search-forward sentinel (line-end-position) t)
+        (replace-match new-sentinel t t)
+        (setq count expand-count)))
+    count
+    ))
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -3730,6 +3827,7 @@ shu- prefix removed."
   (defalias 'prepare-for-rename 'shu-prepare-for-rename)
   (defalias 'getnv 'shu-getnv)
   (defalias 'srs 'shu-srs)
+  (defalias 'fix-header 'shu-fix-header-line)
   )
 
 (provide 'shu-misc)

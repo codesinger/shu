@@ -3012,4 +3012,272 @@
     (should (not rval))
     ))
 
+
+
+;;
+;;  shu-test-shu-fix-header-line-1
+;;
+(ert-deftest shu-test-shu-fix-header-line-1 ()
+  (let* ((file-name "something_or0ther.h")
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " file-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
+                            shu-cpp-edit-sentinel))
+         (data
+          (concat
+           open-line "\n"
+           "\n"
+           "/*!\n"
+           " * \file something_orother.h\n"
+           " *\n"
+           " * \brief Declaration of SomethingOrOther\n"
+           " */\n"))
+         (end-pos 0)
+         (new-end-pos 0)
+         (count 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq count (shu-fix-header-line))
+      (should count)
+      (should (numberp count))
+      (should (= count 0))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (= new-end-pos end-pos)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-fix-header-line-2
+;;
+(ert-deftest shu-test-shu-fix-header-line-2 ()
+  (let* ((file-name "something_or0ther.h")
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " file-name)
+                             (- shu-cpp-comment-end (- (length shu-cpp-edit-sentinel) 3)))
+                            shu-cpp-edit-sentinel))
+         (data
+          (concat
+           open-line "\n"
+           "\n"
+           "/*!\n"
+           " * \file something_orother.h\n"
+           " *\n"
+           " * \brief Declaration of SomethingOrOther\n"
+           " */\n"))
+         (end-pos 0)
+         (new-end-pos 0)
+         (count 0)
+         (diff 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq count (shu-fix-header-line))
+      (should count)
+      (should (numberp count))
+      (should (= count -3))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> end-pos new-end-pos))
+      (setq diff (- end-pos new-end-pos))
+      (should (= diff 3)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-fix-header-line-3
+;;
+(ert-deftest shu-test-shu-fix-header-line-3 ()
+  (let* ((file-name "something_or0ther.h")
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " file-name)
+                             (- shu-cpp-comment-end (+ (length shu-cpp-edit-sentinel) 3)))
+                            shu-cpp-edit-sentinel))
+         (data
+          (concat
+           open-line "\n"
+           "\n"
+           "/*!\n"
+           " * \file something_orother.h\n"
+           " *\n"
+           " * \brief Declaration of SomethingOrOther\n"
+           " */\n"))
+         (end-pos 0)
+         (new-end-pos 0)
+         (count 0)
+         (diff 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq count (shu-fix-header-line))
+      (should count)
+      (should (numberp count))
+      (should (= count 3))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> new-end-pos end-pos))
+      (setq diff (- new-end-pos end-pos))
+      (should (= diff 3)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-expand-header-line-1
+;;
+(ert-deftest shu-test-shu-expand-header-line-1 ()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"))
+        (end-pos 0)
+        (new-end-pos 0)
+        (expand-count 0)
+        (diff))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq expand-count (shu-expand-header-line 8))
+      (should expand-count)
+      (should (numberp expand-count))
+      (should (= expand-count 8))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> new-end-pos end-pos))
+      (setq diff (- new-end-pos end-pos))
+      (should (= diff expand-count)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-expand-header-line-2
+;;
+(ert-deftest shu-test-shu-expand-header-line-2 ()
+  (let ((data
+         (concat
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"))
+        (expand-count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq expand-count (shu-expand-header-line 8))
+      (should expand-count)
+      (should (numberp expand-count))
+      (should (= expand-count 0)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-trim-header-line-1
+;;
+(ert-deftest shu-test-shu-trim-header-line-1 ()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"))
+        (end-pos 0)
+        (new-end-pos 0)
+        (trim-count 0)
+        (diff 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq trim-count (shu-trim-header-line 8))
+      (should trim-count)
+      (should (numberp trim-count))
+      (should (= trim-count 8))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> end-pos new-end-pos))
+      (setq diff (- end-pos new-end-pos))
+      (should (= diff trim-count)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-header-line-2
+;;
+(ert-deftest shu-test-shu-trim-header-line-2 ()
+  (let ((data
+         (concat
+          "// something_orother.h                               aaa   -*-C++-*-\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"))
+        (end-pos 0)
+        (new-end-pos 0)
+        (trim-count 0)
+        (diff 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq trim-count (shu-trim-header-line 8))
+      (should trim-count)
+      (should (numberp trim-count))
+      (should (= trim-count 2))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> end-pos new-end-pos))
+      (setq diff (- end-pos new-end-pos))
+      (should (= diff trim-count)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-header-line-3
+;;
+(ert-deftest shu-test-shu-trim-header-line-3 ()
+  (let ((data
+         (concat
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"))
+        (trim-count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq trim-count (shu-trim-header-line 8))
+      (should trim-count)
+      (should (numberp trim-count))
+      (should (= trim-count 0)))
+    ))
+
 ;;; shu-misc.t.el ends here

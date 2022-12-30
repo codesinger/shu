@@ -31,8 +31,16 @@
 ;;  shu-fix-header-line
 ;;
 (defun shu-fix-header-line ()
-  "Doc string."
-  (interactive)
+  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", adjust
+the line length to be SHU-CPP-COMMENT-END in length, adding or removing
+internal space as necessary.
+
+If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
+do nothing.
+
+Return the number of spaces actually adjusted.  0 means no adjustment made.
+A positive number represents the number of spaces added.  A negative number
+represents the number of spaces removed."
   (let ((right-end (1+ shu-cpp-comment-end))
         (sentinel (concat " " shu-cpp-edit-sentinel))
         (count 0)
@@ -49,6 +57,123 @@
           (when (> end-pos right-end)
             (setq diff (- end-pos right-end))
             (setq count (- (shu-trim-header-line diff)))))))
+    count
+    ))
+
+
+
+;;
+;;  shu-test-shu-fix-header-line-1
+;;
+(ert-deftest shu-test-shu-fix-header-line-1 ()
+  (let* ((file-name "something_or0ther.h")
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " file-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
+                            shu-cpp-edit-sentinel))
+         (data
+          (concat
+           open-line "\n"
+           "\n"
+           "/*!\n"
+           " * \file something_orother.h\n"
+           " *\n"
+           " * \brief Declaration of SomethingOrOther\n"
+           " */\n"))
+         (end-pos 0)
+         (new-end-pos 0)
+         (count 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq count (shu-fix-header-line))
+      (should count)
+      (should (numberp count))
+      (should (= count 0))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (= new-end-pos end-pos)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-fix-header-line-2
+;;
+(ert-deftest shu-test-shu-fix-header-line-2 ()
+  (let* ((file-name "something_or0ther.h")
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " file-name)
+                             (- shu-cpp-comment-end (- (length shu-cpp-edit-sentinel) 3)))
+                            shu-cpp-edit-sentinel))
+         (data
+          (concat
+           open-line "\n"
+           "\n"
+           "/*!\n"
+           " * \file something_orother.h\n"
+           " *\n"
+           " * \brief Declaration of SomethingOrOther\n"
+           " */\n"))
+         (end-pos 0)
+         (new-end-pos 0)
+         (count 0)
+         (diff 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq count (shu-fix-header-line))
+      (should count)
+      (should (numberp count))
+      (should (= count -3))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> end-pos new-end-pos))
+      (setq diff (- end-pos new-end-pos))
+      (should (= diff 3)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-fix-header-line-3
+;;
+(ert-deftest shu-test-shu-fix-header-line-3 ()
+  (let* ((file-name "something_or0ther.h")
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " file-name)
+                             (- shu-cpp-comment-end (+ (length shu-cpp-edit-sentinel) 3)))
+                            shu-cpp-edit-sentinel))
+         (data
+          (concat
+           open-line "\n"
+           "\n"
+           "/*!\n"
+           " * \file something_orother.h\n"
+           " *\n"
+           " * \brief Declaration of SomethingOrOther\n"
+           " */\n"))
+         (end-pos 0)
+         (new-end-pos 0)
+         (count 0)
+         (diff 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq count (shu-fix-header-line))
+      (should count)
+      (should (numberp count))
+      (should (= count 3))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> new-end-pos end-pos))
+      (setq diff (- new-end-pos end-pos))
+      (should (= diff 3)))
     ))
 
 
@@ -125,7 +250,7 @@ Return the number of spaces actually added."
           "/*!\n"
           " * \file something_orother.h\n"
           " *\n"
-          " * \brief Declaration of TickTime\n"
+          " * \brief Declaration of SomethingOrOther\n"
           " */\n"))
         (end-pos 0)
         (new-end-pos 0)
@@ -159,7 +284,7 @@ Return the number of spaces actually added."
           "/*!\n"
           " * \file something_orother.h\n"
           " *\n"
-          " * \brief Declaration of TickTime\n"
+          " * \brief Declaration of SomethingOrOther\n"
           " */\n"))
         (expand-count 0))
     (with-temp-buffer
@@ -184,7 +309,7 @@ Return the number of spaces actually added."
           "/*!\n"
           " * \file something_orother.h\n"
           " *\n"
-          " * \brief Declaration of TickTime\n"
+          " * \brief Declaration of SomethingOrOther\n"
           " */\n"))
         (end-pos 0)
         (new-end-pos 0)
@@ -219,7 +344,7 @@ Return the number of spaces actually added."
           "/*!\n"
           " * \file something_orother.h\n"
           " *\n"
-          " * \brief Declaration of TickTime\n"
+          " * \brief Declaration of SomethingOrOther\n"
           " */\n"))
         (end-pos 0)
         (new-end-pos 0)
@@ -253,7 +378,7 @@ Return the number of spaces actually added."
           "/*!\n"
           " * \file something_orother.h\n"
           " *\n"
-          " * \brief Declaration of TickTime\n"
+          " * \brief Declaration of SomethingOrOther\n"
           " */\n"))
         (trim-count 0))
     (with-temp-buffer
