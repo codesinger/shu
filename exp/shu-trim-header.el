@@ -27,6 +27,31 @@
 
 
 
+;;
+;;  shu-fix-header-line
+;;
+(defun shu-fix-header-line ()
+  "Doc string."
+  (interactive)
+  (let ((right-end (1+ shu-cpp-comment-end))
+        (sentinel (concat " " shu-cpp-edit-sentinel))
+        (count 0)
+        (end-pos 0)
+        (diff 0))
+    (save-excursion
+      (goto-char (point-min))
+      (when (search-forward sentinel (line-end-position) t)
+        (setq end-pos (match-end 0))
+        (if (< end-pos right-end)
+            (progn
+              (setq diff (- right-end end-pos))
+              (setq count (shu-expand-header-line diff)))
+          (when (> end-pos right-end)
+            (setq diff (- end-pos right-end))
+            (setq count (- (shu-trim-header-line diff)))))))
+    ))
+
+
 
 ;;
 ;;  shu-trim-header-line
@@ -42,7 +67,7 @@ If there do not exist enough spaces to remove TRIM-COUNT of them, remove
 as many as possible.
 
 Return the number of spaces actually removed."
-  (let* ((sentinel " -*-C++-*-")
+  (let* ((sentinel (concat " " shu-cpp-edit-sentinel))
          (new-sentinel (concat " " sentinel))
          (end-pos)
          (something t)
@@ -76,9 +101,9 @@ do nothing.
 
 Return the number of spaces actually added."
   (let* ((pad (make-string expand-count ? ))
-        (sentinel " -*-C++-*-")
-        (new-sentinel (concat pad sentinel))
-        (count 0))
+         (sentinel (concat " " shu-cpp-edit-sentinel))
+         (new-sentinel (concat pad sentinel))
+         (count 0))
     (save-excursion
       (goto-char (point-min))
       (when (search-forward sentinel (line-end-position) t)

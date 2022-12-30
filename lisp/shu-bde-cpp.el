@@ -109,7 +109,9 @@
   (let* (
          (hfile-name (file-name-nondirectory (buffer-file-name)))
          (guard-name (shu-bde-include-guard hfile-name))
-         (open-line (concat (shu-make-padded-line (concat "// " hfile-name) 70) "-*-C++-*-"))
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " hfile-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
+                            shu-cpp-edit-sentinel))
          (namespace-name namespace)
          (namespace-sep "::")
          (inner-close "}  // close package namespace\n")
@@ -194,7 +196,9 @@
          (hfile-name (concat (file-name-sans-extension cfile-name) ".h"))
          (rcs-file-name (concat (file-name-sans-extension cfile-name) "_cpp"))
          (guard-name (shu-bde-include-guard cfile-name))
-         (open-line (concat (shu-make-padded-line (concat "// " cfile-name) 70) "-*-C++-*-"))
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " cfile-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
+                            shu-cpp-edit-sentinel))
          (inner-namespace "")
          (inner-close-namespace "")
          )
@@ -264,7 +268,9 @@
          (ext1 (file-name-extension tbase-name))
          (base-name (file-name-sans-extension tbase-name))
          (hfile-name (concat base-name ".h"))
-         (open-line (concat (shu-make-padded-line (concat "// " tfile-name) 70) "-*-C++-*-"))
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " tfile-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
+                            shu-cpp-edit-sentinel))
          (namespace-sep "::")
          (inner-using "")
          )
