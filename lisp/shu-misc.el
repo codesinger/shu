@@ -3772,7 +3772,7 @@ first line comment in a C++ file, which is of the form:
 
 The inserted line is of length SHU-CPP-COMMENT-END.
 
-Does nothing if the curret buffer does not have an associated file name."
+Does nothing if the current buffer does not have an associated file name."
   (interactive)
   (let ((file-name  (file-name-nondirectory (buffer-file-name)))
         (header-line))
