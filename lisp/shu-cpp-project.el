@@ -359,7 +359,7 @@ argument CPP-TYPE.  If CPP-TYPE is t then we only want files of type C++.
 If CPP-TYPE is nil, we want any file of any type..
 
 If CPP-TYPE is nil, this function returns true.  If CPP-TYPE is t, this function
-returns true iff the file eftension of SNAME id one that holds C++ code."
+returns true iff the file extension of SNAME is one that holds C++ code."
   (let ((is-wanted t)
         (extension))
     (when cpp-type
@@ -381,7 +381,7 @@ returns true iff the file eftension of SNAME id one that holds C++ code."
 If PATTERN is non-nil, it is a regular expression that must match NAME.  If
 PATTERN matches NAME, this function returns true.
 
-This function returns true if PATTERN is nil (all names wanted) ir if
+This function returns true if PATTERN is nil (all names wanted) or if
 PATTERN is not nil and is a regular expression that is matched by NAME."
   (let ((wanted t))
     (when pattern

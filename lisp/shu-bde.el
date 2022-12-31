@@ -839,7 +839,7 @@ the buffer GITBUF."
 (defun shu-gen-bde-create-prompt-template ()
   "This function fetches the prompt string from SHU-GEN-BDE-MAKE-PROMPT-STRING
 issues the query, and then issues a query for the comma separated list of
-template parameter names.  It returns a list with twoitens on it:
+template parameter names.  It returns a list with two items on it:
 
     1. The name of the new component
 
@@ -1535,7 +1535,7 @@ name of the containing C++ class."
 (defun shu-cpp-make-qualified-class-name (class-name template-list)
   "The input is a CLASS-NAME and TEMPLATE-LIST.  The output is a class name
 followed by the comma separated list of template parameter names.  If the
-template parameter names are T and S and the class name is MumbleMar, the
+template parameter names are T and S and the class name is MumbleBar, the
 returned value is MumbleBar<T, S>.  If TEMPLATE-LIST is nil or empty,
 the original class name is returned."
   (let ((tlist (shu-cpp-make-template-list template-list)))

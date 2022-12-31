@@ -37,7 +37,7 @@
   "The name of the mode for a dired buffer")
 
 (defvar shu-srs-last-replace nil
-  "Ths holds the last string that was passed to shu-srs.  It is remembered here and used as the
+  "This holds the last string that was passed to shu-srs.  It is remembered here and used as the
 prompt for subsequent invocations of shu-srs")
 
 
@@ -1254,7 +1254,7 @@ origin."
 ;;  shu-git-insert-checkout-default
 ;;
 (defun shu-git-insert-checkout-default ()
-  "Insert at point the git command to cheeck out the current default branch."
+  "Insert at point the git command to check out the current default branch."
   (interactive)
   (let ((default-branch (shu-git-find-default-branch)))
       (insert (concat "git checkout " default-branch))
@@ -2410,7 +2410,7 @@ moved past the left side of the display, the window is positioned such that the
 left edge of the window is aligned with the left edge of the display.
 
 Prefix arguments greater than 10 assume a two display system.  Prefix arguments
-of 11 and 12 put two frames on the right diaplay.  Prefix arguments of 13 and
+of 11 and 12 put two frames on the right display.  Prefix arguments of 13 and
 14 put two frames on the left display.
 
 Implementation note:
@@ -3740,7 +3740,7 @@ Return the number of spaces actually removed."
 ;;
 (defun shu-expand-header-line (expand-count)
   "If the first line of the buffer contains the sentinel \"-*-C++-*-\", add
-EXPAND-COUnt spaces in front of it.
+EXPAND-COUNT spaces in front of it.
 
 If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
 do nothing.
