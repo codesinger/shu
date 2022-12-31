@@ -1182,6 +1182,25 @@ directory is \"foo/blah/humbug\", the value returned from this function is \"hum
     (write-region line nil file 'append)
     )
 
+
+
+
+;;
+;;  shu-make-file-header-line
+;;
+(defun shu-make-file-header-line (file-name)
+  "Return a string that holds the standard first line comment ina C__ file,
+which is of the form:
+
+      \"// file_name                                      -*-C++-*-\"
+
+The returned line is of length SHU-CPP-COMMENT-END."
+    (concat (shu-make-padded-line
+             (concat "// " file-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
+            shu-cpp-edit-sentinel)
+    )
+
+
 (provide 'shu-base)
 
 ;;; shu-base.el ends here

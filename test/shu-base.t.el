@@ -2140,4 +2140,23 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     ))
 
 
+
+;;
+;;  shu-test-shu-make-file-header-line-1
+;;
+(ert-deftest shu-test-shu-make-file-header-line-1 ()
+  (let* (
+         (file-name "something_or0ther.h")
+         (expected (concat (shu-make-padded-line
+                             (concat "// " file-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
+                            shu-cpp-edit-sentinel))
+         (actual)
+         )
+    (setq actual (shu-make-file-header-line file-name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
 ;;; shu-base.t.el ends here

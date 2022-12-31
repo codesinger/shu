@@ -3018,7 +3018,7 @@
 ;;  shu-test-shu-fix-header-line-1
 ;;
 (ert-deftest shu-test-shu-fix-header-line-1 ()
-  (let* ((file-name "something_or0ther.h")
+  (let* ((file-name "something_orother.h")
          (open-line (concat (shu-make-padded-line
                              (concat "// " file-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
                             shu-cpp-edit-sentinel))
@@ -3054,7 +3054,7 @@
 ;;  shu-test-shu-fix-header-line-2
 ;;
 (ert-deftest shu-test-shu-fix-header-line-2 ()
-  (let* ((file-name "something_or0ther.h")
+  (let* ((file-name "something_orother.h")
          (open-line (concat (shu-make-padded-line
                              (concat "// " file-name)
                              (- shu-cpp-comment-end (- (length shu-cpp-edit-sentinel) 3)))
@@ -3094,7 +3094,7 @@
 ;;  shu-test-shu-fix-header-line-3
 ;;
 (ert-deftest shu-test-shu-fix-header-line-3 ()
-  (let* ((file-name "something_or0ther.h")
+  (let* ((file-name "something_orother.h")
          (open-line (concat (shu-make-padded-line
                              (concat "// " file-name)
                              (- shu-cpp-comment-end (+ (length shu-cpp-edit-sentinel) 3)))
