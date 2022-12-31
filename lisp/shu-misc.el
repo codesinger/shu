@@ -3760,6 +3760,36 @@ Return the number of spaces actually added."
 
 
 
+
+;;
+;;  shu-make-header-line
+;;
+(defun shu-make-header-line ()
+  "At the top of the current buffer, insert a string that holds the standard
+first line comment in a C++ file, which is of the form:
+
+      \"// file_name                                      -*-C++-*-\"
+
+The inserted line is of length SHU-CPP-COMMENT-END.
+
+Does nothing if the curret buffer does not have an associated file name."
+  (interactive)
+  (let ((file-name  (file-name-nondirectory (buffer-file-name)))
+        (header-line))
+    (save-excursion
+      (if (not file-name)
+          (progn
+            (ding)
+            (message "%s" "Buffer has no name"))
+        (setq header-line (shu-make-file-header-line file-name))
+        (goto-char (point-min))
+        (insert (concat header-line "\n"))
+        (message "%s" header-line)))
+    ))
+
+
+
+
 ;;
 ;;  shu-misc-set-alias
 ;;
@@ -3828,6 +3858,7 @@ shu- prefix removed."
   (defalias 'getnv 'shu-getnv)
   (defalias 'srs 'shu-srs)
   (defalias 'fix-header 'shu-fix-header-line)
+  (defalias 'make-header 'shu-make-header-line)
   )
 
 (provide 'shu-misc)

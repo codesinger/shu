@@ -1189,7 +1189,7 @@ directory is \"foo/blah/humbug\", the value returned from this function is \"hum
 ;;  shu-make-file-header-line
 ;;
 (defun shu-make-file-header-line (file-name)
-  "Return a string that holds the standard first line comment ina C__ file,
+  "Return a string that holds the standard first line comment in a C++ file,
 which is of the form:
 
       \"// file_name                                      -*-C++-*-\"
