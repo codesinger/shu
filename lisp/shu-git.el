@@ -351,6 +351,30 @@ in a file called \"why.txt\"."
 
 
 ;;
+;;  shu-git-are-files-in-git
+;;
+(defun shu-git-are-files-in-git (files)
+  "Given a list of file names in FILES, return a cons cell whose CAR holds the
+number of files that are under git control and whose CDR holds the number of
+files that are not under git control."
+  (let ((ff files)
+        (file)
+        (in-git)
+        (in-git-count 0)
+        (not-git-count 0))
+    (while ff
+      (setq file (car ff))
+      (setq in-git (shu-git-is-file-in-git file))
+      (if in-git
+          (setq in-git-count (1+ in-git-count))
+        (setq not-git-count (1+ not-git-count)))
+      (setq ff (cdr ff)))
+    (cons in-git-count not-git-count)
+    ))
+
+
+
+;;
 ;;  shu-git-set-alias
 ;;
 (defun shu-git-set-alias ()
