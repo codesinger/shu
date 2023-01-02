@@ -37,44 +37,6 @@
 
 
 ;;
-;;  shu-test-shu-git-number-commits
-;;
-(ert-deftest shu-test-shu-git-number-commits ()
-  (let ((data
-         (concat
-          "commit 545267aaca37b309196cd6aeacf4a0d0c17af17c\n"
-          "Some text here\n"
-          "commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
-          "This is a short commit\n"
-          "commit 03fd2e4f90676e7b91f156de9986d6b08e4591\n\n"
-          "The following does not start at bol:\n"
-          " commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
-          "Another commit:\n"
-          "commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"))
-        (expected
-         (concat
-          "     0. commit 545267aaca37b309196cd6aeacf4a0d0c17af17c\n"
-          "Some text here\n"
-          "     1. commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
-          "This is a short commit\n"
-          "commit 03fd2e4f90676e7b91f156de9986d6b08e4591\n\n"
-          "The following does not start at bol:\n"
-          " commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
-          "Another commit:\n"
-          "     2. commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"))
-        (actual)
-        (count 0))
-    (with-temp-buffer
-      (insert data)
-      (setq count (shu-git-number-commits))
-      (should (= 3 count))
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-      (should (string= expected actual))
-      )))
-
-
-
-;;
 ;;  shu-test-shu-split-range-string-1
 ;;
 (ert-deftest shu-test-shu-split-range-string-1 ()

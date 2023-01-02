@@ -573,6 +573,7 @@ function and its associated doc string and convert it to LaTex.")
    "shu-cpp-misc.el"
    "shu-cpp-project.el"
    "shu-cpp-token.el"
+   "shu-git.el"
    "shu-keyring.el"
    "shu-match.el"
    "shu-misc.el"

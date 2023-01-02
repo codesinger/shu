@@ -58,6 +58,7 @@
          "shu-cpp-misc.t.elc"
          "shu-cpp-project.t.elc"
          "shu-cpp-token.t.elc"
+         "shu-git.t.elc"
          "shu-match.t.elc"
          "shu-misc.t.elc"
          "shu-nvplist.t.elc"
