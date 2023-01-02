@@ -3487,6 +3487,47 @@ Does nothing if the current buffer does not have an associated file name."
 
 
 
+;;
+;;  shu-replace-namespace-in-file
+;;
+(defun shu-replace-namespace-in-file (file-name old-namespace new-namespace)
+  "FILE-NAME is the name of a file with a standard namespace prefix.
+
+It is assumed that the file name uses the convention of the first part of the
+name being the C++ namespace, followed by an underscore, followed by the class
+name in all lower case.
+
+OLD-NAMESPACE is the current namespace.  NEW-NAMESPACE is the new namespace that
+is to replace the old.
+
+Return a new file name that is the same as the original file name but with the
+namespace part of the name replaced with the new namespace.
+
+If the namespace appears in the file path it is not modified.  For example, if
+the old namespace is \"mumble\" and the new namespace is \"bumble\", then the
+following file name
+
+      mumble_bar/mumble_bar/mumble_observer.h
+
+will be returned as
+
+      mumble_bar/mumble_bar/bumble_observer.h"
+  (let ((new-file-name file-name)
+        (ss (concat old-namespace "_"))
+        (case-fold-search nil)
+        (replace-namespace (concat new-namespace "_"))
+        (directory-part (file-name-directory file-name))
+        (file-part (file-name-nondirectory file-name))
+        (new-file-part))
+    (setq new-file-part file-part)
+    (when (string-match ss file-part)
+      (setq new-file-part (replace-match replace-namespace t t file-part)))
+    (setq new-file-name (concat directory-part new-file-part))
+    new-file-name
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias

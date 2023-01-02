@@ -2159,4 +2159,86 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     ))
 
 
+
+
+;;
+;;  shu-test-shu-longest-name-length-1
+;;
+(ert-deftest shu-test-shu-longest-name-length-1 ()
+  (let* ((long-name "Happy Birthday!")
+         (names
+          (list
+           "Hello"
+           "Goodbye"
+           long-name
+           ""
+           "x"))
+         (expected (length long-name))
+         (actual)
+         (debug-on-error t))
+    (setq actual (shu-longest-name-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-name-length-2
+;;
+(ert-deftest shu-test-shu-longest-name-length-2 ()
+  (let* ((long-name "Happy Birthday!")
+         (names
+          (list))
+         (expected 0)
+         (actual)
+         (debug-on-error t))
+    (setq actual (shu-longest-name-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-name-length-3
+;;
+(ert-deftest shu-test-shu-longest-name-length-3 ()
+  (let* ((long-name "Happy Birthday!")
+         (names
+          (list
+           ""
+           ""
+           ""))
+         (expected 0)
+         (actual))
+    (setq actual (shu-longest-name-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-name-length-4
+;;
+(ert-deftest shu-test-shu-longest-name-length-4 ()
+  (let* ((long-name "Happy Birthday!")
+         (names)
+         (expected 0)
+         (actual)
+         (debug-on-error t))
+    (setq actual (shu-longest-name-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
 ;;; shu-base.t.el ends here

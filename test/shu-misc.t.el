@@ -3242,4 +3242,40 @@
       (should (= trim-count 0)))
     ))
 
+
+
+
+;;
+;;  shu-test-shu-replace-namespace-in-file-1
+;;
+(ert-deftest shu-test-shu-replace-namespace-in-file-1 ()
+  (let* ((old-namespace "oldnamespace")
+         (new-namespace "newernamespace")
+         (file-name (concat old-namespace "_mumblebar.t.cpp"))
+         (expected (concat new-namespace "_mumblebar.t.cpp"))
+         (actual))
+    (setq actual (shu-replace-namespace-in-file file-name old-namespace new-namespace))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-replace-namespace-in-file-2
+;;
+(ert-deftest shu-test-shu-replace-namespace-in-file-2 ()
+  (let* ((old-namespace "oldnamespace")
+         (new-namespace "newernamespace")
+         (file-name (concat old-namespace "_/" old-namespace "_/" old-namespace"_mumblebar.t.cpp"))
+         (expected (concat old-namespace "_/" old-namespace "_/" new-namespace "_mumblebar.t.cpp"))
+         (actual))
+    (setq actual (shu-replace-namespace-in-file file-name old-namespace new-namespace))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
 ;;; shu-misc.t.el ends here

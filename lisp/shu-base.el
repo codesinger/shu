@@ -1201,6 +1201,25 @@ The returned line is of length SHU-CPP-COMMENT-END."
     )
 
 
+
+;;
+;;  shu-longest-name-length
+;;
+(defun shu-longest-name-length (names)
+  "Given a list of NAMES, return the length of the longest name."
+  (let ((nm names)
+        (name)
+        (longest-length 0))
+    (while nm
+      (setq name (car nm))
+      (when (> (length name) longest-length)
+        (setq longest-length (length name)))
+      (setq nm (cdr nm)))
+    longest-length
+    ))
+
+
+
 (provide 'shu-base)
 
 ;;; shu-base.el ends here
