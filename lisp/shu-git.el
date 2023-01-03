@@ -375,6 +375,25 @@ files that are not under git control."
 
 
 ;;
+;;  shu-git-move-file
+;;
+(defun shu-git-move-file (old-file new-file)
+  "Issue \"git mv old-file new-file\".
+
+Return a cons cell whose CAR is t if the move succeeded and whose CDR is the
+output of the git move command."
+  (let ((rc)
+        (result))
+    (with-temp-buffer
+      (setq rc (call-process "git" nil (current-buffer) nil "mv" old-file new-file))
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
+    (cons (= rc 0) result)
+    ))
+
+
+
+
+;;
 ;;  shu-git-set-alias
 ;;
 (defun shu-git-set-alias ()

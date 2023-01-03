@@ -3530,6 +3530,25 @@ will be returned as
 
 
 ;;
+;;  shu-move-file
+;;
+(defun shu-move-file (old-file new-file)
+  "Issue \"mv old-file new-file\".
+
+Return a cons cell whose CAR is t if the move succeeded and whose CDR is the
+output of the move command."
+  (let ((rc)
+        (result))
+    (with-temp-buffer
+      (setq rc (call-process "mv" nil (current-buffer) nil old-file new-file))
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
+    (cons (= rc 0) result)
+    ))
+
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
