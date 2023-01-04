@@ -3488,9 +3488,9 @@ Does nothing if the current buffer does not have an associated file name."
 
 
 ;;
-;;  shu-replace-namespace-in-file
+;;  shu-replace-namespace-in-file-name
 ;;
-(defun shu-replace-namespace-in-file (file-name old-namespace new-namespace)
+(defun shu-replace-namespace-in-file-name (file-name old-namespace new-namespace)
   "FILE-NAME is the name of a file with a standard namespace prefix.
 
 It is assumed that the file name uses the convention of the first part of the
@@ -3543,6 +3543,50 @@ output of the move command."
       (setq rc (call-process "mv" nil (current-buffer) nil old-file new-file))
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
     (cons (= rc 0) result)
+    ))
+
+
+
+;;
+;;  shu-move-string
+;;
+(defun shu-move-string (old-file new-file)
+  "Return the \"mv\" command to rename OLD-FILE to NEW-FILE.  The result is
+not intended to be executed.  It is intended for use in messages that explain
+what operation is being done."
+    (concat "mv " old-file " " new-file)
+    )
+
+
+
+
+;;
+;;  shu-replace-namespace-in-buffer
+;;
+(defun shu-replace-namespace-in-buffer (old-namespace new-namespace)
+  "Within the current buffer, do a case sensitive replace of OLD-NAMESPACE with
+NEW-NAMESPACE.  Then do a case sensitive replace of the upper case version of
+OLD-NAMESPACE with the upper case version of NEW-NAMESPACE.
+
+At the end of all replacements, invoke SHU-FIX-HEADER-LINE to fix up the first
+line of the file in case the length of the namespace has changed.
+
+Return the count of items changed."
+  (let ((count 0)
+        (uppercase-old-namespace (upcase old-namespace))
+        (uppercase-new-namespace (upcase new-namespace))
+        (case-fold-search nil))
+    (save-excursion
+      (goto-char (point-min))
+      (while (search-forward old-namespace nil t)
+        (replace-match new-namespace t t)
+        (setq count (1+ count)))
+      (goto-char (point-min))
+      (while (search-forward uppercase-old-namespace nil t)
+        (replace-match uppercase-new-namespace t t)
+        (setq count (1+ count)))
+      (shu-fix-header-line))
+    count
     ))
 
 

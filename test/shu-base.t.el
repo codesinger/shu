@@ -2241,4 +2241,64 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     ))
 
 
+
+
+;;
+;;  shu-test-shu-longest-car-length-1
+;;
+(ert-deftest shu-test-shu-longest-car-length-1 ()
+  (let* ((long-name "Happy Birthday!")
+         (names
+          (list
+           (cons "Hello" 0)
+           (cons "Goodbye" 0)
+           (cons long-name 0)
+           (cons "" 0)
+           (cons "x" 0)))
+         (expected (length long-name))
+         (actual))
+    (setq actual (shu-longest-car-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-car-length-2
+;;
+(ert-deftest shu-test-shu-longest-car-length-2 ()
+  (let* ((names
+          (list))
+         (expected 0)
+         (actual))
+    (setq actual (shu-longest-car-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-car-length-3
+;;
+(ert-deftest shu-test-shu-longest-car-length-3 ()
+  (let* ((names
+          (list
+           (cons "" 0)
+           (cons "" 0)
+           (cons "" 0)))
+         (expected 0)
+         (actual))
+    (setq actual (shu-longest-car-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
 ;;; shu-base.t.el ends here

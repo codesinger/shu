@@ -72,4 +72,22 @@
       (should (string= expected actual))
       )))
 
+
+
+;;
+;;  shu-test-shu-git-move-string-1
+;;
+(ert-deftest shu-test-shu-git-move-string-1 ()
+  (let* (
+        (old-file "input_something.h")
+        (new-file "newer_something.h")
+        (expected (concat "git mv " old-file " " new-file))
+        (actual)
+        )
+    (setq actual (shu-git-move-string old-file new-file))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
 ;;; shu-git.t.el ends here

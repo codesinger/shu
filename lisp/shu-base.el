@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.140
+;; Version: 1.6.141
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -34,7 +34,7 @@
 ;;; Code:
 
 
-(defconst shu-version "1.6.140"
+(defconst shu-version "1.6.141"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2021 Dec 23"
@@ -1215,6 +1215,27 @@ The returned line is of length SHU-CPP-COMMENT-END."
       (when (> (length name) longest-length)
         (setq longest-length (length name)))
       (setq nm (cdr nm)))
+    longest-length
+    ))
+
+
+
+;;
+;;  shu-longest-car-length
+;;
+(defun shu-longest-car-length (cons-cells)
+  "CONS-CELLS is a list of cons cells.  The CAR of each cons cell is a string.
+Return the length of the longest string in all of the CARs oif the cons cells."
+  (let ((cs cons-cells)
+        (cf)
+        (name)
+        (longest-length 0))
+    (while cs
+      (setq cf (car cs))
+      (setq name (car cf))
+      (when (> (length name) longest-length)
+        (setq longest-length (length name)))
+      (setq cs (cdr cs)))
     longest-length
     ))
 

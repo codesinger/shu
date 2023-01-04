@@ -392,6 +392,18 @@ output of the git move command."
 
 
 
+;;
+;;  shu-git-move-string
+;;
+(defun shu-git-move-string (old-file new-file)
+  "Return the \"git mv\" command to rename OLD-FILE to NEW-FILE.  The result is
+not intended to be executed.  It is intended for use in messages that explain
+what operation is being done."
+    (concat "git mv " old-file " " new-file)
+    )
+
+
+
 
 ;;
 ;;  shu-git-set-alias

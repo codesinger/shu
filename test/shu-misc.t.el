@@ -3246,15 +3246,15 @@
 
 
 ;;
-;;  shu-test-shu-replace-namespace-in-file-1
+;;  shu-test-shu-replace-namespace-in-file-name-1
 ;;
-(ert-deftest shu-test-shu-replace-namespace-in-file-1 ()
+(ert-deftest shu-test-shu-replace-namespace-in-file-name-1 ()
   (let* ((old-namespace "oldnamespace")
          (new-namespace "newernamespace")
          (file-name (concat old-namespace "_mumblebar.t.cpp"))
          (expected (concat new-namespace "_mumblebar.t.cpp"))
          (actual))
-    (setq actual (shu-replace-namespace-in-file file-name old-namespace new-namespace))
+    (setq actual (shu-replace-namespace-in-file-name file-name old-namespace new-namespace))
     (should actual)
     (should (stringp actual))
     (should (string= expected actual))
@@ -3264,18 +3264,135 @@
 
 
 ;;
-;;  shu-test-shu-replace-namespace-in-file-2
+;;  shu-test-shu-replace-namespace-in-file-name-2
 ;;
-(ert-deftest shu-test-shu-replace-namespace-in-file-2 ()
+(ert-deftest shu-test-shu-replace-namespace-in-file-name-2 ()
   (let* ((old-namespace "oldnamespace")
          (new-namespace "newernamespace")
          (file-name (concat old-namespace "_/" old-namespace "_/" old-namespace"_mumblebar.t.cpp"))
          (expected (concat old-namespace "_/" old-namespace "_/" new-namespace "_mumblebar.t.cpp"))
          (actual))
-    (setq actual (shu-replace-namespace-in-file file-name old-namespace new-namespace))
+    (setq actual (shu-replace-namespace-in-file-name file-name old-namespace new-namespace))
     (should actual)
     (should (stringp actual))
     (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-move-string-1
+;;
+(ert-deftest shu-test-shu-move-string-1 ()
+  (let* ((old-file "input_something.h")
+        (new-file "newer_something.h")
+        (expected (concat "mv " old-file " " new-file))
+        (actual))
+    (setq actual (shu-move-string old-file new-file))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-replace-namespace-in-buffer-1
+;;
+(ert-deftest shu-test-shu-replace-namespace-in-buffer-1 ()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"
+          "namespace something;\n"
+          "\n"))
+        (old-namespace "something")
+        (new-namespace "newersomething")
+        (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
+      (should count)
+      (should (numberp count))
+      (should (= count 3)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-replace-namespace-in-buffer-2
+;;
+(ert-deftest shu-test-shu-replace-namespace-in-buffer-2()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "#if INCLUDED_SOMETHING_OROTHERH\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"
+          "namespace something;\n"
+          "\n"))
+        (old-namespace "something")
+        (new-namespace "newersomething")
+        (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
+      (should count)
+      (should (numberp count))
+      (should (= count 4)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-replace-namespace-in-buffer-3
+;;
+(ert-deftest shu-test-shu-replace-namespace-in-buffer-3()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "#if INCLUDED_SOMETHING_OROTHER_H\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"
+          "namespace something;\n"
+          "\n"))
+        (expected
+         (concat
+          (shu-make-file-header-line "newersomething_orother.h") "\n"
+          "#if INCLUDED_NEWERSOMETHING_OROTHER_H\n"
+          "\n"
+          "/*!\n"
+          " * \file newersomething_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"
+          "namespace newersomething;\n"
+          "\n"))
+        (old-namespace "something")
+        (new-namespace "newersomething")
+        (count 0)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
+      (should count)
+      (should (numberp count))
+      (should (= count 4))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
     ))
 
 ;;; shu-misc.t.el ends here
