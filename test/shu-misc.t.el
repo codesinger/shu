@@ -2977,6 +2977,75 @@
 
 
 ;;
+;;  shu-test-shu-extract-replacement-triple-1
+;;
+(ert-deftest shu-test-shu-extract-replacement-triple-1 ()
+  (let ((data "$some thing$orother$with pepper")
+        (expected
+         (list
+          "some thing"
+          "orother"
+          "with pepper"))
+        (actual))
+    (setq actual (shu-extract-replacement-triple data))
+    (should actual)
+    (should (listp actual))
+    (should (= (length expected) (length actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-triple-2
+;;
+(ert-deftest shu-test-shu-extract-replacement-triple-2 ()
+  (let ((data "$some thing$orother$")
+        (expected
+         (list
+          "some thing"
+          "orother"
+          ""))
+        (actual))
+    (setq actual (shu-extract-replacement-triple data))
+    (should actual)
+    (should (listp actual))
+    (should (= (length expected) (length actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-triple-3
+;;
+(ert-deftest shu-test-shu-extract-replacement-triple-3 ()
+  (let ((data "$some thing$orother")
+        (expected
+         (list
+          "some thing"
+          "orother"
+          ""))
+        (actual))
+    (setq actual (shu-extract-replacement-triple data))
+    (should actual)
+    (should (listp actual))
+    (should (= (length expected) (length actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-triple-4
+;;
+(ert-deftest shu-test-shu-extract-replacement-triple-4 ()
+  (let ((data "$HappyBirthday")
+        (actual))
+    (setq actual (shu-extract-replacement-triple data))
+    (should (not actual))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-fix-header-line-1
 ;;
 (ert-deftest shu-test-shu-fix-header-line-1 ()
@@ -3308,6 +3377,8 @@
           " * \file something_orother.h\n"
           " *\n"
           " * \brief Declaration of SomethingOrOther\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " * \brief Declaration of SomethingOrOther\n"
           " */\n"
           "namespace something;\n"
           "\n"))
@@ -3319,7 +3390,7 @@
       (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
       (should count)
       (should (numberp count))
-      (should (= count 3)))
+      (should (= count 4)))
     ))
 
 
@@ -3348,7 +3419,7 @@
       (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
       (should count)
       (should (numberp count))
-      (should (= count 4)))
+      (should (= count 5)))
     ))
 
 
@@ -3390,7 +3461,7 @@
       (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
       (should count)
       (should (numberp count))
-      (should (= count 4))
+      (should (= count 5))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     ))

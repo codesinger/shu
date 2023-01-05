@@ -3361,6 +3361,59 @@ nil is returned."
 
 
 
+
+;;
+;;  shu-extract-replacement-triple
+;;
+(defun shu-extract-replacement-triple (rstring)
+  "Parse a sed-like search and replacement string that specifies three parts
+such as \"/abc/defg/xyz\".
+
+This function parses such a string.  The first character in the string is the
+delimiter.  The delimiter character is used to break the string into two or
+three strings, in this case \"abc\", \"defg\", and \"xyz\".  If this can be done
+successfully, the three strings are returned in a list.  If the string cannot be
+parsed, nil is returned.
+
+There my be two or three occurrences of the delimiter character.  For example
+
+      \"$abc$def$ghi\"
+
+returns the list
+
+      1. \"abc\"
+      2. \"def\"
+      3. \"ghi\"
+
+      \"$abc$def$\"
+
+returns the list
+
+      1. \"abc\"
+      2. \"def\"
+      3. \"\"  (Empty string)
+
+as does \"$abc$def\" with no trailing delimiter character."
+  (let ((sc)
+        (ss)
+        (p1)
+        (p2)
+        (p3)
+        (result)
+        (case-fold-search nil))
+    (when (> (length rstring) 4)
+      (setq sc (substring rstring 0 1))
+      (setq ss (concat sc "\\([^" sc "]+\\)" sc "\\([^" sc "]+\\)" sc "*" "\\([^" sc "]*\\)"))
+      (when (string-match ss rstring)
+        (setq p1 (match-string 1 rstring))
+        (setq p2 (match-string 2 rstring))
+        (setq p3 (match-string 3 rstring))
+        (setq result (list p1 p2 p3))))
+    result
+    ))
+
+
+
 ;;
 ;;  shu-fix-header-line
 ;;
