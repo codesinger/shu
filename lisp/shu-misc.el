@@ -3571,10 +3571,11 @@ OLD-NAMESPACE with the upper case version of NEW-NAMESPACE.
 At the end of all replacements, invoke SHU-FIX-HEADER-LINE to fix up the first
 line of the file in case the length of the namespace has changed.
 
-Return the count of items changed."
+Return the count of items changed in the buffer."
   (let ((count 0)
         (uppercase-old-namespace (upcase old-namespace))
         (uppercase-new-namespace (upcase new-namespace))
+        (space-count 0)
         (case-fold-search nil))
     (save-excursion
       (goto-char (point-min))
@@ -3585,7 +3586,10 @@ Return the count of items changed."
       (while (search-forward uppercase-old-namespace nil t)
         (replace-match uppercase-new-namespace t t)
         (setq count (1+ count)))
-      (shu-fix-header-line))
+      (when (/= count 0)
+        (setq space-count (shu-fix-header-line))
+        (when (/= space-count 0)
+          (setq count (1+ count)))))
     count
     ))
 

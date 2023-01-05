@@ -2,7 +2,7 @@
 ;;
 ;; Copyright (C) 2022 Stewart L. Palmer
 ;;
-;; Package: shu-date
+;; Package: shu-trim-header
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -27,366 +27,270 @@
 
 
 
-;;
-;;  shu-fix-header-line
-;;
-(defun shu-fix-header-line ()
-  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", adjust
-the line length to be SHU-CPP-COMMENT-END in length, adding or removing
-internal space as necessary.
 
-If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
-do nothing.
+;;
+;;  try
+;;
+(defun try ()
+  "Doc string."
+  (interactive)
+  (let* (
+         (old-namespace "oldnamespace")
+         (new-namespace "newernamespace")
+         (file-name (concat old-namespace "_mumblebar.t.cpp"))
+         (ss (concat old-namespace "_"))
 
-Return the number of spaces actually adjusted.  0 means no adjustment made.
-A positive number represents the number of spaces added.  A negative number
-represents the number of spaces removed."
-  (let ((right-end (1+ shu-cpp-comment-end))
-        (sentinel (concat " " shu-cpp-edit-sentinel))
-        (count 0)
-        (end-pos 0)
-        (diff 0))
-    (save-excursion
-      (goto-char (point-min))
-      (when (search-forward sentinel (line-end-position) t)
-        (setq end-pos (match-end 0))
-        (if (< end-pos right-end)
+         )
+    (re-search-forward ss nil t)
+    ))
+
+;; oldnamespace_mumblebar.t.cpp
+
+
+
+;;
+;;  dry
+;;
+(defun dry ()
+  "Doc string."
+  (interactive)
+  (let (
+        (in-git (shu-git-is-file-in-git "try.el"))
+        )
+    (message "in-git: %s" (shu-bool-to-string in-git))
+    ))
+
+
+
+;;
+;;  rename-something
+;;
+(defun rename-something ()
+  "Doc string."
+  (interactive)
+  (let* (
+         (log-buffer-name "**shu-rename-log**")
+         (log-buffer (get-buffer-create log-buffer-name))
+         (root "testdata")
+         (pattern "fxcrossbase*")
+         (cpp-type t)
+         (old-namespace "fxcrossbase")
+         (new-namespace "fxnewersomething")
+         (files)
+         (file)
+         (ff)
+         (newfiles)
+         (newfile)
+         (cf)
+         (did)
+         (debug-on-error t)
+         )
+    (setq files (shu-project-get-specific-files root pattern cpp-type))
+    (if (not files)
+        (progn
+          (ding)
+          (message "%s" "No files found to modify")
+          )
+      (princ (concat "\n\nChange namespace from '" old-namespace "' to '" new-namespace "'\n"
+                     "for the following files:\n\n") log-buffer)
+      (dump-list files log-buffer)
+      (setq ff files)
+      (while ff
+        (setq file (car ff))
+        (setq newfile (shu-replace-namespace-in-file-name file old-namespace new-namespace))
+        (setq cf (cons file newfile))
+        (push cf newfiles)
+        (setq ff (cdr ff))
+        )
+      (dump-clist newfiles log-buffer)
+      (setq did (rename-files newfiles log-buffer))
+      (if (not did)
+          (progn
+            (ding)
+            (message "Rename failed.  See buffer %s" log-buffer-name)
+            )
+        (setq did (edit-files newfiles old-namespace new-namespace log-buffer))
+        (if (not did)
             (progn
-              (setq diff (- right-end end-pos))
-              (setq count (shu-expand-header-line diff)))
-          (when (> end-pos right-end)
-            (setq diff (- end-pos right-end))
-            (setq count (- (shu-trim-header-line diff)))))))
-    count
+              (ding)
+              (message "Edits failed.  See buffer %s" log-buffer-name)
+              )
+          (message "Namespace replacement complete.  See buffer %s." log-buffer-name)
+            )
+        )
+
+
+      )
     ))
 
 
 
 ;;
-;;  shu-test-shu-fix-header-line-1
+;;  rename-files
 ;;
-(ert-deftest shu-test-shu-fix-header-line-1 ()
-  (let* ((file-name "something_or0ther.h")
-         (open-line (concat (shu-make-padded-line
-                             (concat "// " file-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
-                            shu-cpp-edit-sentinel))
-         (data
-          (concat
-           open-line "\n"
-           "\n"
-           "/*!\n"
-           " * \file something_orother.h\n"
-           " *\n"
-           " * \brief Declaration of SomethingOrOther\n"
-           " */\n"))
-         (end-pos 0)
-         (new-end-pos 0)
-         (count 0))
-    (with-temp-buffer
-      (insert data)
-      (goto-char (point-min))
-      (setq end-pos (line-end-position))
-      (goto-char (point-max))
-      (setq count (shu-fix-header-line))
-      (should count)
-      (should (numberp count))
-      (should (= count 0))
-      (goto-char (point-min))
-      (setq new-end-pos (line-end-position))
-      (should (= new-end-pos end-pos)))
+(defun rename-files (newfiles log-buffer)
+  "Doc string."
+  (interactive)
+  (let (
+        (nf newfiles)
+        (cf)
+        (cmd)
+        (moved)
+        (result)
+        (old-file)
+        (new-file)
+        )
+    (setq moved t)
+    (princ "\n" log-buffer)
+    (while (and nf moved)
+      (setq cf (car nf))
+      (setq old-file (car cf))
+      (setq new-file (cdr cf))
+      (setq cmd (shu-move-string old-file new-file))
+      (if (not (shu-git-is-file-in-git old-file))
+          (setq cf (shu-move-file old-file new-file))
+        (setq cmd (shu-git-move-string old-file new-file))
+        (setq cf (shu-git-move-file old-file new-file))
+        )
+      (setq moved (car cf))
+      (setq result (cdr cf))
+      (princ (concat cmd "\n") log-buffer)
+      (when (not moved)
+        (princ (concat "Move failed\n" result "\n") log-buffer)
+        )
+      (setq nf (cdr nf))
+      )
+    moved
     ))
 
 
 
 ;;
-;;  shu-test-shu-fix-header-line-2
+;;  edit-files
 ;;
-(ert-deftest shu-test-shu-fix-header-line-2 ()
-  (let* ((file-name "something_or0ther.h")
-         (open-line (concat (shu-make-padded-line
-                             (concat "// " file-name)
-                             (- shu-cpp-comment-end (- (length shu-cpp-edit-sentinel) 3)))
-                            shu-cpp-edit-sentinel))
-         (data
-          (concat
-           open-line "\n"
-           "\n"
-           "/*!\n"
-           " * \file something_orother.h\n"
-           " *\n"
-           " * \brief Declaration of SomethingOrOther\n"
-           " */\n"))
-         (end-pos 0)
-         (new-end-pos 0)
-         (count 0)
-         (diff 0))
-    (with-temp-buffer
-      (insert data)
-      (goto-char (point-min))
-      (setq end-pos (line-end-position))
-      (goto-char (point-max))
-      (setq count (shu-fix-header-line))
-      (should count)
-      (should (numberp count))
-      (should (= count -3))
-      (goto-char (point-min))
-      (setq new-end-pos (line-end-position))
-      (should (> end-pos new-end-pos))
-      (setq diff (- end-pos new-end-pos))
-      (should (= diff 3)))
+(defun edit-files  (newfiles old-namespace new-namespace log-buffer)
+  "Return true if all of the edits work."
+  (let (
+        (nf newfiles)
+        (cf)
+        (old-file)
+        (new-file)
+        (failed)
+        (fbuf)
+        (file-buf)
+        (count 0)
+        (total-count 0)
+        (directory-names)
+        (directory-part)
+        )
+    (princ "\n" log-buffer)
+    (while (and nf (not failed))
+      (setq cf (car nf))
+      (setq new-file (cdr cf))
+      (setq directory-part (file-name-directory new-file))
+      (when (not (member-ignore-case directory-part directory-names))
+        (push directory-part directory-names)
+        )
+      (setq fbuf (get-file-buffer new-file))
+      (if fbuf
+          (setq file-buf fbuf)
+        (setq file-buf (find-file-noselect new-file))
+        )
+      (set-buffer file-buf)
+      (when (not fbuf)
+        (make-local-variable 'backup-inhibited)
+        (setq backup-inhibited t)
+        )
+      (princ (concat "Replacing namespace in '" new-file "'\n") log-buffer)
+      (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
+      (setq total-count (+ total-count count))
+      (when (= count 0)
+        (princ "***Edit failed.  No strings replaced.***\n" log-buffer)
+        (setq failed t)
+        )
+      (when (buffer-modified-p)
+        (basic-save-buffer)
+        )
+      (when (not fbuf)
+        (kill-buffer file-buf)
+        )
+      (setq nf (cdr nf))
+      )
+    (princ (format "\n%s items changed in %s files in %s directories.\n"
+                   (shu-group-number total-count)
+                   (shu-group-number (length newfiles))
+                   (shu-group-number (length directory-names))) log-buffer)
+    (not failed)
     ))
 
 
 
 ;;
-;;  shu-test-shu-fix-header-line-3
+;;  dump-clist
 ;;
-(ert-deftest shu-test-shu-fix-header-line-3 ()
-  (let* ((file-name "something_or0ther.h")
-         (open-line (concat (shu-make-padded-line
-                             (concat "// " file-name)
-                             (- shu-cpp-comment-end (+ (length shu-cpp-edit-sentinel) 3)))
-                            shu-cpp-edit-sentinel))
-         (data
-          (concat
-           open-line "\n"
-           "\n"
-           "/*!\n"
-           " * \file something_orother.h\n"
-           " *\n"
-           " * \brief Declaration of SomethingOrOther\n"
-           " */\n"))
-         (end-pos 0)
-         (new-end-pos 0)
-         (count 0)
-         (diff 0))
-    (with-temp-buffer
-      (insert data)
-      (goto-char (point-min))
-      (setq end-pos (line-end-position))
-      (goto-char (point-max))
-      (setq count (shu-fix-header-line))
-      (should count)
-      (should (numberp count))
-      (should (= count 3))
-      (goto-char (point-min))
-      (setq new-end-pos (line-end-position))
-      (should (> new-end-pos end-pos))
-      (setq diff (- new-end-pos end-pos))
-      (should (= diff 3)))
+(defun dump-clist (files log-buffer)
+  "Doc string."
+  (let (
+        (ff files)
+        (longest-name 0)
+        (cf)
+        (file)
+        (dfile)
+        (newfile)
+        )
+    (setq longest-name (shu-longest-car-length files))
+    (princ "\nFiles will be renamed as follows:\n" log-buffer)
+    (setq ff files)
+    (while ff
+      (setq cf (car ff))
+      (setq file (car cf))
+      (setq newfile (cdr cf))
+      (setq dfile (shu-make-padded-line file longest-name))
+      (princ (concat dfile " --> " newfile "\n") log-buffer)
+      (setq ff (cdr ff))
+      )
     ))
 
 
 
 ;;
-;;  shu-trim-header-line
+;;  dump-list
 ;;
-(defun shu-trim-header-line (trim-count)
-  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", remove
-TRIM-COUNT number of spaces from in front of the sentinel.
-
-If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
-do nothing.
-
-If there do not exist enough spaces to remove TRIM-COUNT of them, remove
-as many as possible.
-
-Return the number of spaces actually removed."
-  (let* ((sentinel (concat " " shu-cpp-edit-sentinel))
-         (new-sentinel (concat " " sentinel))
-         (end-pos)
-         (something t)
-         (count 0))
-    (save-excursion
-      (goto-char (point-min))
-      (when (search-forward sentinel (line-end-position) t)
-        (while something
-          (if (= count trim-count)
-              (setq something nil)
-            (goto-char (point-min))
-            (if (not (search-forward new-sentinel (line-end-position) t))
-                (setq something nil)
-              (replace-match sentinel t t)
-              (setq count (1+ count)))))))
-    count
-    ))
+(defun dump-list (files log-buffer)
+  "Doc string."
+  (interactive)
+  (let (
+        (file)
+        )
+    (while files
+      (setq file (car files))
+      (princ (concat file "\n") log-buffer)
+      (setq files (cdr files))
+      )
 
 
-
-
-;;
-;;  shu-expand-header-line
-;;
-(defun shu-expand-header-line (expand-count)
-  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", add
-EXPAND-COUnt spaces in front of it.
-
-If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
-do nothing.
-
-Return the number of spaces actually added."
-  (let* ((pad (make-string expand-count ? ))
-         (sentinel (concat " " shu-cpp-edit-sentinel))
-         (new-sentinel (concat pad sentinel))
-         (count 0))
-    (save-excursion
-      (goto-char (point-min))
-      (when (search-forward sentinel (line-end-position) t)
-        (replace-match new-sentinel t t)
-        (setq count expand-count)))
-    count
     ))
 
 
 
 ;;
-;;  shu-test-shu-expand-header-line-1
+;;  dump-file
 ;;
-(ert-deftest shu-test-shu-expand-header-line-1 ()
-  (let ((data
-         (concat
-          "// something_orother.h                                      -*-C++-*-\n"
-          "\n"
-          "/*!\n"
-          " * \file something_orother.h\n"
-          " *\n"
-          " * \brief Declaration of SomethingOrOther\n"
-          " */\n"))
-        (end-pos 0)
-        (new-end-pos 0)
-        (expand-count 0)
-        (diff))
-    (with-temp-buffer
-      (insert data)
-      (goto-char (point-min))
-      (setq end-pos (line-end-position))
-      (goto-char (point-max))
-      (setq expand-count (shu-expand-header-line 8))
-      (should expand-count)
-      (should (numberp expand-count))
-      (should (= expand-count 8))
-      (goto-char (point-min))
-      (setq new-end-pos (line-end-position))
-      (should (> new-end-pos end-pos))
-      (setq diff (- new-end-pos end-pos))
-      (should (= diff expand-count)))
-    ))
-
-
-
-;;
-;;  shu-test-shu-expand-header-line-2
-;;
-(ert-deftest shu-test-shu-expand-header-line-2 ()
-  (let ((data
-         (concat
-          "\n"
-          "/*!\n"
-          " * \file something_orother.h\n"
-          " *\n"
-          " * \brief Declaration of SomethingOrOther\n"
-          " */\n"))
-        (expand-count 0))
-    (with-temp-buffer
-      (insert data)
-      (setq expand-count (shu-expand-header-line 8))
-      (should expand-count)
-      (should (numberp expand-count))
-      (should (= expand-count 0)))
-    ))
-
-
-
-
-;;
-;;  shu-test-shu-trim-header-line-1
-;;
-(ert-deftest shu-test-shu-trim-header-line-1 ()
-  (let ((data
-         (concat
-          "// something_orother.h                                      -*-C++-*-\n"
-          "\n"
-          "/*!\n"
-          " * \file something_orother.h\n"
-          " *\n"
-          " * \brief Declaration of SomethingOrOther\n"
-          " */\n"))
-        (end-pos 0)
-        (new-end-pos 0)
-        (trim-count 0)
-        (diff 0))
-    (with-temp-buffer
-      (insert data)
-      (goto-char (point-min))
-      (setq end-pos (line-end-position))
-      (goto-char (point-max))
-      (setq trim-count (shu-trim-header-line 8))
-      (should trim-count)
-      (should (numberp trim-count))
-      (should (= trim-count 8))
-      (goto-char (point-min))
-      (setq new-end-pos (line-end-position))
-      (should (> end-pos new-end-pos))
-      (setq diff (- end-pos new-end-pos))
-      (should (= diff trim-count)))
-    ))
-
-
-
-;;
-;;  shu-test-shu-trim-header-line-2
-;;
-(ert-deftest shu-test-shu-trim-header-line-2 ()
-  (let ((data
-         (concat
-          "// something_orother.h                               aaa   -*-C++-*-\n"
-          "\n"
-          "/*!\n"
-          " * \file something_orother.h\n"
-          " *\n"
-          " * \brief Declaration of SomethingOrOther\n"
-          " */\n"))
-        (end-pos 0)
-        (new-end-pos 0)
-        (trim-count 0)
-        (diff 0))
-    (with-temp-buffer
-      (insert data)
-      (goto-char (point-min))
-      (setq end-pos (line-end-position))
-      (goto-char (point-max))
-      (setq trim-count (shu-trim-header-line 8))
-      (should trim-count)
-      (should (numberp trim-count))
-      (should (= trim-count 2))
-      (goto-char (point-min))
-      (setq new-end-pos (line-end-position))
-      (should (> end-pos new-end-pos))
-      (setq diff (- end-pos new-end-pos))
-      (should (= diff trim-count)))
-    ))
-
-
-
-;;
-;;  shu-test-shu-trim-header-line-3
-;;
-(ert-deftest shu-test-shu-trim-header-line-3 ()
-  (let ((data
-         (concat
-          "\n"
-          "/*!\n"
-          " * \file something_orother.h\n"
-          " *\n"
-          " * \brief Declaration of SomethingOrOther\n"
-          " */\n"))
-        (trim-count 0))
-    (with-temp-buffer
-      (insert data)
-      (setq trim-count (shu-trim-header-line 8))
-      (should trim-count)
-      (should (numberp trim-count))
-      (should (= trim-count 0)))
+(defun dump-file (log-buffer)
+  "Doc string."
+  (interactive)
+  (let (
+        (count 0)
+        (line)
+        )
+    (goto-char (point-min))
+    (princ (concat "\n" (buffer-file-name) "\n") log-buffer)
+    (while (< count 4)
+      (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+      (princ line log-buffer)
+      (forward-line 1)
+      (setq count (1+ count))
+      )
     ))
 
 
