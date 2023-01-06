@@ -3541,6 +3541,112 @@ Does nothing if the current buffer does not have an associated file name."
 
 
 ;;
+;;  shu-rename-namespace-files
+;;
+(defun shu-rename-namespace-files (newfiles log-buffer)
+  "NEWFILES is a list of cons cells.  The CAR of each cons cell is the old file
+name.  The CDR of each cons cell is the new file name.  This function renames
+each file from old to new.
+
+If the file is under git control, then \"git mv\" is used for the rename.  If
+the file is not under git control, then \"mv\" is used for the rename.
+
+Each rename command is placed in the LOG-BUFFER.  This function quits as soon as
+any rename fails, leaving the reason for the failure in the LOG-BUFFER.
+
+The return value is t if all of the renames worked, nil otherwise."
+  "Doc string."
+  (let ((nf newfiles)
+        (cf)
+        (cmd)
+        (moved)
+        (result)
+        (old-file)
+        (new-file))
+    (setq moved t)
+    (princ "\n" log-buffer)
+    (while (and nf moved)
+      (setq cf (car nf))
+      (setq old-file (car cf))
+      (setq new-file (cdr cf))
+      (setq cmd (shu-move-string old-file new-file))
+      (if (not (shu-git-is-file-in-git old-file))
+          (setq cf (shu-move-file old-file new-file))
+        (setq cmd (shu-git-move-string old-file new-file))
+        (setq cf (shu-git-move-file old-file new-file)))
+      (setq moved (car cf))
+      (setq result (cdr cf))
+      (princ (concat cmd "\n") log-buffer)
+      (when (not moved)
+        (princ (concat "Move failed\n" result "\n") log-buffer))
+      (setq nf (cdr nf)))
+    moved
+    ))
+
+
+
+;;
+;;  shu-edit-new-namespace-files
+;;
+(defun shu-edit-new-namespace-files  (newfiles old-namespace new-namespace log-buffer)
+  "NEWFILES is a list of cons cells.  The CAR of each cons cell is the old file
+name.  The CDR of each cons cell is the new file name.  This function uses
+SHU-REPLACE-NAMESPACE-IN-BUFFER to replace the OLD-NAMESPACE name with the
+NEW-NAMESPACE name.
+
+The editing progress is logged in the LOG-BUFFER.
+
+This functions quits as soon as the first edit fails, leaving the reason for the
+failure in the LOG-BUFFER.
+
+Returns t if all of the edits succeeded, nil otherwise."
+  (let ((nf newfiles)
+        (cf)
+        (old-file)
+        (new-file)
+        (failed)
+        (fbuf)
+        (file-buf)
+        (count 0)
+        (total-count 0)
+        (directory-names)
+        (directory-part))
+    (princ "\n" log-buffer)
+    (while (and nf (not failed))
+      (setq cf (car nf))
+      (setq new-file (cdr cf))
+      (setq directory-part (file-name-directory new-file))
+      (when (not (member-ignore-case directory-part directory-names))
+        (push directory-part directory-names))
+      (setq fbuf (get-file-buffer new-file))
+      (if fbuf
+          (setq file-buf fbuf)
+        (setq file-buf (find-file-noselect new-file)))
+      (set-buffer file-buf)
+      (when (not fbuf)
+        (make-local-variable 'backup-inhibited)
+        (setq backup-inhibited t))
+      (princ (concat "Replacing namespace in '" new-file "'\n") log-buffer)
+      (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
+      (setq total-count (+ total-count count))
+      (when (= count 0)
+        (princ "***Edit failed.  No strings replaced.***\n" log-buffer)
+        (setq failed t))
+      (when (buffer-modified-p)
+        (basic-save-buffer))
+      (when (not fbuf)
+        (kill-buffer file-buf))
+      (setq nf (cdr nf)))
+    (princ (format "\n%s items changed in %s files in %s directories.\n"
+                   (shu-group-number total-count)
+                   (shu-group-number (length newfiles))
+                   (shu-group-number (length directory-names))) log-buffer)
+    (not failed)
+    ))
+
+
+
+;;
 ;;  shu-replace-namespace-in-file-name
 ;;
 (defun shu-replace-namespace-in-file-name (file-name old-namespace new-namespace)
@@ -3577,6 +3683,49 @@ will be returned as
       (setq new-file-part (replace-match replace-namespace t t file-part)))
     (setq new-file-name (concat directory-part new-file-part))
     new-file-name
+    ))
+
+
+
+;;
+;;  shu-dump-rename-list
+;;
+(defun shu-dump-rename-list (files log-buffer)
+  "FILES is a list of cons cells.  The CAR of each cons cell is the name of an
+existing file.  The CDR of each cons cell is the name that the file will have
+after the rename operation.  This function prints into the LOG-BUFFER the old
+and new file names to show the name changes that will take place as the rename
+happens."
+  (let ((ff files)
+        (longest-name 0)
+        (cf)
+        (file)
+        (dfile)
+        (newfile))
+    (setq longest-name (shu-longest-car-length files))
+    (princ "\nFiles will be renamed as follows:\n" log-buffer)
+    (setq ff files)
+    (while ff
+      (setq cf (car ff))
+      (setq file (car cf))
+      (setq newfile (cdr cf))
+      (setq dfile (shu-make-padded-line file longest-name))
+      (princ (concat dfile " --> " newfile "\n") log-buffer)
+      (setq ff (cdr ff)))
+    ))
+
+
+
+;;
+;;  shu-dump-list
+;;
+(defun shu-dump-list (items log-buffer)
+  "ITEMS is a list of strinngs, which is printed into LOG-BUFFER."
+  (let ((item))
+    (while items
+      (setq item (car items))
+      (princ (concat item "\n") log-buffer)
+      (setq items (cdr items)))
     ))
 
 
