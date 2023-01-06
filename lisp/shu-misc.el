@@ -3540,6 +3540,73 @@ Does nothing if the current buffer does not have an associated file name."
 
 
 
+
+;;
+;;  shu-internal-process-new-namespace
+;;
+(defun shu-internal-process-new-namespace (root old-namespace new-namespace pattern)
+  "Starting in directory ROOT, look for files as follows.  If PATTERN is nil, look
+for all files that hold C++ code.  If PATTERN is non-nil, use that to search for
+files that hold C+++ code.
+
+Of the set of files found, change the namespace from OLD-NAMESPACE to
+NEW-NAMESPACE.
+
+It is assumed that files follow the standard convention of using the namespace as
+the first part of the file followed by an underscore.  If the current namespace is
+\"mumblebar\", then all file names start with \"mumblebar_\".  If the new namespace
+is \"fubmblenew\", then all files whose names start with \"mumblebar_\" will be
+renamed to start with \"fubmblenew_\".  Within the new files, all instances of
+\"mumblebar\" will be changed to instances of \"fubmblenew\"."
+  (let* ((log-buffer-name "**shu-rename-log**")
+         (log-buffer (get-buffer-create log-buffer-name))
+         (cpp-type t)
+         (files)
+         (file)
+         (ff)
+         (newfiles)
+         (newfile)
+         (cf)
+         (did))
+    (if (not (string= old-namespace (downcase old-namespace)))
+        (progn
+          (ding)
+          (message "old namespace '%s' is not all lower case" old-namespace))
+      (if (not (string= new-namespace (downcase new-namespace)))
+          (progn
+            (ding)
+            (message "new namespace '%s' is not all lower case" new-namespace))
+        (setq files (shu-project-get-specific-files root pattern cpp-type))
+        (if (not files)
+            (progn
+              (ding)
+              (message "%s" "No files found to modify"))
+          (princ (concat "\n\nChange namespace from '" old-namespace "' to '" new-namespace "'\n"
+                         "for the following files:\n\n") log-buffer)
+          (shu-dump-list files log-buffer)
+          (setq ff files)
+          (while ff
+            (setq file (car ff))
+            (setq newfile (shu-replace-namespace-in-file-name file old-namespace new-namespace))
+            (setq cf (cons file newfile))
+            (push cf newfiles)
+            (setq ff (cdr ff)))
+          (setq newfiles (nreverse newfiles))
+          (shu-dump-rename-list newfiles log-buffer)
+          (setq did (shu-rename-namespace-files newfiles log-buffer))
+          (if (not did)
+              (progn
+                (ding)
+                (message "Rename failed.  See buffer %s" log-buffer-name))
+            (setq did (shu-edit-new-namespace-files newfiles old-namespace new-namespace log-buffer))
+            (if (not did)
+                (progn
+                  (ding)
+                  (message "Edits failed.  See buffer %s" log-buffer-name))
+              (message "Namespace replacement complete.  See buffer %s." log-buffer-name))))))
+    ))
+
+
 ;;
 ;;  shu-rename-namespace-files
 ;;
@@ -3600,7 +3667,8 @@ This functions quits as soon as the first edit fails, leaving the reason for the
 failure in the LOG-BUFFER.
 
 Returns t if all of the edits succeeded, nil otherwise."
-  (let ((nf newfiles)
+  (let ((root default-directory)
+        (nf newfiles)
         (cf)
         (old-file)
         (new-file)
@@ -3610,7 +3678,8 @@ Returns t if all of the edits succeeded, nil otherwise."
         (count 0)
         (total-count 0)
         (directory-names)
-        (directory-part))
+        (directory-part)
+        (get-file))
     (princ "\n" log-buffer)
     (while (and nf (not failed))
       (setq cf (car nf))
@@ -3618,10 +3687,11 @@ Returns t if all of the edits succeeded, nil otherwise."
       (setq directory-part (file-name-directory new-file))
       (when (not (member-ignore-case directory-part directory-names))
         (push directory-part directory-names))
-      (setq fbuf (get-file-buffer new-file))
+      (setq get-file (concat root new-file))
+      (setq fbuf (get-file-buffer get-file))
       (if fbuf
           (setq file-buf fbuf)
-        (setq file-buf (find-file-noselect new-file)))
+        (setq file-buf (find-file-noselect get-file)))
       (set-buffer file-buf)
       (when (not fbuf)
         (make-local-variable 'backup-inhibited)
