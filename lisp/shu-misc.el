@@ -3540,6 +3540,77 @@ Does nothing if the current buffer does not have an associated file name."
 
 
 
+;;
+;;  shu-change-namespace
+;;
+(defun shu-change-namespace (input)
+  "This function changes the namespace in a set of C++ source files.
+
+The files to be changed must follow these conventions:
+
+ - The namespace name is all lower case
+ - Each file name starts with the lower case namespace name followed by an
+   underscore
+
+The following steps are performed:
+
+ 1. Locate all of the files to be changed.  These are all files that hold C++
+ source code in the current directory or in any directory below the current
+ directory.  The set of files may be restricted by specifying a regular
+ expression.  The regular expression does not need to include the file type.
+
+ 2. The files to be changed are renamed with the new namespace replacing the
+ old in the file name.  If any file is part of a git repository, then \"git mv\"
+ is used for the rename operation.  Otherwise, \"mv\" is used.
+
+ 3. The files are then edited to replace all occurrences of the old namespace
+ with the new.
+
+The existing namespace, new namespace and file search pattern are specified with
+a single string.
+
+The first character of the string is a delimiter character that is used to split
+the string.  The existing namespace, new namespace and file search pattern are
+separated from each other with the delimiter.
+
+For example, to specify an existing namespace of \"fumblebar\", a new namespace
+of \"wunderbar\", and a search pattern of \"*exception*\", one might specify
+
+       $fumblebar$wunderbar$*exception*
+
+or
+
+       @fumblebar@wunderbar@*exception*
+
+The search pattern is optional.  The following string would do the same
+namespace replacement for all C++ files.
+
+       $fumblebar$wunderbar"
+  (interactive "s/old-namespace/new-namespace/search-pattern:? ")
+  (let ((gb (get-buffer-create "**boo**"))
+        (root default-directory)
+        (items)
+        (old-namespace)
+        (new-namespace)
+        (pattern)
+        (debug-on-error t))
+    (setq items (shu-extract-replacement-triple input))
+    (if (not items)
+        (progn
+          (ding)
+          (message "Unable to parse input string: '%s'" input))
+      (setq old-namespace (car items))
+      (setq items (cdr items))
+      (setq new-namespace (car items))
+      (setq items (cdr items))
+      (setq pattern (car items))
+      (when (string= pattern "")
+        (setq pattern nil))
+      (shu-internal-process-new-namespace root old-namespace new-namespace pattern))
+    ))
+
+
+
 
 ;;
 ;;  shu-internal-process-new-namespace
@@ -3926,6 +3997,7 @@ shu- prefix removed."
   (defalias 'srs 'shu-srs)
   (defalias 'fix-header 'shu-fix-header-line)
   (defalias 'make-header 'shu-make-header-line)
+  (defalias 'change-namespace 'shu-change-namespace)
   )
 
 (provide 'shu-misc)
