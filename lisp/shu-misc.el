@@ -2610,7 +2610,7 @@ of the repository."
         (repo-path (shu-get-git-repo-path))
         (default-branch (shu-git-find-default-branch))
         (badge-added)
-          )
+        )
     (if (not shu-internal-dev-url)
         (progn
           (ding)
@@ -3038,13 +3038,13 @@ is no common prefix."
         (i)
         (s)
         (lcs ""))
-      (setq i 1)
-      (while (< i (length ref))
-        (setq s (substring ref 0 i))
-        (when (shu-is-common-substring s strings)
-          (when (> (length s) (length lcs))
-            (setq lcs s)))
-        (setq i (1+ i)))
+    (setq i 1)
+    (while (< i (length ref))
+      (setq s (substring ref 0 i))
+      (when (shu-is-common-substring s strings)
+        (when (> (length s) (length lcs))
+          (setq lcs s)))
+      (setq i (1+ i)))
     (when (string= lcs "")
       (setq lcs nil))
     lcs
@@ -3230,8 +3230,8 @@ put into the kill ring  a string of the form \"library=1.2.9\"."
   (interactive)
   (let ((nv (shu-get-name-and-version)))
     (when nv
-        (message "%s" nv)
-        (shu-kill-new nv))
+      (message "%s" nv)
+      (shu-kill-new nv))
     ))
 
 
@@ -3629,8 +3629,7 @@ the first part of the file followed by an underscore.  If the current namespace 
 is \"fubmblenew\", then all files whose names start with \"mumblebar_\" will be
 renamed to start with \"fubmblenew_\".  Within the new files, all instances of
 \"mumblebar\" will be changed to instances of \"fubmblenew\"."
-  (let* (
-         (log-buffer-name "**shu-rename-log**")
+  (let* ((log-buffer-name "**shu-rename-log**")
          (log-buffer (get-buffer-create log-buffer-name))
          (root default-directory)
          (cpp-type t)
@@ -3641,24 +3640,20 @@ renamed to start with \"fubmblenew_\".  Within the new files, all instances of
          (newfile)
          (cf)
          (did)
-         (cmake-files)
-           )
+         (cmake-files))
     (if (not (string= old-namespace (downcase old-namespace)))
         (progn
           (ding)
-          (message "old namespace '%s' is not all lower case" old-namespace)
-          )
+          (message "old namespace '%s' is not all lower case" old-namespace))
       (if (not (string= new-namespace (downcase new-namespace)))
           (progn
             (ding)
-            (message "new namespace '%s' is not all lower case" new-namespace)
-            )
+            (message "new namespace '%s' is not all lower case" new-namespace))
         (setq files (shu-project-get-specific-files root pattern cpp-type))
         (if (not files)
             (progn
               (ding)
-              (message "%s" "No files found to modify")
-              )
+              (message "%s" "No files found to modify"))
           (princ (concat "\n\nChange namespace from '" old-namespace "' to '" new-namespace "'\n"
                          "for the following files:\n\n") log-buffer)
           (shu-dump-list files log-buffer)
@@ -3668,16 +3663,14 @@ renamed to start with \"fubmblenew_\".  Within the new files, all instances of
             (setq newfile (shu-replace-namespace-in-file-name file old-namespace new-namespace))
             (setq cf (cons file newfile))
             (push cf newfiles)
-            (setq ff (cdr ff))
-            )
+            (setq ff (cdr ff)))
           (setq newfiles (nreverse newfiles))
           (shu-dump-rename-list newfiles log-buffer)
           (setq did (shu-rename-namespace-files newfiles log-buffer))
           (if (not did)
               (progn
                 (ding)
-                (message "Rename failed.  See buffer %s" log-buffer-name)
-                )
+                (message "Rename failed.  See buffer %s" log-buffer-name))
             (setq cmake-files (shu-namespace-find-cmake-files newfiles log-buffer))
             (princ "\nAll relevant make files:\n" log-buffer)
             (shu-dump-list cmake-files log-buffer)
@@ -3685,15 +3678,9 @@ renamed to start with \"fubmblenew_\".  Within the new files, all instances of
             (if (not did)
                 (progn
                   (ding)
-                  (message "Edits failed.  See buffer %s" log-buffer-name)
-                  )
+                  (message "Edits failed.  See buffer %s" log-buffer-name))
               (shu-edit-namespace-cmake-files root cmake-files newfiles log-buffer)
-              (message "Namespace replacement complete.  See buffer %s." log-buffer-name)
-              )
-            )
-          )
-        )
-      )
+              (message "Namespace replacement complete.  See buffer %s." log-buffer-name))))))
     ))
 
 
@@ -3915,8 +3902,8 @@ output of the move command."
   "Return the \"mv\" command to rename OLD-FILE to NEW-FILE.  The result is
 not intended to be executed.  It is intended for use in messages that explain
 what operation is being done."
-    (concat "mv " old-file " " new-file)
-    )
+  (concat "mv " old-file " " new-file)
+  )
 
 
 
@@ -4046,15 +4033,13 @@ CDR of each cons cell is the new file name.
 
 This function edits each CMake file replacing all instances of the old file name
 with the new file name."
-  (let (
-        (cmf cmake-files)
+  (let ((cmf cmake-files)
         (cf)
         (cmake-file)
         (get-file)
         (fbuf)
         (file-buf)
-        (count 0)
-        )
+        (count 0))
     (when cmake-files
       (princ "\nEdit all relevant CMake files:\n" log-buffer)
       (while cmf
@@ -4064,24 +4049,18 @@ with the new file name."
         (setq fbuf (get-file-buffer get-file))
         (if fbuf
             (setq file-buf fbuf)
-          (setq file-buf (find-file-noselect get-file))
-          )
+          (setq file-buf (find-file-noselect get-file)))
         (set-buffer file-buf)
         (when (not fbuf)
           (make-local-variable 'backup-inhibited)
-          (setq backup-inhibited t)
-          )
+          (setq backup-inhibited t))
         (setq count (shu-edit-namespace-cmake-buffer newfiles log-buffer))
         (princ (format "    Changed %d file names\n" count) log-buffer)
         (when (buffer-modified-p)
-          (basic-save-buffer)
-          )
+          (basic-save-buffer))
         (when (not fbuf)
-          (kill-buffer file-buf)
-          )
-        (setq cmf (cdr cmf))
-        )
-      )
+          (kill-buffer file-buf))
+        (setq cmf (cdr cmf))))
     ))
 
 
@@ -4096,15 +4075,13 @@ CDR of each cons cell is the new file name.
 
 This function edits the buffer replacing all instances of the old file name with
 the new file name."
-  (let (
-        (nff newfiles)
+  (let ((nff newfiles)
         (cf)
         (of)
         (nf)
         (old-file)
         (new-file)
-        (count 0)
-        )
+        (count 0))
     (save-excursion
       (while nff
         (setq cf (car nff))
@@ -4115,11 +4092,8 @@ the new file name."
         (goto-char (point-min))
         (while (search-forward old-file nil t)
           (setq count (1+ count))
-          (replace-match new-file t t)
-          )
-        (setq nff (cdr nff))
-        )
-      )
+          (replace-match new-file t t))
+        (setq nff (cdr nff))))
     count
     ))
 
