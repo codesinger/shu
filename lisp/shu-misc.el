@@ -3687,7 +3687,6 @@ renamed to start with \"fubmblenew_\".  Within the new files, all instances of
                   (ding)
                   (message "Edits failed.  See buffer %s" log-buffer-name)
                   )
-              (princ (format "length of newfiles %d" (length newfiles)) log-buffer)
               (shu-edit-namespace-cmake-files root cmake-files newfiles log-buffer)
               (message "Namespace replacement complete.  See buffer %s." log-buffer-name)
               )
@@ -3787,7 +3786,6 @@ Returns t if all of the edits succeeded, nil otherwise."
         (make-local-variable 'backup-inhibited)
         (setq backup-inhibited t))
       (princ (concat "Replacing namespace in '" new-file "'\n") log-buffer)
-      (princ (concat "Actual file '" get-file "'\n") log-buffer)
       (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
       (setq total-count (+ total-count count))
       (when (= count 0)
@@ -4059,7 +4057,6 @@ with the new file name."
         )
     (when cmake-files
       (princ "\nEdit all relevant CMake files:\n" log-buffer)
-      (princ (format "Length of newfiles: %d\n" (length newfiles)) log-buffer)
       (while cmf
         (setq cmake-file (car cmf))
         (princ (concat "Editing " cmake-file "\n") log-buffer)
@@ -4108,10 +4105,6 @@ the new file name."
         (new-file)
         (count 0)
         )
-    (princ (concat "Editing " (buffer-file-name) "\n") log-buffer)
-    (setq nff newfiles)
-    (princ (format "length of nff: %d\n" (length nff)) log-buffer)
-    (princ (format "length of newfiles: %d\n" (length newfiles)) log-buffer)
     (save-excursion
       (while nff
         (setq cf (car nff))
@@ -4122,7 +4115,6 @@ the new file name."
         (goto-char (point-min))
         (while (search-forward old-file nil t)
           (setq count (1+ count))
-          (princ (concat "Changed '" old-file "' to '" new-file "'\n") log-buffer)
           (replace-match new-file t t)
           )
         (setq nff (cdr nff))
