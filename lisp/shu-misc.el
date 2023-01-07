@@ -3629,8 +3629,10 @@ the first part of the file followed by an underscore.  If the current namespace 
 is \"fubmblenew\", then all files whose names start with \"mumblebar_\" will be
 renamed to start with \"fubmblenew_\".  Within the new files, all instances of
 \"mumblebar\" will be changed to instances of \"fubmblenew\"."
-  (let* ((log-buffer-name "**shu-rename-log**")
+  (let* (
+         (log-buffer-name "**shu-rename-log**")
          (log-buffer (get-buffer-create log-buffer-name))
+         (root default-directory)
          (cpp-type t)
          (files)
          (file)
@@ -3638,20 +3640,25 @@ renamed to start with \"fubmblenew_\".  Within the new files, all instances of
          (newfiles)
          (newfile)
          (cf)
-         (did))
+         (did)
+         (cmake-files)
+           )
     (if (not (string= old-namespace (downcase old-namespace)))
         (progn
           (ding)
-          (message "old namespace '%s' is not all lower case" old-namespace))
+          (message "old namespace '%s' is not all lower case" old-namespace)
+          )
       (if (not (string= new-namespace (downcase new-namespace)))
           (progn
             (ding)
-            (message "new namespace '%s' is not all lower case" new-namespace))
+            (message "new namespace '%s' is not all lower case" new-namespace)
+            )
         (setq files (shu-project-get-specific-files root pattern cpp-type))
         (if (not files)
             (progn
               (ding)
-              (message "%s" "No files found to modify"))
+              (message "%s" "No files found to modify")
+              )
           (princ (concat "\n\nChange namespace from '" old-namespace "' to '" new-namespace "'\n"
                          "for the following files:\n\n") log-buffer)
           (shu-dump-list files log-buffer)
@@ -3661,20 +3668,33 @@ renamed to start with \"fubmblenew_\".  Within the new files, all instances of
             (setq newfile (shu-replace-namespace-in-file-name file old-namespace new-namespace))
             (setq cf (cons file newfile))
             (push cf newfiles)
-            (setq ff (cdr ff)))
+            (setq ff (cdr ff))
+            )
           (setq newfiles (nreverse newfiles))
           (shu-dump-rename-list newfiles log-buffer)
           (setq did (shu-rename-namespace-files newfiles log-buffer))
           (if (not did)
               (progn
                 (ding)
-                (message "Rename failed.  See buffer %s" log-buffer-name))
-            (setq did (shu-edit-new-namespace-files newfiles old-namespace new-namespace log-buffer))
+                (message "Rename failed.  See buffer %s" log-buffer-name)
+                )
+            (setq cmake-files (shu-namespace-find-cmake-files newfiles log-buffer))
+            (princ "\nAll relevant make files:\n" log-buffer)
+            (shu-dump-list cmake-files log-buffer)
+            (setq did (shu-edit-new-namespace-files root newfiles old-namespace new-namespace log-buffer))
             (if (not did)
                 (progn
                   (ding)
-                  (message "Edits failed.  See buffer %s" log-buffer-name))
-              (message "Namespace replacement complete.  See buffer %s." log-buffer-name))))))
+                  (message "Edits failed.  See buffer %s" log-buffer-name)
+                  )
+              (princ (format "length of newfiles %d" (length newfiles)) log-buffer)
+              (shu-edit-namespace-cmake-files root cmake-files newfiles log-buffer)
+              (message "Namespace replacement complete.  See buffer %s." log-buffer-name)
+              )
+            )
+          )
+        )
+      )
     ))
 
 
@@ -3726,7 +3746,7 @@ The return value is t if all of the renames worked, nil otherwise."
 ;;
 ;;  shu-edit-new-namespace-files
 ;;
-(defun shu-edit-new-namespace-files  (newfiles old-namespace new-namespace log-buffer)
+(defun shu-edit-new-namespace-files (root newfiles old-namespace new-namespace log-buffer)
   "NEWFILES is a list of cons cells.  The CAR of each cons cell is the old file
 name.  The CDR of each cons cell is the new file name.  This function uses
 SHU-REPLACE-NAMESPACE-IN-BUFFER to replace the OLD-NAMESPACE name with the
@@ -3738,8 +3758,7 @@ This functions quits as soon as the first edit fails, leaving the reason for the
 failure in the LOG-BUFFER.
 
 Returns t if all of the edits succeeded, nil otherwise."
-  (let ((root default-directory)
-        (nf newfiles)
+  (let ((nf newfiles)
         (cf)
         (old-file)
         (new-file)
@@ -3768,6 +3787,7 @@ Returns t if all of the edits succeeded, nil otherwise."
         (make-local-variable 'backup-inhibited)
         (setq backup-inhibited t))
       (princ (concat "Replacing namespace in '" new-file "'\n") log-buffer)
+      (princ (concat "Actual file '" get-file "'\n") log-buffer)
       (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
       (setq total-count (+ total-count count))
       (when (= count 0)
@@ -3933,6 +3953,181 @@ Return the count of items changed in the buffer."
         (setq space-count (shu-fix-header-line))
         (when (/= space-count 0)
           (setq count (1+ count)))))
+    count
+    ))
+
+
+
+
+;;
+;;  shu-namespace-find-cmake-files
+;;
+(defun shu-namespace-find-cmake-files (newfiles log-buffer)
+  "NEWFILES is a list of cons cells.  The CAR of each cons cell is the name of
+an existing code file with the existing namespace.
+
+This function finds all CMake files (instances of CMakeLists.txt) and returns a
+list of CMake file names, each of which holds at least one instance of an
+existing file name.
+
+These are the CMake files that will need editing after all of the file names
+have been changed to the new namespace names."
+  (let ((files)
+        (ff)
+        (file)
+        (get-file)
+        (root default-directory)
+        (pattern "CMakeLists\\.txt")
+        (cpp-type nil)
+        (cmake-files)
+        (want-file))
+    (setq files (shu-project-get-specific-files root pattern cpp-type))
+    (princ "\nAll make files:\n" log-buffer)
+    (shu-dump-list files log-buffer)
+    (setq ff files)
+    (while ff
+      (setq file (car ff))
+      (setq get-file (concat root file))
+      (setq want-file (shu-namespace-filter-cmake-file get-file newfiles log-buffer))
+      (when want-file
+        (push file cmake-files))
+      (setq ff (cdr ff)))
+    (setq cmake-files (nreverse cmake-files))
+    cmake-files
+    ))
+
+
+
+;;
+;;  shu-namespace-filter-cmake-file
+;;
+(defun shu-namespace-filter-cmake-file (cmake-file newfiles log-buffer)
+  "CMAKE-FILE is a CMake file (CMakeLists.txt).  NEWFILES is a list of cons
+cells.  The CAR of each cons cell is the name of an existing code file with the
+existing namespace.
+
+This function returns true if any of the existing file names are found within
+the CMAKE-FILE."
+  (let ((fbuf)
+        (file-buf)
+        (nf newfiles)
+        (something)
+        (want-file)
+        (file)
+        (file-name))
+    (setq fbuf (get-file-buffer cmake-file))
+    (if fbuf
+        (setq file-buf fbuf)
+      (setq file-buf (find-file-noselect cmake-file)))
+    (set-buffer file-buf)
+    (setq something t)
+    (while (and nf something)
+      (setq want-file nil)
+      (setq file (caar nf))
+      (setq file-name (file-name-nondirectory file))
+      (save-excursion
+        (goto-char (point-min))
+        (when (search-forward file-name nil t)
+          (setq something nil)
+          (setq want-file t)))
+      (setq nf (cdr nf)))
+    (when (not fbuf)
+      (kill-buffer file-buf))
+    want-file
+    ))
+
+
+
+;;
+;;  shu-edit-namespace-cmake-files
+;;
+(defun shu-edit-namespace-cmake-files (root cmake-files newfiles log-buffer)
+  "CMAKE-FILES is a list of CMake files (instances of CMakeLists.txt).  NEWFILES
+is a list of cons cells.  The CAR of each cons cell is the old file name.  The
+CDR of each cons cell is the new file name.
+
+This function edits each CMake file replacing all instances of the old file name
+with the new file name."
+  (let (
+        (cmf cmake-files)
+        (cf)
+        (cmake-file)
+        (get-file)
+        (fbuf)
+        (file-buf)
+        (count 0)
+        )
+    (when cmake-files
+      (princ "\nEdit all relevant CMake files:\n" log-buffer)
+      (princ (format "Length of newfiles: %d\n" (length newfiles)) log-buffer)
+      (while cmf
+        (setq cmake-file (car cmf))
+        (princ (concat "Editing " cmake-file "\n") log-buffer)
+        (setq get-file (concat root cmake-file))
+        (setq fbuf (get-file-buffer get-file))
+        (if fbuf
+            (setq file-buf fbuf)
+          (setq file-buf (find-file-noselect get-file))
+          )
+        (set-buffer file-buf)
+        (when (not fbuf)
+          (make-local-variable 'backup-inhibited)
+          (setq backup-inhibited t)
+          )
+        (setq count (shu-edit-namespace-cmake-buffer newfiles log-buffer))
+        (princ (format "    Changed %d file names\n" count) log-buffer)
+        (when (buffer-modified-p)
+          (basic-save-buffer)
+          )
+        (when (not fbuf)
+          (kill-buffer file-buf)
+          )
+        (setq cmf (cdr cmf))
+        )
+      )
+    ))
+
+
+
+;;
+;;  shu-edit-namespace-cmake-buffer
+;;
+(defun shu-edit-namespace-cmake-buffer (newfiles log-buffer)
+  "The current buffer is a CMake file (instances of CMakeLists.txt).  NEWFILES
+is a list of cons cells.  The CAR of each cons cell is the old file name.  The
+CDR of each cons cell is the new file name.
+
+This function edits the buffer replacing all instances of the old file name with
+the new file name."
+  (let (
+        (nff newfiles)
+        (cf)
+        (of)
+        (nf)
+        (old-file)
+        (new-file)
+        (count 0)
+        )
+    (princ (concat "Editing " (buffer-file-name) "\n") log-buffer)
+    (setq nff newfiles)
+    (princ (format "length of nff: %d\n" (length nff)) log-buffer)
+    (princ (format "length of newfiles: %d\n" (length newfiles)) log-buffer)
+    (save-excursion
+      (while nff
+        (setq cf (car nff))
+        (setq of (car cf))
+        (setq nf (cdr cf))
+        (setq old-file (file-name-nondirectory of))
+        (setq new-file (file-name-nondirectory nf))
+        (goto-char (point-min))
+        (while (search-forward old-file nil t)
+          (setq count (1+ count))
+          (princ (concat "Changed '" old-file "' to '" new-file "'\n") log-buffer)
+          (replace-match new-file t t)
+          )
+        (setq nff (cdr nff))
+        )
+      )
     count
     ))
 
