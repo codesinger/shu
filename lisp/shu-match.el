@@ -167,15 +167,15 @@ double colons making up part of the return value.")
 
 
 (defconst shu-cpp-match-classname-forms
-   (list  ;; "<name> {:: <name>};"
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
-                              'shu-cpp-token-match-same-rx
-                              t shu-cpp-token-type-uq
-                              (concat shu-cpp-name "+"))
+  (list  ;; "<name> {:: <name>};"
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                             'shu-cpp-token-match-same-rx
+                             t shu-cpp-token-type-uq
+                             (concat shu-cpp-name "+"))
 
-    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop-once
-                                  shu-cpp-match-colon-name-return)
-    )
+   (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop-once
+                                 shu-cpp-match-colon-name-return)
+   )
   "Match name::name or name::name::name or name::name::name::name, etc.  The
 double colons make up the return value so that you can tell where one name
 ends and another starts.")

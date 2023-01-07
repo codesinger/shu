@@ -3866,7 +3866,7 @@ happens."
 ;;  shu-dump-list
 ;;
 (defun shu-dump-list (items log-buffer)
-  "ITEMS is a list of strinngs, which is printed into LOG-BUFFER."
+  "ITEMS is a list of strings, which is printed into LOG-BUFFER."
   (let ((item))
     (while items
       (setq item (car items))

@@ -5453,15 +5453,15 @@ contents of the kill buffer (which is assumed to contain an #include statement)
 and then sorts all of the lines in the current include block."
   (interactive)
   (let ((include-line))
-  (with-temp-buffer
-    (yank)
-    (setq include-line (buffer-substring-no-properties (point-min) (point-max))))
-  (setq include-line (shu-trim-trailing include-line))
-  (goto-char (line-beginning-position))
-  (insert include-line)
-  (goto-char (line-beginning-position))
-  (shu-sort-includes)
-  ))
+    (with-temp-buffer
+      (yank)
+      (setq include-line (buffer-substring-no-properties (point-min) (point-max))))
+    (setq include-line (shu-trim-trailing include-line))
+    (goto-char (line-beginning-position))
+    (insert include-line)
+    (goto-char (line-beginning-position))
+    (shu-sort-includes)
+    ))
 
 
 

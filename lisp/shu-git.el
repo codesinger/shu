@@ -2,7 +2,7 @@
 ;;
 ;; Copyright (C) 2023 Stewart L. Palmer
 ;;
-;; Package: shu-base
+;; Package: shu-git
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -318,7 +318,7 @@ origin."
   "Insert at point the git command to check out the current default branch."
   (interactive)
   (let ((default-branch (shu-git-find-default-branch)))
-      (insert (concat "git checkout " default-branch))
+    (insert (concat "git checkout " default-branch))
     ))
 
 
@@ -399,8 +399,8 @@ output of the git move command."
   "Return the \"git mv\" command to rename OLD-FILE to NEW-FILE.  The result is
 not intended to be executed.  It is intended for use in messages that explain
 what operation is being done."
-    (concat "git mv " old-file " " new-file)
-    )
+  (concat "git mv " old-file " " new-file)
+  )
 
 
 

@@ -50,6 +50,10 @@
 
 
 
+
+
+
+
 # Overview #
 
 
@@ -72,7 +76,7 @@ Version 1.6 was merged with the master branch on 16 November 2019.
 
 Version 1.6.108 was merged with the master branch on 24 December 2021
 
-This is Version 1.6.140 of the Shu elisp repository.
+This is Version 1.6.143 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -707,6 +711,23 @@ shu-load-library-files *path-to-libs*
 
 Load all of the library files listed in *shu-library-files* using the path
 *path-to-libs*.  Return true if all of the files were successfully loaded.
+
+
+
+#### shu-longest-car-length ####
+shu-longest-car-length *cons-cells*
+[Function]
+
+*cons-cells* is a list of cons cells.  The CAR of each cons cell is a string.
+Return the length of the longest string in all of the CARs of the cons cells.
+
+
+
+#### shu-longest-name-length ####
+shu-longest-name-length *names*
+[Function]
+
+Given a list of *names*, return the length of the longest name.
 
 
 
@@ -8571,6 +8592,363 @@ shu-cpp-tokenize-show-list-buffer *token-list* *gb* **&optional** *title*
 
 Undocumented
 
+# shu-git #
+
+
+
+A collection of functions for interacting with git
+
+
+## List of functions by alias name ##
+
+A list of aliases and associated function names.
+
+
+
+
+
+#### copy-branch ####
+[Command]
+ (Function: shu-git-copy-branch)
+
+Put the name of the current branch in a git repository into the kill ring.
+
+
+
+#### diff-commits ####
+diff-commits *commit-range*
+[Command]
+ (Function: shu-git-diff-commits)
+
+In a buffer that is a numbered git log, query for a range string, find the two
+commits, and put into the kill ring a git diff command specifying the two commits.
+
+For example, given the following two numbered commits:
+
+```
+    31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
+    33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
+```
+
+if the commit range specified is either "31.33" or "31+2", then the following
+is put into the kill ring:
+
+```
+    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "
+```
+
+
+
+#### gcm ####
+[Command]
+ (Function: shu-git-insert-git-commit)
+
+Insert at point the name the git command to commit with the commentary held
+in a file called "why.txt".
+
+
+
+#### gco ####
+[Command]
+ (Function: shu-git-insert-checkout-default)
+
+Insert at point the git command to check out the current default branch.
+
+
+
+#### get-pr-url ####
+[Command]
+ (Function: shu-git-get-pr-url)
+
+Put into the kill ring the path required to create a new pull request for
+the current branch of the current repository.
+
+
+
+#### gpl ####
+[Command]
+ (Function: shu-git-insert-pull-origin-branch)
+
+Insert at point the name the git command to pull the current branch from
+origin.
+
+
+
+#### gps ####
+[Command]
+ (Function: shu-git-insert-push-origin-branch)
+
+Insert at point the git command to push the current branch out to origin.  If
+the current branch is the default branch (fka "master"), you are prompted to
+see if you want to proceed.  This is to prevent an accidental push to the
+default branch.
+
+
+
+#### insb ####
+[Command]
+ (Function: shu-git-insert-branch)
+
+Insert at point the name of the current branch in a git repository
+
+
+
+#### inso ####
+[Command]
+ (Function: shu-git-insert-origin-branch)
+
+Insert at point the name of the current branch in a git repository preceded by the
+word "origin"..  This can be used as part of git push or pull.
+
+
+
+#### number-commits ####
+[Command]
+ (Function: shu-git-number-commits)
+
+In a git log buffer, number all of the commits with zero being the most
+recent.
+
+It is possible to refer to commits by their SHA-1 hash.  If you want to see the
+difference between two commits you can ask git to show you the difference by
+specifying the commit hash of each one.  But this is cumbersome.  It involves
+copying and pasting two SHA-1 hashes.  Once the commits are numbered, then
+*shu-git-diff-commits* may be used to diff two commits by number.  See the
+documentation for *shu-git-diff-commits* for further information.
+
+This function counts as a commit any instance of "commit" that starts at the
+beginning of a line and is followed by some white space and a forty character
+hexadecimal number.  Returns the count of the number of commits found.
+
+
+
+#### show-branch ####
+[Command]
+ (Function: shu-git-show-branch)
+
+Display the name of the current branch in a git repository.
+
+## List of functions and variables ##
+
+List of functions and variable definitions in this package.
+
+
+
+
+
+#### shu-find-numbered-commit ####
+shu-find-numbered-commit *commit-number*
+[Function]
+
+Search through a numbered git commit log looking for the commit whose number is
+*commit-number*.  Return the SHA-1 hash of the commit if the commit number is found.
+Return nil if no commit with the given number is found.
+The commit log is assume to have been numbered by shu-git-number-commits.
+
+
+
+#### shu-git-add-file ####
+shu-git-add-file *filename*
+[Function]
+
+Do a "git add" for *filename*.  Return empty string if add succeeds.  Otherwise,
+return git error message.
+
+
+
+#### shu-git-are-files-in-git ####
+shu-git-are-files-in-git *files*
+[Function]
+
+Given a list of file names in *files*, return a cons cell whose CAR holds the
+number of files that are under git control and whose CDR holds the number of
+files that are not under git control.
+
+
+
+#### shu-git-copy-branch ####
+[Command]
+ (Alias: copy-branch)
+
+Put the name of the current branch in a git repository into the kill ring.
+
+
+
+#### shu-git-diff-commits ####
+shu-git-diff-commits *commit-range*
+[Command]
+ (Alias: diff-commits)
+
+In a buffer that is a numbered git log, query for a range string, find the two
+commits, and put into the kill ring a git diff command specifying the two commits.
+
+For example, given the following two numbered commits:
+
+```
+    31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
+    33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
+```
+
+if the commit range specified is either "31.33" or "31+2", then the following
+is put into the kill ring:
+
+```
+    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "
+```
+
+
+
+#### shu-git-find-branch ####
+[Function]
+
+Return the name of the current branch in a git repository.
+
+
+
+#### shu-git-find-default-branch ####
+[Function]
+
+Return the name of the default branch in a git repository.  The default
+branch is the one branch that is created with a new repository.
+
+
+
+#### shu-git-find-short-hash ####
+shu-git-find-short-hash *hash*
+[Function]
+
+Return the git short hash for the *hash* supplied as an argument.  Return nil
+if the given *hash* is not a valid git revision.
+
+
+
+#### shu-git-get-pr-url ####
+[Command]
+ (Alias: get-pr-url)
+
+Put into the kill ring the path required to create a new pull request for
+the current branch of the current repository.
+
+
+
+#### shu-git-insert-branch ####
+[Command]
+ (Alias: insb)
+
+Insert at point the name of the current branch in a git repository
+
+
+
+#### shu-git-insert-checkout-default ####
+[Command]
+ (Alias: gco)
+
+Insert at point the git command to check out the current default branch.
+
+
+
+#### shu-git-insert-git-commit ####
+[Command]
+ (Alias: gcm)
+
+Insert at point the name the git command to commit with the commentary held
+in a file called "why.txt".
+
+
+
+#### shu-git-insert-origin-branch ####
+[Command]
+ (Alias: inso)
+
+Insert at point the name of the current branch in a git repository preceded by the
+word "origin"..  This can be used as part of git push or pull.
+
+
+
+#### shu-git-insert-pull-origin-branch ####
+[Command]
+ (Alias: gpl)
+
+Insert at point the name the git command to pull the current branch from
+origin.
+
+
+
+#### shu-git-insert-push-origin-branch ####
+[Command]
+ (Alias: gps)
+
+Insert at point the git command to push the current branch out to origin.  If
+the current branch is the default branch (fka "master"), you are prompted to
+see if you want to proceed.  This is to prevent an accidental push to the
+default branch.
+
+
+
+#### shu-git-is-file-in-git ####
+shu-git-is-file-in-git *filename*
+[Function]
+
+Return t if *filename* is in a git repository and the file is registered with git.
+
+
+
+#### shu-git-move-file ####
+shu-git-move-file *old-file* *new-file*
+[Function]
+
+Issue "git mv old-file new-file".
+
+Return a cons cell whose CAR is t if the move succeeded and whose CDR is the
+output of the git move command.
+
+
+
+#### shu-git-move-string ####
+shu-git-move-string *old-file* *new-file*
+[Function]
+
+Return the "git mv" command to rename *old-file* to *new-file*.  The result is
+not intended to be executed.  It is intended for use in messages that explain
+what operation is being done.
+
+
+
+#### shu-git-number-commits ####
+[Command]
+ (Alias: number-commits)
+
+In a git log buffer, number all of the commits with zero being the most
+recent.
+
+It is possible to refer to commits by their SHA-1 hash.  If you want to see the
+difference between two commits you can ask git to show you the difference by
+specifying the commit hash of each one.  But this is cumbersome.  It involves
+copying and pasting two SHA-1 hashes.  Once the commits are numbered, then
+*shu-git-diff-commits* may be used to diff two commits by number.  See the
+documentation for *shu-git-diff-commits* for further information.
+
+This function counts as a commit any instance of "commit" that starts at the
+beginning of a line and is followed by some white space and a forty character
+hexadecimal number.  Returns the count of the number of commits found.
+
+
+
+#### shu-git-set-alias ####
+[Function]
+
+Set the common alias names for the functions in shu-git.
+These are generally the same as the function names with the leading
+shu- prefix removed.
+
+
+
+#### shu-git-show-branch ####
+[Command]
+ (Alias: show-branch)
+
+Display the name of the current branch in a git repository.
+
 # shu-keyring #
 
 
@@ -9830,6 +10208,62 @@ simple, little function.
 
 
 
+#### change-namespace ####
+change-namespace *input*
+[Command]
+ (Function: shu-change-namespace)
+
+This function changes the namespace in a set of C++ source files.
+
+The files to be changed must follow these conventions:
+
+ - The namespace name is all lower case
+ - Each file name starts with the lower case namespace name followed by an
+   underscore
+
+The following steps are performed:
+
+ 1. Locate all of the files to be changed.  These are all files that hold C++
+ source code in the current directory or in any directory below the current
+ directory.  The set of files may be restricted by specifying a regular
+ expression.  The regular expression does not need to include the file type.
+
+ 2. The files to be changed are renamed with the new namespace replacing the
+ old in the file name.  If any file is part of a git repository, then "git mv"
+ is used for the rename operation.  Otherwise, "mv" is used.
+
+ 3. The files are then edited to replace all occurrences of the old namespace
+ with the new.
+
+The existing namespace, new namespace and file search pattern are specified with
+a single string.
+
+The first character of the string is a delimiter character that is used to split
+the string.  The existing namespace, new namespace and file search pattern are
+separated from each other with the delimiter.
+
+For example, to specify an existing namespace of "fumblebar", a new namespace
+of "wunderbar", and a search pattern of "`*exception*`", one might specify
+
+```
+       $fumblebar$wunderbar$`*exception*`
+```
+
+or
+
+```
+       @fumblebar@wunderbar@`*exception*`
+```
+
+The search pattern is optional.  The following string would do the same
+namespace replacement for all C++ files.
+
+```
+       $fumblebar$wunderbar
+```
+
+
+
 #### comma-names-to-letter ####
 [Command]
  (Function: shu-comma-names-to-letter)
@@ -9837,14 +10271,6 @@ simple, little function.
 In a list of names, change all occurrences
 of Lastname, Firstname to an empty Latex letter.
 Position to the start of the file and invoke once.
-
-
-
-#### copy-branch ####
-[Command]
- (Function: shu-git-copy-branch)
-
-Put the name of the current branch in a git repository into the kill ring.
 
 
 
@@ -9877,30 +10303,6 @@ done.
 
 This function gets rid of all the asterisks.  You can use *shu-add-prefix* to
 put them back.
-
-
-
-#### diff-commits ####
-diff-commits *commit-range*
-[Command]
- (Function: shu-git-diff-commits)
-
-In a buffer that is a numbered git log, query for a range string, find the two
-commits, and put into the kill ring a git diff command specifying the two commits.
-
-For example, given the following two numbered commits:
-
-```
-    31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
-    33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
-```
-
-if the commit range specified is either "31.33" or "31+2", then the following
-is put into the kill ring:
-
-```
-    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "
-```
 
 
 
@@ -9947,37 +10349,11 @@ the Doxyfile.  The current buffer is the Doxyfile.
 
 
 
-#### gcm ####
-[Command]
- (Function: shu-git-insert-git-commit)
-
-Insert at point the name the git command to commit with the commentary held
-in a file called "why.txt".
-
-
-
-#### gco ####
-[Command]
- (Function: shu-git-insert-checkout-default)
-
-Insert at point the git command to check out the current default branch.
-
-
-
 #### gd ####
 [Command]
  (Function: shu-gd)
 
 While in dired, put the full path to the current directory in the kill ring
-
-
-
-#### get-pr-url ####
-[Command]
- (Function: shu-git-get-pr-url)
-
-Put into the kill ring the path required to create a new pull request for
-the current branch of the current repository.
 
 
 
@@ -10043,48 +10419,11 @@ While in a file buffer, put the name of the current file into the kill ring.
 
 
 
-#### gpl ####
-[Command]
- (Function: shu-git-insert-pull-origin-branch)
-
-Insert at point the name the git command to pull the current branch from
-origin.
-
-
-
-#### gps ####
-[Command]
- (Function: shu-git-insert-push-origin-branch)
-
-Insert at point the git command to push the current branch out to origin.  If
-the current branch is the default branch (fka "master"), you are prompted to
-see if you want to proceed.  This is to prevent an accidental push to the
-default branch.
-
-
-
 #### gquote ####
 [Command]
  (Function: shu-gquote)
 
 Insert a LaTeX quote environment and position the cursor for typing the quote.
-
-
-
-#### insb ####
-[Command]
- (Function: shu-git-insert-branch)
-
-Insert at point the name of the current branch in a git repository
-
-
-
-#### inso ####
-[Command]
- (Function: shu-git-insert-origin-branch)
-
-Insert at point the name of the current branch in a git repository preceded by the
-word "origin"..  This can be used as part of git push or pull.
 
 
 
@@ -10243,26 +10582,6 @@ point is placed where the the first line of code in the loop belongs.
 
 
 
-#### number-commits ####
-[Command]
- (Function: shu-git-number-commits)
-
-In a git log buffer, number all of the commits with zero being the most
-recent.
-
-It is possible to refer to commits by their SHA-1 hash.  If you want to see the
-difference between two commits you can ask git to show you the difference by
-specifying the commit hash of each one.  But this is cumbersome.  It involves
-copying and pasting two SHA-1 hashes.  Once the commits are numbered, then
-*shu-git-diff-commits* may be used to diff two commits by number.  See the
-documentation for *shu-git-diff-commits* for further information.
-
-This function counts as a commit any instance of "commit" that starts at the
-beginning of a line and is followed by some white space and a forty character
-hexadecimal number.  Returns the count of the number of commits found.
-
-
-
 #### number-lines ####
 [Command]
  (Function: shu-number-lines)
@@ -10398,14 +10717,6 @@ Set the end of line delimiter to be the DOS standard (CRLF).
  (Function: shu-set-unix-eol)
 
 Set the end of line delimiter to be the Unix standard (LF).
-
-
-
-#### show-branch ####
-[Command]
- (Function: shu-git-show-branch)
-
-Display the name of the current branch in a git repository.
 
 
 
@@ -10676,6 +10987,62 @@ simple, little function.
 
 
 
+#### shu-change-namespace ####
+shu-change-namespace *input*
+[Command]
+ (Alias: change-namespace)
+
+This function changes the namespace in a set of C++ source files.
+
+The files to be changed must follow these conventions:
+
+ - The namespace name is all lower case
+ - Each file name starts with the lower case namespace name followed by an
+   underscore
+
+The following steps are performed:
+
+ 1. Locate all of the files to be changed.  These are all files that hold C++
+ source code in the current directory or in any directory below the current
+ directory.  The set of files may be restricted by specifying a regular
+ expression.  The regular expression does not need to include the file type.
+
+ 2. The files to be changed are renamed with the new namespace replacing the
+ old in the file name.  If any file is part of a git repository, then "git mv"
+ is used for the rename operation.  Otherwise, "mv" is used.
+
+ 3. The files are then edited to replace all occurrences of the old namespace
+ with the new.
+
+The existing namespace, new namespace and file search pattern are specified with
+a single string.
+
+The first character of the string is a delimiter character that is used to split
+the string.  The existing namespace, new namespace and file search pattern are
+separated from each other with the delimiter.
+
+For example, to specify an existing namespace of "fumblebar", a new namespace
+of "wunderbar", and a search pattern of "`*exception*`", one might specify
+
+```
+       $fumblebar$wunderbar$`*exception*`
+```
+
+or
+
+```
+       @fumblebar@wunderbar@`*exception*`
+```
+
+The search pattern is optional.  The following string would do the same
+namespace replacement for all C++ files.
+
+```
+       $fumblebar$wunderbar
+```
+
+
+
 #### shu-comma-names-to-letter ####
 [Command]
  (Alias: comma-names-to-letter)
@@ -10752,11 +11119,75 @@ C-x C-c to this function and use an explicit M-x quit to exit emacs.
 
 
 
+#### shu-dump-list ####
+shu-dump-list *items* *log-buffer*
+[Function]
+
+*items* is a list of strings, which is printed into *log-buffer*.
+
+
+
+#### shu-dump-rename-list ####
+shu-dump-rename-list *files* *log-buffer*
+[Function]
+
+*files* is a list of cons cells.  The CAR of each cons cell is the name of an
+existing file.  The CDR of each cons cell is the name that the file will have
+after the rename operation.  This function prints into the *log-buffer* the old
+and new file names to show the name changes that will take place as the rename
+happens.
+
+
+
 #### shu-dup ####
 [Command]
  (Alias: dup)
 
 Insert a duplicate of the current line, following it.
+
+
+
+#### shu-edit-namespace-cmake-buffer ####
+shu-edit-namespace-cmake-buffer *newfiles* *log-buffer*
+[Function]
+
+The current buffer is a CMake file (instances of CMakeLists.txt).  *newfiles*
+is a list of cons cells.  The CAR of each cons cell is the old file name.  The
+CDR of each cons cell is the new file name.
+
+This function edits the buffer replacing all instances of the old file name with
+the new file name.
+
+
+
+#### shu-edit-namespace-cmake-files ####
+shu-edit-namespace-cmake-files *root* *cmake-files* *newfiles* *log-buffer*
+[Function]
+
+*cmake-files* is a list of CMake files (instances of CMakeLists.txt).  *newfiles*
+is a list of cons cells.  The CAR of each cons cell is the old file name.  The
+CDR of each cons cell is the new file name.
+
+This function edits each CMake file replacing all instances of the old file name
+with the new file name.
+
+
+
+#### shu-edit-new-namespace-files ####
+shu-edit-new-namespace-files *root* *newfiles* *old-namespace* *new-namespace* *log-buffer*
+[Function]
+
+*newfiles* is a list of cons cells.  The CAR of each cons cell is the old file
+name.  The CDR of each cons cell is the new file name.  This function uses
+*shu-replace-namespace-in-buffer* to replace the *old-namespace* name with the
+*new-namespace* name.
+
+The editing progress is logged in the *log-buffer*.
+
+This functions quits as soon as the first edit fails, leaving the reason for the
+failure in the *log-buffer*.
+
+Returns t if all of the edits succeeded, nil otherwise.
 
 
 
@@ -10822,14 +11253,44 @@ nil is returned.
 
 
 
-#### shu-find-numbered-commit ####
-shu-find-numbered-commit *commit-number*
+#### shu-extract-replacement-triple ####
+shu-extract-replacement-triple *rstring*
 [Function]
 
-Search through a numbered git commit log looking for the commit whose number is
-*commit-number*.  Return the SHA-1 hash of the commit if the commit number is found.
-Return nil if no commit with the given number is found.
-The commit log is assume to have been numbered by shu-git-number-commits.
+Parse a sed-like search and replacement string that specifies three parts
+such as "/abc/defg/xyz".
+
+This function parses such a string.  The first character in the string is the
+delimiter.  The delimiter character is used to break the string into two or
+three strings, in this case "abc", "defg", and "xyz".  If this can be done
+successfully, the three strings are returned in a list.  If the string cannot be
+parsed, nil is returned.
+
+There my be two or three occurrences of the delimiter character.  For example
+
+```
+      "$abc$def$ghi"
+```
+
+returns the list
+
+```
+      1. "abc"
+      2. "def"
+      3. "ghi"
+
+      "$abc$def$"
+```
+
+returns the list
+
+```
+      1. "abc"
+      2. "def"
+      3. ""  (Empty string)
+```
+
+as does "$abc$def" with no trailing delimiter character.
 
 
 
@@ -11179,162 +11640,6 @@ While in a file buffer, put the name of the current file into the kill ring.
 
 
 
-#### shu-git-add-file ####
-shu-git-add-file *filename*
-[Function]
-
-Do a "git add" for *filename*.  Return empty string if add succeeds.  Otherwise,
-return git error message.
-
-
-
-#### shu-git-copy-branch ####
-[Command]
- (Alias: copy-branch)
-
-Put the name of the current branch in a git repository into the kill ring.
-
-
-
-#### shu-git-diff-commits ####
-shu-git-diff-commits *commit-range*
-[Command]
- (Alias: diff-commits)
-
-In a buffer that is a numbered git log, query for a range string, find the two
-commits, and put into the kill ring a git diff command specifying the two commits.
-
-For example, given the following two numbered commits:
-
-```
-    31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
-    33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
-```
-
-if the commit range specified is either "31.33" or "31+2", then the following
-is put into the kill ring:
-
-```
-    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "
-```
-
-
-
-#### shu-git-find-branch ####
-[Function]
-
-Return the name of the current branch in a git repository.
-
-
-
-#### shu-git-find-default-branch ####
-[Function]
-
-Return the name of the default branch in a git repository.  The default
-branch is the one branch that is created with a new repository.
-
-
-
-#### shu-git-find-short-hash ####
-shu-git-find-short-hash *hash*
-[Function]
-
-Return the git short hash for the *hash* supplied as an argument.  Return nil
-if the given *hash* is not a valid git revision.
-
-
-
-#### shu-git-get-pr-url ####
-[Command]
- (Alias: get-pr-url)
-
-Put into the kill ring the path required to create a new pull request for
-the current branch of the current repository.
-
-
-
-#### shu-git-insert-branch ####
-[Command]
- (Alias: insb)
-
-Insert at point the name of the current branch in a git repository
-
-
-
-#### shu-git-insert-checkout-default ####
-[Command]
- (Alias: gco)
-
-Insert at point the git command to check out the current default branch.
-
-
-
-#### shu-git-insert-git-commit ####
-[Command]
- (Alias: gcm)
-
-Insert at point the name the git command to commit with the commentary held
-in a file called "why.txt".
-
-
-
-#### shu-git-insert-origin-branch ####
-[Command]
- (Alias: inso)
-
-Insert at point the name of the current branch in a git repository preceded by the
-word "origin"..  This can be used as part of git push or pull.
-
-
-
-#### shu-git-insert-pull-origin-branch ####
-[Command]
- (Alias: gpl)
-
-Insert at point the name the git command to pull the current branch from
-origin.
-
-
-
-#### shu-git-insert-push-origin-branch ####
-[Command]
- (Alias: gps)
-
-Insert at point the git command to push the current branch out to origin.  If
-the current branch is the default branch (fka "master"), you are prompted to
-see if you want to proceed.  This is to prevent an accidental push to the
-default branch.
-
-
-
-#### shu-git-number-commits ####
-[Command]
- (Alias: number-commits)
-
-In a git log buffer, number all of the commits with zero being the most
-recent.
-
-It is possible to refer to commits by their SHA-1 hash.  If you want to see the
-difference between two commits you can ask git to show you the difference by
-specifying the commit hash of each one.  But this is cumbersome.  It involves
-copying and pasting two SHA-1 hashes.  Once the commits are numbered, then
-*shu-git-diff-commits* may be used to diff two commits by number.  See the
-documentation for *shu-git-diff-commits* for further information.
-
-This function counts as a commit any instance of "commit" that starts at the
-beginning of a line and is followed by some white space and a forty character
-hexadecimal number.  Returns the count of the number of commits found.
-
-
-
-#### shu-git-show-branch ####
-[Command]
- (Alias: show-branch)
-
-Display the name of the current branch in a git repository.
-
-
-
 #### shu-gquote ####
 [Command]
  (Alias: gquote)
@@ -11375,6 +11680,26 @@ Insert at point a skeleton lisp function of type *func-type* whose name is
 *func-name*.  *func-type* is not examined in any way but is only useful if its
 value is "defun", "defmacro", "ert-deftest", etc.  If *interactive* is
 true, the function is interactive.
+
+
+
+#### shu-internal-process-new-namespace ####
+shu-internal-process-new-namespace *root* *old-namespace* *new-namespace* *pattern*
+[Function]
+
+Starting in directory *root*, look for files as follows.  If *pattern* is nil, look
+for all files that hold C++ code.  If *pattern* is non-nil, use that to search for
+files that hold C+++ code.
+
+Of the set of files found, change the namespace from *old-namespace* to
+*new-namespace*.
+
+It is assumed that files follow the standard convention of using the namespace as
+the first part of the file followed by an underscore.  If the current namespace is
+"mumblebar", then all file names start with "mumblebar_".  If the new namespace
+is "fubmblenew", then all files whose names start with "mumblebar_" will be
+renamed to start with "fubmblenew_".  Within the new files, all instances of
+"mumblebar" will be changed to instances of "fubmblenew".
 
 
 
@@ -11757,6 +12082,56 @@ too short will be expanded as necessary.
 
 
 
+#### shu-move-file ####
+shu-move-file *old-file* *new-file*
+[Function]
+
+Issue "mv old-file new-file".
+
+Return a cons cell whose CAR is t if the move succeeded and whose CDR is the
+output of the move command.
+
+
+
+#### shu-move-string ####
+shu-move-string *old-file* *new-file*
+[Function]
+
+Return the "mv" command to rename *old-file* to *new-file*.  The result is
+not intended to be executed.  It is intended for use in messages that explain
+what operation is being done.
+
+
+
+#### shu-namespace-filter-cmake-file ####
+shu-namespace-filter-cmake-file *cmake-file* *newfiles* *log-buffer*
+[Function]
+
+*cmake-file* is a CMake file (CMakeLists.txt).  *newfiles* is a list of cons
+cells.  The CAR of each cons cell is the name of an existing code file with the
+existing namespace.
+
+This function returns true if any of the existing file names are found within
+the *cmake-file*.
+
+
+
+#### shu-namespace-find-cmake-files ####
+shu-namespace-find-cmake-files *newfiles* *log-buffer*
+[Function]
+
+*newfiles* is a list of cons cells.  The CAR of each cons cell is the name of
+an existing code file with the existing namespace.
+
+This function finds all CMake files (instances of CMakeLists.txt) and returns a
+list of CMake file names, each of which holds at least one instance of an
+existing file name.
+
+These are the CMake files that will need editing after all of the file names
+have been changed to the new namespace names.
+
+
+
 #### shu-new-ert ####
 shu-new-ert *func-name*
 [Command]
@@ -11922,6 +12297,71 @@ invoked by C-x C-c
  (Alias: remove-test-names)
 
 Remove from a file all lines that contain file names that end in .t.cpp
+
+
+
+#### shu-rename-namespace-files ####
+shu-rename-namespace-files *newfiles* *log-buffer*
+[Function]
+
+*newfiles* is a list of cons cells.  The CAR of each cons cell is the old file
+name.  The CDR of each cons cell is the new file name.  This function renames
+each file from old to new.
+
+If the file is under git control, then "git mv" is used for the rename.  If
+the file is not under git control, then "mv" is used for the rename.
+
+Each rename command is placed in the *log-buffer*.  This function quits as soon as
+any rename fails, leaving the reason for the failure in the *log-buffer*.
+
+The return value is t if all of the renames worked, nil otherwise.
+
+
+
+#### shu-replace-namespace-in-buffer ####
+shu-replace-namespace-in-buffer *old-namespace* *new-namespace*
+[Function]
+
+Within the current buffer, do a case sensitive replace of *old-namespace* with
+*new-namespace*.  Then do a case sensitive replace of the upper case version of
+*old-namespace* with the upper case version of *new-namespace*.
+
+At the end of all replacements, invoke *shu-fix-header-line* to fix up the first
+line of the file in case the length of the namespace has changed.
+
+Return the count of items changed in the buffer.
+
+
+
+#### shu-replace-namespace-in-file-name ####
+shu-replace-namespace-in-file-name *file-name* *old-namespace* *new-namespace*
+[Function]
+
+*file-name* is the name of a file with a standard namespace prefix.
+
+It is assumed that the file name uses the convention of the first part of the
+name being the C++ namespace, followed by an underscore, followed by the class
+name in all lower case.
+
+*old-namespace* is the current namespace.  *new-namespace* is the new namespace that
+is to replace the old.
+
+Return a new file name that is the same as the original file name but with the
+namespace part of the name replaced with the new namespace.
+
+If the namespace appears in the file path it is not modified.  For example, if
+the old namespace is "mumble" and the new namespace is "bumble", then the
+following file name
+
+```
+      mumble_bar/mumble_bar/mumble_observer.h
+```
+
+will be returned as
+
+```
+      mumble_bar/mumble_bar/bumble_observer.h
+```
 
 
 
@@ -12657,6 +13097,7 @@ within type.
 
 Associate a number with each type of variable
 
+
 # Index #
 
 * [acgen](#acgen)
@@ -12685,6 +13126,7 @@ Associate a number with each type of variable
 * [celse](#celse)
 * [cfor](#cfor)
 * [cgen](#cgen)
+* [change-namespace](#change-namespace)
 * [cif](#cif)
 * [ck](#ck)
 * [clc](#clc)
@@ -12978,6 +13420,7 @@ Associate a number with each type of variable
 * [shu-cdo](#shu-cdo)
 * [shu-celse](#shu-celse)
 * [shu-cfor](#shu-cfor)
+* [shu-change-namespace](#shu-change-namespace)
 * [shu-cif](#shu-cif)
 * [shu-citerate](#shu-citerate)
 * [shu-class-is-blocked](#shu-class-is-blocked)
@@ -13297,7 +13740,12 @@ Associate a number with each type of variable
 * [shu-dox-hdr](#shu-dox-hdr)
 * [shu-dox2-hdr](#shu-dox2-hdr)
 * [shu-drc](#shu-drc)
+* [shu-dump-list](#shu-dump-list)
+* [shu-dump-rename-list](#shu-dump-rename-list)
 * [shu-dup](#shu-dup)
+* [shu-edit-namespace-cmake-buffer](#shu-edit-namespace-cmake-buffer)
+* [shu-edit-namespace-cmake-files](#shu-edit-namespace-cmake-files)
+* [shu-edit-new-namespace-files](#shu-edit-new-namespace-files)
 * [shu-emit-get](#shu-emit-get)
 * [shu-emit-set](#shu-emit-set)
 * [shu-end-of-dq-string](#shu-end-of-dq-string)
@@ -13307,6 +13755,7 @@ Associate a number with each type of variable
 * [shu-expand-header-line](#shu-expand-header-line)
 * [shu-extract-name-open-grok](#shu-extract-name-open-grok)
 * [shu-extract-replacement-strings](#shu-extract-replacement-strings)
+* [shu-extract-replacement-triple](#shu-extract-replacement-triple)
 * [shu-find-default-cpp-name](#shu-find-default-cpp-name)
 * [shu-find-line-and-file](#shu-find-line-and-file)
 * [shu-find-numbered-commit](#shu-find-numbered-commit)
@@ -13374,6 +13823,7 @@ Associate a number with each type of variable
 * [shu-gfn](#shu-gfn)
 * [shu-ginclude](#shu-ginclude)
 * [shu-git-add-file](#shu-git-add-file)
+* [shu-git-are-files-in-git](#shu-git-are-files-in-git)
 * [shu-git-copy-branch](#shu-git-copy-branch)
 * [shu-git-diff-commits](#shu-git-diff-commits)
 * [shu-git-find-branch](#shu-git-find-branch)
@@ -13386,7 +13836,11 @@ Associate a number with each type of variable
 * [shu-git-insert-origin-branch](#shu-git-insert-origin-branch)
 * [shu-git-insert-pull-origin-branch](#shu-git-insert-pull-origin-branch)
 * [shu-git-insert-push-origin-branch](#shu-git-insert-push-origin-branch)
+* [shu-git-is-file-in-git](#shu-git-is-file-in-git)
+* [shu-git-move-file](#shu-git-move-file)
+* [shu-git-move-string](#shu-git-move-string)
 * [shu-git-number-commits](#shu-git-number-commits)
+* [shu-git-set-alias](#shu-git-set-alias)
 * [shu-git-show-branch](#shu-git-show-branch)
 * [shu-global-buffer-name](#shu-global-buffer-name)
 * [shu-global-operation](#shu-global-operation)
@@ -13414,6 +13868,7 @@ Associate a number with each type of variable
 * [shu-internal-list-c-file-names](#shu-internal-list-c-file-names)
 * [shu-internal-list-c-project](#shu-internal-list-c-project)
 * [shu-internal-new-lisp](#shu-internal-new-lisp)
+* [shu-internal-process-new-namespace](#shu-internal-process-new-namespace)
 * [shu-internal-replace-class-name](#shu-internal-replace-class-name)
 * [shu-internal-set-c-project](#shu-internal-set-c-project)
 * [shu-internal-sort-includes](#shu-internal-sort-includes)
@@ -13476,8 +13931,10 @@ Associate a number with each type of variable
 * [shu-load-library-files](#shu-load-library-files)
 * [shu-local-class-list](#shu-local-class-list)
 * [shu-local-replace](#shu-local-replace)
+* [shu-longest-car-length](#shu-longest-car-length)
 * [shu-longest-common-prefix](#shu-longest-common-prefix)
 * [shu-longest-common-substring](#shu-longest-common-substring)
+* [shu-longest-name-length](#shu-longest-name-length)
 * [shu-loosen-lisp](#shu-loosen-lisp)
 * [shu-make-c-project](#shu-make-c-project)
 * [shu-make-file-header-line](#shu-make-file-header-line)
@@ -13536,6 +13993,10 @@ Associate a number with each type of variable
 * [shu-misc-split-string](#shu-misc-split-string)
 * [shu-modified-buffers](#shu-modified-buffers)
 * [shu-move-down](#shu-move-down)
+* [shu-move-file](#shu-move-file)
+* [shu-move-string](#shu-move-string)
+* [shu-namespace-filter-cmake-file](#shu-namespace-filter-cmake-file)
+* [shu-namespace-find-cmake-files](#shu-namespace-find-cmake-files)
 * [shu-nc-vtype](#shu-nc-vtype)
 * [shu-new-c-class](#shu-new-c-class)
 * [shu-new-c-file](#shu-new-c-file)
@@ -13608,9 +14069,12 @@ Associate a number with each type of variable
 * [shu-record-visited-project](#shu-record-visited-project)
 * [shu-remove-test-names](#shu-remove-test-names)
 * [shu-remove-trailing-all-whitespace](#shu-remove-trailing-all-whitespace)
+* [shu-rename-namespace-files](#shu-rename-namespace-files)
 * [shu-renew-c-project](#shu-renew-c-project)
 * [shu-replace-class-fun](#shu-replace-class-fun)
 * [shu-replace-class-name](#shu-replace-class-name)
+* [shu-replace-namespace-in-buffer](#shu-replace-namespace-in-buffer)
+* [shu-replace-namespace-in-file-name](#shu-replace-namespace-in-file-name)
 * [shu-replace-string](#shu-replace-string)
 * [shu-return-ptr](#shu-return-ptr)
 * [shu-return-ref](#shu-return-ref)
@@ -13748,5 +14212,7 @@ LocalWords:  CMake doody ops py krpps Doxyfile af repo fixup doxyfile gcm config
 LocalWords:  tocify fgh ijkl mno pqr stuv wxy bcde fg hij klm Stuvw xyzab OpenGrok
 LocalWords:  unbrace iff currentliveupdate debian dep codesinger github pt ua seq
 LocalWords:  dev abc pr fka https classname val charlie pllist tokenization pl aaaa
-LocalWords:  ls cf regex
+LocalWords:  ls cf regex CARs impl typename MumbleBar sname NONDIRECTORY gco mv srs
+LocalWords:  fumblebar wunderbar getnv rstring sed defg cmake newfiles CMakeLists
+LocalWords:  xyz ghi mumblebar fubmblenew
 -->

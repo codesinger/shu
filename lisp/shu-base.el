@@ -1225,7 +1225,7 @@ The returned line is of length SHU-CPP-COMMENT-END."
 ;;
 (defun shu-longest-car-length (cons-cells)
   "CONS-CELLS is a list of cons cells.  The CAR of each cons cell is a string.
-Return the length of the longest string in all of the CARs oif the cons cells."
+Return the length of the longest string in all of the CARs of the cons cells."
   (let ((cs cons-cells)
         (cf)
         (name)

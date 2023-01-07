@@ -1238,8 +1238,8 @@ the current directory name does not match the namespace."
   "Generate a skeleton class declaration at point."
   (interactive "*sClass name?: ")
   (let ((use-allocator shu-cpp-use-bde-library))
-  (shu-cpp-inner-cdecl-template class-name template-list t use-allocator)
-  ))
+    (shu-cpp-inner-cdecl-template class-name template-list t use-allocator)
+    ))
 
 
 
@@ -1391,8 +1391,8 @@ the class comment was placed."
       "\n"
       "// ACCESSORS\n"))
     (when template-list
-    (insert "\n")
-    (shu-cpp-impl-cpp-print-self class-name template-list))
+      (insert "\n")
+      (shu-cpp-impl-cpp-print-self class-name template-list))
     (insert
      (concat
       "\n"
@@ -1463,12 +1463,12 @@ CLASS-NAME is the name of the containing C++ class."
   "Generate the declaration for the streaming operator (operator<<()).
 CLASS-NAME is the name of the containing C++ class."
   (let* ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
-        (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
-        (ipad (make-string shu-cpp-indent-length ? ))
-        (ostream-length (length "std::ostream  "))
-        (ostream-class-length (+ (length "const ") (length qualified-class-name) 2))
-        (ostream-pad "")
-        (ostream-class-pad ""))
+         (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (ostream-length (length "std::ostream  "))
+         (ostream-class-length (+ (length "const ") (length qualified-class-name) 2))
+         (ostream-pad "")
+         (ostream-class-pad ""))
     (if (> ostream-length ostream-class-length)
         (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
       (when (> ostream-class-length ostream-length)
@@ -1501,13 +1501,13 @@ CLASS-NAME is the name of the containing C++ class."
   "Generate the code for the streaming operator (operator<<()).  CLASS-NAME is the
 name of the containing C++ class."
   (let* ((std-name (if shu-cpp-use-bde-library shu-cpp-std-namespace "std"))
-        (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
-        (ipad (make-string shu-cpp-indent-length ? ))
-        (ostream-length (length "std::ostream  "))
-        (ostream-class-length (+ (length "const ") (length qualified-class-name) 2))
-        (ostream-pad "")
-        (ostream-class-pad "")
-        (inline ""))
+         (qualified-class-name (shu-cpp-make-qualified-class-name class-name template-list))
+         (ipad (make-string shu-cpp-indent-length ? ))
+         (ostream-length (length "std::ostream  "))
+         (ostream-class-length (+ (length "const ") (length qualified-class-name) 2))
+         (ostream-pad "")
+         (ostream-class-pad "")
+         (inline ""))
     (if (> ostream-length ostream-class-length)
         (setq ostream-class-pad (make-string (- ostream-length ostream-class-length) ? ))
       (when (> ostream-class-length ostream-length)
@@ -1525,7 +1525,7 @@ name of the containing C++ class."
       ipad "return cn.printSelf(os);\n"
       "}\n"))
 
-                     ))
+    ))
 
 
 
@@ -1555,15 +1555,15 @@ buffer the declaration
         inline
 
 If TEMPLATE-LIST  is nil, do nothing."
-    (when template-list
-      (insert
-       (concat
-        (shu-cpp-make-decl-template template-list))
-       "\n"
-       "inline"
-       "\n"
-       ))
-    )
+  (when template-list
+    (insert
+     (concat
+      (shu-cpp-make-decl-template template-list))
+     "\n"
+     "inline"
+     "\n"
+     ))
+  )
 
 
 

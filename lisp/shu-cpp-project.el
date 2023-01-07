@@ -2428,8 +2428,8 @@ t.cpp or .h file, invoke this function and you will be taken to the
 corresponding .cpp or .c file.  This function will use a project if one is
 active.  Otherwise, it will assume that all files reside in the same directory."
   (interactive)
-    (shu-project-some-other ".cpp")
-    )
+  (shu-project-some-other ".cpp")
+  )
 
 
 ;;
@@ -2441,8 +2441,8 @@ active.  Otherwise, it will assume that all files reside in the same directory."
 corresponding .h file.  This function will use a project if one is active.
 Otherwise, it will assume that all files reside in the same directory."
   (interactive)
-    (shu-project-some-other ".h")
-    )
+  (shu-project-some-other ".h")
+  )
 
 
 ;;
@@ -2454,8 +2454,8 @@ or .cpp file, invoke this function and you will be taken to the corresponding
 .i.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory."
   (interactive)
-    (shu-project-some-other ".i.cpp")
-    )
+  (shu-project-some-other ".i.cpp")
+  )
 
 
 ;;
@@ -2467,8 +2467,8 @@ or .cpp file, invoke this function and you will be taken to the corresponding
 .t.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory."
   (interactive)
-    (shu-project-some-other ".t.cpp")
-    )
+  (shu-project-some-other ".t.cpp")
+  )
 
 
 
@@ -2663,10 +2663,10 @@ file was found and visited, return true."
 ;;
 (defun shu-cpp-get-inverted-class-list ()
   "Return SHU-CPP-INVERTED-CLASS-LIST, creating it if it is currently nil."
-    (when (not shu-cpp-inverted-class-list)
-      (setq shu-cpp-inverted-class-list (shu-cpp-project-invert-list shu-cpp-class-list)))
-    shu-cpp-inverted-class-list
-    )
+  (when (not shu-cpp-inverted-class-list)
+    (setq shu-cpp-inverted-class-list (shu-cpp-project-invert-list shu-cpp-class-list)))
+  shu-cpp-inverted-class-list
+  )
 
 
 
@@ -2743,7 +2743,7 @@ qualified files found."
               (unless (shu-project-directory-is-excluded sname)
                 (push cname dir-list))))
         (when (and (shu-cpp-project-is-type-wanted sname cpp-type)
-                  (shu-project-file-pattern-match sname pattern))
+                   (shu-project-file-pattern-match sname pattern))
           (push (file-relative-name cname) shu-cpp-fetch-list)))
       (setq tlist (cdr tlist)))
     (while dir-list
