@@ -48,8 +48,9 @@
    (cons "1.5"   "821beb4ace51edbae436f7ac1da67873cc5925c2")
    (cons "1.6"   "dcfe32ef84a3d4ca54b0ac43e754249f1e21f35e")
    (cons "1.6.108"  "cd5a1de0a7d9ec611bbd46f8d043d5ae6b631d5a")
+   (cons "1.6.144"  "25d31731fa68128f486d222909982fe960aeb183")
    (cons "1.7"   "UNKNOWN"))
-  "A list of all commits by version starting with version 1.2")
+  "A list of all merges to master by version starting with version 1.2")
 
 (defconst shu-last-commit "dcfe32ef84a3d4ca54b0ac43e754249f1e21f35e"
   "The git SHA-1 of the most recent commit.  This cannot be the SHA-1 hash of
