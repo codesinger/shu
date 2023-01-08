@@ -119,6 +119,11 @@
 
 (tool-bar-mode 0)
 
+(when (shu-system-type-is-mac-osx)
+  (require 'epa-file)
+  (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
+  (epa-file-enable))
+
 ;;;
 (global-set-key "" 'buffer-menu)
 (global-set-key "" 'shell)
@@ -191,6 +196,8 @@
 (put 'eval-expression 'disabled nil)
 (load-library "cc-mode")
 (load-file "~/emacs/shu-base.elc")
+(load-file "~/emacs/shu-git.elc")
+(load-file "~/emacs/shu-misc.elc")
 (shu-load-library-files "~/emacs")
 ;;(load-file "~/emacs/s-mode.elc")
 (when (file-readable-p "~/emacs/useful.elc")
@@ -224,6 +231,7 @@
 (shu-cpp-token-set-alias)
 (shu-bde-set-alias)
 (shu-cpp-project-set-alias)
+(shu-git-set-alias)
 (shu-misc-set-alias)
 (shu-cpp-misc-set-alias)
 (shu-keyring-set-alias)
@@ -486,3 +494,19 @@ text))
   (c-set-offset 'inextern-lang 0)
   )
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+(when nil
+  (when (shu-system-type-is-unix)
+    (custom-set-faces
+     ;; custom-set-faces was added by Custom.
+     ;; If you edit it by hand, you could mess it up, so be careful.
+     ;; Your init file should contain only one such instance.
+     ;; If there is more than one, they won't work right.
+     '(default ((t (:inherit nil :extend nil :stipple nil :background "cornsilk" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 124 :width normal :foundry "unknown" :family "DejaVu Sans Mono")))))
+    )
+  )

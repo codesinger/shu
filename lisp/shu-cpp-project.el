@@ -137,6 +137,10 @@ contain a list of the fully qualified files with the same unqualified name.  if
 SHU-CPP-PROJECT-SHORT-NAMES is nil, this list is identical to the one stored in
 SHU-CPP-COMPLETING-LIST.")
 
+(defvar shu-cpp-inverted-class-list nil
+  "This is the inversion of SHU-CPP-CLASS-LIST.  It is a list of all of the
+fully qualified file names found in SHU-CPP-CLASS-LIST.")
+
 (defvar shu-cpp-prefix-list nil
   "This is the list of prefixes removed from the short names if
 SHU-CPP-PROJECT-SHORT-NAMES is non-nil.")
@@ -206,6 +210,15 @@ by shu-make-c-project")
 
 (defvar shu-project-user-class-count 0)
 
+(defvar shu-project-file-list
+  "This is a list of the full path and name of every file in the project.
+It is used when a global change needs to visit every file in the project.")
+
+(defvar shu-cpp-fetch-list nil
+  "The name of the shared variable that contains the list of directories assembled
+by shu-make-c-project")
+
+
 
 ;;
 ;;  shu-project-get-file-info
@@ -222,10 +235,6 @@ by shu-make-c-project")
        (setq ,full-name-list (car ,tflist)))
     ))
 
-
-(defvar shu-project-file-list
-  "This is a list of the full path and name of every file in the project.
-It is used when a global change needs to visit every file in the project.")
 
 ;;
 ;;  Functions for customzing
@@ -322,6 +331,62 @@ This modifies both shu-cpp-h-extensions and shu-project-extensions."
       (setq nx (list nx)))
     (setq shu-cpp-h-extensions (append shu-cpp-h-extensions nx))
     (setq shu-project-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions))
+    ))
+
+
+
+;;
+;;  shu-project-directory-is-excluded
+;;
+(defun shu-project-directory-is-excluded (directory-name)
+  "Return t if the directory name is among those that should be ignored when
+looking for files within a project.  Typically, these are the names of
+CMake directories that hold generated code."
+  (when (not shu-project-exclude-hash)
+    (shu-project-make-exclude-hash))
+  (gethash directory-name shu-project-exclude-hash)
+  )
+
+
+
+;;
+;;  shu-cpp-project-is-type-wanted
+;;
+(defun shu-cpp-project-is-type-wanted (sname cpp-type)
+  "Determine if a file should be included based on its file type and on the
+argument CPP-TYPE.  If CPP-TYPE is t then we only want files of type C++.
+
+If CPP-TYPE is nil, we want any file of any type..
+
+If CPP-TYPE is nil, this function returns true.  If CPP-TYPE is t, this function
+returns true iff the file extension of SNAME is one that holds C++ code."
+  (let ((is-wanted t)
+        (extension))
+    (when cpp-type
+      (setq is-wanted nil)
+      (setq extension (file-name-extension sname))
+      (when (member extension shu-project-extensions)
+        (setq is-wanted t)))
+    is-wanted
+    ))
+
+
+
+
+;;
+;;  shu-project-file-pattern-match
+;;
+(defun shu-project-file-pattern-match (name pattern)
+  "If PATTERN is nil, then all names qualify and this function returns t.
+If PATTERN is non-nil, it is a regular expression that must match NAME.  If
+PATTERN matches NAME, this function returns true.
+
+This function returns true if PATTERN is nil (all names wanted) or if
+PATTERN is not nil and is a regular expression that is matched by NAME."
+  (let ((wanted t))
+    (when pattern
+      (setq wanted (string-match pattern name)))
+    wanted
     ))
 
 
@@ -554,6 +619,7 @@ appropriate subdirectory."
         (setq shu-project-user-class-count (1+ shu-project-user-class-count))
         (setq ilist (cdr ilist)))
       (setq shu-cpp-class-list (shu-cpp-project-collapse-list key-list))
+      (setq shu-cpp-inverted-class-list nil)
       (setq shu-cpp-prefix-list nil)
       (setq shu-cpp-short-list nil)
       (if (not shu-cpp-project-short-names)
@@ -591,7 +657,7 @@ is wanted."
         (plist)
         (file-name)
         (full-name-list))
-    (setq counts (shu-cpp-project-get-list-counts shu-cpp-class-list))
+    (setq counts (shu-cpp-project-get-list-counts shu-cpp-short-list))
     (setq c-count (car counts))
     (setq counts (cdr counts))
     (setq h-count (car counts))
@@ -676,6 +742,7 @@ name \"/u/foo/bar/thing.c\"."
   (setq shu-cpp-project-file nil)
   (setq shu-cpp-project-list nil)
   (setq shu-cpp-class-list nil)
+  (setq shu-cpp-inverted-class-list nil)
   (setq shu-cpp-prefix-list nil)
   (setq shu-cpp-short-list nil)
   (setq shu-cpp-completing-list nil)
@@ -929,7 +996,7 @@ anywhere on the word \"line\".  This is used pick up file positions of the form:
       ((case-fold-search t)           ;; Searches ignore case
        (bol (save-excursion (beginning-of-line) (point)))
        (eol (save-excursion (forward-line 1) (end-of-line) (point)))
-       (x )                           ;; Set to character position if siting on
+       (x )                           ;; Set to character position if sitting on
        ;;  "l", "i", "n", or "e"
        (y )
        (z )
@@ -1351,8 +1418,7 @@ names."
 ;;  shu-internal-list-c-file-names
 ;;
 (defun shu-internal-list-c-file-names (proj-list)
-  "Doc string."
-  (interactive)
+  "Internal implementation function of SHU-LIST-C-FILE-NAMES."
   (let ((plist proj-list)
         (file-name)
         (full-name-list)
@@ -1362,6 +1428,7 @@ names."
       (push file-name file-names)
       (setq plist (cdr plist)))
     (setq file-names (sort file-names `string<))
+    (insert (concat (shu-group-number (length file-names)) " unique file names:\n\n"))
     (while file-names
       (setq file-name (car file-names))
       (insert (concat file-name "\n"))
@@ -1392,9 +1459,9 @@ current project."
 (defun shu-internal-list-c-project (proj-list)
   "Insert into the current buffer the names of all of the code files in the
 project whose files are in PROJ-LIST."
-  (let
-      ((plist (shu-cpp-project-invert-list proj-list))
-       (full-name))
+  (let ((plist (shu-cpp-project-invert-list proj-list))
+        (full-name))
+    (insert (concat (shu-group-number (length plist)) " files:\n\n"))
     (while plist
       (setq full-name (car plist))
       (insert (concat full-name "\n"))
@@ -1415,7 +1482,7 @@ duplicates."
       (progn
         (message "There is no project to list.")
         (ding))
-    (shu-internal-list-c-duplicates shu-cpp-class-list))
+    (shu-internal-list-c-duplicates shu-cpp-short-list))
   )
 
 
@@ -1447,9 +1514,9 @@ duplicates."
         (message "%s" "Project has no duplicates")
       (setq dlist (sort proj-dups
                         (lambda(lhs rhs)
-                          (string< (car lhs) (car rhs))
-                          )))
+                          (string< (car lhs) (car rhs)))))
       (setq proj-dups dlist)
+      (insert (concat (shu-group-number (length dlist)) " duplicates:\n\n"))
       (while dlist
         (setq entry (car dlist))
         (setq file-name (car entry))
@@ -1495,7 +1562,8 @@ about extracted file prefixes."
         (prefix-name)
         (count)
         (pad-length)
-        (pad))
+        (pad)
+        (ess "es"))
     (if (not shu-cpp-class-list)
         (progn
           (message "There is no project in use.")
@@ -1511,12 +1579,14 @@ about extracted file prefixes."
           (progn
             (message "Current project has no prefixes.")
             (ding))
+        (setq pl shu-cpp-prefix-list)
+        (when (= 1 (length pl))
+          (setq ess ""))
+        (insert (concat (shu-group-number (length pl)) " prefix" ess "\n\n"))
         (insert
          (concat
-          "\n"
           "prefix name               count\n"
           "-----------               -----\n"))
-        (setq pl shu-cpp-prefix-list)
         (while pl
           (setq item (car pl))
           (setq prefix (car item))
@@ -1578,15 +1648,22 @@ along with the names of the actual files to which they map."
   "Implementation function for SHU-CPP-LIST-SHORT-NAMES,
 SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
   (let ((sl (when name-list (copy-tree name-list)))
+        (sll)
         (pos (point))
-        (pad (make-string 18 ? ))
+        (lpos)
+        (pad)
+        (pad1)
         (item)
         (name)
         (full-name)
         (full-names)
         (full-name-list)
         (name-count 0)
-        (file-count 0))
+        (file-count 0)
+        (max-len 0)
+        (ncount)
+        (pad-count)
+        (header))
     (if (not shu-cpp-class-list)
         (progn
           (message "There is no project in use.")
@@ -1595,31 +1672,48 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
           (progn
             (message "Current project has no %s" type-name)
             (ding))
+        (setq sll sl)
+        (while sll
+          (setq item (car sll))
+          (setq name (car item))
+          (when (> (length name) max-len)
+            (setq max-len (length name)))
+          (setq sll (cdr sll)))
+        (setq max-len (+ max-len 2))
+        (setq pad1 (make-string max-len ? ))
         (while sl
           (setq name-count (1+ name-count))
           (setq item (car sl))
           (setq name (car item))
           (setq full-name-list (cdr item))
-          (insert (concat name ":\n"))
+          (insert (concat name ":"))
           (while full-name-list
             (setq full-names (car full-name-list))
+            (setq ncount 1)
             (while full-names
               (setq full-name (car full-names))
+              (if (/= ncount 1)
+                  (setq pad pad1)
+                (setq pad "")
+                (when (< (length name) max-len)
+                  (setq pad-count (1- (- max-len (length name))))
+                  (setq pad (make-string pad-count ? ))))
               (insert (concat pad full-name "\n"))
               (setq file-count (1+ file-count))
+              (setq ncount (1+ ncount))
               (setq full-names (cdr full-names)))
             (setq full-name (car full-names))
             (setq full-name-list (cdr full-name-list)))
           (setq sl (cdr sl)))
+        (setq header (concat
+                      (shu-group-number name-count)
+                      " " type-name " map to "
+                      (shu-group-number file-count)
+                      " files:\n\n"))
+        (setq lpos (+ (point) (length header)))
         (goto-char pos)
-        (insert
-         (concat
-          "\n"
-          (shu-group-number name-count)
-          " " type-name " map to "
-          (shu-group-number file-count)
-          " files:\n\n"))
-        (goto-char pos)))
+        (insert header))
+      (goto-char lpos))
     ))
 
 
@@ -1636,6 +1730,7 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
         (progn
           (message "There is no project to list.")
           (ding))
+      (insert (concat (shu-group-number (length tlist)) " directories:\n\n"))
       (while tlist
         (setq dir-name (car tlist))
         (insert (concat dir-name "\n"))
@@ -1660,6 +1755,96 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
         (insert (concat full-name "\n")))
       (setq directory-list (cdr directory-list)))
     ))
+
+
+
+
+;;
+;;  shu-list-c-all-project
+;;
+(defun shu-list-c-all-project ()
+  "Insert into the current buffer everything that is known about the files,
+prefixes, short names, long names, and duplicate names within the current
+project."
+  (interactive)
+  (if (not shu-cpp-class-list)
+      (progn
+        (message "There is no project to list.")
+        (ding))
+    (shu-internal-list-c-all-project)))
+
+
+
+
+;;
+;;  shu-internal-list-c-all-project
+;;
+(defun shu-internal-list-c-all-project ()
+  "The internal implementation function for SHU-LIST-C-ALL-PROJECT."
+  (let ((pos (point))
+        (prefix "*** ")
+        (suffix " ***")
+        (pad    "    "))
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-c-prefixes" suffix "\n"
+      pad    "(All prefixes removed to form short names)\n"
+      "\n"))
+    (shu-list-c-prefixes)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-c-directories" suffix "\n"
+      pad    "(All directories in the project)\n"
+      "\n"))
+    (shu-list-c-directories)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-c-file-names" suffix "\n"
+      pad    "(All unique file names within the project)\n"
+      "\n"))
+    (shu-list-c-file-names)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-c-project" suffix "\n"
+      pad    "(Full path to all files in the project)\n"
+      "\n"))
+    (shu-list-c-project)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-short-names" suffix "\n"
+      pad    "(All the short names and their corresponding full names)\n"
+      "\n"))
+    (shu-cpp-list-short-names)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-c-duplicates" suffix "\n"
+      pad    "(Full path to all files whose short names are duplicates)\n"
+      "\n"))
+    (shu-list-c-duplicates)
+    (insert
+     (concat
+      "\n"
+      "\n"
+      prefix "list-completing-names" suffix "\n"
+      pad    "(All recognized file names of all forms)\n"
+      "\n"))
+    (shu-cpp-list-completing-names)
+    (goto-char pos)
+    ))
+
+
 
 ;;
 ;;  shu-which-c-project
@@ -1700,6 +1885,22 @@ results in that buffer, and then quit out of the buffer."
       (switch-to-buffer pbuf))
     ))
 
+
+
+
+;;
+;;  shu-record-visited-project
+;;
+(defun shu-record-visited-project (name proj-dir)
+  "Record a project visit in the file \"~/visited-projects.log\"."
+  (let ((fnow (format-time-string "%Y-%m-%d-%T-(%a)"))
+        (line))
+    (setq line (concat fnow ": " name "  " proj-dir "\n"))
+    (write-region line nil "~/visited-projects.log" 'append)
+    ))
+
+
+
 ;;
 ;;  shu-setup-project-and-tags
 ;;
@@ -1708,7 +1909,8 @@ results in that buffer, and then quit out of the buffer."
 create a file called \"files.txt\" with the name of every file found, invoke
 ctags on that file to build a new tags file, and then visit the tags file.
 PROJ-DIR is the name of the directory in which the project file exists and in
-which the tags file is to be built."
+which the tags file is to be built.
+Record the visit in the file \"~/visited-projects.log\"."
   (let
       ((tags-add-tables nil)
        (gbuf (get-buffer-create "*setup project*"))
@@ -1724,8 +1926,7 @@ which the tags file is to be built."
        (etime)
        (c-count)
        (h-count)
-       (pname))
-    (setq pname (shu-get-real-this-command-name))
+       (pname (shu-get-real-this-command-name)))
     (setq shu-cpp-project-name pname)
     (setq sstring (format-time-string "on %a, %e %b %Y at %k:%M:%S" stime))
     (princ (format "\nStart project (%s) setup in %s %s.\n\n" shu-cpp-project-name proj-dir sstring) gbuf)
@@ -1757,6 +1958,7 @@ which the tags file is to be built."
     (princ (format "\n  End project setup in %s %s.\n" proj-dir sstring) gbuf)
     (princ "\nThe current project is:\n\n" gbuf)
     (shu-internal-which-c-project gbuf)
+    (shu-record-visited-project pname proj-dir)
     (switch-to-buffer gbuf)
     ))
 
@@ -2226,17 +2428,8 @@ t.cpp or .h file, invoke this function and you will be taken to the
 corresponding .cpp or .c file.  This function will use a project if one is
 active.  Otherwise, it will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (shu-cpp-project-get-base-name))
-        (newfile)
-        (found))
-    (setq newfile (concat base-name ".cpp"))
-    (setq found (shu-cpp-choose-other-file newfile))
-    (when (not found)
-      (setq newfile (concat base-name ".c"))
-      (setq found (shu-cpp-choose-other-file newfile))
-      (when (not found)
-        (message (concat "Cannot find C file for " base-name))))
-    ))
+  (shu-project-some-other ".cpp")
+  )
 
 
 ;;
@@ -2248,12 +2441,8 @@ active.  Otherwise, it will assume that all files reside in the same directory."
 corresponding .h file.  This function will use a project if one is active.
 Otherwise, it will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (shu-cpp-project-get-base-name))
-        (newfile ))
-    (setq newfile (concat base-name ".h"))
-    (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot find H file for %s" base-name))
-    ))
+  (shu-project-some-other ".h")
+  )
 
 
 ;;
@@ -2265,12 +2454,8 @@ or .cpp file, invoke this function and you will be taken to the corresponding
 .i.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory."
   (interactive)
-  (let ((base-name (shu-cpp-project-get-base-name))
-        (newfile))
-    (setq newfile (concat base-name ".i.cpp"))
-    (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot find integration test file for %s" base-name))
-    ))
+  (shu-project-some-other ".i.cpp")
+  )
 
 
 ;;
@@ -2282,11 +2467,63 @@ or .cpp file, invoke this function and you will be taken to the corresponding
 .t.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory."
   (interactive)
+  (shu-project-some-other ".t.cpp")
+  )
+
+
+
+;;
+;;  shu-project-some-other
+;;
+(defun shu-project-some-other (extension)
+  "Visit a related file within a project.  If you are in a \".h\" file and you
+wish to go to the corresponding \".t.cpp\" file, this function will form the new
+file name and then look it up within the project to find the location of the
+related file and then visit that file, if possible."
   (let ((base-name (shu-cpp-project-get-base-name))
         (newfile))
-    (setq newfile (concat base-name ".t.cpp"))
-    (when (not (shu-cpp-choose-other-file newfile))
-      (message "Cannot find unit test file for %s" base-name))
+    (when (shu-validate-file-in-project)
+      (setq newfile (concat base-name extension))
+      (when (not (shu-cpp-choose-other-file newfile))
+        (message "Cannot '%s' file for %s" (file-name-nondirectory newfile) base-name)))
+    ))
+
+
+
+;;
+;;  shu-validate-file-in-project
+;;
+(defun shu-validate-file-in-project ()
+  "Validate that the current file is a member of the current project.
+
+If you are in a project and then visit some file in another directory tree whose
+FILE-NAME-NONDIRECTORY matches a file name in the current project, an attempt to
+visit a related file by using the project primitives will take you back into the
+project tree, when you might have thought that you were going to some other part
+of the directory tree you were in.
+
+For example, suppose you are in a project file \"a/b/src/foo/foo.h\" and you
+then visit another file in \"x/y/src/foo/foo.h.\" If you then try to go to the
+unit test file for \"x/y/src/foo/foo.h,\" instead of visiting
+\"x/y/test/unit/foo.t.cpp,\" you will, instead, silently be taken to
+\"a/b/test/unit/foo.t.cpp,\" which is not the unit test file for
+\"x/y/src/foo/foo.h.\"
+
+When visiting related files within a project, this function verifies that the
+current file is actually a member of the current project.  If there exists a
+project and the current file is not a member of that project, you are probably
+about to be taken silently to the wrong file."
+  (let ((local-name (buffer-file-name))
+        (plist)
+        (file-in-project))
+    (if (not shu-cpp-class-list)
+        (setq file-in-project t)
+      (setq plist (shu-cpp-get-inverted-class-list))
+      (if (member local-name plist)
+          (setq file-in-project t)
+        (ding)
+        (message "%s" "current file is not in current project")))
+    file-in-project
     ))
 
 
@@ -2327,10 +2564,68 @@ the logic of the function can be unit tested."
 ;;  shu-cpp-choose-other-file
 ;;
 (defun shu-cpp-choose-other-file (newfile)
-  "Try to visit a file first within a project and, it not successful, in the
-current directory.  If no project is in use or if the file does not belong to
-the project, try to find the file in the current directory.  If a file was found
-and visited, return true."
+  "NEWFILE is a fully qualified file name that has been formed by changing the
+file suffix, perhaps from .cpp to .h or .h to .t.cpp.  We want to try to open
+the file either in the current directory or in the project.
+
+Up until 5 February 2022, we first looked for the file in the project, then in
+the local directory.  But if two .h files were duplicate names and two .cpp
+files were duplicate names, a request to visit the \"other\" file would bring up
+a choice of the duplicate names.  It seems logical that if you are in a .h file
+and you want to visit the associated .cpp file, the one that you want to visit
+is the one in the current directory.
+
+As of 5 February 2022, we first look for the file in the current directory and
+then in the project.  The local variable LOCAL-DIRECTORY-FIRST can be used to
+invert that choice and return to the original behavior of first looking in the
+project for the file.
+
+If a file was found and visited, return true."
+  (let ((found)
+        (local-directory-first t))
+    (if local-directory-first
+        (setq found (shu-cpp-project-visit-prefer-local newfile))
+      (setq found (shu-cpp-project-visit-prefer-project newfile)))
+    found
+    ))
+
+
+
+;;
+;;  shu-cpp-project-visit-prefer-local
+;;
+(defun shu-cpp-project-visit-prefer-local (newfile)
+  "NEWFILE is a fully qualified file name that has been formed by changing the
+file suffix, perhaps from .cpp to .h or .h to .t.cpp.  We want to try to open
+the file either in the current directory or in the project.
+
+First try to visit the file in the local directory.  If not found in the local
+directory, try to find and visit it within the project.
+
+If a file was found and visited, return true."
+  (let ((nfile (file-name-nondirectory newfile))
+        (found))
+    (if (not (file-readable-p newfile))
+        (setq found (shu-cpp-choose-project-file nfile))
+      (setq found t)
+      (find-file newfile))
+    found
+    ))
+
+
+
+;;
+;;  shu-cpp-project-visit-prefer-project
+;;
+(defun shu-cpp-project-visit-prefer-project (newfile)
+  "NEWFILE is a fully qualified file name that has been formed by changing the
+file suffix, perhaps from .cpp to .h or .h to .t.cpp.  We want to try to open
+the file either in the current directory or in the project.
+
+First try to visit the file in the project.  If not found in the project, try to
+visit the file in the local directory.
+
+If a file was found and visited, return true."
   (let ((nfile (file-name-nondirectory newfile))
         (found))
     (setq found (shu-cpp-choose-project-file nfile))
@@ -2364,6 +2659,101 @@ file was found and visited, return true."
 
 
 ;;
+;;  shu-cpp-get-inverted-class-list
+;;
+(defun shu-cpp-get-inverted-class-list ()
+  "Return SHU-CPP-INVERTED-CLASS-LIST, creating it if it is currently nil."
+  (when (not shu-cpp-inverted-class-list)
+    (setq shu-cpp-inverted-class-list (shu-cpp-project-invert-list shu-cpp-class-list)))
+  shu-cpp-inverted-class-list
+  )
+
+
+
+;;
+;;  shu-project-get-specific-files
+;;
+(defun shu-project-get-specific-files (root pattern cpp-type)
+  "Starting at ROOT, search for all files that meet the following criteria:
+
+      - If PATTERN is non-nil, it is a regular expression that the file name
+        must match.  If PATTERN is nil, then the file names are ignored and all
+        files are potentially returned.
+
+      - If CPP-TYPE is nil, then file type is ignored and all files are
+        potentially returned subject to constraints of PATTERN described above.
+
+If PATTERN and CPP-TYPE are both nil, then all files are returned.
+
+If you wish to find all files that are of type C++, then set PATTERN to nil and
+CPP-TYPE to t.
+
+If you wish to find all files with similar names that are of type C++, then set
+CPP-TYPE to t and PATTERN to some regular expression that will filter the files
+appropriately, such as \"mumble_bar*\".
+
+The directories excluded by project search are also excluded here.  There are
+typically CMake directories that are populated with temporary files.  See
+SHU-PROJECT-EXCLUDE-LIST for a list of excluded directories.
+
+The files are returned as a list of files with paths relative to ROOT."
+  (let ((level 0)
+        (flist)
+        (dir-name))
+    (shu-project-make-exclude-hash)
+    (setq shu-cpp-fetch-list nil)
+    (shu-project-sub-specific-files root level pattern cpp-type)
+    (setq shu-cpp-fetch-list (sort shu-cpp-fetch-list 'string<))
+    shu-cpp-fetch-list
+    ))
+
+
+
+
+;;
+;;  shu-project-sub-specific-files
+;;
+(defun shu-project-sub-specific-files (dir-name level pattern cpp-type)
+  "Recursively search for all files as described in
+SHU-PROJECT-GET-SPECIFIC-FILES.
+
+Two lists are accumulated.  DIR-LIST is a list of all directories encountered.
+This function calls itself recursively to search all of them for the desired
+files.
+
+The global variable SHU-CPP-FETCH-LIST is used to accumulate the list of
+qualified files found."
+  (let ((dlist)
+        (tlist)
+        (cname)
+        (sname)
+        (dname)
+        (dir-list)
+        (got-interest)
+        (extension))
+    (setq dlist (directory-files dir-name t nil t))
+    (setq tlist dlist)
+    (while tlist
+      (setq cname (car tlist))
+      (setq sname (file-name-nondirectory cname))
+      (if (file-directory-p cname)
+          (progn
+            (unless (or (string= sname  ".")
+                        (string= sname ".."))
+              (unless (shu-project-directory-is-excluded sname)
+                (push cname dir-list))))
+        (when (and (shu-cpp-project-is-type-wanted sname cpp-type)
+                   (shu-project-file-pattern-match sname pattern))
+          (push (file-relative-name cname) shu-cpp-fetch-list)))
+      (setq tlist (cdr tlist)))
+    (while dir-list
+      (setq dname (car dir-list))
+      (shu-project-sub-specific-files dname (1+ level) pattern cpp-type)
+      (setq dir-list (cdr dir-list)))
+    ))
+
+
+;;
 ;;  shu-cpp-project-set-alias
 ;;
 (defun shu-cpp-project-set-alias ()
@@ -2389,6 +2779,7 @@ shu- prefix removed."
   (defalias 'list-project-names 'shu-cpp-list-project-names)
   (defalias 'list-completing-names 'shu-cpp-list-completing-names)
   (defalias 'list-c-directories 'shu-list-c-directories)
+  (defalias 'list-c-all-project 'shu-list-c-all-project)
   (defalias 'which-c-project 'shu-which-c-project)
   (defalias 'vf 'shu-vf)
   (defalias 'other 'shu-other)

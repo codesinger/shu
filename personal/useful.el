@@ -241,7 +241,7 @@ given task as a Google test."
      (concat
       "#!/bin/ksh -x\n"
       "time ./" task-name " "
-      "--gtest_filter=*.* --bael-log-on-success --baem-metrics   --bael-level INFO --bael-format \"%d %p:%t %s %f:%l %c %m %u\\n\"\n"))
+      "--gtest_filter=*.* --bsls-review-throws --bael-log-on-success --baem-metrics  --bael-level INFO --bael-format \"%d %p:%t %s %f:%l %c %m %u\\n\"\n"))
     (when (buffer-modified-p)
       (basic-save-buffer)
       (set-file-modes file-name #o755))
@@ -261,6 +261,73 @@ given task as a Google test."
     (setq start (save-excursion (beginning-of-line) (point)))
     (insert "BSLS_ASSERT_OPT();\n")
     (goto-char (+ start pad-count 16))))
+
+
+
+;;
+;;  ddb
+;;
+(defun ddb ()
+  "Insert \"dpkg-distro-dev build \" at point."
+  (interactive)
+    (insert "dpkg-distro-dev build ")
+    )
+
+
+
+;;
+;;  ddi
+;;
+(defun ddi ()
+  "Insert \"dpkg-distro-dev init \" at point."
+  (interactive)
+    (insert "dpkg-distro-dev init ")
+    )
+
+
+
+;;
+;;  ddm
+;;
+(defun ddm ()
+  "Insert \"git diff master..<branch> >mm.diff\""
+  (interactive)
+  (let ((branch (shu-git-find-branch))
+        (default-branch (shu-git-find-default-branch)))
+    (insert (concat "git diff " default-branch ".." branch " >mm.diff"))
+    ))
+
+
+
+;;
+;;  dds
+;;
+(defun dds ()
+  "Insert \"git diff --stat master..<branch> >ss.diff\""
+  (interactive)
+  (let ((branch (shu-git-find-branch))
+        (default-branch (shu-git-find-default-branch)))
+    (insert (concat "git diff --stat " default-branch ".." branch " >ss.diff"))
+    ))
+
+
+
+;;
+;;  fall
+;;
+(defun fall ()
+  "Insert at point a find command to grep all files."
+  (interactive)
+  (let* (
+         (p1 "find . -name \"*\" -type f -exec grep -H ")
+         (p2 " {} \\;")
+        (f (concat p1 p2))
+        )
+    (insert f)
+    (backward-char (length p2))
+    ))
+
+
 
 
 ;;

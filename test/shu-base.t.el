@@ -2140,4 +2140,165 @@ points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
     ))
 
 
+
+;;
+;;  shu-test-shu-make-file-header-line-1
+;;
+(ert-deftest shu-test-shu-make-file-header-line-1 ()
+  (let* (
+         (file-name "something_or0ther.h")
+         (expected (concat (shu-make-padded-line
+                             (concat "// " file-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
+                            shu-cpp-edit-sentinel))
+         (actual)
+         )
+    (setq actual (shu-make-file-header-line file-name))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-name-length-1
+;;
+(ert-deftest shu-test-shu-longest-name-length-1 ()
+  (let* ((long-name "Happy Birthday!")
+         (names
+          (list
+           "Hello"
+           "Goodbye"
+           long-name
+           ""
+           "x"))
+         (expected (length long-name))
+         (actual)
+         (debug-on-error t))
+    (setq actual (shu-longest-name-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-name-length-2
+;;
+(ert-deftest shu-test-shu-longest-name-length-2 ()
+  (let* ((long-name "Happy Birthday!")
+         (names
+          (list))
+         (expected 0)
+         (actual)
+         (debug-on-error t))
+    (setq actual (shu-longest-name-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-name-length-3
+;;
+(ert-deftest shu-test-shu-longest-name-length-3 ()
+  (let* ((long-name "Happy Birthday!")
+         (names
+          (list
+           ""
+           ""
+           ""))
+         (expected 0)
+         (actual))
+    (setq actual (shu-longest-name-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-name-length-4
+;;
+(ert-deftest shu-test-shu-longest-name-length-4 ()
+  (let* ((long-name "Happy Birthday!")
+         (names)
+         (expected 0)
+         (actual)
+         (debug-on-error t))
+    (setq actual (shu-longest-name-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-car-length-1
+;;
+(ert-deftest shu-test-shu-longest-car-length-1 ()
+  (let* ((long-name "Happy Birthday!")
+         (names
+          (list
+           (cons "Hello" 0)
+           (cons "Goodbye" 0)
+           (cons long-name 0)
+           (cons "" 0)
+           (cons "x" 0)))
+         (expected (length long-name))
+         (actual))
+    (setq actual (shu-longest-car-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-car-length-2
+;;
+(ert-deftest shu-test-shu-longest-car-length-2 ()
+  (let* ((names
+          (list))
+         (expected 0)
+         (actual))
+    (setq actual (shu-longest-car-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-car-length-3
+;;
+(ert-deftest shu-test-shu-longest-car-length-3 ()
+  (let* ((names
+          (list
+           (cons "" 0)
+           (cons "" 0)
+           (cons "" 0)))
+         (expected 0)
+         (actual))
+    (setq actual (shu-longest-car-length names))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
 ;;; shu-base.t.el ends here

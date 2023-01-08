@@ -167,15 +167,15 @@ double colons making up part of the return value.")
 
 
 (defconst shu-cpp-match-classname-forms
-   (list  ;; "<name> {:: <name>};"
-    (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
-                              'shu-cpp-token-match-same-rx
-                              t shu-cpp-token-type-uq
-                              (concat shu-cpp-name "+"))
+  (list  ;; "<name> {:: <name>};"
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same-rx
+                             'shu-cpp-token-match-same-rx
+                             t shu-cpp-token-type-uq
+                             (concat shu-cpp-name "+"))
 
-    (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop-once
-                                  shu-cpp-match-colon-name-return)
-    )
+   (shu-cpp-make-match-side-list shu-cpp-token-match-type-side-loop-once
+                                 shu-cpp-match-colon-name-return)
+   )
   "Match name::name or name::name::name or name::name::name::name, etc.  The
 double colons make up the return value so that you can tell where one name
 ends and another starts.")
@@ -1526,6 +1526,53 @@ statements should be changed."
     incl-ht
     ))
 
+
+
+;;
+;;  shu-cpp-match-general-include
+;;
+(defconst shu-cpp-match-general-include
+  (list  ;; #include < name >
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             t shu-cpp-token-type-op
+                             "#")
+   (shu-cpp-make-match-info  shu-cpp-token-match-type-same
+                             'shu-cpp-token-match-same
+                             nil shu-cpp-token-type-uq
+                             "include"))
+  "A list of match-info that matches \"#include\".")
+
+
+
+;;
+;;  shu-match-find-all-general-include
+;;
+(defun shu-match-find-all-general-include ()
+  "Given a token list, return a list that holds the location of each \"#\" that
+represents the start of an #include directive.  Return an empty list if there
+are no #include directives."
+  (let ((token-list)
+        (ret-val t)
+        (tlist)
+        (rlist)
+        (token-info)
+        (incl-list))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (setq token-list (shu-cpp-tokenize-region-for-command (point-min) (point-max)))
+        (setq tlist token-list)
+        (while ret-val
+          (setq ret-val (shu-cpp-search-match-tokens rlist shu-cpp-match-general-include tlist))
+          (when ret-val
+            (setq tlist (car ret-val))
+            (setq rlist (cdr ret-val))
+            (setq token-info (car rlist))
+            (push token-info incl-list)
+            (setq rlist nil)))))
+    incl-list
+    ))
 
 
 

@@ -242,6 +242,7 @@
 ;;
 (ert-deftest shu-test-shu-cpp-decl-h-print-self ()
   (let* ((ipad (make-string shu-cpp-indent-length ? ))
+         (std-name (if shu-cpp-use-bde-library "bsl" "std"))
          (expected
           (concat
            ipad "/*!\n"
@@ -249,8 +250,8 @@
            ipad " *\n"
            ipad " * Intended for use by operator<<()\n"
            ipad " */\n"
-           ipad "std::ostream &printSelf(\n"
-           ipad "    std::ostream    &os)\n"
+           ipad std-name "::ostream &printSelf(\n"
+           ipad "    " std-name "::ostream    &os)\n"
            ipad "const;\n"))
          (actual))
     (with-temp-buffer
@@ -272,10 +273,11 @@
 (ert-deftest shu-test-shu-cpp-decl-cpp-print-self ()
   (let* ((ipad (make-string shu-cpp-indent-length ? ))
          (class-name "MumbleFrotz")
+         (std-name (if shu-cpp-use-bde-library "bsl" "std"))
          (expected
           (concat
-           "std::ostream &" class-name "::printSelf(\n"
-           "    std::ostream    &os)\n"
+           std-name "::ostream &" class-name "::printSelf(\n"
+           "    " std-name "::ostream    &os)\n"
            "const\n"
            "{\n"
            ipad "os << \"Instance of '" class-name "'\";\n"
@@ -302,13 +304,14 @@
 (ert-deftest shu-test-shu-cpp-decl-h-stream ()
   (let* ((ipad (make-string shu-cpp-indent-length ? ))
          (class-name "MumbleFrotz")
+         (std-name (if shu-cpp-use-bde-library "bsl" "std"))
          (expected
           (concat
            "/*!\n"
            " *  \\brief Stream an instance of " class-name " to the stream `os`\n"
            " */\n"
-           "std::ostream &operator<<(\n"
-           ipad "std::ostream       &os,\n"
+           std-name "::ostream &operator<<(\n"
+           ipad std-name "::ostream       &os,\n"
            ipad "const " class-name "  &cn);\n"))
          (actual))
     (with-temp-buffer
@@ -329,11 +332,12 @@
 ;;
 (ert-deftest shu-test-shu-cpp-decl-cpp-stream ()
   (let* ((class-name "MumbleFrotz")
+         (std-name (if shu-cpp-use-bde-library "bsl" "std"))
          (expected
           (concat
            "inline\n"
-           "std::ostream &operator<<(\n"
-           "    std::ostream       &os,\n"
+           std-name "::ostream &operator<<(\n"
+           "    " std-name "::ostream       &os,\n"
            "    const MumbleFrotz  &cn)\n"
            "{\n"
            "    return cn.printSelf(os);\n"
@@ -369,9 +373,5 @@
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     ))
-
-
-
-
 
 ;;; shu-cpp-misc.t.el ends here

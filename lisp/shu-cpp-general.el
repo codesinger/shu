@@ -42,7 +42,6 @@
 
 
 (require 'shu-base)
-(require 'shu-cpp-token)
 
 
 (defcustom shu-cpp-allocator-type "bslma::Allocator"
@@ -126,6 +125,9 @@
    "unsigned")
   "A list of all of the base types in C and C++.  This may be modified by shu-add-cpp-base-types")
 
+(defvar shu-cpp-keywords-hash nil
+  "The hash table of C++ key words")
+
 (defvar shu-cpp-member-prefix "_"
   "The character string that is used as the prefix to member variables of a C++ class.
 This is used by shu-internal-get-set when generating getters and setters for a class.")
@@ -152,6 +154,113 @@ Used to filter duplicates.")
 (defvar shu-cpp-include-names nil
   "A hash table that maps class names to include file names  This is the hash table
 inversion of shu-std-include-list or shu-bsl-include-list.")
+
+
+;;
+;;  shu-cpp-keywords
+;;
+(defconst shu-cpp-keywords
+  (list
+   (cons "alignas" 0)
+   (cons "alignof" 0)
+   (cons "and" 0)
+   (cons "and_eq" 0)
+   (cons "asm" 0)
+   (cons "atomic_cancel" 0)
+   (cons "atomic_commit" 0)
+   (cons "atomic_noexcept" 0)
+   (cons "auto" 0)
+   (cons "bitand" 0)
+   (cons "bitor" 0)
+   (cons "bool" 0)
+   (cons "break" 0)
+   (cons "case" 0)
+   (cons "catch" 0)
+   (cons "char" 0)
+   (cons "char8_t" 0)
+   (cons "char16_t" 0)
+   (cons "char32_t" 0)
+   (cons "class" 0)
+   (cons "compl" 0)
+   (cons "concept" 0)
+   (cons "const" 0)
+   (cons "consteval" 0)
+   (cons "constexpr" 0)
+   (cons "constinit" 0)
+   (cons "const_cast" 0)
+   (cons "continue" 0)
+   (cons "co_await" 0)
+   (cons "co_return" 0)
+   (cons "co_yield" 0)
+   (cons "decltype" 0)
+   (cons "default" 0)
+   (cons "delete" 0)
+   (cons "do" 0)
+   (cons "double" 0)
+   (cons "dynamic_cast" 0)
+   (cons "else" 0)
+   (cons "enum" 0)
+   (cons "explicit" 0)
+   (cons "export" 0)
+   (cons "extern" 0)
+   (cons "false" 0)
+   (cons "float" 0)
+   (cons "for" 0)
+   (cons "friend" 0)
+   (cons "goto" 0)
+   (cons "if" 0)
+   (cons "import" 0)
+   (cons "inline" 0)
+   (cons "int" 0)
+   (cons "long" 0)
+   (cons "module" 0)
+   (cons "mutable" 0)
+   (cons "namespace" 0)
+   (cons "new" 0)
+   (cons "noexcept" 0)
+   (cons "not" 0)
+   (cons "not_eq" 0)
+   (cons "nullptr" 0)
+   (cons "operator" 0)
+   (cons "or" 0)
+   (cons "or_eq" 0)
+   (cons "private" 0)
+   (cons "protected" 0)
+   (cons "public" 0)
+   (cons "reflexpr" 0)
+   (cons "register" 0)
+   (cons "reinterpret_cast" 0)
+   (cons "requires" 0)
+   (cons "return" 0)
+   (cons "short" 0)
+   (cons "signed" 0)
+   (cons "sizeof" 0)
+   (cons "static" 0)
+   (cons "static_assert" 0)
+   (cons "static_cast" 0)
+   (cons "struct" 0)
+   (cons "switch" 0)
+   (cons "synchronized" 0)
+   (cons "template" 0)
+   (cons "this" 0)
+   (cons "thread_local" 0)
+   (cons "throw" 0)
+   (cons "true" 0)
+   (cons "try" 0)
+   (cons "typedef" 0)
+   (cons "typeid" 0)
+   (cons "typename" 0)
+   (cons "union" 0)
+   (cons "unsigned" 0)
+   (cons "using" 0)
+   (cons "virtual" 0)
+   (cons "void" 0)
+   (cons "volatile" 0)
+   (cons "wchar_t" 0)
+   (cons "while" 0)
+   (cons "xor" 0)
+   (cons "xor_eq" 0))
+  "alist of C++ key words up to approximately C++20")
 
 ;;
 ;;  shu-std-include-list
@@ -256,6 +365,12 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                       "std::atomic_ref"
                       "std::atomic_flag"
                       "std::memory_order"
+                      "std::memory_order_relaxed"
+                      "std::memory_order_consume"
+                      "std::memory_order_acquire"
+                      "std::memory_order_release"
+                      "std::memory_order_acq_rel"
+                      "std::memory_order_seq_cst"
                       "std::atomic_bool"
                       "std::atomic_char"
                       "std::atomic_schar"
@@ -348,6 +463,7 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                       "std::bitset"
                       ))
    (cons "chrono"    (list
+                      "std::chrono"
                       "std::time_point"
                       "std::system_clock"
                       "std::steady_clock"
@@ -371,6 +487,36 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                        "std::ptrdiff_t"
                        "std::max_align_t"
                        "std::nullptr_t"
+                       ))
+   (cons "cstdint"    (list
+                       "std::int8_t"
+                       "std::int16_t"
+                       "std::int32_t"
+                       "std::int64_t"
+                       "std::int_fast8_t"
+                       "std::int_fast16_t"
+                       "std::int_fast32_t"
+                       "std::int_fast64_t"
+                       "std::int_least8_t"
+                       "std::int_least16_t"
+                       "std::int_least32_t"
+                       "std::int_least64_t"
+                       "std::intmax_t"
+                       "std::intptr_t"
+                       "std::uint8_t"
+                       "std::uint16_t"
+                       "std::uint32_t"
+                       "std::uint64_t"
+                       "std::uint_fast8_t"
+                       "std::uint_fast16_t"
+                       "std::uint_fast32_t"
+                       "std::uint_fast64_t"
+                       "std::uint_least8_t"
+                       "std::uint_least16_t"
+                       "std::uint_least32_t"
+                       "std::uint_least64_t"
+                       "std::uintmax_t"
+                       "std::uintptr_t"
                        ))
    (cons "cstring" (list
                     "std::memcpy"
@@ -860,104 +1006,110 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
 ;;
 (defconst shu-bsl-include-list
   (list
-   (cons "bsl_algrithm.h"    (list
-                              "bsl::all_of"
-                              "bsl::any_of"
-                              "bsl::none_of"
-                              "bsl::for_each"
-                              "bsl::for_each_n"
-                              "bsl::count"
-                              "bsl::count_if"
-                              "bsl::mismatch"
-                              "bsl::find"
-                              "bsl::find_if"
-                              "bsl::find_if_not"
-                              "bsl::find_end"
-                              "bsl::find_first_of"
-                              "bsl::adjacent_find"
-                              "bsl::search"
-                              "bsl::search_n"
-                              "bsl::copy"
-                              "bsl::copy_if"
-                              "bsl::copy_n"
-                              "bsl::copy_backward"
-                              "bsl::move"
-                              "bsl::move_backward"
-                              "bsl::fill"
-                              "bsl::fill_n"
-                              "bsl::transform"
-                              "bsl::generate"
-                              "bsl::generate_n"
-                              "bsl::remove"
-                              "bsl::remove_if"
-                              "bsl::remove_copy"
-                              "bsl::remove_copy_if"
-                              "bsl::replace"
-                              "bsl::replace_if"
-                              "bsl::replace_copy"
-                              "bsl::replace_copy_if"
-                              "bsl::swap"
-                              "bsl::swap_ranges"
-                              "bsl::iter_swap"
-                              "bsl::reverse"
-                              "bsl::reverse_copy"
-                              "bsl::rotate"
-                              "bsl::rotate_copy"
-                              "bsl::shift_left"
-                              "bsl::shift_right"
-                              "bsl::random_shuffle"
-                              "bsl::shuffle"
-                              "bsl::sample"
-                              "bsl::unique"
-                              "bsl::unique_copy"
-                              "bsl::is_partitioned"
-                              "bsl::partition"
-                              "bsl::partition_copy"
-                              "bsl::stable_partition"
-                              "bsl::partition_point"
-                              "bsl::is_sorted"
-                              "bsl::is_sorted_until"
-                              "bsl::sort"
-                              "bsl::partial_sort"
-                              "bsl::partial_sort_copy"
-                              "bsl::stable_sort"
-                              "bsl::nth_element"
-                              "bsl::lower_bound"
-                              "bsl::upper_bound"
-                              "bsl::binary_search"
-                              "bsl::equal_range"
-                              "bsl::merge"
-                              "bsl::inplace_merge"
-                              "bsl::includes"
-                              "bsl::set_difference"
-                              "bsl::set_intersection"
-                              "bsl::set_symmetric_difference"
-                              "bsl::set_union"
-                              "bsl::is_heap"
-                              "bsl::is_heap_until"
-                              "bsl::make_heap"
-                              "bsl::push_heap"
-                              "bsl::pop_heap"
-                              "bsl::sort_heap"
-                              "bsl::max"
-                              "bsl::max_element"
-                              "bsl::min"
-                              "bsl::min_element"
-                              "bsl::minmax"
-                              "bsl::minmax_element"
-                              "bsl::clamp"
-                              "bsl::equal"
-                              "bsl::lexicographical_compare"
-                              "bsl::lexicographical_compare_three_way"
-                              "bsl::is_permutation"
-                              "bsl::next_permutation"
-                              "bsl::prev_permutation"
-                              ))
+   (cons "bsl_algorithm.h"    (list
+                               "bsl::all_of"
+                               "bsl::any_of"
+                               "bsl::none_of"
+                               "bsl::for_each"
+                               "bsl::for_each_n"
+                               "bsl::count"
+                               "bsl::count_if"
+                               "bsl::mismatch"
+                               "bsl::find"
+                               "bsl::find_if"
+                               "bsl::find_if_not"
+                               "bsl::find_end"
+                               "bsl::find_first_of"
+                               "bsl::adjacent_find"
+                               "bsl::search"
+                               "bsl::search_n"
+                               "bsl::copy"
+                               "bsl::copy_if"
+                               "bsl::copy_n"
+                               "bsl::copy_backward"
+                               "bsl::move"
+                               "bsl::move_backward"
+                               "bsl::fill"
+                               "bsl::fill_n"
+                               "bsl::transform"
+                               "bsl::generate"
+                               "bsl::generate_n"
+                               "bsl::remove"
+                               "bsl::remove_if"
+                               "bsl::remove_copy"
+                               "bsl::remove_copy_if"
+                               "bsl::replace"
+                               "bsl::replace_if"
+                               "bsl::replace_copy"
+                               "bsl::replace_copy_if"
+                               "bsl::swap"
+                               "bsl::swap_ranges"
+                               "bsl::iter_swap"
+                               "bsl::reverse"
+                               "bsl::reverse_copy"
+                               "bsl::rotate"
+                               "bsl::rotate_copy"
+                               "bsl::shift_left"
+                               "bsl::shift_right"
+                               "bsl::random_shuffle"
+                               "bsl::shuffle"
+                               "bsl::sample"
+                               "bsl::unique"
+                               "bsl::unique_copy"
+                               "bsl::is_partitioned"
+                               "bsl::partition"
+                               "bsl::partition_copy"
+                               "bsl::stable_partition"
+                               "bsl::partition_point"
+                               "bsl::is_sorted"
+                               "bsl::is_sorted_until"
+                               "bsl::sort"
+                               "bsl::partial_sort"
+                               "bsl::partial_sort_copy"
+                               "bsl::stable_sort"
+                               "bsl::nth_element"
+                               "bsl::lower_bound"
+                               "bsl::upper_bound"
+                               "bsl::binary_search"
+                               "bsl::equal_range"
+                               "bsl::merge"
+                               "bsl::inplace_merge"
+                               "bsl::includes"
+                               "bsl::set_difference"
+                               "bsl::set_intersection"
+                               "bsl::set_symmetric_difference"
+                               "bsl::set_union"
+                               "bsl::is_heap"
+                               "bsl::is_heap_until"
+                               "bsl::make_heap"
+                               "bsl::push_heap"
+                               "bsl::pop_heap"
+                               "bsl::sort_heap"
+                               "bsl::max"
+                               "bsl::max_element"
+                               "bsl::min"
+                               "bsl::min_element"
+                               "bsl::minmax"
+                               "bsl::minmax_element"
+                               "bsl::clamp"
+                               "bsl::equal"
+                               "bsl::lexicographical_compare"
+                               "bsl::lexicographical_compare_three_way"
+                               "bsl::is_permutation"
+                               "bsl::next_permutation"
+                               "bsl::prev_permutation"
+                               ))
    (cons "bsl_atomic.h"    (list
                             "bsl::atomic"
                             "bsl::atomic_ref"
                             "bsl::atomic_flag"
                             "bsl::memory_order"
+                            "bsl::memory_order_relaxed"
+                            "bsl::memory_order_consume"
+                            "bsl::memory_order_acquire"
+                            "bsl::memory_order_release"
+                            "bsl::memory_order_acq_rel"
+                            "bsl::memory_order_seq_cst"
                             "bsl::atomic_bool"
                             "bsl::atomic_char"
                             "bsl::atomic_schar"
@@ -1057,6 +1209,7 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                   "bdlf::Placeholders"
                                   ))
    (cons "bsl_chrono.h"    (list
+                            "bsl::chrono"
                             "bsl::time_point"
                             "bsl::system_clock"
                             "bsl::steady_clock"
@@ -1070,16 +1223,46 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsl::remote_version"
                             ))
    (cons "bsl_condition_variable.h" (list
-                               "bsl::condition_variable"
-                               "bsl::condition_variable_any"
-                               "bsl::cv_status"
-                               "bsl::notify_all_at_thread_exit"
-                               ))
+                                     "bsl::condition_variable"
+                                     "bsl::condition_variable_any"
+                                     "bsl::cv_status"
+                                     "bsl::notify_all_at_thread_exit"
+                                     ))
    (cons "bsl_cstddef.h"    (list
                              "bsl::size_t"
                              "bsl::ptrdiff_t"
                              "bsl::max_align_t"
                              "bsl::nullptr_t"
+                             ))
+   (cons "bsl_cstdint.h"    (list
+                             "bsl::int8_t"
+                             "bsl::int16_t"
+                             "bsl::int32_t"
+                             "bsl::int64_t"
+                             "bsl::int_fast8_t"
+                             "bsl::int_fast16_t"
+                             "bsl::int_fast32_t"
+                             "bsl::int_fast64_t"
+                             "bsl::int_least8_t"
+                             "bsl::int_least16_t"
+                             "bsl::int_least32_t"
+                             "bsl::int_least64_t"
+                             "bsl::intmax_t"
+                             "bsl::intptr_t"
+                             "bsl::uint8_t"
+                             "bsl::uint16_t"
+                             "bsl::uint32_t"
+                             "bsl::uint64_t"
+                             "bsl::uint_fast8_t"
+                             "bsl::uint_fast16_t"
+                             "bsl::uint_fast32_t"
+                             "bsl::uint_fast64_t"
+                             "bsl::uint_least8_t"
+                             "bsl::uint_least16_t"
+                             "bsl::uint_least32_t"
+                             "bsl::uint_least64_t"
+                             "bsl::uintmax_t"
+                             "bsl::uintptr_t"
                              ))
    (cons "bsl_cstring.h" (list
                           "bsl::memcpy"
@@ -1266,20 +1449,20 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsl::reinterpret_pointer_cast"
                             ))
    (cons "bsl_mutex.h" (list
-                  "bsl::mutex"
-                  "bsl::recursive_mutex"
-                  "bsl::timed_mutex"
-                  "bsl::recursive_timed_mutex"
-                  "bsl::lock_guard"
-                  "bsl::unique_lock"
-                  "bsl::once_flag"
-                  "bsl::adopt_lock_t"
-                  "bsl::defer_lock_t"
-                  "bsl::try_to_lock_t"
-                  "bsl::try_lock"
-                  "bsl::lock"
-                  "bsl::call_once"
-                  ))
+                        "bsl::mutex"
+                        "bsl::recursive_mutex"
+                        "bsl::timed_mutex"
+                        "bsl::recursive_timed_mutex"
+                        "bsl::lock_guard"
+                        "bsl::unique_lock"
+                        "bsl::once_flag"
+                        "bsl::adopt_lock_t"
+                        "bsl::defer_lock_t"
+                        "bsl::try_to_lock_t"
+                        "bsl::try_lock"
+                        "bsl::lock"
+                        "bsl::call_once"
+                        ))
    (cons "bsl_new.h"   (list
                         "bsl::bad_alloc"
                         "bsl::bad_array_new_length"
@@ -1377,9 +1560,9 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                                 "bsl::wstring_view"
                                 ))
    (cons "bsl_thread.h" (list
-                   "bsl::thread"
-                   "bsl::this_thread"
-                   ))
+                         "bsl::thread"
+                         "bsl::this_thread"
+                         ))
    (cons "bsl_tuple.h"    (list
                            "bsl::tuple"
                            "bsl::tuple_size"
@@ -1583,10 +1766,73 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
 
 
 
+;;
+;;  shu-get-cpp-keywords-hash
+;;
+(defun shu-get-cpp-keywords-hash ()
+  "Return a hash table containing all of the C++ key words."
+  (let ((ht (make-hash-table :test 'equal :size (length shu-cpp-keywords)))
+        (kl shu-cpp-keywords)
+        (kc))
+    (while kl
+      (setq kc (car kl))
+      (puthash (car kc) (cdr kc) ht)
+      (setq kl (cdr kl)))
+    ht
+    ))
+
 
 ;;
-;;  Functions for customzing
+;;  shu-cpp-is-keyword
 ;;
+(defun shu-cpp-is-keyword (word)
+  "Doc string."
+  (unless shu-cpp-keywords-hash
+    (setq shu-cpp-keywords-hash (shu-get-cpp-keywords-hash)))
+  (gethash word shu-cpp-keywords-hash)
+  )
+
+
+
+;;
+;;  shu-cpp-sitting-on-keyword
+;;
+(defun shu-cpp-sitting-on-keyword ()
+  "If (point) is sitting on a C++ key word, return that key word, else return
+ nil."
+  (let ((is-maybe-key (shu-sitting-on shu-cpp-keyword))
+        (is-key))
+    (when is-maybe-key
+      (setq is-key (shu-cpp-is-keyword is-maybe-key))
+      (when (not is-key)
+        (setq is-maybe-key nil)))
+    is-maybe-key
+    ))
+
+
+;;
+;;  shu-is-keyword
+;;
+(defun shu-is-keyword ()
+  "Do a COMPLETING-READ from the minibuffer of a string that may or may not be a
+C++ key word.  If the string is a C++ key word, display the key word, else
+display \"no\".  If (point) is sitting on a C++ key word, that is the default
+initial input to the completing read."
+  (interactive)
+  (let ((maybe-key (shu-cpp-sitting-on-keyword))
+        (x)
+        (completion-ignore-case nil))
+    (setq x (completing-read
+             "Word? "            ;;; prompt
+             shu-cpp-keywords    ;;; collection
+             nil                 ;;; predicate
+             nil                 ;;; require-match
+             maybe-key))         ;;; initial-input
+    (if x
+        (message "%s" x)
+      (message "%s" "no"))
+    ))
+
 
 
 ;;
@@ -5199,90 +5445,397 @@ shell, and yank."
 
 
 ;;
+;;  shu-add-include
+;;
+(defun shu-add-include ()
+  "When positioned on a line below an include block, this function yanks the
+contents of the kill buffer (which is assumed to contain an #include statement)
+and then sorts all of the lines in the current include block."
+  (interactive)
+  (let ((include-line))
+    (with-temp-buffer
+      (yank)
+      (setq include-line (buffer-substring-no-properties (point-min) (point-max))))
+    (setq include-line (shu-trim-trailing include-line))
+    (goto-char (line-beginning-position))
+    (insert include-line)
+    (goto-char (line-beginning-position))
+    (shu-sort-includes)
+    ))
+
+
+
+;;
 ;;  shu-sort-includes
 ;;
 (defun shu-sort-includes ()
   "When positioned on a line that is an #include directive, find all of the
-#include directives above and below that line that are not separated by a blank
-line and sort them into alphabetical order with case ignored.  If not positioned
-on a line that is an #include directive, do nothing.  Case is ignored for the
-sort.  The return value is the number of lines sorted.  If no lines were sorted
-because (point) is not positioned on an #include directive, return nil.  The
-return value is for the benefit of the unit tests.
-Additionally, if there are spaces surrounding the \"#\" of the #include, they
-are removed."
+#include directives above and below that line that are not separated by a line
+that is not an #include directive and sort them into alphabetical order with
+case ignored.  If not positioned on a line that is an #include directive, do
+nothing.  The return value is the number of lines sorted.  If no lines were
+sorted because (point) is not positioned on an #include directive, return nil.
+The return value is for the benefit of the unit tests.  Additionally, if there
+are spaces surrounding the \"#\" of the #include, they are removed.  After the
+sort, any duplicate #include directives are removed."
   (interactive)
-  (let ((here (point))
-        (top1)
-        (bot1)
+  (let ((pl (shu-cpp-find-current-include-block))
+        (ret-val)
         (line-count)
-        (sort-fold-case t))
-    (if (not (shu-line-is-include))
-        (progn
-          (ding)
-          (message "%s" "Not on an #include line"))
-      (setq top1 (shu-find-end-include -1))
-      (goto-char here)
-      (setq bot1 (shu-find-end-include 1))
-      (goto-char bot1)
-      (setq bot1 (line-end-position))
-      (setq line-count (1+ (- (shu-the-line-at bot1) (shu-the-line-at top1))))
-      (sort-lines nil top1 bot1)
-      (message "Sorted %d lines" line-count))
+        (del-count))
+    (setq ret-val (shu-internal-sort-includes pl))
+    (setq line-count (car ret-val))
+    (shu-announce-sort-counts ret-val)
     line-count
     ))
 
 
 
+;;
+;;  shu-sort-all-includes
+;;
+(defun shu-sort-all-includes ()
+  "Sort each contiguous block of #include directives in the entire buffer.  This
+is similar to SHU-SORT-INCLUDES but instead of restricting the sort to the
+current block of contiguous #include directives, it finds all of the blocks of
+contiguous #include directives and sorts each block."
+  (interactive)
+  (let ((blist (shu-cpp-find-include-blocks))
+        (ret-val)
+        (pl)
+        (line-count 0)
+        (del-count 0)
+        (group-count 0)
+        (changed-group-count 0)
+        (total-line 0)
+        (total-del 0))
+    (while blist
+      (setq pl (car blist))
+      (setq ret-val (shu-internal-sort-includes pl))
+      (setq line-count (car ret-val))
+      (setq del-count (cdr ret-val))
+      (setq total-line (+ total-line line-count))
+      (setq total-del (+ total-del del-count))
+      (setq group-count (1+ group-count))
+      (when (or (/= del-count 0) (/= line-count 0))
+        (setq changed-group-count (1+ changed-group-count)))
+      (setq blist (cdr blist)))
+    (shu-announce-sort-counts (cons total-line total-del) group-count changed-group-count)
+    (cons total-line total-del)
+    ))
+
+
 
 ;;
-;;  shu-find-end-include
+;;  shu-internal-sort-includes
 ;;
-(defun shu-find-end-include (dir)
-  "On entry, (point) is positioned on an #include directive.  This function
-searches either backwards or forward for the next line that does not contain an
-include directive.  If DIR is positive the search is forward, else backward.
-The return value is the (line-beginning-position) of the last line that contains
-an #include directive."
-  (let ((mc (if (< dir 0) -1 1))
-        (something t)
-        (last1)
-        (n))
-    (when (shu-line-is-include)
-      (goto-char (line-beginning-position))
-      (setq last1 (point))
-      (while something
-        (setq n (forward-line mc))
-        (if (= n 0)
-            (progn
-              (if (shu-line-is-include t)
-                  (setq last1 (line-beginning-position))
-                (setq something nil)))
-          (setq something nil))))
-    last1
+(defun shu-internal-sort-includes (pl)
+  "There are times when SHU-SUB-SORT-INCLUDES does not actually change anything
+in the buffer.  After it has done its transformation and sorting, nothing in the
+#include block has changed because the #includes were already in sorted order.
+But emacs still marks the buffer as modified, which can be confusing.
+
+This function copies the include block into a temporary buffer, calls
+SHU-SUB-SORT-INCLUDES, checks to see if the temporary buffer contents are
+unchanged.  If the temporary buffer contents remain unchanged, then
+SHU-SUB-SORT-INCLUDES is not called at all on the real buffer and its sort and
+delete counts are set to zero."
+  (let ((spoint)
+        (epoint)
+        (ret-val (cons 0 0))
+        (original)
+        (copy))
+    (when pl
+      (save-excursion
+        (setq spoint (car pl))
+        (setq epoint (cdr pl))
+        (setq original (buffer-substring-no-properties spoint epoint))
+        (with-temp-buffer
+          (insert original)
+          (setq ret-val (shu-sub-sort-includes (cons (point-min) (point-max))))
+          (setq copy (buffer-substring-no-properties (point-min) (point-max))))
+        (if (string= copy original)
+            (setq ret-val (cons 0 0))
+          (setq ret-val (shu-sub-sort-includes pl)))))
+    ret-val
     ))
 
 
 
 
 ;;
-;;  shu-line-is-include
+;;  shu-sub-sort-includes
 ;;
-(defun shu-line-is-include (&optional fix)
-  "Return true if the line on which (point) resides is an #include directive."
+(defun shu-sub-sort-includes (pl)
+  "PL is a cons cell that defines the start and end position of a block one or
+more contiguous #include directives.  Any lines that have extra spacing in them,
+such as \" # include \" have the extra spacing removed and then the entire block
+is sorted into alphabetical order with any duplicate lines removed.  The return
+value is a cons cell whose car holds the number of lines sorted and whose cdr
+holds the number of duplicates removed."
   (let ((ss "\\s-*#\\s-*include\\s-+")
-        (min-length (length "#include <a>"))
-        (include-length (length "#include "))
-        (line-length)
-        (line-start)
-        (is-inc nil))
+        (spoint)
+        (epoint)
+        (line-count 0)
+        (del-count 0)
+        (count 0)
+        (len1)
+        (len2)
+        (diff)
+        (total 0)
+        (sort-fold-case t))
+    (when pl
+      (save-excursion
+        (setq spoint (car pl))
+        (setq epoint (cdr pl))
+        (setq line-count (1+ (- (shu-the-line-at epoint) (shu-the-line-at spoint))))
+        (goto-char spoint)
+        (while (< count line-count)
+          (beginning-of-line)
+          (setq len1 (- (line-end-position) (line-beginning-position)))
+          (when (re-search-forward ss (line-end-position) t)
+            (replace-match "#include " t t)
+            (setq len2 (- (line-end-position) (line-beginning-position)))
+            (setq diff (- len1 len2))
+            (setq total (+ total diff)))
+          (setq count (1+ count))
+          (forward-line 1))
+        (setq epoint (- epoint total))
+        (sort-lines nil spoint epoint)
+        (setq del-count (delete-duplicate-lines spoint epoint nil t nil nil))
+        (setq line-count (- line-count del-count))))
+    (cons line-count del-count)
+    ))
+
+
+
+
+;;
+;;  shu-announce-sort-counts
+;;
+(defun shu-announce-sort-counts (ret-val &optional group-count changed-group-count)
+  "RET-VAL is a cons cell whose car is the count of lines sorted by
+SHU-INTERNAL-SORT-INCLUDES and whose cdr is the number of duplicate lines
+removed.  The optional GROUP-COUNT is the number of groups sorted, if present.
+The optional CHANGED-GROUP-COUNT is the number of groups that were actually
+changed.  Display the appropriate message in the minibuffer with those counts."
+  (let ((announcement (shu-make-sort-announcement ret-val group-count changed-group-count)))
+    (message "%s" announcement)
+    ))
+
+
+
+;;
+;;  shu-make-sort-announcement
+;;
+(defun shu-make-sort-announcement (ret-val &optional group-count changed-group-count)
+  "RET-VAL is a cons cell whose car is the count of lines sorted by
+SHU-INTERNAL-SORT-INCLUDES and whose cdr is the number of duplicate lines
+removed.  The optional GROUP-COUNT is the number of groups sorted, if present.
+The optional CHANGED-GROUP-COUNT is the number of groups that were actually
+changed.  Return an appropriately formatted message with these counts.  This is
+a separate function in order to allow it to be unit tested."
+  (let ((line-count (car ret-val))
+        (del-count (cdr ret-val))
+        (dup-name "duplicates")
+        (line-name "lines")
+        (tgroups "")
+        (group-name "groups")
+        (have-changed)
+        (announcement ""))
+    (when group-count
+      (when (numberp group-count)
+        (when changed-group-count
+          (when (numberp changed-group-count)
+            (when (/= group-count changed-group-count)
+              (setq have-changed t))))
+        (when (= group-count 1)
+          (setq group-name "group"))
+        (if have-changed
+            (setq tgroups (format " in %d of %d %s" changed-group-count group-count group-name))
+          (setq tgroups (format " in %d %s" group-count group-name)))))
+    (when (= line-count 1)
+      (setq line-name "line"))
+    (if (= del-count 0)
+        (setq announcement (format "Sorted %d %s%s" line-count line-name tgroups))
+      (when (= del-count 1)
+        (setq dup-name "duplicate"))
+      (setq announcement (format "Sorted %d %s%s (after deleting %d %s)"
+                                 line-count line-name tgroups del-count dup-name)))
+    announcement
+    ))
+
+
+
+;;
+;;  shu-cpp-find-current-include-block
+;;
+(defun shu-cpp-find-current-include-block ()
+  "This function returns a cons cell that defines the upper and lower bounds of
+the contiguous block of #include directives in which point it sitting.  If point
+is not sitting in a contiguous block of one or more #include directives, return
+nil."
+  (let ((here (point))
+        (blist (shu-cpp-find-include-blocks))
+        (found)
+        (pl)
+        (spoint)
+        (epoint))
+    (if (not blist)
+        (progn
+          (ding)
+          (message "%s" "There are no #includes in the buffer"))
+      (while (and blist (not found))
+        (setq pl (car blist))
+        (setq spoint (car pl))
+        (setq epoint (cdr pl))
+        (when (and
+               (>= here spoint)
+               (<= here epoint))
+          (setq found pl))
+        (setq blist (cdr blist)))
+      (when (not found)
+        (ding)
+        (message "%s" "Not sitting on an #include")))
+    found
+    ))
+
+
+;;
+;;  shu-cpp-find-include-blocks
+;;
+(defun shu-cpp-find-include-blocks ()
+  "This function returns a list of cons cells, each of which holds the point of
+the start and end of a contiguous block of #include directives.
+
+For example, if a buffer contains
+
+      #include <able>
+      #include <charlie>
+      // Hello
+      #include <delta>
+
+this function will return a list of two cons cells.  The first one holds the
+point of the \"#\" of #include <delta> and the point of the \">\" of #include
+<delta>.  The second holds the point of the \"#\" of #include <able> and the
+point of the \">\" of #include <charlie>."
+  (let ((pllist)
+        (first-line)
+        (last-line)
+        (first-line)
+        (llist)
+        (ilist)
+        (line-diff 1)
+        (pl)
+        (line)
+        (lcount 0)
+        (new-list))
+    (setq pllist (shu-cpp-find-include-locations))
+    (setq line-diff (shu-cpp-find-include-direction pllist))
+    (when pllist
+      (if (< (length pllist) 2)
+          (progn
+            (setq pl (car pllist))
+            (push (shu-make-include-block pl) new-list))
+        (setq llist pllist)
+        (while llist
+          (setq pl (car llist))
+          (setq lcount (1+ lcount))
+          (setq line (cdr pl))
+          (if (not first-line)
+              (progn
+                (setq first-line pl)
+                (setq last-line pl))
+            (if (= (+ (cdr last-line) line-diff) line)
+                (setq last-line pl)
+              (push (shu-make-include-block first-line last-line) new-list)
+              (setq first-line pl)
+              (setq last-line pl)
+              (setq lcount 1)))
+          (setq llist (cdr llist)))
+        (when (/= lcount 0)
+          (push (shu-make-include-block first-line last-line) new-list))
+        (when (< line-diff 0)
+          (setq new-list (nreverse new-list)))))
+    new-list
+    ))
+
+
+;;
+;;  shu-make-include-block
+;;
+(defun shu-make-include-block (first-line &optional last-line)
+  "FIRST-LINE is a cons cell that holds the point and line of an #include
+directive.  LAST-LINE optionally holds the point and line of another #include
+directive.  FIRST-LINE and LAST-LINE may be in any order.  This function returns
+a cons cell whose car holds the point of the start of the first #include
+directive and whose cdr holds the point of the end of the last #include."
+  (let ((gb (get-buffer-create "**foo**"))
+        (spoint (car first-line))
+        (epoint))
+    (if last-line
+        (setq epoint (car last-line))
+      (setq epoint (1+ spoint)))
+    (when (> spoint epoint)
+      (shu-swap spoint epoint))
     (save-excursion
-      (goto-char (line-beginning-position))
-      (when (re-search-forward ss (line-end-position) t)
-        (setq is-inc t)
-        (when fix
-          (replace-match "#include " t t))))
-    is-inc
+      (goto-char epoint)
+      (setq epoint (line-end-position)))
+    (cons spoint epoint)
+    ))
+
+
+
+;;
+;;  shu-cpp-find-include-direction
+;;
+(defun shu-cpp-find-include-direction (pllist)
+  "PLLIST is a list returned from SHU-CPP-FIND-INCLUDE-LOCATIONS.  Each entry in
+the list is a cons cell whose car is the point of the \"#\" sign and whose cdr
+is the line number on which the \"#\" was found.  The list may have been
+produced by either a forward or backward tokenization.  i.e., The first item on
+the list may be the last #include in the buffer or the first.  This function
+returns +1 if the list is in order by ascending location or -1 if the list is in
+order by descending location.  If the list has no order because it only has one
+entry, +1 is returned."
+  (let ((line-diff 1)
+        (pl)
+        (pl2))
+    (when pllist
+      (when (> (length pllist) 1)
+        (setq pl (car pllist))
+        (setq pl2 (cadr pllist))
+        (when (> (car pl) (car pl2))
+          (setq line-diff -1))))
+    line-diff
+    ))
+
+
+;;
+;;  shu-cpp-find-include-locations
+;;
+(defun shu-cpp-find-include-locations ()
+  "Return a list of the locations of all #include directives in the current
+buffer.  Each entry in the list is a cons cell whose car is the point of the
+\"#\" sign and whose cdr is the line number on which the \"#\" was found."
+  (let ((token-list (shu-match-find-all-general-include))
+        (tlist)
+        (token-info)
+        (spoint)
+        (line)
+        (pl)
+        (pllist))
+    (when token-list
+      (setq tlist token-list)
+      (while tlist
+        (setq token-info (car tlist))
+        (setq spoint (shu-cpp-token-extract-spoint token-info))
+        (setq line (shu-the-line-at spoint))
+        (setq pl (cons spoint line))
+        (push pl pllist)
+        (setq tlist (cdr tlist)))
+      (setq pllist (nreverse pllist)))
+    pllist
     ))
 
 
@@ -5294,6 +5847,7 @@ an #include directive."
   "Set the common alias names for the functions in shu-cpp-general.
 These are generally the same as the function names with the leading
 shu- prefix removed."
+  (defalias 'is-keyword 'shu-is-keyword)
   (defalias 'cpp1-class 'shu-cpp1-class)
   (defalias 'cpp2-class 'shu-cpp2-class)
   (defalias 'new-c-class 'shu-new-c-class)
@@ -5348,7 +5902,9 @@ shu- prefix removed."
   (defalias 'fill-data 'shu-cpp-fill-test-data)
   (defalias 'fill-area 'shu-cpp-fill-test-area)
   (defalias 'gcc 'shu-gcc)
+  (defalias 'add-include 'shu-add-include)
   (defalias 'sort-includes 'shu-sort-includes)
+  (defalias 'sort-all-includes 'shu-sort-all-includes)
   )
 
 (provide 'shu-cpp-general)

@@ -37,12 +37,21 @@
 * [shu-cpp-misc](#shu-cpp-misc)
 * [shu-cpp-project](#shu-cpp-project)
 * [shu-cpp-token](#shu-cpp-token)
+* [shu-git](#shu-git)
 * [shu-keyring](#shu-keyring)
 * [shu-match](#shu-match)
 * [shu-misc](#shu-misc)
 * [shu-nvplist](#shu-nvplist)
 * [shu-org-extensions](#shu-org-extensions)
 * [shu-xref](#shu-xref)
+
+
+
+
+
+
+
+
 
 
 
@@ -70,7 +79,9 @@ Version 1.6 was merged with the master branch on 16 November 2019.
 
 Version 1.6.108 was merged with the master branch on 24 December 2021
 
-This is Version 1.6.108 of the Shu elisp repository.
+Version 1.6.144 was merged with the master branch on 8 January 2023
+
+This is Version 1.6.144 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -187,6 +198,14 @@ will include the brackets as characters to be skipped.
 
 
 
+#### shu-append-to-file ####
+shu-append-to-file *file* *line*
+[Function]
+
+Append *line* to *file*.
+
+
+
 #### shu-bool-to-string ####
 shu-bool-to-string *arg*
 [Function]
@@ -275,6 +294,14 @@ The string that defines the default C++ namepace, if any.
 
 
 
+#### shu-cpp-edit-sentinel ####
+[Custom]
+
+The sentinel that appears in a comment in the beginning of a file to indicate
+to a text editor that this file contains C++ code.
+
+
+
 #### shu-cpp-file-directory-name ####
 [Constant]
 
@@ -329,6 +356,20 @@ by angle brackets and an include of "myclass.h" would be written as
 [Custom]
 
 Size of the standard indent for names within class declarations, etc.
+
+
+
+#### shu-cpp-keyword ####
+[Constant]
+
+A regular expression to match a key word in a C++ program.
+
+
+
+#### shu-cpp-keyword-list ####
+[Constant]
+
+List of all characters that can be present in a C++ key word.
 
 
 
@@ -614,7 +655,7 @@ and the returned alist would be
 
 The return value of this function is a cons cell whose car is the hash table and
 whose cdr is the alist.  If the cdr of the return value is nil, then the entire
-hash table could be constructed.
+hash table could not be constructed.
 
 
 
@@ -675,6 +716,38 @@ shu-load-library-files *path-to-libs*
 
 Load all of the library files listed in *shu-library-files* using the path
 *path-to-libs*.  Return true if all of the files were successfully loaded.
+
+
+
+#### shu-longest-car-length ####
+shu-longest-car-length *cons-cells*
+[Function]
+
+*cons-cells* is a list of cons cells.  The CAR of each cons cell is a string.
+Return the length of the longest string in all of the CARs of the cons cells.
+
+
+
+#### shu-longest-name-length ####
+shu-longest-name-length *names*
+[Function]
+
+Given a list of *names*, return the length of the longest name.
+
+
+
+#### shu-make-file-header-line ####
+shu-make-file-header-line *file-name*
+[Function]
+
+Return a string that holds the standard first line comment in a C++ file,
+which is of the form:
+
+```
+      "// file_name                                      -`*-C++-*-`"
+```
+
+The returned line is of length *shu-cpp-comment-end*.
 
 
 
@@ -1039,6 +1112,15 @@ List of standard namespaces and their associated classes
 
 
 
+#### shu-new-generate-component ####
+[Function]
+
+Fetch the arguments from environment variables and then call
+*shu-internal-gen-bde-component* to generate a set of three BDE component
+files with optional template parameters.
+
+
+
 #### shu-old-generate-component ####
 [Function]
 
@@ -1207,6 +1289,24 @@ gen-bde-component *class-name*
 
 Generate the three files for a new component: .cpp, .h, and .t.cpp
 
+
+
+#### gen-bde-template ####
+gen-bde-template *class-name* *template-string*
+[Command]
+ (Function: shu-gen-bde-template)
+
+Generate the three files for a new component: .cpp, .h, and .t.cpp
+
+
+
+#### gen-new-bde-component ####
+gen-new-bde-component *class-name*
+[Command]
+ (Function: shu-new-gen-bde-component)
+
+Generate the three files for a new component: .cpp, .h, and .t.cpp
+
 ## List of functions and variables ##
 
 List of functions and variable definitions in this package.
@@ -1366,6 +1466,157 @@ Generate a skeleton BDE struct code generation at point.
 
 
 
+#### shu-cpp-acgen-template ####
+shu-cpp-acgen-template *class-name* *template-list*
+[Command]
+
+Generate a skeleton class code generation at point.
+
+
+
+#### shu-cpp-ccdecl-template ####
+shu-cpp-ccdecl-template *class-name* *template-list*
+[Command]
+
+Generate a skeleton class declaration at point.
+
+
+
+#### shu-cpp-cdecl-template ####
+shu-cpp-cdecl-template *class-name* *template-list*
+[Command]
+
+Generate a skeleton class declaration at point.
+
+
+
+#### shu-cpp-decl-cpp-stream-template ####
+shu-cpp-decl-cpp-stream-template *class-name* *template-list*
+[Function]
+
+Generate the code for the streaming operator (operator<<()).  *class-name* is the
+name of the containing C++ class.
+
+
+
+#### shu-cpp-decl-h-stream-template ####
+shu-cpp-decl-h-stream-template *class-name* *template-list*
+[Function]
+
+Generate the declaration for the streaming operator (operator<<()).
+*class-name* is the name of the containing C++ class.
+
+
+
+#### shu-cpp-gen-h-class-intro-template ####
+shu-cpp-gen-h-class-intro-template *class-name* *template-list*
+[Function]
+
+Generate the preamble to a class declaration in a header file.  This is all
+of the code that precedes the \\ DATA comment.  Return the position at which
+the class comment was placed.
+
+
+
+#### shu-cpp-hcgen-template ####
+shu-cpp-hcgen-template *class-name* *template-list* *use-allocator*
+[Command]
+
+Generate a skeleton class code generation at point.
+
+
+
+#### shu-cpp-impl-cpp-constructor ####
+shu-cpp-impl-cpp-constructor *class-name* *template-list* *use-allocator*
+[Function]
+
+Insert the skeleton constructor implementation.
+
+
+
+#### shu-cpp-impl-cpp-print-self ####
+shu-cpp-impl-cpp-print-self *class-name* *template-list*
+[Function]
+
+Generate the skeleton code for the printSelf() function.
+*class-name* is the name of the containing C++ class.
+
+
+
+#### shu-cpp-inner-cdecl-template ####
+shu-cpp-inner-cdecl-template *class-name* *template-list* *copy-allowed* *use-allocator*
+[Function]
+
+Generate a skeleton class declaration at point.
+
+
+
+#### shu-cpp-insert-template-decl ####
+shu-cpp-insert-template-decl *template-list*
+[Function]
+
+If *template-list* holds a list of template parameter names, insert into the
+buffer the declaration
+
+```
+        template<typename A, typename B>
+        inline
+```
+
+If *template-list*  is nil, do nothing.
+
+
+
+#### shu-cpp-make-decl-template ####
+shu-cpp-make-decl-template *template-list*
+[Function]
+
+Create the declaration
+
+```
+        template<typename A, typename B>
+```
+
+from the list of template parameter names
+
+
+
+#### shu-cpp-make-qualified-class-name ####
+shu-cpp-make-qualified-class-name *class-name* *template-list*
+[Function]
+
+The input is a *class-name* and *template-list*.  The output is a class name
+followed by the comma separated list of template parameter names.  If the
+template parameter names are T and S and the class name is MumbleBar, the
+returned value is MumbleBar<T, S>.  If *template-list* is nil or empty,
+the original class name is returned.
+
+
+
+#### shu-cpp-make-template-list ####
+shu-cpp-make-template-list *template-list*
+[Function]
+
+Create the declaration
+
+```
+        <A, B>
+```
+
+from the list of template parameter names.
+An empty string is returned if *template-list* is nil or empty.
+
+
+
+#### shu-cpp-split-template-parameter-list ####
+shu-cpp-split-template-parameter-list *tp-string*
+[Function]
+
+*tp-string* is a comma separated list of template parameter names.  This
+function splits the string into a list of names and returns that list.
+
+
+
 #### shu-gen-bde-component ####
 shu-gen-bde-component *class-name*
 [Command]
@@ -1387,6 +1638,45 @@ the current directory name does not match the namespace.
 
 
 
+#### shu-gen-bde-create-prompt-template ####
+[Function]
+
+This function fetches the prompt string from *shu-gen-bde-make-prompt-string*
+issues the query, and then issues a query for the comma separated list of
+template parameter names.  It returns a list with two items on it:
+
+```
+    1. The name of the new component
+
+    2. The list of template parameter names
+```
+
+If the comma separated list of template parameter names is empty, the list of
+template parameter names (Item 2 above) is nil
+
+
+
+#### shu-gen-bde-make-prompt-string ####
+[Function]
+
+This function creates the prompt for the interactive special form of the
+function *shu-gen-bde-component*.  The prompt includes the namespace in which the
+new class will be created or the string "NO NAMESPACE" if there is no default
+namespace set.  If the name of the current directory does not match the default
+namespace, the prompt also includes the directory name to remind the user that
+the current directory name does not match the namespace.
+
+
+
+#### shu-gen-bde-template ####
+shu-gen-bde-template *class-name* *template-string*
+[Command]
+ (Alias: gen-bde-template)
+
+Generate the three files for a new component: .cpp, .h, and .t.cpp
+
+
+
 #### shu-generate-bde-cfile ####
 shu-generate-bde-cfile *author* *namespace* *class-name*
 [Function]
@@ -1395,8 +1685,24 @@ Generate a skeleton cpp file
 
 
 
+#### shu-generate-bde-cfile-template ####
+shu-generate-bde-cfile-template *author* *namespace* *class-name* *template-list*
+[Function]
+
+Generate a skeleton cpp file
+
+
+
 #### shu-generate-bde-hfile ####
 shu-generate-bde-hfile *author* *namespace* *class-name*
+[Function]
+
+Generate a skeleton header file
+
+
+
+#### shu-generate-bde-hfile-template ####
+shu-generate-bde-hfile-template *author* *namespace* *class-name* *template-list*
 [Function]
 
 Generate a skeleton header file
@@ -1423,6 +1729,23 @@ the buffer *gitbuf*.
 #### shu-internal-gen-bde-component ####
 shu-internal-gen-bde-component *class-name* *author* *namespace* *file-prefix*
 [Function]
+
+Generate the three files for a new component: .cpp, .h, and .t.cpp
+
+
+
+#### shu-internal-gen-bde-template ####
+shu-internal-gen-bde-template *class-name* *template-list* *author* *namespace* *file-prefix*
+[Function]
+
+Generate the three files for a new component: .cpp, .h, and .t.cpp
+
+
+
+#### shu-new-gen-bde-component ####
+shu-new-gen-bde-component *class-name*
+[Command]
+ (Alias: gen-new-bde-component)
 
 Generate the three files for a new component: .cpp, .h, and .t.cpp
 
@@ -2457,6 +2780,16 @@ A list of aliases and associated function names.
 
 
 
+#### add-include ####
+[Command]
+ (Function: shu-add-include)
+
+When positioned on a line below an include block, this function yanks the
+contents of the kill buffer (which is assumed to contain an #include statement)
+and then sorts all of the lines in the current include block.
+
+
+
 #### author ####
 [Command]
  (Function: shu-author)
@@ -2925,6 +3258,17 @@ is delimited by left and right angle brackets.
 
 
 
+#### is-keyword ####
+[Command]
+ (Function: shu-is-keyword)
+
+Do a COMPLETING-READ from the minibuffer of a string that may or may not be a
+C++ key word.  If the string is a C++ key word, display the key word, else
+display "no".  If (point) is sitting on a C++ key word, that is the default
+initial input to the completing read.
+
+
+
 #### make-datetime ####
 [Command]
  (Function: shu-cpp-make-datetime)
@@ -3059,19 +3403,30 @@ Unconditionally set shu-cpp-modern to false.
 
 
 
+#### sort-all-includes ####
+[Command]
+ (Function: shu-sort-all-includes)
+
+Sort each contiguous block of #include directives in the entire buffer.  This
+is similar to *shu-sort-includes* but instead of restricting the sort to the
+current block of contiguous #include directives, it finds all of the blocks of
+contiguous #include directives and sorts each block.
+
+
+
 #### sort-includes ####
 [Command]
  (Function: shu-sort-includes)
 
 When positioned on a line that is an #include directive, find all of the
-#include directives above and below that line that are not separated by a blank
-line and sort them into alphabetical order with case ignored.  If not positioned
-on a line that is an #include directive, do nothing.  Case is ignored for the
-sort.  The return value is the number of lines sorted.  If no lines were sorted
-because (point) is not positioned on an #include directive, return nil.  The
-return value is for the benefit of the unit tests.
-Additionally, if there are spaces surrounding the "#" of the #include, they
-are removed.
+#include directives above and below that line that are not separated by a line
+that is not an #include directive and sort them into alphabetical order with
+case ignored.  If not positioned on a line that is an #include directive, do
+nothing.  The return value is the number of lines sorted.  If no lines were
+sorted because (point) is not positioned on an #include directive, return nil.
+The return value is for the benefit of the unit tests.  Additionally, if there
+are spaces surrounding the "#" of the #include, they are removed.  After the
+sort, any duplicate #include directives are removed.
 
 
 
@@ -3175,6 +3530,16 @@ This modifies shu-cpp-base-types.
 
 
 
+#### shu-add-include ####
+[Command]
+ (Alias: add-include)
+
+When positioned on a line below an include block, this function yanks the
+contents of the kill buffer (which is assumed to contain an #include statement)
+and then sorts all of the lines in the current include block.
+
+
+
 #### shu-aix-show-allocators ####
 shu-aix-show-allocators *sizes* *gb*
 [Function]
@@ -3190,6 +3555,18 @@ shu-aix-show-malloc-list *mlist* *gb*
 [Function]
 
 Print the number of buffers allocated by size from an AIX dbx malloc command.
+
+
+
+#### shu-announce-sort-counts ####
+shu-announce-sort-counts *ret-val* **&optional** *group-count* *changed-group-count*
+[Function]
+
+*ret-val* is a cons cell whose car is the count of lines sorted by
+*shu-internal-sort-includes* and whose cdr is the number of duplicate lines
+removed.  The optional *group-count* is the number of groups sorted, if present.
+The optional *changed-group-count* is the number of groups that were actually
+changed.  Display the appropriate message in the minibuffer with those counts.
 
 
 
@@ -3436,6 +3813,16 @@ filled in with a new semi-colon following it.
 
 
 
+#### shu-cpp-find-current-include-block ####
+[Function]
+
+This function returns a cons cell that defines the upper and lower bounds of
+the contiguous block of #include directives in which point it sitting.  If point
+is not sitting in a contiguous block of one or more #include directives, return
+nil.
+
+
+
 #### shu-cpp-find-h-definition ####
 [Command]
  (Alias: getdef)
@@ -3443,6 +3830,52 @@ filled in with a new semi-colon following it.
 While in a cpp file, position point on a variable name that is defined in the
 corresponding header file and invoke this function.  It will find all occurrences of
 the name in the header file and put them in the message area.
+
+
+
+#### shu-cpp-find-include-blocks ####
+[Function]
+
+This function returns a list of cons cells, each of which holds the point of
+the start and end of a contiguous block of #include directives.
+
+For example, if a buffer contains
+
+```
+      #include <able>
+      #include <charlie>
+      // Hello
+      #include <delta>
+```
+
+this function will return a list of two cons cells.  The first one holds the
+point of the "#" of #include <delta> and the point of the ">" of #include
+<delta>.  The second holds the point of the "#" of #include <able> and the
+point of the ">" of #include <charlie>.
+
+
+
+#### shu-cpp-find-include-direction ####
+shu-cpp-find-include-direction *pllist*
+[Function]
+
+*pllist* is a list returned from *shu-cpp-find-include-locations*.  Each entry in
+the list is a cons cell whose car is the point of the "#" sign and whose cdr
+is the line number on which the "#" was found.  The list may have been
+produced by either a forward or backward tokenization.  i.e., The first item on
+the list may be the last #include in the buffer or the first.  This function
+returns +1 if the list is in order by ascending location or -1 if the list is in
+order by descending location.  If the list has no order because it only has one
+entry, +1 is returned.
+
+
+
+#### shu-cpp-find-include-locations ####
+[Function]
+
+Return a list of the locations of all #include directives in the current
+buffer.  Each entry in the list is a cons cell whose car is the point of the
+"#" sign and whose cdr is the line number on which the "#" was found.
 
 
 
@@ -3713,6 +4146,28 @@ or right parenthesis or a left or right square bracket.
 
 
 
+#### shu-cpp-is-keyword ####
+shu-cpp-is-keyword *word*
+[Function]
+
+Doc string.
+
+
+
+#### shu-cpp-keywords ####
+[Constant]
+
+alist of C++ key words up to approximately C++20
+
+
+
+#### shu-cpp-keywords-hash ####
+[Variable]
+
+The hash table of C++ key words
+
+
+
 #### shu-cpp-long-long-type ####
 [Custom]
 
@@ -3860,6 +4315,14 @@ NB: This version is deprecated.  See the new version in shu-match.el
 [Custom]
 
 The data type that represents a short time interval type.
+
+
+
+#### shu-cpp-sitting-on-keyword ####
+[Function]
+
+If (point) is sitting on a C++ key word, return that key word, else return
+ nil.
 
 
 
@@ -4170,18 +4633,6 @@ Undocumented
 
 
 
-#### shu-find-end-include ####
-shu-find-end-include *dir*
-[Function]
-
-On entry, (point) is positioned on an #include directive.  This function
-searches either backwards or forward for the next line that does not contain an
-include directive.  If *dir* is positive the search is forward, else backward.
-The return value is the (line-beginning-position) of the last line that contains
-an #include directive.
-
-
-
 #### shu-gcc ####
 [Command]
  (Alias: gcc)
@@ -4199,6 +4650,13 @@ shell, and yank.
 [Function]
 
 Undocumented
+
+
+
+#### shu-get-cpp-keywords-hash ####
+[Function]
+
+Return a hash table containing all of the C++ key words.
 
 
 
@@ -4352,10 +4810,38 @@ replaced.
 
 
 
+#### shu-internal-sort-includes ####
+shu-internal-sort-includes *pl*
+[Function]
+
+There are times when *shu-sub-sort-includes* does not actually change anything
+in the buffer.  After it has done its transformation and sorting, nothing in the
+#include block has changed because the #includes were already in sorted order.
+But emacs still marks the buffer as modified, which can be confusing.
+
+This function copies the include block into a temporary buffer, calls
+*shu-sub-sort-includes*, checks to see if the temporary buffer contents are
+unchanged.  If the temporary buffer contents remain unchanged, then
+*shu-sub-sort-includes* is not called at all on the real buffer and its sort and
+delete counts are set to zero.
+
+
+
 #### shu-is-const ####
 [Variable]
 
 Set true if the C++ data member we are working is declared to be const.
+
+
+
+#### shu-is-keyword ####
+[Command]
+ (Alias: is-keyword)
+
+Do a COMPLETING-READ from the minibuffer of a string that may or may not be a
+C++ key word.  If the string is a C++ key word, display the key word, else
+display "no".  If (point) is sitting on a C++ key word, that is the default
+initial input to the completing read.
 
 
 
@@ -4366,11 +4852,15 @@ Comment string with the first letter downcased.
 
 
 
-#### shu-line-is-include ####
-shu-line-is-include **&optional** *fix*
+#### shu-make-include-block ####
+shu-make-include-block *first-line* **&optional** *last-line*
 [Function]
 
-Return true if the line on which (point) resides is an #include directive.
+*first-line* is a cons cell that holds the point and line of an #include
+directive.  *last-line* optionally holds the point and line of another #include
+directive.  *first-line* and *last-line* may be in any order.  This function returns
+a cons cell whose car holds the point of the start of the first #include
+directive and whose cdr holds the point of the end of the last #include.
 
 
 
@@ -4379,6 +4869,19 @@ shu-make-padded-line *line* *tlen*
 [Function]
 
 Add sufficient spaces to make *line* the length *tlen*.
+
+
+
+#### shu-make-sort-announcement ####
+shu-make-sort-announcement *ret-val* **&optional** *group-count* *changed-group-count*
+[Function]
+
+*ret-val* is a cons cell whose car is the count of lines sorted by
+*shu-internal-sort-includes* and whose cdr is the number of duplicate lines
+removed.  The optional *group-count* is the number of groups sorted, if present.
+The optional *changed-group-count* is the number of groups that were actually
+changed.  Return an appropriately formatted message with these counts.  This is
+a separate function in order to allow it to be unit tested.
 
 
 
@@ -4635,19 +5138,30 @@ of files in the current project.
 
 
 
+#### shu-sort-all-includes ####
+[Command]
+ (Alias: sort-all-includes)
+
+Sort each contiguous block of #include directives in the entire buffer.  This
+is similar to *shu-sort-includes* but instead of restricting the sort to the
+current block of contiguous #include directives, it finds all of the blocks of
+contiguous #include directives and sorts each block.
+
+
+
 #### shu-sort-includes ####
 [Command]
  (Alias: sort-includes)
 
 When positioned on a line that is an #include directive, find all of the
-#include directives above and below that line that are not separated by a blank
-line and sort them into alphabetical order with case ignored.  If not positioned
-on a line that is an #include directive, do nothing.  Case is ignored for the
-sort.  The return value is the number of lines sorted.  If no lines were sorted
-because (point) is not positioned on an #include directive, return nil.  The
-return value is for the benefit of the unit tests.
-Additionally, if there are spaces surrounding the "#" of the #include, they
-are removed.
+#include directives above and below that line that are not separated by a line
+that is not an #include directive and sort them into alphabetical order with
+case ignored.  If not positioned on a line that is an #include directive, do
+nothing.  The return value is the number of lines sorted.  If no lines were
+sorted because (point) is not positioned on an #include directive, return nil.
+The return value is for the benefit of the unit tests.  Additionally, if there
+are spaces surrounding the "#" of the #include, they are removed.  After the
+sort, any duplicate #include directives are removed.
 
 
 
@@ -4655,6 +5169,19 @@ are removed.
 [Constant]
 
 An alist that maps include file names to class names.
+
+
+
+#### shu-sub-sort-includes ####
+shu-sub-sort-includes *pl*
+[Function]
+
+*pl* is a cons cell that defines the start and end position of a block one or
+more contiguous #include directives.  Any lines that have extra spacing in them,
+such as " # include " have the extra spacing removed and then the entire block
+is sorted into alphabetical order with any duplicate lines removed.  The return
+value is a cons cell whose car holds the number of lines sorted and whose cdr
+holds the number of duplicates removed.
 
 
 
@@ -5921,6 +6448,16 @@ will assume that all files reside in the same directory.
 
 
 
+#### list-c-all-project ####
+[Command]
+ (Function: shu-list-c-all-project)
+
+Insert into the current buffer everything that is known about the files,
+prefixes, short names, long names, and duplicate names within the current
+project.
+
+
+
 #### list-c-directories ####
 [Command]
  (Function: shu-list-c-directories)
@@ -6259,10 +6796,23 @@ visit that file.
 shu-cpp-choose-other-file *newfile*
 [Function]
 
-Try to visit a file first within a project and, it not successful, in the
-current directory.  If no project is in use or if the file does not belong to
-the project, try to find the file in the current directory.  If a file was found
-and visited, return true.
+*newfile* is a fully qualified file name that has been formed by changing the
+file suffix, perhaps from .cpp to .h or .h to .t.cpp.  We want to try to open
+the file either in the current directory or in the project.
+
+Up until 5 February 2022, we first looked for the file in the project, then in
+the local directory.  But if two .h files were duplicate names and two .cpp
+files were duplicate names, a request to visit the "other" file would bring up
+a choice of the duplicate names.  It seems logical that if you are in a .h file
+and you want to visit the associated .cpp file, the one that you want to visit
+is the one in the current directory.
+
+As of 5 February 2022, we first look for the file in the current directory and
+then in the project.  The local variable LOCAL-DIRECTORY-FIRST can be used to
+invert that choice and return to the original behavior of first looking in the
+project for the file.
+
+If a file was found and visited, return true.
 
 
 
@@ -6338,6 +6888,14 @@ current completion.
 
 
 
+#### shu-cpp-fetch-list ####
+[Variable]
+
+The name of the shared variable that contains the list of directories assembled
+by shu-make-c-project
+
+
+
 #### shu-cpp-final-list ####
 [Variable]
 
@@ -6370,6 +6928,13 @@ contains those that we actually found in building the current project.
 
 
 
+#### shu-cpp-get-inverted-class-list ####
+[Function]
+
+Return *shu-cpp-inverted-class-list*, creating it if it is currently nil.
+
+
+
 #### shu-cpp-h-extensions ####
 [Constant]
 
@@ -6391,6 +6956,14 @@ shu-cpp-internal-list-names *name-list* *type-name*
 
 Implementation function for *shu-cpp-list-short-names*,
 *shu-cpp-list-project-names*, and *shu-cpp-list-completing-names*.
+
+
+
+#### shu-cpp-inverted-class-list ####
+[Variable]
+
+This is the inversion of *shu-cpp-class-list*.  It is a list of all of the
+fully qualified file names found in *shu-cpp-class-list*.
 
 
 
@@ -6504,6 +7077,20 @@ qualified file names.
 
 
 
+#### shu-cpp-project-is-type-wanted ####
+shu-cpp-project-is-type-wanted *sname* *cpp-type*
+[Function]
+
+Determine if a file should be included based on its file type and on the
+argument *cpp-type*.  If *cpp-type* is t then we only want files of type C++.
+
+If *cpp-type* is nil, we want any file of any type..
+
+If *cpp-type* is nil, this function returns true.  If *cpp-type* is t, this function
+returns true iff the file extension of *sname* is one that holds C++ code.
+
+
+
 #### shu-cpp-project-list ####
 [Variable]
 
@@ -6574,6 +7161,36 @@ then the short names for these two files would be "mumble.cpp" and
 "stumble.cpp".  This means that the user does not have to type the prefix in
 order to find the file.  If the user types "mumble.cpp" as the file name,
 emacs will open the file "my_own_server_mumble.cpp".
+
+
+
+#### shu-cpp-project-visit-prefer-local ####
+shu-cpp-project-visit-prefer-local *newfile*
+[Function]
+
+*newfile* is a fully qualified file name that has been formed by changing the
+file suffix, perhaps from .cpp to .h or .h to .t.cpp.  We want to try to open
+the file either in the current directory or in the project.
+
+First try to visit the file in the local directory.  If not found in the local
+directory, try to find and visit it within the project.
+
+If a file was found and visited, return true.
+
+
+
+#### shu-cpp-project-visit-prefer-project ####
+shu-cpp-project-visit-prefer-project *newfile*
+[Function]
+
+*newfile* is a fully qualified file name that has been formed by changing the
+file suffix, perhaps from .cpp to .h or .h to .t.cpp.  We want to try to open
+the file either in the current directory or in the project.
+
+First try to visit the file in the project.  If not found in the project, try to
+visit the file in the local directory.
+
+If a file was found and visited, return true.
 
 
 
@@ -6791,6 +7408,13 @@ Otherwise, it will assume that all files reside in the same directory.
 
 
 
+#### shu-internal-list-c-all-project ####
+[Function]
+
+The internal implementation function for *shu-list-c-all-project*.
+
+
+
 #### shu-internal-list-c-duplicates ####
 shu-internal-list-c-duplicates *proj-list*
 [Function]
@@ -6801,9 +7425,9 @@ Internal implementation of shu-list-c-duplicates.
 
 #### shu-internal-list-c-file-names ####
 shu-internal-list-c-file-names *proj-list*
-[Command]
+[Function]
 
-Doc string.
+Internal implementation function of *shu-list-c-file-names*.
 
 
 
@@ -6853,6 +7477,16 @@ Visit a i.cpp file from the corresponding .cpp or .h file.  If visiting a .c
 or .cpp file, invoke this function and you will be taken to the corresponding
 .i.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory.
+
+
+
+#### shu-list-c-all-project ####
+[Command]
+ (Alias: list-c-all-project)
+
+Insert into the current buffer everything that is known about the files,
+prefixes, short names, long names, and duplicate names within the current
+project.
 
 
 
@@ -6996,6 +7630,16 @@ are being scanned.
 
 
 
+#### shu-project-directory-is-excluded ####
+shu-project-directory-is-excluded *directory-name*
+[Function]
+
+Return t if the directory name is among those that should be ignored when
+looking for files within a project.  Typically, these are the names of
+CMake directories that hold generated code.
+
+
+
 #### shu-project-exclude-hash ####
 [Variable]
 
@@ -7028,11 +7672,56 @@ It is used when a global change needs to visit every file in the project.
 
 
 
+#### shu-project-file-pattern-match ####
+shu-project-file-pattern-match *name* *pattern*
+[Function]
+
+If *pattern* is nil, then all names qualify and this function returns t.
+If *pattern* is non-nil, it is a regular expression that must match *name*.  If
+*pattern* matches *name*, this function returns true.
+
+This function returns true if *pattern* is nil (all names wanted) or if
+*pattern* is not nil and is a regular expression that is matched by *name*.
+
+
+
 #### shu-project-get-file-info ####
 shu-project-get-file-info *plist* *file-name* *full-name-list*
 [Macro]
 
 Extract the file information from one entry in shu-cpp-class-list.
+
+
+
+#### shu-project-get-specific-files ####
+shu-project-get-specific-files *root* *pattern* *cpp-type*
+[Function]
+
+Starting at *root*, search for all files that meet the following criteria:
+
+```
+      - If *pattern* is non-nil, it is a regular expression that the file name
+        must match.  If *pattern* is nil, then the file names are ignored and all
+        files are potentially returned.
+
+      - If *cpp-type* is nil, then file type is ignored and all files are
+        potentially returned subject to constraints of *pattern* described above.
+```
+
+If *pattern* and *cpp-type* are both nil, then all files are returned.
+
+If you wish to find all files that are of type C++, then set *pattern* to nil and
+*cpp-type* to t.
+
+If you wish to find all files with similar names that are of type C++, then set
+*cpp-type* to t and *pattern* to some regular expression that will filter the files
+appropriately, such as "mumble_bar*".
+
+The directories excluded by project search are also excluded here.  There are
+typically CMake directories that are populated with temporary files.  See
+*shu-project-exclude-list* for a list of excluded directories.
+
+The files are returned as a list of files with paths relative to *root*.
 
 
 
@@ -7060,6 +7749,17 @@ list of short names.
 
 Return is a cons cell whose car is the prefix list and whose cdr is the short
 name list.
+
+
+
+#### shu-project-some-other ####
+shu-project-some-other *extension*
+[Function]
+
+Visit a related file within a project.  If you are in a ".h" file and you
+wish to go to the corresponding ".t.cpp" file, this function will form the new
+file name and then look it up within the project to find the location of the
+related file and then visit that file, if possible.
 
 
 
@@ -7091,6 +7791,22 @@ Return a cons cell of the form (prefix . short-name)
 
 
 
+#### shu-project-sub-specific-files ####
+shu-project-sub-specific-files *dir-name* *level* *pattern* *cpp-type*
+[Function]
+
+Recursively search for all files as described in
+*shu-project-get-specific-files*.
+
+Two lists are accumulated.  DIR-LIST is a list of all directories encountered.
+This function calls itself recursively to search all of them for the desired
+files.
+
+The global variable *shu-cpp-fetch-list* is used to accumulate the list of
+qualified files found.
+
+
+
 #### shu-project-user-class-count ####
 [Variable]
 
@@ -7102,6 +7818,14 @@ Undocumented
 [Constant]
 
 A list of file extensions for Python projects
+
+
+
+#### shu-record-visited-project ####
+shu-record-visited-project *name* *proj-dir*
+[Function]
+
+Record a project visit in the file "~/visited-projects.log".
 
 
 
@@ -7173,6 +7897,7 @@ create a file called "files.txt" with the name of every file found, invoke
 ctags on that file to build a new tags file, and then visit the tags file.
 *proj-dir* is the name of the directory in which the project file exists and in
 which the tags file is to be built.
+Record the visit in the file "~/visited-projects.log".
 
 
 
@@ -7195,6 +7920,31 @@ Visit a t.cpp file from the corresponding .cpp or .h file.  If visiting a .c
 or .cpp file, invoke this function and you will be taken to the corresponding
 .t.cpp file.  This function will use a project if one is active.  Otherwise, it
 will assume that all files reside in the same directory.
+
+
+
+#### shu-validate-file-in-project ####
+[Function]
+
+Validate that the current file is a member of the current project.
+
+If you are in a project and then visit some file in another directory tree whose
+FILE-NAME-NONDIRECTORY matches a file name in the current project, an attempt to
+visit a related file by using the project primitives will take you back into the
+project tree, when you might have thought that you were going to some other part
+of the directory tree you were in.
+
+For example, suppose you are in a project file "a/b/src/foo/foo.h" and you
+then visit another file in "x/y/src/foo/foo.h." If you then try to go to the
+unit test file for "x/y/src/foo/foo.h," instead of visiting
+"x/y/test/unit/foo.t.cpp," you will, instead, silently be taken to
+"a/b/test/unit/foo.t.cpp," which is not the unit test file for
+"x/y/src/foo/foo.h."
+
+When visiting related files within a project, this function verifies that the
+current file is actually a member of the current project.  If there exists a
+project and the current file is not a member of that project, you are probably
+about to be taken silently to the wrong file.
 
 
 
@@ -7262,7 +8012,7 @@ first token in the list being the first token found.  The latter function
 returns the reverse of the former.
 
 The tokenized lists are used by the functions in shu-cpp-match.el and
-shu-match.el to find and retrieve patters in the token lists.
+shu-match.el to find and retrieve patterns in the token lists.
 
 
 ## List of functions by alias name ##
@@ -7396,20 +8146,6 @@ If imbalance is present, print error message and return nil.  Typically *open-ch
 might be a left parenthesis and *close-char* might be a right parenthesis.  Or they
 might be "<" and ">", or any other pair types.  Note that this function
 returns t if there are no occurrences of *open-char* and *close-char*
-
-
-
-#### shu-cpp-keywords ####
-[Constant]
-
-alist of C++ key words up to approximately C++20
-
-
-
-#### shu-cpp-keywords-hash ####
-[Variable]
-
-The hash table of C++ key words
 
 
 
@@ -7861,12 +8597,362 @@ shu-cpp-tokenize-show-list-buffer *token-list* *gb* **&optional** *title*
 
 Undocumented
 
+# shu-git #
 
 
-#### shu-get-cpp-keywords-hash ####
+
+A collection of functions for interacting with git
+
+
+## List of functions by alias name ##
+
+A list of aliases and associated function names.
+
+
+
+
+
+#### copy-branch ####
 [Command]
+ (Function: shu-git-copy-branch)
 
-Return a hash table containing all of the C++ key words.
+Put the name of the current branch in a git repository into the kill ring.
+
+
+
+#### diff-commits ####
+diff-commits *commit-range*
+[Command]
+ (Function: shu-git-diff-commits)
+
+In a buffer that is a numbered git log, query for a range string, find the two
+commits, and put into the kill ring a git diff command specifying the two commits.
+
+For example, given the following two numbered commits:
+
+```
+    31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
+    33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
+```
+
+if the commit range specified is either "31.33" or "31+2", then the following
+is put into the kill ring:
+
+```
+    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "
+```
+
+
+
+#### gcm ####
+[Command]
+ (Function: shu-git-insert-git-commit)
+
+Insert at point the name the git command to commit with the commentary held
+in a file called "why.txt".
+
+
+
+#### gco ####
+[Command]
+ (Function: shu-git-insert-checkout-default)
+
+Insert at point the git command to check out the current default branch.
+
+
+
+#### get-pr-url ####
+[Command]
+ (Function: shu-git-get-pr-url)
+
+Put into the kill ring the path required to create a new pull request for
+the current branch of the current repository.
+
+
+
+#### gpl ####
+[Command]
+ (Function: shu-git-insert-pull-origin-branch)
+
+Insert at point the name the git command to pull the current branch from
+origin.
+
+
+
+#### gps ####
+[Command]
+ (Function: shu-git-insert-push-origin-branch)
+
+Insert at point the git command to push the current branch out to origin.  If
+the current branch is the default branch (fka "master"), you are prompted to
+see if you want to proceed.  This is to prevent an accidental push to the
+default branch.
+
+
+
+#### insb ####
+[Command]
+ (Function: shu-git-insert-branch)
+
+Insert at point the name of the current branch in a git repository
+
+
+
+#### inso ####
+[Command]
+ (Function: shu-git-insert-origin-branch)
+
+Insert at point the name of the current branch in a git repository preceded by the
+word "origin"..  This can be used as part of git push or pull.
+
+
+
+#### number-commits ####
+[Command]
+ (Function: shu-git-number-commits)
+
+In a git log buffer, number all of the commits with zero being the most
+recent.
+
+It is possible to refer to commits by their SHA-1 hash.  If you want to see the
+difference between two commits you can ask git to show you the difference by
+specifying the commit hash of each one.  But this is cumbersome.  It involves
+copying and pasting two SHA-1 hashes.  Once the commits are numbered, then
+*shu-git-diff-commits* may be used to diff two commits by number.  See the
+documentation for *shu-git-diff-commits* for further information.
+
+This function counts as a commit any instance of "commit" that starts at the
+beginning of a line and is followed by some white space and a forty character
+hexadecimal number.  Returns the count of the number of commits found.
+
+
+
+#### show-branch ####
+[Command]
+ (Function: shu-git-show-branch)
+
+Display the name of the current branch in a git repository.
+
+## List of functions and variables ##
+
+List of functions and variable definitions in this package.
+
+
+
+
+
+#### shu-find-numbered-commit ####
+shu-find-numbered-commit *commit-number*
+[Function]
+
+Search through a numbered git commit log looking for the commit whose number is
+*commit-number*.  Return the SHA-1 hash of the commit if the commit number is found.
+Return nil if no commit with the given number is found.
+The commit log is assume to have been numbered by shu-git-number-commits.
+
+
+
+#### shu-git-add-file ####
+shu-git-add-file *filename*
+[Function]
+
+Do a "git add" for *filename*.  Return empty string if add succeeds.  Otherwise,
+return git error message.
+
+
+
+#### shu-git-are-files-in-git ####
+shu-git-are-files-in-git *files*
+[Function]
+
+Given a list of file names in *files*, return a cons cell whose CAR holds the
+number of files that are under git control and whose CDR holds the number of
+files that are not under git control.
+
+
+
+#### shu-git-copy-branch ####
+[Command]
+ (Alias: copy-branch)
+
+Put the name of the current branch in a git repository into the kill ring.
+
+
+
+#### shu-git-diff-commits ####
+shu-git-diff-commits *commit-range*
+[Command]
+ (Alias: diff-commits)
+
+In a buffer that is a numbered git log, query for a range string, find the two
+commits, and put into the kill ring a git diff command specifying the two commits.
+
+For example, given the following two numbered commits:
+
+```
+    31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
+    33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
+```
+
+if the commit range specified is either "31.33" or "31+2", then the following
+is put into the kill ring:
+
+```
+    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "
+```
+
+
+
+#### shu-git-find-branch ####
+[Function]
+
+Return the name of the current branch in a git repository.
+
+
+
+#### shu-git-find-default-branch ####
+[Function]
+
+Return the name of the default branch in a git repository.  The default
+branch is the one branch that is created with a new repository.
+
+
+
+#### shu-git-find-short-hash ####
+shu-git-find-short-hash *hash*
+[Function]
+
+Return the git short hash for the *hash* supplied as an argument.  Return nil
+if the given *hash* is not a valid git revision.
+
+
+
+#### shu-git-get-pr-url ####
+[Command]
+ (Alias: get-pr-url)
+
+Put into the kill ring the path required to create a new pull request for
+the current branch of the current repository.
+
+
+
+#### shu-git-insert-branch ####
+[Command]
+ (Alias: insb)
+
+Insert at point the name of the current branch in a git repository
+
+
+
+#### shu-git-insert-checkout-default ####
+[Command]
+ (Alias: gco)
+
+Insert at point the git command to check out the current default branch.
+
+
+
+#### shu-git-insert-git-commit ####
+[Command]
+ (Alias: gcm)
+
+Insert at point the name the git command to commit with the commentary held
+in a file called "why.txt".
+
+
+
+#### shu-git-insert-origin-branch ####
+[Command]
+ (Alias: inso)
+
+Insert at point the name of the current branch in a git repository preceded by the
+word "origin"..  This can be used as part of git push or pull.
+
+
+
+#### shu-git-insert-pull-origin-branch ####
+[Command]
+ (Alias: gpl)
+
+Insert at point the name the git command to pull the current branch from
+origin.
+
+
+
+#### shu-git-insert-push-origin-branch ####
+[Command]
+ (Alias: gps)
+
+Insert at point the git command to push the current branch out to origin.  If
+the current branch is the default branch (fka "master"), you are prompted to
+see if you want to proceed.  This is to prevent an accidental push to the
+default branch.
+
+
+
+#### shu-git-is-file-in-git ####
+shu-git-is-file-in-git *filename*
+[Function]
+
+Return t if *filename* is in a git repository and the file is registered with git.
+
+
+
+#### shu-git-move-file ####
+shu-git-move-file *old-file* *new-file*
+[Function]
+
+Issue "git mv old-file new-file".
+
+Return a cons cell whose CAR is t if the move succeeded and whose CDR is the
+output of the git move command.
+
+
+
+#### shu-git-move-string ####
+shu-git-move-string *old-file* *new-file*
+[Function]
+
+Return the "git mv" command to rename *old-file* to *new-file*.  The result is
+not intended to be executed.  It is intended for use in messages that explain
+what operation is being done.
+
+
+
+#### shu-git-number-commits ####
+[Command]
+ (Alias: number-commits)
+
+In a git log buffer, number all of the commits with zero being the most
+recent.
+
+It is possible to refer to commits by their SHA-1 hash.  If you want to see the
+difference between two commits you can ask git to show you the difference by
+specifying the commit hash of each one.  But this is cumbersome.  It involves
+copying and pasting two SHA-1 hashes.  Once the commits are numbered, then
+*shu-git-diff-commits* may be used to diff two commits by number.  See the
+documentation for *shu-git-diff-commits* for further information.
+
+This function counts as a commit any instance of "commit" that starts at the
+beginning of a line and is followed by some white space and a forty character
+hexadecimal number.  Returns the count of the number of commits found.
+
+
+
+#### shu-git-set-alias ####
+[Function]
+
+Set the common alias names for the functions in shu-git.
+These are generally the same as the function names with the leading
+shu- prefix removed.
+
+
+
+#### shu-git-show-branch ####
+[Command]
+ (Alias: show-branch)
+
+Display the name of the current branch in a git repository.
 
 # shu-keyring #
 
@@ -8408,6 +9494,13 @@ double colons making up part of the return value.
 
 
 
+#### shu-cpp-match-general-include ####
+[Constant]
+
+A list of match-info that matches "#include".
+
+
+
 #### shu-cpp-match-many-using-list ####
 [Constant]
 
@@ -8554,6 +9647,15 @@ For example, in the following code:
 the member variables x and y should be changed to std::set and std::map
 respectively, but none of the occurrences of set or map in the include
 statements should be changed.
+
+
+
+#### shu-match-find-all-general-include ####
+[Function]
+
+Given a token list, return a list that holds the location of each "#" that
+represents the start of an #include directive.  Return an empty list if there
+are no #include directives.
 
 
 
@@ -9041,6 +10143,10 @@ If the prefix argument is large enough that the left side of the frame would be
 moved past the left side of the display, the window is positioned such that the
 left edge of the window is aligned with the left edge of the display.
 
+Prefix arguments greater than 10 assume a two display system.  Prefix arguments
+of 11 and 12 put two frames on the right display.  Prefix arguments of 13 and
+14 put two frames on the left display.
+
 Implementation note:
 
 If this function is called when the left side of the frame is positioned to the
@@ -9107,6 +10213,62 @@ simple, little function.
 
 
 
+#### change-namespace ####
+change-namespace *input*
+[Command]
+ (Function: shu-change-namespace)
+
+This function changes the namespace in a set of C++ source files.
+
+The files to be changed must follow these conventions:
+
+ - The namespace name is all lower case
+ - Each file name starts with the lower case namespace name followed by an
+   underscore
+
+The following steps are performed:
+
+ 1. Locate all of the files to be changed.  These are all files that hold C++
+ source code in the current directory or in any directory below the current
+ directory.  The set of files may be restricted by specifying a regular
+ expression.  The regular expression does not need to include the file type.
+
+ 2. The files to be changed are renamed with the new namespace replacing the
+ old in the file name.  If any file is part of a git repository, then "git mv"
+ is used for the rename operation.  Otherwise, "mv" is used.
+
+ 3. The files are then edited to replace all occurrences of the old namespace
+ with the new.
+
+The existing namespace, new namespace and file search pattern are specified with
+a single string.
+
+The first character of the string is a delimiter character that is used to split
+the string.  The existing namespace, new namespace and file search pattern are
+separated from each other with the delimiter.
+
+For example, to specify an existing namespace of "fumblebar", a new namespace
+of "wunderbar", and a search pattern of "`*exception*`", one might specify
+
+```
+       $fumblebar$wunderbar$`*exception*`
+```
+
+or
+
+```
+       @fumblebar@wunderbar@`*exception*`
+```
+
+The search pattern is optional.  The following string would do the same
+namespace replacement for all C++ files.
+
+```
+       $fumblebar$wunderbar
+```
+
+
+
 #### comma-names-to-letter ####
 [Command]
  (Function: shu-comma-names-to-letter)
@@ -9149,30 +10311,6 @@ put them back.
 
 
 
-#### diff-commits ####
-diff-commits *commit-range*
-[Command]
- (Function: shu-git-diff-commits)
-
-In a buffer that is a numbered git log, query for a range string, find the two
-commits, and put into the kill ring a git diff command specifying the two commits.
-
-For example, given the following two numbered commits:
-
-```
-    31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
-    33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
-```
-
-if the commit range specified is either "31.33" or "31+2", then the following
-is put into the kill ring:
-
-```
-    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "
-```
-
-
-
 #### dup ####
 [Command]
  (Function: shu-dup)
@@ -9189,6 +10327,23 @@ Save and load the current file as a .el file.
 
 
 
+#### fix-header ####
+[Command]
+ (Function: shu-fix-header-line)
+
+If the first line of the buffer contains the sentinel "-`*-C++-*-`", adjust
+the line length to be *shu-cpp-comment-end* in length, adding or removing
+internal space as necessary.
+
+If the first line of the buffer does not contain the sentinel "-`*-C++-*-`",
+do nothing.
+
+Return the number of spaces actually adjusted.  0 means no adjustment made.
+A positive number represents the number of spaces added.  A negative number
+represents the number of spaces removed.
+
+
+
 #### fixup-doxyfile ####
 [Command]
  (Function: shu-fixup-doxyfile)
@@ -9199,29 +10354,11 @@ the Doxyfile.  The current buffer is the Doxyfile.
 
 
 
-#### gcm ####
-[Command]
- (Function: shu-git-insert-git-commit)
-
-Insert at point the name the git command to commit with the commentary held
-in a file called "why.txt".
-
-
-
 #### gd ####
 [Command]
  (Function: shu-gd)
 
 While in dired, put the full path to the current directory in the kill ring
-
-
-
-#### get-pr-url ####
-[Command]
- (Function: shu-git-get-pr-url)
-
-Put into the kill ring the path required to create a new pull request for
-the current branch of the current repository.
 
 
 
@@ -9235,6 +10372,20 @@ Return nil if the path cannot be found.
 
 The search is made from the current directory and upwards for the first
 directory called ".git".
+
+
+
+#### getnv ####
+[Command]
+ (Function: shu-getnv)
+
+When positioned anywhere on a line that looks like
+
+```
+        Published version 1.2.9 of library
+```
+
+put into the kill ring  a string of the form "library=1.2.9".
 
 
 
@@ -9273,48 +10424,11 @@ While in a file buffer, put the name of the current file into the kill ring.
 
 
 
-#### gpl ####
-[Command]
- (Function: shu-git-insert-pull-origin-branch)
-
-Insert at point the name the git command to pull the current branch from
-origin.
-
-
-
-#### gps ####
-[Command]
- (Function: shu-git-insert-push-origin-branch)
-
-Insert at point the git command to push the current branch out to origin.  If
-the current branch is the default branch (fka "master"), you are prompted to
-see if you want to proceed.  This is to prevent an accidental push to the
-default branch.
-
-
-
 #### gquote ####
 [Command]
  (Function: shu-gquote)
 
 Insert a LaTeX quote environment and position the cursor for typing the quote.
-
-
-
-#### insb ####
-[Command]
- (Function: shu-git-insert-branch)
-
-Insert at point the name of the current branch in a git repository
-
-
-
-#### inso ####
-[Command]
- (Function: shu-git-insert-origin-branch)
-
-Insert at point the name of the current branch in a git repository preceded by the
-word "origin"..  This can be used as part of git push or pull.
 
 
 
@@ -9336,6 +10450,23 @@ inside of them without having to worry about which line contains the closing
 parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run *shu-tighten-lisp* to put the
 parentheses back where they belong.
+
+
+
+#### make-header ####
+[Command]
+ (Function: shu-make-header-line)
+
+At the top of the current buffer, insert a string that holds the standard
+first line comment in a C++ file, which is of the form:
+
+```
+      "// file_name                                      -`*-C++-*-`"
+```
+
+The inserted line is of length *shu-cpp-comment-end*.
+
+Does nothing if the current buffer does not have an associated file name.
 
 
 
@@ -9456,26 +10587,6 @@ point is placed where the the first line of code in the loop belongs.
 
 
 
-#### number-commits ####
-[Command]
- (Function: shu-git-number-commits)
-
-In a git log buffer, number all of the commits with zero being the most
-recent.
-
-It is possible to refer to commits by their SHA-1 hash.  If you want to see the
-difference between two commits you can ask git to show you the difference by
-specifying the commit hash of each one.  But this is cumbersome.  It involves
-copying and pasting two SHA-1 hashes.  Once the commits are numbered, then
-*shu-git-diff-commits* may be used to diff two commits by number.  See the
-documentation for *shu-git-diff-commits* for further information.
-
-This function counts as a commit any instance of "commit" that starts at the
-beginning of a line and is followed by some white space and a forty character
-hexadecimal number.  Returns the count of the number of commits found.
-
-
-
 #### number-lines ####
 [Command]
  (Function: shu-number-lines)
@@ -9521,6 +10632,48 @@ While in dired, open the current file (Mac OS X only)
 Display the name of the host operating system type.  This is a sanity check
 function for the various functions defined in .emacs to determine the type of
 the host operating system.
+
+
+
+#### prepare-for-rename ####
+prepare-for-rename *old-namespace* *new-namespace*
+[Command]
+ (Function: shu-prepare-for-rename)
+
+This is a function that helps to rename a list of files that share one common
+part of a name to a list of files that have a different common part of the name.
+For example, given the following set of files:
+
+```
+      aaaa_mumble.cpp
+      aaaa_mumble.h
+      aaaa_mumble.t.cpp
+```
+
+it is not uncommon to want to change those file names to something like
+
+```
+      abcdef_mumble.cpp
+      abcdef_mumble.h
+      abcdef_mumble.t.cpp
+```
+
+This can be done with the following work flow:
+
+```
+      1. ls "aaaa*" >cf.txt
+
+      2. Edit cf.txt to turn it into a script that renames the files from
+         "aaaa`*\` to "abcdef*".
+```
+
+The editing steps are relatively straightforward, but take a small number of
+minutes.
+
+This function automates the editing steps.
+
+When invoked interactively, it first prompts for the old common part and then
+for the new common part.
 
 
 
@@ -9572,14 +10725,6 @@ Set the end of line delimiter to be the Unix standard (LF).
 
 
 
-#### show-branch ####
-[Command]
- (Function: shu-git-show-branch)
-
-Display the name of the current branch in a git repository.
-
-
-
 #### show-repo ####
 [Command]
  (Function: shu-show-repo)
@@ -9594,6 +10739,57 @@ the minibuffer.
  (Function: shu-show-system-name)
 
 Place the system name (machine name) in the message area.
+
+
+
+#### srs ####
+srs *rstring*
+[Command]
+ (Function: shu-srs)
+
+A sed-like version of REPLACE-STRING.  REPLACE-STRING requires two arguments,
+which are read interactively, one at a time.  This works well for normal
+interactive use.
+
+But sometimes you actually create the search and replacement strings in another
+buffer to be fed to REPLACE-STRING.  To use these two strings you have to do the
+following:
+
+```
+     1. Invoke REPLACE-STRING
+     2. Switch to the other buffer
+     3. Copy the search string from the other buffer
+     4. Switch back to the main buffer
+     5. Paste the search string from the kill ring
+     6. Hit enter
+     7. Switch to the other buffer
+     8. Copy the replacement string from the other buffer
+     9. Switch back to the main buffer
+    10. Paste the replacement string from the kill ring
+    11. Hit enter
+```
+
+This function allows you to enter both strings at one prompt using a sed-like
+syntax, such as
+
+```
+     /abc/defg
+```
+
+This specifies a search string of "abc\ and a replacement string of "defg".
+
+The work flow now becomes
+
+```
+     1. Invoke *shu-srs*
+     2. Switch to the other buffer
+     3. Copy the search and replacement string from the other buffer
+     4. Switch back to the main buffer
+     5. Paste the search and replacement string from the kill ring
+     6. Hit enter
+```
+
+You only have to go through six steps instead of eleven.
 
 
 
@@ -9669,6 +10865,10 @@ the display.
 If the prefix argument is large enough that the left side of the frame would be
 moved past the left side of the display, the window is positioned such that the
 left edge of the window is aligned with the left edge of the display.
+
+Prefix arguments greater than 10 assume a two display system.  Prefix arguments
+of 11 and 12 put two frames on the right display.  Prefix arguments of 13 and
+14 put two frames on the left display.
 
 Implementation note:
 
@@ -9792,6 +10992,62 @@ simple, little function.
 
 
 
+#### shu-change-namespace ####
+shu-change-namespace *input*
+[Command]
+ (Alias: change-namespace)
+
+This function changes the namespace in a set of C++ source files.
+
+The files to be changed must follow these conventions:
+
+ - The namespace name is all lower case
+ - Each file name starts with the lower case namespace name followed by an
+   underscore
+
+The following steps are performed:
+
+ 1. Locate all of the files to be changed.  These are all files that hold C++
+ source code in the current directory or in any directory below the current
+ directory.  The set of files may be restricted by specifying a regular
+ expression.  The regular expression does not need to include the file type.
+
+ 2. The files to be changed are renamed with the new namespace replacing the
+ old in the file name.  If any file is part of a git repository, then "git mv"
+ is used for the rename operation.  Otherwise, "mv" is used.
+
+ 3. The files are then edited to replace all occurrences of the old namespace
+ with the new.
+
+The existing namespace, new namespace and file search pattern are specified with
+a single string.
+
+The first character of the string is a delimiter character that is used to split
+the string.  The existing namespace, new namespace and file search pattern are
+separated from each other with the delimiter.
+
+For example, to specify an existing namespace of "fumblebar", a new namespace
+of "wunderbar", and a search pattern of "`*exception*`", one might specify
+
+```
+       $fumblebar$wunderbar$`*exception*`
+```
+
+or
+
+```
+       @fumblebar@wunderbar@`*exception*`
+```
+
+The search pattern is optional.  The following string would do the same
+namespace replacement for all C++ files.
+
+```
+       $fumblebar$wunderbar
+```
+
+
+
 #### shu-comma-names-to-letter ####
 [Command]
  (Alias: comma-names-to-letter)
@@ -9868,11 +11124,75 @@ C-x C-c to this function and use an explicit M-x quit to exit emacs.
 
 
 
+#### shu-dump-list ####
+shu-dump-list *items* *log-buffer*
+[Function]
+
+*items* is a list of strings, which is printed into *log-buffer*.
+
+
+
+#### shu-dump-rename-list ####
+shu-dump-rename-list *files* *log-buffer*
+[Function]
+
+*files* is a list of cons cells.  The CAR of each cons cell is the name of an
+existing file.  The CDR of each cons cell is the name that the file will have
+after the rename operation.  This function prints into the *log-buffer* the old
+and new file names to show the name changes that will take place as the rename
+happens.
+
+
+
 #### shu-dup ####
 [Command]
  (Alias: dup)
 
 Insert a duplicate of the current line, following it.
+
+
+
+#### shu-edit-namespace-cmake-buffer ####
+shu-edit-namespace-cmake-buffer *newfiles* *log-buffer*
+[Function]
+
+The current buffer is a CMake file (instances of CMakeLists.txt).  *newfiles*
+is a list of cons cells.  The CAR of each cons cell is the old file name.  The
+CDR of each cons cell is the new file name.
+
+This function edits the buffer replacing all instances of the old file name with
+the new file name.
+
+
+
+#### shu-edit-namespace-cmake-files ####
+shu-edit-namespace-cmake-files *root* *cmake-files* *newfiles* *log-buffer*
+[Function]
+
+*cmake-files* is a list of CMake files (instances of CMakeLists.txt).  *newfiles*
+is a list of cons cells.  The CAR of each cons cell is the old file name.  The
+CDR of each cons cell is the new file name.
+
+This function edits each CMake file replacing all instances of the old file name
+with the new file name.
+
+
+
+#### shu-edit-new-namespace-files ####
+shu-edit-new-namespace-files *root* *newfiles* *old-namespace* *new-namespace* *log-buffer*
+[Function]
+
+*newfiles* is a list of cons cells.  The CAR of each cons cell is the old file
+name.  The CDR of each cons cell is the new file name.  This function uses
+*shu-replace-namespace-in-buffer* to replace the *old-namespace* name with the
+*new-namespace* name.
+
+The editing progress is logged in the *log-buffer*.
+
+This functions quits as soon as the first edit fails, leaving the reason for the
+failure in the *log-buffer*.
+
+Returns t if all of the edits succeeded, nil otherwise.
 
 
 
@@ -9896,6 +11216,20 @@ does not matter.
 
 
 
+#### shu-expand-header-line ####
+shu-expand-header-line *expand-count*
+[Function]
+
+If the first line of the buffer contains the sentinel "-`*-C++-*-`", add
+*expand-count* spaces in front of it.
+
+If the first line of the buffer does not contain the sentinel "-`*-C++-*-`",
+do nothing.
+
+Return the number of spaces actually added.
+
+
+
 #### shu-extract-name-open-grok ####
 [Command]
  (Alias: scan-grok)
@@ -9910,14 +11244,75 @@ tests.
 
 
 
-#### shu-find-numbered-commit ####
-shu-find-numbered-commit *commit-number*
+#### shu-extract-replacement-strings ####
+shu-extract-replacement-strings *rstring*
 [Function]
 
-Search through a numbered git commit log looking for the commit whose number is
-*commit-number*.  Return the SHA-1 hash of the commit if the commit number is found.
-Return nil if no commit with the given number is found.
-The commit log is assume to have been numbered by shu-git-number-commits.
+Parse a sed-like search and replacement string such as "/abc/defg".
+
+This function parses such a string.  The first character in the string is the
+delimiter.  The delimiter character is used to break the string into two
+strings, in this case "abc" and "defg".  If this can be done successfully,
+the two strings are returned in a cons cell.  If the string cannot be parsed,
+nil is returned.
+
+
+
+#### shu-extract-replacement-triple ####
+shu-extract-replacement-triple *rstring*
+[Function]
+
+Parse a sed-like search and replacement string that specifies three parts
+such as "/abc/defg/xyz".
+
+This function parses such a string.  The first character in the string is the
+delimiter.  The delimiter character is used to break the string into two or
+three strings, in this case "abc", "defg", and "xyz".  If this can be done
+successfully, the three strings are returned in a list.  If the string cannot be
+parsed, nil is returned.
+
+There my be two or three occurrences of the delimiter character.  For example
+
+```
+      "$abc$def$ghi"
+```
+
+returns the list
+
+```
+      1. "abc"
+      2. "def"
+      3. "ghi"
+
+      "$abc$def$"
+```
+
+returns the list
+
+```
+      1. "abc"
+      2. "def"
+      3. ""  (Empty string)
+```
+
+as does "$abc$def" with no trailing delimiter character.
+
+
+
+#### shu-fix-header-line ####
+[Command]
+ (Alias: fix-header)
+
+If the first line of the buffer contains the sentinel "-`*-C++-*-`", adjust
+the line length to be *shu-cpp-comment-end* in length, adding or removing
+internal space as necessary.
+
+If the first line of the buffer does not contain the sentinel "-`*-C++-*-`",
+do nothing.
+
+Return the number of spaces actually adjusted.  0 means no adjustment made.
+A positive number represents the number of spaces added.  A negative number
+represents the number of spaces removed.
 
 
 
@@ -10156,6 +11551,20 @@ start ``` with no companion ``` close, it is not included in the list.
 
 
 
+#### shu-get-name-and-version ####
+[Function]
+
+When positioned anywhere on a line that looks like
+
+```
+        Published version 1.2.9 of library
+```
+
+return a string of the form "library=1.2.9".  If the current line does not
+match the required pattern, return nil.
+
+
+
 #### shu-get-repo ####
 [Function]
  (Alias: get-repo)
@@ -10184,6 +11593,20 @@ The url for the git repository in .git/config is of the form
 This function removes the trailing ".git", replaces the leading "git@" with
 "https://" and replaces the ":" between the web-address and repository-name
 with "/".
+
+
+
+#### shu-getnv ####
+[Command]
+ (Alias: getnv)
+
+When positioned anywhere on a line that looks like
+
+```
+        Published version 1.2.9 of library
+```
+
+put into the kill ring  a string of the form "library=1.2.9".
 
 
 
@@ -10219,153 +11642,6 @@ file into the kill ring in the form of "line 1234 of foo.cpp".
  (Alias: gfn)
 
 While in a file buffer, put the name of the current file into the kill ring.
-
-
-
-#### shu-git-add-file ####
-shu-git-add-file *filename*
-[Function]
-
-Do a "git add" for *filename*.  Return empty string if add succeeds.  Otherwise,
-return git error message.
-
-
-
-#### shu-git-branch-to-kill-ring ####
-[Command]
-
-Put the name of the current branch in a git repository into the kill ring.
-
-
-
-#### shu-git-diff-commits ####
-shu-git-diff-commits *commit-range*
-[Command]
- (Alias: diff-commits)
-
-In a buffer that is a numbered git log, query for a range string, find the two
-commits, and put into the kill ring a git diff command specifying the two commits.
-
-For example, given the following two numbered commits:
-
-```
-    31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
-    33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
-```
-
-if the commit range specified is either "31.33" or "31+2", then the following
-is put into the kill ring:
-
-```
-    "git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 "
-```
-
-
-
-#### shu-git-find-branch ####
-[Function]
-
-Return the name of the current branch in a git repository.
-
-
-
-#### shu-git-find-default-branch ####
-[Function]
-
-Return the name of the default branch in a git repository.  The default
-branch is the one branch that is created with a new repository.
-
-
-
-#### shu-git-find-short-hash ####
-shu-git-find-short-hash *hash*
-[Function]
-
-Return the git short hash for the *hash* supplied as an argument.  Return nil
-if the given *hash* is not a valid git revision.
-
-
-
-#### shu-git-get-pr-url ####
-[Command]
- (Alias: get-pr-url)
-
-Put into the kill ring the path required to create a new pull request for
-the current branch of the current repository.
-
-
-
-#### shu-git-insert-branch ####
-[Command]
- (Alias: insb)
-
-Insert at point the name of the current branch in a git repository
-
-
-
-#### shu-git-insert-git-commit ####
-[Command]
- (Alias: gcm)
-
-Insert at point the name the git command to commit with the commentary held
-in a file called "why.txt".
-
-
-
-#### shu-git-insert-origin-branch ####
-[Command]
- (Alias: inso)
-
-Insert at point the name of the current branch in a git repository preceded by the
-word "origin"..  This can be used as part of git push or pull.
-
-
-
-#### shu-git-insert-pull-origin-branch ####
-[Command]
- (Alias: gpl)
-
-Insert at point the name the git command to pull the current branch from
-origin.
-
-
-
-#### shu-git-insert-push-origin-branch ####
-[Command]
- (Alias: gps)
-
-Insert at point the git command to push the current branch out to origin.  If
-the current branch is the default branch (fka "master"), you are prompted to
-see if you want to proceed.  This is to prevent an accidental push to the
-default branch.
-
-
-
-#### shu-git-number-commits ####
-[Command]
- (Alias: number-commits)
-
-In a git log buffer, number all of the commits with zero being the most
-recent.
-
-It is possible to refer to commits by their SHA-1 hash.  If you want to see the
-difference between two commits you can ask git to show you the difference by
-specifying the commit hash of each one.  But this is cumbersome.  It involves
-copying and pasting two SHA-1 hashes.  Once the commits are numbered, then
-*shu-git-diff-commits* may be used to diff two commits by number.  See the
-documentation for *shu-git-diff-commits* for further information.
-
-This function counts as a commit any instance of "commit" that starts at the
-beginning of a line and is followed by some white space and a forty character
-hexadecimal number.  Returns the count of the number of commits found.
-
-
-
-#### shu-git-show-branch ####
-[Command]
- (Alias: show-branch)
-
-Display the name of the current branch in a git repository.
 
 
 
@@ -10412,6 +11688,44 @@ true, the function is interactive.
 
 
 
+#### shu-internal-process-new-namespace ####
+shu-internal-process-new-namespace *root* *old-namespace* *new-namespace* *pattern*
+[Function]
+
+Starting in directory *root*, look for files as follows.  If *pattern* is nil, look
+for all files that hold C++ code.  If *pattern* is non-nil, use that to search for
+files that hold C+++ code.
+
+Of the set of files found, change the namespace from *old-namespace* to
+*new-namespace*.
+
+It is assumed that files follow the standard convention of using the namespace as
+the first part of the file followed by an underscore.  If the current namespace is
+"mumblebar", then all file names start with "mumblebar_".  If the new namespace
+is "fubmblenew", then all files whose names start with "mumblebar_" will be
+renamed to start with "fubmblenew_".  Within the new files, all instances of
+"mumblebar" will be changed to instances of "fubmblenew".
+
+
+
+#### shu-is-common-prefix ####
+shu-is-common-prefix *prefix* *strings*
+[Function]
+
+If *prefix* is a common prefix in the list of *strings*, return *prefix*,
+else, return nil.
+
+
+
+#### shu-is-common-substring ####
+shu-is-common-substring *substring* *strings*
+[Function]
+
+If *substring* is a common substring in the list of *strings*, return *substring*,
+else, return nil.
+
+
+
 #### shu-kill-current-buffer ####
 [Command]
 
@@ -10451,6 +11765,24 @@ case-fold-search.  The user should set it before calling this function.
 
 
 
+#### shu-longest-common-prefix ####
+shu-longest-common-prefix *strings*
+[Command]
+
+Return the longest common prefix of the list of *strings*.  Return nil if there
+is no common prefix.
+
+
+
+#### shu-longest-common-substring ####
+shu-longest-common-substring *strings*
+[Command]
+
+Return the longest common substring of the list of *strings*.  Return nil if
+there is no common substring.
+
+
+
 #### shu-loosen-lisp ####
 [Command]
  (Alias: loosen-lisp)
@@ -10461,6 +11793,23 @@ inside of them without having to worry about which line contains the closing
 parenthesis.  All closing parentheses are now on separate lines.  Once the
 changes to the function are complete, you can run *shu-tighten-lisp* to put the
 parentheses back where they belong.
+
+
+
+#### shu-make-header-line ####
+[Command]
+ (Alias: make-header)
+
+At the top of the current buffer, insert a string that holds the standard
+first line comment in a C++ file, which is of the form:
+
+```
+      "// file_name                                      -`*-C++-*-`"
+```
+
+The inserted line is of length *shu-cpp-comment-end*.
+
+Does nothing if the current buffer does not have an associated file name.
 
 
 
@@ -10738,6 +12087,56 @@ too short will be expanded as necessary.
 
 
 
+#### shu-move-file ####
+shu-move-file *old-file* *new-file*
+[Function]
+
+Issue "mv old-file new-file".
+
+Return a cons cell whose CAR is t if the move succeeded and whose CDR is the
+output of the move command.
+
+
+
+#### shu-move-string ####
+shu-move-string *old-file* *new-file*
+[Function]
+
+Return the "mv" command to rename *old-file* to *new-file*.  The result is
+not intended to be executed.  It is intended for use in messages that explain
+what operation is being done.
+
+
+
+#### shu-namespace-filter-cmake-file ####
+shu-namespace-filter-cmake-file *cmake-file* *newfiles* *log-buffer*
+[Function]
+
+*cmake-file* is a CMake file (CMakeLists.txt).  *newfiles* is a list of cons
+cells.  The CAR of each cons cell is the name of an existing code file with the
+existing namespace.
+
+This function returns true if any of the existing file names are found within
+the *cmake-file*.
+
+
+
+#### shu-namespace-find-cmake-files ####
+shu-namespace-find-cmake-files *newfiles* *log-buffer*
+[Function]
+
+*newfiles* is a list of cons cells.  The CAR of each cons cell is the name of
+an existing code file with the existing namespace.
+
+This function finds all CMake files (instances of CMakeLists.txt) and returns a
+list of CMake file names, each of which holds at least one instance of an
+existing file name.
+
+These are the CMake files that will need editing after all of the file names
+have been changed to the new namespace names.
+
+
+
 #### shu-new-ert ####
 shu-new-ert *func-name*
 [Command]
@@ -10840,6 +12239,48 @@ Return a string with the name of the type of the host operating system.
 
 
 
+#### shu-prepare-for-rename ####
+shu-prepare-for-rename *old-namespace* *new-namespace*
+[Command]
+ (Alias: prepare-for-rename)
+
+This is a function that helps to rename a list of files that share one common
+part of a name to a list of files that have a different common part of the name.
+For example, given the following set of files:
+
+```
+      aaaa_mumble.cpp
+      aaaa_mumble.h
+      aaaa_mumble.t.cpp
+```
+
+it is not uncommon to want to change those file names to something like
+
+```
+      abcdef_mumble.cpp
+      abcdef_mumble.h
+      abcdef_mumble.t.cpp
+```
+
+This can be done with the following work flow:
+
+```
+      1. ls "aaaa*" >cf.txt
+
+      2. Edit cf.txt to turn it into a script that renames the files from
+         "aaaa`*\` to "abcdef*".
+```
+
+The editing steps are relatively straightforward, but take a small number of
+minutes.
+
+This function automates the editing steps.
+
+When invoked interactively, it first prompts for the old common part and then
+for the new common part.
+
+
+
 #### shu-put-line-near-top ####
 [Command]
 
@@ -10861,6 +12302,71 @@ invoked by C-x C-c
  (Alias: remove-test-names)
 
 Remove from a file all lines that contain file names that end in .t.cpp
+
+
+
+#### shu-rename-namespace-files ####
+shu-rename-namespace-files *newfiles* *log-buffer*
+[Function]
+
+*newfiles* is a list of cons cells.  The CAR of each cons cell is the old file
+name.  The CDR of each cons cell is the new file name.  This function renames
+each file from old to new.
+
+If the file is under git control, then "git mv" is used for the rename.  If
+the file is not under git control, then "mv" is used for the rename.
+
+Each rename command is placed in the *log-buffer*.  This function quits as soon as
+any rename fails, leaving the reason for the failure in the *log-buffer*.
+
+The return value is t if all of the renames worked, nil otherwise.
+
+
+
+#### shu-replace-namespace-in-buffer ####
+shu-replace-namespace-in-buffer *old-namespace* *new-namespace*
+[Function]
+
+Within the current buffer, do a case sensitive replace of *old-namespace* with
+*new-namespace*.  Then do a case sensitive replace of the upper case version of
+*old-namespace* with the upper case version of *new-namespace*.
+
+At the end of all replacements, invoke *shu-fix-header-line* to fix up the first
+line of the file in case the length of the namespace has changed.
+
+Return the count of items changed in the buffer.
+
+
+
+#### shu-replace-namespace-in-file-name ####
+shu-replace-namespace-in-file-name *file-name* *old-namespace* *new-namespace*
+[Function]
+
+*file-name* is the name of a file with a standard namespace prefix.
+
+It is assumed that the file name uses the convention of the first part of the
+name being the C++ namespace, followed by an underscore, followed by the class
+name in all lower case.
+
+*old-namespace* is the current namespace.  *new-namespace* is the new namespace that
+is to replace the old.
+
+Return a new file name that is the same as the original file name but with the
+namespace part of the name replaced with the new namespace.
+
+If the namespace appears in the file path it is not modified.  For example, if
+the old namespace is "mumble" and the new namespace is "bumble", then the
+following file name
+
+```
+      mumble_bar/mumble_bar/mumble_observer.h
+```
+
+will be returned as
+
+```
+      mumble_bar/mumble_bar/bumble_observer.h
+```
 
 
 
@@ -10989,6 +12495,28 @@ Place the system name (machine name) in the message area.
 
 
 
+#### shu-sitting-end ####
+shu-sitting-end *regex* *dir*
+[Function]
+
+If the text at (point) is a character that matches *regex*, scan until either
+whitespace or the beginning / end of the line is reached.  If all characters
+scanned match *regex*, return the point of the last matching character, otherwise
+return nil.  *dir* indicates the direction of the scan.  Negative does a backward
+scan.  Non-negative does a forward scan.
+
+
+
+#### shu-sitting-on ####
+shu-sitting-on *regex*
+[Function]
+
+If the contiguous string of characters at (point) all match *regex* bounded by
+either whitespace or the begin / end of the line, return the matched string.  If
+any characters are found that do not match *regex*, return nil.
+
+
+
 #### shu-split-range-string ####
 shu-split-range-string *range-string*
 [Function]
@@ -11006,6 +12534,77 @@ and the cdr of the cons cell are nil.
 
 For example, "99+2" has start 99 and end 101.  "99-2" has start 99 and end 97.
 "99.103" has start 99, end 103.  "98" has start 98 and end is nil.
+
+
+
+#### shu-srs ####
+shu-srs *rstring*
+[Command]
+ (Alias: srs)
+
+A sed-like version of REPLACE-STRING.  REPLACE-STRING requires two arguments,
+which are read interactively, one at a time.  This works well for normal
+interactive use.
+
+But sometimes you actually create the search and replacement strings in another
+buffer to be fed to REPLACE-STRING.  To use these two strings you have to do the
+following:
+
+```
+     1. Invoke REPLACE-STRING
+     2. Switch to the other buffer
+     3. Copy the search string from the other buffer
+     4. Switch back to the main buffer
+     5. Paste the search string from the kill ring
+     6. Hit enter
+     7. Switch to the other buffer
+     8. Copy the replacement string from the other buffer
+     9. Switch back to the main buffer
+    10. Paste the replacement string from the kill ring
+    11. Hit enter
+```
+
+This function allows you to enter both strings at one prompt using a sed-like
+syntax, such as
+
+```
+     /abc/defg
+```
+
+This specifies a search string of "abc\ and a replacement string of "defg".
+
+The work flow now becomes
+
+```
+     1. Invoke *shu-srs*
+     2. Switch to the other buffer
+     3. Copy the search and replacement string from the other buffer
+     4. Switch back to the main buffer
+     5. Paste the search and replacement string from the kill ring
+     6. Hit enter
+```
+
+You only have to go through six steps instead of eleven.
+
+
+
+#### shu-srs-create-prompt ####
+[Function]
+
+This function creates the prompt for the shu-srs replacement function.
+*shu-srs-last-replace* is nil, this function prints the default prompt and returns
+whatever the user types in.  If *shu-srs-last-replace* is non-nil, the prompt
+offers to replicate the last change made by *shu-srs*.  If the user types nothing,
+the last replacement string is returned.  If the user types something, that is
+returned instead.
+
+
+
+#### shu-srs-last-replace ####
+[Variable]
+
+This holds the last string that was passed to shu-srs.  It is remembered here and used as the
+prompt for subsequent invocations of shu-srs
 
 
 
@@ -11102,6 +12701,23 @@ do not trim the last four characters.
 
 Return the *path*, leading and trailing spaces trimmed, with perhaps ".git"
 removed from the end.
+
+
+
+#### shu-trim-header-line ####
+shu-trim-header-line *trim-count*
+[Function]
+
+If the first line of the buffer contains the sentinel "-`*-C++-*-`", remove
+*trim-count* number of spaces from in front of the sentinel.
+
+If the first line of the buffer does not contain the sentinel "-`*-C++-*-`",
+do nothing.
+
+If there do not exist enough spaces to remove *trim-count* of them, remove
+as many as possible.
+
+Return the number of spaces actually removed.
 
 
 
@@ -11486,13 +13102,12 @@ within type.
 
 Associate a number with each type of variable
 
-
-
 # Index #
 
 * [acgen](#acgen)
 * [add-alexandria-badge](#add-alexandria-badge)
 * [add-alexandria](#add-alexandria)
+* [add-include](#add-include)
 * [add-prefix](#add-prefix)
 * [af](#af)
 * [all-quit](#all-quit)
@@ -11515,12 +13130,14 @@ Associate a number with each type of variable
 * [celse](#celse)
 * [cfor](#cfor)
 * [cgen](#cgen)
+* [change-namespace](#change-namespace)
 * [cif](#cif)
 * [ck](#ck)
 * [clc](#clc)
 * [clear-c-project](#clear-c-project)
 * [clear-prefix](#clear-prefix)
 * [comma-names-to-letter](#comma-names-to-letter)
+* [copy-branch](#copy-branch)
 * [copy-repo](#copy-repo)
 * [cother](#cother)
 * [count-c-project](#count-c-project)
@@ -11548,19 +13165,24 @@ Associate a number with each type of variable
 * [fill-area](#fill-area)
 * [fill-data](#fill-data)
 * [find-all-variables](#find-all-variables)
+* [fix-header](#fix-header)
 * [fixp](#fixp)
 * [fixup-doxyfile](#fixup-doxyfile)
 * [fline](#fline)
 * [gcc](#gcc)
 * [gcm](#gcm)
+* [gco](#gco)
 * [gd](#gd)
 * [gen-bb-component](#gen-bb-component)
 * [gen-bde-component](#gen-bde-component)
+* [gen-bde-template](#gen-bde-template)
 * [gen-component](#gen-component)
+* [gen-new-bde-component](#gen-new-bde-component)
 * [get-pr-url](#get-pr-url)
 * [get-repo](#get-repo)
 * [get-set](#get-set)
 * [getdef](#getdef)
+* [getnv](#getnv)
 * [getters](#getters)
 * [gf](#gf)
 * [gfc](#gfc)
@@ -11576,6 +13198,7 @@ Associate a number with each type of variable
 * [insb](#insb)
 * [inso](#inso)
 * [iother](#iother)
+* [is-keyword](#is-keyword)
 * [kill-system-name](#kill-system-name)
 * [kracct](#kracct)
 * [krfn](#krfn)
@@ -11585,6 +13208,7 @@ Associate a number with each type of variable
 * [krpw](#krpw)
 * [krurl](#krurl)
 * [krvf](#krvf)
+* [list-c-all-project](#list-c-all-project)
 * [list-c-directories](#list-c-directories)
 * [list-c-duplicates](#list-c-duplicates)
 * [list-c-file-names](#list-c-file-names)
@@ -11597,6 +13221,7 @@ Associate a number with each type of variable
 * [make-c-project](#make-c-project)
 * [make-datetime](#make-datetime)
 * [make-full-c-project](#make-full-c-project)
+* [make-header](#make-header)
 * [make-interval](#make-interval)
 * [make-md-toc](#make-md-toc)
 * [make-p-project](#make-p-project)
@@ -11620,6 +13245,7 @@ Associate a number with each type of variable
 * [os-name](#os-name)
 * [other](#other)
 * [parse-region](#parse-region)
+* [prepare-for-rename](#prepare-for-rename)
 * [qualify-bsl](#qualify-bsl)
 * [qualify-class](#qualify-class)
 * [qualify-std](#qualify-std)
@@ -11651,6 +13277,7 @@ Associate a number with each type of variable
 * [shu-add-cpp-h-extensions](#shu-add-cpp-h-extensions)
 * [shu-add-cpp-package-line](#shu-add-cpp-package-line)
 * [shu-add-doxyfile](#shu-add-doxyfile)
+* [shu-add-include](#shu-add-include)
 * [shu-add-prefix](#shu-add-prefix)
 * [shu-add-to-alist-list](#shu-add-to-alist-list)
 * [shu-add-to-alist](#shu-add-to-alist)
@@ -11662,6 +13289,8 @@ Associate a number with each type of variable
 * [shu-all-whitespace-chars](#shu-all-whitespace-chars)
 * [shu-all-whitespace-regexp-scf](#shu-all-whitespace-regexp-scf)
 * [shu-all-whitespace-regexp](#shu-all-whitespace-regexp)
+* [shu-announce-sort-counts](#shu-announce-sort-counts)
+* [shu-append-to-file](#shu-append-to-file)
 * [shu-attr-name](#shu-attr-name)
 * [shu-author](#shu-author)
 * [shu-batch-add-alexandria](#shu-batch-add-alexandria)
@@ -11795,6 +13424,7 @@ Associate a number with each type of variable
 * [shu-cdo](#shu-cdo)
 * [shu-celse](#shu-celse)
 * [shu-cfor](#shu-cfor)
+* [shu-change-namespace](#shu-change-namespace)
 * [shu-cif](#shu-cif)
 * [shu-citerate](#shu-citerate)
 * [shu-class-is-blocked](#shu-class-is-blocked)
@@ -11810,6 +13440,7 @@ Associate a number with each type of variable
 * [shu-cother](#shu-cother)
 * [shu-count-c-project](#shu-count-c-project)
 * [shu-count-in-cpp-directory](#shu-count-in-cpp-directory)
+* [shu-cpp-acgen-template](#shu-cpp-acgen-template)
 * [shu-cpp-acgen](#shu-cpp-acgen)
 * [shu-cpp-adjust-template-parameters](#shu-cpp-adjust-template-parameters)
 * [shu-cpp-all-search-match-tokens](#shu-cpp-all-search-match-tokens)
@@ -11818,8 +13449,10 @@ Associate a number with each type of variable
 * [shu-cpp-base-types](#shu-cpp-base-types)
 * [shu-cpp-c-extensions](#shu-cpp-c-extensions)
 * [shu-cpp-c-file-count](#shu-cpp-c-file-count)
+* [shu-cpp-ccdecl-template](#shu-cpp-ccdecl-template)
 * [shu-cpp-ccdecl](#shu-cpp-ccdecl)
 * [shu-cpp-ccgen](#shu-cpp-ccgen)
+* [shu-cpp-cdecl-template](#shu-cpp-cdecl-template)
 * [shu-cpp-cdecl](#shu-cpp-cdecl)
 * [shu-cpp-cgen](#shu-cpp-cgen)
 * [shu-cpp-check-streaming-op](#shu-cpp-check-streaming-op)
@@ -11845,22 +13478,30 @@ Associate a number with each type of variable
 * [shu-cpp-decl-class-name](#shu-cpp-decl-class-name)
 * [shu-cpp-decl-cpp-class-name](#shu-cpp-decl-cpp-class-name)
 * [shu-cpp-decl-cpp-print-self](#shu-cpp-decl-cpp-print-self)
+* [shu-cpp-decl-cpp-stream-template](#shu-cpp-decl-cpp-stream-template)
 * [shu-cpp-decl-cpp-stream](#shu-cpp-decl-cpp-stream)
 * [shu-cpp-decl-h-class-name](#shu-cpp-decl-h-class-name)
 * [shu-cpp-decl-h-print-self](#shu-cpp-decl-h-print-self)
+* [shu-cpp-decl-h-stream-template](#shu-cpp-decl-h-stream-template)
 * [shu-cpp-decl-h-stream](#shu-cpp-decl-h-stream)
 * [shu-cpp-default-allocator-name](#shu-cpp-default-allocator-name)
 * [shu-cpp-default-allocator-type](#shu-cpp-default-allocator-type)
 * [shu-cpp-default-global-namespace](#shu-cpp-default-global-namespace)
 * [shu-cpp-default-member](#shu-cpp-default-member)
 * [shu-cpp-default-namespace](#shu-cpp-default-namespace)
+* [shu-cpp-edit-sentinel](#shu-cpp-edit-sentinel)
+* [shu-cpp-fetch-list](#shu-cpp-fetch-list)
 * [shu-cpp-file-directory-name](#shu-cpp-file-directory-name)
 * [shu-cpp-file-name-list](#shu-cpp-file-name-list)
 * [shu-cpp-file-name](#shu-cpp-file-name)
 * [shu-cpp-fill-test-area](#shu-cpp-fill-test-area)
 * [shu-cpp-fill-test-data](#shu-cpp-fill-test-data)
 * [shu-cpp-final-list](#shu-cpp-final-list)
+* [shu-cpp-find-current-include-block](#shu-cpp-find-current-include-block)
 * [shu-cpp-find-h-definition](#shu-cpp-find-h-definition)
+* [shu-cpp-find-include-blocks](#shu-cpp-find-include-blocks)
+* [shu-cpp-find-include-direction](#shu-cpp-find-include-direction)
+* [shu-cpp-find-include-locations](#shu-cpp-find-include-locations)
 * [shu-cpp-find-using](#shu-cpp-find-using)
 * [shu-cpp-find-variable-name-by-token](#shu-cpp-find-variable-name-by-token)
 * [shu-cpp-find-variable-name-lines-by-token](#shu-cpp-find-variable-name-lines-by-token)
@@ -11868,10 +13509,12 @@ Associate a number with each type of variable
 * [shu-cpp-fix-prototype](#shu-cpp-fix-prototype)
 * [shu-cpp-found-extensions](#shu-cpp-found-extensions)
 * [shu-cpp-gen-decl-h-private](#shu-cpp-gen-decl-h-private)
+* [shu-cpp-gen-h-class-intro-template](#shu-cpp-gen-h-class-intro-template)
 * [shu-cpp-gen-h-class-intro](#shu-cpp-gen-h-class-intro)
 * [shu-cpp-gen-inline-template-header](#shu-cpp-gen-inline-template-header)
 * [shu-cpp-general-set-alias](#shu-cpp-general-set-alias)
 * [shu-cpp-get-comment](#shu-cpp-get-comment)
+* [shu-cpp-get-inverted-class-list](#shu-cpp-get-inverted-class-list)
 * [shu-cpp-get-operator-token](#shu-cpp-get-operator-token)
 * [shu-cpp-get-quoted-token](#shu-cpp-get-quoted-token)
 * [shu-cpp-get-unquoted-token](#shu-cpp-get-unquoted-token)
@@ -11879,11 +13522,16 @@ Associate a number with each type of variable
 * [shu-cpp-get-variable-name](#shu-cpp-get-variable-name)
 * [shu-cpp-h-extensions](#shu-cpp-h-extensions)
 * [shu-cpp-h-file-count](#shu-cpp-h-file-count)
+* [shu-cpp-hcgen-template](#shu-cpp-hcgen-template)
 * [shu-cpp-hcgen](#shu-cpp-hcgen)
+* [shu-cpp-impl-cpp-constructor](#shu-cpp-impl-cpp-constructor)
+* [shu-cpp-impl-cpp-print-self](#shu-cpp-impl-cpp-print-self)
 * [shu-cpp-include-names](#shu-cpp-include-names)
 * [shu-cpp-include-user-brackets](#shu-cpp-include-user-brackets)
 * [shu-cpp-indent-length](#shu-cpp-indent-length)
+* [shu-cpp-inner-cdecl-template](#shu-cpp-inner-cdecl-template)
 * [shu-cpp-inner-cdecl](#shu-cpp-inner-cdecl)
+* [shu-cpp-insert-template-decl](#shu-cpp-insert-template-decl)
 * [shu-cpp-internal-fill-test-data](#shu-cpp-internal-fill-test-data)
 * [shu-cpp-internal-list-names](#shu-cpp-internal-list-names)
 * [shu-cpp-internal-make-bool](#shu-cpp-internal-make-bool)
@@ -11903,8 +13551,12 @@ Associate a number with each type of variable
 * [shu-cpp-internal-sub-match-tokens](#shu-cpp-internal-sub-match-tokens)
 * [shu-cpp-internal-tz-make-datetime](#shu-cpp-internal-tz-make-datetime)
 * [shu-cpp-interval-type](#shu-cpp-interval-type)
+* [shu-cpp-inverted-class-list](#shu-cpp-inverted-class-list)
 * [shu-cpp-is-enclosing-op](#shu-cpp-is-enclosing-op)
+* [shu-cpp-is-keyword](#shu-cpp-is-keyword)
 * [shu-cpp-is-reverse-token-list-balanced](#shu-cpp-is-reverse-token-list-balanced)
+* [shu-cpp-keyword-list](#shu-cpp-keyword-list)
+* [shu-cpp-keyword](#shu-cpp-keyword)
 * [shu-cpp-keywords-hash](#shu-cpp-keywords-hash)
 * [shu-cpp-keywords](#shu-cpp-keywords)
 * [shu-cpp-line-end](#shu-cpp-line-end)
@@ -11914,11 +13566,14 @@ Associate a number with each type of variable
 * [shu-cpp-long-long-type](#shu-cpp-long-long-type)
 * [shu-cpp-make-date](#shu-cpp-make-date)
 * [shu-cpp-make-datetime](#shu-cpp-make-datetime)
+* [shu-cpp-make-decl-template](#shu-cpp-make-decl-template)
 * [shu-cpp-make-interval](#shu-cpp-make-interval)
 * [shu-cpp-make-match-info](#shu-cpp-make-match-info)
 * [shu-cpp-make-match-side-list](#shu-cpp-make-match-side-list)
+* [shu-cpp-make-qualified-class-name](#shu-cpp-make-qualified-class-name)
 * [shu-cpp-make-short-interval](#shu-cpp-make-short-interval)
 * [shu-cpp-make-size-type](#shu-cpp-make-size-type)
+* [shu-cpp-make-template-list](#shu-cpp-make-template-list)
 * [shu-cpp-make-time](#shu-cpp-make-time)
 * [shu-cpp-make-token-info](#shu-cpp-make-token-info)
 * [shu-cpp-map-class-to-include](#shu-cpp-map-class-to-include)
@@ -11932,6 +13587,7 @@ Associate a number with each type of variable
 * [shu-cpp-match-extract-side-list](#shu-cpp-match-extract-side-list)
 * [shu-cpp-match-extract-token](#shu-cpp-match-extract-token)
 * [shu-cpp-match-extract-type](#shu-cpp-match-extract-type)
+* [shu-cpp-match-general-include](#shu-cpp-match-general-include)
 * [shu-cpp-match-is-side-list](#shu-cpp-match-is-side-list)
 * [shu-cpp-match-many-list](#shu-cpp-match-many-list)
 * [shu-cpp-match-many-using-list](#shu-cpp-match-many-using-list)
@@ -11974,6 +13630,7 @@ Associate a number with each type of variable
 * [shu-cpp-project-get-base-name](#shu-cpp-project-get-base-name)
 * [shu-cpp-project-get-list-counts](#shu-cpp-project-get-list-counts)
 * [shu-cpp-project-invert-list](#shu-cpp-project-invert-list)
+* [shu-cpp-project-is-type-wanted](#shu-cpp-project-is-type-wanted)
 * [shu-cpp-project-list](#shu-cpp-project-list)
 * [shu-cpp-project-name](#shu-cpp-project-name)
 * [shu-cpp-project-set-alias](#shu-cpp-project-set-alias)
@@ -11981,6 +13638,8 @@ Associate a number with each type of variable
 * [shu-cpp-project-subdirs](#shu-cpp-project-subdirs)
 * [shu-cpp-project-time](#shu-cpp-project-time)
 * [shu-cpp-project-very-short-names](#shu-cpp-project-very-short-names)
+* [shu-cpp-project-visit-prefer-local](#shu-cpp-project-visit-prefer-local)
+* [shu-cpp-project-visit-prefer-project](#shu-cpp-project-visit-prefer-project)
 * [shu-cpp-qualify-classes](#shu-cpp-qualify-classes)
 * [shu-cpp-remove-template-parameters](#shu-cpp-remove-template-parameters)
 * [shu-cpp-replace-token-info](#shu-cpp-replace-token-info)
@@ -11995,7 +13654,9 @@ Associate a number with each type of variable
 * [shu-cpp-short-interval-type](#shu-cpp-short-interval-type)
 * [shu-cpp-short-list](#shu-cpp-short-list)
 * [shu-cpp-side-list-functions](#shu-cpp-side-list-functions)
+* [shu-cpp-sitting-on-keyword](#shu-cpp-sitting-on-keyword)
 * [shu-cpp-size-type](#shu-cpp-size-type)
+* [shu-cpp-split-template-parameter-list](#shu-cpp-split-template-parameter-list)
 * [shu-cpp-std-namespace](#shu-cpp-std-namespace)
 * [shu-cpp-string-type](#shu-cpp-string-type)
 * [shu-cpp-subdir-for-package](#shu-cpp-subdir-for-package)
@@ -12083,18 +13744,26 @@ Associate a number with each type of variable
 * [shu-dox-hdr](#shu-dox-hdr)
 * [shu-dox2-hdr](#shu-dox2-hdr)
 * [shu-drc](#shu-drc)
+* [shu-dump-list](#shu-dump-list)
+* [shu-dump-rename-list](#shu-dump-rename-list)
 * [shu-dup](#shu-dup)
+* [shu-edit-namespace-cmake-buffer](#shu-edit-namespace-cmake-buffer)
+* [shu-edit-namespace-cmake-files](#shu-edit-namespace-cmake-files)
+* [shu-edit-new-namespace-files](#shu-edit-new-namespace-files)
 * [shu-emit-get](#shu-emit-get)
 * [shu-emit-set](#shu-emit-set)
 * [shu-end-of-dq-string](#shu-end-of-dq-string)
 * [shu-end-of-string](#shu-end-of-string)
 * [shu-eob](#shu-eob)
 * [shu-erase-region](#shu-erase-region)
+* [shu-expand-header-line](#shu-expand-header-line)
 * [shu-extract-name-open-grok](#shu-extract-name-open-grok)
+* [shu-extract-replacement-strings](#shu-extract-replacement-strings)
+* [shu-extract-replacement-triple](#shu-extract-replacement-triple)
 * [shu-find-default-cpp-name](#shu-find-default-cpp-name)
-* [shu-find-end-include](#shu-find-end-include)
 * [shu-find-line-and-file](#shu-find-line-and-file)
 * [shu-find-numbered-commit](#shu-find-numbered-commit)
+* [shu-fix-header-line](#shu-fix-header-line)
 * [shu-fix-markdown-section](#shu-fix-markdown-section)
 * [shu-fix-times](#shu-fix-times)
 * [shu-fixed-format-num](#shu-fixed-format-num)
@@ -12108,13 +13777,18 @@ Associate a number with each type of variable
 * [shu-gd](#shu-gd)
 * [shu-gen-bb-component](#shu-gen-bb-component)
 * [shu-gen-bde-component](#shu-gen-bde-component)
+* [shu-gen-bde-create-prompt-template](#shu-gen-bde-create-prompt-template)
 * [shu-gen-bde-create-prompt](#shu-gen-bde-create-prompt)
+* [shu-gen-bde-make-prompt-string](#shu-gen-bde-make-prompt-string)
+* [shu-gen-bde-template](#shu-gen-bde-template)
 * [shu-gen-component](#shu-gen-component)
 * [shu-gen-return-ptr](#shu-gen-return-ptr)
 * [shu-generate-bb-cfile](#shu-generate-bb-cfile)
 * [shu-generate-bb-hfile](#shu-generate-bb-hfile)
 * [shu-generate-bb-tfile](#shu-generate-bb-tfile)
+* [shu-generate-bde-cfile-template](#shu-generate-bde-cfile-template)
 * [shu-generate-bde-cfile](#shu-generate-bde-cfile)
+* [shu-generate-bde-hfile-template](#shu-generate-bde-hfile-template)
 * [shu-generate-bde-hfile](#shu-generate-bde-hfile)
 * [shu-generate-bde-tfile](#shu-generate-bde-tfile)
 * [shu-generate-cfile](#shu-generate-cfile)
@@ -12140,10 +13814,12 @@ Associate a number with each type of variable
 * [shu-get-markdown-level](#shu-get-markdown-level)
 * [shu-get-markdown-prefix](#shu-get-markdown-prefix)
 * [shu-get-md-boundaries](#shu-get-md-boundaries)
+* [shu-get-name-and-version](#shu-get-name-and-version)
 * [shu-get-real-this-command-name](#shu-get-real-this-command-name)
 * [shu-get-repo](#shu-get-repo)
 * [shu-get-set](#shu-get-set)
 * [shu-get-url-repo](#shu-get-url-repo)
+* [shu-getnv](#shu-getnv)
 * [shu-getters](#shu-getters)
 * [shu-gf](#shu-gf)
 * [shu-gfc](#shu-gfc)
@@ -12151,18 +13827,24 @@ Associate a number with each type of variable
 * [shu-gfn](#shu-gfn)
 * [shu-ginclude](#shu-ginclude)
 * [shu-git-add-file](#shu-git-add-file)
-* [shu-git-branch-to-kill-ring](#shu-git-branch-to-kill-ring)
+* [shu-git-are-files-in-git](#shu-git-are-files-in-git)
+* [shu-git-copy-branch](#shu-git-copy-branch)
 * [shu-git-diff-commits](#shu-git-diff-commits)
 * [shu-git-find-branch](#shu-git-find-branch)
 * [shu-git-find-default-branch](#shu-git-find-default-branch)
 * [shu-git-find-short-hash](#shu-git-find-short-hash)
 * [shu-git-get-pr-url](#shu-git-get-pr-url)
 * [shu-git-insert-branch](#shu-git-insert-branch)
+* [shu-git-insert-checkout-default](#shu-git-insert-checkout-default)
 * [shu-git-insert-git-commit](#shu-git-insert-git-commit)
 * [shu-git-insert-origin-branch](#shu-git-insert-origin-branch)
 * [shu-git-insert-pull-origin-branch](#shu-git-insert-pull-origin-branch)
 * [shu-git-insert-push-origin-branch](#shu-git-insert-push-origin-branch)
+* [shu-git-is-file-in-git](#shu-git-is-file-in-git)
+* [shu-git-move-file](#shu-git-move-file)
+* [shu-git-move-string](#shu-git-move-string)
 * [shu-git-number-commits](#shu-git-number-commits)
+* [shu-git-set-alias](#shu-git-set-alias)
 * [shu-git-show-branch](#shu-git-show-branch)
 * [shu-global-buffer-name](#shu-global-buffer-name)
 * [shu-global-operation](#shu-global-operation)
@@ -12181,21 +13863,28 @@ Associate a number with each type of variable
 * [shu-internal-dev-url](#shu-internal-dev-url)
 * [shu-internal-double-citerate](#shu-internal-double-citerate)
 * [shu-internal-gen-bde-component](#shu-internal-gen-bde-component)
+* [shu-internal-gen-bde-template](#shu-internal-gen-bde-template)
 * [shu-internal-get-repo](#shu-internal-get-repo)
 * [shu-internal-get-set](#shu-internal-get-set)
 * [shu-internal-group-name](#shu-internal-group-name)
+* [shu-internal-list-c-all-project](#shu-internal-list-c-all-project)
 * [shu-internal-list-c-duplicates](#shu-internal-list-c-duplicates)
 * [shu-internal-list-c-file-names](#shu-internal-list-c-file-names)
 * [shu-internal-list-c-project](#shu-internal-list-c-project)
 * [shu-internal-new-lisp](#shu-internal-new-lisp)
+* [shu-internal-process-new-namespace](#shu-internal-process-new-namespace)
 * [shu-internal-replace-class-name](#shu-internal-replace-class-name)
 * [shu-internal-set-c-project](#shu-internal-set-c-project)
+* [shu-internal-sort-includes](#shu-internal-sort-includes)
 * [shu-internal-visit-project-file](#shu-internal-visit-project-file)
 * [shu-internal-which-c-project](#shu-internal-which-c-project)
 * [shu-invert-alist-list](#shu-invert-alist-list)
 * [shu-invert-alist-to-hash](#shu-invert-alist-to-hash)
 * [shu-iother](#shu-iother)
+* [shu-is-common-prefix](#shu-is-common-prefix)
+* [shu-is-common-substring](#shu-is-common-substring)
 * [shu-is-const](#shu-is-const)
+* [shu-is-keyword](#shu-is-keyword)
 * [shu-keyring-account-name](#shu-keyring-account-name)
 * [shu-keyring-add-values-to-index](#shu-keyring-add-values-to-index)
 * [shu-keyring-buffer-name](#shu-keyring-buffer-name)
@@ -12235,8 +13924,8 @@ Associate a number with each type of variable
 * [shu-lc-comment](#shu-lc-comment)
 * [shu-library-files](#shu-library-files)
 * [shu-line-and-column-at](#shu-line-and-column-at)
-* [shu-line-is-include](#shu-line-is-include)
 * [shu-line-number-at-pos](#shu-line-number-at-pos)
+* [shu-list-c-all-project](#shu-list-c-all-project)
 * [shu-list-c-directories](#shu-list-c-directories)
 * [shu-list-c-duplicates](#shu-list-c-duplicates)
 * [shu-list-c-file-names](#shu-list-c-file-names)
@@ -12246,19 +13935,28 @@ Associate a number with each type of variable
 * [shu-load-library-files](#shu-load-library-files)
 * [shu-local-class-list](#shu-local-class-list)
 * [shu-local-replace](#shu-local-replace)
+* [shu-longest-car-length](#shu-longest-car-length)
+* [shu-longest-common-prefix](#shu-longest-common-prefix)
+* [shu-longest-common-substring](#shu-longest-common-substring)
+* [shu-longest-name-length](#shu-longest-name-length)
 * [shu-loosen-lisp](#shu-loosen-lisp)
 * [shu-make-c-project](#shu-make-c-project)
+* [shu-make-file-header-line](#shu-make-file-header-line)
 * [shu-make-full-c-project](#shu-make-full-c-project)
+* [shu-make-header-line](#shu-make-header-line)
+* [shu-make-include-block](#shu-make-include-block)
 * [shu-make-md-index-name](#shu-make-md-index-name)
 * [shu-make-md-name-entry](#shu-make-md-name-entry)
 * [shu-make-md-section-name](#shu-make-md-section-name)
 * [shu-make-md-toc-entry](#shu-make-md-toc-entry)
 * [shu-make-p-project](#shu-make-p-project)
 * [shu-make-padded-line](#shu-make-padded-line)
+* [shu-make-sort-announcement](#shu-make-sort-announcement)
 * [shu-make-xref](#shu-make-xref)
 * [shu-match-add-names-to-class-list](#shu-match-add-names-to-class-list)
 * [shu-match-erase-using](#shu-match-erase-using)
 * [shu-match-fetch-include-hash-table](#shu-match-fetch-include-hash-table)
+* [shu-match-find-all-general-include](#shu-match-find-all-general-include)
 * [shu-match-find-all-some-include](#shu-match-find-all-some-include)
 * [shu-match-find-all-using-internal](#shu-match-find-all-using-internal)
 * [shu-match-find-any-using-internal](#shu-match-find-any-using-internal)
@@ -12299,11 +13997,17 @@ Associate a number with each type of variable
 * [shu-misc-split-string](#shu-misc-split-string)
 * [shu-modified-buffers](#shu-modified-buffers)
 * [shu-move-down](#shu-move-down)
+* [shu-move-file](#shu-move-file)
+* [shu-move-string](#shu-move-string)
+* [shu-namespace-filter-cmake-file](#shu-namespace-filter-cmake-file)
+* [shu-namespace-find-cmake-files](#shu-namespace-find-cmake-files)
 * [shu-nc-vtype](#shu-nc-vtype)
 * [shu-new-c-class](#shu-new-c-class)
 * [shu-new-c-file](#shu-new-c-file)
 * [shu-new-deallocate](#shu-new-deallocate)
 * [shu-new-ert](#shu-new-ert)
+* [shu-new-gen-bde-component](#shu-new-gen-bde-component)
+* [shu-new-generate-component](#shu-new-generate-component)
 * [shu-new-h-file](#shu-new-h-file)
 * [shu-new-latex](#shu-new-latex)
 * [shu-new-lisp-while](#shu-new-lisp-while)
@@ -12341,15 +14045,21 @@ Associate a number with each type of variable
 * [shu-point-at-sexp](#shu-point-at-sexp)
 * [shu-point-in-string](#shu-point-in-string)
 * [shu-possible-cpp-file-name](#shu-possible-cpp-file-name)
+* [shu-prepare-for-rename](#shu-prepare-for-rename)
 * [shu-project-cpp-buffer-name](#shu-project-cpp-buffer-name)
+* [shu-project-directory-is-excluded](#shu-project-directory-is-excluded)
 * [shu-project-exclude-hash](#shu-project-exclude-hash)
 * [shu-project-exclude-list](#shu-project-exclude-list)
 * [shu-project-extensions](#shu-project-extensions)
 * [shu-project-file-list](#shu-project-file-list)
+* [shu-project-file-pattern-match](#shu-project-file-pattern-match)
 * [shu-project-get-file-info](#shu-project-get-file-info)
+* [shu-project-get-specific-files](#shu-project-get-specific-files)
 * [shu-project-make-exclude-hash](#shu-project-make-exclude-hash)
 * [shu-project-make-short-key-list](#shu-project-make-short-key-list)
+* [shu-project-some-other](#shu-project-some-other)
 * [shu-project-split-file-name](#shu-project-split-file-name)
+* [shu-project-sub-specific-files](#shu-project-sub-specific-files)
 * [shu-project-user-class-count](#shu-project-user-class-count)
 * [shu-put-line-near-top](#shu-put-line-near-top)
 * [shu-py-extensions](#shu-py-extensions)
@@ -12360,11 +14070,15 @@ Associate a number with each type of variable
 * [shu-quit](#shu-quit)
 * [shu-random-letter](#shu-random-letter)
 * [shu-random-range](#shu-random-range)
+* [shu-record-visited-project](#shu-record-visited-project)
 * [shu-remove-test-names](#shu-remove-test-names)
 * [shu-remove-trailing-all-whitespace](#shu-remove-trailing-all-whitespace)
+* [shu-rename-namespace-files](#shu-rename-namespace-files)
 * [shu-renew-c-project](#shu-renew-c-project)
 * [shu-replace-class-fun](#shu-replace-class-fun)
 * [shu-replace-class-name](#shu-replace-class-name)
+* [shu-replace-namespace-in-buffer](#shu-replace-namespace-in-buffer)
+* [shu-replace-namespace-in-file-name](#shu-replace-namespace-in-file-name)
 * [shu-replace-string](#shu-replace-string)
 * [shu-return-ptr](#shu-return-ptr)
 * [shu-return-ref](#shu-return-ref)
@@ -12396,13 +14110,20 @@ Associate a number with each type of variable
 * [shu-show-repo](#shu-show-repo)
 * [shu-show-system-name](#shu-show-system-name)
 * [shu-simple-hother-file](#shu-simple-hother-file)
+* [shu-sitting-end](#shu-sitting-end)
+* [shu-sitting-on](#shu-sitting-on)
+* [shu-sort-all-includes](#shu-sort-all-includes)
 * [shu-sort-includes](#shu-sort-includes)
 * [shu-split-new-lines](#shu-split-new-lines)
 * [shu-split-range-string](#shu-split-range-string)
+* [shu-srs-create-prompt](#shu-srs-create-prompt)
+* [shu-srs-last-replace](#shu-srs-last-replace)
+* [shu-srs](#shu-srs)
 * [shu-starts-with](#shu-starts-with)
 * [shu-std-include-list](#shu-std-include-list)
 * [shu-string-starts-ends](#shu-string-starts-ends)
 * [shu-sub-make-c-project](#shu-sub-make-c-project)
+* [shu-sub-sort-includes](#shu-sub-sort-includes)
 * [shu-swap](#shu-swap)
 * [shu-system-name-string](#shu-system-name-string)
 * [shu-system-name](#shu-system-name)
@@ -12421,6 +14142,7 @@ Associate a number with each type of variable
 * [shu-trim-file-hook](#shu-trim-file-hook)
 * [shu-trim-file](#shu-trim-file)
 * [shu-trim-git-end](#shu-trim-git-end)
+* [shu-trim-header-line](#shu-trim-header-line)
 * [shu-trim-leading](#shu-trim-leading)
 * [shu-trim-trailing-blanks](#shu-trim-trailing-blanks)
 * [shu-trim-trailing](#shu-trim-trailing)
@@ -12428,6 +14150,7 @@ Associate a number with each type of variable
 * [shu-unbrace](#shu-unbrace)
 * [shu-unit-test-buffer](#shu-unit-test-buffer)
 * [shu-upcase-first-letter](#shu-upcase-first-letter)
+* [shu-validate-file-in-project](#shu-validate-file-in-project)
 * [shu-var-name](#shu-var-name)
 * [shu-version](#shu-version)
 * [shu-vf](#shu-vf)
@@ -12447,7 +14170,9 @@ Associate a number with each type of variable
 * [shu-xref-lisp-name](#shu-xref-lisp-name)
 * [shu-xref-type-compare](#shu-xref-type-compare)
 * [shu-xref-var-types](#shu-xref-var-types)
+* [sort-all-includes](#sort-all-includes)
 * [sort-includes](#sort-includes)
+* [srs](#srs)
 * [tciterate](#tciterate)
 * [tighten-lisp](#tighten-lisp)
 * [titerate](#titerate)
@@ -12490,5 +14215,8 @@ LocalWords:  timezone tzdate tz deleteObject nullptr printSelf ctor dtor iother 
 LocalWords:  CMake doody ops py krpps Doxyfile af repo fixup doxyfile gcm config za
 LocalWords:  tocify fgh ijkl mno pqr stuv wxy bcde fg hij klm Stuvw xyzab OpenGrok
 LocalWords:  unbrace iff currentliveupdate debian dep codesinger github pt ua seq
-LocalWords:  dev abc pr fka https classname
+LocalWords:  dev abc pr fka https classname val charlie pllist tokenization pl aaaa
+LocalWords:  ls cf regex CARs impl typename MumbleBar sname NONDIRECTORY gco mv srs
+LocalWords:  fumblebar wunderbar getnv rstring sed defg cmake newfiles CMakeLists
+LocalWords:  xyz ghi mumblebar fubmblenew
 -->

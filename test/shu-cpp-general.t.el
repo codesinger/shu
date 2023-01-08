@@ -3141,7 +3141,7 @@ This is most likely the name of an include file and not the name of a class."
 (ert-deftest shu-test-shu-cpp-map-class-to-include-1 ()
   (let* ((namespace (if shu-cpp-use-bde-library "bsl" "std"))
          (class-name (concat namespace "::make_shared"))
-         (expected-name (if shu-cpp-use-bde-library "bsl_memory.h?" "memory"))
+         (expected-name (if shu-cpp-use-bde-library "bsl_memory.h" "memory"))
          (actual-name))
     (setq actual-name (shu-cpp-map-class-to-include class-name))
     (should actual-name)
@@ -3511,77 +3511,6 @@ class names."
 
 
 
-
-;;
-;;  shu-test-shu-line-is-include-1
-;;
-(ert-deftest shu-test-shu-line-is-include-1 ()
-  (let ((data
-         (concat
-          "\n"
-          "// Hello\n"
-          "#include <something>\n"
-          "// Goodbye\n"))
-        (found)
-        (is-inc))
-    (with-temp-buffer
-      (insert data)
-      (goto-char (point-min))
-      (setq found (search-forward "#include" nil t))
-      (should found)
-      (setq is-inc (shu-line-is-include))
-      (should is-inc))
-    ))
-
-
-
-;;
-;;  shu-test-shu-line-is-include-2
-;;
-(ert-deftest shu-test-shu-line-is-include-2 ()
-  (let ((data
-         (concat
-          "\n"
-          "// Hello\n"
-          "#include <something>\n"
-          "// Goodbye\n"))
-        (found)
-        (is-inc))
-    (with-temp-buffer
-      (insert data)
-      (goto-char (point-min))
-      (setq found (search-forward "// He" nil t))
-      (should found)
-      (setq is-inc (shu-line-is-include))
-      (should (not is-inc)))
-    ))
-
-
-
-
-;;
-;;  shu-test-shu-line-is-include-3
-;;
-(ert-deftest shu-test-shu-line-is-include-3 ()
-  (let ((data
-         (concat
-          "\n"
-          "// Hello\n"
-          " # include <something>\n"
-          "// Goodbye\n"))
-        (found)
-        (is-inc))
-    (with-temp-buffer
-      (insert data)
-      (goto-char (point-min))
-      (setq found (search-forward "include" nil t))
-      (should found)
-      (setq is-inc (shu-line-is-include))
-      (should is-inc))
-    ))
-
-
-
 ;;
 ;;  shu-test-shu-sort-includes-1
 ;;
@@ -3809,20 +3738,20 @@ class names."
   (let ((data
          (concat
           "// Hello\n"
-          "#include <gg>\n"
-          "#include <aa>\n"
-          "#  include <zz>\n"
-          "#include <rr>\n"
-          "#include <vv>\n"
+          "#include <gg6>\n"
+          "#include <aa6>\n"
+          "#  include <zz6>\n"
+          "#include <rr6>\n"
+          "#include <vv6>\n"
           "// Goodbye\n"))
         (expected
          (concat
           "// Hello\n"
-          "#include <aa>\n"
-          "#include <gg>\n"
-          "#include <rr>\n"
-          "#include <vv>\n"
-          "#include <zz>\n"
+          "#include <aa6>\n"
+          "#include <gg6>\n"
+          "#include <rr6>\n"
+          "#include <vv6>\n"
+          "#include <zz6>\n"
           "// Goodbye\n"))
         (actual)
         (found)
@@ -3873,11 +3802,846 @@ class names."
       (setq count (shu-sort-includes))
       (should count)
       (should (numberp count))
-      (should (= 1 count))
+      (should (= 0 count))
       (setq actual (buffer-substring-no-properties (point-min) (point-max)))
       (should (string= expected actual)))
     ))
 
 
+
+;;
+;;  shu-test-shu-sort-includes-8
+;;
+(ert-deftest shu-test-shu-sort-includes-8 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <gg>\n"
+          "#include <aa>\n"
+          "#include <zz>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "#include <aa>\n"
+          "#include <gg>\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <aa>\n"
+          "#include <gg>\n"
+          "#include <rr>\n"
+          "#include <vv>\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "include" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 5 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-includes-9
+;;
+(ert-deftest shu-test-shu-sort-includes-9 ()
+  (let (
+        (data
+         (concat
+          "// Hello\n"
+          "// How are you?\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "// How are you?\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count)
+          )
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "Hello" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-includes-10
+;;
+(ert-deftest shu-test-shu-sort-includes-10 ()
+  (let (
+        (data
+         (concat
+          "// Hello\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <zz>\n"
+          "// Goodbye\n"))
+        (actual)
+        (found)
+        (count)
+          )
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "// He" nil t))
+      (should found)
+      (setq count (shu-sort-includes))
+      (should count)
+      (should (numberp count))
+      (should (= 0 count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual))
+      )
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-all-includes-1
+;;
+(ert-deftest shu-test-shu-sort-all-includes-1 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <z1>\n"
+          "#include <c1>\n"
+          "#include <a1>\n"
+          "// Goodbye\n"
+          "#include <z2>\n"
+          "#include <c2>\n"
+          "#include <a2>\n"
+          "// Again\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <a1>\n"
+          "#include <c1>\n"
+          "#include <z1>\n"
+          "// Goodbye\n"
+          "#include <a2>\n"
+          "#include <c2>\n"
+          "#include <z2>\n"
+          "// Again\n"))
+        (actual)
+        (ret-val)
+        (line-count)
+        (del-count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq ret-val (shu-sort-all-includes))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq line-count (car ret-val))
+      (setq del-count (cdr ret-val))
+      (should line-count)
+      (should (numberp line-count))
+      (should del-count)
+      (should (numberp del-count))
+      (should (= 6 line-count))
+      (should (= 0 del-count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-all-includes-2
+;;
+(ert-deftest shu-test-shu-sort-all-includes-2 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "#include <a1>\n"
+          "#include <c1>\n"
+          "#include <z1>\n"
+          "// Goodbye\n"
+          "#include <a2>\n"
+          "#include <c2>\n"
+          "#include <z2>\n"
+          "// Again\n"))
+        (expected
+         (concat
+          "// Hello\n"
+          "#include <a1>\n"
+          "#include <c1>\n"
+          "#include <z1>\n"
+          "// Goodbye\n"
+          "#include <a2>\n"
+          "#include <c2>\n"
+          "#include <z2>\n"
+          "// Again\n"))
+        (actual)
+        (ret-val)
+        (line-count)
+        (del-count))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq ret-val (shu-sort-all-includes))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq line-count (car ret-val))
+      (setq del-count (cdr ret-val))
+      (should line-count)
+      (should (numberp line-count))
+      (should del-count)
+      (should (numberp del-count))
+      (should (= 0 line-count))
+      (should (= 0 del-count))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-blocks-1
+;;
+(ert-deftest shu-test-shu-cpp-find-include-blocks-1 ()
+  (let ((data
+         (concat
+          "#include <a>\n"
+          "#include <b>\n"
+          "#include <c>\n"
+          "\\ Hello\n"
+          "#include <d>\n"
+          "#include <e>\n"
+          "#include <f>\n"
+          "\\ Bye\n"))
+        (pllist)
+        (pl)
+        (spoint)
+        (epoint))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-blocks))
+      (should pllist)
+      (should (listp pllist))
+      (should (= 2 (length pllist)))
+
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 48))
+      (should (= epoint 86))
+
+      (setq pllist (cdr pllist))
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 1))
+      (should (= epoint 39)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-find-include-blocks-2
+;;
+(ert-deftest shu-test-shu-cpp-find-include-blocks-2 ()
+  (let ((data
+         (concat
+          "#include <a>\n"
+          "#include <b>\n"
+          "\\ Hello\n"
+          "#include <c>\n"
+          "\\ Bye\n"
+          "#include <d>\n"
+          "#include <e>\n"
+          "#include <f>\n"
+          "\\ Bye\n"))
+        (pllist)
+        (pl)
+        (spoint)
+        (epoint))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-blocks))
+      (should pllist)
+      (should (listp pllist))
+      (should (= 3 (length pllist)))
+
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 54))
+      (should (= epoint 92))
+
+      (setq pllist (cdr pllist))
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 35))
+      (should (= epoint 47))
+
+      (setq pllist (cdr pllist))
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 1))
+      (should (= epoint 26)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-find-include-blocks-3
+;;
+(ert-deftest shu-test-shu-cpp-find-include-blocks-3 ()
+  (let ((data
+         (concat
+          "\\ Hello\n"
+          "#include <c>\n"
+          "\\ Bye\n"))
+        (pllist)
+        (pl)
+        (spoint)
+        (epoint))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-blocks))
+      (should pllist)
+      (should (listp pllist))
+      (should (= 1 (length pllist)))
+
+      (setq pl (car pllist))
+      (should pl)
+      (should (consp pl))
+      (setq spoint (car pl))
+      (setq epoint (cdr pl))
+      (should spoint)
+      (should epoint)
+      (should (numberp spoint))
+      (should (numberp epoint))
+      (should (= spoint 9))
+      (should (= epoint 21)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-find-include-blocks-4
+;;
+(ert-deftest shu-test-shu-cpp-find-include-blocks-4 ()
+  (let ((data
+         (concat
+          "\\ Hello\n"
+          "\\ Bye\n"))
+        (pllist))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-blocks))
+      (should (not pllist)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-locations-1
+;;
+(ert-deftest shu-test-shu-cpp-find-include-locations-1 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "# include <mumble>\n"
+          "#include <bob>\n"
+          "// Goodbye\n"
+          "#include <bumble>\n"))
+        (pllist)
+        (pl)
+        (spoint)
+        (line))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-locations)))
+    (should pllist)
+    (should (listp pllist))
+    (should (= 3 (length pllist)))
+    (setq pl (car pllist))
+    (should pl)
+    (should (consp pl))
+    (setq spoint (car pl))
+    (should spoint)
+    (should (numberp spoint))
+    (should (= 55 spoint))
+    (setq line (cdr pl))
+    (should line)
+    (should (numberp line))
+    (should (= 5 line))
+
+    (setq pllist (cdr pllist))
+    (should pllist)
+    (should (listp pllist))
+    (setq pl (car pllist))
+    (should pl)
+    (should (consp pl))
+    (setq spoint (car pl))
+    (should spoint)
+    (should (numberp spoint))
+    (should (= 29 spoint))
+    (setq line (cdr pl))
+    (should line)
+    (should (numberp line))
+    (should (= 3 line))
+
+    (setq pllist (cdr pllist))
+    (should pllist)
+    (should (listp pllist))
+    (setq pl (car pllist))
+    (should pl)
+    (should (consp pl))
+    (setq spoint (car pl))
+    (should spoint)
+    (should (numberp spoint))
+    (should (= 10 spoint))
+    (setq line (cdr pl))
+    (should line)
+    (should (numberp line))
+    (should (= 2 line))
+    ))
+
+
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-locations-2
+;;
+(ert-deftest shu-test-shu-cpp-find-include-locations-2 ()
+  (let ((data
+         (concat
+          "// Hello\n"
+          "// Goodbye\n"))
+        (pllist))
+    (with-temp-buffer
+      (insert data)
+      (setq pllist (shu-cpp-find-include-locations)))
+    (should (not pllist))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-find-include-direction-1
+;;
+(ert-deftest shu-test-shu-cpp-find-include-direction-1 ()
+  (let ((pllist
+         (list
+          (cons 15 2)
+          (cons 30 4)))
+        (actual)
+        (expected 1))
+    (setq actual (shu-cpp-find-include-direction pllist))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-direction-2
+;;
+(ert-deftest shu-test-shu-cpp-find-include-direction-2 ()
+  (let ((pllist
+         (list
+          (cons 30 4)
+          (cons 15 2)))
+        (actual)
+        (expected -1))
+    (setq actual (shu-cpp-find-include-direction pllist))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-direction-3
+;;
+(ert-deftest shu-test-shu-cpp-find-include-direction-3 ()
+  (let ((pllist
+         (list
+          (cons 30 4)))
+        (actual)
+        (expected 1))
+    (setq actual (shu-cpp-find-include-direction pllist))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-find-include-direction-4
+;;
+(ert-deftest shu-test-shu-cpp-find-include-direction-4 ()
+  (let ((pllist)
+        (actual)
+        (expected 1))
+    (setq actual (shu-cpp-find-include-direction pllist))
+    (should actual)
+    (should (numberp actual))
+    (should (= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-1
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-1 ()
+  (let ((ret-val (cons 0 0))
+        (group-count)
+        (actual)
+        (expected "Sorted 0 lines"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-2
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-2 ()
+  (let ((ret-val (cons 1 0))
+        (group-count)
+        (actual)
+        (expected "Sorted 1 line"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-3
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-3 ()
+  (let ((ret-val (cons 2 0))
+        (group-count)
+        (actual)
+        (expected "Sorted 2 lines"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-4
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-4 ()
+  (let ((ret-val (cons 0 1))
+        (group-count)
+        (actual)
+        (expected "Sorted 0 lines (after deleting 1 duplicate)"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-5
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-5 ()
+  (let ((ret-val (cons 1 2))
+        (group-count)
+        (actual)
+        (expected "Sorted 1 line (after deleting 2 duplicates)"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-6
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-6 ()
+  (let ((ret-val (cons 0 0))
+        (group-count 0)
+        (actual)
+        (expected "Sorted 0 lines in 0 groups"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-7
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-7 ()
+  (let ((ret-val (cons 0 0))
+        (group-count 1)
+        (actual)
+        (expected "Sorted 0 lines in 1 group"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-8
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-8 ()
+  (let ((ret-val (cons 1 0))
+        (group-count 1)
+        (actual)
+        (expected "Sorted 1 line in 1 group"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-9
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-9 ()
+  (let ((ret-val (cons 2 0))
+        (group-count 2)
+        (actual)
+        (expected "Sorted 2 lines in 2 groups"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-10
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-10 ()
+  (let ((ret-val (cons 0 1))
+        (group-count 2)
+        (actual)
+        (expected "Sorted 0 lines in 2 groups (after deleting 1 duplicate)"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-sort-announcement-11
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-11 ()
+  (let ((ret-val (cons 1 2))
+        (group-count 2)
+        (actual)
+        (expected "Sorted 1 line in 2 groups (after deleting 2 duplicates)"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  Shu-test-shu-make-sort-announcement-12
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-12 ()
+  (let ((ret-val (cons 0 0))
+        (group-count 1)
+        (changed-group-count 1)
+        (actual)
+        (expected "Sorted 0 lines in 1 group"))
+    (setq actual (shu-make-sort-announcement ret-val group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  Shu-test-shu-make-sort-announcement-13
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-13 ()
+  (let ((ret-val (cons 0 0))
+        (group-count 2)
+        (changed-group-count 2)
+        (actual)
+        (expected "Sorted 0 lines in 2 groups"))
+    (setq actual (shu-make-sort-announcement ret-val group-count changed-group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+;;
+;;  Shu-test-shu-make-sort-announcement-14
+;;
+(ert-deftest shu-test-shu-make-sort-announcement-14 ()
+  (let ((ret-val (cons 0 0))
+        (group-count 3)
+        (changed-group-count 2)
+        (actual)
+        (expected "Sorted 0 lines in 2 of 3 groups"))
+    (setq actual (shu-make-sort-announcement ret-val group-count changed-group-count))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-cpp-is-keyword-1
+;;
+(ert-deftest shu-test-shu-cpp-is-keyword-1 ()
+    (should (shu-cpp-is-keyword "register"))
+    )
+
+
+;;
+;;  shu-test-shu-cpp-is-keyword-2
+;;
+(ert-deftest shu-test-shu-cpp-is-keyword-2 ()
+    (should (shu-cpp-is-keyword "static_cast"))
+    )
+
+
+;;
+;;  shu-test-shu-cpp-is-keyword-3
+;;
+(ert-deftest shu-test-shu-cpp-is-keyword-3 ()
+    (should (not (shu-cpp-is-keyword "ztatic_cast")))
+    )
+
+
+;;
+;;  shu-test-shu-cpp-sitting-on-keyword-1
+;;
+(ert-deftest shu-test-shu-cpp-sitting-on-keyword-1 ()
+  (let ((data "  static_cast  ")
+        (found)
+        (actual)
+        (expected "static_cast"))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "stat" nil t))
+      (should found)
+      (setq actual (shu-cpp-sitting-on-keyword))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-sitting-on-keyword-2
+;;
+(ert-deftest shu-test-shu-cpp-sitting-on-keyword-2 ()
+  (let ((data "  dynamic_cast  ")
+        (found)
+        (actual)
+        (expected "dynamic_cast"))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "dyna" nil t))
+      (should found)
+      (setq actual (shu-cpp-sitting-on-keyword))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+;;
+;;  shu-test-shu-cpp-sitting-on-keyword-3
+;;
+(ert-deftest shu-test-shu-cpp-sitting-on-keyword-3 ()
+  (let ((data "  static_bast  ")
+        (found)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "stat" nil t))
+      (should found)
+      (should (not actual))
+      )
+    ))
 
 ;;; shu-cpp-general.t.el ends here

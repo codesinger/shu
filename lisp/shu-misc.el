@@ -1,3 +1,4 @@
+
 ;;; shu-cpp-misc.el --- Shu project code for dealing wth C++ in Emacs
 ;;
 ;; Copyright (C) 2015 Stewart L. Palmer
@@ -29,11 +30,18 @@
 
 ;;; Code:
 
+(require 'shu-git)
 (require 'subr-x)
 
 
 (defconst shu-dired-mode-name "Dired by date"
   "The name of the mode for a dired buffer")
+
+(defvar shu-srs-last-replace nil
+  "This holds the last string that was passed to shu-srs.  It is remembered here and used as the
+prompt for subsequent invocations of shu-srs")
+
+
 
 
 ;;
@@ -144,7 +152,9 @@ This makes it a valid path on windows machines."
   "While in dired, put the full path to the current file in the kill ring"
   (interactive)
   (let ((name   (dired-get-filename)))
-    (shu-kill-new name)))
+    (shu-kill-new name)
+    (message "%s" name)
+    ))
 
 ;;
 ;;  shu-of
@@ -163,7 +173,9 @@ This makes it a valid path on windows machines."
   "While in dired, put the full path to the current directory in the kill ring"
   (interactive)
   (let ((name   (dired-current-directory)))
-    (shu-kill-new name)))
+    (shu-kill-new name)
+    (message "%s" name)
+    ))
 
 
 ;;
@@ -173,10 +185,11 @@ This makes it a valid path on windows machines."
   "While in a file buffer, put the name of the current file into the kill ring."
   (interactive)
   (let ((name  (file-name-nondirectory (buffer-file-name))))
-    (if name
-        (shu-kill-new name)
-      ;;
-      (ding))))
+    (if (not name)
+        (ding)
+      (shu-kill-new name)
+      (message "%s" name))
+    ))
 
 
 ;;
@@ -191,9 +204,10 @@ file into the kill ring in the form of \"line 1234 of foo.cpp\"."
        (fline))
     (if (not name)
         (ding)
-      ;;
       (setq fline (format "line %d of %s" (shu-current-line) name))
-      (shu-kill-new fline))))
+      (shu-kill-new fline)
+      (message "%s" fline))
+    ))
 
 
 ;;
@@ -205,15 +219,15 @@ column number and the name of the current file into the kill ring
 in the form of \"foo.cpp:123:2\"."
   (interactive)
   (let
-      ((debug-on-error t)
-       (name  (file-name-nondirectory (buffer-file-name)))
+      ((name  (file-name-nondirectory (buffer-file-name)))
        (curpos (1+ (current-column)))
        (fline))
     (if (not name)
         (ding)
-      ;;
       (setq fline (format "%s:%d:%d" name (shu-current-line) curpos))
-      (shu-kill-new fline))))
+      (shu-kill-new fline)
+      (message "%s" fline))
+    ))
 
 
 ;;
@@ -222,9 +236,7 @@ in the form of \"foo.cpp:123:2\"."
 (defun shu-gquote ()
   "Insert a LaTeX quote environment and position the cursor for typing the quote."
   (interactive)
-  (let (
-        (ip     )
-        )
+  (let ((ip))
     (insert "\\begin{quote}\n\n")
     (setq ip (point))
     (insert "\n\n\\end{quote}\n")
@@ -871,40 +883,6 @@ eliminates whitespace.  If there is a non-whitespace character in column
 
 
 
-
-;;
-;;  shu-git-number-commits
-;;
-(defun shu-git-number-commits ()
-  "In a git log buffer, number all of the commits with zero being the most
-recent.
-
-It is possible to refer to commits by their SHA-1 hash.  If you want to see the
-difference between two commits you can ask git to show you the difference by
-specifying the commit hash of each one.  But this is cumbersome.  It involves
-copying and pasting two SHA-1 hashes.  Once the commits are numbered, then
-SHU-GIT-DIFF-COMMITS may be used to diff two commits by number.  See the
-documentation for SHU-GIT-DIFF-COMMITS for further information.
-
-This function counts as a commit any instance of \"commit\" that starts at the
-beginning of a line and is followed by some white space and a forty character
-hexadecimal number.  Returns the count of the number of commits found."
-  (interactive)
-  (let ((ss "^\\(commit\\)\\s-+[0-9a-f]\\{40\\}")
-        (count 0)
-        (cn))
-    (goto-char (point-min))
-    (while (re-search-forward ss nil t)
-      (setq cn (shu-format-num count 6))
-      (replace-match (concat cn ". " (match-string 0)))
-      (setq count (1+ count)))
-    (goto-char (point-min))
-    (message "Numnbered %d commits" count)
-    count
-    ))
-
-
-
 ;;
 ;;  shu-fix-times
 ;;
@@ -992,261 +970,6 @@ For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end 9
         (setq range (cons nil nil))))
     range
     ))
-
-
-
-
-;;
-;;  shu-find-numbered-commit
-;;
-(defun shu-find-numbered-commit (commit-number)
-  "Search through a numbered git commit log looking for the commit whose number is
-COMMIT-NUMBER.  Return the SHA-1 hash of the commit if the commit number is found.
-Return nil if no commit with the given number is found.
-The commit log is assume to have been numbered by shu-git-number-commits."
-  (let ((ss-1 "\\s-*")
-        (ss-2 "\\.\\s-*commit\\s-+\\([0-9a-f]\\{40\\}\\)")
-        (sss)
-        (commit-hash))
-    (save-excursion
-      (goto-char (point-min))
-      (setq sss (concat ss-1 (number-to-string commit-number) ss-2))
-      (when (re-search-forward sss nil t)
-        (setq commit-hash (match-string 1))))
-    commit-hash
-    ))
-
-
-
-;;
-;;  shu-git-diff-commits
-;;
-(defun shu-git-diff-commits (commit-range)
-  "In a buffer that is a numbered git log, query for a range string, find the two
-commits, and put into the kill ring a git diff command specifying the two commits.
-
-For example, given the following two numbered commits:
-
-    31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
-    33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
-
-if the commit range specified is either \"31.33\" or \"31+2\", then the following
-is put into the kill ring:
-
-    \"git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 \""
-  (interactive "sCommits in the form x.y or x+y or x-y?: ")
-  (let ((range)
-        (start)
-        (end)
-        (commit-1)
-        (commit-2)
-        (scommit-1)
-        (scommit-2)
-        (diff))
-    (setq range (shu-split-range-string commit-range))
-    (setq start (car range))
-    (setq end (cdr range))
-    (if (or (not start)
-            (not end))
-        (progn
-          (message "%s" "Invalid range specified")
-          (ding))
-      (setq commit-1 (shu-find-numbered-commit start))
-      (setq commit-2 (shu-find-numbered-commit end))
-      (setq scommit-1 (shu-git-find-short-hash commit-1))
-      (when scommit-1
-        (setq commit-1 scommit-1))
-      (setq scommit-2 (shu-git-find-short-hash commit-2))
-      (when scommit-2
-        (setq commit-2 scommit-2))
-      (setq diff (concat "git diff -b " commit-1 ".." commit-2 " "))
-      (shu-kill-new diff))
-    ))
-
-
-
-;;
-;;  shu-git-find-short-hash
-;;
-(defun shu-git-find-short-hash (hash)
-  "Return the git short hash for the HASH supplied as an argument.  Return nil
-if the given HASH is not a valid git revision."
-  (let ((short-hash)
-        (ss "^[a-fA-F0-9]\\{2,40\\}"))
-    (with-temp-buffer
-      (call-process "git" nil (current-buffer) nil "rev-parse" "--short" hash)
-      (goto-char (point-min))
-      (when (re-search-forward ss nil t)
-        (setq short-hash (match-string 0))))
-    short-hash
-    ))
-
-
-
-;;
-;;  shu-git-add-file
-;;
-(defun shu-git-add-file (filename)
-  "Do a \"git add\" for FILENAME.  Return empty string if add succeeds.  Otherwise,
-return git error message."
-  (let ((result))
-    (with-temp-buffer
-      (call-process "git" nil (current-buffer) nil "add" filename)
-      (setq result (buffer-substring-no-properties (point-min) (point-max))))
-    (setq result (shu-trim-trailing result))
-    (when (not (string= result ""))
-      (setq result (concat "After git add " filename ":\n" result)))
-    result
-    ))
-
-
-
-
-;;
-;;  shu-git-find-branch
-;;
-(defun shu-git-find-branch ()
-  "Return the name of the current branch in a git repository."
-  (let ((branch))
-    (with-temp-buffer
-      (call-process "git" nil (current-buffer) nil "rev-parse" "--abbrev-ref" "HEAD")
-      (setq branch (buffer-substring-no-properties (point-min) (1- (point-max)))))
-    branch
-    ))
-
-
-
-
-;;
-;;  shu-git-find-default-branch
-;;
-(defun shu-git-find-default-branch ()
-  "Return the name of the default branch in a git repository.  The default
-branch is the one branch that is created with a new repository."
-  (let ((branch)
-        (fset (length "origin/")))
-    (with-temp-buffer
-      (call-process "git" nil (current-buffer) nil "rev-parse" "--abbrev-ref" "origin/HEAD")
-      (setq branch (buffer-substring-no-properties (+ (point-min) fset) (1- (point-max)))))
-    branch
-    ))
-
-
-
-;;
-;;  shu-git-get-pr-url
-;;
-(defun shu-git-get-pr-url ()
-  "Put into the kill ring the path required to create a new pull request for
-the current branch of the current repository."
-  (interactive)
-  (let ((url-repo (shu-get-url-repo))
-        (branch (shu-git-find-branch))
-        (url))
-    (setq url (concat url-repo "/pull/new/" branch))
-    (shu-kill-new url)
-    ))
-
-
-
-
-;;
-;;  shu-git-show-branch
-;;
-(defun shu-git-show-branch ()
-  "Display the name of the current branch in a git repository."
-  (interactive)
-  (let ((branch (shu-git-find-branch)))
-    (message "%s" branch)
-    ))
-
-
-
-
-;;
-;;  shu-git-branch-to-kill-ring
-;;
-(defun shu-git-branch-to-kill-ring ()
-  "Put the name of the current branch in a git repository into the kill ring."
-  (interactive)
-  (let ((branch (shu-git-find-branch)))
-    (shu-kill-new branch)
-    ))
-
-
-
-
-;;
-;;  shu-git-insert-branch
-;;
-(defun shu-git-insert-branch ()
-  "Insert at point the name of the current branch in a git repository"
-  (interactive)
-  (let ((branch (shu-git-find-branch)))
-    (insert branch)
-    ))
-
-
-
-
-;;
-;;  shu-git-insert-origin-branch
-;;
-(defun shu-git-insert-origin-branch ()
-  "Insert at point the name of the current branch in a git repository preceded by the
-word \"origin\"..  This can be used as part of git push or pull."
-  (interactive)
-  (let ((branch (shu-git-find-branch)))
-    (insert (concat "origin " branch))
-    ))
-
-
-
-
-;;
-;;  shu-git-insert-push-origin-branch
-;;
-(defun shu-git-insert-push-origin-branch ()
-  "Insert at point the git command to push the current branch out to origin.  If
-the current branch is the default branch (fka \"master\"), you are prompted to
-see if you want to proceed.  This is to prevent an accidental push to the
-default branch."
-  (interactive)
-  (let ((branch (shu-git-find-branch))
-        (insert-push t)
-        (default-branch (shu-git-find-default-branch)))
-    (when (string= branch default-branch)
-      (setq insert-push (yes-or-no-p (concat "Really push to " branch " branch? "))))
-    (when insert-push
-      (insert (concat "git push origin " branch)))
-    ))
-
-
-
-
-;;
-;;  shu-git-insert-pull-origin-branch
-;;
-(defun shu-git-insert-pull-origin-branch ()
-  "Insert at point the name the git command to pull the current branch from
-origin."
-  (interactive)
-  (let ((branch (shu-git-find-branch)))
-    (insert (concat "git pull origin " branch))
-    ))
-
-
-
-
-;;
-;;  shu-git-insert-git-commit
-;;
-(defun shu-git-insert-git-commit ()
-  "Insert at point the name the git command to commit with the commentary held
-in a file called \"why.txt\"."
-  (interactive)
-  (insert "git commit -F why.txt")
-  )
 
 
 
@@ -1489,11 +1212,12 @@ project."
         (buf)
         (mod-list)
         (buf-fn)
-        (buf-name))
+        (buf-name)
+        (buf-mode-name))
     (while buf-list
       (setq buf (car buf-list))
-      (setq mode-name (with-current-buffer buf mode-name))
-      (if (string= mode-name shu-dired-mode-name)
+      (setq buf-mode-name (with-current-buffer buf (format-mode-line mode-name)))
+      (if (string= buf-mode-name shu-dired-mode-name)
           (push buf mod-list)
         (setq buf-fn (buffer-file-name buf))
         (when buf-fn
@@ -1502,9 +1226,10 @@ project."
       (setq buf-list (cdr buf-list)))
     (while mod-list
       (setq buf (car mod-list))
-      (setq mode-name (with-current-buffer buf mode-name))
+      (setq buf-mode-name (with-current-buffer buf (format-mode-line mode-name)))
       (setq buf-name (buffer-name buf))
-      (princ (concat "Killing " buf-name " (" mode-name ")\n") gb)
+      (princ "Killing buffer: " gb)(princ buf-name gb)
+      (princ " (" gb)(princ buf-mode-name gb)(princ ")\n" gb)
       (kill-buffer buf)
       (setq mod-list (cdr mod-list)))
     (when (fboundp 'shu-clear-c-project)
@@ -2382,6 +2107,10 @@ If the prefix argument is large enough that the left side of the frame would be
 moved past the left side of the display, the window is positioned such that the
 left edge of the window is aligned with the left edge of the display.
 
+Prefix arguments greater than 10 assume a two display system.  Prefix arguments
+of 11 and 12 put two frames on the right display.  Prefix arguments of 13 and
+14 put two frames on the left display.
+
 Implementation note:
 
 If this function is called when the left side of the frame is positioned to the
@@ -2399,8 +2128,7 @@ The assumption is that a negative x frame position means that the user has
 positioned the frame just a bit past the left edge and that the desired frame
 position is actually the leftmost edge of the display."
   (interactive "P")
-  (let* (
-         (lost-lines
+  (let* ((lost-lines
           (if (shu-system-type-is-windows)
               5
             (if (shu-system-type-is-mac-osx)
@@ -2418,16 +2146,29 @@ position is actually the leftmost edge of the display."
          (y)
          (frame-pixel-width (shu-frame-width))
          (display-pixel-width (x-display-pixel-width))
-         (offset 0))
+         (offset 0)
+         (right-panel-x 2553)
+         (left-panel-x 2547))
     (setq fp (frame-position))
     (setq actual-x (car fp))
     (setq calc-x actual-x)
     (setq y (cdr fp))
     (when frame-no
-      (if (= frame-no 1)
-          (setq offset frame-pixel-width)
-        (setq offset (+ (* (1- frame-no) (- frame-pixel-width width-fudge)) frame-pixel-width)))
-      (setq calc-x (- display-pixel-width offset)))
+      (if (< frame-no 11)
+          (progn
+            (if (= frame-no 1)
+                (setq offset frame-pixel-width)
+              (setq offset (+ (* (1- frame-no) (- frame-pixel-width width-fudge)) frame-pixel-width)))
+            (setq calc-x (- display-pixel-width offset)))
+        (cond
+         ((= frame-no 11)
+          (setq calc-x (- (+ right-panel-x frame-pixel-width) width-fudge)))
+         ((= frame-no 12)
+          (setq calc-x right-panel-x))
+         ((= frame-no 13)
+          (setq calc-x (+ (- left-panel-x frame-pixel-width) width-fudge)))
+         ((= frame-no 14)
+          (setq calc-x (+ (- left-panel-x (+ frame-pixel-width frame-pixel-width)) width-fudge width-fudge))))))
     (when (< calc-x 0)
       (setq calc-x 0))
     (set-frame-height (selected-frame) hpl)
@@ -2864,21 +2605,27 @@ of the repository."
 (defun shu-add-alexandria-badge ()
   "Insert an Alexandria badge for the current project."
   (interactive)
-  (let ((library-name (shu-get-directory-prefix))
+  (let (
+        (library-name (shu-get-directory-prefix))
         (repo-path (shu-get-git-repo-path))
-        (badge-added))
+        (default-branch (shu-git-find-default-branch))
+        (badge-added)
+        )
     (if (not shu-internal-dev-url)
         (progn
           (ding)
-          (message "%s" "SHU-INTERNAL-DEV-URL custom variable is not set."))
+          (message "%s" "SHU-INTERNAL-DEV-URL custom variable is not set.")
+          )
       (when repo-path
         (insert
          (concat
           "[![Alexandria doxygen](https://badges." shu-internal-dev-url "/badge"
           "//Alexandria%20|%20Doxygen/blue?icon=fa-book-open)]"
           "(http://alexandria-doc.stacker." shu-internal-dev-url "/" repo-path
-          "/master/)"))
-        (setq badge-added t)))
+          "/" default-branch "/)"))
+        (setq badge-added t)
+        )
+      )
     badge-added
     ))
 
@@ -3190,6 +2937,1168 @@ nil is returned."
 
 
 
+;;
+;;  shu-sitting-on
+;;
+(defun shu-sitting-on (regex)
+  "If the contiguous string of characters at (point) all match REGEX bounded by
+either whitespace or the begin / end of the line, return the matched string.  If
+any characters are found that do not match REGEX, return nil."
+  (let ((here (point))
+        (begin)
+        (end)
+        (result))
+    (save-excursion
+      (setq begin (shu-sitting-end regex -1))
+      (when begin
+        (setq end (shu-sitting-end regex 1))
+        (when end
+          (setq result (buffer-substring-no-properties begin (1+ end))))))
+    result
+    ))
+
+
+
+;;
+;;  shu-sitting-end
+;;
+(defun shu-sitting-end (regex dir)
+  "If the text at (point) is a character that matches REGEX, scan until either
+whitespace or the beginning / end of the line is reached.  If all characters
+scanned match REGEX, return the point of the last matching character, otherwise
+return nil.  DIR indicates the direction of the scan.  Negative does a backward
+scan.  Non-negative does a forward scan."
+  (let ((something t)
+        (mc (if (< dir 0) -1 1))
+        (end-adjust (if (< dir 0) +1 -1))
+        (epos (if (< dir 0)  (line-beginning-position) (1- (line-end-position))))
+        (fpos)
+        (count 0)
+        (case-fold-search nil)
+        (c))
+    (save-excursion
+      (when (looking-at regex)
+        (setq count 1)
+        (while something
+          (if (= (point) epos)
+              (progn
+                (setq something nil)
+                (when (/= count 0)
+                  (setq fpos (point))))
+            (forward-char mc)
+            (setq count (1+ count))
+            (when (not (looking-at regex))
+              (setq something nil)
+              (when (looking-at shu-all-whitespace-regexp)
+                (setq fpos (+ (point) end-adjust))))))))
+    fpos
+    ))
+
+
+
+;;
+;;  shu-longest-common-substring
+;;
+(defun shu-longest-common-substring (strings)
+  "Return the longest common substring of the list of STRINGS.  Return nil if
+there is no common substring."
+  (interactive)
+  (let ((strs strings)
+        (ref (car strings))
+        (i)
+        (j)
+        (s)
+        (lcs ""))
+    (setq i 0)
+    (while (< i (length ref))
+      (setq j (1+ i))
+      (while (< j (length ref))
+        (setq s (substring ref i j))
+        (when (shu-is-common-substring s strings)
+          (when (> (length s) (length lcs))
+            (setq lcs s)))
+        (setq j (1+ j)))
+      (setq i (1+ i)))
+    (when (string= lcs "")
+      (setq lcs nil))
+    lcs
+    ))
+
+
+
+;;
+;;  shu-longest-common-prefix
+;;
+(defun shu-longest-common-prefix (strings)
+  "Return the longest common prefix of the list of STRINGS.  Return nil if there
+is no common prefix."
+  (interactive)
+  (let ((strs strings)
+        (ref (car strings))
+        (i)
+        (s)
+        (lcs ""))
+    (setq i 1)
+    (while (< i (length ref))
+      (setq s (substring ref 0 i))
+      (when (shu-is-common-substring s strings)
+        (when (> (length s) (length lcs))
+          (setq lcs s)))
+      (setq i (1+ i)))
+    (when (string= lcs "")
+      (setq lcs nil))
+    lcs
+    ))
+
+
+
+
+;;
+;;  shu-is-common-substring
+;;
+(defun shu-is-common-substring (substring strings)
+  "If SUBSTRING is a common substring in the list of STRINGS, return SUBSTRING,
+else, return nil."
+  (let ((strs strings)
+        (excluded)
+        (string)
+        (sstring (regexp-quote substring))
+        (common))
+    (while (and strs (not excluded))
+      (setq string (car strs))
+      (when (not (string-match-p sstring string))
+        (setq excluded t))
+      (setq strs (cdr strs)))
+    (when (not excluded)
+      (setq common substring))
+    common
+    ))
+
+
+
+
+;;
+;;  shu-is-common-prefix
+;;
+(defun shu-is-common-prefix (prefix strings)
+  "If PREFIX is a common prefix in the list of STRINGS, return PREFIX,
+else, return nil."
+  (let ((strs strings)
+        (excluded)
+        (string)
+        (prefix-length (length prefix))
+        (common))
+    (while (and strs (not excluded))
+      (setq string (car strs))
+      (when (not (string= prefix (substring string 0 prefix-length)))
+        (setq excluded t))
+      (setq strs (cdr strs)))
+    (when (not excluded)
+      (setq common prefix))
+    common
+    ))
+
+
+
+;;
+;;  shu-prepare-for-rename
+;;
+(defun shu-prepare-for-rename (old-namespace new-namespace)
+  "This is a function that helps to rename a list of files that share one common
+part of a name to a list of files that have a different common part of the name.
+For example, given the following set of files:
+
+      aaaa_mumble.cpp
+      aaaa_mumble.h
+      aaaa_mumble.t.cpp
+
+it is not uncommon to want to change those file names to something like
+
+      abcdef_mumble.cpp
+      abcdef_mumble.h
+      abcdef_mumble.t.cpp
+
+This can be done with the following work flow:
+
+      1. ls \"aaaa*\" >cf.txt
+
+      2. Edit cf.txt to turn it into a script that renames the files from
+         \"aaaa*\ to \"abcdef*\".
+
+The editing steps are relatively straightforward, but take a small number of
+minutes.
+
+This function automates the editing steps.
+
+When invoked interactively, it first prompts for the old common part and then
+for the new common part."
+  (interactive "*sOld common part?: \nsNew common part?: ")
+  (let ((line)
+        (line-length)
+        (max-line-length 0)
+        (line-diff 0)
+        (pad-length 0)
+        (pad "")
+        (all-lines)
+        (spoint))
+    (when (> (buffer-size) 0)
+      (delete-trailing-whitespace (point-min))
+      (goto-char (point-min))
+      (while (and (= line-diff 0)
+                  (not (= (point) (point-max))))
+        (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+        (setq line-length (length line))
+        (when (> line-length max-line-length)
+          (setq max-line-length line-length))
+        (setq line-diff (forward-line 1)))
+      (when (> max-line-length line-length)
+        (setq pad-length (- max-line-length line-length)))
+      (setq pad-length (+ pad-length 2))
+      (setq pad (make-string pad-length ? ))
+      (setq all-lines (concat (buffer-substring-no-properties (point-min) (1- (point-max))) pad))
+      (setq spoint (point-max))
+      (goto-char spoint)
+      (insert all-lines)
+      (goto-char spoint)
+      (while (search-forward old-namespace nil t)
+        (replace-match new-namespace t t))
+      (kill-rectangle spoint (point-max))
+      (goto-char (point-min))
+      (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+      (setq line-length (length line))
+      (setq pad-length 0)
+      (when (> max-line-length line-length)
+        (setq pad-length (- max-line-length line-length)))
+      (setq pad-length (+ pad-length 2))
+      (setq pad (make-string pad-length ? ))
+      (end-of-line)
+      (insert pad)
+      (yank-rectangle)
+      (goto-char (point-min))
+      (delete-trailing-whitespace (point-min))
+      (goto-char (point-min))
+      (while (and (= line-diff 0)
+                  (not (= (point) (point-max))))
+        (beginning-of-line)
+        (insert "mv ")
+        (setq line-diff (forward-line 1)))
+      (goto-char (point-min)))
+    ))
+
+
+
+
+;;
+;;  shu-get-name-and-version
+;;
+(defun shu-get-name-and-version ()
+  "When positioned anywhere on a line that looks like
+
+        Published version 1.2.9 of library
+
+return a string of the form \"library=1.2.9\".  If the current line does not
+match the required pattern, return nil."
+  (let ((ss "Published version\\s-+\\([.0-9]+\\)\\s-+of\\s-+\\([_-0-9a-zA-Z]+\\)")
+        (line)
+        (name)
+        (version)
+        (nv))
+    (save-excursion
+      (beginning-of-line)
+      (if (not (re-search-forward ss (line-end-position) t))
+          (progn
+            (ding)
+            (setq line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+            (message "Library name and version not found in '%s'/'" line))
+        (setq version (match-string 1))
+        (setq name (match-string 2))
+        (setq nv (concat name "=" version))))
+    nv
+    ))
+
+
+
+;;
+;;  shu-getnv
+;;
+(defun shu-getnv ()
+  "When positioned anywhere on a line that looks like
+
+        Published version 1.2.9 of library
+
+put into the kill ring  a string of the form \"library=1.2.9\"."
+  (interactive)
+  (let ((nv (shu-get-name-and-version)))
+    (when nv
+      (message "%s" nv)
+      (shu-kill-new nv))
+    ))
+
+
+
+
+;;
+;;  shu-srs-create-prompt
+;;
+(defun shu-srs-create-prompt ()
+  "This function creates the prompt for the shu-srs replacement function.
+SHU-SRS-LAST-REPLACE is nil, this function prints the default prompt and returns
+whatever the user types in.  If SHU-SRS-LAST-REPLACE is non-nil, the prompt
+offers to replicate the last change made by SHU-SRS.  If the user types nothing,
+the last replacement string is returned.  If the user types something, that is
+returned instead."
+  (let* ((default-prompt "/x/y?")
+         (new-prompt (concat default-prompt ": "))
+         (initial-contents)
+         (keymap)
+         (read)
+         (hist)
+         (input)
+         (retval))
+    (barf-if-buffer-read-only)
+    (when shu-srs-last-replace
+      (setq retval (shu-extract-replacement-strings shu-srs-last-replace))
+      (when retval
+        (setq new-prompt (concat default-prompt " (default " (car retval) " -> " (cdr retval) "): "))))
+    (setq input (read-from-minibuffer new-prompt initial-contents keymap read hist shu-srs-last-replace))
+    (when (and (= (length input) 0) shu-srs-last-replace)
+      (setq input shu-srs-last-replace))
+    input
+    ))
+
+
+
+;;
+;;  shu-srs
+;;
+(defun shu-srs (rstring)
+  "A sed-like version of REPLACE-STRING.  REPLACE-STRING requires two arguments,
+which are read interactively, one at a time.  This works well for normal
+interactive use.
+
+But sometimes you actually create the search and replacement strings in another
+buffer to be fed to REPLACE-STRING.  To use these two strings you have to do the
+following:
+
+     1. Invoke REPLACE-STRING
+     2. Switch to the other buffer
+     3. Copy the search string from the other buffer
+     4. Switch back to the main buffer
+     5. Paste the search string from the kill ring
+     6. Hit enter
+     7. Switch to the other buffer
+     8. Copy the replacement string from the other buffer
+     9. Switch back to the main buffer
+    10. Paste the replacement string from the kill ring
+    11. Hit enter
+
+This function allows you to enter both strings at one prompt using a sed-like
+syntax, such as
+
+     /abc/defg
+
+This specifies a search string of \"abc\ and a replacement string of \"defg\".
+
+The work flow now becomes
+
+     1. Invoke SHU-SRS
+     2. Switch to the other buffer
+     3. Copy the search and replacement string from the other buffer
+     4. Switch back to the main buffer
+     5. Paste the search and replacement string from the kill ring
+     6. Hit enter
+
+You only have to go through six steps instead of eleven."
+  (interactive (list (shu-srs-create-prompt)))
+  (let ((rval (shu-extract-replacement-strings rstring))
+        (p1)
+        (p2)
+        (count 0)
+        (ess "s"))
+    (if (not rval)
+        (progn
+          (ding)
+          (message "Cannot parse '%s' to find the two replacement strings" rstring))
+      (setq p1 (car rval))
+      (setq p2 (cdr rval))
+      (while (search-forward p1 nil t)
+        (replace-match p2 nil t)
+        (setq count (1+ count)))
+      (when (= count 1)
+        (setq ess ""))
+      (message "shu-srs: Replaced %d occurrence%s" count ess)
+      (setq shu-srs-last-replace rstring))
+    ))
+
+
+
+;;
+;;  shu-extract-replacement-strings
+;;
+(defun shu-extract-replacement-strings (rstring)
+  "Parse a sed-like search and replacement string such as \"/abc/defg\".
+
+This function parses such a string.  The first character in the string is the
+delimiter.  The delimiter character is used to break the string into two
+strings, in this case \"abc\" and \"defg\".  If this can be done successfully,
+the two strings are returned in a cons cell.  If the string cannot be parsed,
+nil is returned."
+  (let ((sc)
+        (ss)
+        (p1)
+        (p2)
+        (rval)
+        (case-fold-search nil))
+    (when (> (length rstring) 3)
+      (setq sc (substring rstring 0 1))
+      (setq ss (concat sc "\\([^" sc "]+\\)" sc "\\([^" sc "]+\\)" sc "*"))
+      (when (string-match ss rstring)
+        (setq p1 (match-string 1 rstring))
+        (setq p2 (match-string 2 rstring))
+        (setq rval (cons p1 p2))))
+    rval
+    ))
+
+
+
+
+;;
+;;  shu-extract-replacement-triple
+;;
+(defun shu-extract-replacement-triple (rstring)
+  "Parse a sed-like search and replacement string that specifies three parts
+such as \"/abc/defg/xyz\".
+
+This function parses such a string.  The first character in the string is the
+delimiter.  The delimiter character is used to break the string into two or
+three strings, in this case \"abc\", \"defg\", and \"xyz\".  If this can be done
+successfully, the three strings are returned in a list.  If the string cannot be
+parsed, nil is returned.
+
+There my be two or three occurrences of the delimiter character.  For example
+
+      \"$abc$def$ghi\"
+
+returns the list
+
+      1. \"abc\"
+      2. \"def\"
+      3. \"ghi\"
+
+      \"$abc$def$\"
+
+returns the list
+
+      1. \"abc\"
+      2. \"def\"
+      3. \"\"  (Empty string)
+
+as does \"$abc$def\" with no trailing delimiter character."
+  (let ((sc)
+        (ss)
+        (p1)
+        (p2)
+        (p3)
+        (result)
+        (case-fold-search nil))
+    (when (> (length rstring) 4)
+      (setq sc (substring rstring 0 1))
+      (setq ss (concat sc "\\([^" sc "]+\\)" sc "\\([^" sc "]+\\)" sc "*" "\\([^" sc "]*\\)"))
+      (when (string-match ss rstring)
+        (setq p1 (match-string 1 rstring))
+        (setq p2 (match-string 2 rstring))
+        (setq p3 (match-string 3 rstring))
+        (setq result (list p1 p2 p3))))
+    result
+    ))
+
+
+
+;;
+;;  shu-fix-header-line
+;;
+(defun shu-fix-header-line ()
+  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", adjust
+the line length to be SHU-CPP-COMMENT-END in length, adding or removing
+internal space as necessary.
+
+If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
+do nothing.
+
+Return the number of spaces actually adjusted.  0 means no adjustment made.
+A positive number represents the number of spaces added.  A negative number
+represents the number of spaces removed."
+  (interactive)
+  (let ((right-end (1+ shu-cpp-comment-end))
+        (sentinel (concat " " shu-cpp-edit-sentinel))
+        (count 0)
+        (end-pos 0)
+        (diff 0))
+    (save-excursion
+      (goto-char (point-min))
+      (when (search-forward sentinel (line-end-position) t)
+        (setq end-pos (match-end 0))
+        (if (< end-pos right-end)
+            (progn
+              (setq diff (- right-end end-pos))
+              (setq count (shu-expand-header-line diff)))
+          (when (> end-pos right-end)
+            (setq diff (- end-pos right-end))
+            (setq count (- (shu-trim-header-line diff)))))))
+    count
+    ))
+
+
+
+;;
+;;  shu-trim-header-line
+;;
+(defun shu-trim-header-line (trim-count)
+  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", remove
+TRIM-COUNT number of spaces from in front of the sentinel.
+
+If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
+do nothing.
+
+If there do not exist enough spaces to remove TRIM-COUNT of them, remove
+as many as possible.
+
+Return the number of spaces actually removed."
+  (let* ((sentinel (concat " " shu-cpp-edit-sentinel))
+         (new-sentinel (concat " " sentinel))
+         (end-pos)
+         (something t)
+         (count 0))
+    (save-excursion
+      (goto-char (point-min))
+      (when (search-forward sentinel (line-end-position) t)
+        (while something
+          (if (= count trim-count)
+              (setq something nil)
+            (goto-char (point-min))
+            (if (not (search-forward new-sentinel (line-end-position) t))
+                (setq something nil)
+              (replace-match sentinel t t)
+              (setq count (1+ count)))))))
+    count
+    ))
+
+
+
+
+;;
+;;  shu-expand-header-line
+;;
+(defun shu-expand-header-line (expand-count)
+  "If the first line of the buffer contains the sentinel \"-*-C++-*-\", add
+EXPAND-COUNT spaces in front of it.
+
+If the first line of the buffer does not contain the sentinel \"-*-C++-*-\",
+do nothing.
+
+Return the number of spaces actually added."
+  (let* ((pad (make-string expand-count ? ))
+         (sentinel (concat " " shu-cpp-edit-sentinel))
+         (new-sentinel (concat pad sentinel))
+         (count 0))
+    (save-excursion
+      (goto-char (point-min))
+      (when (search-forward sentinel (line-end-position) t)
+        (replace-match new-sentinel t t)
+        (setq count expand-count)))
+    count
+    ))
+
+
+
+
+;;
+;;  shu-make-header-line
+;;
+(defun shu-make-header-line ()
+  "At the top of the current buffer, insert a string that holds the standard
+first line comment in a C++ file, which is of the form:
+
+      \"// file_name                                      -*-C++-*-\"
+
+The inserted line is of length SHU-CPP-COMMENT-END.
+
+Does nothing if the current buffer does not have an associated file name."
+  (interactive)
+  (let ((file-name  (file-name-nondirectory (buffer-file-name)))
+        (header-line))
+    (save-excursion
+      (if (not file-name)
+          (progn
+            (ding)
+            (message "%s" "Buffer has no name"))
+        (setq header-line (shu-make-file-header-line file-name))
+        (goto-char (point-min))
+        (insert (concat header-line "\n"))
+        (message "%s" header-line)))
+    ))
+
+
+
+;;
+;;  shu-change-namespace
+;;
+(defun shu-change-namespace (input)
+  "This function changes the namespace in a set of C++ source files.
+
+The files to be changed must follow these conventions:
+
+ - The namespace name is all lower case
+ - Each file name starts with the lower case namespace name followed by an
+   underscore
+
+The following steps are performed:
+
+ 1. Locate all of the files to be changed.  These are all files that hold C++
+ source code in the current directory or in any directory below the current
+ directory.  The set of files may be restricted by specifying a regular
+ expression.  The regular expression does not need to include the file type.
+
+ 2. The files to be changed are renamed with the new namespace replacing the
+ old in the file name.  If any file is part of a git repository, then \"git mv\"
+ is used for the rename operation.  Otherwise, \"mv\" is used.
+
+ 3. The files are then edited to replace all occurrences of the old namespace
+ with the new.
+
+The existing namespace, new namespace and file search pattern are specified with
+a single string.
+
+The first character of the string is a delimiter character that is used to split
+the string.  The existing namespace, new namespace and file search pattern are
+separated from each other with the delimiter.
+
+For example, to specify an existing namespace of \"fumblebar\", a new namespace
+of \"wunderbar\", and a search pattern of \"*exception*\", one might specify
+
+       $fumblebar$wunderbar$*exception*
+
+or
+
+       @fumblebar@wunderbar@*exception*
+
+The search pattern is optional.  The following string would do the same
+namespace replacement for all C++ files.
+
+       $fumblebar$wunderbar"
+  (interactive "s/old-namespace/new-namespace/search-pattern:? ")
+  (let ((gb (get-buffer-create "**boo**"))
+        (root default-directory)
+        (items)
+        (old-namespace)
+        (new-namespace)
+        (pattern)
+        (debug-on-error t))
+    (setq items (shu-extract-replacement-triple input))
+    (if (not items)
+        (progn
+          (ding)
+          (message "Unable to parse input string: '%s'" input))
+      (setq old-namespace (car items))
+      (setq items (cdr items))
+      (setq new-namespace (car items))
+      (setq items (cdr items))
+      (setq pattern (car items))
+      (when (string= pattern "")
+        (setq pattern nil))
+      (shu-internal-process-new-namespace root old-namespace new-namespace pattern))
+    ))
+
+
+
+
+;;
+;;  shu-internal-process-new-namespace
+;;
+(defun shu-internal-process-new-namespace (root old-namespace new-namespace pattern)
+  "Starting in directory ROOT, look for files as follows.  If PATTERN is nil, look
+for all files that hold C++ code.  If PATTERN is non-nil, use that to search for
+files that hold C+++ code.
+
+Of the set of files found, change the namespace from OLD-NAMESPACE to
+NEW-NAMESPACE.
+
+It is assumed that files follow the standard convention of using the namespace as
+the first part of the file followed by an underscore.  If the current namespace is
+\"mumblebar\", then all file names start with \"mumblebar_\".  If the new namespace
+is \"fubmblenew\", then all files whose names start with \"mumblebar_\" will be
+renamed to start with \"fubmblenew_\".  Within the new files, all instances of
+\"mumblebar\" will be changed to instances of \"fubmblenew\"."
+  (let* ((log-buffer-name "**shu-rename-log**")
+         (log-buffer (get-buffer-create log-buffer-name))
+         (root default-directory)
+         (cpp-type t)
+         (files)
+         (file)
+         (ff)
+         (newfiles)
+         (newfile)
+         (cf)
+         (did)
+         (cmake-files))
+    (if (not (string= old-namespace (downcase old-namespace)))
+        (progn
+          (ding)
+          (message "old namespace '%s' is not all lower case" old-namespace))
+      (if (not (string= new-namespace (downcase new-namespace)))
+          (progn
+            (ding)
+            (message "new namespace '%s' is not all lower case" new-namespace))
+        (setq files (shu-project-get-specific-files root pattern cpp-type))
+        (if (not files)
+            (progn
+              (ding)
+              (message "%s" "No files found to modify"))
+          (princ (concat "\n\nChange namespace from '" old-namespace "' to '" new-namespace "'\n"
+                         "for the following files:\n\n") log-buffer)
+          (shu-dump-list files log-buffer)
+          (setq ff files)
+          (while ff
+            (setq file (car ff))
+            (setq newfile (shu-replace-namespace-in-file-name file old-namespace new-namespace))
+            (setq cf (cons file newfile))
+            (push cf newfiles)
+            (setq ff (cdr ff)))
+          (setq newfiles (nreverse newfiles))
+          (shu-dump-rename-list newfiles log-buffer)
+          (setq did (shu-rename-namespace-files newfiles log-buffer))
+          (if (not did)
+              (progn
+                (ding)
+                (message "Rename failed.  See buffer %s" log-buffer-name))
+            (setq cmake-files (shu-namespace-find-cmake-files newfiles log-buffer))
+            (princ "\nAll relevant make files:\n" log-buffer)
+            (shu-dump-list cmake-files log-buffer)
+            (setq did (shu-edit-new-namespace-files root newfiles old-namespace new-namespace log-buffer))
+            (if (not did)
+                (progn
+                  (ding)
+                  (message "Edits failed.  See buffer %s" log-buffer-name))
+              (shu-edit-namespace-cmake-files root cmake-files newfiles log-buffer)
+              (message "Namespace replacement complete.  See buffer %s." log-buffer-name))))))
+    ))
+
+
+;;
+;;  shu-rename-namespace-files
+;;
+(defun shu-rename-namespace-files (newfiles log-buffer)
+  "NEWFILES is a list of cons cells.  The CAR of each cons cell is the old file
+name.  The CDR of each cons cell is the new file name.  This function renames
+each file from old to new.
+
+If the file is under git control, then \"git mv\" is used for the rename.  If
+the file is not under git control, then \"mv\" is used for the rename.
+
+Each rename command is placed in the LOG-BUFFER.  This function quits as soon as
+any rename fails, leaving the reason for the failure in the LOG-BUFFER.
+
+The return value is t if all of the renames worked, nil otherwise."
+  "Doc string."
+  (let ((nf newfiles)
+        (cf)
+        (cmd)
+        (moved)
+        (result)
+        (old-file)
+        (new-file))
+    (setq moved t)
+    (princ "\n" log-buffer)
+    (while (and nf moved)
+      (setq cf (car nf))
+      (setq old-file (car cf))
+      (setq new-file (cdr cf))
+      (setq cmd (shu-move-string old-file new-file))
+      (if (not (shu-git-is-file-in-git old-file))
+          (setq cf (shu-move-file old-file new-file))
+        (setq cmd (shu-git-move-string old-file new-file))
+        (setq cf (shu-git-move-file old-file new-file)))
+      (setq moved (car cf))
+      (setq result (cdr cf))
+      (princ (concat cmd "\n") log-buffer)
+      (when (not moved)
+        (princ (concat "Move failed\n" result "\n") log-buffer))
+      (setq nf (cdr nf)))
+    moved
+    ))
+
+
+
+;;
+;;  shu-edit-new-namespace-files
+;;
+(defun shu-edit-new-namespace-files (root newfiles old-namespace new-namespace log-buffer)
+  "NEWFILES is a list of cons cells.  The CAR of each cons cell is the old file
+name.  The CDR of each cons cell is the new file name.  This function uses
+SHU-REPLACE-NAMESPACE-IN-BUFFER to replace the OLD-NAMESPACE name with the
+NEW-NAMESPACE name.
+
+The editing progress is logged in the LOG-BUFFER.
+
+This functions quits as soon as the first edit fails, leaving the reason for the
+failure in the LOG-BUFFER.
+
+Returns t if all of the edits succeeded, nil otherwise."
+  (let ((nf newfiles)
+        (cf)
+        (old-file)
+        (new-file)
+        (failed)
+        (fbuf)
+        (file-buf)
+        (count 0)
+        (total-count 0)
+        (directory-names)
+        (directory-part)
+        (get-file))
+    (princ "\n" log-buffer)
+    (while (and nf (not failed))
+      (setq cf (car nf))
+      (setq new-file (cdr cf))
+      (setq directory-part (file-name-directory new-file))
+      (when (not (member-ignore-case directory-part directory-names))
+        (push directory-part directory-names))
+      (setq get-file (concat root new-file))
+      (setq fbuf (get-file-buffer get-file))
+      (if fbuf
+          (setq file-buf fbuf)
+        (setq file-buf (find-file-noselect get-file)))
+      (set-buffer file-buf)
+      (when (not fbuf)
+        (make-local-variable 'backup-inhibited)
+        (setq backup-inhibited t))
+      (princ (concat "Replacing namespace in '" new-file "'\n") log-buffer)
+      (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
+      (setq total-count (+ total-count count))
+      (when (= count 0)
+        (princ "***Edit failed.  No strings replaced.***\n" log-buffer)
+        (setq failed t))
+      (when (buffer-modified-p)
+        (basic-save-buffer))
+      (when (not fbuf)
+        (kill-buffer file-buf))
+      (setq nf (cdr nf)))
+    (princ (format "\n%s items changed in %s files in %s directories.\n"
+                   (shu-group-number total-count)
+                   (shu-group-number (length newfiles))
+                   (shu-group-number (length directory-names))) log-buffer)
+    (not failed)
+    ))
+
+
+
+;;
+;;  shu-replace-namespace-in-file-name
+;;
+(defun shu-replace-namespace-in-file-name (file-name old-namespace new-namespace)
+  "FILE-NAME is the name of a file with a standard namespace prefix.
+
+It is assumed that the file name uses the convention of the first part of the
+name being the C++ namespace, followed by an underscore, followed by the class
+name in all lower case.
+
+OLD-NAMESPACE is the current namespace.  NEW-NAMESPACE is the new namespace that
+is to replace the old.
+
+Return a new file name that is the same as the original file name but with the
+namespace part of the name replaced with the new namespace.
+
+If the namespace appears in the file path it is not modified.  For example, if
+the old namespace is \"mumble\" and the new namespace is \"bumble\", then the
+following file name
+
+      mumble_bar/mumble_bar/mumble_observer.h
+
+will be returned as
+
+      mumble_bar/mumble_bar/bumble_observer.h"
+  (let ((new-file-name file-name)
+        (ss (concat old-namespace "_"))
+        (case-fold-search nil)
+        (replace-namespace (concat new-namespace "_"))
+        (directory-part (file-name-directory file-name))
+        (file-part (file-name-nondirectory file-name))
+        (new-file-part))
+    (setq new-file-part file-part)
+    (when (string-match ss file-part)
+      (setq new-file-part (replace-match replace-namespace t t file-part)))
+    (setq new-file-name (concat directory-part new-file-part))
+    new-file-name
+    ))
+
+
+
+;;
+;;  shu-dump-rename-list
+;;
+(defun shu-dump-rename-list (files log-buffer)
+  "FILES is a list of cons cells.  The CAR of each cons cell is the name of an
+existing file.  The CDR of each cons cell is the name that the file will have
+after the rename operation.  This function prints into the LOG-BUFFER the old
+and new file names to show the name changes that will take place as the rename
+happens."
+  (let ((ff files)
+        (longest-name 0)
+        (cf)
+        (file)
+        (dfile)
+        (newfile))
+    (setq longest-name (shu-longest-car-length files))
+    (princ "\nFiles will be renamed as follows:\n" log-buffer)
+    (setq ff files)
+    (while ff
+      (setq cf (car ff))
+      (setq file (car cf))
+      (setq newfile (cdr cf))
+      (setq dfile (shu-make-padded-line file longest-name))
+      (princ (concat dfile " --> " newfile "\n") log-buffer)
+      (setq ff (cdr ff)))
+    ))
+
+
+
+;;
+;;  shu-dump-list
+;;
+(defun shu-dump-list (items log-buffer)
+  "ITEMS is a list of strings, which is printed into LOG-BUFFER."
+  (let ((item))
+    (while items
+      (setq item (car items))
+      (princ (concat item "\n") log-buffer)
+      (setq items (cdr items)))
+    ))
+
+
+
+
+;;
+;;  shu-move-file
+;;
+(defun shu-move-file (old-file new-file)
+  "Issue \"mv old-file new-file\".
+
+Return a cons cell whose CAR is t if the move succeeded and whose CDR is the
+output of the move command."
+  (let ((rc)
+        (result))
+    (with-temp-buffer
+      (setq rc (call-process "mv" nil (current-buffer) nil old-file new-file))
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
+    (cons (= rc 0) result)
+    ))
+
+
+
+;;
+;;  shu-move-string
+;;
+(defun shu-move-string (old-file new-file)
+  "Return the \"mv\" command to rename OLD-FILE to NEW-FILE.  The result is
+not intended to be executed.  It is intended for use in messages that explain
+what operation is being done."
+  (concat "mv " old-file " " new-file)
+  )
+
+
+
+
+;;
+;;  shu-replace-namespace-in-buffer
+;;
+(defun shu-replace-namespace-in-buffer (old-namespace new-namespace)
+  "Within the current buffer, do a case sensitive replace of OLD-NAMESPACE with
+NEW-NAMESPACE.  Then do a case sensitive replace of the upper case version of
+OLD-NAMESPACE with the upper case version of NEW-NAMESPACE.
+
+At the end of all replacements, invoke SHU-FIX-HEADER-LINE to fix up the first
+line of the file in case the length of the namespace has changed.
+
+Return the count of items changed in the buffer."
+  (let ((count 0)
+        (uppercase-old-namespace (upcase old-namespace))
+        (uppercase-new-namespace (upcase new-namespace))
+        (space-count 0)
+        (case-fold-search nil))
+    (save-excursion
+      (goto-char (point-min))
+      (while (search-forward old-namespace nil t)
+        (replace-match new-namespace t t)
+        (setq count (1+ count)))
+      (goto-char (point-min))
+      (while (search-forward uppercase-old-namespace nil t)
+        (replace-match uppercase-new-namespace t t)
+        (setq count (1+ count)))
+      (when (/= count 0)
+        (setq space-count (shu-fix-header-line))
+        (when (/= space-count 0)
+          (setq count (1+ count)))))
+    count
+    ))
+
+
+
+
+;;
+;;  shu-namespace-find-cmake-files
+;;
+(defun shu-namespace-find-cmake-files (newfiles log-buffer)
+  "NEWFILES is a list of cons cells.  The CAR of each cons cell is the name of
+an existing code file with the existing namespace.
+
+This function finds all CMake files (instances of CMakeLists.txt) and returns a
+list of CMake file names, each of which holds at least one instance of an
+existing file name.
+
+These are the CMake files that will need editing after all of the file names
+have been changed to the new namespace names."
+  (let ((files)
+        (ff)
+        (file)
+        (get-file)
+        (root default-directory)
+        (pattern "CMakeLists\\.txt")
+        (cpp-type nil)
+        (cmake-files)
+        (want-file))
+    (setq files (shu-project-get-specific-files root pattern cpp-type))
+    (princ "\nAll make files:\n" log-buffer)
+    (shu-dump-list files log-buffer)
+    (setq ff files)
+    (while ff
+      (setq file (car ff))
+      (setq get-file (concat root file))
+      (setq want-file (shu-namespace-filter-cmake-file get-file newfiles log-buffer))
+      (when want-file
+        (push file cmake-files))
+      (setq ff (cdr ff)))
+    (setq cmake-files (nreverse cmake-files))
+    cmake-files
+    ))
+
+
+
+;;
+;;  shu-namespace-filter-cmake-file
+;;
+(defun shu-namespace-filter-cmake-file (cmake-file newfiles log-buffer)
+  "CMAKE-FILE is a CMake file (CMakeLists.txt).  NEWFILES is a list of cons
+cells.  The CAR of each cons cell is the name of an existing code file with the
+existing namespace.
+
+This function returns true if any of the existing file names are found within
+the CMAKE-FILE."
+  (let ((fbuf)
+        (file-buf)
+        (nf newfiles)
+        (something)
+        (want-file)
+        (file)
+        (file-name))
+    (setq fbuf (get-file-buffer cmake-file))
+    (if fbuf
+        (setq file-buf fbuf)
+      (setq file-buf (find-file-noselect cmake-file)))
+    (set-buffer file-buf)
+    (setq something t)
+    (while (and nf something)
+      (setq want-file nil)
+      (setq file (caar nf))
+      (setq file-name (file-name-nondirectory file))
+      (save-excursion
+        (goto-char (point-min))
+        (when (search-forward file-name nil t)
+          (setq something nil)
+          (setq want-file t)))
+      (setq nf (cdr nf)))
+    (when (not fbuf)
+      (kill-buffer file-buf))
+    want-file
+    ))
+
+
+
+;;
+;;  shu-edit-namespace-cmake-files
+;;
+(defun shu-edit-namespace-cmake-files (root cmake-files newfiles log-buffer)
+  "CMAKE-FILES is a list of CMake files (instances of CMakeLists.txt).  NEWFILES
+is a list of cons cells.  The CAR of each cons cell is the old file name.  The
+CDR of each cons cell is the new file name.
+
+This function edits each CMake file replacing all instances of the old file name
+with the new file name."
+  (let ((cmf cmake-files)
+        (cf)
+        (cmake-file)
+        (get-file)
+        (fbuf)
+        (file-buf)
+        (count 0))
+    (when cmake-files
+      (princ "\nEdit all relevant CMake files:\n" log-buffer)
+      (while cmf
+        (setq cmake-file (car cmf))
+        (princ (concat "Editing " cmake-file "\n") log-buffer)
+        (setq get-file (concat root cmake-file))
+        (setq fbuf (get-file-buffer get-file))
+        (if fbuf
+            (setq file-buf fbuf)
+          (setq file-buf (find-file-noselect get-file)))
+        (set-buffer file-buf)
+        (when (not fbuf)
+          (make-local-variable 'backup-inhibited)
+          (setq backup-inhibited t))
+        (setq count (shu-edit-namespace-cmake-buffer newfiles log-buffer))
+        (princ (format "    Changed %d file names\n" count) log-buffer)
+        (when (buffer-modified-p)
+          (basic-save-buffer))
+        (when (not fbuf)
+          (kill-buffer file-buf))
+        (setq cmf (cdr cmf))))
+    ))
+
+
+
+;;
+;;  shu-edit-namespace-cmake-buffer
+;;
+(defun shu-edit-namespace-cmake-buffer (newfiles log-buffer)
+  "The current buffer is a CMake file (instances of CMakeLists.txt).  NEWFILES
+is a list of cons cells.  The CAR of each cons cell is the old file name.  The
+CDR of each cons cell is the new file name.
+
+This function edits the buffer replacing all instances of the old file name with
+the new file name."
+  (let ((nff newfiles)
+        (cf)
+        (of)
+        (nf)
+        (old-file)
+        (new-file)
+        (count 0))
+    (save-excursion
+      (while nff
+        (setq cf (car nff))
+        (setq of (car cf))
+        (setq nf (cdr cf))
+        (setq old-file (file-name-nondirectory of))
+        (setq new-file (file-name-nondirectory nf))
+        (goto-char (point-min))
+        (while (search-forward old-file nil t)
+          (setq count (1+ count))
+          (replace-match new-file t t))
+        (setq nff (cdr nff))))
+    count
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias
@@ -3220,15 +4129,6 @@ shu- prefix removed."
   (defalias 'reverse-comma-names 'shu-reverse-comma-names)
   (defalias 'comma-names-to-letter 'shu-comma-names-to-letter)
   (defalias 'remove-test-names 'shu-remove-test-names)
-  (defalias 'number-commits 'shu-git-number-commits)
-  (defalias 'diff-commits 'shu-git-diff-commits)
-  (defalias 'get-pr-url 'shu-git-get-pr-url)
-  (defalias 'show-branch 'shu-git-show-branch)
-  (defalias 'insb 'shu-git-insert-branch)
-  (defalias 'inso 'shu-git-insert-origin-branch)
-  (defalias 'gpl 'shu-git-insert-pull-origin-branch)
-  (defalias 'gps 'shu-git-insert-push-origin-branch)
-  (defalias 'gcm 'shu-git-insert-git-commit)
   (defalias 'case-sensitive 'shu-case-sensitive)
   (defalias 'case-insensitive 'shu-case-insensitive)
   (defalias 'number-lines 'shu-number-lines)
@@ -3253,6 +4153,12 @@ shu- prefix removed."
   (defalias 'copy-repo 'shu-copy-repo)
   (defalias 'show-repo 'shu-show-repo)
   (defalias 'unbrace 'shu-unbrace)
+  (defalias 'prepare-for-rename 'shu-prepare-for-rename)
+  (defalias 'getnv 'shu-getnv)
+  (defalias 'srs 'shu-srs)
+  (defalias 'fix-header 'shu-fix-header-line)
+  (defalias 'make-header 'shu-make-header-line)
+  (defalias 'change-namespace 'shu-change-namespace)
   )
 
 (provide 'shu-misc)

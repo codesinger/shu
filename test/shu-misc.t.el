@@ -37,44 +37,6 @@
 
 
 ;;
-;;  shu-test-shu-git-number-commits
-;;
-(ert-deftest shu-test-shu-git-number-commits ()
-  (let ((data
-         (concat
-          "commit 545267aaca37b309196cd6aeacf4a0d0c17af17c\n"
-          "Some text here\n"
-          "commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
-          "This is a short commit\n"
-          "commit 03fd2e4f90676e7b91f156de9986d6b08e4591\n\n"
-          "The following does not start at bol:\n"
-          " commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
-          "Another commit:\n"
-          "commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"))
-        (expected
-         (concat
-          "     0. commit 545267aaca37b309196cd6aeacf4a0d0c17af17c\n"
-          "Some text here\n"
-          "     1. commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
-          "This is a short commit\n"
-          "commit 03fd2e4f90676e7b91f156de9986d6b08e4591\n\n"
-          "The following does not start at bol:\n"
-          " commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"
-          "Another commit:\n"
-          "     2. commit 03fd2e4f90676e7b91f156de9986d6b08e4591d6\n\n"))
-        (actual)
-        (count 0))
-    (with-temp-buffer
-      (insert data)
-      (setq count (shu-git-number-commits))
-      (should (= 3 count))
-      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
-      (should (string= expected actual))
-      )))
-
-
-
-;;
 ;;  shu-test-shu-split-range-string-1
 ;;
 (ert-deftest shu-test-shu-split-range-string-1 ()
@@ -2383,5 +2345,1125 @@
 
 
 
+
+;;
+;;  shu-test-shu-sitting-end-1
+;;
+(ert-deftest shu-test-shu-sitting-end-1 ()
+  (let ((data "  something  \n")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 11)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-2
+;;
+(ert-deftest shu-test-shu-sitting-end-2 ()
+  (let ((data "  something  \n")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq fpos (shu-sitting-end shu-cpp-keyword -1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 3)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-3
+;;
+(ert-deftest shu-test-shu-sitting-end-3 ()
+  (let ((data "something  \n")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq fpos (shu-sitting-end shu-cpp-keyword -1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 1)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-4
+;;
+(ert-deftest shu-test-shu-sitting-end-4 ()
+  (let ((data " something")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 10)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-5
+;;
+(ert-deftest shu-test-shu-sitting-end-5 ()
+  (let ((data "  s ")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 3)
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 3)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-6
+;;
+(ert-deftest shu-test-shu-sitting-end-6 ()
+  (let ((data "s")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 1)
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 1)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-7
+;;
+(ert-deftest shu-test-shu-sitting-end-7 ()
+  (let ((data "s")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 1)
+      (setq fpos (shu-sitting-end shu-cpp-keyword -1))
+      (should fpos)
+      (should (numberp fpos))
+      (should (= fpos 1)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-8
+;;
+(ert-deftest shu-test-shu-sitting-end-8 ()
+  (let ((data " somethingBIG ")
+        (found)
+        (fpos))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should (not fpos)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-end-9
+;;
+(ert-deftest shu-test-shu-sitting-end-9 ()
+  (let ((fpos))
+    (with-temp-buffer
+      (goto-char (point-min))
+      (setq fpos (shu-sitting-end shu-cpp-keyword 1))
+      (should (not fpos)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-on-1
+;;
+(ert-deftest shu-test-shu-sitting-on-1 ()
+  (let ((data "  something  \n")
+        (found)
+        (actual)
+        (expected "something"))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq actual (shu-sitting-on shu-cpp-keyword))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-on-2
+;;
+(ert-deftest shu-test-shu-sitting-on-2 ()
+  (let ((data "something")
+        (found)
+        (actual)
+        (expected "something"))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq actual (shu-sitting-on shu-cpp-keyword))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sitting-on-3
+;;
+(ert-deftest shu-test-shu-sitting-on-3 ()
+  (let ((data "somethingBIG")
+        (found)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq found (search-forward "some" nil t))
+      (should found)
+      (setq actual (shu-sitting-on shu-cpp-keyword))
+      (should (not actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-is-common-substring-1
+;;
+(ert-deftest shu-test-shu-is-common-substring-1 ()
+  (let ((data
+         (list
+          "aaaa_bumble"
+          "aaaa_stumble"
+          "aaaa_mumble"
+          ))
+        (substring "aaaa")
+        (expected "aaaa")
+        (actual))
+    (setq actual (shu-is-common-substring substring data))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-is-common-substring-2
+;;
+(ert-deftest shu-test-shu-is-common-substring-2 ()
+  (let ((data
+         (list
+          "aaaa_bumble"
+          "aaab_stumble"
+          "aaaa_mumble"))
+        (substring "aaaa")
+        (expected "aaaa")
+        (actual))
+    (setq actual (shu-is-common-substring substring data))
+    (should (not actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-is-common-prefix-1
+;;
+(ert-deftest shu-test-shu-is-common-prefix-1 ()
+  (let ((data
+         (list
+          "abcwqlohfa"
+          "abcjfqoeriih"
+          "abchqper"))
+          (prefix "abc")
+          (expected "abc")
+          (actual))
+    (setq actual (shu-is-common-prefix prefix data))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-is-common-prefix-2
+;;
+(ert-deftest shu-test-shu-is-common-prefix-2 ()
+  (let ((data
+         (list
+          "wqlohfa"
+          "abcjfqoeriih"
+          "abchqper"))
+          (prefix "abc")
+          (actual))
+    (setq actual (shu-is-common-prefix prefix data))
+    (should (not actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-longest-common-substring-1
+;;
+(ert-deftest shu-test-shu-longest-common-substring-1 ()
+  (let (
+        (strings
+         (list
+          "abcdemumb"
+          "abcdebumb"
+          "abcdestumb"))
+        (expected "abcde")
+        (actual)
+        )
+    (setq actual (shu-longest-common-substring strings))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-longest-common-substring-2
+;;
+(ert-deftest shu-test-shu-longest-common-substring-2 ()
+  (let (
+        (strings
+         (list
+          "abcd"
+          "effghi"
+          "jklmn"))
+        (expected "abcde")
+        (actual)
+        )
+    (setq actual (shu-longest-common-substring strings))
+    (should (not actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-prepare-for-rename-1
+;;
+(ert-deftest shu-test-shu-prepare-for-rename-1 ()
+  (let ((data
+         (concat
+          "aaaa_fooble.cpp\n"
+          "aaaa_fooble.h\n"
+          "aaaa_fooble.t.cpp\n"))
+        (expected
+         (concat
+          "mv aaaa_fooble.cpp    abcdef_fooble.cpp\n"
+          "mv aaaa_fooble.h      abcdef_fooble.h\n"
+          "mv aaaa_fooble.t.cpp  abcdef_fooble.t.cpp\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-prepare-for-rename "aaaa" "abcdef")
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-prepare-for-rename-2
+;;
+(ert-deftest shu-test-shu-prepare-for-rename-2 ()
+  (let ((data
+         (concat
+          "aaaa_fooble.cpp\n"
+          "aaaa_fooble.h\n"
+          "aaaa_fooble.t.cpp\n"
+          "\n"
+          "\n"))
+        (expected
+         (concat
+          "mv aaaa_fooble.cpp    abcdef_fooble.cpp\n"
+          "mv aaaa_fooble.h      abcdef_fooble.h\n"
+          "mv aaaa_fooble.t.cpp  abcdef_fooble.t.cpp\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-prepare-for-rename "aaaa" "abcdef")
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-prepare-for-rename-3
+;;
+(ert-deftest shu-test-shu-prepare-for-rename-3 ()
+  (let ((data
+         (concat
+          "aaaa_fooble.h\n"
+          "aaaa_fooble.cpp\n"
+          "aaaa_fooble.t.cpp\n"))
+        (expected
+         (concat
+          "mv aaaa_fooble.h      abcdef_fooble.h\n"
+          "mv aaaa_fooble.cpp    abcdef_fooble.cpp\n"
+          "mv aaaa_fooble.t.cpp  abcdef_fooble.t.cpp\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-prepare-for-rename "aaaa" "abcdef")
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-prepare-for-rename-4
+;;
+(ert-deftest shu-test-shu-prepare-for-rename-4 ()
+  (let ((data
+         (concat
+          "aaaa_fooble.t.cpp\n"
+          "aaaa_fooble.h\n"
+          "aaaa_fooble.cpp\n"))
+        (expected
+         (concat
+          "mv aaaa_fooble.t.cpp  abcdef_fooble.t.cpp\n"
+          "mv aaaa_fooble.h      abcdef_fooble.h\n"
+          "mv aaaa_fooble.cpp    abcdef_fooble.cpp\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-prepare-for-rename "aaaa" "abcdef")
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-prepare-for-rename-5
+;;
+(ert-deftest shu-test-shu-prepare-for-rename-5 ()
+  (let ((data
+         (concat
+          "aaaa_fooble.t.cpp\n"
+          "aaaa_fooble.h\n"
+          "aaaa_fooble.cpp\n"))
+        (expected
+         (concat
+          "mv aaaa_fooble.t.cpp  abc_fooble.t.cpp\n"
+          "mv aaaa_fooble.h      abc_fooble.h\n"
+          "mv aaaa_fooble.cpp    abc_fooble.cpp\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-prepare-for-rename "aaaa" "abc")
+      (setq actual (buffer-substring-no-properties (point-min) (point-max))))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-name-and-version-1
+;;
+(ert-deftest shu-test-shu-get-name-and-version-1 ()
+  (let ((actual)
+        (actual)
+        (expected "library=1.2.9"))
+    (with-temp-buffer
+      (insert "Published version 1.2.9 of library\n")
+      (goto-char 8)
+      (setq actual (shu-get-name-and-version))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-get-name-and-version-2
+;;
+(ert-deftest shu-test-shu-get-name-and-version-2 ()
+  (let ((actual))
+    (with-temp-buffer
+      (insert "April is the cruellest month\n")
+      (goto-char 8)
+      (setq actual (shu-get-name-and-version))
+      (should (not actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-get-name-and-version-3
+;;
+(ert-deftest shu-test-shu-get-name-and-version-3 ()
+  (let ((actual))
+    (with-temp-buffer
+      (insert "\n")
+      (goto-char (point-min))
+      (setq actual (shu-get-name-and-version))
+      (should (not actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-strings-1
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-1 ()
+  (let* ((expected1 "abc")
+         (expected2 "defg")
+         (dc "/")
+         (data (concat dc expected1 dc expected2))
+         (rval)
+         (actual1)
+         (actual2)
+         (debug-on-error t))
+    (setq rval (shu-extract-replacement-strings data))
+    (should rval)
+    (should (consp rval))
+    (setq actual1 (car rval))
+    (setq actual2 (cdr rval))
+    (should actual1)
+    (should (stringp actual1))
+    (should actual2)
+    (should (stringp actual2))
+    (should (string= expected1 actual1))
+    (should (string= expected2 actual2))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-strings-2
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-2 ()
+  (let* ((expected1 "abc")
+         (expected2 "defg")
+         (dc "/")
+         (data (concat dc expected1 dc expected2 dc))
+         (rval)
+         (actual1)
+         (actual2))
+    (setq rval (shu-extract-replacement-strings data))
+    (should rval)
+    (should (consp rval))
+    (setq actual1 (car rval))
+    (setq actual2 (cdr rval))
+    (should actual1)
+    (should (stringp actual1))
+    (should actual2)
+    (should (stringp actual2))
+    (should (string= expected1 actual1))
+    (should (string= expected2 actual2))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-strings-3
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-3 ()
+  (let* ((expected1 "abc")
+         (expected2 "defg")
+         (dc "$")
+         (data (concat dc expected1 dc expected2))
+         (rval)
+         (actual1)
+         (actual2))
+    (setq rval (shu-extract-replacement-strings data))
+    (should rval)
+    (should (consp rval))
+    (setq actual1 (car rval))
+    (setq actual2 (cdr rval))
+    (should actual1)
+    (should (stringp actual1))
+    (should actual2)
+    (should (stringp actual2))
+    (should (string= expected1 actual1))
+    (should (string= expected2 actual2))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-strings-4
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-4 ()
+  (let* ((expected1 "abc")
+         (expected2 "defg")
+         (dc "$")
+         (data (concat dc expected1 dc expected2 dc))
+         (rval)
+         (actual1)
+         (actual2))
+    (setq rval (shu-extract-replacement-strings data))
+    (should rval)
+    (should (consp rval))
+    (setq actual1 (car rval))
+    (setq actual2 (cdr rval))
+    (should actual1)
+    (should (stringp actual1))
+    (should actual2)
+    (should (stringp actual2))
+    (should (string= expected1 actual1))
+    (should (string= expected2 actual2))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-strings-5
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-5 ()
+  (let* ((dc "$")
+         (data "Just the worst time of year for a journey")
+         (rval))
+    (setq rval (shu-extract-replacement-strings data))
+    (should (not rval))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-triple-1
+;;
+(ert-deftest shu-test-shu-extract-replacement-triple-1 ()
+  (let ((data "$some thing$orother$with pepper")
+        (expected
+         (list
+          "some thing"
+          "orother"
+          "with pepper"))
+        (actual))
+    (setq actual (shu-extract-replacement-triple data))
+    (should actual)
+    (should (listp actual))
+    (should (= (length expected) (length actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-triple-2
+;;
+(ert-deftest shu-test-shu-extract-replacement-triple-2 ()
+  (let ((data "$some thing$orother$")
+        (expected
+         (list
+          "some thing"
+          "orother"
+          ""))
+        (actual))
+    (setq actual (shu-extract-replacement-triple data))
+    (should actual)
+    (should (listp actual))
+    (should (= (length expected) (length actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-triple-3
+;;
+(ert-deftest shu-test-shu-extract-replacement-triple-3 ()
+  (let ((data "$some thing$orother")
+        (expected
+         (list
+          "some thing"
+          "orother"
+          ""))
+        (actual))
+    (setq actual (shu-extract-replacement-triple data))
+    (should actual)
+    (should (listp actual))
+    (should (= (length expected) (length actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-extract-replacement-triple-4
+;;
+(ert-deftest shu-test-shu-extract-replacement-triple-4 ()
+  (let ((data "$HappyBirthday")
+        (actual))
+    (setq actual (shu-extract-replacement-triple data))
+    (should (not actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-fix-header-line-1
+;;
+(ert-deftest shu-test-shu-fix-header-line-1 ()
+  (let* ((file-name "something_orother.h")
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " file-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
+                            shu-cpp-edit-sentinel))
+         (data
+          (concat
+           open-line "\n"
+           "\n"
+           "/*!\n"
+           " * \file something_orother.h\n"
+           " *\n"
+           " * \brief Declaration of SomethingOrOther\n"
+           " */\n"))
+         (end-pos 0)
+         (new-end-pos 0)
+         (count 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq count (shu-fix-header-line))
+      (should count)
+      (should (numberp count))
+      (should (= count 0))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (= new-end-pos end-pos)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-fix-header-line-2
+;;
+(ert-deftest shu-test-shu-fix-header-line-2 ()
+  (let* ((file-name "something_orother.h")
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " file-name)
+                             (- shu-cpp-comment-end (- (length shu-cpp-edit-sentinel) 3)))
+                            shu-cpp-edit-sentinel))
+         (data
+          (concat
+           open-line "\n"
+           "\n"
+           "/*!\n"
+           " * \file something_orother.h\n"
+           " *\n"
+           " * \brief Declaration of SomethingOrOther\n"
+           " */\n"))
+         (end-pos 0)
+         (new-end-pos 0)
+         (count 0)
+         (diff 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq count (shu-fix-header-line))
+      (should count)
+      (should (numberp count))
+      (should (= count -3))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> end-pos new-end-pos))
+      (setq diff (- end-pos new-end-pos))
+      (should (= diff 3)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-fix-header-line-3
+;;
+(ert-deftest shu-test-shu-fix-header-line-3 ()
+  (let* ((file-name "something_orother.h")
+         (open-line (concat (shu-make-padded-line
+                             (concat "// " file-name)
+                             (- shu-cpp-comment-end (+ (length shu-cpp-edit-sentinel) 3)))
+                            shu-cpp-edit-sentinel))
+         (data
+          (concat
+           open-line "\n"
+           "\n"
+           "/*!\n"
+           " * \file something_orother.h\n"
+           " *\n"
+           " * \brief Declaration of SomethingOrOther\n"
+           " */\n"))
+         (end-pos 0)
+         (new-end-pos 0)
+         (count 0)
+         (diff 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq count (shu-fix-header-line))
+      (should count)
+      (should (numberp count))
+      (should (= count 3))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> new-end-pos end-pos))
+      (setq diff (- new-end-pos end-pos))
+      (should (= diff 3)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-expand-header-line-1
+;;
+(ert-deftest shu-test-shu-expand-header-line-1 ()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"))
+        (end-pos 0)
+        (new-end-pos 0)
+        (expand-count 0)
+        (diff))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq expand-count (shu-expand-header-line 8))
+      (should expand-count)
+      (should (numberp expand-count))
+      (should (= expand-count 8))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> new-end-pos end-pos))
+      (setq diff (- new-end-pos end-pos))
+      (should (= diff expand-count)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-expand-header-line-2
+;;
+(ert-deftest shu-test-shu-expand-header-line-2 ()
+  (let ((data
+         (concat
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"))
+        (expand-count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq expand-count (shu-expand-header-line 8))
+      (should expand-count)
+      (should (numberp expand-count))
+      (should (= expand-count 0)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-trim-header-line-1
+;;
+(ert-deftest shu-test-shu-trim-header-line-1 ()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"))
+        (end-pos 0)
+        (new-end-pos 0)
+        (trim-count 0)
+        (diff 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq trim-count (shu-trim-header-line 8))
+      (should trim-count)
+      (should (numberp trim-count))
+      (should (= trim-count 8))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> end-pos new-end-pos))
+      (setq diff (- end-pos new-end-pos))
+      (should (= diff trim-count)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-header-line-2
+;;
+(ert-deftest shu-test-shu-trim-header-line-2 ()
+  (let ((data
+         (concat
+          "// something_orother.h                               aaa   -*-C++-*-\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"))
+        (end-pos 0)
+        (new-end-pos 0)
+        (trim-count 0)
+        (diff 0))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq end-pos (line-end-position))
+      (goto-char (point-max))
+      (setq trim-count (shu-trim-header-line 8))
+      (should trim-count)
+      (should (numberp trim-count))
+      (should (= trim-count 2))
+      (goto-char (point-min))
+      (setq new-end-pos (line-end-position))
+      (should (> end-pos new-end-pos))
+      (setq diff (- end-pos new-end-pos))
+      (should (= diff trim-count)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-trim-header-line-3
+;;
+(ert-deftest shu-test-shu-trim-header-line-3 ()
+  (let ((data
+         (concat
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"))
+        (trim-count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq trim-count (shu-trim-header-line 8))
+      (should trim-count)
+      (should (numberp trim-count))
+      (should (= trim-count 0)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-replace-namespace-in-file-name-1
+;;
+(ert-deftest shu-test-shu-replace-namespace-in-file-name-1 ()
+  (let* ((old-namespace "oldnamespace")
+         (new-namespace "newernamespace")
+         (file-name (concat old-namespace "_mumblebar.t.cpp"))
+         (expected (concat new-namespace "_mumblebar.t.cpp"))
+         (actual))
+    (setq actual (shu-replace-namespace-in-file-name file-name old-namespace new-namespace))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-replace-namespace-in-file-name-2
+;;
+(ert-deftest shu-test-shu-replace-namespace-in-file-name-2 ()
+  (let* ((old-namespace "oldnamespace")
+         (new-namespace "newernamespace")
+         (file-name (concat old-namespace "_/" old-namespace "_/" old-namespace"_mumblebar.t.cpp"))
+         (expected (concat old-namespace "_/" old-namespace "_/" new-namespace "_mumblebar.t.cpp"))
+         (actual))
+    (setq actual (shu-replace-namespace-in-file-name file-name old-namespace new-namespace))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-move-string-1
+;;
+(ert-deftest shu-test-shu-move-string-1 ()
+  (let* ((old-file "input_something.h")
+        (new-file "newer_something.h")
+        (expected (concat "mv " old-file " " new-file))
+        (actual))
+    (setq actual (shu-move-string old-file new-file))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual))
+    ))
+
+
+
+;;
+;;  shu-test-shu-replace-namespace-in-buffer-1
+;;
+(ert-deftest shu-test-shu-replace-namespace-in-buffer-1 ()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"
+          "namespace something;\n"
+          "\n"))
+        (old-namespace "something")
+        (new-namespace "newersomething")
+        (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
+      (should count)
+      (should (numberp count))
+      (should (= count 4)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-replace-namespace-in-buffer-2
+;;
+(ert-deftest shu-test-shu-replace-namespace-in-buffer-2()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "#if INCLUDED_SOMETHING_OROTHERH\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"
+          "namespace something;\n"
+          "\n"))
+        (old-namespace "something")
+        (new-namespace "newersomething")
+        (count 0))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
+      (should count)
+      (should (numberp count))
+      (should (= count 5)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-replace-namespace-in-buffer-3
+;;
+(ert-deftest shu-test-shu-replace-namespace-in-buffer-3()
+  (let ((data
+         (concat
+          "// something_orother.h                                      -*-C++-*-\n"
+          "#if INCLUDED_SOMETHING_OROTHER_H\n"
+          "\n"
+          "/*!\n"
+          " * \file something_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"
+          "namespace something;\n"
+          "\n"))
+        (expected
+         (concat
+          (shu-make-file-header-line "newersomething_orother.h") "\n"
+          "#if INCLUDED_NEWERSOMETHING_OROTHER_H\n"
+          "\n"
+          "/*!\n"
+          " * \file newersomething_orother.h\n"
+          " *\n"
+          " * \brief Declaration of SomethingOrOther\n"
+          " */\n"
+          "namespace newersomething;\n"
+          "\n"))
+        (old-namespace "something")
+        (new-namespace "newersomething")
+        (count 0)
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (setq count (shu-replace-namespace-in-buffer old-namespace new-namespace))
+      (should count)
+      (should (numberp count))
+      (should (= count 5))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should (string= expected actual)))
+    ))
 
 ;;; shu-misc.t.el ends here

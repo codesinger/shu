@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.108
+;; Version: 1.6.144
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -34,10 +34,10 @@
 ;;; Code:
 
 
-(defconst shu-version "1.6.108"
+(defconst shu-version "1.6.144"
   "The version number of the Shu elisp package.")
 
-(defconst shu-date "2019 Nov 18"
+(defconst shu-date "2021 Dec 23"
   "Date of the most recent merge with the master branch.")
 
 (defconst shu-all-commits
@@ -48,8 +48,9 @@
    (cons "1.5"   "821beb4ace51edbae436f7ac1da67873cc5925c2")
    (cons "1.6"   "dcfe32ef84a3d4ca54b0ac43e754249f1e21f35e")
    (cons "1.6.108"  "cd5a1de0a7d9ec611bbd46f8d043d5ae6b631d5a")
+   (cons "1.6.144"  "25d31731fa68128f486d222909982fe960aeb183")
    (cons "1.7"   "UNKNOWN"))
-  "A list of all commits by version starting with version 1.2")
+  "A list of all merges to master by version starting with version 1.2")
 
 (defconst shu-last-commit "dcfe32ef84a3d4ca54b0ac43e754249f1e21f35e"
   "The git SHA-1 of the most recent commit.  This cannot be the SHA-1 hash of
@@ -71,6 +72,17 @@ here.")
 (defconst shu-cpp-name (regexp-opt
                         shu-cpp-name-list  nil)
   "A regular expression to match a variable name in a C or C++ program.")
+
+(defconst shu-cpp-keyword-list
+  (list "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
+        "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
+        "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+        "_")
+  "List of all characters that can be present in a C++ key word.")
+
+(defconst shu-cpp-keyword (regexp-opt
+                           shu-cpp-keyword-list  nil)
+  "A regular expression to match a key word in a C++ program.")
 
 (defconst shu-non-cpp-name
   (concat "[^" (substring shu-cpp-name 1))
@@ -215,6 +227,12 @@ deleted copy / move constructors."
   :type '(string)
   :group 'shu-base)
 
+(defcustom shu-cpp-edit-sentinel "-*-C++-*-"
+  "The sentinel that appears in a comment in the beginning of a file to indicate
+to a text editor that this file contains C++ code."
+  :type '(string)
+  :group 'shu-base)
+
 (defconst shu-all-whitespace-chars
   (list " " "\b" "\t" "\n" "\v" "\f" "\r")
   "List of all whitespace characters.
@@ -265,8 +283,8 @@ information.")
 (defconst shu-library-files
   (list
    "shu-misc.elc"
-   "shu-cpp-token.elc"
    "shu-cpp-general.elc"
+   "shu-cpp-token.elc"
    "shu-cpp-misc.elc"
    "shu-cpp-match.elc"
    "shu-match.elc"
@@ -827,7 +845,7 @@ and the returned alist would be
 
 The return value of this function is a cons cell whose car is the hash table and
 whose cdr is the alist.  If the cdr of the return value is nil, then the entire
-hash table could be constructed."
+hash table could not be constructed."
   (let ((al alist)
         (ht)
         (count 0)
@@ -1022,7 +1040,9 @@ if any."
     (when arg
       (if (stringp arg)
           (setq sval arg)
-        (setq sval "t")))
+        (if (numberp arg)
+            (setq sval (number-to-string arg))
+          (setq sval "t"))))
     sval
     ))
 
@@ -1152,6 +1172,74 @@ directory is \"foo/blah/humbug\", the value returned from this function is \"hum
     (setq prefix-name (nth (1- (length rr)) rr))
     prefix-name
     ))
+
+
+
+;;
+;;  shu-append-to-file
+;;
+(defun shu-append-to-file (file line)
+  "Append LINE to FILE."
+    (write-region line nil file 'append)
+    )
+
+
+
+
+;;
+;;  shu-make-file-header-line
+;;
+(defun shu-make-file-header-line (file-name)
+  "Return a string that holds the standard first line comment in a C++ file,
+which is of the form:
+
+      \"// file_name                                      -*-C++-*-\"
+
+The returned line is of length SHU-CPP-COMMENT-END."
+    (concat (shu-make-padded-line
+             (concat "// " file-name) (- shu-cpp-comment-end (length shu-cpp-edit-sentinel)))
+            shu-cpp-edit-sentinel)
+    )
+
+
+
+;;
+;;  shu-longest-name-length
+;;
+(defun shu-longest-name-length (names)
+  "Given a list of NAMES, return the length of the longest name."
+  (let ((nm names)
+        (name)
+        (longest-length 0))
+    (while nm
+      (setq name (car nm))
+      (when (> (length name) longest-length)
+        (setq longest-length (length name)))
+      (setq nm (cdr nm)))
+    longest-length
+    ))
+
+
+
+;;
+;;  shu-longest-car-length
+;;
+(defun shu-longest-car-length (cons-cells)
+  "CONS-CELLS is a list of cons cells.  The CAR of each cons cell is a string.
+Return the length of the longest string in all of the CARs of the cons cells."
+  (let ((cs cons-cells)
+        (cf)
+        (name)
+        (longest-length 0))
+    (while cs
+      (setq cf (car cs))
+      (setq name (car cf))
+      (when (> (length name) longest-length)
+        (setq longest-length (length name)))
+      (setq cs (cdr cs)))
+    longest-length
+    ))
+
 
 
 (provide 'shu-base)
