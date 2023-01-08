@@ -37,12 +37,15 @@
 * [shu-cpp-misc](#shu-cpp-misc)
 * [shu-cpp-project](#shu-cpp-project)
 * [shu-cpp-token](#shu-cpp-token)
+* [shu-git](#shu-git)
 * [shu-keyring](#shu-keyring)
 * [shu-match](#shu-match)
 * [shu-misc](#shu-misc)
 * [shu-nvplist](#shu-nvplist)
 * [shu-org-extensions](#shu-org-extensions)
 * [shu-xref](#shu-xref)
+
+
 
 
 
@@ -76,7 +79,7 @@ Version 1.6 was merged with the master branch on 16 November 2019.
 
 Version 1.6.108 was merged with the master branch on 24 December 2021
 
-This is Version 1.6.143 of the Shu elisp repository.
+This is Version 1.6.144 of the Shu elisp repository.
 
 What this document lacks lacks are detailed scenarios and work flows.  The
 reader might well say that this is an interesting collection of parts, and
@@ -13096,7 +13099,6 @@ within type.
 [Constant]
 
 Associate a number with each type of variable
-
 
 # Index #
 

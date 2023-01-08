@@ -30,8 +30,24 @@
 \usepackage{makeidx}
 
 \input{prologue}
+\newcommand*{\slpmaketitle}{%
+\begingroup
+\begin{titlepage}
+\begin{center}
+\vspace*{2em}
+\LARGE{The Shu emacs lisp package}\\
+\vspace{1in}
+\rule{0.3\textwidth}{0.4pt}\par
+\vspace{1in}
+\Large{Stewart L. Palmer}\\
+\vspace{1in}
+\large{7 January 2023}\\
+\end{center}
+\end{titlepage}
+\endgroup}
 \makeindex
 \begin{document}
+\slpmaketitle
 \pagenumbering{roman}
 
 \tableofcontents
