@@ -72,10 +72,10 @@ hexadecimal number.  Returns the count of the number of commits found."
 ;;  shu-find-numbered-commit
 ;;
 (defun shu-find-numbered-commit (commit-number)
-  "Search through a numbered git commit log looking for the commit whose number is
-COMMIT-NUMBER.  Return the SHA-1 hash of the commit if the commit number is found.
-Return nil if no commit with the given number is found.
-The commit log is assume to have been numbered by shu-git-number-commits."
+  "Search through a numbered git commit log looking for the commit whose number
+is COMMIT-NUMBER.  Return the SHA-1 hash of the commit if the commit number is
+found.  Return nil if no commit with the given number is found.  The commit log
+is assume to have been numbered by shu-git-number-commits."
   (let ((ss-1 "\\s-*")
         (ss-2 "\\.\\s-*commit\\s-+\\([0-9a-f]\\{40\\}\\)")
         (sss)
@@ -94,18 +94,19 @@ The commit log is assume to have been numbered by shu-git-number-commits."
 ;;  shu-git-diff-commits
 ;;
 (defun shu-git-diff-commits (commit-range)
-  "In a buffer that is a numbered git log, query for a range string, find the two
-commits, and put into the kill ring a git diff command specifying the two commits.
+  "In a buffer that is a numbered git log, query for a range string, find the
+two commits, and put into the kill ring a git diff command specifying the two
+commits.
 
 For example, given the following two numbered commits:
 
     31. commit 38f25b6769385dbc3526f32a75b97218cb4a6754
     33. commit 052ee7f4297206f08d44466934f1a52678da6ec9
 
-if the commit range specified is either \"31.33\" or \"31+2\", then the following
-is put into the kill ring:
+if the commit range specified is either \"31.33\" or \"31+2\", then the
+following is put into the kill ring:
 
-    \"git diff -b 38f25b6769385dbc3526f32a75b97218cb4a6754..052ee7f4297206f08d44466934f1a52678da6ec9 \""
+    \"git diff -b 38f25b6..052ee7f \""
   (interactive "sCommits in the form x.y or x+y or x-y?: ")
   (let ((range)
         (start)
@@ -266,8 +267,8 @@ the current branch of the current repository."
 ;;  shu-git-insert-origin-branch
 ;;
 (defun shu-git-insert-origin-branch ()
-  "Insert at point the name of the current branch in a git repository preceded by the
-word \"origin\"..  This can be used as part of git push or pull."
+  "Insert at point the name of the current branch in a git repository preceded
+by the word \"origin\"..  This can be used as part of git push or pull."
   (interactive)
   (let ((branch (shu-git-find-branch)))
     (insert (concat "origin " branch))
