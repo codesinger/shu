@@ -38,8 +38,8 @@
   "The name of the mode for a dired buffer")
 
 (defvar shu-srs-last-replace nil
-  "This holds the last string that was passed to shu-srs.  It is remembered here and used as the
-prompt for subsequent invocations of shu-srs")
+  "This holds the last string that was passed to shu-srs.  It is remembered here
+and used as the prompt for subsequent invocations of shu-srs")
 
 
 
@@ -196,8 +196,8 @@ This makes it a valid path on windows machines."
 ;;  shu-gfl
 ;;
 (defun shu-gfl()
-  "While in a file buffer, put both the current line number and the name of the current
-file into the kill ring in the form of \"line 1234 of foo.cpp\"."
+  "While in a file buffer, put both the current line number and the name of the
+current file into the kill ring in the form of \"line 1234 of foo.cpp\"."
   (interactive)
   (let
       ((name  (file-name-nondirectory (buffer-file-name)))
@@ -438,11 +438,11 @@ This searches for \"let\" or \"let*\" followed by \"(\".")
 ;;  shu-get-containing-function
 ;;
 (defun shu-get-containing-function ()
-  "Search backwards from the current point to find the beginning of the enclosing
-function, macro, etc.  If such a beginning is found, return a cons cell whose car
-is the point that defines the point at the beginning of the function and whose cdr
-defines the point at the end of the function.  If not inside a function, macro, etc.,
-return nil"
+  "Search backwards from the current point to find the beginning of the
+enclosing function, macro, etc.  If such a beginning is found, return a cons
+cell whose car is the point that defines the point at the beginning of the
+function and whose cdr defines the point at the end of the function.  If not
+inside a function, macro, etc., return nil"
   (let ((ret-val)
         (bof)
         (eof))
@@ -519,13 +519,13 @@ the end of the previous line.  This function is the opposite of SHU-LOOSEN-LISP"
 ;;
 (defun shu-tighten-hanging-paren (eof)
   "Call this function while point is on a left parenthesis.  This function will
-find the matching right parenthesis.  If the matching right parenthesis is on a line
-by itself and a previous line ends in another right parenthesis, the line and
-dangling right parenthesis will be moved up to the end of the line that also ends
-in a right parenthesis.  This is an internal part of the function SHU-TIGHTEN-LISP.
-EOF is the point at which the current function on which we are operating ends.
-This function removes some text from the current function.  It adjusts EOF appropriately
-and returns the new value to the caller."
+find the matching right parenthesis.  If the matching right parenthesis is on a
+line by itself and a previous line ends in another right parenthesis, the line
+and dangling right parenthesis will be moved up to the end of the line that also
+ends in a right parenthesis.  This is an internal part of the function
+SHU-TIGHTEN-LISP.  EOF is the point at which the current function on which we
+are operating ends.  This function removes some text from the current function.
+It adjusts EOF appropriately and returns the new value to the caller."
   (interactive)
   (let ((sp)
         (end-pos)
@@ -929,18 +929,19 @@ The latter is a format that Microsoft Excel can import."
 ;;
 (defun shu-split-range-string (range-string)
   "RANGE-STRING is a string that contains either one or two numbers, possibly
-separated by plus, minus, or period.  If one number then it is the starting number
-and there is no ending number.  If two numbers then the first number is the start.
-The operator in the middle determines the end.  If plus, then the end is the
-second number added to the first.  If minus, then the end is the second number
-subtracted from the first.  If period, then the end is the second number.
+separated by plus, minus, or period.  If one number then it is the starting
+number and there is no ending number.  If two numbers then the first number is
+the start.  The operator in the middle determines the end.  If plus, then the
+end is the second number added to the first.  If minus, then the end is the
+second number subtracted from the first.  If period, then the end is the second
+number.
 
-Return the two numbers as a cons cell (start . end).  If there is no end then the
-cdr of the cons cell is nil.  If range string is not numeric, then both the car
-and the cdr of the cons cell are nil.
+Return the two numbers as a cons cell (start . end).  If there is no end then
+the cdr of the cons cell is nil.  If range string is not numeric, then both the
+car and the cdr of the cons cell are nil.
 
-For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end 97.
-\"99.103\" has start 99, end 103.  \"98\" has start 98 and end is nil."
+For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end
+97.  \"99.103\" has start 99, end 103.  \"98\" has start 98 and end is nil."
   (let ((s-one "[0-9]+")
         (s-two "\\([0-9]+\\)\\(\\+\\|\\-\\|\\.\\)\\([0-9]+\\)")
         (start)
@@ -1200,12 +1201,13 @@ only modified buffers that hold the contents of a file."
 ;;  shu-all-quit
 ;;
 (defun shu-all-quit ()
-  "Kill all dired buffers and all buffers that contain a file and are unmodified.
-It is not uncommon to have dozens of buffers open that are unrelated to the current task
-and this is a convenience function for closing many buffers that do not need to
-be open.
-If the function SHU-CLEAR-C-PROJECT is defined, it is called to clear the current
-project."
+  "Kill all dired buffers and all buffers that contain a file and are
+unmodified.  It is not uncommon to have dozens of buffers open that are
+unrelated to the current task and this is a convenience function for closing
+many buffers that do not need to be open.
+
+If the function SHU-CLEAR-C-PROJECT is defined, it is called to clear the
+current project."
   (interactive)
   (let ((gb (get-buffer-create "*shu-killed-buffers*"))
         (buf-list (buffer-list))
@@ -2703,10 +2705,11 @@ the Doxyfile.  The current buffer is the Doxyfile."
 ;;  shu-fixup-project-doxyfile
 ;;
 (defun shu-fixup-project-doxyfile (project-name)
-  "PROJECT-NAME is the name of the project for which the Doxyfile has been created.
-This function sets standard default values.
-If this function succeeds, it return true, else nil.  The return value may be used
-in batch mode to determine if the fixup was successful."
+  "PROJECT-NAME is the name of the project for which the Doxyfile has been
+created.  This function sets standard default values.
+
+If this function succeeds, it return true, else nil.  The return value may be
+used in batch mode to determine if the fixup was successful."
   (interactive "sProject name? ")
   (let ((gb (get-buffer-create shu-trace-buffer))
         (library-name (shu-get-git-repo-name))
@@ -2888,7 +2891,8 @@ file so that it may be opened.  If no such file exists, return nil."
 ;;  shu-add-doxyfile
 ;;
 (defun shu-add-doxyfile ()
-  "Call \"doxygen -g\" to create a Doxyfile.  Return the output from the doxygen command."
+  "Call \"doxygen -g\" to create a Doxyfile.  Return the output from the doxygen
+command."
   (let ((result))
     (with-temp-buffer
       (process-file "doxygen" nil nil nil "-g")
@@ -3616,19 +3620,20 @@ namespace replacement for all C++ files.
 ;;  shu-internal-process-new-namespace
 ;;
 (defun shu-internal-process-new-namespace (root old-namespace new-namespace pattern)
-  "Starting in directory ROOT, look for files as follows.  If PATTERN is nil, look
-for all files that hold C++ code.  If PATTERN is non-nil, use that to search for
-files that hold C+++ code.
+  "Starting in directory ROOT, look for files as follows.  If PATTERN is nil,
+look for all files that hold C++ code.  If PATTERN is non-nil, use that to
+search for files that hold C+++ code.
 
 Of the set of files found, change the namespace from OLD-NAMESPACE to
 NEW-NAMESPACE.
 
-It is assumed that files follow the standard convention of using the namespace as
-the first part of the file followed by an underscore.  If the current namespace is
-\"mumblebar\", then all file names start with \"mumblebar_\".  If the new namespace
-is \"fubmblenew\", then all files whose names start with \"mumblebar_\" will be
-renamed to start with \"fubmblenew_\".  Within the new files, all instances of
-\"mumblebar\" will be changed to instances of \"fubmblenew\"."
+It is assumed that files follow the standard convention of using the namespace
+as the first part of the file followed by an underscore.  If the current
+namespace is \"mumblebar\", then all file names start with \"mumblebar_\".  If
+the new namespace is \"fubmblenew\", then all files whose names start with
+\"mumblebar_\" will be renamed to start with \"fubmblenew_\".  Within the new
+files, all instances of \"mumblebar\" will be changed to instances of
+\"fubmblenew\"."
   (let* ((log-buffer-name "**shu-rename-log**")
          (log-buffer (get-buffer-create log-buffer-name))
          (root default-directory)
