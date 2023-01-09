@@ -123,14 +123,16 @@
    "uint32_t"
    "uint64_t"
    "unsigned")
-  "A list of all of the base types in C and C++.  This may be modified by shu-add-cpp-base-types")
+  "A list of all of the base types in C and C++.  This may be modified by
+shu-add-cpp-base-types")
 
 (defvar shu-cpp-keywords-hash nil
   "The hash table of C++ key words")
 
 (defvar shu-cpp-member-prefix "_"
-  "The character string that is used as the prefix to member variables of a C++ class.
-This is used by shu-internal-get-set when generating getters and setters for a class.")
+  "The character string that is used as the prefix to member variables of a C++
+class.  This is used by shu-internal-get-set when generating getters and setters
+for a class.")
 
 (defvar shu-is-const nil
   "Set true if the C++ data member we are working is declared to be const.")
@@ -148,8 +150,8 @@ This is used by shu-internal-get-set when generating getters and setters for a c
   "Comment string with the first letter downcased.")
 
 (defvar shu-rmv-classes nil
-  "An alist of \"using namespace\" directives and their line numbers where first declared.
-Used to filter duplicates.")
+  "An alist of \"using namespace\" directives and their line numbers where first
+declared.  Used to filter duplicates.")
 
 (defvar shu-cpp-include-names nil
   "A hash table that maps class names to include file names  This is the hash table
@@ -1839,9 +1841,9 @@ initial input to the completing read."
 ;;  shu-add-cpp-base-types
 ;;
 (defun shu-add-cpp-base-types (ntypes)
-  "Add one or more data types to the list of C++ native data types defined in shu-cpp-base-types
-in shu-cpp-general.el.  Argument may be a single type in a string or a list of strings.
-This modifies shu-cpp-base-types."
+  "Add one or more data types to the list of C++ native data types defined in
+shu-cpp-base-types in shu-cpp-general.el.  Argument may be a single type in a
+string or a list of strings.  This modifies shu-cpp-base-types."
   (let ((nt ntypes))
     (when (not (listp nt))
       (setq nt (list nt)))
@@ -3089,16 +3091,13 @@ and set functions will be placed in the buffer *get-set*."
 below a certain minimum length..  The line length used is defined by the custom
 variable SHU-CPP-LINE-END.
 
-For example, you may copy a very long line of text into a section of code as
-follows:
-
-     static const std::string x(\"This is a very long line of text that looks as though it will go on forever.\");
+For example, you may copy a very long line of text into a section of code.
 
 To be polite to future code readers, you want to split this into multiple lines.
 This can be a bit cumbersome if the text is very long.  This function splits the
 text at a somewhat arbitrary boundary so that it can be read by others whose
 text editors do not show code much beyond column 80 or so.  This is an example
-of the above line after csplit was invoked:
+of the line after csplit was invoked:
 
      static const std::string x(\"This is a very long line of text that looks \"
                                 \"as though it will go on forever.\");
@@ -3798,9 +3797,9 @@ If optional CONST is true, a const iterator is generated."
 ;;  shu-cpp-check-streaming-op
 ;;
 (defun shu-cpp-check-streaming-op (start end)
-  "Check a streaming operation.   Mark a region that contains a set of streaming
-operators and invoke this function.  It will make sure that you have no unterminated
-strings and that you are not missing any occurrences of <<."
+  "Check a streaming operation.  Mark a region that contains a set of streaming
+operators and invoke this function.  It will make sure that you have no
+unterminated strings and that you are not missing any occurrences of <<."
   (interactive "r")                 ; bounds of marked region (start end)
   (let (
         (ret-val)
@@ -4305,20 +4304,20 @@ Return true if the class name should be ignored."
 ;;  shu-interactive-qualify-class-name
 ;;
 (defun shu-interactive-qualify-class-name ()
-  "Interactively call SHU-QUALIFY-CLASS-NAME to find all instances of a class name and
-add a namespace qualifier to it.  First prompt is for the class name.  If a fully qualified
-class name is supplied, then the given namespace is applied to the class name.  If the name
-supplied is not a namespace qualified class name, then a second prompt is given to read the
-namespace.
+  "Interactively call SHU-QUALIFY-CLASS-NAME to find all instances of a class
+name and add a namespace qualifier to it.  First prompt is for the class name.
+If a fully qualified class name is supplied, then the given namespace is applied
+to the class name.  If the name supplied is not a namespace qualified class
+name, then a second prompt is given to read the namespace.
+
 This is intended to help rescue code that has one or more \"using namespace\"
 directives in it.  The problem with \"using namespace\" is that you now have
-class names from other namespaces with no easy way to identify the namespace
-to which they belong.  The best thing to do is get rid of the \"using
-namespace\" statements and explicitly qualify the class names.  But if you
-use a simple replace to do that, you will qualify variable names that resemble
-class names as well as class names that are already qualified.  This function
-only adds a namespace to a class name that does not already have a namespace
-qualifier."
+class names from other namespaces with no easy way to identify the namespace to
+which they belong.  The best thing to do is get rid of the \"using namespace\"
+statements and explicitly qualify the class names.  But if you use a simple
+replace to do that, you will qualify variable names that resemble class names as
+well as class names that are already qualified.  This function only adds a
+namespace to a class name that does not already have a namespace qualifier."
   (interactive)
   (let ((class "")
         (qclass "")
@@ -4681,11 +4680,11 @@ would be transformed into
 ;;  shu-simple-hother-file
 ;;
 (defun shu-simple-hother-file ()
-  "Return the name of the .h file that corresponds to the .cpp file or .t.cpp file
-that is in the current buffer.  This version of the function creates the name of
-the .h file from the name of the file in the current buffer.  This is in contrast
-with the function shu-hother which finds the corresponding .h file from the list
-of files in the current project."
+  "Return the name of the .h file that corresponds to the .cpp file or .t.cpp
+file that is in the current buffer.  This version of the function creates the
+name of the .h file from the name of the file in the current buffer.  This is in
+contrast with the function shu-hother which finds the corresponding .h file from
+the list of files in the current project."
   (let ((base-name (file-name-sans-extension (buffer-file-name)))
         (newfile ))
     (when (string= (file-name-extension base-name) "t")
@@ -4703,8 +4702,8 @@ of files in the current project."
 ;;
 (defun shu-cpp-find-h-definition ()
   "While in a cpp file, position point on a variable name that is defined in the
-corresponding header file and invoke this function.  It will find all occurrences of
-the name in the header file and put them in the message area."
+corresponding header file and invoke this function.  It will find all
+occurrences of the name in the header file and put them in the message area."
   (interactive)
   (let ((hfile)
         (fbuf)
@@ -4741,8 +4740,8 @@ the name in the header file and put them in the message area."
 ;;  shu-cpp-get-variable-name
 ;;
 (defun shu-cpp-get-variable-name ()
-  "If point is sitting on something that looks like a legal variable name, return it,
-otherwise, return nil."
+  "If point is sitting on something that looks like a legal variable name,
+return it, otherwise, return nil."
   (let ((target-char shu-cpp-name)
         (target-name (concat shu-cpp-name "+"))
         (bol (line-beginning-position))
@@ -5091,8 +5090,9 @@ a timezone datetime type."
 ;;  shu-cpp-make-interval
 ;;
 (defun shu-cpp-make-interval ()
-  "insert a string that is the list of values to be passed to the constructor of a datetime
- type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
+  "insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds."
   (interactive)
   (insert (concat (shu-cpp-internal-make-interval) ";"))
   )
@@ -5103,8 +5103,9 @@ a timezone datetime type."
 ;;  shu-cpp-internal-make-interval
 ;;
 (defun shu-cpp-internal-make-interval ()
-  "Return a string that is the list of values to be passed to the constructor of a datetime
- type that accepts days, hours, minutes, seconds, milliseconds, microseconds."
+  "Return a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts days, hours, minutes, seconds, milliseconds,
+ microseconds."
   (let ((days "0")
         (hours (number-to-string (shu-random-range 0 23)))
         (minutes (number-to-string (shu-random-range 0 59)))
@@ -5120,8 +5121,9 @@ a timezone datetime type."
 ;;  shu-cpp-make-short-interval
 ;;
 (defun shu-cpp-make-short-interval ()
-  "insert a string that is the list of values to be passed to the constructor of a datetime
- type that accepts year, month, day, hour, minute, second, milliseconds, microseconds."
+  "insert a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts year, month, day, hour, minute, second,
+ milliseconds, microseconds."
   (interactive)
   (insert (concat (shu-cpp-internal-make-short-interval) ";"))
   )
@@ -5132,8 +5134,8 @@ a timezone datetime type."
 ;;  shu-cpp-internal-make-short-interval
 ;;
 (defun shu-cpp-internal-make-short-interval ()
-  "Return a string that is the list of values to be passed to the constructor of a datetime
- type that accepts seconds and nanoseconds."
+  "Return a string that is the list of values to be passed to the constructor of
+ a datetime type that accepts seconds and nanoseconds."
   (let ((days "0")
         (seconds (number-to-string (shu-random-range 0 999999)))
         (nanos (number-to-string (shu-random-range 0 999999))))
@@ -5146,7 +5148,8 @@ a timezone datetime type."
 ;;  shu-cpp-internal-make-long-long
 ;;
 (defun shu-cpp-internal-make-long-long ()
-  "Return a string that can be used to initialize a test variable of type long long."
+  "Return a string that can be used to initialize a test variable of type long
+long."
   (interactive)
   (let ((min 12345678901)
         (max 123456789012345678))
