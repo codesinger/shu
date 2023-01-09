@@ -125,8 +125,8 @@ end of a file are deleted when a file is saved."
   :group 'shu-base)
 
 (defcustom shu-cpp-comment-start 36
-  "Column in which a standard comment starts.  Any comment that starts to the left of
-this point is assumed to be a block comment."
+  "Column in which a standard comment starts.  Any comment that starts to the
+left of this point is assumed to be a block comment."
   :type '(number)
   :group 'shu-base)
 
@@ -151,10 +151,9 @@ this point is assumed to be a block comment."
   :group 'shu-base)
 
 (defcustom shu-cpp-include-user-brackets nil
-  "Set non-nil if user written include files are to be delimited by
-angle brackets instead of quotes.
-In many C and C++ environments, system include files such as stdio.h are delimited
-by angle brackets, for example:
+  "Set non-nil if user written include files are to be delimited by angle
+brackets instead of quotes.  In many C and C++ environments, system include
+files such as stdio.h are delimited by angle brackets, for example:
 
       #include <stdio.h>
 
@@ -162,8 +161,8 @@ while user written include files are delimited by quotes, for example:
 
       #include \"myclass.h\"
 
-If this variable is non-nil, then user written include files are delimited
-by angle brackets and an include of \"myclass.h\" would be written as
+If this variable is non-nil, then user written include files are delimited by
+angle brackets and an include of \"myclass.h\" would be written as
 
       #include <myclass.h>"
   :type '(number)
@@ -242,12 +241,13 @@ newlines.")
 
 (defconst shu-all-whitespace-regexp
   (regexp-opt shu-all-whitespace-chars nil)
-  "Regular expression to search for whitespace.  Since the syntax table considers
-newline to be (among other things) a comment terminator, the usual \\s- won't work
-for whitespace that includes newlines.  Note that this regular expression is a
-character alternative enclosed in left and right brackets.  skip-chars-forward does
-not expect character alternatives to be enclosed in square brackets and will include
-the left and right brackets in the class of characters to be skipped.")
+  "Regular expression to search for whitespace.  Since the syntax table
+considers newline to be (among other things) a comment terminator, the usual
+\\s- won't work for whitespace that includes newlines.  Note that this regular
+expression is a character alternative enclosed in left and right brackets.
+skip-chars-forward does not expect character alternatives to be enclosed in
+square brackets and will include the left and right brackets in the class of
+characters to be skipped.")
 
 (defconst shu-all-whitespace-regexp-scf
   (substring shu-all-whitespace-regexp 1 (1- (length shu-all-whitespace-regexp)))
@@ -258,12 +258,13 @@ will include the brackets as characters to be skipped.")
 
 (defconst shu-not-all-whitespace-regexp
   (concat "[^" (substring shu-all-whitespace-regexp 1))
-  "Regular expression to search for non-whitespace.  Since the syntax table considers
-newline to be (among other things) a comment terminator, the usual \\s- won't work
-for whitespace that includes newlines.  Note that this regular expression is a
-character alternative enclosed in left and right brackets.  skip-chars-forward does
-not expect character alternatives to be enclosed in square brackets and will include
-the left and right brackets in the class of characters to be skipped.")
+  "Regular expression to search for non-whitespace.  Since the syntax table
+considers newline to be (among other things) a comment terminator, the usual
+\\s- won't work for whitespace that includes newlines.  Note that this regular
+expression is a character alternative enclosed in left and right brackets.
+skip-chars-forward does not expect character alternatives to be enclosed in
+square brackets and will include the left and right brackets in the class of
+characters to be skipped.")
 
 (defconst shu-comment-start-pattern "/[/\\*]"
   "The regular expression that defines the delimiter used to start
@@ -359,8 +360,9 @@ Return false if any readable file failed to load."
 ;;  shu-the-line-at
 ;;
 (defun shu-the-line-at (arg)
-  "Return the line number of the point passed in as an argument.  The line number is
-relative to the start of the buffer, whether or not narrowing is in effect."
+  "Return the line number of the point passed in as an argument.  The line
+number is relative to the start of the buffer, whether or not narrowing is in
+effect."
   (let ((current-line (save-excursion (save-restriction (widen) (goto-char arg) (line-number-at-pos)))))
     current-line))
 
@@ -418,12 +420,12 @@ string TEST-CHAR, return the input string unmodified."
 ;;  shu-point-in-string
 ;;
 (defun shu-point-in-string (&optional pos)
-  "Return the start position of the string text if point is sitting between a pair
-of non-escaped quotes (double quotes).  The left-hand quote (opening quote) must be
-on the same line as point.  The string must be on a single line.  If point is sitting
-on a quote, then it is not inside a string.  In order to be inside a string, point
-must lie between two non-escaped quotes.  The optional argument POS, if specified,
-is used in place of the position of point."
+  "Return the start position of the string text if point is sitting between a
+pair of non-escaped quotes (double quotes).  The left-hand quote (opening quote)
+must be on the same line as point.  The string must be on a single line.  If
+point is sitting on a quote, then it is not inside a string.  In order to be
+inside a string, point must lie between two non-escaped quotes.  The optional
+argument POS, if specified, is used in place of the position of point."
   (let ((xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
         ;; of a line or a quote not preceded by \
         (start-pos)
@@ -485,9 +487,9 @@ pad character of ?0.  Do not use a pad character of \"0\""
 ;;  shu-fixed-format-num
 ;;
 (defun shu-fixed-format-num (num width)
-  "Return a printable representation of NUM in a string right justified
-and pad filled to length WIDTH.  The number is formatted as comma separated
-as defined by shu-group-number."
+  "Return a printable representation of NUM in a string right justified and pad
+filled to length WIDTH.  The number is formatted as comma separated as defined
+by shu-group-number."
   (let ((num  (shu-group-number num 3)))
     (when (<= width (length num))
       (setq width (length num)))
@@ -499,9 +501,9 @@ as defined by shu-group-number."
 ;;  shu-group-number
 ;;
 (defun shu-group-number (num &optional size char)
-  "Format NUM as string grouped to SIZE with CHAR.  Default SIZE if 3.  Default CHAR
-is ','.  e.g., 1234567 is formatted as 1,234,567.  Argument to be formatted may be
-either a string or a number."
+  "Format NUM as string grouped to SIZE with CHAR.  Default SIZE if 3.  Default
+CHAR is ','.  e.g., 1234567 is formatted as 1,234,567.  Argument to be formatted
+may be either a string or a number."
   (let* ((size (or size 3))
          (char (or char ","))
          (str (if (stringp num)
@@ -968,9 +970,9 @@ two strings, which are \"Hi\" and \"How are you?\"."
 ;;  shu-starts-with
 ;;
 (defun shu-starts-with (regexp)
-  "If the first non-whitespace on the current line matches REGEXP, return the position
-of the beginning of the matched REGEXP.  If the first non-whitespace does not match
-REGEXP, return nil."
+  "If the first non-whitespace on the current line matches REGEXP, return the
+position of the beginning of the matched REGEXP.  If the first non-whitespace
+does not match REGEXP, return nil."
   (let ((isit))
     (save-excursion
       (goto-char (line-beginning-position))
@@ -1090,8 +1092,9 @@ to lower case"
 ;;  shu-random-range
 ;;
 (defun shu-random-range (x y)
-  "Return a random number that lies within the closed interval [X, Y].  If Y < X, then the
-closed interval is [Y, X].  If Y is equal to X, then the returned value is X."
+  "Return a random number that lies within the closed interval [X, Y].  If
+Y < X, then the closed interval is [Y, X].  If Y is equal to X, then the
+returned value is X."
   (let ((lower x)
         (upper y)
         (range)
@@ -1162,8 +1165,9 @@ An empty START-STRING matches anything.  An empty END-STRING matches anything."
 ;;  shu-get-directory-prefix
 ;;
 (defun shu-get-directory-prefix ()
-  "Get a directory based prefix, which is the last name in the current path.  If the current
-directory is \"foo/blah/humbug\", the value returned from this function is \"humbug\""
+  "Get a directory based prefix, which is the last name in the current path.  If
+the current directory is \"foo/blah/humbug\", the value returned from this
+function is \"humbug\""
   (let*
       ((gbuf (get-buffer-create shu-unit-test-buffer))
        (sep-char (substring default-directory -1))
