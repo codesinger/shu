@@ -97,20 +97,22 @@
 
 
 (defconst shu-cpp-c-extensions (list "c" "cc" "cpp" "Cc" "C")
-  "A list of file extensions for all of the C file types we want to find.  This is defined
-as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions.")
+  "A list of file extensions for all of the C file types we want to find.  This
+is defined as defconst in shu-cpp-base.el but may be modified by
+shu-add-cpp-c-extensions.")
 
 (defconst shu-cpp-h-extensions (list "h" "H" "hh")
-  "A list of file extensions for all of the H file types we want to find.  This is defined
-as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-h-extensions")
+  "A list of file extensions for all of the H file types we want to find.  This
+is defined as defconst in shu-cpp-base.el but may be modified by
+shu-add-cpp-h-extensions")
 
 (defconst shu-py-extensions (list "py")
   "A list of file extensions for Python projects")
 
 (defconst shu-project-extensions (append shu-cpp-c-extensions shu-cpp-h-extensions)
-  "A list of file extensions for all of the file types we want to find.  This is defined
-as defconst in shu-cpp-base.el but may be modified by shu-add-cpp-c-extensions or
-shu-add-cpp-h-extensions.")
+  "A list of file extensions for all of the file types we want to find.  This is
+defined as defconst in shu-cpp-base.el but may be modified by
+shu-add-cpp-c-extensions or shu-add-cpp-h-extensions.")
 
 (defconst shu-project-exclude-list (list "cmake-build" "cmake-distro-dev" "dists")
   "A list of top level directory names to exclude while creating a project via
@@ -157,9 +159,10 @@ SHU-CPP-PROJECT-SHORT-NAMES is non-nil, then this alist includes the short file
 names as well.")
 
 (defvar shu-cpp-found-extensions (list)
-  "This is a list of all of the file extensions found in the current project.  While
-shu-project-extensions contains all of the extensions that we look for.  This variable
-contains those that we actually found in building the current project.")
+  "This is a list of all of the file extensions found in the current project.
+While shu-project-extensions contains all of the extensions that we look for.
+This variable contains those that we actually found in building the current
+project.")
 
 (defvar shu-cpp-project-time nil
   "This is the time at which the current project was created.")
@@ -309,9 +312,10 @@ a project file and point is not sitting on something that resembles a file name.
 ;;  shu-add-cpp-c-extensions
 ;;
 (defun shu-add-cpp-c-extensions (xtns)
-  "Add one or more file extensions to the list of C and C++ extensions recognized by the
-C package functions.  Argument may be a single extension in a string or a list of strings.
-This modifies both shu-cpp-c-extensions and shu-project-extensions."
+  "Add one or more file extensions to the list of C and C++ extensions
+recognized by the C package functions.  Argument may be a single extension in a
+string or a list of strings.  This modifies both shu-cpp-c-extensions and
+shu-project-extensions."
   (let ((nx xtns))
     (when (not (listp nx))
       (setq nx (list nx)))
@@ -323,9 +327,10 @@ This modifies both shu-cpp-c-extensions and shu-project-extensions."
 ;;  shu-add-cpp-h-extensions
 ;;
 (defun shu-add-cpp-h-extensions (xtns)
-  "Add one or more file extensions to the list of C and C++ extensions recognized by the
-C package functions.  Argument may be a single extension in a string or a list of strings.
-This modifies both shu-cpp-h-extensions and shu-project-extensions."
+  "Add one or more file extensions to the list of C and C++ extensions
+recognized by the C package functions.  Argument may be a single extension in a
+string or a list of strings.  This modifies both shu-cpp-h-extensions and
+shu-project-extensions."
   (let ((nx xtns))
     (when (not (listp nx))
       (setq nx (list nx)))
@@ -461,10 +466,10 @@ into the current file at point."
 ;;
 (defun shu-cpp-project-subdirs (dir-name level)
   "Starting with the directory name DIR-NAME. create a list of subdirectories
-whose head is in SHU-CPP-FINAL-LIST, that contains the name of every directory and
-subdirectory that contains C, C++, or H files.  This is used by shu-make-c-project
-and other functions that wish to discover all directories that might contain
-source code."
+whose head is in SHU-CPP-FINAL-LIST, that contains the name of every directory
+and subdirectory that contains C, C++, or H files.  This is used by
+shu-make-c-project and other functions that wish to discover all directories
+that might contain source code."
   (let ((gbuf      (get-buffer-create "*Project List*")) ;
         (dlist )
         (tlist )
@@ -779,10 +784,11 @@ SHU-PROJECT-EXCLUDE-HASH is also set to nil."
 ;;
 ;;
 (defun shu-vh ()
-  "Visit a c or h file in a project.  If point is on something that resembles a file
-name, then visit that file.  If the file name is followed by a colon and a number
-then go to that line in the file.  If the line number is followed by a colon and
-a number then use the second number as the column number within the line."
+  "Visit a c or h file in a project.  If point is on something that resembles a
+file name, then visit that file.  If the file name is followed by a colon and a
+number then go to that line in the file.  If the line number is followed by a
+colon and a number then use the second number as the column number within the
+line."
   (interactive)
   (shu-internal-visit-project-file t)
   )
@@ -794,8 +800,8 @@ a number then use the second number as the column number within the line."
 ;;
 ;;
 (defun shu-vj ()
-  "Visit a c or h file in a project.  Ignore any text that point is on and visit the
-file typed in the completion buffer."
+  "Visit a c or h file in a project.  Ignore any text that point is on and visit
+the file typed in the completion buffer."
   (interactive)
   (shu-internal-visit-project-file nil)
   )
@@ -921,9 +927,10 @@ number."
 ;;    we wish to visit.
 ;;
 (defun shu-find-default-cpp-name ()
-  "Find a default file name to visit.  Calls shu-find-line-and-file to find a possible file
-name and possible line number within the file.  Return the file name if one is found and
-sets shu-cpp-target-file-line to the line number if one is found"
+  "Find a default file name to visit.  Calls shu-find-line-and-file to find a
+possible file name and possible line number within the file.  Return the file
+name if one is found and sets shu-cpp-target-file-line to the line number if one
+is found"
   (let
       ((ret-name)
        (ret-list)
@@ -951,14 +958,15 @@ sets shu-cpp-target-file-line to the line number if one is found"
 (defun shu-find-line-and-file()
   "If point is sitting on the word \"line\", then look for a string of the form
 \"line 678 of frobnitz.cpp\" and return a list whose first item is the file name
-and whose second item is the line number.  If point is not sitting on the word \"line\",
-then check to see if point is sitting on a string that has the syntax of a valid
-file name.  If that is the case, remember the file name.  If the file name is
-followed by a colon, look for a line number following the colon.  If found, look
-for another colon followed by a possible column number.  This function will return
-nil if none of the above are found.  If only a file name is found, return a list
-with one entry.  If file name and line number, a list with two entries.  If file
-name, line number, and column number, a list with three entries."
+and whose second item is the line number.  If point is not sitting on the word
+\"line\", then check to see if point is sitting on a string that has the syntax
+of a valid file name.  If that is the case, remember the file name.  If the file
+name is followed by a colon, look for a line number following the colon.  If
+found, look for another colon followed by a possible column number.  This
+function will return nil if none of the above are found.  If only a file name is
+found, return a list with one entry.  If file name and line number, a list with
+two entries.  If file name, line number, and column number, a list with three
+entries."
   (let*
       ((case-fold-search t)           ;; Searches ignore case
        (target-extensions (regexp-opt shu-project-extensions t))
@@ -989,9 +997,9 @@ name, line number, and column number, a list with three entries."
 ;;  shu-on-the-word-line
 ;;
 (defun shu-on-the-word-line()
-  "Return the character position of the start of the current word if point is sitting
-anywhere on the word \"line\".  This is used pick up file positions of the form:
-\"line 628 of frobnitz.cpp\""
+  "Return the character position of the start of the current word if point is
+sitting anywhere on the word \"line\".  This is used pick up file positions of
+the form: \"line 628 of frobnitz.cpp\""
   (let
       ((case-fold-search t)           ;; Searches ignore case
        (bol (save-excursion (beginning-of-line) (point)))
@@ -1344,8 +1352,9 @@ temporary buffer *shu-project-count*"
 ;;
 (defun shu-count-in-cpp-directory (directory-name pbuf tdirs
                                                   t-h-files t-c-files t-h-count t-c-count)
-  "Count the lines of code in each of the code files in the given directory, updating
-the message in the minibuffer and passing the totals back to the caller."
+  "Count the lines of code in each of the code files in the given directory,
+updating the message in the minibuffer and passing the totals back to the
+caller."
   (let*
       ((full-name "")
        (target-extensions (regexp-opt shu-project-extensions t))
@@ -1741,7 +1750,8 @@ SHU-CPP-LIST-PROJECT-NAMES, and SHU-CPP-LIST-COMPLETING-NAMES."
 ;;  shu-list-in-cpp-directory
 ;;
 (defun shu-list-in-cpp-directory (directory-name)
-  "Insert into the current buffer the names of all of the code files in a directory."
+  "Insert into the current buffer the names of all of the code files in a
+directory."
   (let*
       ((full-name "")
        (target-extensions (regexp-opt shu-project-extensions t))
@@ -1850,10 +1860,11 @@ project."
 ;;  shu-which-c-project
 ;;
 (defun shu-which-c-project ()
-  "Identify the current project by putting into a project buffer the name of the file
-from which the project was derived as well as the name of all of the directories in the
-project.  Then switch to that buffer.  The idea is to invoke this function, look at the
-results in that buffer, and then quit out of the buffer."
+  "Identify the current project by putting into a project buffer the name of the
+file from which the project was derived as well as the name of all of the
+directories in the project.  Then switch to that buffer.  The idea is to invoke
+this function, look at the results in that buffer, and then quit out of the
+buffer."
   (interactive)
   (let
       ((pbuf    (get-buffer-create "*current c project*"))
@@ -2109,9 +2120,10 @@ For example
        (list nil 'search-forward \"howdy\" \"doody\"))
 
 is a list that defines two search and replace operations.  Both operations use
-the search-forward function.  The first is a case sensitive search and replace to
-replace all instances of \"Mumble\" with \"Bumble\".  The second is a case
-insensitive search and replace to replace all instances of \"howdy\" with \"doody\".
+the search-forward function.  The first is a case sensitive search and replace
+to replace all instances of \"Mumble\" with \"Bumble\".  The second is a case
+insensitive search and replace to replace all instances of \"howdy\" with
+\"doody\".
 
 These operations may be performed on every file in the project as follows:
 
@@ -2161,9 +2173,10 @@ These operations may be performed on every file in the project as follows:
 ;;  shu-cpp-project-get-list-counts
 ;;
 (defun shu-cpp-project-get-list-counts (proj-list)
-  "PROJ-LIST is an alist whose structure is identical to that of SHU-CPP-CLASS-LIST.
-This function returns a list with three items on it: the number of c / cpp files, the
-number of h files, and the number of duplicate names found in the list."
+  "PROJ-LIST is an alist whose structure is identical to that of
+SHU-CPP-CLASS-LIST.  This function returns a list with three items on it: the
+number of c / cpp files, the number of h files, and the number of duplicate
+names found in the list."
   (let ((plist proj-list)
         (c-count   0)
         (h-count   0)
