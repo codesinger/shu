@@ -546,9 +546,9 @@ code contains any such statements and to identify them."
 ;;  shu-match-using-namespace-string
 ;;
 (defun shu-match-using-namespace-string (rlist &optional top-name)
-  "Given an RLIST that contains a \"using namespace\" statement, return the string
-that is the fully qualified namespace name.  If the first part of the name is the
-optional TOP-NAME, it is omitted from the final result."
+  "Given an RLIST that contains a \"using namespace\" statement, return the
+string that is the fully qualified namespace name.  If the first part of the
+name is the optional TOP-NAME, it is omitted from the final result."
   (let ((nlist (cddr rlist))
         (sep-char "")
         (name "")
@@ -647,13 +647,13 @@ whose cdr is the class name."
 ;;  shu-match-get-start-end-pos
 ;;
 (defun shu-match-get-start-end-pos (rlist &optional whole-lines)
-  "Given an RLIST return the beginning and end positions.  The beginning position is
-the position of the first character of the first token.  The end position is the
-position of the last character of the last token.  These two are returned as a cons
-cell whose car is the beginning position and whose cdr is the end position.  If
-the optional WHOLE-LINES is true, the start position is that of the beginning of
-the line on which the start falls and the end position is that of the end of
-the line on which the end falls."
+  "Given an RLIST return the beginning and end positions.  The beginning
+position is the position of the first character of the first token.  The end
+position is the position of the last character of the last token.  These two are
+returned as a cons cell whose car is the beginning position and whose cdr is the
+end position.  If the optional WHOLE-LINES is true, the start position is that
+of the beginning of the line on which the start falls and the end position is
+that of the end of the line on which the end falls."
   (let ((token-info (car rlist))
         (ptoken-info)
         (spoint)
@@ -983,22 +983,22 @@ unqualified class names to be qualified."
 ;;
 (defun shu-match-qualify-class-names (class-ht count-alist clist np-rlists token-count symbol-count log-buf)
   "CLASS-HT is the hash table that maps a class name to its containing namespace
-name.  COUNT-ALIST is the alist that counts the number of times each class
-name has been qualified by its enclosing namespace.  CLIST is the list of
-token-info, each of which represents an unqualified class name.  The list is in
-reverse order, which is important.  It means that one can add a qualification to
-one class name in the list without changing the location of any other class
-names, which are above the current one in the buffer.  NP-RLISTS is a list of
-rlists, each of which represents a \"using namespace\" statement for which
-there is no corresponding entry in the class list.  There are the \"using
-namespace\" statements that we will not be processing..
+name.  COUNT-ALIST is the alist that counts the number of times each class name
+has been qualified by its enclosing namespace.  CLIST is the list of token-info,
+each of which represents an unqualified class name.  The list is in reverse
+order, which is important.  It means that one can add a qualification to one
+class name in the list without changing the location of any other class names,
+which are above the current one in the buffer.  NP-RLISTS is a list of rlists,
+each of which represents a \"using namespace\" statement for which there is no
+corresponding entry in the class list.  There are the \"using namespace\"
+statements that we will not be processing..
 
 This function goes to the position of each unqualified class name, finds its
 containing namespace in the hash table, and inserts the containing namespace
 followed by \"::\" in front of the unqualified class name.
 
-After it inserts the qualifying namespace, it increments in COUNT-ALIST the number
-of times that the class name was explicitly qualified."
+After it inserts the qualifying namespace, it increments in COUNT-ALIST the
+number of times that the class name was explicitly qualified."
   (let ((nprl np-rlists)
         (rlist)
         (ret-val)
@@ -1340,15 +1340,15 @@ from the buffer."
 ;;
 (defun shu-match-make-class-hash-table-internal (proc-classes log-buf)
   "PROC-CLASSES is the alist of all of the namespaces and classes that we will
-process, with the namespace name being the key and a list of class names within the
-namespace name as the value.
+process, with the namespace name being the key and a list of class names within
+the namespace name as the value.
 
-This function builds a hash table that inverts the
-alist.  Each entry in the hash table has a class name as the key with the name
-of the enclosing namespace as the value.
-If two class names map to the same enclosing namespace name, then there is an
-unresolvable ambiguity that must terminate the operation.  If that is the case,
-diagnostic messages are placed into the log buffer and a nil value is returned."
+This function builds a hash table that inverts the alist.  Each entry in the
+hash table has a class name as the key with the name of the enclosing namespace
+as the value.  If two class names map to the same enclosing namespace name, then
+there is an unresolvable ambiguity that must terminate the operation.  If that
+is the case, diagnostic messages are placed into the log buffer and a nil value
+is returned."
   (let ((pc proc-classes)
         (ht)
         (count 0)
@@ -1390,9 +1390,9 @@ diagnostic messages are placed into the log buffer and a nil value is returned."
 ;;  shu-match-make-count-alist-from-hash
 ;;
 (defun shu-match-make-count-alist-from-hash (class-ht)
-  "Create an alist in which the key is a class name and the value is zero.  This alist
-will be used to generate a count of number of items changed per class name."
-  (interactive)
+  "Create an alist in which the key is a class name and the value is zero.  This
+alist will be used to generate a count of number of items changed per class
+name."
   (let ((count-alist))
     (maphash (lambda (class-name ns-name)
                (push (cons class-name 0) count-alist))

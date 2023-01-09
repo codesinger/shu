@@ -1608,11 +1608,12 @@
 ;;  shu-test-check-shu-cpp-get-token
 ;;
 (defun shu-test-check-shu-cpp-get-token (test-id token-info xtoken xtoken-type xspoint xepoint &optional xerror-message)
-  "Examine the data in TOKEN-INFO to verify that it matches the expectd values specified by
-XTOKEN, XTOKEN-TYPE, XSPOINT, and XEPOINT.  If XERROR-MESSAGE is specified, it is compared
-to the value of error-message.  Any of the expected values may be specified as nil, in
-which case they are not compared to the values derived from TOKEN-INFO.  TEST-ID may
-me anything.  It is printed on test failure to identify the test that failed."
+  "Examine the data in TOKEN-INFO to verify that it matches the expectd values
+specified by XTOKEN, XTOKEN-TYPE, XSPOINT, and XEPOINT.  If XERROR-MESSAGE is
+specified, it is compared to the value of error-message.  Any of the expected
+values may be specified as nil, in which case they are not compared to the
+values derived from TOKEN-INFO.  TEST-ID may me anything.  It is printed on test
+failure to identify the test that failed."
   (let
       ((gb      (get-buffer-create shu-unit-test-buffer))
        (info)
