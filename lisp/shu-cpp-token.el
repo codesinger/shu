@@ -176,11 +176,11 @@ comment that starts in a column greater than or equal to the column defined
 by shu-cpp-comment-start.  This is known as a code comment with no code present.")
 
 (defconst shu-cpp-token-type-tp 7
-  "Token type that indicates a template parameter.  The standard parsing does nothing
-with template parameters.  Something like \"<int>\" is simply turned into three separate
-tokens, \"<\", \"int\", and \">\" (or \">\", \"int\", and \"<\" in a reverse parse).
-But some of the other transform functions will turn this list of tokens into the single
-template parameter \"int\"")
+  "Token type that indicates a template parameter.  The standard parsing does
+nothing with template parameters.  Something like \"<int>\" is simply turned
+into three separate tokens, \"<\", \"int\", and \">\" (or \">\", \"int\", and
+\"<\" in a reverse parse).  But some of the other transform functions will turn
+this list of tokens into the single template parameter \"int\"")
 
 (defconst shu-cpp-token-delimiter-end
   (regexp-opt shu-cpp-token-delimiter-chars  nil)
@@ -551,16 +551,16 @@ error, return the token list, else return nil"
 ;;  shu-cpp-token-internal-tokenize-region-for-command
 ;;
 (defun shu-cpp-token-internal-tokenize-region-for-command (func start end &optional limit)
-  "Internal function to do a forward or reverse parse of the region between START
-and END.  FUNC holds the function to be invoked to do the parse.  This would be
-either shu-cpp-tokenize-region or shu-cpp-reverse-tokenize-region.  Once the
-parse is complete, we check to see if an error was detected.  If an error was
-detected we go to the error point and show the error.  Then we return nil to the
-caller.  If no error was detected, we return the token-list to the caller.  This
-is a convenient way for a command to get the token-list and not have to do anything
-to display an error message if an error is encountered.  The command calls this
-function and simply exits if nil is returned, knowing that the error message has
-already been displayed."
+  "Internal function to do a forward or reverse parse of the region between
+START and END.  FUNC holds the function to be invoked to do the parse.  This
+would be either shu-cpp-tokenize-region or shu-cpp-reverse-tokenize-region.
+Once the parse is complete, we check to see if an error was detected.  If an
+error was detected we go to the error point and show the error.  Then we return
+nil to the caller.  If no error was detected, we return the token-list to the
+caller.  This is a convenient way for a command to get the token-list and not
+have to do anything to display an error message if an error is encountered.  The
+command calls this function and simply exits if nil is returned, knowing that
+the error message has already been displayed."
   (let
       ((token-list)
        (tlist)
@@ -594,12 +594,13 @@ already been displayed."
 ;;  shu-cpp-tokenize-region
 ;;
 (defun shu-cpp-tokenize-region (start end &optional limit)
-  "Scan the region between START and AND to build a list of tokens that represent the C++
-code in the region.  Return a cons cell with two items in it.  The car of the cons cell
-is a token-info that represents a parse error.  The cdr of the cons cell is the list of
-tokens.  This list is incomplete if the car of the cons cell is not nil.  The optional
-LIMIT argument is used to bound the scan as follows.  When we have added to the list the
-first token that is beyond the point specified by LIMIT, we stop the scan."
+  "Scan the region between START and AND to build a list of tokens that
+represent the C++ code in the region.  Return a cons cell with two items in it.
+The car of the cons cell is a token-info that represents a parse error.  The cdr
+of the cons cell is the list of tokens.  This list is incomplete if the car of
+the cons cell is not nil.  The optional LIMIT argument is used to bound the scan
+as follows.  When we have added to the list the first token that is beyond the
+point specified by LIMIT, we stop the scan."
   (let
       ((ret-val)
        (error-token-info)
@@ -616,12 +617,13 @@ first token that is beyond the point specified by LIMIT, we stop the scan."
 ;;  shu-cpp-reverse-tokenize-region
 ;;
 (defun shu-cpp-reverse-tokenize-region (start end &optional limit)
-  "Scan the region between START and AND to build a list of tokens that represent the C++
-code in the region.  Return a cons cell with two items in it.  The car of the cons cell
-is a token-info that represents a parse error.  The cdr of the cons cell is the list of
-tokens.  This list is incomplete if the car of the cons sell is not nil.  The optional
-LIMIT argument is used to bound the scan as follows.  When we have added to the list the
-first token that is beyond the point specified by LIMIT, we stop the scan."
+  "Scan the region between START and AND to build a list of tokens that
+represent the C++ code in the region.  Return a cons cell with two items in it.
+The car of the cons cell is a token-info that represents a parse error.  The cdr
+of the cons cell is the list of tokens.  This list is incomplete if the car of
+the cons sell is not nil.  The optional LIMIT argument is used to bound the scan
+as follows.  When we have added to the list the first token that is beyond the
+point specified by LIMIT, we stop the scan."
   (let
       ((done)
        (spoint)
@@ -826,7 +828,8 @@ line.  If it starts with /*, skip to terminating */.  If there is no terminating
 ;;  shu-cpp-replace-token-info
 ;;
 (defun shu-cpp-replace-token-info (token-info token token-type spoint epoint &optional error-message)
-  "Replace the supplied arguments in the given TOKEN-INFO and return the TOKEN-INFO."
+  "Replace the supplied arguments in the given TOKEN-INFO and return the
+TOKEN-INFO."
   (let
       ((info)
        (ext-info)
@@ -958,10 +961,11 @@ modified TOKEN-INFO"
 ;;
 (defun shu-cpp-is-reverse-token-list-balanced (token-list open-char close-char)
   "Return t if a token-list contains matched pairs of OPEN-CHAR and CLOSE-CHAR.
-If imbalance is present, print error message and return nil.  Typically OPEN-CHAR
-might be a left parenthesis and CLOSE-CHAR might be a right parenthesis.  Or they
-might be \"<\" and \">\", or any other pair types.  Note that this function
-returns t if there are no occurrences of OPEN-CHAR and CLOSE-CHAR"
+If imbalance is present, print error message and return nil.  Typically
+OPEN-CHAR might be a left parenthesis and CLOSE-CHAR might be a right
+parenthesis.  Or they might be \"<\" and \">\", or any other pair types.  Note
+that this function returns t if there are no occurrences of OPEN-CHAR and
+CLOSE-CHAR"
   (let ((tlist)
         (token-info)
         (token)
@@ -1232,7 +1236,8 @@ of reverse parsed code have the same suffix."
 ;;  shu-cpp-token-show-token-info
 ;;
 (defun shu-cpp-token-show-token-info (token-info &optional title)
-  "Show the data returned by one of the functions in this file that scans for tokens."
+  "Show the data returned by one of the functions in this file that scans for
+tokens."
   (let
       ((gb      (get-buffer-create shu-unit-test-buffer)))
     (shu-cpp-token-show-token-info-buffer token-info gb title)
@@ -1243,7 +1248,8 @@ of reverse parsed code have the same suffix."
 ;;  shu-cpp-token-show-token-info-buffer
 ;;
 (defun shu-cpp-token-show-token-info-buffer (token-info gb &optional title)
-  "Show the data returned by one of the functions in this file that scans for tokens."
+  "Show the data returned by one of the functions in this file that scans for
+tokens."
   (let
       ((info)
        (token-type)
