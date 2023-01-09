@@ -46,7 +46,7 @@
 ;;
 ;; Version 1.6.144 was merged with the master branch on 8 January 2023
 ;;
-;; This is Version 1.6.144 of the Shu elisp repository.
+;; This is Version 1.6.145 of the Shu elisp repository.
 ;;
 ;; What this document lacks lacks are detailed scenarios and work flows.  The
 ;; reader might well say that this is an interesting collection of parts, and

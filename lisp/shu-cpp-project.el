@@ -454,6 +454,8 @@ into the current file at point."
       (setq shu-cpp-final-list (cdr shu-cpp-final-list)))
     ))
 
+
+
 ;;
 ;;  shu-cpp-project-subdirs
 ;;
@@ -482,9 +484,7 @@ source code."
           (progn
             (unless (or (string= sname  ".")
                         (string= sname ".."))
-              (unless (and (= level 1)
-                           shu-project-exclude-hash
-                           (gethash sname shu-project-exclude-hash))
+              (unless (shu-project-directory-is-excluded sname)
                 (setq dir-list (cons cname dir-list)))))
         (when (not got-interest)
           (setq extension (file-name-extension sname))
