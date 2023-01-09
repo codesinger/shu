@@ -241,9 +241,9 @@ into a buffer or pasted into the application requesting it."
 ;; shu-keyring-get-acct
 ;;
 (defun shu-keyring-get-acct()
-  "Find the account for an entry in the keyring file.  This displays the entry in the message
-area and puts the password into the kill ring so that it can be yanked or pasted into the application
-requesting it."
+  "Find the account for an entry in the keyring file.  This displays the entry
+in the message area and puts the password into the kill ring so that it can be
+yanked or pasted into the application requesting it."
   (interactive)
   (shu-keyring-get-field shu-keyring-account-name)
   )
@@ -267,11 +267,11 @@ using the wrong keyring file."
 ;;  shu-keyring-clear-index
 ;;
 (defun shu-keyring-clear-index()
-  "This is called from after-save-hook to clear the keyring index if the keyring file is saved.
-The keyring index is built the first time it is needed and kept in memory thereafter.  But we
-must refresh the index if the keyring file is modified.  The easiest way to do this is to clear
-the index when the keyring file is modified.  The next time the index is needed it will be
-recreated."
+  "This is called from after-save-hook to clear the keyring index if the keyring
+file is saved.  The keyring index is built the first time it is needed and kept
+in memory thereafter.  But we must refresh the index if the keyring file is
+modified.  The easiest way to do this is to clear the index when the keyring
+file is modified.  The next time the index is needed it will be recreated."
   (let
       ((fn1 (buffer-file-name))
        (fn2 (abbreviate-file-name (buffer-file-name))))
@@ -309,9 +309,10 @@ about syntax errors in the file."
 ;;  shu-keyring-get-field
 ;;
 (defun shu-keyring-get-field (name)
-  "Fetch the value of a named field from the keyring.  Prompt the user with a completing-read
-for the field that identifies the key.  Use the key to find the item.  Find the value of the named
-key value pair within the item.  Put the value in the kill-ring and also return it to the caller."
+  "Fetch the value of a named field from the keyring.  Prompt the user with a
+completing-read for the field that identifies the key.  Use the key to find the
+item.  Find the value of the named key value pair within the item.  Put the
+value in the kill-ring and also return it to the caller."
   (let ((gbuf      (get-buffer-create shu-keyring-buffer-name))
         (invitation   "Key? ")
         (keyring-key   )
@@ -418,10 +419,11 @@ contains no duplicate keys."
 ;;  shu-keyring-find-index-duplicates
 ;;
 (defun shu-keyring-find-index-duplicates (index)
-  "Find any duplicates in the keyring index.  When the index is built we filter duplicate
-keys for the same item.  But there could be two different items with the same key.  This
-function returns TRUE if two or more items have the same key.  The index must be in sorted
-order by key value before this function is called."
+  "Find any duplicates in the keyring index.  When the index is built we filter
+duplicate keys for the same item.  But there could be two different items with
+the same key.  This function returns TRUE if two or more items have the same
+key.  The index must be in sorted order by key value before this function is
+called."
   (let
       ((gbuf      (get-buffer-create shu-keyring-buffer-name))
        (tindex  index)
@@ -516,9 +518,9 @@ order by key value before this function is called."
 ;;  shu-keyring-add-values-to-index
 ;;
 (defun shu-keyring-add-values-to-index (index vlist item)
-  "Add a set of keys VLIST to INDEX for ITEM.  Keys within the item are filtered for
-duplicates.  But this does not prevent two different items from sharing the same key,
-although it would be unusual in a keyring."
+  "Add a set of keys VLIST to INDEX for ITEM.  Keys within the item are filtered
+for duplicates.  But this does not prevent two different items from sharing the
+same key, although it would be unusual in a keyring."
   (let
       ((zlist   vlist)
        (value   )
@@ -537,9 +539,9 @@ although it would be unusual in a keyring."
 ;;  shu-keyring-show-name-url
 ;;
 (defun shu-keyring-show-name-url (type item)
-  "Show in the message area the name, url, or both of a keyring entry.  Also prefix
-the message with the upper case type, which is the type of the entry that has been
-placed in the clipboard, (PW, ID, etc.)"
+  "Show in the message area the name, url, or both of a keyring entry.  Also
+prefix the message with the upper case type, which is the type of the entry that
+has been placed in the clipboard, (PW, ID, etc.)"
   (let ((names   (shu-nvplist-get-item-value shu-keyring-name-name item))
         (urls    (shu-nvplist-get-item-value shu-keyring-url-name item))
         (ids     (shu-nvplist-get-item-value shu-keyring-id-name item))
