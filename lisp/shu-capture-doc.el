@@ -196,7 +196,8 @@ of length zero"
 ;;  shu-capture-a-type-func
 ;;
 (defconst shu-capture-a-type-func 2
-  "The a-list key value that identifies the function that formats a function signature'")
+  "The a-list key value that identifies the function that formats a function
+signature'")
 
 
 ;;
@@ -295,8 +296,8 @@ code snippet.")
 ;;  shu-capture-md-section-delimiter
 ;;
 (defconst shu-capture-md-section-delimiter "##"
-  "Define the markdown delimiter that is used to identify a section.  This is separated
-from the section name by a space.")
+  "Define the markdown delimiter that is used to identify a section.  This is
+separated from the section name by a space.")
 
 
 ;;
@@ -531,8 +532,8 @@ code snippet.")
    (cons shu-capture-a-type-after        shu-capture-md-code-delimiter)
    (cons shu-capture-a-type-open-quote   shu-capture-md-quote-delimiter)
    (cons shu-capture-a-type-close-quote  shu-capture-md-quote-delimiter))
-  "This is the association list of functions and strings that is used to take an elisp
-function and its associated doc string and convert it to markdown.")
+  "This is the association list of functions and strings that is used to take an
+elisp function and its associated doc string and convert it to markdown.")
 
 
 
@@ -553,8 +554,8 @@ function and its associated doc string and convert it to markdown.")
    (cons shu-capture-a-type-after        shu-capture-latex-code-end)
    (cons shu-capture-a-type-open-quote   shu-capture-latex-open-quote)
    (cons shu-capture-a-type-close-quote  shu-capture-latex-close-quote))
-  "This is the association list of functions and strings that is used to take an elisp
-function and its associated doc string and convert it to LaTex.")
+  "This is the association list of functions and strings that is used to take an
+elisp function and its associated doc string and convert it to LaTex.")
 
 
 ;;
@@ -640,8 +641,9 @@ markdown."
 ;;
 (defun shu-capture-make-md-section (level hdr)
   "Turn HDR into a markdown section header of level LEVEL, where 1 is a section,
-2 a subsection, etc.  Return the markdown string.  If level is one (major heading),
-write a corresponding entry into the markdown table of contents buffer."
+2 a subsection, etc.  Return the markdown string.  If level is one (major
+heading), write a corresponding entry into the markdown table of contents
+buffer."
   (let* ((tocb (get-buffer-create shu-capture-toc-buffer))
          (delim (make-string level ?#))
          (toc-entry)
@@ -894,9 +896,9 @@ them into a LaTex text that documents the functions and their doc strings."
 ;;  shu-capture-doc
 ;;
 (defun shu-capture-doc (converters)
-  "Top level function that captures all definitions and doc strings in a language
-neutral manner and then uses the supplied CONVERTERS to convert the documentation to
-either markdown or LaTex."
+  "Top level function that captures all definitions and doc strings in a
+language neutral manner and then uses the supplied CONVERTERS to convert the
+documentation to either markdown or LaTex."
   (let (
         (gb (get-buffer-create shu-capture-buffer-name))
         (section-converter (cdr (assoc shu-capture-a-type-hdr converters)))
@@ -1134,16 +1136,16 @@ found in the commentary section."
 ;;
 (defun shu-capture-get-doc-string (eof)
   "Enter with point positioned immediately after a function declaration.  Try to
-fetch the associated doc string as follows:  1. Look for the first open or close
-parenthesis.  2. Look for the first quote.  If the first parenthesis comes before
-the first quote, then there is no doc string.  In the following function, there is
-no doc string:
+fetch the associated doc string as follows: 1. Look for the first open or close
+parenthesis.  2. Look for the first quote.  If the first parenthesis comes
+before the first quote, then there is no doc string.  In the following function,
+there is no doc string:
 
      (defun foo (name)
        (interactive \"sName?: \"))
 
-but if we do not notice that the first parenthesis comes before the first quote, then
-we might think that there is a doc string that contains \"sName?: \".
+but if we do not notice that the first parenthesis comes before the first quote,
+then we might think that there is a doc string that contains \"sName?: \".
 
 Return the doc string if there is one, nil otherwise."
   (let ((xquote "^\\\"\\|[^\\]\\\"") ;; Match either a quote at the beginning
@@ -1204,8 +1206,8 @@ Return the doc string if there is one, nil otherwise."
   "DESCRIPTION contains a doc string from a function definition (with leading
 and trailing quotes removed).  This function turns escaped quotes into regular
 (non-escaped) quotes and turns names with leading and trailing asterisks (e.g.,
-**project-count-buffer**) into short code blocks surrounded by back ticks.  It also
-turns upper case names into lower case names surrounded by markdown ticks."
+**project-count-buffer**) into short code blocks surrounded by back ticks.  It
+also turns upper case names into lower case names surrounded by markdown ticks."
   (let ((esc-quote    "\\\\\"")
         (plain-quote  "\"")
         (star-name "*[a-zA-Z0-9*-_]+")
@@ -1288,23 +1290,22 @@ it a code snippet in markdown.  Return the number of code snippets marked."
 ;;  shu-capture-show-list
 ;;
 (defun shu-capture-show-list (func-list converters buffer is-alias-list)
-  "FUNC-LIST is a list of function and macro definitions.  CONVERTERS
-is an a-list of functions and strings as
-follows:
+  "FUNC-LIST is a list of function and macro definitions.  CONVERTERS is an
+a-list of functions and strings as follows:
 
-      Key                              Value
-      ---                              -----
-      shu-capture-a-type-hdr           Function to format a section header
-      shu-capture-a-type-func          Function to format a function signature
-      shu-capture-a-type-buf           Function to format a buffer name
-      shu-capture-a-type-arg           Function to format an argument name
-      shu-capture-a-type-keywd         Function to format a key word
-      shu-capture-a-type-doc-string    Function to finish formatting the doc string
-      shu-capture-a-type-enclose-doc   Function to enclose doc string in begin / end
-      shu-capture-a-type-before        String that starts a block of verbatim code
-      shu-capture-a-type-after         String that ends a block of verbatim code
-      shu-capture-a-type-open-quote    String that is an open quote
-      shu-capture-a-type-close-quote   String that is a close quote
+    Key                             Value
+    ---                             -----
+    shu-capture-a-type-hdr          Function to format a section header
+    shu-capture-a-type-func         Function to format a function signature
+    shu-capture-a-type-buf          Function to format a buffer name
+    shu-capture-a-type-arg          Function to format an argument name
+    shu-capture-a-type-keywd        Function to format a key word
+    shu-capture-a-type-doc-string   Function to finish formatting the doc string
+    shu-capture-a-type-enclose-doc  Function to enclose doc string in begin/end
+    shu-capture-a-type-before       String that starts a block of verbatim code
+    shu-capture-a-type-after        String that ends a block of verbatim code
+    shu-capture-a-type-open-quote   String that is an open quote
+    shu-capture-a-type-close-quote  String that is a close quote
 
 This function goes through the list and uses the CONVERTERS to turn the set of
 function definitions into either markdown or LaTex."
@@ -1394,7 +1395,8 @@ function definitions into either markdown or LaTex."
 ;;  shu-capture-convert-func-md
 ;;
 (defun shu-capture-convert-func-md (func-def converters is-alias-list)
-  "Take a function definition and turn it into a string of markdown.  Return said string."
+  "Take a function definition and turn it into a string of markdown.  Return
+said string."
   (let (
         (gb (get-buffer-create shu-capture-buffer-name))
         (arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-md-converters)))
@@ -1444,14 +1446,12 @@ name is \"arg1,\" its length is 4 even though the length of the argument name
 after markup is applied may be longer.  The cdr of MARKUPS is a list of the
 arguments with markup applied to them.  SECTION-CONVERTER is the function that
 will turn a string into a section heading."
-  (let (
-        (ixb (get-buffer-create shu-capture-index-buffer))
+  (let ((ixb (get-buffer-create shu-capture-index-buffer))
         (arg)
         (args)
         (pad)
         (result)
-        (sec-hdr (funcall section-converter 4 func-name))
-        )
+        (sec-hdr (funcall section-converter 4 func-name)))
     (princ (concat "* [" func-name "](#" func-name ")\n") ixb)
     (with-temp-buffer
       (insert
@@ -1464,13 +1464,10 @@ will turn a string into a section heading."
         (while args
           (setq arg (car args))
           (insert (concat pad arg))
-          (setq args (cdr args))
-          )
-        (insert "\n")
-        )
+          (setq args (cdr args)))
+        (insert "\n"))
       (insert (concat "[" func-type "]"))
-      (setq result (buffer-substring-no-properties (point-min) (point-max)))
-      )
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
     result
     ))
 
@@ -1480,7 +1477,8 @@ will turn a string into a section heading."
 ;;  shu-capture-convert-func-latex
 ;;
 (defun shu-capture-convert-func-latex (func-def converters is-alias-list)
-  "Take a function definition and turn it into a string of LaTex.  Return said string."
+  "Take a function definition and turn it into a string of LaTex.  Return said
+string."
   (let (
         (gb (get-buffer-create shu-capture-buffer-name))
         (arg-converter (cdr (assoc shu-capture-a-type-arg shu-capture-latex-converters)))
@@ -1592,39 +1590,36 @@ arguments with markup applied to them."
 ;;
 (defun shu-capture-convert-doc-string (signature description converters)
   "DESCRIPTION contains a doc string from a function definition (with leading
-and trailing quotes removed).  CONVERTERS is an a-list of functions and strings as
-follows:
+and trailing quotes removed).  CONVERTERS is an a-list of functions and strings
+as follows:
 
-      Key                              Value
-      ---                              -----
-      shu-capture-a-type-hdr           Function to format a section header
-      shu-capture-a-type-func          Function to format a function signature
-      shu-capture-a-type-buf           Function to format a buffer name
-      shu-capture-a-type-arg           Function to format an argument name
-      shu-capture-a-type-keywd         Function to format a key word
-      shu-capture-a-type-doc-string    Function to finish formatting the doc string
-      shu-capture-a-type-enclose-doc   Function to enclose doc string in begin / end
-      shu-capture-a-type-before        String that starts a block of verbatim code
-      shu-capture-a-type-after         String that ends a block of verbatim code
-      shu-capture-a-type-open-quote    String that is an open quote
-      shu-capture-a-type-close-quote   String that is a close quote
+    Key                             Value
+    ---                             -----
+    shu-capture-a-type-hdr          Function to format a section header
+    shu-capture-a-type-func         Function to format a function signature
+    shu-capture-a-type-buf          Function to format a buffer name
+    shu-capture-a-type-arg          Function to format an argument name
+    shu-capture-a-type-keywd        Function to format a key word
+    shu-capture-a-type-doc-string   Function to finish formatting the doc string
+    shu-capture-a-type-enclose-doc  Function to enclose doc string in begin/end
+    shu-capture-a-type-before       String that starts a block of verbatim code
+    shu-capture-a-type-after        String that ends a block of verbatim code
+    shu-capture-a-type-open-quote   String that is an open quote
+    shu-capture-a-type-close-quote  String that is a close quote
 
-This function turns escaped quotes into open and close quote strings, turns names
-with leading and trailing asterisks (e.g., **project-buffer**) into formatted buffer
-names, turns upper case names that match any argument names into lower case,
-formatted argument names.  This is an internal function of shu-capture-doc and
-will likely crash if called with an invalid a-list."
-  (let (
-        (encloser (cdr (assoc shu-capture-a-type-enclose-doc converters)))
+This function turns escaped quotes into open and close quote strings, turns
+names with leading and trailing asterisks (e.g., **project-buffer**) into
+formatted buffer names, turns upper case names that match any argument names
+into lower case, formatted argument names.  This is an internal function of
+shu-capture-doc and will likely crash if called with an invalid a-list."
+  (let ((encloser (cdr (assoc shu-capture-a-type-enclose-doc converters)))
         (result)
-        (result2)
-        )
+        (result2))
     (setq result (shu-capture-internal-convert-doc-string signature description converters))
     (with-temp-buffer
       (insert result)
       (funcall encloser)
-      (setq result2 (buffer-substring-no-properties (point-min) (point-max)))
-      )
+      (setq result2 (buffer-substring-no-properties (point-min) (point-max))))
     result2
     ))
 
@@ -1634,28 +1629,28 @@ will likely crash if called with an invalid a-list."
 ;;
 (defun shu-capture-internal-convert-doc-string (signature description converters)
   "DESCRIPTION contains a doc string from a function definition (with leading
-and trailing quotes removed).  CONVERTERS is an a-list of functions and strings as
-follows:
+and trailing quotes removed).  CONVERTERS is an a-list of functions and strings
+as follows:
 
-      Key                              Value
-      ---                              -----
-      shu-capture-a-type-hdr           Function to format a section header
-      shu-capture-a-type-func          Function to format a function signature
-      shu-capture-a-type-buf           Function to format a buffer name
-      shu-capture-a-type-arg           Function to format an argument name
-      shu-capture-a-type-keywd         Function to format a key word
-      shu-capture-a-type-doc-string    Function to finish formatting the doc string
-      shu-capture-a-type-enclose-doc   Function to enclose doc string in begin / end
-      shu-capture-a-type-before        String that starts a block of verbatim code
-      shu-capture-a-type-after         String that ends a block of verbatim code
-      shu-capture-a-type-open-quote    String that is an open quote
-      shu-capture-a-type-close-quote   String that is a close quote
+    Key                             Value
+    ---                             -----
+    shu-capture-a-type-hdr          Function to format a section header
+    shu-capture-a-type-func         Function to format a function signature
+    shu-capture-a-type-buf          Function to format a buffer name
+    shu-capture-a-type-arg          Function to format an argument name
+    shu-capture-a-type-keywd        Function to format a key word
+    shu-capture-a-type-doc-string   Function to finish formatting the doc string
+    shu-capture-a-type-enclose-doc  Function to enclose doc string in begin/end
+    shu-capture-a-type-before       String that starts a block of verbatim code
+    shu-capture-a-type-after        String that ends a block of verbatim code
+    shu-capture-a-type-open-quote   String that is an open quote
+    shu-capture-a-type-close-quote  String that is a close quote
 
-This function turns escaped quotes into open and close quote strings, turns names
-with leading and trailing asterisks (e.g., **project-buffer**) into formatted buffer
-names, turns upper case names that match any argument names into lower case,
-formatted argument names.  This is an internal function of shu-capture-doc and
-will likely crash if called with an invalid a-list."
+This function turns escaped quotes into open and close quote strings, turns
+names with leading and trailing asterisks (e.g., **project-buffer**) into
+formatted buffer names, turns upper case names that match any argument names
+into lower case, formatted argument names.  This is an internal function of
+shu-capture-doc and will likely crash if called with an invalid a-list."
   (let ((star-name "*[a-zA-Z0-9*-_]+")
         (arg-name "\\(?:^\\|\\s-\\)*\\([A-Z0-9-]+\\)\\(?:\\s-\\|$\\|,\\|\\.\\)+")
         (section-converter (cdr (assoc shu-capture-a-type-hdr converters)))
@@ -1693,11 +1688,11 @@ will likely crash if called with an invalid a-list."
 ;;  shu-capture-headers-in-doc
 ;;
 (defun shu-capture-headers-in-doc (section-converter)
-  "Convert markdown section headers to either markdown or LaTex.
-This allows the author of some Commentary at the beginning of a file to add section
-headers.  If the heading level is 2 through 4 and the heading begins in column 1 and
-the number of pound signs at the end is the same as the number of pound signs at
-the beginning and the pound signs at the end are at the end of a line, then this is
+  "Convert markdown section headers to either markdown or LaTex.  This allows
+the author of some Commentary at the beginning of a file to add section headers.
+If the heading level is 2 through 4 and the heading begins in column 1 and the
+number of pound signs at the end is the same as the number of pound signs at the
+beginning and the pound signs at the end are at the end of a line, then this is
 considered to be a heading and is translated to either markdown or LaTex."
   (let ((ss  "\\([#]\\{2,4\\}\\) \\([a-zA-Z0-9 -_]+\\) \\1$")
         (line-diff 0)
@@ -1732,8 +1727,8 @@ category is plain text that should be scanned for characters to escape, such as
 pound signs if we are converting to LaTex.  The second category is text that
 should not be scanned for characters to escape, either because it is to be
 treated as a verbatim code snippet or because it is a pseudo markdown section
-heading that will be converted either to a markdown section heading or to a LaTex
-section heading.
+heading that will be converted either to a markdown section heading or to a
+LaTex section heading.
 
 When we come to the end of plain text (either because we have found a code
 snippet or because we have found a pseudo markdown section heading), we call the
@@ -1742,8 +1737,8 @@ found.
 
 A pseudo markdown section heading is identified as follows.  It must start in
 column 1.  It must start with two to four pound signs.  It must have some text.
-It must end at the end of the line with the same number of pound signs with which
-it started.
+It must end at the end of the line with the same number of pound signs with
+which it started.
 
 A code snippet to be shown in verbatim mode is any one whose first column occurs
 on or after SHU-CAPTURE-DOC-CODE-INDENT.
@@ -1828,10 +1823,10 @@ TEXT-CONVERTER function to return the new text end point to this function."
 ;;  shu-capture-convert-quotes
 ;;
 (defun shu-capture-convert-quotes (open-quote close-quote)
-  "Go through the current buffer converting any escaped quote to either an open or
-close quote.  If an escaped quote is preceded by whitespace, \"(\", \"{\", \"<\", or \">\",
-or by a close quote, then we replace it with an open quote.  Otherwise we replace it
-with a close quote."
+  "Go through the current buffer converting any escaped quote to either an open
+or close quote.  If an escaped quote is preceded by whitespace, \"(\", \"{\",
+\"<\", or \">\", or by a close quote, then we replace it with an open quote.
+Otherwise we replace it with a close quote."
   (let* ((diff-quotes (not (string= open-quote close-quote)))
          (esc-quote    "\\\\\"")
          (is-open-chars (append shu-all-whitespace-chars (list "(" "[" "<" ">")))a
@@ -1887,12 +1882,13 @@ with a close quote."
 ;;  shu-capture-doc-convert-args
 ;;
 (defun shu-capture-doc-convert-args (signature converters)
-  "The current buffer contains a doc string from a function.  The argument to this
-function is the SIGNATURE of the function for which the doc string was written.
-This function goes through the doc string buffer looking for any word that is all
-upper case.  If the upper case word matches the name of an argument to the function,
-it is passed to the CONVERTER function for conversion into a markup language, which
-is probably markdown or LaTex, and it is then replaced in the doc string buffer.
+  "The current buffer contains a doc string from a function.  The argument to
+this function is the SIGNATURE of the function for which the doc string was
+written.  This function goes through the doc string buffer looking for any word
+that is all upper case.  If the upper case word matches the name of an argument
+to the function, it is passed to the CONVERTER function for conversion into a
+markup language, which is probably markdown or LaTex, and it is then replaced in
+the doc string buffer.
 
 For example, if the function has the following signature:
 
@@ -1976,26 +1972,27 @@ an a-list is returned with the keys \"others,\" \"and,\" \"things,\" \"these,\" 
 ;;
 (defun shu-capture-convert-args-to-markup (signature arg-converter keywd-converter)
   "SIGNATURE contains the function signature (both function name and arguments).
-ARG-CONVERTER is the function used to convert an argument to markup.  KEYWD-CONVERTER
-is the function used to convert an argument list keyword, such as \"&optional\" or \"&rest\"
-to markup.
+ARG-CONVERTER is the function used to convert an argument to markup.
+KEYWD-CONVERTER is the function used to convert an argument list keyword, such
+as \"&optional\" or \"&rest\" to markup.
 
-This function returns a cons cell pointing to two lists.  The first list contains the length
-of each argument name prior to conversion to markup.  This is because the amount of space
-on a line is largely determined by the length of the unconverted argument.  \"arg\" will
-take much less space on a line than will the same word with markup added.  The second list
-contains each of the argument names converted to the appropriate markup.
+This function returns a cons cell pointing to two lists.  The first list
+contains the length of each argument name prior to conversion to markup.  This
+is because the amount of space on a line is largely determined by the length of
+the unconverted argument.  \"arg\" will take much less space on a line than will
+the same word with markup added.  The second list contains each of the argument
+names converted to the appropriate markup.
 
 Given the following function signature:
 
      do-something (with these things &optional and &rest others)
 
-the length list will contain (4, 5, 6, 9, 3, 5, 6).  The converted arguments list for
-markdown will contain (\"*with*\", \"*these*\", \"*things*\", \"**&optional**\", \"*and*\",
-\"**&rest**\", \"*others*\").
+the length list will contain (4, 5, 6, 9, 3, 5, 6).  The converted arguments
+list for markdown will contain (\"*with*\", \"*these*\", \"*things*\",
+\"**&optional**\", \"*and*\", \"**&rest**\", \"*others*\").
 
-If the function signature contains no arguments, then nil is returned instead of the
-above described cons cell."
+If the function signature contains no arguments, then nil is returned instead of
+the above described cons cell."
   (let ((func-name)
         (arg-string)
         (arg-list)
