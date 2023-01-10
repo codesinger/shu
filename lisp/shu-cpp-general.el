@@ -5844,6 +5844,44 @@ buffer.  Each entry in the list is a cons cell whose car is the point of the
 
 
 ;;
+;;  shu-sort-makefile
+;;
+(defun shu-sort-makefile ()
+  "Find all of the cpp files in a Cmake file and sort them in alphabetical order."
+  (interactive)
+  (let* ((gb (get-buffer-create "**boo**"))
+         (case-fold-search nil)
+         (target-extensions (regexp-opt shu-cpp-c-extensions t))
+         (target-name (concat shu-cpp-file-name "*\\." target-extensions "+" shu-all-whitespace-regexp "+?"))
+         (white (concat shu-all-whitespace-regexp "+"))
+         (start)
+         (end))
+    (save-excursion
+      (goto-char (point-min))
+      (if (not (re-search-forward target-name nil t))
+          (progn
+            (ding)
+            (message "%s" "Cannot find any cpp files."))
+        (if (not (re-search-backward white nil t))
+            (progn
+              (ding)
+              (message "%s" "No whitespace following cpp file name."))
+          (setq start (line-beginning-position))
+          (goto-char (point-max))
+          (if (not (re-search-backward target-name nil t))
+              (progn
+                (ding)
+                (message "%s" "Cannot find last cpp file."))
+            (forward-line 1)
+            (setq end (line-beginning-position))
+            (princ (format "start: %d, end: %d\n" start end) gb)
+            (sort-lines nil start end)))))
+    ))
+
+
+
+
+;;
 ;;  shu-cpp-general-set-alias
 ;;
 (defun shu-cpp-general-set-alias ()
@@ -5908,6 +5946,7 @@ shu- prefix removed."
   (defalias 'add-include 'shu-add-include)
   (defalias 'sort-includes 'shu-sort-includes)
   (defalias 'sort-all-includes 'shu-sort-all-includes)
+  (defalias 'sort-makefile 'shu-sort-makefile)
   )
 
 (provide 'shu-cpp-general)
