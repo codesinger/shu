@@ -40,9 +40,9 @@
 ;; shu-nvplist-parse-file
 ;;
 (defun shu-nvplist-parse-file (file-name file-type item-list)
-  "Parse a file full of name value pair lists.  The name of the file is FILE-NAME.
-The type of the file (only for error messages) is FILE-TYPE.  ITEM-LIST is the head
-of the returned item list."
+  "Parse a file full of name value pair lists.  The name of the file is
+FILE-NAME.  The type of the file (only for error messages) is FILE-TYPE.
+ITEM-LIST is the head of the returned item list."
   (let
       ((pwbuf  (find-buffer-visiting file-name))
        (cbuf   (current-buffer))
@@ -210,9 +210,9 @@ name-value pair list in the CDR."
 ;;  shu-nvplist-get-item-value
 ;;
 (defun shu-nvplist-get-item-value(name item)
-  "Extract a named list of values from an item.  NAME is the name of the values to
-find.  ITEM is the item from which to extract the values.  A list is returned that contain
-all of the values whose name matches NAME."
+  "Extract a named list of values from an item.  NAME is the name of the values
+to find.  ITEM is the item from which to extract the values.  A list is returned
+that contain all of the values whose name matches NAME."
   (let
       ((vlist     )
        (nvpair    )
@@ -234,9 +234,10 @@ all of the values whose name matches NAME."
 ;;  shu-nvplist-make-nvpair-list
 ;;
 (defun shu-nvplist-make-nvpair-list (tlist)
-  "Turn a list of tokens from an entry in the file into a list of name value pairs.  The
-CAR of each entry in the list is the name.  The CDR of each entry in the list is the value.  If
-errors are found in the token list, then an empty list is returned."
+  "Turn a list of tokens from an entry in the file into a list of name value
+pairs.  The CAR of each entry in the list is the name.  The CDR of each entry in
+the list is the value.  If errors are found in the token list, then an empty
+list is returned."
   (let (
         (gbuf      (get-buffer-create shu-unit-test-buffer))
         (nvplist       )
@@ -299,10 +300,11 @@ errors are found in the token list, then an empty list is returned."
 ;;  shu-nvplist-make-token-list
 ;;
 (defun shu-nvplist-make-token-list (tlist)
-  "Turn an entry in a name / value file into a list of tokens.  The CAR of each entry is the point
-at which the token starts.  the CDR of each entry in the list is the token itself.  On entry
-to this function, point is immediately after the start delimiter (\"<\").  On return, point
-is positioned immediately after the end delimiter (\"/>\")."
+  "Turn an entry in a name / value file into a list of tokens.  The CAR of each
+entry is the point at which the token starts.  the CDR of each entry in the list
+is the token itself.  On entry to this function, point is immediately after the
+start delimiter (\"<\").  On return, point is positioned immediately after the
+end delimiter (\"/>\")."
   (let
       ((gbuf      (get-buffer-create shu-unit-test-buffer))
        (debug-on-error   t)

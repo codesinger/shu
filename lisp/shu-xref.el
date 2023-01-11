@@ -358,9 +358,9 @@ within file."
 ;;  shu-xref-get-longest-name
 ;;
 (defun shu-xref-get-longest-name (fun-defs)
-  " Return the length of the longest variable name in the list and the longest type
-name in the list.  These are returned as a cons cell with the length of the longest
-type name in the CAR and the longest variable name in the CDR."
+  " Return the length of the longest variable name in the list and the longest
+type name in the list.  These are returned as a cons cell with the length of the
+longest type name in the CAR and the longest variable name in the CDR."
   (let
       ((tlist fun-defs)
        (max-var-name-length 0)
@@ -545,12 +545,11 @@ type name in the CAR and the longest variable name in the CDR."
 ;;
 (defun shu-xref-get-next-definition (retval)
   "Find and return the next definition of an emacs lisp function of variable.
-   RETVAL is returned
-as nil if there are no more function definitions after point.  If a definition
-is found, RETVAL is returned as a cons cell with the name of the function
-in the CAR and the information about the function in the CDR.  The information in the
-CDR is a cons cell with the numeric variable type in the CAR and the line number in
-which the definition started in the CDR."
+RETVAL is returned as nil if there are no more function definitions after point.
+If a definition is found, RETVAL is returned as a cons cell with the name of the
+function in the CAR and the information about the function in the CDR.  The
+information in the CDR is a cons cell with the numeric variable type in the CAR
+and the line number in which the definition started in the CDR."
   (let*
       ((name "def\\(un\\|macro\\|subst\\|alias\\|var\\|const\\|custom\\|group\\)")
        (sdefun (concat "\(" shu-all-whitespace-regexp "*" name shu-all-whitespace-regexp "*" "\\(" shu-xref-lisp-name "+\\)"))
@@ -591,10 +590,11 @@ which the definition started in the CDR."
 ;;  shu-xref-get-next-funcall
 ;;
 (defun shu-xref-get-next-funcall (name retval)
-  "Find and return the next call to the emacs lisp function NAME.  RETVAL is returned
-as nil if there are no more function invocations after point.  If a function
-invocation is found, RETVAL is returned as a cons cell with the name of the function
-in the CAR and the line number in which the function definition starts in the CDR."
+  "Find and return the next call to the emacs lisp function NAME.  RETVAL is
+returned as nil if there are no more function invocations after point.  If a
+function invocation is found, RETVAL is returned as a cons cell with the name of
+the function in the CAR and the line number in which the function definition
+starts in the CDR."
   (let
       ((sdefun (concat "\(" shu-all-whitespace-regexp "*" name shu-all-whitespace-regexp "*" "\\(" shu-xref-lisp-name "+\\)"))
        (retval)

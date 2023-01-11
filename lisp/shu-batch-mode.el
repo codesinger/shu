@@ -314,11 +314,11 @@ the value for the custom variable SHU-INTERNAL-DEV-URL.
 
 Invoke as:
 
-     emacs --batch -l ~/emacs/shu-batch-mode.elc -f shu-batch-add-alexandria <dev-url>
+    emacs --batch -l ~/emacs/shu-batch-mode.elc -f shu-batch-add-alexandria url
 
-where \"<dev-url>\" is the organization's internal web site that hosts its code
-and tools.  See the description of the custom variable SHU-INTERNAL-DEV-URL.
-for more information."
+where \"url\" is the organization's internal web site that hosts its code and
+tools.  See the description of the custom variable SHU-INTERNAL-DEV-URL.  for
+more information."
   (let ((nargs (length command-line-args-left))
         (done))
     (shu-batch-init)
@@ -386,20 +386,19 @@ for more information."
 ;;  shu-batch-test-args
 ;;
 (defun shu-batch-test-args ()
-  "A script to use in batch mode to demonstrate how to fetch command line arguments.
+` "A script to use in batch mode to demonstrate how to fetch command line
+arguments.
 
-When run from a batch script as the function that is the target of the \"-f\" option.
-For example
+When run from a batch script as the function that is the target of the \"-f\"
+option.  For example
 
-    emacs --batch -l shu-batch-mode.elc -f shu-batch-test-args hello world how are you
+    emacs --batch -l shu-batch-mode.elc -f shu-batch-test-args hello world how
 
 produces the following output:
     There are 5 arguments
     arg: 0: \"hello\"
     arg: 1: \"world\"
-    arg: 2: \"how\"
-    arg: 3: \"are\"
-    arg: 4: \"you\""
+    arg: 2: \"how\""
   (let ((i 0)
         (arg))
     (princ (format "There are %d arguments\n" (length command-line-args-left)))

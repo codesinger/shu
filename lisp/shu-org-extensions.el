@@ -51,11 +51,12 @@
 ;;  shu-org-done-projects-string
 ;;
 (defun shu-org-done-projects-string()
-  "Return a string that is a search for a TODO tag that does not contain any of the
-words that represent a DONE item.  These are the words defined in org-done-keywords-for-agenda.
-If the two keywords that mean finished item are DONE and CANCELLED, then this function will
-return the string: TODO={.+}/-CANCELLED-DONE.  This is intended to be used in the definition
-of the variable \"org-stuck-projects\"."
+  "Return a string that is a search for a TODO tag that does not contain any of
+the words that represent a DONE item.  These are the words defined in
+org-done-keywords-for-agenda.  If the two keywords that mean finished item are
+DONE and CANCELLED, then this function will return the string:
+TODO={.+}/-CANCELLED-DONE.  This is intended to be used in the definition of the
+variable \"org-stuck-projects\"."
   (let
       ((qq    shu-org-done-keywords)
        (str   "TODO={.+}/")
@@ -72,7 +73,8 @@ of the variable \"org-stuck-projects\"."
 ;;  shu-org-date-match-regexp
 ;;
 (defun shu-org-date-match-regexp ()
-  "Return a regexp string that matches an org date of the form 2014-04-01 Tue 13:18."
+  "Return a regexp string that matches an org date of the form
+2014-04-01 Tue 13:18."
   (let (
 
         ;; Months 01 - 12
@@ -141,9 +143,9 @@ of the variable \"org-stuck-projects\"."
 ;;  shu-org-state-regexp
 ;;
 (defun shu-org-state-regexp(done-word)
-  "Return a regular expression that will match a particular TODO state record of the form
-   - State \"DONE\"       from \"CANCELLED\"  [2012-04-01 Tue 13:18]
-  DONE-WORD is the desired state of the record."
+  "Return a regular expression that will match a particular TODO state record of
+the form - State \"DONE\" from \"CANCELLED\" [2012-04-01 Tue 13:18].
+DONE-WORD is the desired state of the record."
   (let*
       ((date-match (concat "\\[\\(" (shu-org-date-match-regexp) "\\)\\]"))
 
@@ -163,8 +165,8 @@ of the variable \"org-stuck-projects\"."
 ;;  Original idea came from a similar function written by John Wiegley in 2007
 ;;
 (defun shu-org-archive-done-tasks()
-  "Go through an org file and archive any completed TODO item that was completed more
-than shu-org-archive-expiry-days days ago."
+  "Go through an org file and archive any completed TODO item that was completed
+more than shu-org-archive-expiry-days days ago."
   (interactive)
   (let
       ((ofile (concat shu-org-home "/auto-archive-log.txt"))

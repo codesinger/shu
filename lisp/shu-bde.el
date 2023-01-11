@@ -73,11 +73,11 @@ file, if any."
 ;;  shu-bde-add-guard
 ;;
 (defun shu-bde-add-guard ()
-  "Add the BDE include guards around an existing #include directive.  If the line
-before the #include directive contains a valid guard, then we do not add a guard
-and position point to the line following the #include.  This makes it possible to
-run bde-all-guard on a file that contains some guarded #includes and some unguarded
-#includes.  Only the unguarded ones will have the guard added."
+  "Add the BDE include guards around an existing #include directive.  If the
+line before the #include directive contains a valid guard, then we do not add a
+guard and position point to the line following the #include.  This makes it
+possible to run bde-all-guard on a file that contains some guarded #includes and
+some unguarded #includes.  Only the unguarded ones will have the guard added."
   (interactive)
   (let
       ((gg (concat "#include\s*<\\(" shu-cpp-file-name "+\\)>"))
@@ -117,9 +117,9 @@ run bde-all-guard on a file that contains some guarded #includes and some unguar
 ;;  shu-bde-insert-guard
 ;;
 (defun shu-bde-insert-guard(fn at-top)
-  "Insert a #ifndef / #endif guard around an #include directive.  FN is the name of
-the included file.  AT-TOP is true if the #include directive is located on the first
-line of the file so there is no line above it."
+  "Insert a #ifndef / #endif guard around an #include directive.  FN is the name
+of the included file.  AT-TOP is true if the #include directive is located on
+the first line of the file so there is no line above it."
   (let*
       ((guard-name (shu-bde-include-guard fn))
        (guard-string (concat "#ifndef " guard-name)))
@@ -169,11 +169,11 @@ or narrowed region."
 ;;  shu-bde-include-guard-fn
 ;;
 (defun shu-bde-include-guard-fn (&optional fn)
-  "Return the file name name of the macro variable to be used in a BDE style include
-guard.  Name of the current buffer file name is used if no file name is passed in as
-the only optional argument.  This is only the file name part of the include guard.
-If the name of the file is foo_something.h, then this function returns
-FOO_SOMETHING.  The full name of the macro variable would be
+  "Return the file name name of the macro variable to be used in a BDE style
+include guard.  Name of the current buffer file name is used if no file name is
+passed in as the only optional argument.  This is only the file name part of the
+include guard.  If the name of the file is foo_something.h, then this function
+returns FOO_SOMETHING.  The full name of the macro variable would be
 INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard"
   (let ((file-name (or fn (file-name-nondirectory (buffer-file-name))))
         (guard ))
@@ -184,11 +184,12 @@ INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard"
 ;;  shu-bde-include-guard
 ;;
 (defun shu-bde-include-guard (&optional fn)
-  "Return the name of the macro variable to be used in a BDE style include guard.
-Name of the current buffer file name is used if no file name is passed in as the
-only optional argument.  This is the name of the macro variable that is used in the
-include guard.  If the name of the file is foo_something.h, then this function
-returns INCLUDED_FOO_SOMETHING.  See also shu-bde-include-guard-fn"
+  "Return the name of the macro variable to be used in a BDE style include
+guard.  Name of the current buffer file name is used if no file name is passed
+in as the only optional argument.  This is the name of the macro variable that
+is used in the include guard.  If the name of the file is foo_something.h, then
+this function returns INCLUDED_FOO_SOMETHING.  See also
+shu-bde-include-guard-fn"
   (let
       ((guard (concat "INCLUDED_" (shu-bde-include-guard-fn fn))))
     guard))

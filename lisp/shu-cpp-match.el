@@ -547,7 +547,8 @@ side list."
 ;;  shu-cpp-match-extract-side-list
 ;;
 (defmacro shu-cpp-match-extract-side-list (match-info op-code side-list side-parameter)
-  "Extract the side-list information out of a match-info that represents a side-list.."
+  "Extract the side-list information out of a match-info that represents a
+side-list.."
   (let ((tmatch-side (make-symbol "match-side")))
     `(let ((,tmatch-side))
        (setq ,op-code (car ,match-info))
@@ -563,8 +564,8 @@ side list."
 ;;
 (defun shu-cpp-match-extract-side-list-only (match-info)
   "Extract only the side list from the match info.  This is in contract to
-shu-cpp-match-extract-side-list, which extracts all of the properties of a
-side list."
+shu-cpp-match-extract-side-list, which extracts all of the properties of a side
+list."
   (cddr match-info)
   )
 
@@ -1008,7 +1009,8 @@ C++ qualified name could be any of the following:
 
 You can match this with a match list that requires an unquoted token that
 matches a C++ name, followed by a side list looking for operator \"::\" followed
-by an unquoted token.   If there is a match, you have a name with one level of qualification.
+by an unquoted token.  If there is a match, you have a name with one level of
+qualification.
 
 fails in the middle, then you have found something that looks like \"a::\",
 which is not a valid C++ name."
