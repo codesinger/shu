@@ -26,6 +26,40 @@
 ;;; Commentary:
 
 ;; elisp code for maintaining directories of name / value pairs.
+;;
+;; A set of functions to parse a buffer of sets of name value pairs.
+;;
+;; Each set of name value pairs is enclosed in opening and closing delimiters.
+;;
+;; The opening delimiter is \"<\".  The closing delimiter is \"/>\".
+;;
+;; Each name value pair is a name followed by an equal sign followed by a value.
+;;
+;; This is an example of one set of name value pairs:
+;;
+;;       < id=mumble  bob=happy  car=\"Jaguar XKE\"  />
+;;
+;; If a name or a value contains spaces, it must be enclosed in quotes.
+;;
+;; These functions parse a buffer of sets of name value pairs into a list of
+;; cons cells.
+;;
+;; The CAR of each cons cell is the item number.  The CDR of each cons cell is
+;; the list of name value pairs.  Each name value pair is held on a cons cell
+;; whose CAR is the name and whose CDR is the value.
+;;
+;; For example, the following set of name value pairs
+;;
+;;           <id=mumble  try=fuumble car=\"Jaguar XKE\" />
+;;           <cat=dog  bob=happy />
+;;           <mary=lamb  stew=bubble fox=hen   />
+;;
+;; would be converted to
+;;
+;;       (1 (id . mumble) (try . fuumble) (car . Jaguar XKE))
+;;       (2 (cat . dog) (bob . happy))
+;;       (3 (mary . lamb) (stew . bubble) (fox . hen))
+;;
 
 ;;; Code:
 

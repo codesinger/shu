@@ -399,7 +399,7 @@ contains no duplicate keys."
        (item-number )
        (item-number-string )
        (count   0))
-    (princ "     Line\n" gbuf)
+    (princ "     Item\n" gbuf)
     (princ "    Number   Key ...\n" gbuf)
     (while tindex
       (setq count (1+ count))
