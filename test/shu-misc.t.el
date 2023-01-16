@@ -3466,4 +3466,63 @@
       (should (string= expected actual)))
     ))
 
+
+
+;;
+;;  shu-test-shu-fix-du-buffer-1
+;;
+(ert-deftest shu-test-shu-fix-du-buffer-1 ()
+  (let ((gb (get-buffer-create "**boo**"))
+        (data
+         (concat
+          "2732         ./local-libraries/srvcctypes\n"
+          "616          ./local-libraries/uinfoclient\n"
+          "3890560      ./local-libraries/refroot\n"
+          "28324	.\n"))
+        (expected
+         (concat
+          "            2732   ./local-libraries/srvcctypes\n"
+          "             616   ./local-libraries/uinfoclient\n"
+          "         3890560   ./local-libraries/refroot\n"
+          "           28324   .\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-fix-du-buffer)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (princ actual gb)
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-fix-du-buffer-2
+;;
+(ert-deftest shu-test-shu-fix-du-buffer-2 ()
+  (let ((gb (get-buffer-create "**boo**"))
+        (data
+         (concat
+          "32	./testdata/code\n"
+          "4	./testdata/decoy\n"
+          "8	./testdata/test\n"
+          "44	./testdata\n"
+          "3696	.\n"))
+        (expected
+         (concat
+          "      32   ./testdata/code\n"
+          "       4   ./testdata/decoy\n"
+          "       8   ./testdata/test\n"
+          "      44   ./testdata\n"
+          "    3696   .\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-fix-du-buffer)
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (princ actual gb))
+    ))
+
 ;;; shu-misc.t.el ends here

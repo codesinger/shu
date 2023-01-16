@@ -4106,6 +4106,45 @@ the new file name."
 
 
 ;;
+;;  shu-fix-du-buffer
+;;
+(defun shu-fix-du-buffer ()
+  "In a buffer that was created via \"du -k\" where each line looks something
+like the following:
+
+      2732        ./local-libraries/srvcctypes
+      616         ./local-libraries/uinfoclient
+      3890560     ./local-libraries/refroot
+
+change each of the leading strings into real numbers and re-write the line with
+a right justified number.  This allows sort-lines to sort the lines actually by
+size.  If you do not make this transformation, then 616 sorts as a bigger number
+than 3890560."
+  (interactive)
+  (let ((nump  "[0-9]+\\s-*")
+        (num)
+        (fnum)
+        (longest-length 0)
+        (matched))
+    (goto-char (point-min))
+    (while (re-search-forward nump nil t)
+      (setq matched (match-string 0))
+      (when (> (length matched) longest-length)
+        (setq longest-length (length matched))))
+    (setq longest-length (+ longest-length 3))
+    (goto-char (point-min))
+    (while (re-search-forward nump nil t)
+      (setq matched (match-string 0))
+      (setq num (string-to-number matched))
+      (setq fnum (concat (shu-format-num num longest-length) "   "))
+      (replace-match fnum)
+      (end-of-line))
+    ))
+
+
+
+
+;;
 ;;  shu-misc-set-alias
 ;;
 (defun shu-misc-set-alias ()
@@ -4164,6 +4203,7 @@ shu- prefix removed."
   (defalias 'fix-header 'shu-fix-header-line)
   (defalias 'make-header 'shu-make-header-line)
   (defalias 'change-namespace 'shu-change-namespace)
+  (defalias 'fix-du-buffer 'shu-fix-du-buffer)
   )
 
 (provide 'shu-misc)
