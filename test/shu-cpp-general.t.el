@@ -4644,4 +4644,61 @@ class names."
       )
     ))
 
+
+
+;;
+;;  shu-test-shu-sort-makefile-1
+;;
+(ert-deftest shu-test-shu-sort-makefile-1 ()
+  (let ((data
+         (concat
+          "#\n"
+          "# thing.com\n"
+          "# This is another comment\n"
+          "  bb.cpp\n"
+          "  zz.cpp\n"
+          "  cc.cpp\n"
+          "  aa.cpp\n"
+          "#And yet another thing.com comment\n"))
+        (expected
+         (concat
+          "#\n"
+          "# thing.com\n"
+          "# This is another comment\n"
+          "  aa.cpp\n"
+          "  bb.cpp\n"
+          "  cc.cpp\n"
+          "  zz.cpp\n"
+          "#And yet another thing.com comment\n"))
+        (sorted)
+        (actual))
+  (with-temp-buffer
+    (insert data)
+    (setq sorted (shu-sort-makefile))
+    (should sorted)
+    (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+    (should actual)
+    (should (stringp actual))
+    (should (string= expected actual)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-sort-makefile-2
+;;
+(ert-deftest shu-test-shu-sort-makefile-2 ()
+  (let ((data
+         (concat
+          "#\n"
+          "# thing.com\n"
+          "# This is another comment\n"
+          "#And yet another thing.com comment\n"))
+        (sorted))
+  (with-temp-buffer
+    (insert data)
+    (setq sorted (shu-sort-makefile))
+    (should (not sorted)))
+    ))
+
 ;;; shu-cpp-general.t.el ends here

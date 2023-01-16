@@ -5847,7 +5847,9 @@ buffer.  Each entry in the list is a cons cell whose car is the point of the
 ;;  shu-sort-makefile
 ;;
 (defun shu-sort-makefile ()
-  "Find all of the cpp files in a Cmake file and sort them in alphabetical order."
+  "Find all of the cpp files in a make file and sort them in alphabetical
+order.  Return t if the files were found and sorted.  This return value is for
+the benefit of unit tests."
   (interactive)
   (let* ((gb (get-buffer-create "**boo**"))
          (case-fold-search nil)
@@ -5855,7 +5857,8 @@ buffer.  Each entry in the list is a cons cell whose car is the point of the
          (target-name (concat shu-cpp-file-name "*\\." target-extensions "+" shu-all-whitespace-regexp "+?"))
          (white (concat shu-all-whitespace-regexp "+"))
          (start)
-         (end))
+         (end)
+         (sorted))
     (save-excursion
       (goto-char (point-min))
       (if (not (re-search-forward target-name nil t))
@@ -5875,7 +5878,9 @@ buffer.  Each entry in the list is a cons cell whose car is the point of the
             (forward-line 1)
             (setq end (line-beginning-position))
             (princ (format "start: %d, end: %d\n" start end) gb)
-            (sort-lines nil start end)))))
+            (sort-lines nil start end)
+            (setq sorted t)))))
+    sorted
     ))
 
 
