@@ -24,6 +24,34 @@
 ;; It is not part of the shu package
 
 
+(defvar shu-initial-af-frame nil
+  "If non-nil, this is the initial frame position to pass to SHU-ADAPT-FRAME")
+
+
+;;
+;;  shu-process-af-arg
+;;
+(defun shu-process-af-arg (switch)
+  "Process the \"-af\" coommand line argument, which is a frame number passed
+to SHU-ADAPT-FRAME."
+  (let ((fno))
+    (setq fno (string-to-number (pop command-line-args-left)))
+    (setq shu-initial-af-frame fno)
+    ))
+
+
+;;
+;;  shu-process-af-position
+;;
+(defun shu-process-af-position ()
+  "This is the WINDOW-SETUP-HOOK that passes the \"af\" argument to SHU-ADAPT-FRAME."
+    (when shu-initial-af-frame
+      (shu-adapt-frame shu-initial-af-frame))
+    )
+
+(setq window-setup-hook 'shu-process-af-position)
+
+(add-to-list 'command-switch-alist '("-af" . shu-process-af-arg))
 
 
 ;;
