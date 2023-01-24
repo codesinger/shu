@@ -4701,4 +4701,114 @@ class names."
     (should (not sorted)))
     ))
 
+
+
+;;
+;;  shu-test-shu-get-function-name-1
+;;
+(ert-deftest shu-test-shu-get-function-name-1 ()
+  (let* ((class-name "MumbleBar")
+         (function-name "something")
+         (data (concat class-name "::" function-name "(const int x)"))
+         (ret-val)
+         (name)
+         (msg))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq ret-val (shu-get-function-name class-name))
+      (setq name (car ret-val))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq name (car ret-val))
+      (setq msg (cdr ret-val))
+      (should (not msg))
+      (should name)
+      (should (stringp name))
+      (should (string= function-name name)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-function-name-2
+;;
+(ert-deftest shu-test-shu-get-function-name-2 ()
+  (let* ((class-name "MumbleBar")
+         (function-name "something")
+         (data (concat class-name "  ::  " function-name "  (const int x)"))
+         (ret-val)
+         (name)
+         (msg))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq ret-val (shu-get-function-name class-name))
+      (setq name (car ret-val))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq name (car ret-val))
+      (setq msg (cdr ret-val))
+      (should (not msg))
+      (should name)
+      (should (stringp name))
+      (should (string= function-name name)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-function-name-3
+;;
+(ert-deftest shu-test-shu-get-function-name-3 ()
+  (let* ((class-name "MumbleBar")
+         (function-name "something")
+         (data (concat "ZumbleBar  ::  " function-name "  (const int x)"))
+         (ret-val)
+         (name)
+         (msg)
+         (expected "Unable to find class name: 'MumbleBar'"))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq ret-val (shu-get-function-name class-name))
+      (setq name (car ret-val))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq name (car ret-val))
+      (setq msg (cdr ret-val))
+      (should (not name))
+      (should msg)
+      (should (stringp msg))
+      (should (string= expected msg)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-get-function-name-4
+;;
+(ert-deftest shu-test-shu-get-function-name-4 ()
+  (let* ((class-name "MumbleBar")
+         (function-name "something")
+         (data (concat class-name "  ::  " function-name "  const int x"))
+         (ret-val)
+         (name)
+         (msg)
+         (expected "Unable to find open parenthesis following function name"))
+    (with-temp-buffer
+      (insert data)
+      (goto-char (point-min))
+      (setq ret-val (shu-get-function-name class-name))
+      (setq name (car ret-val))
+      (should ret-val)
+      (should (consp ret-val))
+      (setq name (car ret-val))
+      (setq msg (cdr ret-val))
+      (should (not name))
+      (should msg)
+      (should (stringp msg))
+      (should (string= expected msg)))
+    ))
+
 ;;; shu-cpp-general.t.el ends here

@@ -5885,6 +5885,110 @@ the benefit of unit tests."
 
 
 
+;;
+;;  shu-start-returns
+;;
+(defun shu-start-returns ()
+  "This function replaces all instances of \";\" with
+
+          {
+              return m_;
+          }
+
+This is useful when copying a set of C++ function declarations from a header
+file to a code file as the first step in turning the function declarations into
+code."
+  (interactive)
+  (let ((body
+         (concat
+          "\n"
+          "{\n"
+          "    return m_;\n"
+          "}\n")))
+    (while (search-forward ";" nil t)
+      (replace-match body t t))
+    ))
+
+
+
+;;
+;;  shu-fill-getters
+;;
+(defun shu-fill-getters (class-name)
+  "This turns a set of partial skeletons of a accessors into functions that
+returns actual values.
+
+Given a function that resembles
+
+      int MumbleBar::farble() const
+      {
+          return m_;
+      }
+
+this function replaces the above text with
+
+      int MumbleBar::farble() const
+      {
+          return m_farble;
+      }"
+  (interactive "*sClass name?: ")
+  (let ((gb (get-buffer-create "**boo**"))
+        (something t)
+        (ret-val)
+        (name)
+        (msg)
+        (rest))
+    (while something
+      (setq ret-val (shu-get-function-name class-name))
+      (setq name (car ret-val))
+      (setq msg (cdr ret-val))
+      (if (not name)
+          (progn
+            (ding)
+            (setq something nil)
+            (message "%s" msg))
+        (if (not (search-forward "return m_;" nil t))
+            (progn
+              (ding)
+              (setq something nil)
+              (message "Unable to find return statement in function %s" name))
+          (replace-match (concat "return m_" name ";") t t)
+          (princ (format "name: %s, point: %d, point-max: %d\n" name (point) (point-max)) gb)
+          (setq rest 0)
+          (when (< (point) (point-max))
+            (setq rest (- (point-max) (point))))
+          (when (< rest (length class-name))
+            (setq something nil)))))
+    ))
+
+
+
+
+
+
+;;
+;;  shu-get-function-name
+;;
+(defun shu-get-function-name (class-name)
+  "Doc string."
+  (let ((cname (concat class-name "\\s-*::\\s-*"))
+        (beg)
+        (end)
+        (name)
+        (msg)
+        (case-fold-search nil))
+    (if (not (re-search-forward cname nil t))
+        (setq msg (format "Unable to find class name: '%s'" class-name))
+      (setq beg (point))
+      (if (not (search-forward "(" (line-end-position) t))
+          (setq msg "Unable to find open parenthesis following function name")
+        (setq end (1- (point)))
+        (setq name (shu-trim (buffer-substring-no-properties beg end)))))
+    (cons name msg)
+    ))
+
+
+
 
 ;;
 ;;  shu-cpp-general-set-alias
@@ -5952,6 +6056,8 @@ shu- prefix removed."
   (defalias 'sort-includes 'shu-sort-includes)
   (defalias 'sort-all-includes 'shu-sort-all-includes)
   (defalias 'sort-makefile 'shu-sort-makefile)
+  (defalias 'start-returns 'shu-start-returns)
+  (defalias 'fill-getters 'shu-fill-getters)
   )
 
 (provide 'shu-cpp-general)
