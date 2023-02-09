@@ -1,0 +1,70 @@
+#!/bin/ksh -x
+### work-emacs - A script for launching multiple instances of emacs
+##
+## Copyright (C) 2023 Stewart L. Palmer
+##
+## This file is NOT part of GNU Emacs.
+##
+## This is free software: you can redistribute it and/or modify it
+## under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY# without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## There is a copy of the Gnu General Public license in the file
+## LICENSE in this repository.  You should also have received a copy
+## of the GNU General Public License along with GNU Emacs.  If not,
+## see <http://www.gnu.org/licenses/>.
+##
+## It is not part of the shu package
+
+function show_help
+{
+    print "This script launches from one to five emacs windows that"
+    print "are properly aligned for two seventeen inch monitors."
+    print "With no command line arguments, five windows are launched."
+    print "Single command line argument from one to five may be"
+    print "specified to define the number of windows to be launched."
+}
+
+default=5
+count=0
+if [[ $# -eq 0 ]];then
+    count=default
+elif [[ $# -eq 1 ]];then
+    count=$1
+else
+   show_help $#
+   exit
+fi
+
+inst="instances"
+if [[ $count -eq 1 ]];then
+    inst="instance"
+fi
+print "Will create $count $inst"
+
+if [[ $count -gt 4 ]];then
+    /opt/bb/bin/emacs -bg cornsilk --debug-init -af 8&
+    sleep 1
+fi
+if [[ $count -gt 3 ]];then
+    /opt/bb/bin/emacs -bg cornsilk --debug-init -af 14&
+    sleep 1
+fi
+if [[ $count -gt 2 ]];then
+    /opt/bb/bin/emacs -bg cornsilk --debug-init -af 13&
+    sleep 1
+fi
+if [[ $count -gt 1 ]];then
+    /opt/bb/bin/emacs -bg cornsilk --debug-init -af 12&
+    sleep 1
+fi
+if [[ $count -gt 0 ]];then
+    /opt/bb/bin/emacs -bg cornsilk --debug-init -af 11&
+    sleep 1
+fi
