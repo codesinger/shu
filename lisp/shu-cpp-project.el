@@ -751,6 +751,7 @@ name \"/u/foo/bar/thing.c\"."
   (setq shu-cpp-prefix-list nil)
   (setq shu-cpp-short-list nil)
   (setq shu-cpp-completing-list nil)
+  (setq shu-cpp-project-name nil)
   )
 
 
@@ -2766,6 +2767,23 @@ qualified files found."
     ))
 
 
+
+;;
+;;  shu-get-c-project
+;;
+(defun shu-get-c-project ()
+  "If there is a current project name, put it in the kill ring."
+  (interactive)
+    (if shu-cpp-project-name
+        (progn
+          (shu-kill-new shu-cpp-project-name)
+          (message "%s" shu-cpp-project-name))
+      (ding)
+      (message "%s" "No project name is currently set"))
+    )
+
+
+
 ;;
 ;;  shu-cpp-project-set-alias
 ;;
@@ -2800,6 +2818,7 @@ shu- prefix removed."
   (defalias 'hother 'shu-hother)
   (defalias 'iother 'shu-iother)
   (defalias 'tother 'shu-tother)
+  (defalias 'get-c-project 'shu-get-c-project)
   )
 
 (provide 'shu-cpp-project)
