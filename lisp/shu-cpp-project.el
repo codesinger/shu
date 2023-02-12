@@ -2769,9 +2769,9 @@ qualified files found."
 
 
 ;;
-;;  shu-get-c-project
+;;  shu-copy-c-project
 ;;
-(defun shu-get-c-project ()
+(defun shu-copy-c-project ()
   "If there is a current project name, put it in the kill ring."
   (interactive)
     (if shu-cpp-project-name
@@ -2818,7 +2818,7 @@ shu- prefix removed."
   (defalias 'hother 'shu-hother)
   (defalias 'iother 'shu-iother)
   (defalias 'tother 'shu-tother)
-  (defalias 'get-c-project 'shu-get-c-project)
+  (defalias 'copy-c-project 'shu-copy-c-project)
   )
 
 (provide 'shu-cpp-project)
