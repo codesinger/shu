@@ -42,7 +42,8 @@
 ;;  shu-run-all-unit-tests
 ;;
 (defun shu-run-all-unit-tests ()
-  "Compile and run all of the unit tests.  This must be run from the test directory."
+  "Compile and run all of the unit tests.  This must be run from the test
+directory."
   (interactive)
   (let
       ((test-files

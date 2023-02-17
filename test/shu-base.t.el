@@ -39,13 +39,14 @@
 ;;  shu-test-fillbuffer-ipsum
 ;;
 (defun shu-test-fillbuffer-ipsum ()
-  "Fill the current buffer with 59 lines of lorem ipsum text on which test cases may
-operate.  The following variables must be declared by the caller, which will then be
-bound to this function.  SHU-TEST-POINT-LIST is a returned list of points.
-SHU-TEST-LINE-LIST is a returned list of line numbers corresponding to the points in
-SHU-TEST-POINT-LIST.  SHU-TEST-START-NARROW and SHU-TEST-END-NARROW are two points
-in the buffer that may be used to narrow it in such a way that at least some of the
-points in SHU-TEST-POINT-LIST fall outside of the narrowed region."
+  "Fill the current buffer with 59 lines of lorem ipsum text on which test cases
+may operate.  The following variables must be declared by the caller, which will
+then be bound to this function.  SHU-TEST-POINT-LIST is a returned list of
+points.  SHU-TEST-LINE-LIST is a returned list of line numbers corresponding to
+the points in SHU-TEST-POINT-LIST.  SHU-TEST-START-NARROW and
+SHU-TEST-END-NARROW are two points in the buffer that may be used to narrow it
+in such a way that at least some of the points in SHU-TEST-POINT-LIST fall
+outside of the narrowed region."
   (let ((x))
     (insert
      (concat
