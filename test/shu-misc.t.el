@@ -3525,4 +3525,41 @@
       (princ actual gb))
     ))
 
+
+
+
+;;
+;;  shu-test-shu-nocase-sort-lines-1
+;;
+(ert-deftest shu-test-shu-nocase-sort-lines-1 ()
+  (let ((data
+         (concat
+          "’Twas brillig, and the slithy toves\n"
+          "Did gyre and gimble in the wabe:\n"
+          "ALL MIMSY WERE THE BOROGOVES,\n"
+          "And the mome raths outgrabe.\n"
+          "BEWARE THE JABBERWOCK, my son!\n"
+          "The jaws that bite, the claws that catch!\n"
+          "Beware the Jubjub bird, and shun\n"
+          "The frumious Bandersnatch!\n"))
+        (expected
+         (concat
+          "ALL MIMSY WERE THE BOROGOVES,\n"
+          "And the mome raths outgrabe.\n"
+          "BEWARE THE JABBERWOCK, my son!\n"
+          "Beware the Jubjub bird, and shun\n"
+          "Did gyre and gimble in the wabe:\n"
+          "The frumious Bandersnatch!\n"
+          "The jaws that bite, the claws that catch!\n"
+          "’Twas brillig, and the slithy toves\n"))
+        (actual))
+    (with-temp-buffer
+      (insert data)
+      (shu-nocase-sort-lines nil (point-min) (point-max))
+      (setq actual (buffer-substring-no-properties (point-min) (point-max)))
+      (should actual)
+      (should (stringp actual))
+      (should (string= expected actual)))
+    ))
+
 ;;; shu-misc.t.el ends here

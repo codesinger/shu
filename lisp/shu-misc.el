@@ -4143,6 +4143,21 @@ than 3890560."
 
 
 
+;;
+;;  shu-nocase-sort-lines
+;;
+(defun shu-nocase-sort-lines (reverse beg end)
+  "Case insensitive SORT-LINES
+Sort lines in region alphabetically; argument means descending order.
+Called from a program, there are three arguments:
+REVERSE (non-nil means reverse order), BEG and END (region to sort)."
+  (interactive "P\nr")
+  (let ((sort-fold-case t))
+    (sort-lines reverse beg end)
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias
@@ -4204,6 +4219,7 @@ shu- prefix removed."
   (defalias 'make-header 'shu-make-header-line)
   (defalias 'change-namespace 'shu-change-namespace)
   (defalias 'fix-du-buffer 'shu-fix-du-buffer)
+  (defalias 'nocase-sort-lines 'shu-nocase-sort-lines)
   )
 
 (provide 'shu-misc)
