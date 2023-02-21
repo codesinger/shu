@@ -191,6 +191,10 @@ are recorded.")
 to type the passphrase at the beginning of an emacs session.  Once this is
 set it can then be put into kill ring by shu-keyring-get-passphrase.")
 
+(defvar shu-keyring-alternate-passphrase nil
+  "Holds the alternate passphrase.  The alternate passphrase has no assigned
+meaning.  It means whatever the user wants it to mean.")
+
 
 ;;
 ;; shu-keyring-get-pw
@@ -597,7 +601,7 @@ has been placed in the clipboard, (PW, ID, etc.)"
 ;;  shu-keyring-get-passphrase
 ;;
 (defun shu-keyring-get-passphrase ()
-  "Doc string."
+  "Put the external passphrase into the kill ring."
   (interactive)
   (let ((phrase "**unknown**")
         (displaypw ".........."))
@@ -607,6 +611,36 @@ has been placed in the clipboard, (PW, ID, etc.)"
           (message "Pass phrase: %s" displaypw))
       (ding)
       (message "%s" "Pass phrase is not set."))
+    (shu-kill-new phrase)
+    ))
+
+
+
+
+;;
+;;  shu-keyring-set-alternate-passphrase
+;;
+(defun shu-keyring-set-alternate-passphrase (phrase)
+  "Function to read and set the alternate external pass phrase."
+  (interactive "sPass phrase?: ")
+  (setq shu-keyring-alternate-passphrase phrase)
+  )
+
+
+;;
+;;  shu-keyring-get-alternate-passphrase
+;;
+(defun shu-keyring-get-alternate-passphrase ()
+  "Put the alternate passphrase into the kill ring."
+  (interactive)
+  (let ((phrase "**unknown**")
+        (displaypw ".........."))
+    (if shu-keyring-alternate-passphrase
+        (progn
+          (setq phrase shu-keyring-alternate-passphrase)
+          (message "Alternate pass phrase: %s" displaypw))
+      (ding)
+      (message "%s" "Alternate pass phrase is not set."))
     (shu-kill-new phrase)
     ))
 
@@ -628,6 +662,8 @@ to make them easier to type. "
   (defalias 'krvf 'shu-keyring-verify-file)
   (defalias 'krpps 'shu-keyring-get-passphrase)
   (defalias 'set-passphrase 'shu-keyring-set-passphrase)
+  (defalias 'set-alternate-passphrase'shu-keyring-set-alternate-passphrase)
+  (defalias 'kraps 'shu-keyring-get-alternate-passphrase)
   )
 
 ;;; shu-keyring.el ends here
