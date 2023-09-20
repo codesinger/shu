@@ -265,6 +265,21 @@ given task as a Google test."
 
 
 ;;
+;;  nassert
+;;
+(defun nassert ()
+  "Insert an empty assert statement."
+  (interactive)
+  (let
+   ((pad-count (current-column))
+    (start ))
+    (setq start (save-excursion (beginning-of-line) (point)))
+    (insert "BSLS_ASSERT_INVOKE_NORETURN(\"\");\n")
+    (goto-char (+ start pad-count 29))))
+
+
+
+;;
 ;;  ddb
 ;;
 (defun ddb ()

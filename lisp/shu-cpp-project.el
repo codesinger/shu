@@ -130,6 +130,11 @@ of SHU-VISIT-PROJECT-AND-TAGS, this is the name of the interactive function that
 was invoked by the user to set it up.  This is useful when you are in a project
 and you forgot the name of the interactive function that got you there.")
 
+(defvar shu-cpp-project-comment nil
+  "If the current project was established by either SHU-SETUP-PROJECT-AND-TAGS
+of SHU-VISIT-PROJECT-AND-TAGS, this is an optional comment associated with the
+project.")
+
 (defvar shu-cpp-project-list nil
   "List that holds all of the subdirectories in the current project.")
 
@@ -520,6 +525,7 @@ established by either SHU-SETUP-PROJECT-AND-TAGS of SHU-VISIT-PROJECT-AND-TAGS."
   (interactive "r")
   (setq shu-project-extensions shu-py-extensions)
   (setq shu-cpp-project-name nil)
+  (setq shu-cpp-project-comment nil)
   (shu-internal-set-c-project start end)
   )
 
@@ -538,6 +544,7 @@ this function is called interactively, it clears the project name that was
 established by either SHU-SETUP-PROJECT-AND-TAGS of SHU-VISIT-PROJECT-AND-TAGS."
   (interactive "r")
   (setq shu-cpp-project-name nil)
+  (setq shu-cpp-project-comment nil)
   (shu-internal-set-c-project start end)
   )
 
@@ -752,6 +759,7 @@ name \"/u/foo/bar/thing.c\"."
   (setq shu-cpp-short-list nil)
   (setq shu-cpp-completing-list nil)
   (setq shu-cpp-project-name nil)
+  (setq shu-cpp-project-comment nil)
   )
 
 
@@ -1888,6 +1896,8 @@ buffer."
       (princ (concat shu-cpp-project-file ":\n------------\n") pbuf)
       (when shu-cpp-project-name
         (princ (concat "Project name: " shu-cpp-project-name "\n") pbuf))
+      (when shu-cpp-project-comment
+        (princ (concat "Project comment: " shu-cpp-project-comment "\n") pbuf))
       (princ (format-time-string "Set on %a, %e %b %Y at %k:%M:%S." shu-cpp-project-time) pbuf)
       (princ "\n\n" pbuf)
       (while tlist
@@ -1916,7 +1926,7 @@ buffer."
 ;;
 ;;  shu-setup-project-and-tags
 ;;
-(defun shu-setup-project-and-tags (proj-dir)
+(defun shu-setup-project-and-tags (proj-dir &optional proj-comment)
   "Visit a project file, make a C project from the contents of the whole file,
 create a file called \"files.txt\" with the name of every file found, invoke
 ctags on that file to build a new tags file, and then visit the tags file.
@@ -1940,8 +1950,13 @@ Record the visit in the file \"~/visited-projects.log\"."
        (h-count)
        (pname (shu-get-real-this-command-name)))
     (setq shu-cpp-project-name pname)
+    (if proj-comment
+        (setq shu-cpp-project-comment proj-comment)
+      (setq shu-cpp-project-comment nil))
     (setq sstring (format-time-string "on %a, %e %b %Y at %k:%M:%S" stime))
     (princ (format "\nStart project (%s) setup in %s %s.\n\n" shu-cpp-project-name proj-dir sstring) gbuf)
+    (when shu-cpp-project-comment
+      (princ (concat "\nProject comment: " shu-cpp-project-comment "\n")))
     (find-file proj-file)
     (shu-internal-set-c-project (point-min) (point-max))
     (setq elapsed (time-since stime))
@@ -1991,7 +2006,7 @@ do not support real-this-command."
 ;;
 ;;  shu-visit-project-and-tags
 ;;
-(defun shu-visit-project-and-tags (proj-dir)
+(defun shu-visit-project-and-tags (proj-dir &optional proj-comment)
   "Visit a project file, make a C project from the contents of the whole file,
 and load that tags table from the tags file in the specified directory.  This
 function uses the existing tags table, whereas SHU-SETUP-PROJECT-AND-TAGS
@@ -2014,8 +2029,13 @@ creates a new tags table."
        (pname))
     (setq pname (shu-get-real-this-command-name))
     (setq shu-cpp-project-name pname)
+    (if proj-comment
+        (setq shu-cpp-project-comment proj-comment)
+      (setq shu-cpp-project-comment nil))
     (setq sstring (format-time-string "on %a, %e %b %Y at %k:%M:%S" stime))
     (princ (format "\nStart project (%s) setup in %s %s.\n\n" shu-cpp-project-name proj-dir sstring) gbuf)
+    (when shu-cpp-project-comment
+      (princ (concat "\nProject comment: " shu-cpp-project-comment "\n")))
     (find-file proj-file)
     (shu-internal-set-c-project (point-min) (point-max))
     (setq elapsed (time-since stime))
