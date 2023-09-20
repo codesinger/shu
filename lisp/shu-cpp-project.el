@@ -2794,13 +2794,17 @@ qualified files found."
 (defun shu-copy-c-project ()
   "If there is a current project name, put it in the kill ring."
   (interactive)
+  (let ((pstring))
     (if shu-cpp-project-name
         (progn
-          (shu-kill-new shu-cpp-project-name)
-          (message "%s" shu-cpp-project-name))
+          (setq pstring shu-cpp-project-name)
+          (when shu-cpp-project-comment
+            (setq pstring (concat pstring " (" shu-cpp-project-comment ")")))
+          (shu-kill-new pstring)
+          (message "%s" pstring))
       (ding)
       (message "%s" "No project name is currently set"))
-    )
+    ))
 
 
 
