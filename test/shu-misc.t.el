@@ -2689,6 +2689,123 @@
 
 
 ;;
+;;  shu-test-shu-unique-randoms-1
+;;
+(ert-deftest shu-test-shu-unique-randoms-1 ()
+  (let* ((count 80)
+         (max (1- count))
+         (result (shu-unique-randoms count))
+         (rslt result)
+         (numbers)
+         (num))
+    (should result)
+    (should (listp result))
+    (should (= count (length result)))
+    (while rslt
+      (setq num (car rslt))
+      (should num)
+      (should (numberp num))
+      (should (>= num 0))
+      (should (<= num max))
+      (should (not (member num numbers)))
+      (push num numbers)
+      (setq rslt (cdr rslt)))
+    ))
+
+
+
+;;
+;;  shu-test-shu-unique-randoms-2
+;;
+(ert-deftest shu-test-shu-unique-randoms-2 ()
+  (let* ((count 21)
+         (max 189)
+         (result (shu-unique-randoms count))
+         (rslt result)
+         (numbers)
+         (num))
+    (should result)
+    (should (listp result))
+    (should (= count (length result)))
+    (while rslt
+      (setq num (car rslt))
+      (should num)
+      (should (numberp num))
+      (should (>= num 0))
+      (should (<= num max))
+      (should (not (member num numbers)))
+      (push num numbers)
+      (setq rslt (cdr rslt)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-random-chars-1
+;;
+(ert-deftest shu-test-shu-random-chars-1 ()
+  (let* ((input "0123456789")
+        (result (shu-random-chars input (length input)))
+        (ordered-input)
+        (ordered-result))
+    (should result)
+    (should (stringp result))
+    (should (= (length input) (length result)))
+    (should (not (string= input result)))
+    (setq ordered-input (mapcar 'string input))
+    (setq ordered-input (sort ordered-input 'string<))
+    (setq ordered-result (mapcar 'string result))
+    (setq ordered-result (sort ordered-result 'string<))
+    (should (equal ordered-input ordered-result))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-random-chars-2
+;;
+(ert-deftest shu-test-shu-random-chars-2 ()
+  (let* ((input "abcdefghijklmnopqrstuvwxyz")
+        (result (shu-random-chars input (length input)))
+        (ordered-input)
+        (ordered-result))
+    (should result)
+    (should (stringp result))
+    (should (= (length input) (length result)))
+    (should (not (string= input result)))
+    (setq ordered-input (mapcar 'string input))
+    (setq ordered-input (sort ordered-input 'string<))
+    (setq ordered-result (mapcar 'string result))
+    (setq ordered-result (sort ordered-result 'string<))
+    (should (equal ordered-input ordered-result))
+    ))
+
+
+
+;;
+;;  shu-test-min-max-1
+;;
+(ert-deftest shu-test-min-max-1 ()
+  (let ((x 9)
+        (y 9)
+        (z))
+    (setq z (min x y))
+    (should z)
+    (should (numberp z))
+    (should (= x z))
+    (should (= y z))
+    (setq z (max x y))
+    (should z)
+    (should (numberp z))
+    (should (= x z))
+    (should (= y z))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-prepare-for-rename-1
 ;;
 (ert-deftest shu-test-shu-prepare-for-rename-1 ()
@@ -3560,6 +3677,92 @@
       (should actual)
       (should (stringp actual))
       (should (string= expected actual)))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-generate-password-1
+;;
+(ert-deftest shu-test-shu-generate-password-1 ()
+  (let* ((min-length  18)
+         (max-length  25)
+         (pw (shu-generate-password min-length max-length)))
+    (should pw)
+    (should (stringp pw))
+    (should (>= (length pw) min-length))
+    (should (<= (length pw) max-length))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-generate-password-2
+;;
+(ert-deftest shu-test-shu-generate-password-2 ()
+  (let* ((min-length  18)
+         (max-length  25)
+         (pw (shu-generate-password max-length min-length)))
+    (should pw)
+    (should (stringp pw))
+    (should (>= (length pw) min-length))
+    (should (<= (length pw) max-length))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-generate-password-3
+;;
+(ert-deftest shu-test-shu-generate-password-3 ()
+  (let* ((exact-length  22)
+         (pw (shu-generate-password exact-length)))
+    (should pw)
+    (should (stringp pw))
+    (should (= (length pw) exact-length))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-generate-password-4
+;;
+(ert-deftest shu-test-shu-generate-password-4 ()
+  (let* ((lowers (string-to-list "abcdefghijklmnopqrstuvwxyz"))
+        (uppers (string-to-list "ABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+        (specials (string-to-list "!@#$%^&*_-+="))
+        (digits (string-to-list "1234567890"))
+        (exact-length  27)
+        (pw (shu-generate-password exact-length))
+        (pwl (string-to-list pw))
+        (lower-count 0)
+        (upper-count 0)
+        (special-count 0)
+        (digit-count 0)
+        (c))
+    (should pw)
+    (should (stringp pw))
+    (should (= (length pw) exact-length))
+    (while pwl
+      (setq c (car pwl))
+      (cond
+       ((member c lowers)
+        (setq lower-count (1+ lower-count)))
+       ((member c uppers)
+        (setq upper-count (1+ upper-count)))
+       ((member c specials)
+        (setq special-count (1+ special-count)))
+       ((member c digits)
+        (setq digit-count (1+ digit-count))))
+      (setq pwl (cdr pwl)))
+    (should (>= lower-count 2))
+    (should (>= upper-count 2))
+    (should (>= special-count 2))
+    (should (>= digit-count 2))
     ))
 
 ;;; shu-misc.t.el ends here

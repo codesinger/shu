@@ -3104,6 +3104,58 @@ else, return nil."
 
 
 
+
+
+;;
+;;  shu-random-chars
+;;
+(defun shu-random-chars (input n)
+  "Return a string of N random characters chosen from the string
+INPUT.  The character positions within the string are unique.  If
+the characters in the INPUT string are unique, the returned
+string will also be composed of unique characters."
+  (let ((ixs (shu-unique-randoms n (1- (length input))))
+        (ix)
+        (result ""))
+    (while ixs
+      (setq ix (car ixs))
+      (setq result (concat result (substring input ix (1+ ix))))
+      (setq ixs (cdr ixs)))
+    result
+    ))
+
+
+
+
+;;
+;;  shu-unique-randoms
+;;
+(defun shu-unique-randoms (n &optional max)
+  "Return a list of N unique random numbers whose values range
+from zero to (N - 1).  If optional MAX is specified, then the
+values range from zero to MAX.
+
+This is only practical for small values of N (or MAX).
+Internally, this function builds a list of monotonically
+increasing integers from zero to (N - 1) (or MAX).  Large values
+of N or MAX are impractical."
+  (let* ((mx (if max max (1- n)))
+        (result)
+        (numbers (number-sequence 0 mx))
+        (count n)
+        (ix)
+        (x))
+    (while (> count 0)
+      (setq ix (random (length numbers)))
+      (setq x (nth ix numbers))
+      (setq numbers (delete x numbers))
+      (push x result)
+      (setq count (1- count)))
+    result
+    ))
+
+
+
 ;;
 ;;  shu-prepare-for-rename
 ;;
@@ -4154,6 +4206,53 @@ REVERSE (non-nil means reverse order), BEG and END (region to sort)."
   (interactive "P\nr")
   (let ((sort-fold-case t))
     (sort-lines reverse beg end)
+    ))
+
+
+
+
+;;
+;;  shu-generate-password
+;;
+(defun shu-generate-password (min-length &optional max-length)
+  "Generate and return a password of length MIN-LENGTH.  If optional MAX-LENGTH
+is present, the length is randomly chosen between MIN-LENGTH and MAX-LENGTH.
+MIN-LENGTH and MAX-LENGTH may be reversed.  The larger of the two arguments is
+used for MAX_LENGTH.  If the length of the password is less than 8, then at
+least one lower case letter, one upper case letter, one digit, and one special
+character are present in the generated password.  If the length of the password
+is greater than or equal to eight, then 2 each of those characters are present.
+The remaining characters are chosen randomly."
+  (let* ((lmax (if max-length max-length min-length))
+         (lmin (min min-length lmax))
+         (lmax (max min-length lmax))
+         (lowers "abcdefghijklmnopqrstuvwxyz")
+         (uppers (upcase lowers))
+         (specials "!@#$%^&*_-+=")
+         (digits "1234567890")
+         (all-chars (concat lowers uppers specials digits))
+         (upper-count 1)
+         (lower-count 1)
+         (special-count 1)
+         (digit-count 1)
+         (ldiff (- lmax lmin))
+         (lplus (random (1+ ldiff)))
+         (llen (+ lmin lplus))
+         (rlen llen)
+         (pw ""))
+    (when (>= llen 8)
+      (setq upper-count 2)
+      (setq lower-count 2)
+      (setq special-count 2)
+      (setq digit-count 2))
+    (setq rlen (- llen upper-count lower-count special-count digit-count))
+    (setq pw (concat pw (shu-random-chars uppers upper-count)))
+    (setq pw (concat pw (shu-random-chars lowers lower-count)))
+    (setq pw (concat pw (shu-random-chars digits digit-count)))
+    (setq pw (concat pw (shu-random-chars specials special-count)))
+    (setq pw (concat pw (shu-random-chars all-chars rlen)))
+    (setq pw (shu-random-chars pw (length pw)))
+    pw
     ))
 
 

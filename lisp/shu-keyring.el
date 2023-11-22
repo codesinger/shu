@@ -98,6 +98,7 @@
 
 
 (require 'shu-nvplist)
+(require 'shu-misc)
 
 ;;
 ;; ```
@@ -171,7 +172,10 @@ entry in the keyring file.")
   "Key word that denotes a name.")
 
 (defconst shu-keyring-account-name   "account"
-  "Key word that denotes a name.")
+  "Key word that denotes an account name.")
+
+(defconst shu-keyring-route-name   "route"
+  "Key word that denotes a bank routing number.")
 
 (defconst shu-keyring-id-name   "id"
   "Key word that denotes a user ID.")
@@ -246,11 +250,45 @@ into a buffer or pasted into the application requesting it."
 ;;
 (defun shu-keyring-get-acct()
   "Find the account for an entry in the keyring file.  This displays the entry
-in the message area and puts the password into the kill ring so that it can be
-yanked or pasted into the application requesting it."
+in the message area and puts the account number into the kill ring so that it
+can be yanked or pasted into the application requesting it."
   (interactive)
   (shu-keyring-get-field shu-keyring-account-name)
   )
+
+;;
+;; shu-keyring-get-route
+;;
+(defun shu-keyring-get-route()
+  "Find the routing number for an entry in the keyring file.  This displays the
+entry in the message area and puts the routing number into the kill ring so that
+it can be yanked or pasted into the application requesting it."
+  (interactive)
+  (shu-keyring-get-field shu-keyring-route-name)
+  )
+
+
+
+;;
+;;  shu-keyring-generate-password
+;;
+(defun shu-keyring-generate-password (length-range)
+  "Generate a random password and put it in the kill ring.  Issue a query for
+the minimum and maximum password length.  If two numbers are given, these are
+the minimum and maximum password lengths.  If only one number is given, this is
+the exact password length.  The password is created by calling
+SHU-GENERATE-PASSWORD and putting the returned password into the kill ring."
+ (interactive "sLength length or min.max?: ")
+  (let ((range)
+        (min-length)
+        (max-length)
+        (pw))
+    (setq range (shu-split-range-string length-range))
+    (setq min-length (car range))
+    (setq max-length (cdr range))
+    (setq pw (shu-generate-password min-length max-length))
+    (shu-kill-new pw)
+    ))
 
 
 ;;
@@ -658,11 +696,13 @@ to make them easier to type. "
   (defalias 'krpin 'shu-keyring-get-pin)
   (defalias 'krid 'shu-keyring-get-id)
   (defalias 'kracct 'shu-keyring-get-acct)
+  (defalias 'krroute 'shu-keyring-get-route)
+  (defalias 'krgenpw 'shu-keyring-generate-password)
   (defalias 'krfn 'shu-keyring-get-file)
   (defalias 'krvf 'shu-keyring-verify-file)
   (defalias 'krpps 'shu-keyring-get-passphrase)
   (defalias 'set-passphrase 'shu-keyring-set-passphrase)
-  (defalias 'set-alternate-passphrase'shu-keyring-set-alternate-passphrase)
+  (defalias 'set-alternate-passphrase 'shu-keyring-set-alternate-passphrase)
   (defalias 'kraps 'shu-keyring-get-alternate-passphrase)
   )
 
