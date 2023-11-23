@@ -65,7 +65,11 @@
 ;;
 ;; pin represents a pin number
 ;;
+;; route represents a bank routing number
+;;
 ;; pw represents a password
+;;
+;; oldpw represents an expired password
 ;;
 ;; url represents a URL
 ;;
@@ -93,6 +97,23 @@
 ;; for conveniently pasting into the gmail widow.  To obtain the password, type
 ;; M-x krpw.  This puts the password into the clip board from which it may be
 ;; pasted into the gmail widow.
+;;
+;; The interctive commands defined in this file are as follows:
+;;
+;; krpw    - Fetch the password for an entry
+;; kroldpw - Fetch the expired password for an entry
+;; krurl   - Fetch the URL for an entry
+;; krpin   - Fetch the PIN for an entry
+;; krid    - Fetch the Use ID for an entry
+;; kracct  - Fetch the account number for an entry
+;; krrt    - Fetch the bank routing number for an entry
+;; krnewpw - Generate a new, random password
+;; krfn    - Display the name of the keyring file
+;; krvf    - Parse and verify the keyring file
+;; krpps   - Fetch the global passphrase
+;; kraps   - Fetch the global alternate passphrase
+;; set-passphrase - Set the global passphrase
+;; set-alternate-passphrase - Set the global alternate passphrase
 
 ;;; Code:
 
@@ -183,6 +204,9 @@ entry in the keyring file.")
 (defconst shu-keyring-pw-name   "pw"
   "Key word that denotes a password.")
 
+(defconst shu-keyring-oldpw-name   "oldpw"
+  "Key word that denotes an expired password.")
+
 (defconst shu-keyring-pin-name   "pin"
   "Key word that denotes a PIN.")
 
@@ -210,6 +234,19 @@ ring so that it can be yanked into a buffer or pasted into the application
 requesting it."
   (interactive)
   (shu-keyring-get-field shu-keyring-pw-name)
+  )
+
+
+;;
+;; shu-keyring-get-oldpw
+;;
+(defun shu-keyring-get-oldpw()
+  "Find the expired password for an entry in the keyring file.  This displays
+the entry (without the password) in the message area and puts the expired
+password into the kill ring so that it can be yanked into a buffer or pasted
+into the application requesting it."
+  (interactive)
+  (shu-keyring-get-field shu-keyring-oldpw-name)
   )
 
 ;;
@@ -692,12 +729,13 @@ These are generally the same as the function names with the leading
 shu- prefix removed.  But in this case the names are drastically shortened
 to make them easier to type. "
   (defalias 'krpw 'shu-keyring-get-pw)
+  (defalias 'kroldpw 'shu-keyring-get-oldpw)
   (defalias 'krurl 'shu-keyring-get-url)
   (defalias 'krpin 'shu-keyring-get-pin)
   (defalias 'krid 'shu-keyring-get-id)
   (defalias 'kracct 'shu-keyring-get-acct)
-  (defalias 'krroute 'shu-keyring-get-route)
-  (defalias 'krgenpw 'shu-keyring-generate-password)
+  (defalias 'krrt 'shu-keyring-get-route)
+  (defalias 'krnewpw 'shu-keyring-generate-password)
   (defalias 'krfn 'shu-keyring-get-file)
   (defalias 'krvf 'shu-keyring-verify-file)
   (defalias 'krpps 'shu-keyring-get-passphrase)
