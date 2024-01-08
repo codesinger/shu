@@ -4228,7 +4228,7 @@ The remaining characters are chosen randomly."
          (lmax (max min-length lmax))
          (lowers "abcdefghijklmnopqrstuvwxyz")
          (uppers (upcase lowers))
-         (specials "!@#$%^&*_-+=")
+         (specials "!@#$%^&*_-+")
          (digits "1234567890")
          (all-chars (concat lowers uppers specials digits))
          (upper-count 1)
