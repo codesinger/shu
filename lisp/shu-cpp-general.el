@@ -478,6 +478,28 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                       "std::reload_tzdb"
                       "std::remote_version"
                       ))
+   (cons "compare" (list
+                    "std::three_way_comparable"
+                    "std::three_way_comparable_with"
+                    "std::partial_ordering"
+                    "std::weak_ordering"
+                    "std::strong_ordering"
+                    "std::is_eq"
+                    "std::is_neq"
+                    "std::is_lt"
+                    "std::is_lteq"
+                    "std::is_gt"
+                    "std::is_gteq"
+                    "std::compare_three_way"
+                    "std::compare_three_way_result"
+                    "std::common_comparison_category"
+                    "std::strong_order"
+                    "std::weak_order"
+                    "std::partial_order"
+                    "std::compare_strong_order_fallback"
+                    "std::compare_weak_order_fallback"
+                    "std::compare_partial_order_fallback"
+                    ))
    (cons "condition_variable" (list
                                "std::condition_variable"
                                "std::condition_variable_any"
@@ -863,12 +885,13 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                      "std::tuple"
                      "std::tuple_size"
                      "std::tuple_element"
-                     "std::make_tuple"
+                     "std::make_from_tuple"
                      "std::forward_as_tuple"
                      "std::tie"
                      "std::tuple_cat"
                      "std::get"
                      "std::ignore"
+                     "std::apply"
                      ))
    (cons "type_traits"    (list
                            "std::integral_constant"
@@ -1023,8 +1046,10 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                        "std::in_place_t"
                        "std::in_place_type_t"
                        "std::in_place_index_t"
+                       "std::apply"
+                       "std::in_range"
+                       "std::make_from_tuple"
                        ))
-
    (cons "variant"    (list
                        "std::variant"
                        "std::monostate"
@@ -1264,6 +1289,28 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                             "bsl::reload_tzdb"
                             "bsl::remote_version"
                             ))
+   (cons "bsl_compare.h" (list
+                          "bsl::three_way_comparable"
+                          "bsl::three_way_comparable_with"
+                          "bsl::partial_ordering"
+                          "bsl::weak_ordering"
+                          "bsl::strong_ordering"
+                          "bsl::is_eq"
+                          "bsl::is_neq"
+                          "bsl::is_lt"
+                          "bsl::is_lteq"
+                          "bsl::is_gt"
+                          "bsl::is_gteq"
+                          "bsl::compare_three_way"
+                          "bsl::compare_three_way_result"
+                          "bsl::common_comparison_category"
+                          "bsl::strong_order"
+                          "bsl::weak_order"
+                          "bsl::partial_order"
+                          "bsl::compare_strong_order_fallback"
+                          "bsl::compare_weak_order_fallback"
+                          "bsl::compare_partial_order_fallback"
+                          ))
    (cons "bsl_condition_variable.h" (list
                                      "bsl::condition_variable"
                                      "bsl::condition_variable_any"
@@ -1649,12 +1696,13 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                            "bsl::tuple"
                            "bsl::tuple_size"
                            "bsl::tuple_element"
-                           "bsl::make_tuple"
+                           "bsl::make_from_tuple"
                            "bsl::forward_as_tuple"
                            "bsl::tie"
                            "bsl::tuple_cat"
                            "bsl::get"
                            "bsl::ignore"
+                           "bsl::apply"
                            ))
    (cons "bsl_type_traits.h"    (list
                                  "bsl::integral_constant"
