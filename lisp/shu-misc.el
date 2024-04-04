@@ -1964,7 +1964,7 @@ from the buffer the returned string."
 ;;
 (defun shu-obfuscate-region (start end)
   "Obfuscate a region of text by replacing every alphabetic character in the
-region with the next letter of the alphabet, staring with 'a'. For example, of
+region with the next letter of the alphabet, staring with \"a\". For example, of
 the region contains
 
   Now is the time for all good men to come to the aid of the Party 10 times.
@@ -2008,8 +2008,8 @@ is an encoding that cannot be reversed."
 (defun shu-next-char-in-seq (current-char)
   "CURRENT-CHAR is a character in the range a-z (or A-Z).  This function returns
 the next character, where next is the next character in the alphabet unless
-CURRENT-CHAR is 'z', in which case the next character returned is 'a'.  If
-CURRENT-CHAR is 'Z', then the next character returned is 'A'."
+CURRENT-CHAR is \"z\", in which case the next character returned is \"a\".  If
+CURRENT-CHAR is \"Z\", then the next character returned is \"A\"."
   (let ((next-char)
         (case-fold-search nil))
     (cond
@@ -3756,7 +3756,6 @@ Each rename command is placed in the LOG-BUFFER.  This function quits as soon as
 any rename fails, leaving the reason for the failure in the LOG-BUFFER.
 
 The return value is t if all of the renames worked, nil otherwise."
-  "Doc string."
   (let ((nf newfiles)
         (cf)
         (cmd)
