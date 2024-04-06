@@ -437,7 +437,6 @@ value in the kill-ring and also return it to the caller."
 (defun shu-keyring-parse-keyring-file ()
   "Parse the keyring file and create the in-memory index if the keyring file
 contains no duplicate keys."
-  (interactive)
   (let
       ((gbuf      (get-buffer-create shu-keyring-buffer-name))
        (count        )
