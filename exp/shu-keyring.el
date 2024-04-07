@@ -77,6 +77,7 @@
 ;;
 ;;      (load-file "/Users/fred/.emacs.d/shu-base.elc")
 ;;      (load-file "/Users/fred/.emacs.d/shu-nvplist.elc")
+;;      (load-file "/Users/fred/.emacs.d/shu-nvpindex.elc")
 ;;      (load-file "/Users/fred/.emacs.d/shu-keyring.elc")
 ;;      (shu-keyring-set-alias)
 ;;      (setq shu-keyring-file "/Users/fred/shu/usr/keyring.txt")

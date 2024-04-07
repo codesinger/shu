@@ -1,0 +1,9 @@
+This is a sample web bookmarks file for use by the functions in shu-bkmark.el.
+Text not enclosed in angle brackets is completeloy ignored
+
+< name=search url=www.google.com  />
+
+< url=ww.facebook.com  />
+
+< name=metaprogramming  url=www.youtube.com/watch?v=Am2is2QCvxY />
+Walter Brown's talk on "Modern Template Metaprogramming"
