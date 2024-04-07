@@ -3,7 +3,7 @@ Text not enclosed in angle brackets is completeloy ignored
 
 < name=search url=www.google.com  />
 
-< url=ww.facebook.com  />
+< url=www.facebook.com  />
 
 < name=metaprogramming  url="www.youtube.com/watch?v=Am2is2QCvxY" />
 Walter Brown's talk on "Modern Template Metaprogramming"
