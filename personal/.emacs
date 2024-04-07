@@ -122,7 +122,8 @@ to SHU-ADAPT-FRAME."
 (shu-show-load-path "AFTER-HOME")
 
 
-(if (shu-system-type-is-mac-osx)
+;;;(if (shu-system-type-is-mac-osx)
+(if (and (shu-system-type-is-mac-osx) (< emacs-major-version 29))
     (progn
       (setq slp-org-location "~/emacs/org-7.8.09")
       (when (file-readable-p (concat slp-org-location "/lisp/org-install.el"))
@@ -149,7 +150,7 @@ to SHU-ADAPT-FRAME."
 
 (when (shu-system-type-is-mac-osx)
   (require 'epa-file)
-  (custom-set-variables '(epg-gpg-program  "/usr/local/MacGPG2/bin/gpg2"))
+  (custom-set-variables '(epg-gpg-program  "/usr/local/gnupg-2.4/bin/gpg2"))
   (epa-file-enable))
 
 ;;;
@@ -217,7 +218,7 @@ to SHU-ADAPT-FRAME."
 ;
 ; Set ispell
 (if (shu-system-type-is-mac-osx)
-  (setq ispell-program-name "/opt/local/bin/ispell")   ;; For Mac OS X
+  (setq ispell-program-name "/usr/local/bin/ispell")   ;; For Mac OS X
   (setq ispell-program-name "/opt/swt/bin/aspell"))    ;; For all others
 
 
@@ -244,6 +245,7 @@ to SHU-ADAPT-FRAME."
   (load-file "~/emacs/rmv-using.elc"))
 (load-file "~/emacs/shu-org-extensions.elc")
 (load-file "~/emacs/shu-keyring.elc")
+(load-file "~/emacs/shu-bkmark.elc")
 (load-file "~/emacs/shu-capture-doc.elc")
 (load-file "~/emacs/shu-xref.elc")
 (load-file "~/emacs/slp-comment-hooks.elc")
@@ -263,6 +265,7 @@ to SHU-ADAPT-FRAME."
 (shu-misc-set-alias)
 (shu-cpp-misc-set-alias)
 (shu-keyring-set-alias)
+(shu-bkmark-set-alias)
 (shu-match-set-alias)
 (shu-org-extensions-set-alias)
 
@@ -278,7 +281,7 @@ to SHU-ADAPT-FRAME."
   (shu-set-author "Stewart Palmer (spalmer62@bloomberg.net)")
   (shu-set-default-global-namespace "BloombergLP")
   (setq shu-internal-dev-url "dev.bloomberg.com")
-  (setq shu-internal-group-name "drqs1011")
+  (setq shu-internal-group-name "pmf")
   (setq shu-cpp-use-bde-library t)
   (setq shu-cpp-include-user-brackets t)
   (setq shu-cpp-std-namespace "bsl")
@@ -344,8 +347,16 @@ to SHU-ADAPT-FRAME."
 ;; Define the loction of the keyring file
 (setq shu-keyring-file "~/projects/stuff/plist.ctx.gpg")
 
+;; Define the loction of the bookmark file
+(if (shu-system-type-is-mac-osx)
+    (setq shu-bkmark-file "~/projects/stuff/bookmarks.ctx.gpg")
+  (setq shu-bkmark-file "~/bookmarks.txt"))
+
 ;; Clear the keyring index whenever the keyring file is saved
 (add-hook 'after-save-hook 'shu-keyring-clear-index)
+
+;; Clear the bookmark index whenever the bookmark file is saved
+(add-hook 'after-save-hook 'shu-bkmark-clear-index)
 (add-hook 'before-save-hook 'shu-trim-file-hook)
 (add-hook 'find-file-hook 'slp-record-visited-file)
 
