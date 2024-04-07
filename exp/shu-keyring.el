@@ -41,7 +41,7 @@
 ;; The file keyring.txt in the usr directory is am example of a small
 ;; keyring file that has not been encrypted.  Each entry in the file consists of
 ;; a set of name value pairs.  Each value may be enclosed in quotes and must be
-;; enclosed in quotes if it contains embedded blanks.
+;; enclosed in quotes if it contains embedded blanks, commas, or slashes.
 ;;
 ;; A single set of name value pairs starts with an opening "<" and is terminated
 ;; by a closing "/>".

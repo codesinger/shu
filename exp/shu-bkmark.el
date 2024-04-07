@@ -54,7 +54,8 @@
 ;; The file bookmarks.txt in the usr directory is am example of a small
 ;; bookmarks file that has not been encrypted.  Each entry in the file
 ;; consists of a set of name value pairs.  Each value may be enclosed in
-;; quotes and must be enclosed in quotes if it contains embedded blanks.
+;; quotes and must be enclosed in quotes if it contains embedded blanks,
+;; commas, or slashes.
 ;;
 ;; A single set of name value pairs starts with an opening "<" and is
 ;; terminated by a closing "/>".
@@ -168,11 +169,11 @@
 
 
 (defvar shu-bkmark-index nil
-  "The variable that points to the in-memory keyring index.")
+  "The variable that points to the in-memory bookmark index.")
 
 (defvar shu-bkmark-history   nil
   "The history list used by completing-read when asking the user for a key to an
-entry in the keyring file.")
+entry in the bookmark file.")
 
 (defconst shu-bkmark-url-name   "url"
   "Key word that denotes a URL.")
@@ -181,17 +182,17 @@ entry in the keyring file.")
   "Key word that denotes a name.")
 
 (defconst shu-bkmark-buffer-name  "**shu-bkmark**"
-  "The name of the buffer into which keyring diagnostics and messages
+  "The name of the buffer into which bookmark diagnostics and messages
 are recorded.")
 
 (defconst shu-bkmark-file-type "Bookmark"
-  "The name of the file type of keyring file.  Used for diagnostic messages.")
+  "The name of the file type of bookmark file.  Used for diagnostic messages.")
 
 ;;
 ;; shu-bkmark-get-url
 ;;
 (defun shu-bkmark-get-url()
-  "Find the url for an entry in the keyring file.  This displays the entry in
+  "Find the url for an entry in the bookmark file.  This displays the entry in
 the message area and puts the url into the kill ring so that it can be yanked
 into a buffer or pasted into the application requesting it."
   (interactive)
@@ -203,24 +204,24 @@ into a buffer or pasted into the application requesting it."
 ;; shu-bkmark-get-file
 ;;
 (defun shu-bkmark-get-file()
-  "Display the name of the keyring file, if any.  This is useful if you are
-getting unexpected results from some of the query functions that look up keyring
-information.  Perhaps the unexpected results come from the fact that you are
-using the wrong keyring file."
+  "Display the name of the bookmark file, if any.  This is useful if you are
+getting unexpected results from some of the query functions that look up
+bookmark information.  Perhaps the unexpected results come from the fact that
+you are using the wrong bookmark file."
   (interactive)
   (if shu-bkmark-file
-      (message "Shu keyring file is \"%s\"" shu-bkmark-file)
-    (message "%s" "No keyring file is defined."))
+      (message "Shu bookmark file is \"%s\"" shu-bkmark-file)
+    (message "%s" "No bookmark file is defined."))
   )
 
 ;;
 ;;  shu-bkmark-clear-index
 ;;
 (defun shu-bkmark-clear-index()
-  "This is called from after-save-hook to clear the keyring index if the keyring
-file is saved.  The keyring index is built the first time it is needed and kept
-in memory thereafter.  But we must refresh the index if the keyring file is
-modified.  The easiest way to do this is to clear the index when the keyring
+  "This is called from after-save-hook to clear the bookmark index if the bookmark
+file is saved.  The bookmark index is built the first time it is needed and kept
+in memory thereafter.  But we must refresh the index if the bookmark file is
+modified.  The easiest way to do this is to clear the index when the bookmark
 file is modified.  The next time the index is needed it will be recreated."
   (let
       ((fn1 (buffer-file-name))
@@ -236,14 +237,14 @@ file is modified.  The next time the index is needed it will be recreated."
 ;;  shu-bkmark-verify-file
 ;;
 (defun shu-bkmark-verify-file ()
-  "Parse and verify the keyring file, displaying the result of the operation in the
-keyring buffer (**shu-bkmark**).  If one of the queries for a url or other
+  "Parse and verify the bookmark file, displaying the result of the operation in
+the bookmark buffer (**shu-bkmark**).  If one of the queries for a url or other
 piece of information is unable to find the requested information, it could be
-that you have the wrong keyring file or that there is a syntax error in the
-keyring file.  shu-bkmark-get-file (alias krfn) displays the name of the
-keyring file.  This function parses the keyring file.  After the operation. look
-into the keyring buffer (**shu-bkmark**) to see if there are any complaints
-about syntax errors in the file."
+that you have the wrong bookmark file or that there is a syntax error in the
+bookmark file.  shu-bkmark-get-file (alias krfn) displays the name of the
+bookmark file.  This function parses the bookmark file.  After the
+operation. look into the bookmark buffer (**shu-bkmark**) to see if there are
+any complaints about syntax errors in the file."
   (interactive)
   (setq shu-bkmark-index nil)
   (when (bufferp shu-bkmark-buffer-name)
@@ -260,14 +261,14 @@ about syntax errors in the file."
 ;;  shu-bkmark-get-field
 ;;
 (defun shu-bkmark-get-field (name)
-  "Fetch the value of a named field from the keyring.  Prompt the user with a
-completing-read for the field that identifies the key.  Use the key to find the
-item.  Find the value of the named key value pair within the item.  Put the
-value in the kill-ring and also return it to the caller."
+  "Fetch the value of a named field from the set of bookmarks.  Prompt the user
+with a completing-read for the field that identifies the key.  Use the key to
+find the item.  Find the value of the named key value pair within the item.  Put
+the value in the kill-ring and also return it to the caller."
   (let ((gbuf      (get-buffer-create shu-bkmark-buffer-name))
         (invitation   "Key? ")
-        (keyring-key   )
-        (keyring-entry )
+        (bookmark-key   )
+        (bookmark-entry )
         (item          )
         (vlist         )
         (item-value    ))
@@ -276,12 +277,12 @@ value in the kill-ring and also return it to the caller."
             (shu-nvpindex-parse-file shu-bkmark-file shu-bkmark-file-type shu-bkmark-buffer-name)))
     (if (not shu-bkmark-index)
         (progn
-          (message "Could not parse keyring.  See %s." shu-bkmark-buffer-name)
+          (message "Could not parse bookmarks.  See %s." shu-bkmark-buffer-name)
           (ding))
 
       (let
           ((completion-ignore-case t))
-        (setq keyring-key
+        (setq bookmark-key
               (completing-read
                invitation  ;; prompt
                shu-bkmark-index   ;; collection
@@ -290,8 +291,8 @@ value in the kill-ring and also return it to the caller."
                nil         ;; Initial input (initial minibuffer contents)
                shu-bkmark-history  ;; History list
                nil)))      ;; Default value
-      (setq keyring-entry  (assoc keyring-key shu-bkmark-index))
-      (setq item (cdr keyring-entry))
+      (setq bookmark-entry  (assoc bookmark-key shu-bkmark-index))
+      (setq item (cdr bookmark-entry))
       (shu-bkmark-show-name-url name item)
       (setq vlist (shu-nvplist-get-item-value name item))
       (if (not vlist)
@@ -308,7 +309,7 @@ value in the kill-ring and also return it to the caller."
 ;;  shu-bkmark-show-name-url
 ;;
 (defun shu-bkmark-show-name-url (type item)
-  "Show in the message area the name, url, or both of a keyring entry.  Also
+  "Show in the message area the name, url, or both of a bookmark entry.  Also
 prefix the message with the upper case type, which is the type of the entry that
 has been placed in the clipboard, (PW, ID, etc.)"
   (let ((names   (shu-nvplist-get-item-value shu-bkmark-name-name item))

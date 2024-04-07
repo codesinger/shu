@@ -5,5 +5,6 @@ Text not enclosed in angle brackets is completeloy ignored
 
 < url=ww.facebook.com  />
 
-< name=metaprogramming  url=www.youtube.com/watch?v=Am2is2QCvxY />
+< name=metaprogramming  url="www.youtube.com/watch?v=Am2is2QCvxY" />
 Walter Brown's talk on "Modern Template Metaprogramming"
+The URL above is enclosed in quotes because it contains a slash.
