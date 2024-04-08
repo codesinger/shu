@@ -41,7 +41,7 @@
 ;; The file keyring.txt in the usr directory is am example of a small
 ;; keyring file that has not been encrypted.  Each entry in the file consists of
 ;; a set of name value pairs.  Each value may be enclosed in quotes and must be
-;; enclosed in quotes if it contains embedded blanks.
+;; enclosed in quotes if it contains embedded blanks, commas, or slashes.
 ;;
 ;; A single set of name value pairs starts with an opening "<" and is terminated
 ;; by a closing "/>".
@@ -77,6 +77,7 @@
 ;;
 ;;      (load-file "/Users/fred/.emacs.d/shu-base.elc")
 ;;      (load-file "/Users/fred/.emacs.d/shu-nvplist.elc")
+;;      (load-file "/Users/fred/.emacs.d/shu-nvpindex.elc")
 ;;      (load-file "/Users/fred/.emacs.d/shu-keyring.elc")
 ;;      (shu-keyring-set-alias)
 ;;      (setq shu-keyring-file "/Users/fred/shu/usr/keyring.txt")
@@ -119,6 +120,7 @@
 
 
 (require 'shu-nvplist)
+(require 'shu-nvpindex)
 (require 'shu-misc)
 
 ;;
@@ -213,6 +215,9 @@ entry in the keyring file.")
 (defconst shu-keyring-buffer-name  "**shu-keyring**"
   "The name of the buffer into which keyring diagnostics and messages
 are recorded.")
+
+(defconst shu-keyring-file-type "Keyring"
+  "The name of the file type of keyring file.  Used for diagnostic messages.")
 
 (defvar shu-keyring-external-passphrase nil
   "Holds the external passphrase for the keyring file.  This allows the user
@@ -377,7 +382,8 @@ about syntax errors in the file."
   (setq shu-keyring-index nil)
   (when (bufferp shu-keyring-buffer-name)
     (kill-buffer shu-keyring-buffer-name))
-  (shu-keyring-parse-keyring-file)
+  (setq shu-keyring-index
+        (shu-nvpindex-parse-file shu-keyring-file shu-keyring-file-type shu-keyring-buffer-name))
   (switch-to-buffer shu-keyring-buffer-name)
   (goto-char (point-min))
   )
@@ -400,7 +406,8 @@ value in the kill-ring and also return it to the caller."
         (vlist         )
         (item-value    ))
     (when (not shu-keyring-index)
-      (shu-keyring-parse-keyring-file))
+      (setq shu-keyring-index
+            (shu-nvpindex-parse-file shu-keyring-file shu-keyring-file-type shu-keyring-buffer-name)))
     (if (not shu-keyring-index)
         (progn
           (message "Could not parse keyring.  See %s." shu-keyring-buffer-name)
@@ -432,188 +439,6 @@ value in the kill-ring and also return it to the caller."
 
 
 ;;
-;; shu-keyring-parse-keyring-file
-;;
-(defun shu-keyring-parse-keyring-file ()
-  "Parse the keyring file and create the in-memory index if the keyring file
-contains no duplicate keys."
-  (let
-      ((gbuf      (get-buffer-create shu-keyring-buffer-name))
-       (count        )
-       (file-type   "Keyring")
-       (item-list    )
-       (ilist        )
-       (item         )
-       (index        ))
-    (princ (format "Shu keyring file is \"%s\".\n" shu-keyring-file) gbuf)
-    (setq item-list (shu-nvplist-parse-file shu-keyring-file file-type item-list))
-    (setq ilist item-list)
-    (while ilist
-      (setq item (car ilist))
-      (setq index (shu-keyring-update-index index item))
-      (setq ilist (cdr ilist)))
-    (setq index (sort index (lambda(t1 t2) (string< (upcase (car t1)) (upcase (car t2))))))
-    (if (shu-keyring-find-index-duplicates index)
-        (princ "Index has duplicates\n" gbuf)
-      (princ "Index has no duplicates\n" gbuf)
-      (setq count (length index))
-      (setq shu-keyring-index index)
-      (princ (format "Index contains %d entries.\n" count)  gbuf))
-    (shu-keyring-show-index index)
-    ))
-
-
-;;
-;;  shu-keyring-show-index
-;;
-(defun shu-keyring-show-index (index)
-  "Print the keyring index"
-  (let
-      ((gbuf      (get-buffer-create shu-keyring-buffer-name))
-       (tindex  index)
-       (key-item )
-       (key     )
-       (item    )
-       (item-number )
-       (item-number-string )
-       (count   0))
-    (princ "     Item\n" gbuf)
-    (princ "    Number   Key ...\n" gbuf)
-    (while tindex
-      (setq count (1+ count))
-      (setq key-item (car tindex))
-      (setq key  (car key-item))
-      (setq item (cdr key-item))
-      (setq item-number (shu-nvplist-get-item-number item))
-      (setq item-number-string (shu-fixed-format-num item-number 10))
-      (princ (format "%s:  %s\n" item-number-string key) gbuf)
-      (setq tindex (cdr tindex)))
-    (princ (format "Index contains %d entries.\n" count)  gbuf)
-    ))
-
-
-
-;;
-;;  shu-keyring-find-index-duplicates
-;;
-(defun shu-keyring-find-index-duplicates (index)
-  "Find any duplicates in the keyring index.  When the index is built we filter
-duplicate keys for the same item.  But there could be two different items with
-the same key.  This function returns TRUE if two or more items have the same
-key.  The index must be in sorted order by key value before this function is
-called."
-  (let
-      ((gbuf      (get-buffer-create shu-keyring-buffer-name))
-       (tindex  index)
-       (key-item )
-       (key     )
-       (item    )
-       (item-number )
-       (last-key   nil)
-       (last-item-number  0)
-       (has-duplicate     nil))
-    (while tindex
-      (setq key-item (car tindex))
-      (setq key  (car key-item))
-      (setq item (cdr key-item))
-      (setq item-number (shu-nvplist-get-item-number item))
-      (when last-key
-        (when (string= (upcase last-key) (upcase key))
-          (setq has-duplicate t)
-          (if (= item-number last-item-number)
-              (princ (format "Item %d has duplicate key <%s>\n" item-number key) gbuf)
-            (princ (format "Items %d and %d share key <%s>\n" last-item-number item-number key) gbuf))))
-      (setq last-key key)
-      (setq last-item-number item-number)
-      (setq tindex (cdr tindex)))
-    has-duplicate
-    ))
-
-;;
-;;  shu-keyring-update-index
-;;
-(defun shu-keyring-update-index (index item)
-  "Extract the keys from a keyring item and add them to the keyring index."
-  (let
-      ((vlist   )
-       (tlist   )
-       (value   )
-       (new-value ))
-    ;; First add all the names for this item to the index
-    (setq vlist (shu-nvplist-get-item-value "name" item))
-    (setq index (shu-keyring-add-values-to-index index vlist item))
-
-    ;; Now get all the urls
-    (setq vlist (shu-nvplist-get-item-value "url" item))
-    (setq tlist vlist)
-
-    ;; For each url of the form "www.something", we also add a key of "something"
-    ;; This may result in duplicates.  But the function that actually adds the values
-    ;; to the index eliminates duplicates.
-    (while tlist
-      (setq value (car tlist))
-      (when (string= (substring (upcase value) 0 4) "WWW.")
-        (setq new-value (substring value 4))
-        (setq vlist (cons new-value vlist)))
-      (setq tlist (cdr tlist)))
-    (setq index (shu-keyring-add-values-to-index index vlist item))
-    index
-    ))
-
-
-;;
-;;  shu-keyring-in-index
-;;
-(defun shu-keyring-in-index (index item value)
-  "Return true if the INDEX already contains the VALUE for this ITEM."
-  (let
-      ((item-number (shu-nvplist-get-item-number item))
-       (tindex  index)
-       (done         )
-       (pair         )
-       (xvalue       )
-       (xitem        )
-       (xitem-number )
-       (got-it    nil))
-    (when (not tindex)
-      (setq done t))
-    (while (not done)
-      (setq pair (car tindex))
-      (setq xvalue (car pair))
-      (setq xitem (cdr pair))
-      (setq xitem-number (shu-nvplist-get-item-number xitem))
-      (when (and (= item-number xitem-number) (string= xvalue value))
-        (setq done t)
-        (setq got-it t))
-      (setq tindex (cdr tindex))
-      (when (not tindex)
-        (setq done t)))
-    got-it
-    ))
-
-
-;;
-;;  shu-keyring-add-values-to-index
-;;
-(defun shu-keyring-add-values-to-index (index vlist item)
-  "Add a set of keys VLIST to INDEX for ITEM.  Keys within the item are filtered
-for duplicates.  But this does not prevent two different items from sharing the
-same key, although it would be unusual in a keyring."
-  (let
-      ((zlist   vlist)
-       (value   )
-       (pair    ))
-    (while zlist
-      (setq value (car zlist))
-      (when (not (shu-keyring-in-index index item value))
-        (setq pair (cons value item))
-        (setq index (cons pair index)))
-      (setq zlist (cdr zlist)))
-    index
-    ))
-
-
-;;
 ;;  shu-keyring-show-name-url
 ;;
 (defun shu-keyring-show-name-url (type item)
@@ -630,34 +455,17 @@ has been placed in the clipboard, (PW, ID, etc.)"
       ;; Nothing to display
       (setq got-string nil))
      ((and names (not urls)) ;; names only
-      (setq mstring (shu-keyring-values-to-string names)))
+      (setq mstring (shu-nvpindex-values-to-string names)))
      ((and urls (not names)) ;; urls only
-      (setq mstring  (shu-keyring-values-to-string urls)))
+      (setq mstring  (shu-nvpindex-values-to-string urls)))
      (t                       ;; Both names and urls
-      (setq mstring (concat (shu-keyring-values-to-string urls) " (" (shu-keyring-values-to-string names) ")"))))
+      (setq mstring (concat (shu-nvpindex-values-to-string urls) " (" (shu-nvpindex-values-to-string names) ")"))))
     (when got-string
       (setq mstring (concat mstring " ")))
     (when ids
-      (setq mstring (concat mstring "id=" (shu-keyring-values-to-string ids))))
+      (setq mstring (concat mstring "id=" (shu-nvpindex-values-to-string ids))))
     (setq mstring (concat (upcase type) ": " mstring))
     (message "%s" mstring)
-    ))
-
-
-;;
-;;  shu-keyring-values-to-string
-;;
-(defun shu-keyring-values-to-string (values)
-  "Turn a list of values into a single string of values separated by slashes."
-  (let ((retval "")
-        (x       0))
-    (while values
-      (setq x (1+ x))
-      (when (not (= x 1))
-        (setq retval (concat retval " / ")))
-      (setq retval (concat retval (car values)))
-      (setq values (cdr values)))
-    retval
     ))
 
 

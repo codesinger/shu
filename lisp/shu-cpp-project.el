@@ -2125,7 +2125,7 @@ a list of arguments as follows:
 
      1. A boolean value, t means case sensitive search, nil means ignore case
      2. The function to call to do the search.  This must be
-        'search-forward, 're-search-forward, or any function with the same
+        \\='search-forward, \\='re-search-forward, or any function with the same
         signature and behavior.
      3. The string that is the target of the search
      4. The string the is to replace the target whenever found
@@ -2137,8 +2137,8 @@ a list of arguments as follows:
 For example
 
      (list
-       (list t 'search-forward \"Mumble\" \"Bumble\")
-       (list nil 'search-forward \"howdy\" \"doody\"))
+       (list t \\='search-forward \"Mumble\" \"Bumble\")
+       (list nil \\='search-forward \"howdy\" \"doody\"))
 
 is a list that defines two search and replace operations.  Both operations use
 the search-forward function.  The first is a case sensitive search and replace
@@ -2150,10 +2150,10 @@ These operations may be performed on every file in the project as follows:
 
      (setq ops
        (list
-         (list t 'search-forward \"Mumble\" \"Bumble\")
-         (list nil 'search-forward \"howdy\" \"doody\")))
+         (list t \\='search-forward \"Mumble\" \"Bumble\")
+         (list nil \\='search-forward \"howdy\" \"doody\")))
      (setq doc \"Description of change\")
-     (shu-global-operation doc 'shu-global-search-replace ops)"
+     (shu-global-operation doc \\='shu-global-search-replace ops)"
   (let ((gb (get-buffer-create shu-global-buffer-name))
         (rlist)
         (tlist)
