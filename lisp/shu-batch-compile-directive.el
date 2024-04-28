@@ -26,8 +26,7 @@
 
 ;;; Commentary:
 
-;;
-;; This file tells the compiler to add the directory "~/emacs" to the load path
+;; This file tells the compiler to add the current directory to the load path
 ;; at compile time.  If all of the lisp code in the shu project is being
 ;; compiled in batch mode with batch-byte-compile, the files must be compiled
 ;; in order of dependencies and the compiler must understand the load path at
@@ -36,6 +35,6 @@
 ;;; Code:
 
 (eval-and-compile
-  (add-to-list 'load-path "~/emacs/"))
+  (add-to-list 'load-path default-directory))
 
 ;;; shu-batch-compile-directive.el ends here
