@@ -1046,9 +1046,6 @@ inversion of shu-std-include-list or shu-bsl-include-list.")
                        "std::in_place_t"
                        "std::in_place_type_t"
                        "std::in_place_index_t"
-                       "std::apply"
-                       "std::in_range"
-                       "std::make_from_tuple"
                        ))
    (cons "variant"    (list
                        "std::variant"
@@ -2886,20 +2883,6 @@ is delimited by left and right angle brackets."
   (insert " *\n")
   (insert " * \\author " shu-cpp-author "\n")
   )
-
-;;
-;;  shu-make-padded-line
-;;
-(defun shu-make-padded-line (line tlen)
-  "Add sufficient spaces to make LINE the length TLEN."
-  (let ((clen       (length line))
-        (pad        "")
-        (pad-count  nil))
-    (setq pad-count (- tlen clen))
-    (when (> pad-count 0)
-      (setq pad (make-string pad-count ? ))  )
-    (concat line pad)
-    ))
 
 ;;
 ;;  shu-getters

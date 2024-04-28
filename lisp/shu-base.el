@@ -682,6 +682,21 @@ string.  String remains unmodified if it had no leading or trailing whitespace."
     ))
 
 
+;;
+;;  shu-make-padded-line
+;;
+(defun shu-make-padded-line (line tlen)
+  "Add sufficient spaces to make LINE the length TLEN."
+  (let ((clen       (length line))
+        (pad        "")
+        (pad-count  nil))
+    (setq pad-count (- tlen clen))
+    (when (> pad-count 0)
+      (setq pad (make-string pad-count ? ))  )
+    (concat line pad)
+    ))
+
+
 
 ;;
 ;;  shu-add-to-alist
