@@ -31,7 +31,6 @@
 ;;; Code:
 
 
-(require 'shu-misc)
 
 
 
