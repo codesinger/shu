@@ -20,4 +20,6 @@
 # of the GNU General Public License along with GNU Emacs.  If not,
 # see <http://www.gnu.org/licenses/>.
 #
+# Batch compile all elisp files in dependency order
+#
 emacs --batch -f batch-byte-compile  shu-batch-compile-directive.el shu-base.el shu-git.el shu-misc.el shu-cpp-general.el shu-cpp-token.el shu-cpp-misc.el shu-match.el shu-cpp-match.el shu-bde.el shu-bde-cpp.el shu-cpp-project.el shu-batch-mode.el shu-nvplist.el shu-nvpindex.el shu-bkmark.el shu-keyring.el shu-capture-doc.el shu-xref.el slp-comment-hooks.el slp-bb-comment-hooks.el useful.el macros.el
