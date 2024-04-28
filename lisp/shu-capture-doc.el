@@ -442,42 +442,42 @@ code snippet.")
 ;;
 ;;  shu-capture-attr-inter
 ;;
-(defconst shu-capture-attr-inter (lsh 1 0)
+(defconst shu-capture-attr-inter (ash 1 0)
   "Bit that indicates that a function is interactive")
 
 
 ;;
 ;;  shu-capture-attr-alias
 ;;
-(defconst shu-capture-attr-alias (lsh 1 1)
+(defconst shu-capture-attr-alias (ash 1 1)
   "Bit that indicates that a function is identified by its alias name")
 
 
 ;;
 ;;  shu-capture-attr-macro
 ;;
-(defconst shu-capture-attr-macro (lsh 1 2)
+(defconst shu-capture-attr-macro (ash 1 2)
   "Bit that indicates that a function is a macro")
 
 
 ;;
 ;;  shu-capture-attr-const
 ;;
-(defconst shu-capture-attr-const (lsh 1 3)
+(defconst shu-capture-attr-const (ash 1 3)
   "Bit that indicates that a definition is a defconst")
 
 
 ;;
 ;;  shu-capture-attr-var
 ;;
-(defvar shu-capture-attr-var (lsh 1 4)
+(defvar shu-capture-attr-var (ash 1 4)
   "Bit that indicates that a definition is a defvar")
 
 
 ;;
 ;;  shu-capture-attr-custom
 ;;
-(defvar shu-capture-attr-custom (lsh 1 5)
+(defvar shu-capture-attr-custom (ash 1 5)
   "Bit that indicates that a definition is a defcustom")
 
 

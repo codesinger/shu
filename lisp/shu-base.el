@@ -1,10 +1,10 @@
-;;; shu-base.el --- Shu project global variables and functions
+8;;; shu-base.el --- Shu project global variables and functions
 ;;
 ;; Copyright (C) 2013 Stewart L. Palmer
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.157
+;; Version: 1.6.158
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -34,7 +34,7 @@
 ;;; Code:
 
 
-(defconst shu-version "1.6.157"
+(defconst shu-version "1.6.158"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2021 Dec 23"
@@ -1258,6 +1258,57 @@ Return the length of the longest string in all of the CARs of the cons cells."
         (setq longest-length (length name)))
       (setq cs (cdr cs)))
     longest-length
+    ))
+
+
+
+
+;;
+;;  shu-split-range-string
+;;
+(defun shu-split-range-string (range-string)
+  "RANGE-STRING is a string that contains either one or two numbers, possibly
+separated by plus, minus, or period.  If one number then it is the starting
+number and there is no ending number.  If two numbers then the first number is
+the start.  The operator in the middle determines the end.  If plus, then the
+end is the second number added to the first.  If minus, then the end is the
+second number subtracted from the first.  If period, then the end is the second
+number.
+
+Return the two numbers as a cons cell (start . end).  If there is no end then
+the cdr of the cons cell is nil.  If range string is not numeric, then both the
+car and the cdr of the cons cell are nil.
+
+For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end
+97.  \"99.103\" has start 99, end 103.  \"98\" has start 98 and end is nil."
+  (let ((s-one "[0-9]+")
+        (s-two "\\([0-9]+\\)\\(\\+\\|\\-\\|\\.\\)\\([0-9]+\\)")
+        (start)
+        (end)
+        (op)
+        (second)
+        (range))
+    (if (string-match s-two range-string)
+        (progn
+          (setq start (string-to-number (match-string 1 range-string)))
+          (setq op (match-string 2 range-string))
+          (setq second (string-to-number (match-string 3 range-string)))
+          (cond
+           ((string= "+" op)
+            (setq end (+ start second))
+            )
+           ((string= "-" op)
+            (setq end (- start second))
+            )
+           ((string= "." op)
+            (setq end second)))
+          (setq range (cons start end)))
+      (if (string-match s-one range-string)
+          (progn
+            (setq start (string-to-number (match-string 0 range-string)))
+            (setq range (cons start nil)))
+        (setq range (cons nil nil))))
+    range
     ))
 
 
