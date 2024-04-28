@@ -30,6 +30,7 @@
 
 ;;; Code:
 
+(require 'shu-base)
 (require 'shu-git)
 (require 'subr-x)
 
