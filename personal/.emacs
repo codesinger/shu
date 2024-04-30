@@ -207,8 +207,9 @@ to SHU-ADAPT-FRAME."
       (setq default-frame-alist '((tool-bar-lines . 0) (menu-bar-lines . 0) (width . 115)))
       (add-to-list 'default-frame-alist (cons 'height hpl)))
     ))
-(when (display-graphic-p)
-  (shu-set-frame-size-full-height))
+(if (display-graphic-p)
+    (shu-set-frame-size-full-height)
+  (setq ansi-color-for-comint-mode 'filter))
 
 ;(set-frame-parameter nil 'width '115)
 ;;
