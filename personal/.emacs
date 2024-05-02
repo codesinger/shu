@@ -243,6 +243,8 @@ to SHU-ADAPT-FRAME."
 ;;(load-file "~/emacs/slp-java-base.elc")
 (when (file-readable-p "~/emacs/slpbb.elc")
   (load-file "~/emacs/slpbb.elc"))
+(when (file-readable-p "~/emacs/spacebb.elc")
+  (load-file "~/emacs/spacebb.elc"))
 (when (file-readable-p "~/emacs/rmv-using.elc")
   (load-file "~/emacs/rmv-using.elc"))
 (load-file "~/emacs/shu-org-extensions.elc")
