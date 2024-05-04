@@ -2789,6 +2789,34 @@ qualified files found."
 
 
 ;;
+;;  shu-cpp-project-get-current-directory-names
+;;
+(defun shu-cpp-project-get-current-directory-names (dir-name)
+  "Return a list of the unqualified names of the directories contained within
+the top level of DIR-NAME.  If DIR-NAME holds no directories, the returned
+list is empty."
+  (let ((dlist)
+        (tlist)
+        (cname)
+        (sname)
+        (dir-list))
+    (setq dlist (directory-files dir-name t nil t))
+    (setq tlist dlist)
+    (while tlist
+      (setq cname (car tlist))
+      (setq sname (file-name-nondirectory cname))
+      (when (file-directory-p cname)
+        (unless (or (string= sname  ".")
+                    (string= sname ".."))
+          (push sname dir-list)))
+      (setq tlist (cdr tlist)))
+    (setq dir-list (sort dir-list 'string<))
+    dir-list
+    ))
+
+
+
+;;
 ;;  shu-copy-c-project
 ;;
 (defun shu-copy-c-project ()
