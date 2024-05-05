@@ -1992,6 +1992,19 @@ Record the visit in the file \"~/visited-projects.log\"."
 
 
 ;;
+;;  shu-setup-project-and-tags-with-namespace
+;;
+(defun shu-setup-project-and-tags-with-namespace (proj-dir namespace &optional proj-comment)
+  "Call SHU-SETUP-PROJECT-AND-TAGS and then use NAMESPACE to set the current
+namespace and the default file p[refix."
+    (shu-setup-project-and-tags proj-dir proj-comment)
+    (shu-set-default-namespace namespace)
+    (shu-set-prefix (concat namespace "_"))
+    )
+
+
+
+;;
 ;;  shu-get-real-this-command-name
 ;;
 (defun shu-get-real-this-command-name ()
@@ -2058,6 +2071,19 @@ creates a new tags table."
     (shu-internal-which-c-project gbuf)
     (switch-to-buffer gbuf)
     ))
+
+
+
+;;
+;;  shu-visit-project-and-tags-with-namespace
+;;
+(defun shu-visit-project-and-tags-with-namespace (proj-dir namespace &optional proj-comment)
+  "Call SHU-VISIT-PROJECT-AND-TAGS and then use NAMESPACE to set the current
+namespace and the default file p[refix."
+    (shu-visit-project-and-tags proj-dir proj-comment)
+    (shu-set-default-namespace namespace)
+    (shu-set-prefix (concat namespace "_"))
+    )
 
 
 ;;
@@ -2812,6 +2838,48 @@ list is empty."
       (setq tlist (cdr tlist)))
     (setq dir-list (sort dir-list 'string<))
     dir-list
+    ))
+
+
+
+;;
+;;  shu-project-get-default-namespace
+;;
+(defun shu-project-get-default-namespace (proj-dir)
+  "If PROJ-DIR contains exactly one directory-name, return that name as a
+putative default namespace.  The return value is a cons cell, whose CDR is a
+the name of the single directory and whose CAR is an error message if PROJ-DIR
+does not contain exactly one directory name."
+  (let ((dir-list (shu-cpp-project-get-current-directory-names proj-dir))
+        (result))
+    (setq result (shu-project-dir-name-to-namespace proj-dir dir-list))
+    result
+   ))
+
+
+
+
+;;
+;;  shu-project-dir-name-to-namespace
+;;
+(defun shu-project-dir-name-to-namespace (proj-dir dir-list)
+  "DIR-LIST is a possible list of directory names from the top level of
+PROJ-DIR.  If DIR-LIST contains exactly one name, return that name as a
+possible namespace.  If DIR-LIST is empty or holds more than one name, we cannot
+assume a namespace.  The return value is a cons cell whose CDR is either nil or
+the possible namespace and whose CAR is an error message if DIR-LIST does not
+hold exactly one name."
+  (let ((result)
+        (emsg)
+        (dlist))
+    (if (and dir-list (= 1 (length dir-list)))
+        (setq result (cons nil (car dir-list)))
+      (if (not dir-list)
+          (setq emsg (concat proj-dir " holds no subdirectories."))
+        (setq dlist (mapconcat 'identity dir-list ", "))
+        (setq emsg (format "%s holds %d directories: %s" proj-dir (length dir-list) dlist)))
+      (setq result (cons emsg nil)))
+    result
     ))
 
 

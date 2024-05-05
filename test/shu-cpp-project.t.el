@@ -1128,4 +1128,70 @@
     (should (not result))
     ))
 
+
+
+;;
+;;  shu-test-shu-project-dir-name-to-namespace-1
+;;
+(ert-deftest shu-test-shu-project-dir-name-to-namespace-1 ()
+  (let ((proj-dir "project")
+        (dir-list (list "namespace"))
+        (result)
+        (emsg)
+        (namespace))
+    (setq result (shu-project-dir-name-to-namespace proj-dir dir-list))
+    (should result)
+    (should (consp result))
+    (setq emsg (car result))
+    (should (not emsg))
+    (setq namespace (cdr result))
+    (should namespace)
+    (should (stringp namespace))
+    (should (string= namespace "namespace"))
+    ))
+
+
+
+;;
+;;  shu-test-shu-project-dir-name-to-namespace-2
+;;
+(ert-deftest shu-test-shu-project-dir-name-to-namespace-2 ()
+  (let ((proj-dir "project")
+        (dir-list)
+        (result)
+        (emsg)
+        (namespace))
+    (setq result (shu-project-dir-name-to-namespace proj-dir dir-list))
+    (should result)
+    (should (consp result))
+    (setq namespace (cdr result))
+    (should (not namespace))
+    (setq emsg (car result))
+    (should emsg)
+    (should (stringp emsg))
+    (should (string= "project holds no subdirectories." emsg))
+    ))
+
+
+
+;;
+;;  shu-test-shu-project-dir-name-to-namespace-3
+;;
+(ert-deftest shu-test-shu-project-dir-name-to-namespace-3 ()
+  (let ((proj-dir "project")
+        (dir-list (list "first" "second" "third"))
+        (result)
+        (emsg)
+        (namespace))
+    (setq result (shu-project-dir-name-to-namespace proj-dir dir-list))
+    (should result)
+    (should (consp result))
+    (setq namespace (cdr result))
+    (should (not namespace))
+    (setq emsg (car result))
+    (should emsg)
+    (should (stringp emsg))
+    (should (string= "project holds 3 directories: first, second, third" emsg))
+    ))
+
 ;;; shu-cpp-project.t.el ends here
