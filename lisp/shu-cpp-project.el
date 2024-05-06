@@ -2005,6 +2005,31 @@ namespace and the default file p[refix."
 
 
 ;;
+;;  shu-setup-project-and-tags-with-default-namespace
+;;
+(defun shu-setup-project-and-tags-with-default-namespace (proj-dir &optional proj-comment)
+  "If PROJ-DIR contains exactly one directory name, use that name as the default
+namespace and then call SHU-SETUP-PROJECT-AND-TAGS and then use the assumed
+namespace to set the current namespace and the default file prefix.
+If PROJ-DIR has no directories or more than one directory, issue an error
+message and quit."
+  (let ((result (shu-project-get-default-namespace proj-dir))
+        (emsg)
+        (namespace))
+    (setq emsg (car result))
+    (setq namespace (cdr result))
+    (if emsg
+        (progn
+          (ding)
+          (message "%s" emsg))
+      (shu-setup-project-and-tags proj-dir proj-comment)
+      (shu-set-default-namespace namespace)
+      (shu-set-prefix (concat namespace "_")))
+    ))
+
+
+
+;;
 ;;  shu-get-real-this-command-name
 ;;
 (defun shu-get-real-this-command-name ()
@@ -2084,6 +2109,32 @@ namespace and the default file p[refix."
     (shu-set-default-namespace namespace)
     (shu-set-prefix (concat namespace "_"))
     )
+
+
+
+;;
+;;  shu-visit-project-and-tags-with-default-namespace
+;;
+(defun shu-visit-project-and-tags-with-default-namespace (proj-dir &optional proj-comment)
+  "If PROJ-DIR contains exactly one directory name, use that name as the default
+namespace and then call SHU-VISIT-PROJECT-AND-TAGS and then use the assumed
+namespace to set the current namespace and the default file prefix.
+If PROJ-DIR has no directories or more than one directory, issue an error
+message and quit."
+  (let ((result (shu-project-get-default-namespace proj-dir))
+        (emsg)
+        (namespace))
+    (setq emsg (car result))
+    (setq namespace (cdr result))
+    (if emsg
+        (progn
+          (ding)
+          (message "%s" emsg))
+      (shu-visit-project-and-tags proj-dir proj-comment)
+      (shu-set-default-namespace namespace)
+      (shu-set-prefix (concat namespace "_")))
+    ))
+
 
 
 ;;
