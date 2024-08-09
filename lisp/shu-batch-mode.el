@@ -306,6 +306,51 @@ files with optional template parameters."
 
 
 ;;
+;;  shu-generate-template
+;;
+(defun shu-generate-template ()
+  "Fetch the arguments from environment variables and then call
+SHU-INTERNAL-GEN-BDE-TEMPLATE to generate a set of three BDE component
+files for a template class."
+  (let ((global-namespace)
+        (namespace)
+        (class-name)
+        (template-list)
+        (author)
+        (modern "False")
+        (file-prefix)
+        (nargs (length command-line-args-left)))
+    (shu-batch-init)
+    (slp-bb-set-comment-hooks)
+    (if (and (/= nargs 5) (/= nargs 6))
+        (progn
+          (message "%s" "Require 5 or 6 args: global-namespace namespace class-name template-list author, optional 'modern'"))
+      (setq global-namespace (pop command-line-args-left))
+      (setq namespace (pop command-line-args-left))
+      (setq class-name (pop command-line-args-left))
+      (setq template-list (pop command-line-args-left))
+      (setq author (pop command-line-args-left))
+      (when (= nargs 6)
+        (setq modern (pop command-line-args-left)))
+      (when (string= modern "True")
+        (setq shu-cpp-modern t))
+      (setq file-prefix (concat namespace "_"))
+      (message "global-namespace: %s" global-namespace)
+      (message "namespace: %s" namespace)
+      (message "class-name: %s" class-name)
+      (message "template-list: %s" template-list)
+      (message "author: %s" author)
+      (setq shu-cpp-use-bde-library t)
+      (setq shu-cpp-include-user-brackets t)
+      (setq shu-cpp-std-namespace "bsl")
+      (setq shu-cpp-default-allocator-type "bslma::Allocator")
+      (setq shu-cpp-default-global-namespace global-namespace)
+      (shu-internal-gen-bde-template class-name template-list author namespace file-prefix))
+    ))
+
+
+
+;;
 ;;  shu-batch-add-alexandria
 ;;
 (defun shu-batch-add-alexandria ()
