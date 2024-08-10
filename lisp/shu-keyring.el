@@ -188,6 +188,10 @@
   "The history list used by completing-read when asking the user for a key to an
 entry in the keyring file.")
 
+(defvar shu-keyring-last-key nil
+  "The variable that holds the last key read from the minibuffer.  This is used
+ as the default value for the next completing-read")
+
 (defconst shu-keyring-url-name   "url"
   "Key word that denotes a URL.")
 
@@ -423,14 +427,15 @@ value in the kill-ring and also return it to the caller."
                nil         ;; require-match
                nil         ;; Initial input (initial minibuffer contents)
                shu-keyring-history  ;; History list
-               nil)))      ;; Default value
+               shu-keyring-last-key)))      ;; Default value
       (setq keyring-entry  (assoc keyring-key shu-keyring-index))
       (setq item (cdr keyring-entry))
       (shu-keyring-show-name-url name item)
       (setq vlist (shu-nvplist-get-item-value name item))
       (if (not vlist)
           (ding)
-        (setq item-value (car vlist))))
+        (setq item-value (car vlist))
+        (setq shu-keyring-last-key keyring-key)))
     (if item-value
         (kill-new item-value)
       (kill-new "unknown"))

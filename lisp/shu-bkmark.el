@@ -175,6 +175,10 @@
   "The history list used by completing-read when asking the user for a key to an
 entry in the bookmark file.")
 
+(defvar shu-bkmark-last-key nil
+  "The variable that holds the last key read from the minibuffer.  This is used
+ as the default value for the next completing-read")
+
 (defconst shu-bkmark-url-name   "url"
   "Key word that denotes a URL.")
 
@@ -290,14 +294,15 @@ the value in the kill-ring and also return it to the caller."
                nil         ;; require-match
                nil         ;; Initial input (initial minibuffer contents)
                shu-bkmark-history  ;; History list
-               nil)))      ;; Default value
+               shu-bkmark-last-key))) ;; Default value
       (setq bookmark-entry  (assoc bookmark-key shu-bkmark-index))
       (setq item (cdr bookmark-entry))
       (shu-bkmark-show-name-url name item)
       (setq vlist (shu-nvplist-get-item-value name item))
       (if (not vlist)
           (ding)
-        (setq item-value (car vlist))))
+        (setq item-value (car vlist))
+        (setq shu-bkmark-last-key bookmark-key)))
     (if item-value
         (kill-new item-value)
       (kill-new "unknown"))
