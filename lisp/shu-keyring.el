@@ -314,6 +314,22 @@ it can be yanked or pasted into the application requesting it."
   )
 
 
+;;
+;;  shu-keyring-clear-last
+;;
+(defun shu-keyring-clear-last ()
+  "Overwrite the last item placed in the kill ring.  The current item in the
+kill ring will be the thing that is pasted by an operating system paste
+function.  If the last thing placed in the kill ring is a password that you do
+not want arbitrarily pasted again, you can call this function to add a string to
+kill ring.  The password remains in the kill ring, but will not be pasted again
+by the next operating system paste operation because it is no longer the current
+item in the kill ring."
+  (interactive)
+  (let ((nothing "***NONE***"))
+    (shu-kill-new nothing)
+    ))
+
 
 ;;
 ;;  shu-keyring-generate-password
@@ -547,6 +563,7 @@ to make them easier to type. "
   (defalias 'krid 'shu-keyring-get-id)
   (defalias 'kracct 'shu-keyring-get-acct)
   (defalias 'krrt 'shu-keyring-get-route)
+  (defalias 'krclear 'shu-keyring-clear-last)
   (defalias 'krnewpw 'shu-keyring-generate-password)
   (defalias 'krfn 'shu-keyring-get-file)
   (defalias 'krvf 'shu-keyring-verify-file)
