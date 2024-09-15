@@ -232,6 +232,14 @@ to a text editor that this file contains C++ code."
   :type '(string)
   :group 'shu-base)
 
+(defcustom shu-record-visited-files t
+  "True if all files visited are to be recorded in ~/visited-files.log"
+  :type '(string)
+  :group 'shu-base)
+
+
+
+
 (defconst shu-all-whitespace-chars
   (list " " "\b" "\t" "\n" "\v" "\f" "\r")
   "List of all whitespace characters.
@@ -1009,6 +1017,40 @@ to trim blank lines from the end of a file if SHU-TRIM-FILE is true."
   (when shu-trim-file
     (delete-trailing-whitespace))
   )
+
+
+;;
+;;  shu-record-visited-file-hook
+;;
+(defun shu-record-visited-file-hook ()
+  "This is a find-file-hook that records in ~/visited-files.log the name
+of every visited file.  Makes a useful history of all files visited."
+  (let (
+        (name (buffer-file-name))
+        (fname (file-name-nondirectory (buffer-file-name)))
+        (now)
+        (fnow)
+        (line)
+          )
+    (setq now (current-time-string))
+    (setq fnow (format-time-string "%Y-%m-%d-%T-(%a)"))
+    (setq line (concat fnow ": " name "  " fname "\n"))
+    (write-region line nil "~/visited-files.log" 'append)
+    ))
+
+
+;;
+;;  shu-make-record-visited-files-false
+;;
+(defun shu-make-record-visited-files-false ()
+  "Return the current value of SHU-RECORD-VISITED-FILES and set it to false.
+Can be used to temporarily change the value and then use the prior value
+to restore it."
+  (let ((old-value shu-record-visited-files))
+    (setq shu-record-visited-files nil)
+    old-value
+    ))
+
 
 
 

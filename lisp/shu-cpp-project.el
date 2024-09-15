@@ -1875,7 +1875,8 @@ modified.  Those remain modified and unsaved.  This is an unconditional trim of
 all trailing whitespace and is not affected by the setting of SHU-TRIM-FILE,
 which only affects that automatic trimming on normal file save."
   (interactive)
-  (let ((cbuf      (current-buffer))
+  (let ((pbuf    (get-buffer-create "*shu-trim-whitespace*"))
+        (cbuf      (current-buffer))
         (tlist     shu-project-file-list)
         (fcount 0)
         (mod-count 0)
@@ -1884,11 +1885,14 @@ which only affects that automatic trimming on normal file save."
         (file)
         (fbuf)
         (file-buf)
-        (was-modified))
+        (was-modified)
+        (emsg)
+        (old-visit-value))
     (if (not tlist)
         (progn
           (message "There is no project to trim.")
           (ding))
+      (princ "\n\n\n******************************************\n\n\n" pbuf)
       (save-excursion
         (while tlist
           (setq file (car tlist))
@@ -1896,7 +1900,9 @@ which only affects that automatic trimming on normal file save."
           (setq fbuf (get-file-buffer file))
           (if fbuf
               (setq file-buf fbuf)
-            (setq file-buf (find-file-noselect file)))
+            (setq old-visit-value (shu-make-record-visited-files-false))
+            (setq file-buf (find-file-noselect file))
+            (setq shu-record-visited-files old-visit-value))
           (set-buffer file-buf)
           (setq was-modified (buffer-modified-p))
           (setq byte-count (shu-internal-trim-buffer))
@@ -1911,10 +1917,110 @@ which only affects that automatic trimming on normal file save."
           (setq tlist (cdr tlist))))
       (switch-to-buffer cbuf)
       (if (= mod-bytes 0)
-          (message "No trailing whitespace in %d files" fcount)
-        (message "%s bytes of trailing whitespace remove from %d of %d files"
+          (setq emsg (format "No trailing whitespace in %d files" fcount))
+        (setq emsg (format "%s bytes of trailing whitespace removed from %d of %d files"
                  mod-bytes mod-count fcount)))
+      (princ (concat "\n\n" emsg "\n") pbuf)
+      (message "%s" emsg))
     ))
+
+
+;;
+;;  shu-trim-c-directories
+;;
+(defun shu-trim-c-directories ()
+  "Trim trailing whitespace from every file in each directory that is part of
+this project.  This is useful when you do not want to restrict the trimming to
+just standard code files.  The direcgtories might contain scripts,
+configurationfiles, and other things whose trailing whitespace should also be
+trimmed."
+  (interactive)
+  (let ((pbuf    (get-buffer-create "*shu-trim-whitespace*"))
+        (tlist    shu-cpp-project-list)
+        (dir-name)
+        (rlist)
+        (fcount 0)
+        (mod-bytes 0)
+        (mod-count 0)
+        (total-fcount 0)
+        (total-mod-bytes 0)
+        (total-mod-count 0)
+        (dir-count 0)
+        (emsg))
+    (if (not tlist)
+        (progn
+          (message "There is no project to trim.")
+          (ding))
+      (princ "\n\n\n******************************************\n\n\n" pbuf)
+      (while tlist
+        (setq dir-name (car tlist))
+        (setq rlist (shu-trim-in-cpp-directory dir-name pbuf))
+        (setq fcount (car rlist))
+        (setq rlist (cdr rlist))
+        (setq mod-bytes (car rlist))
+        (setq rlist (cdr rlist))
+        (setq mod-count (car rlist))
+        (setq total-fcount (+ total-fcount fcount))
+        (setq total-mod-bytes (+ total-mod-bytes mod-bytes))
+        (setq total-mod-count (+ total-mod-count mod-count))
+        (setq dir-count (1+ dir-count))
+        (setq tlist (cdr tlist)))
+      (if (= total-mod-bytes 0)
+          (setq emsg (format "No trailing whitespace in %d files" total-fcount))
+        (setq emsg (format  "%s bytes of trailing whitespace removed from %d of %d files"
+                 total-mod-bytes total-mod-count total-fcount)))
+      (princ (concat "\n\n" emsg "\n") pbuf)
+      (message "%s" emsg))
+    ))
+
+
+
+;;
+;;  shu-trim-in-cpp-directory
+;;
+(defun shu-trim-in-cpp-directory (directory-name pbuf)
+  "Trim trailing whitespace from every file in DIRECTORY-NAME.  Print progrss
+notes into PBUF.  Return in a list the number ot files found, number of bytes
+removed, and number of fils modified."
+  (let ((directory-list (directory-files directory-name t))
+        (full-name)
+        (sname)
+        (fcount 0)
+        (fbuf)
+        (file-buf)
+        (was-modified)
+        (fcount 0)
+        (byte-count 0)
+        (mod-bytes 0)
+        (mod-count 0)
+        (old-visit-value))
+    (while directory-list
+      (setq full-name (car directory-list))
+      (setq sname (file-name-nondirectory full-name))
+      (when (not (file-directory-p full-name))
+        (setq fcount (1+ fcount))
+        (setq fbuf (get-file-buffer full-name))
+        (if fbuf
+            (setq file-buf fbuf)
+          (setq old-visit-value (shu-make-record-visited-files-false))
+          (setq file-buf (find-file-noselect full-name))
+          (setq shu-record-visited-files old-visit-value))
+        (set-buffer file-buf)
+        (setq was-modified (buffer-modified-p))
+        (setq byte-count (shu-internal-trim-buffer))
+        (princ (concat (shu-fixed-format-num byte-count 8) " " full-name "\n") pbuf)
+        (setq mod-bytes (+ mod-bytes byte-count))
+        (when (/= byte-count 0)
+          (setq mod-count (1+ mod-count)))
+        (when (not was-modified)
+          (when (buffer-modified-p)
+            (basic-save-buffer)))
+        (when (not fbuf)  ; We created the file buffer
+          (kill-buffer file-buf)))
+
+    (setq directory-list (cdr directory-list)))
+  (list fcount mod-bytes mod-count)
+  ))
 
 
 
@@ -3037,6 +3143,7 @@ shu- prefix removed."
   (defalias 'list-c-all-project 'shu-list-c-all-project)
   (defalias 'which-c-project 'shu-which-c-project)
   (defalias 'trim-c-project 'shu-trim-c-project)
+  (defalias 'trim-c-directories 'shu-trim-c-directories)
   (defalias 'vf 'shu-vf)
   (defalias 'other 'shu-other)
   (defalias 'cother 'shu-cother)
