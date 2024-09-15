@@ -1025,17 +1025,16 @@ to trim blank lines from the end of a file if SHU-TRIM-FILE is true."
 (defun shu-record-visited-file-hook ()
   "This is a find-file-hook that records in ~/visited-files.log the name
 of every visited file.  Makes a useful history of all files visited."
-  (let (
-        (name (buffer-file-name))
+  (let ((name (buffer-file-name))
         (fname (file-name-nondirectory (buffer-file-name)))
         (now)
         (fnow)
-        (line)
-          )
-    (setq now (current-time-string))
-    (setq fnow (format-time-string "%Y-%m-%d-%T-(%a)"))
-    (setq line (concat fnow ": " name "  " fname "\n"))
-    (write-region line nil "~/visited-files.log" 'append)
+        (line))
+    (when shu-record-visited-files
+      (setq now (current-time-string))
+      (setq fnow (format-time-string "%Y-%m-%d-%T-(%a)"))
+      (setq line (concat fnow ": " name "  " fname "\n"))
+      (write-region line nil "~/visited-files.log" 'append))
     ))
 
 
