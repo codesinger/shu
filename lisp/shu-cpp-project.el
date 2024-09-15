@@ -1866,9 +1866,9 @@ project."
 
 
 ;;
-;;  shu-project-trim-all-files
+;;  shu-trim-c-project
 ;;
-(defun shu-project-trim-all-files ()
+(defun shu-trim-c-project ()
   "Trim all trailing whitespace from all of the files in the project.  The file
 changes are saved with the exception of those files that are open and already
 modified.  Those remain modified and unsaved.  This is an unconditional trim of
@@ -1885,31 +1885,35 @@ which only affects that automatic trimming on normal file save."
         (fbuf)
         (file-buf)
         (was-modified))
-    (save-excursion
-      (while tlist
-        (setq file (car tlist))
-        (setq fcount (1+ fcount))
-        (setq fbuf (get-file-buffer file))
-        (if fbuf
-            (setq file-buf fbuf)
-          (setq file-buf (find-file-noselect file)))
-        (set-buffer file-buf)
-        (setq was-modified (buffer-modified-p))
-        (setq byte-count (shu-internal-trim-buffer))
-        (setq mod-bytes (+ mod-bytes byte-count))
-        (when (/= byte-count 0)
-          (setq mod-count (1+ mod-count)))
-        (when (not was-modified)
-          (when (buffer-modified-p)
-            (basic-save-buffer)))
-        (when (not fbuf)  ; We created the file buffer
-          (kill-buffer file-buf))
-        (setq tlist (cdr tlist))))
-    (switch-to-buffer cbuf)
-    (if (= mod-bytes 0)
-        (message "No trailing whitespace in %d files" fcount)
-      (message "%s bytes of trailing whitespace remove from %d of %d files"
-               mod-bytes mod-count fcount))
+    (if (not tlist)
+        (progn
+          (message "There is no project to trim.")
+          (ding))
+      (save-excursion
+        (while tlist
+          (setq file (car tlist))
+          (setq fcount (1+ fcount))
+          (setq fbuf (get-file-buffer file))
+          (if fbuf
+              (setq file-buf fbuf)
+            (setq file-buf (find-file-noselect file)))
+          (set-buffer file-buf)
+          (setq was-modified (buffer-modified-p))
+          (setq byte-count (shu-internal-trim-buffer))
+          (setq mod-bytes (+ mod-bytes byte-count))
+          (when (/= byte-count 0)
+            (setq mod-count (1+ mod-count)))
+          (when (not was-modified)
+            (when (buffer-modified-p)
+              (basic-save-buffer)))
+          (when (not fbuf)  ; We created the file buffer
+            (kill-buffer file-buf))
+          (setq tlist (cdr tlist))))
+      (switch-to-buffer cbuf)
+      (if (= mod-bytes 0)
+          (message "No trailing whitespace in %d files" fcount)
+        (message "%s bytes of trailing whitespace remove from %d of %d files"
+                 mod-bytes mod-count fcount)))
     ))
 
 
@@ -2046,10 +2050,10 @@ Record the visit in the file \"~/visited-projects.log\"."
 (defun shu-setup-project-and-tags-with-namespace (proj-dir namespace &optional proj-comment)
   "Call SHU-SETUP-PROJECT-AND-TAGS and then use NAMESPACE to set the current
 namespace and the default file p[refix."
-    (shu-setup-project-and-tags proj-dir proj-comment)
-    (shu-set-default-namespace namespace)
-    (shu-set-prefix (concat namespace "_"))
-    )
+  (shu-setup-project-and-tags proj-dir proj-comment)
+  (shu-set-default-namespace namespace)
+  (shu-set-prefix (concat namespace "_"))
+  )
 
 
 
@@ -2154,10 +2158,10 @@ creates a new tags table."
 (defun shu-visit-project-and-tags-with-namespace (proj-dir namespace &optional proj-comment)
   "Call SHU-VISIT-PROJECT-AND-TAGS and then use NAMESPACE to set the current
 namespace and the default file p[refix."
-    (shu-visit-project-and-tags proj-dir proj-comment)
-    (shu-set-default-namespace namespace)
-    (shu-set-prefix (concat namespace "_"))
-    )
+  (shu-visit-project-and-tags proj-dir proj-comment)
+  (shu-set-default-namespace namespace)
+  (shu-set-prefix (concat namespace "_"))
+  )
 
 
 
@@ -2954,7 +2958,7 @@ does not contain exactly one directory name."
         (result))
     (setq result (shu-project-dir-name-to-namespace proj-dir dir-list))
     result
-   ))
+    ))
 
 
 
@@ -3032,7 +3036,7 @@ shu- prefix removed."
   (defalias 'list-c-directories 'shu-list-c-directories)
   (defalias 'list-c-all-project 'shu-list-c-all-project)
   (defalias 'which-c-project 'shu-which-c-project)
-  (defalias 'trim-c-project 'shu-project-trim-all-files)
+  (defalias 'trim-c-project 'shu-trim-c-project)
   (defalias 'vf 'shu-vf)
   (defalias 'other 'shu-other)
   (defalias 'cother 'shu-cother)
