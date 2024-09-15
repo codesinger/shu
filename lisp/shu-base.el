@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.160
+;; Version: 1.6.161
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -34,7 +34,7 @@
 ;;; Code:
 
 
-(defconst shu-version "1.6.160"
+(defconst shu-version "1.6.161"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2021 Dec 23"
@@ -1174,6 +1174,28 @@ An empty START-STRING matches anything.  An empty END-STRING matches anything."
         (setq is-true t)))
     is-true
     ))
+
+
+
+
+;;
+;;  shu-internal-trim-buffer
+;;
+(defun shu-internal-trim-buffer ()
+  "Remove all trailing whitespace from a buffer, returning the number of
+bytes trimmed.  The trimming is unconditional and is not affected by the
+setting of SHU-TRIM-FILE."
+  (let ((nbytes-before)
+        (nbytes-after))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (setq nbytes-before (- (point-max) (point-min)))
+        (delete-trailing-whitespace (point-min))
+        (setq nbytes-after (- (point-max) (point-min)))))
+    (- nbytes-before nbytes-after)
+    ))
+
 
 
 

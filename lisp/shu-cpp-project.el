@@ -1866,6 +1866,55 @@ project."
 
 
 ;;
+;;  shu-project-trim-all-files
+;;
+(defun shu-project-trim-all-files ()
+  "Trim all trailing whitespace from all of the files in the project.  The file
+changes are saved with the exception of those files that are open and already
+modified.  Those remain modified and unsaved.  This is an unconditional trim of
+all trailing whitespace and is not affected by the setting of SHU-TRIM-FILE,
+which only affects that automatic trimming on normal file save."
+  (interactive)
+  (let ((cbuf      (current-buffer))
+        (tlist     shu-project-file-list)
+        (fcount 0)
+        (mod-count 0)
+        (mod-bytes 0)
+        (byte-count 0)
+        (file)
+        (fbuf)
+        (file-buf)
+        (was-modified))
+    (save-excursion
+      (while tlist
+        (setq file (car tlist))
+        (setq fcount (1+ fcount))
+        (setq fbuf (get-file-buffer file))
+        (if fbuf
+            (setq file-buf fbuf)
+          (setq file-buf (find-file-noselect file)))
+        (set-buffer file-buf)
+        (setq was-modified (buffer-modified-p))
+        (setq byte-count (shu-internal-trim-buffer))
+        (setq mod-bytes (+ mod-bytes byte-count))
+        (when (/= byte-count 0)
+          (setq mod-count (1+ mod-count)))
+        (when (not was-modified)
+          (when (buffer-modified-p)
+            (basic-save-buffer)))
+        (when (not fbuf)  ; We created the file buffer
+          (kill-buffer file-buf))
+        (setq tlist (cdr tlist))))
+    (switch-to-buffer cbuf)
+    (if (= mod-bytes 0)
+        (message "No trailing whitespace in %d files" fcount)
+      (message "%s bytes of trailing whitespace remove from %d of %d files"
+               mod-bytes mod-count fcount))
+    ))
+
+
+
+;;
 ;;  shu-which-c-project
 ;;
 (defun shu-which-c-project ()
@@ -2983,6 +3032,7 @@ shu- prefix removed."
   (defalias 'list-c-directories 'shu-list-c-directories)
   (defalias 'list-c-all-project 'shu-list-c-all-project)
   (defalias 'which-c-project 'shu-which-c-project)
+  (defalias 'trim-c-project 'shu-project-trim-all-files)
   (defalias 'vf 'shu-vf)
   (defalias 'other 'shu-other)
   (defalias 'cother 'shu-cother)

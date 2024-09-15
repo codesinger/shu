@@ -2302,4 +2302,108 @@ outside of the narrowed region."
     ))
 
 
+
+;;
+;;  shu-test-shu-internal-trim-buffer-1
+;;
+(ert-deftest shu-test-shu-internal-trim-buffer-1 ()
+  (let ((data
+         (concat
+          "this is line 1\n"
+          "this is line 2\n"
+          "this is line 3\n"
+          ))
+        (expected 0)
+        (actual 22))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 20)
+      (setq actual (shu-internal-trim-buffer)))
+    (should actual)
+    (should (numberp actual))
+    (should (= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-internal-trim-buffer-2
+;;
+(ert-deftest shu-test-shu-internal-trim-buffer-2 ()
+  (let ((data
+         (concat
+          "this is line 1    \n "
+          "this is line 2\n"
+          "this is line 3     \n"
+          "this is line 4\n"
+          ))
+        (expected 9)
+        (actual 22))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 20)
+      (setq actual (shu-internal-trim-buffer)))
+    (should actual)
+    (should (numberp actual))
+    (should (= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-internal-trim-buffer-3
+;;
+(ert-deftest shu-test-shu-internal-trim-buffer-3 ()
+  (let ((data
+         (concat
+          "this is line 1    \n "
+          "this is line 2\n"
+          "this is line 3     \n"
+          "this is line 4\n"
+          "\n"
+          "\n"
+          "\n"
+          ))
+        (expected 12)
+        (actual 22))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 20)
+      (setq actual (shu-internal-trim-buffer)))
+    (should actual)
+    (should (numberp actual))
+    (should (= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-internal-trim-buffer-4
+;;
+(ert-deftest shu-test-shu-internal-trim-buffer-4 ()
+  (let ((data
+         (concat
+          "\n"
+          "\n"
+          "\n"
+          "this is line 1    \n "
+          "this is line 2\n"
+          "this is line 3     \n"
+          "this is line 4\n"
+          "\n"
+          "\n"
+          "\n"
+          ))
+        (expected 12)
+        (actual 22))
+    (with-temp-buffer
+      (insert data)
+      (goto-char 20)
+      (setq actual (shu-internal-trim-buffer)))
+    (should actual)
+    (should (numberp actual))
+    (should (= actual expected))
+    ))
+
+
 ;;; shu-base.t.el ends here

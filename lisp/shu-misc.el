@@ -3930,6 +3930,22 @@ The remaining characters are chosen randomly."
 
 
 
+;;
+;;  shu-trim-buffer
+;;
+(defun shu-trim-buffer ()
+  "Delete all traiing whitespace from the current buffer.  This is an
+unconditional change and is not affected byt he setting of the
+variable SHU-TRIM-FILE."
+  (interactive)
+  (let ((bytes-trimmed (shu-internal-trim-buffer)))
+    (if (= 0 bytes-trimmed)
+        (message "%s" "No trailing whitespace to trim")
+      (message "%d bytes of trailing whitespace trimmed." bytes-trimmed))
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias
@@ -3990,6 +4006,7 @@ shu- prefix removed."
   (defalias 'change-namespace 'shu-change-namespace)
   (defalias 'fix-du-buffer 'shu-fix-du-buffer)
   (defalias 'nocase-sort-lines 'shu-nocase-sort-lines)
+  (defalias 'trim-file 'shu-trim-buffer)
   )
 
 (provide 'shu-misc)
