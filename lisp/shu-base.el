@@ -1038,18 +1038,23 @@ of every visited file.  Makes a useful history of all files visited."
     ))
 
 
-;;
-;;  shu-make-record-visited-files-false
-;;
-(defun shu-make-record-visited-files-false ()
-  "Return the current value of SHU-RECORD-VISITED-FILES and set it to false.
-Can be used to temporarily change the value and then use the prior value
-to restore it."
-  (let ((old-value shu-record-visited-files))
-    (setq shu-record-visited-files nil)
-    old-value
-    ))
 
+;;
+;;  shu-internal-find-file-noselect
+;;
+(defun shu-internal-find-file-noselect (file-name &optional trace-flag)
+  "Call FIND-FILE-NOSELECT on the given FILE-NAME.  If TRACE-FLAG is specified,
+its value is used to set SHU-RECORD-VISITED-FILES.  This function is commonly
+used to visit a file while not recording the visit in the file
+visited-files.log.  Some automated multi-file changes can add unwanted bulk to
+the visited files trace."
+  (let ((original-record-value shu-record-visited-files)
+        (returned-buffer))
+    (setq shu-record-visited-files trace-flag)
+    (setq returned-buffer (find-file-noselect file-name))
+    (setq shu-record-visited-files original-record-value)
+    returned-buffer
+    ))
 
 
 
