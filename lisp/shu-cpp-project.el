@@ -218,7 +218,7 @@ by shu-make-c-project")
 
 (defvar shu-project-user-class-count 0)
 
-(defvar shu-project-file-list
+(defvar shu-project-file-list nil
   "This is a list of the full path and name of every file in the project.
 It is used when a global change needs to visit every file in the project.")
 
