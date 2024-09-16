@@ -1890,8 +1890,7 @@ which only affects that automatic trimming on normal file save."
         (sstring)
         (estring)
         (was-modified)
-        (emsg)
-        (old-visit-value))
+        (emsg))
     (if (not tlist)
         (progn
           (message "There is no project to trim.")
@@ -1905,9 +1904,7 @@ which only affects that automatic trimming on normal file save."
           (setq fbuf (get-file-buffer file))
           (if fbuf
               (setq file-buf fbuf)
-            (setq old-visit-value (shu-make-record-visited-files-false))
-            (setq file-buf (find-file-noselect file))
-            (setq shu-record-visited-files old-visit-value))
+            (setq file-buf (shu-internal-find-file-noselect file)))
           (set-buffer file-buf)
           (setq was-modified (buffer-modified-p))
           (setq byte-count (shu-internal-trim-buffer))
@@ -2009,8 +2006,7 @@ removed, and number of fils modified."
         (fcount 0)
         (byte-count 0)
         (mod-bytes 0)
-        (mod-count 0)
-        (old-visit-value))
+        (mod-count 0))
     (while directory-list
       (setq full-name (car directory-list))
       (setq sname (file-name-nondirectory full-name))
@@ -2019,9 +2015,7 @@ removed, and number of fils modified."
         (setq fbuf (get-file-buffer full-name))
         (if fbuf
             (setq file-buf fbuf)
-          (setq old-visit-value (shu-make-record-visited-files-false))
-          (setq file-buf (find-file-noselect full-name))
-          (setq shu-record-visited-files old-visit-value))
+          (setq file-buf (shu-internal-find-file-noselect full-name)))
         (set-buffer file-buf)
         (setq was-modified (buffer-modified-p))
         (setq byte-count (shu-internal-trim-buffer))

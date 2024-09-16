@@ -1,4 +1,4 @@
-8;;; shu-base.el --- Shu project global variables and functions
+;;; shu-base.el --- Shu project global variables and functions
 ;;
 ;; Copyright (C) 2013 Stewart L. Palmer
 ;;
