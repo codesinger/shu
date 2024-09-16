@@ -362,7 +362,7 @@ to SHU-ADAPT-FRAME."
 ;; Clear the bookmark index whenever the bookmark file is saved
 (add-hook 'after-save-hook 'shu-bkmark-clear-index)
 (add-hook 'before-save-hook 'shu-trim-file-hook)
-(add-hook 'find-file-hook 'slp-record-visited-file)
+(add-hook 'find-file-hook 'shu-record-visited-file-hook)
 
 (defvar shu-org-mode-is-set nil
   "set to true if org mode has been set up")
