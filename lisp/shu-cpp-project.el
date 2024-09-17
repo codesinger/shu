@@ -456,7 +456,7 @@ into the current file at point."
         (tlist)
         (local-dir))
     (setq shu-cpp-final-list nil)
-    (shu-cpp-project-subdirs (file-truename (expand-file-name proj-root)) level)
+    (shu-cpp-project-subdirs (expand-file-name proj-root) level)
     (setq shu-cpp-final-list (sort shu-cpp-final-list 'string<))
     (while shu-cpp-final-list
       (setq local-dir (file-relative-name (car shu-cpp-final-list)))
