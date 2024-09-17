@@ -456,7 +456,7 @@ into the current file at point."
         (tlist)
         (local-dir))
     (setq shu-cpp-final-list nil)
-    (shu-cpp-project-subdirs (expand-file-name proj-root) level)
+    (shu-cpp-project-subdirs (file-truename (expand-file-name proj-root)) level)
     (setq shu-cpp-final-list (sort shu-cpp-final-list 'string<))
     (while shu-cpp-final-list
       (setq local-dir (file-relative-name (car shu-cpp-final-list)))
@@ -567,10 +567,10 @@ appropriate subdirectory."
           (line-diff 0)
           (eol       nil)
           (dir-name  nil)
-          (local-dir (file-name-directory buffer-file-name))
+          (local-dir (file-name-directory (file-truename (buffer-file-name))))
           (shu-cpp-buffer (get-buffer-create shu-project-cpp-buffer-name)))
       (setq shu-cpp-project-list nil)
-      (setq shu-cpp-project-file (buffer-file-name))
+      (setq shu-cpp-project-file (file-truename (buffer-file-name)))
       (setq shu-cpp-c-file-count 0)
       (setq shu-cpp-h-file-count 0)
       (while (and (<= (shu-current-line) eline) (= line-diff 0)) ; there are more lines
@@ -625,7 +625,7 @@ appropriate subdirectory."
       (while ilist
         (setq c1 (car ilist))
         (setq file-name (car c1))
-        (setq full-name (cdr c1))
+        (setq full-name (file-truename (cdr c1)))
         (setq extension (file-name-extension file-name))
         (setq shu-project-file-list (cons full-name shu-project-file-list))
         (setq shu-project-user-class-count (1+ shu-project-user-class-count))
@@ -731,7 +731,7 @@ name \"/u/foo/bar/thing.c\"."
        (target-name (concat "[^.]\\." target-extensions "$"))
        (directory-list (directory-files directory-name t target-name)))
     (while directory-list
-      (setq full-name (car directory-list))
+      (setq full-name (file-truename (car directory-list)))
       (setq file-name (file-name-nondirectory full-name))
       ;; Exclude emacs file reservations
       (when (not (and (file-symlink-p full-name) (string= (substring file-name 0 2) ".#")))
@@ -2794,7 +2794,7 @@ When visiting related files within a project, this function verifies that the
 current file is actually a member of the current project.  If there exists a
 project and the current file is not a member of that project, you are probably
 about to be taken silently to the wrong file."
-  (let ((local-name (buffer-file-name))
+  (let ((local-name (file-truename (buffer-file-name)))
         (plist)
         (file-in-project))
     (if (not shu-cpp-class-list)
@@ -2819,7 +2819,7 @@ intermediate extension, such as .i or .t when visiting .i.cpp or .t.cpp.  This
 function gets the buffer file name and removes the one or two extensions in
 order to get the name with no extensions at all."
   (interactive)
-  (let ((base-name (buffer-file-name)))
+  (let ((base-name (file-truename (buffer-file-name))))
     (shu-cpp-project-extract-base-name base-name)
     ))
 
