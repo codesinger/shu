@@ -291,6 +291,17 @@ given task as a Google test."
 
 
 ;;
+;;  ddf
+;;
+(defun ddf ()
+  "Insert \"git diff >d.diff\" at point."
+  (interactive)
+    (insert "git diff >d.diff")
+    )
+
+
+
+;;
 ;;  ddi
 ;;
 (defun ddi ()
@@ -376,7 +387,8 @@ given task as a Google test."
 ;;  ngf
 ;;
 (defun ngf()
-  "While in dired, put the full path to the current file in the kill ring (quoted for shell)"
+  "While in dired, put the full path to the current file in the kill ring
+(quoted for shell)"
   (interactive)
   (let (
     (debug-on-error t)
@@ -429,8 +441,8 @@ given task as a Google test."
 ;; ghist - Visit the two history directories
 ;;
 (defun ghist ()
-  (interactive)
   "Visit the two history directories."
+  (interactive)
   (dired  "~/projects/personal/history/")
   (dired "~/projects/personal/yale/summer-2012/hist-s213/")
 )
@@ -439,8 +451,8 @@ given task as a Google test."
 ;; gincl - Visit the equivalent of /usr/include on Mavericks Xcode
 ;;
 (defun gincl ()
-  (interactive)
   "Visit the equivalent of /usr/include in MacOS Xcode"
+  (interactive)
   (dired  "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/")
 )
 
@@ -449,7 +461,8 @@ given task as a Google test."
 ;;  shu-run-all-unit-tests
 ;;
 (defun shu-run-all-unit-tests ()
-  "Compile and run all of the unit tests.  This must be run from the test directory."
+  "Compile and run all of the unit tests.  This must be run from the test
+directory."
   (interactive)
   (let
       ((test-files
@@ -467,7 +480,7 @@ given task as a Google test."
     (setq tlist test-files)
     (while tlist
       (setq file-name (car tlist))
-      (byte-recompile-file file-name 0 0 1)
+      (byte-recompile-file file-name nil 0)
       (setq tlist (cdr tlist)))
     (ert t)
     ))
@@ -519,9 +532,10 @@ makes it smaller."
 ;;  font-size
 ;;
 (defun font-size (scale)
-"Interactive function to change the size of the default font.  The size is specified in tenths
-of a point.  So 120 is 12 points.  Use prefix argument to set the new size.  If no prefix
-argument is used, a prompt is placed in the mini-buffer."
+  "Interactive function to change the size of the default font.  The size is
+specified in tenths of a point.  So 120 is 12 points.  Use prefix argument to
+set the new size.  If no prefix argument is used, a prompt is placed in the
+mini-buffer."
   (interactive "NSize in tenths of points?: ")
   (set-face-attribute 'default nil :height scale)
 )
@@ -855,8 +869,8 @@ but only for type @book."
 ;; fixup-senior-notes
 ;;
 (defun fixup-senior-notes ()
-  "Transform \section{\citetitle{blah}} into \section{\citetitle{blah} (blah)}.  This puts the
-   actual BibTex tag names into the headings."
+  "Transform \section{\citetitle{blah}} into \section{\citetitle{blah} (blah)}.
+   This puts the actual BibTex tag names into the headings."
   (interactive)
   (let (
     (gbuf      (get-buffer-create "*slp debug*")) ;
