@@ -3094,6 +3094,18 @@
 
 
 ;;
+;;  shu-test-shu-extract-replacement-strings-6
+;;
+(ert-deftest shu-test-shu-extract-replacement-strings-6 ()
+  (let ((data "$Just the$ worst time of year$ for a journey")
+        (rval))
+    (setq rval (shu-extract-replacement-strings data))
+    (should (not rval))
+    ))
+
+
+
+;;
 ;;  shu-test-shu-extract-replacement-triple-1
 ;;
 (ert-deftest shu-test-shu-extract-replacement-triple-1 ()

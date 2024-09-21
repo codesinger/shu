@@ -3077,15 +3077,21 @@ nil is returned."
         (ss)
         (p1)
         (p2)
+        (p3)
         (rval)
         (case-fold-search nil))
     (when (> (length rstring) 3)
       (setq sc (substring rstring 0 1))
-      (setq ss (concat sc "\\([^" sc "]+\\)" sc "\\([^" sc "]+\\)" sc "*"))
+      (setq ss (concat sc "\\([^" sc "]+\\)" sc "\\([^" sc "]+\\)" sc "*" "\\([^" sc "]*\\)"))
       (when (string-match ss rstring)
         (setq p1 (match-string 1 rstring))
         (setq p2 (match-string 2 rstring))
-        (setq rval (cons p1 p2))))
+        (setq p3 (match-string 3 rstring))
+        (when p3
+          (when (= 0 (length p3))
+            (setq p3 nil)))
+          (when (not p3)
+            (setq rval (cons p1 p2)))))
     rval
     ))
 
@@ -3956,6 +3962,7 @@ These are generally the same as the function names with the leading
 shu- prefix removed."
   (defalias 'set-unix-eol 'shu-set-unix-eol)
   (defalias 'set-dos-eol 'shu-set-dos-eol)
+  (defalias 'set-mac-eol 'shu-set-mac-eol)
   (defalias 'trim-trailing-blanks 'shu-trim-trailing-blanks)
   (defalias 'winpath 'shu-winpath)
   (defalias 'eld 'shu-save-and-load)
