@@ -216,7 +216,7 @@ entry in the keyring file.")
 (defconst shu-keyring-pin-name   "pin"
   "Key word that denotes a PIN.")
 
-(defconst shu-keyring-buffer-name  "**shu-keyring**"
+(defconst shu-keyring-msg-buffer-name  "**shu-keyring**"
   "The name of the buffer into which keyring diagnostics and messages
 are recorded.")
 
@@ -231,6 +231,18 @@ set it can then be put into kill ring by shu-keyring-get-passphrase.")
 (defvar shu-keyring-alternate-passphrase nil
   "Holds the alternate passphrase.  The alternate passphrase has no assigned
 meaning.  It means whatever the user wants it to mean.")
+
+(defvar shu-keyring-x-id nil
+  "Holds the ID portion of the user ID and password for an arbitrary
+application.  The combination of SHU-X-ID and SHU-X-PW are assumed to represent
+the user ID and password for an arbitrary application but can be used to
+remember any two strings for any purpose.")
+
+(defvar shu-keyring-x-pw nil
+  "Holds the password portion of the user ID and password for an arbitrary
+application.  The combination of SHU-X-ID and SHU-X-PW are assumed to represent
+the user ID and password for an arbitrary application but can be used to
+remember any two strings for any purpose.")
 
 
 ;;
@@ -400,11 +412,11 @@ into the keyring buffer (**shu-keyring**) to see if there are any complaints
 about syntax errors in the file."
   (interactive)
   (setq shu-keyring-index nil)
-  (when (bufferp shu-keyring-buffer-name)
-    (kill-buffer shu-keyring-buffer-name))
+  (when (bufferp shu-keyring-msg-buffer-name)
+    (kill-buffer shu-keyring-msg-buffer-name))
   (setq shu-keyring-index
-        (shu-nvpindex-parse-file shu-keyring-file shu-keyring-file-type shu-keyring-buffer-name))
-  (switch-to-buffer shu-keyring-buffer-name)
+        (shu-nvpindex-parse-file shu-keyring-file shu-keyring-file-type shu-keyring-msg-buffer-name))
+  (switch-to-buffer shu-keyring-msg-buffer-name)
   (goto-char (point-min))
   )
 
@@ -418,7 +430,7 @@ about syntax errors in the file."
 completing-read for the field that identifies the key.  Use the key to find the
 item.  Find the value of the named key value pair within the item.  Put the
 value in the kill-ring and also return it to the caller."
-  (let ((gbuf      (get-buffer-create shu-keyring-buffer-name))
+  (let ((gbuf      (get-buffer-create shu-keyring-msg-buffer-name))
         (invitation   "Key? ")
         (keyring-key   )
         (keyring-entry )
@@ -427,10 +439,10 @@ value in the kill-ring and also return it to the caller."
         (item-value    ))
     (when (not shu-keyring-index)
       (setq shu-keyring-index
-            (shu-nvpindex-parse-file shu-keyring-file shu-keyring-file-type shu-keyring-buffer-name)))
+            (shu-nvpindex-parse-file shu-keyring-file shu-keyring-file-type shu-keyring-msg-buffer-name)))
     (if (not shu-keyring-index)
         (progn
-          (message "Could not parse keyring.  See %s." shu-keyring-buffer-name)
+          (message "Could not parse keyring.  See %s." shu-keyring-msg-buffer-name)
           (ding))
 
       (let
@@ -548,6 +560,103 @@ has been placed in the clipboard, (PW, ID, etc.)"
     ))
 
 
+
+;;
+;;  shu-keyring-set-x-both
+;;
+(defun shu-keyring-set-x-both (id-string)
+  "Set the both the User ID and password of the user ID and password for an
+arbitrary application.  The combination of SHU-X-ID and SHU-X-PW are assumed to
+represent the user ID and password for an arbitrary application but can be used
+to remember any two strings for any purpose.
+
+The two strings are separated by a delimiter, which is defined by the first
+character of the string.  If you wish to set an ID of \"Fred\" and a password of
+\"Happy Birthday,\" then a string you might enter would be
+\"$Fred$HappyBirthday\" or \"/Fred/HappyBirthday\""
+  (interactive "sID pair?: ")
+  (let ((rval (shu-extract-replacement-strings id-string)))
+    (if (not rval)
+        (progn
+          (ding)
+          (message "Cannot parse '%s' to find the two ID / PW strings" id-string))
+      (setq shu-keyring-x-id (car rval))
+      (setq shu-keyring-x-pw (cdr rval)))
+    ))
+
+
+
+;;
+;;  shu-keyring-set-x-id
+;;
+(defun shu-keyring-set-x-id (id-string)
+  "Set the ID portion of the user ID and password for an arbitrary application.
+The combination of SHU-X-ID and SHU-X-PW are assumed to represent the user ID
+and password for an arbitrary application but can be used to remember any two
+strings for any purpose."
+  (interactive "sID?: ")
+    (setq shu-keyring-x-id id-string)
+    )
+
+
+
+;;
+;;  shu-keyring-get-x-id
+;;
+(defun shu-keyring-get-x-id ()
+  "Put into the kill ring, the User ID portion of a user ID and password for an
+arbitrary application.  The combination of SHU-X-ID and SHU-X-PW are assumed to
+represent the user ID and password for an arbitrary application but can be used
+to remember any two strings for any purpose."
+  (interactive)
+  (let ((phrase "**unknown**")
+        (displaypw ".........."))
+    (if shu-keyring-x-id
+        (progn
+          (setq phrase shu-keyring-x-id)
+          (message "X ID: %s" displaypw))
+      (ding)
+      (message "%s" "The X id is not set."))
+    (shu-kill-new phrase)
+    ))
+
+
+
+;;
+;;  shu-keyring-set-x-pw
+;;
+(defun shu-keyring-set-x-pw (pw-string)
+  "Set the password portion of the user ID and password for an arbitrary
+application.  The combination of SHU-X-ID and SHU-X-PW are assumed to represent
+the user ID and password for an arbitrary application but can be used to
+remember any two strings for any purpose."
+  (interactive "sPW?: ")
+    (setq shu-keyring-x-pw pw-string)
+    )
+
+
+
+;;
+;;  shu-keyring-get-x-pw
+;;
+(defun shu-keyring-get-x-pw ()
+  "Put into the kill ring, the User ID portion of a user ID and password for an
+arbitrary application.  The combination of SHU-X-ID and SHU-X-PW are assumed to
+represent the user ID and password for an arbitrary application but can be used
+to remember any two strings for any purpose."
+  (interactive)
+  (let ((phrase "**unknown**")
+        (displaypw ".........."))
+    (if shu-keyring-x-pw
+        (progn
+          (setq phrase shu-keyring-x-pw)
+          (message "X PW: %s" displaypw))
+      (ding)
+      (message "%s" "The X passphrase is not set."))
+    (shu-kill-new phrase)
+    ))
+
+
 ;;
 ;;  shu-keyring-set-alias
 ;;
@@ -571,6 +680,11 @@ to make them easier to type. "
   (defalias 'set-passphrase 'shu-keyring-set-passphrase)
   (defalias 'set-alternate-passphrase 'shu-keyring-set-alternate-passphrase)
   (defalias 'kraps 'shu-keyring-get-alternate-passphrase)
+  (defalias 'set-x-both 'shu-keyring-set-x-both)
+  (defalias 'set-x-id 'shu-keyring-set-x-id)
+  (defalias 'set-x-pw 'shu-keyring-set-x-pw)
+  (defalias 'krxid 'shu-keyring-get-x-id)
+  (defalias 'krxpw 'shu-keyring-get-x-pw)
   )
 
 ;;; shu-keyring.el ends here
