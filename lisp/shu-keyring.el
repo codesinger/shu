@@ -587,6 +587,44 @@ character of the string.  If you wish to set an ID of \"Fred\" and a password of
 
 
 ;;
+;;  shu-keyring-get-x-both
+;;
+(defun shu-keyring-get-x-both ()
+  "Put into the kill ring, the User ID and password of a user ID and password
+for an arbitrary application.  The combination of SHU-X-ID and SHU-X-PW are
+assumed to represent the user ID and password for an arbitrary application but
+can be used to remember any two strings for any purpose.
+The item put into the kill ring consists of two delimited strings intended to be
+used as input to SHU-KEYRING-SET-X-BOTH."
+  (interactive)
+  (let ((delims "$!@#%&;:<>/|\[]{}")
+        (delim)
+        (ids)
+        (both))
+    (if (or (not shu-keyring-x-id)
+            (not shu-keyring-x-pw))
+        (progn
+          (ding)
+          (if (and (not shu-keyring-x-id)
+                   (not shu-keyring-x-pw))
+                (message "%s" "Neither SHU-X-ID nor SHU-X-PW are set")
+            (if (not shu-keyring-x-id)
+                  (message "%s" "SHU-X-ID is not set")
+              (when (not shu-keyring-x-pw)
+                (message "%s" "SHU-X-PW is not set")))))
+      (setq ids (concat shu-keyring-x-id shu-keyring-x-pw))
+      (setq delim (shu-first-char-not-in-second delims ids))
+      (if (not delim)
+          (progn
+            (ding)
+            (message "Unable to find appropriate delimiter in the set {%s}" delims))
+        (setq both (concat delim shu-keyring-x-id delim shu-keyring-x-pw))
+        (shu-kill-new both)))
+    ))
+
+
+
+;;
 ;;  shu-keyring-set-x-id
 ;;
 (defun shu-keyring-set-x-id (id-string)
@@ -685,6 +723,7 @@ to make them easier to type. "
   (defalias 'set-x-pw 'shu-keyring-set-x-pw)
   (defalias 'krxid 'shu-keyring-get-x-id)
   (defalias 'krxpw 'shu-keyring-get-x-pw)
+  (defalias 'krxboth `shu-keyring-get-x-both)
   )
 
 ;;; shu-keyring.el ends here

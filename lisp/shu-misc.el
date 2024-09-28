@@ -3952,6 +3952,32 @@ variable SHU-TRIM-FILE."
 
 
 
+;;
+;;  shu-first-char-not-in-second
+;;
+(defun shu-first-char-not-in-second (string1 string2)
+  "Find and return (as a string) the first character in STRING1 that does not
+exist in STRING2.  For example, if STRING1 = \"abcdefQgh\" and STRING2 =
+\"abcdefgh\", this function returns the string \"Q\".  If STRING2 actually
+contains every character in STRING1, this function returns nil."
+  (let ((length (length string1))
+        (i 0)
+        (c)
+        (r)
+        (result)
+        (case-fold-search nil))
+    (while (and (< i length)
+                (not result))
+      (setq c (substring string1 i (1+ i)))
+      (setq r (regexp-opt (list c)))
+      (unless (string-match-p r string2)
+        (setq result c))
+      (setq i (1+ i)))
+    result
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias

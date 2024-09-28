@@ -3777,4 +3777,132 @@
     (should (>= digit-count 2))
     ))
 
+
+
+;;
+;;  she-test-shu-first-char-not-in-second-1
+;;
+(ert-deftest she-test-shu-first-char-not-in-second-1 ()
+  (let ((string1 "abcgefQgh")
+        (string2 "abcgefqxhijkl")
+        (expected "Q")
+        (actual))
+    (setq actual (shu-first-char-not-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  she-test-shu-first-char-not-in-second-2
+;;
+(ert-deftest she-test-shu-first-char-not-in-second-2 ()
+  (let ((string1 "abcdefgh")
+        (string2 "abcdefg")
+        (expected "h")
+        (actual))
+    (setq actual (shu-first-char-not-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  she-test-shu-first-char-not-in-second-3
+;;
+(ert-deftest she-test-shu-first-char-not-in-second-3 ()
+  (let ((string1 "abcdefgh")
+        (string2 "abcdefghijklmnop")
+        (actual))
+    (setq actual (shu-first-char-not-in-second string1 string2))
+    (should (not actual))
+    ))
+
+
+
+;;
+;;  she-test-shu-first-char-not-in-second-4
+;;
+(ert-deftest she-test-shu-first-char-not-in-second-4 ()
+  (let ((string1 "/$@!&")
+        (string2 "abcdefg")
+        (expected "/")
+        (actual))
+    (setq actual (shu-first-char-not-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  she-test-shu-first-char-not-in-second-5
+;;
+(ert-deftest she-test-shu-first-char-not-in-second-5 ()
+  (let ((string1 "/$@!&")
+        (string2 "abc/defg")
+        (expected "$")
+        (actual))
+    (setq actual (shu-first-char-not-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+
+;;
+;;  she-test-shu-first-char-not-in-second-6
+;;
+(ert-deftest she-test-shu-first-char-not-in-second-6 ()
+  (let ((string1 "/$@!&")
+        (string2 "a$bc/defg")
+        (expected "@")
+        (actual))
+    (setq actual (shu-first-char-not-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+
+;;
+;;  she-test-shu-first-char-not-in-second-7
+;;
+(ert-deftest she-test-shu-first-char-not-in-second-7 ()
+  (let ((string1 "/$@!&|")
+        (string2 "a$bc/de@fg")
+        (expected "!")
+        (actual))
+    (setq actual (shu-first-char-not-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+
+;;
+;;  she-test-shu-first-char-not-in-second-8
+;;
+(ert-deftest she-test-shu-first-char-not-in-second-8()
+  (let ((string1 "/$@!&|")
+        (string2 "a$bc/de@f/$@!&g")
+        (expected "|")
+        (actual))
+    (setq actual (shu-first-char-not-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
 ;;; shu-misc.t.el ends here
