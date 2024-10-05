@@ -52,32 +52,4 @@
     ))
 
 
-
-;;
-;;  shu-test-shu-nvpindex-get-nvplist-from-item
-;;
-(ert-deftest shu-test-shu-nvpindex-get-nvplist-from-item ()
-  (let ((item (cons 5 6))
-        (nvplist))
-    (setq nvplist (shu-nvpindex-get-nvplist-from-item item))
-    (should nvplist)
-    (should (numberp nvplist))
-    (should (= nvplist 6))
-    ))
-
-
-
-;;
-;;  shu-test-shu-nvpindex-get-item-number-from-item
-;;
-(ert-deftest shu-test-shu-nvpindex-get-item-number-from-item ()
-  (let ((item (cons 7 8))
-        (item-number))
-    (setq item-number (shu-nvpindex-get-item-number-from-item item))
-    (should item-number)
-    (should (numberp item-number))
-    (should (= item-number 7))
-    ))
-
-
 ;;; shu-nvpindex.t.el ends here

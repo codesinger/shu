@@ -100,9 +100,9 @@
 ;;
 ;;  shu-nvpindex-get-item-from-key-item
 ;;
-(defmacro shu-nvpindex-get-item-from-key-item (index-entry)
-  "Fetch the ITEM from an INDEX-ENTRY."
-    `(cdr ,index-entry)
+(defmacro shu-nvpindex-get-item-from-key-item (key-item)
+  "Fetch the ITEM from an KEY-ITEM."
+    `(cdr ,key-item)
     )
 
 
@@ -110,29 +110,9 @@
 ;;
 ;;  shu-nvpindex-get-key-from-key-item
 ;;
-(defmacro shu-nvpindex-get-key-from-key-item (index-entry)
-  "Fetch the ITEM from an INDEX-ENTRY."
-    `(car ,index-entry)
-    )
-
-
-
-;;
-;;  shu-nvpindex-get-nvplist-from-item
-;;
-(defmacro shu-nvpindex-get-nvplist-from-item (item)
-  "Fetch the NVPLIST from an ITEM."
-    `(cdr ,item)
-    )
-
-
-
-;;
-;;  shu-nvpindex-get-item-number-from-item
-;;
-(defmacro shu-nvpindex-get-item-number-from-item (item)
-  "Fetch the NVPLIST from an ITEM."
-    `(car ,item)
+(defmacro shu-nvpindex-get-key-from-key-item (key-item)
+  "Fetch the ITEM from an KEY-ITEM."
+    `(car ,key-item)
     )
 
 
@@ -187,8 +167,8 @@ contains no duplicate keys."
     (while tindex
       (setq count (1+ count))
       (setq key-item (car tindex))
-      (setq key  (car key-item))
-      (setq item (cdr key-item))
+      (setq key  (shu-nvpindex-get-key-from-key-item key-item))
+      (setq item (shu-nvpindex-get-item-from-key-item key-item))
       (setq item-number (shu-nvplist-get-item-number item))
       (setq item-number-string (shu-fixed-format-num item-number 10))
       (princ (format "%s:  %s\n" item-number-string key) gbuf)
@@ -219,8 +199,8 @@ called."
        (has-duplicate     nil))
     (while tindex
       (setq key-item (car tindex))
-      (setq key  (car key-item))
-      (setq item (cdr key-item))
+      (setq key  (shu-nvpindex-get-key-from-key-item key-item))
+      (setq item (shu-nvpindex-get-item-from-key-item key-item))
       (setq item-number (shu-nvplist-get-item-number item))
       (when last-key
         (when (string= (upcase last-key) (upcase key))
