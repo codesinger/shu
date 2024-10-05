@@ -43,9 +43,9 @@
 
 
 ;;
-;;  shu-test-shu-nvplist-parse-buffer-1\
+;;  shu-test-shu-nvplist-parse-buffer-1
 ;;
-(ert-deftest shu-test-shu-nvplist-parse-buffer-1\ ()
+(ert-deftest shu-test-shu-nvplist-parse-buffer-1 ()
   (let ((gb (get-buffer-create "**boo**"))
         (data
          (concat
@@ -77,11 +77,12 @@
       (shu-nvplist-show-item-list item-list)
       (while item-list
         (setq item (car item-list))
-        (princ item gb)(princ "\n" gb)
+        (princ "item: " gb)(princ item gb)(princ "\n" gb)
         (should item)
         (should (consp item))
         (setq item-no (car item))
         (setq items (cdr item))
+        (princ "items: " gb)(princ items gb)(princ "\n" gb)
         (should item-no)
         (should (numberp item-no))
         (should (or (= 1 item-no) (= 2 item-no) (= 3 item-no)))
@@ -98,6 +99,75 @@
           (should (listp xx))
           (when (= x item-no)
             (setq found t)
+            (princ "xx: " gb)(princ xx gb)(princ "\n" gb)
+            (should (equal xx items)))
+          (setq exp (cdr exp)))
+        (setq item-list (cdr item-list))))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-nvplist-parse-buffer-2
+;;
+(ert-deftest shu-test-shu-nvplist-parse-buffer-2 ()
+  (let ((gb (get-buffer-create "**boo**"))
+        (data
+         (concat
+          "\n"
+          " <id=mumble  car=Audi try=fuumble car=\"Jaguar XKE\" />\n"
+          " <cat=dog  bob=happy />\n"
+          " <fox=smile  mary=lamb  fox=eggs stew=bubble fox=hen   />\n"
+          ))
+        (item-list)
+        (item)
+        (item-no)
+        (items)
+        (expected
+         (list
+          (cons 1
+                (list (cons "id" "mumble") (cons "car" "Audi") (cons "try" "fuumble") (cons "car" "Jaguar XKE")))
+          (cons 2
+                (list (cons "cat" "dog") (cons "bob" "happy")))
+          (cons 3
+                (list (cons "fox" "smile") (cons "mary" "lamb") (cons "fox" "eggs")
+                      (cons "stew" "bubble") (cons "fox" "hen")))))
+        (exp)
+        (found)
+        (xp)
+        (x)
+        (xx))
+    (with-temp-buffer
+      (princ "\n\n\n" gb)
+      (insert data)
+      (setq item-list (shu-nvplist-parse-buffer item-list))
+      (shu-nvplist-show-item-list item-list)
+      (while item-list
+        (setq item (car item-list))
+        (princ "item: " gb)(princ item gb)(princ "\n" gb)
+        (should item)
+        (should (consp item))
+        (setq item-no (car item))
+        (setq items (cdr item))
+        (princ "items: " gb)(princ items gb)(princ "\n" gb)
+        (should item-no)
+        (should (numberp item-no))
+        (should (or (= 1 item-no) (= 2 item-no) (= 3 item-no)))
+        (setq exp expected)
+        (setq found nil)
+        (while exp
+          (setq xp (car exp))
+          (setq x (car xp))
+          (should x)
+          (should (numberp x))
+          (should (or (= 1 x) (= 2 x) (= 3 x)))
+          (setq xx (cdr xp))
+          (should xx)
+          (should (listp xx))
+          (when (= x item-no)
+            (setq found t)
+            (princ "xx: " gb)(princ xx gb)(princ "\n" gb)
             (should (equal xx items)))
           (setq exp (cdr exp)))
         (setq item-list (cdr item-list))))
