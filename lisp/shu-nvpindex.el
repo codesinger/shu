@@ -97,6 +97,44 @@
 
 
 
+;;
+;;  shu-nvpindex-get-item-from-key-item
+;;
+(defmacro shu-nvpindex-get-item-from-key-item (index-entry)
+  "Fetch the ITEM from an INDEX-ENTRY."
+    `(cdr ,index-entry)
+    )
+
+
+
+;;
+;;  shu-nvpindex-get-key-from-key-item
+;;
+(defmacro shu-nvpindex-get-key-from-key-item (index-entry)
+  "Fetch the ITEM from an INDEX-ENTRY."
+    `(car ,index-entry)
+    )
+
+
+
+;;
+;;  shu-nvpindex-get-nvplist-from-item
+;;
+(defmacro shu-nvpindex-get-nvplist-from-item (item)
+  "Fetch the NVPLIST from an ITEM."
+    `(cdr ,item)
+    )
+
+
+
+;;
+;;  shu-nvpindex-get-item-number-from-item
+;;
+(defmacro shu-nvpindex-get-item-number-from-item (item)
+  "Fetch the NVPLIST from an ITEM."
+    `(car ,item)
+    )
+
 
 
 ;;

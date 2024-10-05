@@ -62,6 +62,7 @@ directory."
          "shu-git.t.elc"
          "shu-match.t.elc"
          "shu-misc.t.elc"
+         "shu-nvpindex.t.elc"
          "shu-nvplist.t.elc"
          "shu-xref.t.elc"))
        (file-name)

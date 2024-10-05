@@ -578,6 +578,7 @@ elisp function and its associated doc string and convert it to LaTex.")
    "shu-keyring.el"
    "shu-match.el"
    "shu-misc.el"
+   "shu-nvpindex.el"
    "shu-nvplist.el"
    "shu-org-extensions.el"
    "shu-xref.el")
