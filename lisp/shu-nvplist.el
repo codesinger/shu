@@ -60,6 +60,34 @@
 ;;       (2 (cat . dog) (bob . happy))
 ;;       (3 (mary . lamb) (stew . bubble) (fox . hen))
 ;;
+;;
+;; Note that there is nothing in this mechanism that enforces name uniqueness in
+;; a name value pair list.
+;;
+;; The following set of name value pairs
+;;
+;;     <id=mumble  try=fuumble car=\"Jaguar XKE\" id=bumble car=Audi/>
+;;     <cat=dog  cat=tiger bob=happy />
+;;     <mary=lamb  stew=bubble fox=hen fox=egg fox=smile  />
+;;
+;; would be converted to
+;;
+;;     (1 (id . mumble) (try . fuumble) (car . Jaguar XKE) (id . bumble)
+;;        (car . Audi))
+;;     (2 (cat . dog) (cat . tiger) (bob . happy))
+;;     (3 (mary . lamb) (stew . bubble) (fox . hen) (fox . egg) (fox . smile))
+;;
+;; If one were to extract the value of \"car\" from the first list with
+;; SHU-NVPLIST-GET-ITEM-VALUE, a list of length 2 would be returned that
+;; is (list \"Jaguar XKE\" \"Audi\").
+;;
+;; Fetching the value of \"fox\" from the third list with
+;; SHU-NVPLIST-GET-ITEM-VALUE would return
+;; (list \"hen\" \"egg\" \"smile\")
+;;
+;; Fetching the value of \"mary\" from the third list with
+;; SHU-NVPLIST-GET-ITEM-VALUE would return (list \"lamb\").
+;;
 
 ;;; Code:
 
