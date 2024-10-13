@@ -148,6 +148,35 @@ contains no duplicate keys."
     ))
 
 
+
+;;
+;; shu-nvpindex-make-primary-index
+;;
+(defun shu-nvpindex-make-primary-index (item-list buffer-name)
+  "Given an ITEM-LIST created by SHU-NVPLIST-PARSE-FILE, create and return the
+primary index used by higher level applications to locate the items in the
+ITEM-LIST."
+  (let
+      ((gbuf      (get-buffer-create buffer-name))
+       (count)
+       (ilist item-list)
+       (item )
+       (index))
+    (while ilist
+      (setq item (car ilist))
+      (setq index (shu-nvpindex-update-index index item))
+      (setq ilist (cdr ilist)))
+    (setq index (sort index (lambda(t1 t2) (string< (upcase (car t1)) (upcase (car t2))))))
+    (if (shu-nvpindex-find-index-duplicates index buffer-name)
+        (princ "Index has duplicates\n" gbuf)
+      (princ "Index has no duplicates\n" gbuf)
+      (setq count (length index))
+      (princ (format "Index contains %d entries.\n" count)  gbuf))
+    (shu-nvpindex-show-index index buffer-name)
+    index
+    ))
+
+
 ;;
 ;;  shu-nvpindex-show-index
 ;;
