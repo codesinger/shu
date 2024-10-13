@@ -3905,4 +3905,81 @@
     (should (string= actual expected))
     ))
 
+
+
+;;
+;;  shu-test-shu-any-char-from-first-in-second-1
+;;
+(ert-deftest shu-test-shu-any-char-from-first-in-second-1 ()
+  (let ((string1 " =/>")
+        (string2 "Happy Birthday=!")
+        (expected " ")
+        (actual))
+    (setq actual (shu-any-char-from-first-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-any-char-from-first-in-second-2
+;;
+(ert-deftest shu-test-shu-any-char-from-first-in-second-2 ()
+  (let ((string1 " =/>")
+        (string2 "Happy=Birthday/!")
+        (expected "=")
+        (actual))
+    (setq actual (shu-any-char-from-first-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-any-char-from-first-in-second-3
+;;
+(ert-deftest shu-test-shu-any-char-from-first-in-second-3 ()
+  (let ((string1 " =/>")
+        (string2 "Happy/Birthday>")
+        (expected "/")
+        (actual))
+    (setq actual (shu-any-char-from-first-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-any-char-from-first-in-second-4
+;;
+(ert-deftest shu-test-shu-any-char-from-first-in-second-4 ()
+  (let ((string1 " =/>")
+        (string2 "Happy>Birthday")
+        (expected ">")
+        (actual))
+    (setq actual (shu-any-char-from-first-in-second string1 string2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-any-char-from-first-in-second-5
+;;
+(ert-deftest shu-test-shu-any-char-from-first-in-second-5 ()
+  (let ((string1 " =/>")
+        (string2 "HappyBirthday!")
+        (actual))
+    (setq actual (shu-any-char-from-first-in-second string1 string2))
+    (should (not actual))
+    ))
+
 ;;; shu-misc.t.el ends here

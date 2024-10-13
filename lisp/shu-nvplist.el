@@ -88,6 +88,32 @@
 ;; Fetching the value of \"mary\" from the third list with
 ;; SHU-NVPLIST-GET-ITEM-VALUE would return (list \"lamb\").
 ;;
+;;
+;; ```
+;;  nvplist:
+;;
+;;   is a list of nvpair, each of which contains:
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> Value
+;;        |
+;;        +-------------> Name
+;;
+;;
+;;  item:
+;;
+;;   -------------------
+;;   |        |        |
+;;   | Item # |   o-------------->nvplist
+;;   |        |        |
+;;   -------------------
+;; ```
+;;
 
 ;;; Code:
 

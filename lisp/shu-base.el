@@ -302,6 +302,7 @@ information.")
    "shu-bde-cpp.elc"
    "shu-cpp-project.elc"
    "shu-nvplist.elc"
+   "shu-nvpindex.elc"
    "slp-comment-hooks.elc"
    "slp-bb-comment-hooks.elc")
   "A list of all of the library files that comprise the Shu elisp package in the

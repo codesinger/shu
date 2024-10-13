@@ -3978,6 +3978,30 @@ contains every character in STRING1, this function returns nil."
 
 
 
+;;
+;;  shu-any-char-from-first-in-second
+;;
+(defun shu-any-char-from-first-in-second (string1 string2)
+  "Find and return (as a string) the first character in STRING1 that exists in
+STRING2.  If no characters in STRING1 occur in STRING2, return nil."
+  (let ((length (length string1))
+        (i 0)
+        (c)
+        (r)
+        (result)
+        (case-fold-search nil))
+    (while (and (< i length)
+                (not result))
+      (setq c (substring string1 i (1+ i)))
+      (setq r (regexp-opt (list c)))
+      (when (string-match-p r string2)
+        (setq result c))
+      (setq i (1+ i)))
+    result
+    ))
+
+
+
 
 ;;
 ;;  shu-misc-set-alias
