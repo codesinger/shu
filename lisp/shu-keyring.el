@@ -180,6 +180,11 @@
   :type '(string)
   :group 'shu-keyring)
 
+(defvar shu-keyring-item-list nil
+  "The variable that points to the in-memory ITEM-LIST returned
+by SHU-NVPLIST-PARSE-FILE and subsequently passed to
+SHU-NVPINDEX-MAKE-PRIMARY-INDEX to create the keyring index
+pointed to by SHU-KEYRING-INDEX.")
 
 (defvar shu-keyring-index nil
   "The variable that points to the in-memory keyring index.")
@@ -243,6 +248,35 @@ remember any two strings for any purpose.")
 application.  The combination of SHU-X-ID and SHU-X-PW are assumed to represent
 the user ID and password for an arbitrary application but can be used to
 remember any two strings for any purpose.")
+
+
+
+;;
+;;  shu-keyring-erase-index
+;;
+(defun shu-keyring-erase-index ()
+  "Make the entire index nil."
+    (setq shu-keyring-item-list nil)
+    (setq shu-keyring-index nil)
+    )
+
+
+
+;;
+;;  shu-keyring-make-primary-index
+;;
+(defun shu-keyring-make-primary-index ()
+  "Doc string."
+  (let (
+        )
+    (shu-keyring-erase-index)
+    (setq shu-keyring-item-list
+          (shu-nvplist-parse-file shu-keyring-file shu-keyring-file-type shu-keyring-item-list))
+    (setq shu-keyring-index
+          (shu-nvpindex-make-primary-index shu-keyring-item-list shu-keyring-msg-buffer-name))
+    ))
+
+
 
 
 ;;
@@ -394,7 +428,7 @@ file is modified.  The next time the index is needed it will be recreated."
 
     (when (or (string= shu-keyring-file fn1)
               (string= shu-keyring-file fn2))
-      (setq shu-keyring-index nil))
+      (shu-keyring-erase-index))
     ))
 
 
@@ -411,11 +445,10 @@ keyring file.  This function parses the keyring file.  After the operation. look
 into the keyring buffer (**shu-keyring**) to see if there are any complaints
 about syntax errors in the file."
   (interactive)
-  (setq shu-keyring-index nil)
+  (shu-keyring-erase-index)
   (when (bufferp shu-keyring-msg-buffer-name)
     (kill-buffer shu-keyring-msg-buffer-name))
-  (setq shu-keyring-index
-        (shu-nvpindex-parse-file shu-keyring-file shu-keyring-file-type shu-keyring-msg-buffer-name))
+  (shu-keyring-make-primary-index)
   (switch-to-buffer shu-keyring-msg-buffer-name)
   (goto-char (point-min))
   )
@@ -438,8 +471,7 @@ value in the kill-ring and also return it to the caller."
         (vlist         )
         (item-value    ))
     (when (not shu-keyring-index)
-      (setq shu-keyring-index
-            (shu-nvpindex-parse-file shu-keyring-file shu-keyring-file-type shu-keyring-msg-buffer-name)))
+      (shu-keyring-make-primary-index))
     (if (not shu-keyring-index)
         (progn
           (message "Could not parse keyring.  See %s." shu-keyring-msg-buffer-name)
