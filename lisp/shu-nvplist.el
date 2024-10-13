@@ -452,6 +452,125 @@ end delimiter (\"/>\")."
     tlist
     ))
 
+
+
+;;
+;;  shu-nvplist-get-names
+;;
+(defun shu-nvplist-get-names (item)
+  "Return a list of all of the distinct names from an NVPLIST."
+  (let ((nvplist (shu-get-item-nvplist item))
+        (vname)
+        (uvname)
+        (uname-list)
+        (name-list))
+    (while nvplist
+      (setq vname (caar nvplist))
+      (setq uvname (upcase vname))
+      (unless (member uvname uname-list)
+        (push uvname uname-list)
+        (push vname name-list))
+      (setq nvplist (cdr nvplist)))
+    (setq name-list (sort name-list (lambda(t1 t2) (string< (upcase t1) (upcase t2)))))
+    name-list
+    ))
+
+
+
+;;
+;;  shu-nvplist-quoted-value
+;;
+(defun shu-nvplist-quoted-value (value)
+  "Return VALUE as a quoted string if it contains any characters that would have
+required it to be quoted in the original source list.  Otherwise return VALUE
+unaltered."
+  (let ((quoted-value value)
+        (delims " =/>"))
+        (when (shu-any-char-from-first-in-second delims value)
+          (setq quoted-value (concat "\"" quoted-value "\"")))
+        quoted-value
+    ))
+
+
+
+;;
+;;  shu-nvplist-to-string
+;;
+(defun shu-nvplist-to-string (nvplist)
+  "Return an NVPLIST as a atring."
+  (let ((nvpair)
+        (name)
+        (value)
+        (sepchar "")
+        (string-value ""))
+    (while nvplist
+      (setq nvpair (car nvplist))
+      (setq name (car nvpair))
+      (setq value (shu-nvplist-quoted-value (cdr nvpair)))
+      (when (string= (upcase name) "PW")
+        (setq value "........"))
+      (setq string-value (concat string-value sepchar name "=" value))
+      (setq sepchar " ")
+      (setq nvplist (cdr nvplist)))
+    string-value
+    ))
+
+
+
+;;
+;;  shu-nvplist-item-to-string
+;;
+(defun shu-nvplist-item-to-string (item)
+  "Return an ITEM (and its NVPLIST) as a string."
+  (let (
+        (item-number (shu-nvplist-get-item-number item))
+        (pitem-number)
+        (nvplist (shu-get-item-nvplist item))
+        (string-value "")
+        )
+    (setq pitem-number (shu-fixed-format-num item-number 8))
+    (concat pitem-number ": " (shu-nvplist-to-string nvplist))
+    ))
+
+
+
+
+;;
+;;  shu-nvplist-check-duplicates
+;;
+(defun shu-nvplist-check-duplicates (keys item buffer-name)
+  "ITEM is an ITEM produced by SHU-NVPLIST-PARSE-BUFFER.  The ITEM contains an
+NVPLIST.  KEYS is a list of names each of which is only allowed to have no more
+that one occurrence in the NVPLIST.  The NVPLIST mechanism does not constrain
+the number of times that a name may appear in a name value pair.  But a web site
+can have only one \"id\" and one \"pw\".  If the NVPLIST is used by
+SHU-KEYRING.EL, it makes no sense to have more than one instance of either
+\"id\" or \"pw\" in a given NVPLIST.
+
+The return value of this function is a count of the number of names in KEYS that
+occur more than once in the NVPLIST.  If the names in KEYS may appear at most
+once in a given NVPLIST, then the returned duplicate count must be zero if the
+NVPLIST meets the criteria of not having duplicate entries for the names
+specified in KEYS.
+
+BUFFER-NAME is the name of the buffer into which error messages are emitted if
+duplicate names are detected."
+  (let ((gb (get-buffer-create buffer-name))
+        (key-list keys)
+        (dup-count 0)
+        (key)
+        (vlist)
+        (item-number (shu-nvplist-get-item-number item)))
+    (while key-list
+      (setq key (car key-list))
+      (setq vlist (shu-nvplist-get-item-value key item))
+      (when (> (length vlist) 1)
+        (setq dup-count (1+ dup-count))
+        (princ (format "Item %d has %d instances of \"%s\"\n" item-number (length vlist) key) gb))
+      (setq key-list (cdr key-list)))
+    dup-count
+    ))
+
 (provide 'shu-nvplist)
 
 ;;; shu-nvplist.el ends here

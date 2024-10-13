@@ -174,4 +174,211 @@
     ))
 
 
+
+
+;;
+;;  shu-test-shu-nvplist-get-names-1
+;;
+(ert-deftest shu-test-shu-nvplist-get-names-1 ()
+  (let ((item
+         (cons 88
+         (list (cons "name" "fred") (cons "name" "bob") (cons "id" "mumble")
+               (cons "url" "www.fumble.com") (cons "uRl" "Jaguar XKE"))))
+         (actual)
+         (expected
+          (list
+           "id"
+           "name"
+           "url")))
+    (setq actual (shu-nvplist-get-names item))
+    (should actual)
+    (should (listp actual))
+    (should (equal actual expected))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-nvplist-quoted-value-1
+;;
+(ert-deftest shu-test-shu-nvplist-quoted-value-1 ()
+  (let ((value "Happy Birthday")
+        (expected "\"Happy Birthday\"")
+        (actual))
+    (setq actual (shu-nvplist-quoted-value value))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-nvplist-quoted-value-2
+;;
+(ert-deftest shu-test-shu-nvplist-quoted-value-2 ()
+  (let ((value "Happy=Birthday")
+        (expected "\"Happy=Birthday\"")
+        (actual))
+    (setq actual (shu-nvplist-quoted-value value))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-nvplist-quoted-value-3
+;;
+(ert-deftest shu-test-shu-nvplist-quoted-value-3 ()
+  (let ((value "Happy/Birthday")
+        (expected "\"Happy/Birthday\"")
+        (actual))
+    (setq actual (shu-nvplist-quoted-value value))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-nvplist-quoted-value-4
+;;
+(ert-deftest shu-test-shu-nvplist-quoted-value-4 ()
+  (let ((value "HappyBirthday")
+        (expected "HappyBirthday")
+        (actual))
+    (setq actual (shu-nvplist-quoted-value value))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-nvplist-to-string-1
+;;
+(ert-deftest shu-test-shu-nvplist-to-string-1 ()
+  (let ((data
+         (list
+          (cons "name" "fred") (cons "name" "bob") (cons "id" "mumble")
+          (cons "url" "www.fumble.com") (cons "car" "Jaguar XKE")))
+        (expected "name=fred name=bob id=mumble url=www.fumble.com car=\"Jaguar XKE\"")
+        (actual))
+    (setq actual (shu-nvplist-to-string data))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-nvplist-to-string-2
+;;
+(ert-deftest shu-test-shu-nvplist-to-string-2 ()
+  (let ((data
+         (list
+          (cons "name" "fred") (cons "name" "bob") (cons "id" "mumble")
+          (cons "url" "www.fumble.com") (cons "pw" "somesortofsecret") (cons "car" "Jaguar XKE")))
+        (expected "name=fred name=bob id=mumble url=www.fumble.com pw=........ car=\"Jaguar XKE\"")
+        (actual))
+    (setq actual (shu-nvplist-to-string data))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-nvplist-item-to-string-1
+;;
+(ert-deftest shu-test-shu-nvplist-item-to-string-1 ()
+  (let (
+        (item
+         (cons 88
+         (list
+          (cons "name" "fred") (cons "name" "bob") (cons "id" "mumble")
+          (cons "url" "www.fumble.com") (cons "car" "Jaguar XKE"))))
+        (expected "      88: name=fred name=bob id=mumble url=www.fumble.com car=\"Jaguar XKE\"")
+        (actual)
+        )
+    (setq actual (shu-nvplist-item-to-string item))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-nvplist-check-duplicates-1
+;;
+(ert-deftest shu-test-shu-nvplist-check-duplicates-1 ()
+  (let ((buffer-name shu-unit-test-buffer)
+        (item
+         (cons 88
+         (list (cons "name" "fred") (cons "name" "bob") (cons "id" "mumble")
+               (cons "url" "www.fumble.com") (cons "car" "Jaguar XKE"))))
+        (key-list
+         (list "account" "route" "id" "pw" "oldpw" "pin"))
+        (dup-count))
+    (setq dup-count (shu-nvplist-check-duplicates key-list item buffer-name))
+    (should dup-count)
+    (should (numberp dup-count))
+    (should (= 0 dup-count))
+    ))
+
+
+
+;;
+;;  shu-test-shu-nvplist-check-duplicates-2
+;;
+(ert-deftest shu-test-shu-nvplist-check-duplicates-2 ()
+  (let ((buffer-name shu-unit-test-buffer)
+        (item
+         (cons 77
+         (list (cons "name" "fred") (cons "name" "bob") (cons "id" "mumble")
+               (cons "id" "other") (cons "url" "www.fumble.com") (cons "pin" "1234")
+               (cons "pin" "45678") (cons "car" "Jaguar XKE"))))
+        (key-list
+         (list "account" "route" "id" "pw" "oldpw" "pin"))
+        (dup-count))
+    (setq dup-count (shu-nvplist-check-duplicates key-list item buffer-name))
+    (should dup-count)
+    (should (numberp dup-count))
+    (should (= 2 dup-count))
+    ))
+
+
+
+;;
+;;  shu-test-shu-nvplist-check-duplicates-3
+;;
+(ert-deftest shu-test-shu-nvplist-check-duplicates-3 ()
+  (let ((buffer-name shu-unit-test-buffer)
+        (item
+         (cons 105
+         (list (cons "name" "fred") (cons "name" "bob") (cons "id" "mumble")
+               (cons "id" "other") (cons "url" "www.fumble.com") (cons "pin" "1234")
+               (cons "pin" "45678") (cons "car" "Jaguar XKE")
+               (cons "account" "Happy") (cons "route" "123456")
+               (cons "oldpw" "old-one") (cons "pin" "hdhdhshdh")
+               (cons "account" "Birthday") (cons "route" "123456")
+               (cons "oldpw" "new-one"))))
+        (key-list
+         (list "account" "route" "id" "pw" "oldpw" "pin"))
+        (dup-count))
+    (setq dup-count (shu-nvplist-check-duplicates key-list item buffer-name))
+    (should dup-count)
+    (should (numberp dup-count))
+    (should (= 5 dup-count))
+    ))
+
+
 ;;; shu-nvplist.t.el ends here
