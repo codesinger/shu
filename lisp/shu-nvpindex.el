@@ -74,7 +74,9 @@
 ;;   -------------------
 ;;
 ;;
-;;  index:
+;;
+;;
+;;  Primary index:
 ;;
 ;;   is a list of key-item, each of which contains:
 ;;
@@ -90,7 +92,27 @@
 ;;        +-------------> Key
 ;;
 ;;  Given a key value, one can use (assoc), (assq), (assoc-default), etc. to find
-;;  the item associated with the key.
+;;  the ITEM associated with the key.
+;;
+;;
+;;  Secondary index:
+;;
+;;   is a list of key-item, each of which contains:
+;;
+;;
+;;   -------------------
+;;   |        |        |
+;;   |    o   |   o    |
+;;   |    |   |   |    |
+;;   -----|-------|-----
+;;        |       |
+;;        |       +-----> item-list
+;;        |
+;;        +-------------> Key
+;;
+;;  Given a key value, one can use (assoc), (assq), (assoc-default), etc. to find
+;;  the ITEM-LIST associated with the key.  The ITEM-LIST contains all ITEM that
+;;  are associated with the key.
 ;; ```
 ;;
 
@@ -101,7 +123,7 @@
 ;;  shu-nvpindex-get-item-from-key-item
 ;;
 (defmacro shu-nvpindex-get-item-from-key-item (key-item)
-  "Fetch the ITEM from an KEY-ITEM."
+  "Fetch the ITEM from a KEY-ITEM."
     `(cdr ,key-item)
     )
 
@@ -177,6 +199,66 @@ ITEM-LIST."
     ))
 
 
+
+
+;;
+;;  shu-nvpindex-make-secondary-index
+;;
+(defun shu-nvpindex-make-secondary-index (item-list name buffer-name)
+  "Create a secondary index from the ITEM-LIST using all values associated with
+NAME.  For each ITEM in the ITEM-LIST, find all values associated with NAME.
+For each such value create an entry in the alist whose key is the item value
+associated with the NAME and whose value is a list of all ITEM that hold that
+name value pair.
+
+If the secondary index is on \"id\" and there is an instance of \"id\" whose
+value is \"Fred\", then the secondary index will contain a key that is \"Fred\".
+The associated value for \"Fred\" is a list of all of the ITEM in which
+\"id=Fred\"."
+  (let ((gbuf      (get-buffer-create buffer-name))
+        (ilist item-list)
+        (item )
+        (index))
+    (while ilist
+      (setq item (car ilist))
+      (setq index (shu-nvpindex-update-secondary-index index name item))
+      (setq ilist (cdr ilist)))
+    (shu-nvpindex-show-secondary-index index buffer-name)
+    index
+    ))
+
+
+
+
+;;
+;;  shu-nvpindex-update-secondary-index
+;;
+(defun shu-nvpindex-update-secondary-index (index name item)
+  "A secondary INDEX is an alist.  The CAR (key) of each entry is the value
+associated with NAME.  The CDR (value) of each entry is the ITEM that holds the
+name value pair.
+This function adds a single ITEM to the INDEX."
+  (let ((vlist)
+        (value)
+        (item-list)
+        (new-item)
+        (added-item)
+        (debug-on-error t))
+    (setq vlist (shu-nvplist-get-item-value name item))
+    (while vlist
+      (setq value (car vlist))
+      (setq item-list (list item))
+      (setq new-item (cons value item-list))
+      (shu-add-to-alist added-item new-item index)
+      (when (not (eq added-item new-item))
+        (setq item-list (cdr added-item))
+        (push item item-list)
+        (setcdr added-item item-list))
+      (setq vlist (cdr vlist)))
+    index
+    ))
+
+
 ;;
 ;;  shu-nvpindex-show-index
 ;;
@@ -201,6 +283,39 @@ ITEM-LIST."
       (setq item-number (shu-nvplist-get-item-number item))
       (setq item-number-string (shu-fixed-format-num item-number 10))
       (princ (format "%s:  %s\n" item-number-string key) gbuf)
+      (setq tindex (cdr tindex)))
+    (princ (format "Index contains %d entries.\n" count)  gbuf)
+    ))
+
+
+;;
+;;  shu-nvpindex-show-secondary-index
+;;
+(defun shu-nvpindex-show-secondary-index (index buffer-name)
+  "Print a secondary index"
+  (let
+      ((gbuf      (get-buffer-create buffer-name))
+       (tindex  index)
+       (key-item-list )
+       (key     )
+       (item-list)
+       (item    )
+       (item-string)
+       (count   0))
+    (princ "     Item\n" gbuf)
+    (princ "    Number   Key ...\n" gbuf)
+    (while tindex
+      (setq count (1+ count))
+      (setq key-item-list (car tindex))
+      (setq key  (shu-nvpindex-get-key-from-key-item key-item-list))
+      (setq item-list (shu-nvpindex-get-item-from-key-item key-item-list))
+      (princ (concat "KEY: '" key "':\n") gbuf)
+      (while item-list
+        (setq item (car item-list))
+        (setq item-string (shu-nvplist-item-to-string item))
+        (princ (concat "    " item-string "\n") gbuf)
+        (setq item-list (cdr item-list))
+        )
       (setq tindex (cdr tindex)))
     (princ (format "Index contains %d entries.\n" count)  gbuf)
     ))

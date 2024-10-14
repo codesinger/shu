@@ -274,6 +274,7 @@ remember any two strings for any purpose.")
           (shu-nvplist-parse-file shu-keyring-file shu-keyring-file-type shu-keyring-item-list))
     (setq shu-keyring-index
           (shu-nvpindex-make-primary-index shu-keyring-item-list shu-keyring-msg-buffer-name))
+;;;    (shu-nvpindex-make-secondary-index shu-keyring-item-list "pw" shu-keyring-msg-buffer-name)
     ))
 
 
