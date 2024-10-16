@@ -109,12 +109,16 @@ removed from the end."
   "Call SHU-GET-REPO to find the path to the repository and put the result in
 the kill ring."
   (interactive)
-  (let ((repo (shu-get-repo)))
-    (if repo
-        (progn
-          (message "%s" repo)
-          (shu-kill-new repo))
-      (message "%s" "*** Not found ***"))
+  (let ((repo (shu-get-repo))
+        (branch (shu-git-find-branch))
+        (rstring ""))
+    (if (not repo)
+        (message "%s" "*** Not found ***")
+      (if (not branch)
+          (setq rstring repo)
+        (setq rstring (concat repo " (" branch ")")))
+      (message "%s" rstring)
+      (shu-kill-new repo))
     ))
 
 
@@ -124,12 +128,17 @@ the kill ring."
 ;;
 (defun shu-show-repo ()
   "Call SHU-GET-REPO to find the path to the repository and show the result in
-the minibuffer."
+the minibuffer along with the branch, if available."
   (interactive)
-  (let ((repo (shu-get-repo)))
-    (if repo
-        (message "%s" repo)
-      (message "%s" "*** Not found ***"))
+  (let ((repo (shu-get-repo))
+        (branch (shu-git-find-branch))
+        (rstring ""))
+    (if (not repo)
+        (message "%s" "*** Not found ***")
+      (if (not branch)
+          (setq rstring repo)
+        (setq rstring (concat repo " (" branch ")")))
+      (message "%s" rstring))
     ))
 
 
