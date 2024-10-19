@@ -2406,4 +2406,120 @@ outside of the narrowed region."
     ))
 
 
+
+
+;;
+;;  shu-test-shu-make-conditional-prompt-1
+;;
+(ert-deftest shu-test-shu-make-conditional-prompt-1 ()
+  (let* ((var)
+         (p1 "expected prompt")
+         (p2 "unexpected prompt")
+         (actual)
+         (expected p1))
+    (setq actual (shu-make-conditional-prompt var p1 p2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-make-conditional-prompt-2
+;;
+(ert-deftest shu-test-shu-make-conditional-prompt-2 ()
+  (let* ((var "HowdyDoody")
+         (p1 "unexpected prompt")
+         (p2 "exexpected prompt")
+         (actual)
+         (expected p2))
+    (setq actual (shu-make-conditional-prompt var p1 p2))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-conditional-bi-prompt-1
+;;
+(ert-deftest shu-test-shu-make-conditional-bi-prompt-1 ()
+  (let* ((var1)
+        (var2)
+        (p1 "Expected prompt")
+        (p2 "Unexpected prompt p2")
+        (p3 "Unexpected prompt p3")
+        (p4 "Unexpected prompt p4")
+        (actual)
+        (expected p1))
+    (setq actual (shu-make-conditional-bi-prompt var1 var2 p1 p2 p3 p4))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-conditional-bi-prompt-2
+;;
+(ert-deftest shu-test-shu-make-conditional-bi-prompt-2 ()
+  (let* ((var1 "HowdyDoody")
+        (var2)
+        (p1 "Unexpected prompt p1")
+        (p2 "Expected prompt p2")
+        (p3 "Unexpected prompt p3")
+        (p4 "Unexpected prompt p4")
+        (actual)
+        (expected p2))
+    (setq actual (shu-make-conditional-bi-prompt var1 var2 p1 p2 p3 p4))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-conditional-bi-prompt-3
+;;
+(ert-deftest shu-test-shu-make-conditional-bi-prompt-3 ()
+  (let* ((var1)
+        (var2 "HowdyDoody")
+        (p1 "Unexpected prompt p1")
+        (p2 "Unexpected prompt p2")
+        (p3 "Expected prompt p3")
+        (p4 "Unexpected prompt p4")
+        (actual)
+        (expected p3))
+    (setq actual (shu-make-conditional-bi-prompt var1 var2 p1 p2 p3 p4))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-make-conditional-bi-prompt-4
+;;
+(ert-deftest shu-test-shu-make-conditional-bi-prompt-4 ()
+  (let* ((var1 "Buffalo Bob")
+        (var2 "HowdyDoody")
+        (p1 "Unexpected prompt p1")
+        (p2 "Unexpected prompt p2")
+        (p3 "Unexpected prompt p3")
+        (p4 "Expected prompt p4")
+        (actual)
+        (expected p4))
+    (setq actual (shu-make-conditional-bi-prompt var1 var2 p1 p2 p3 p4))
+    (should actual)
+    (should (stringp actual))
+    (should (string= actual expected))
+    ))
+
+
 ;;; shu-base.t.el ends here

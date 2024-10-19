@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.163
+;; Version: 1.6.164
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -34,7 +34,7 @@
 ;;; Code:
 
 
-(defconst shu-version "1.6.163"
+(defconst shu-version "1.6.164"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2021 Dec 23"
@@ -1378,6 +1378,71 @@ For example, \"99+2\" has start 99 and end 101.  \"99-2\" has start 99 and end
             (setq range (cons start nil)))
         (setq range (cons nil nil))))
     range
+    ))
+
+
+
+
+;;
+;;  shu-make-conditional-prompt
+;;
+(defun shu-make-conditional-prompt (var p1 p2)
+  "Return a string that is expected, but not required, to be used in a prompt
+for a function such as READ-STRING.
+
+If VAR is nil, use P1 as the prompt.  if VAR is non-nil, use P2 as the prompt."
+  (let ((prompt (if var p2 p1)))
+    prompt
+    ))
+
+
+
+;;
+;;  shu-conditional-prompt-read
+;;
+(defun shu-conditional-prompt-read (var p1 p2)
+  "Return the value of READ-STRING with a prompt that depends on VAR.  If VAR is
+nil, use P1 as the prompt.  if VAR is non-nil, use P2 as the prompt."
+  (let ((prompt (shu-make-conditional-prompt var p1 p2)))
+    (read-string prompt)
+    ))
+
+
+
+;;
+;;  shu-make-conditional-bi-prompt
+;;
+(defun shu-make-conditional-bi-prompt (var1 var2 p1 p2 p3 p4)
+  "Return a string that is expected, but not required, to be used in a prompt
+for a function such as READ-STRING.
+
+If VAR1 and VAR2 are both nil, use P1 as the prompt.
+If VAR1 is non-nil and VAR2 is nil, use P2 as the prompt.
+If VAR1 is nil and VAR2 is non-nil, use P3 as the prompt.
+If VAR1 and VAR2 are both non-nil, use P4 as the prompt."
+  (let ((prompt))
+    (cond
+     ((and (not var1) (not var2))
+      (setq prompt p1))
+     ((and var1 (not var2))
+      (setq prompt p2))
+     ((and (not var1) var2)
+      (setq prompt p3))
+     (t
+      (setq prompt p4)))
+    prompt
+    ))
+
+
+
+;;
+;;  shu-conditional-bi-prompt-read
+;;
+(defun shu-conditional-bi-prompt-read (var1 var2 p1 p2 p3 p4)
+  "Return the value of READ-STRING with a prompt that depends on VAR.  If VAR is
+nil, use P1 as the prompt.  if VAR is non-nil, use P2 as the prompt."
+  (let ((prompt (shu-make-conditional-bi-prompt var1 var2 p1 p2 p3 p4)))
+    (read-string prompt)
     ))
 
 
