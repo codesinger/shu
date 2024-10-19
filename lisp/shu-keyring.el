@@ -540,7 +540,9 @@ has been placed in the clipboard, (PW, ID, etc.)"
 ;;
 (defun shu-keyring-set-passphrase (phrase)
   "Function to read and set the external pass phrase."
-  (interactive "sPass phrase?: ")
+  (interactive (list
+                (shu-conditional-prompt-read shu-keyring-external-passphrase
+                                             "Pass phrase?: " "REPLACE Pass phrase?: ")))
   (setq shu-keyring-external-passphrase phrase)
   )
 
@@ -563,14 +565,14 @@ has been placed in the clipboard, (PW, ID, etc.)"
     ))
 
 
-
-
 ;;
 ;;  shu-keyring-set-alternate-passphrase
 ;;
 (defun shu-keyring-set-alternate-passphrase (phrase)
   "Function to read and set the alternate external pass phrase."
-  (interactive "sPass phrase?: ")
+  (interactive (list
+                (shu-conditional-prompt-read shu-keyring-alternate-passphrase
+                                             "Pass phrase?: " "REPLACE Pass phrase?: ")))
   (setq shu-keyring-alternate-passphrase phrase)
   )
 
@@ -607,7 +609,13 @@ The two strings are separated by a delimiter, which is defined by the first
 character of the string.  If you wish to set an ID of \"Fred\" and a password of
 \"Happy Birthday,\" then a string you might enter would be
 \"$Fred$HappyBirthday\" or \"/Fred/HappyBirthday\""
-  (interactive "sID pair?: ")
+  (interactive (list
+                (shu-conditional-bi-prompt-read shu-keyring-x-id shu-keyring-x-pw
+                                                "ID pair?: "
+                                                "Replace ID / new PW?: "
+                                                "New ID / replace PW?: "
+                                                "Replace ID pair?: "
+                                                )))
   (let ((rval (shu-extract-replacement-strings id-string)))
     (if (not rval)
         (progn
@@ -665,7 +673,9 @@ used as input to SHU-KEYRING-SET-X-BOTH."
 The combination of SHU-X-ID and SHU-X-PW are assumed to represent the user ID
 and password for an arbitrary application but can be used to remember any two
 strings for any purpose."
-  (interactive "sID?: ")
+  (interactive (list
+                (shu-conditional-prompt-read shu-keyring-x-id
+                                             "ID?: " "REPLACE ID?: ")))
     (setq shu-keyring-x-id id-string)
     )
 
@@ -701,10 +711,12 @@ to remember any two strings for any purpose."
 application.  The combination of SHU-X-ID and SHU-X-PW are assumed to represent
 the user ID and password for an arbitrary application but can be used to
 remember any two strings for any purpose."
-  (interactive "sPW?: ")
+  (interactive (list
+                (shu-conditional-prompt-read shu-keyring-x-pw
+                                             "PW?: " "REPLACE PW?: ")))
     (setq shu-keyring-x-pw pw-string)
-    )
 
+)
 
 
 ;;
