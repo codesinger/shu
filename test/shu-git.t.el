@@ -90,4 +90,52 @@
     (should (string= expected actual))
     ))
 
+
+
+
+;;
+;;  shu-test-shu-git-internal-pop-branch-1
+;;
+(ert-deftest shu-test-shu-git-internal-pop-branch-1 ()
+  (let ((repo-branch))
+    (setq shu-git-branch-stack nil)
+    (setq repo-branch (shu-git-internal-pop-branch))
+    (should (not repo-branch))
+    ))
+
+
+
+
+;;
+;;  shu-test-shu-git-internal-pop-branch-2
+;;
+(ert-deftest shu-test-shu-git-internal-pop-branch-2()
+  (let* ((repo "Bob")
+         (branch "Alice")
+         (expected (cons repo branch))
+         (actual))
+    (shu-git-internal-push-branch repo branch)
+    (setq actual (shu-git-internal-pop-branch))
+    (should actual)
+    (should (consp actual))
+    (should (equal actual expected))
+    ))
+
+
+
+;;
+;;  shu-test-shu-git-internal-get-top-branch-1
+;;
+(ert-deftest shu-test-shu-git-internal-get-top-branch-1 ()
+  (let* ((repo "Bob")
+         (branch "Alice")
+         (expected (cons repo branch))
+         (actual))
+    (shu-git-internal-push-branch repo branch)
+    (setq actual (shu-git-internal-get-top-branch))
+    (should actual)
+    (should (consp actual))
+    (should (equal actual expected))
+    ))
+
 ;;; shu-git.t.el ends here

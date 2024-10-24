@@ -35,6 +35,13 @@
 
 
 
+(defconst shu-git-branch-stack nil
+  "A stack of cons cells, each of which holds a repository name and a branch.")
+
+(defconst shu-git-buffer-name "**shu-git**"
+  "Name of buffer used to trace git interatcions.")
+
+
 ;;
 ;;  shu-get-git-name
 ;;
@@ -273,7 +280,7 @@ of the repository."
   "This function tries to get the name of the current git repository
 from the .git/config file.  Returns nil if it cannot open .git/config."
   (let (
-        (gb (get-buffer-create shu-trace-buffer))
+        (gb (get-buffer-create shu-git-buffer-name))
         (git-url)
         (ret-val)
         (repo-name)
@@ -447,13 +454,15 @@ if the given HASH is not a valid git revision."
 (defun shu-git-add-file (filename)
   "Do a \"git add\" for FILENAME.  Return empty string if add succeeds.  Otherwise,
 return git error message."
-  (let ((result))
+  (let ((gb (get-buffer-create shu-git-buffer-name))
+        (action "add")
+        (result))
+    (princ (concat "git " action " " filename "\n") gb)
     (with-temp-buffer
-      (call-process "git" nil (current-buffer) nil "add" filename)
+      (call-process "git" nil (current-buffer) nil action filename)
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
     (setq result (shu-trim-trailing result))
-    (when (not (string= result ""))
-      (setq result (concat "After git add " filename ":\n" result)))
+    (princ (concat result "\n") gb)
     result
     ))
 
@@ -668,11 +677,15 @@ files that are not under git control."
 
 Return a cons cell whose CAR is t if the move succeeded and whose CDR is the
 output of the git move command."
-  (let ((rc)
+  (let ((gb (get-buffer-create shu-git-buffer-name))
+        (rc)
+        (action "mv")
         (result))
+    (princ (concat "git " action " " old-file " " new-file "\n") gb)
     (with-temp-buffer
-      (setq rc (call-process "git" nil (current-buffer) nil "mv" old-file new-file))
+      (setq rc (call-process "git" nil (current-buffer) nil action old-file new-file))
       (setq result (buffer-substring-no-properties (point-min) (point-max))))
+    (princ (concat result "\n") gb)
     (cons (= rc 0) result)
     ))
 
@@ -692,6 +705,173 @@ what operation is being done."
 
 
 ;;
+;;  shu-git-checkout-branch
+;;
+(defun shu-git-checkout-branch (branch)
+  "Call SHU-GIT-INTERNAL-CHECKOUT-BRANCH to tell git to checkout BRANCH,]."
+  (let ((new-branch))
+    (shu-git-internal-checkout-branch branch)
+    (setq new-branch (shu-git-find-branch))
+    (when (not (string= new-branch branch))
+      (setq new-branch nil))
+    new-branch
+    ))
+
+
+
+;;
+;;  shu-git-internal-checkout-branch
+;;
+(defun shu-git-internal-checkout-branch (branch)
+  "Call SHU-GIT-INTERNAL-CHECKOUT-BRANCH to tell git to checkout BRANCH.  Then
+call SHU-GIT-FIND-BRANCH to find the new branch name and compare the two.  If we
+are actually on that branch, return the banch name, else return nil."
+  (let ((gb (get-buffer-create shu-git-buffer-name))
+        (action "checkout")
+        (result))
+    (princ (concat "git " action " " branch "\n") gb)
+    (with-temp-buffer
+      (call-process "git" nil (current-buffer) nil action branch)
+      (setq result (buffer-substring-no-properties (point-min) (point-max))))
+    (setq result (shu-trim-trailing result))
+    (princ (concat result "\n") gb)
+    ))
+
+
+
+
+;;
+;;  shu-git-push-branch
+;;
+(defun shu-git-push-branch ()
+  "Save the current repository name and branch on the branch stack.  This may be
+used later by SHU-GIT-POP-BRANCH to restore to the current branch."
+  (interactive)
+  (let ((repo (shu-get-repo))
+        (branch (shu-git-find-branch)))
+    (if (not repo)
+        (progn
+          (ding)
+          (message "%s" "Cannot find current repository"))
+      (if (not branch)
+          (progn
+            (ding)
+            (message "%s" "Cannot find current branch"))
+        (shu-git-internal-push-branch repo branch)
+        (message "%s (%s)" repo branch)))
+    ))
+
+
+
+;;
+;;  shu-git-pop-branch
+;;
+(defun shu-git-pop-branch ()
+  "Restore to the branch that is on the top of the branch stack iff the
+repository name associated with that branch matches the current git repository.
+If for some reason we cannot restore to the branch, the branch stack remains
+unaltered."
+  (interactive)
+  (let ((current-repo (shu-get-repo))
+        (repo-branch (shu-git-internal-get-top-branch))
+        (repo)
+        (branch)
+        (new-branch))
+    (when current-repo
+      (when repo-branch
+        (setq repo (car repo-branch))
+        (setq branch (cdr repo-branch))
+        (if (not (string= current-repo repo))
+            (progn
+              (ding)
+              (message "Saved branch %s not in current repository %s" branch current-repo))
+          (setq new-branch (shu-git-checkout-branch branch))
+          (if (not new-branch)
+              (progn
+                (ding)
+                (message "Cannot check out branch %s" branch))
+            (shu-git-internal-pop-branch)
+            (shu-git-show-branch)))))
+    ))
+
+
+
+;;
+;;  shu-git-internal-push-branch
+;;
+(defun shu-git-internal-push-branch (repo branch)
+  "Push REPO and BRANCH onto the branch stack as a cons cell."
+  (let ((repo-branch (cons repo branch)))
+    (push repo-branch shu-git-branch-stack)
+    ))
+
+
+
+
+;;
+;;  shu-git-internal-pop-branch
+;;
+(defun shu-git-internal-pop-branch ()
+  "Return the top of the branch stack if the branch stack is not empty."
+  (let ((repo-branch))
+    (if (not shu-git-branch-stack)
+        (progn
+          (ding)
+          (message "%s" "branch stack is empty"))
+      (setq repo-branch (pop shu-git-branch-stack)))
+    repo-branch
+    ))
+
+
+
+;;
+;;  shu-git-internal-get-top-branch
+;;
+(defun shu-git-internal-get-top-branch ()
+  "Return the top entry on the branch stack if the branch stack is not empty,
+else return nil."
+  (let ((repo-branch))
+    (if (not shu-git-branch-stack)
+        (progn
+          (ding)
+          (message "%s" "branch stack is empty"))
+      (setq repo-branch (car shu-git-branch-stack)))
+    repo-branch
+    ))
+
+
+
+;;
+;;  shu-git-dump-branch-stack
+;;
+(defun shu-git-dump-branch-stack ()
+  "Dumop the current branch stack to the git interaction buffer."
+  (interactive)
+  (let ((gb (get-buffer-create shu-git-buffer-name))
+        (bs shu-git-branch-stack)
+        (repo-branch)
+        (repo)
+        (branch)
+        (item 0))
+    (princ "\n" gb)
+    (if (not bs)
+        (princ "Branch stack is empty\n" gb)
+      (while bs
+        (setq repo-branch (car bs))
+        (setq repo (car repo-branch))
+        (setq branch (cdr repo-branch))
+        (princ (format "%d:\n" item) gb)
+        (princ (concat "    " repo "\n") gb)
+        (princ (concat "    " branch "\n") gb)
+        (setq item (1+ item))
+        (setq bs (cdr bs))))
+    (princ "\n" gb)
+    ))
+
+
+
+
+;;
 ;;  shu-git-set-alias
 ;;
 (defun shu-git-set-alias ()
@@ -705,6 +885,9 @@ shu- prefix removed."
   (defalias 'copy-branch 'shu-git-copy-branch)
   (defalias 'copy-repo 'shu-copy-repo)
   (defalias 'show-repo 'shu-show-repo)
+  (defalias 'push-branch 'shu-git-push-branch)
+  (defalias 'pop-branch 'shu-git-pop-branch)
+  (defalias 'dump-branch-stack 'shu-git-dump-branch-stack)
   (defalias 'insb 'shu-git-insert-branch)
   (defalias 'inso 'shu-git-insert-origin-branch)
   (defalias 'gco 'shu-git-insert-checkout-default)
