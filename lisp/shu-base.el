@@ -4,7 +4,7 @@
 ;;
 ;; Package: shu-base
 ;; Author: Stewart L. Palmer <stewart@stewartpalmer.com>
-;; Version: 1.6.165
+;; Version: 1.6.166
 ;; Homepage: https://github.com/codesinger/shu.git
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -34,7 +34,7 @@
 ;;; Code:
 
 
-(defconst shu-version "1.6.165"
+(defconst shu-version "1.6.166"
   "The version number of the Shu elisp package.")
 
 (defconst shu-date "2021 Dec 23"
@@ -234,7 +234,7 @@ to a text editor that this file contains C++ code."
 
 (defcustom shu-record-visited-files t
   "True if all files visited are to be recorded in ~/visited-files.log"
-  :type '(string)
+  :type 'boolean
   :group 'shu-base)
 
 
