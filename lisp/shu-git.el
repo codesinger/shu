@@ -645,6 +645,49 @@ then the -s option is added to the commit command."
 
 
 ;;
+;;  shu-git-get-config
+;;
+(defun shu-git-get-config (key)
+  "Return the result of the command \"git config --get\" for the given KEY."
+  (let ((result))
+    (with-temp-buffer
+      (call-process "git" nil (current-buffer) nil "config" "--get" key)
+      (setq result (buffer-substring-no-properties (point-min) (1- (point-max)))))
+    result
+    ))
+
+
+
+;;
+;;  shu-git-get-author
+;;
+(defun shu-git-get-author ()
+  "Return the git author string which is composed of the git config values
+user.name and user.email in the form of \"name <email>.\""
+  (let ((name (shu-git-get-config "user.name"))
+        (email (shu-git-get-config "user.email"))
+        (author ""))
+    (setq author (concat name " <" email ">"))
+    author
+    ))
+
+
+
+;;
+;;  shu-git-insert-git-signoff
+;;
+(defun shu-git-insert-git-signoff ()
+  "Insert at point, the phrase \"Signed-off-by: \" followed by the identity
+of the git author of this repository."
+  (interactive)
+  (let ((author (shu-git-get-author))
+        (signoff "Signed-off-by: "))
+    (insert (concat signoff author))
+    ))
+
+
+
+;;
 ;;  shu-git-is-file-in-git
 ;;
 (defun shu-git-is-file-in-git (filename)
@@ -907,6 +950,7 @@ shu- prefix removed."
   (defalias 'gpl 'shu-git-insert-pull-origin-branch)
   (defalias 'gps 'shu-git-insert-push-origin-branch)
   (defalias 'gcm 'shu-git-insert-git-commit)
+  (defalias 'gcs 'shu-git-insert-git-signoff)
   )
 
 
