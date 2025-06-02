@@ -366,6 +366,15 @@ given task as a Google test."
 )
 
 ;;
+;;  homecare - Visit the PAC home care directory
+;;
+(defun homecare ()
+  "Visit the PAC home care directory."
+  (interactive)
+  (dired "~/projects/personal/pcoker/hospital/home-health-care")
+)
+
+;;
 ;;  yspring - Visit the course directory for Spring 2014
 ;;
 (defun yspring ()
